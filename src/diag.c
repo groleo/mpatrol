@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.64 2001-03-04 14:23:34 graeme Exp $"
+#ident "$Id: diag.c,v 1.65 2001-03-04 14:29:00 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.64 2001-03-04 14:23:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.65 2001-03-04 14:29:00 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -584,7 +584,10 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
-    vfprintf(logfile, s, v);
+    if ((s == NULL) && (errordetails[e].format != NULL))
+        vfprintf(logfile, errordetails[e].format, v);
+    else
+        vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
     if (((__mp_diagflags & FLG_EDIT) || (__mp_diagflags & FLG_LIST)) &&
@@ -598,7 +601,10 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             if (f != AT_MAX)
                 fprintf(stderr, "%s: ", __mp_functionnames[f]);
             va_start(v, s);
-            vfprintf(stderr, s, v);
+            if ((s == NULL) && (errordetails[e].format != NULL))
+                vfprintf(stderr, errordetails[e].format, v);
+            else
+                vfprintf(stderr, s, v);
             va_end(v);
             fputc('\n', stderr);
         }
@@ -628,7 +634,10 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
-    vfprintf(logfile, s, v);
+    if ((s == NULL) && (errordetails[e].format != NULL))
+        vfprintf(logfile, errordetails[e].format, v);
+    else
+        vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
     if (((__mp_diagflags & FLG_EDIT) || (__mp_diagflags & FLG_LIST)) &&
@@ -642,7 +651,10 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             if (f != AT_MAX)
                 fprintf(stderr, "%s: ", __mp_functionnames[f]);
             va_start(v, s);
-            vfprintf(stderr, s, v);
+            if ((s == NULL) && (errordetails[e].format != NULL))
+                vfprintf(stderr, errordetails[e].format, v);
+            else
+                vfprintf(stderr, s, v);
             va_end(v);
             fputc('\n', stderr);
         }
