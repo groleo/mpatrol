@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.252 2001-09-26 21:50:09 graeme Exp $
+@c $Id: mpatrol.texi,v 1.253 2001-12-05 22:09:23 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.13
 @set VERSION 1.4.8
-@set UPDATED 26th September, 2001
+@set UPDATED 5th December, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -246,8 +246,9 @@ command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve
 McIntyre (@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the
 @code{fork()} problem and provided example code on how to fix it.  Boris
 Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
-initial testing for the FreeBSD port, and Ivan Finch (@email{i.finch@@rl.ac.uk})
-and Andreas Schallenberg
+initial testing for the FreeBSD port, and Ivan Finch
+(@email{i.finch@@rl.ac.uk}), Gerrit Bruchhaeuser
+(@email{gbruchhaeuser@@orga.com}) and Andreas Schallenberg
 (@email{andreas.schallenberg@@informatik.uni-oldenburg.de}) did the same for the
 Tru64 and SuSE ports.  Both Aleksandar Donev (@email{donev@@pa.msu.edu}) and Van
 Snyder (@email{vsnyder@@math.jpl.nasa.gov}) provided suggestions and code for
@@ -3736,6 +3737,13 @@ the log file to use, or @file{progfile.log} if it can't find that.  The
 randomly-accessable.  Note also that the @command{mpsym} command supports the
 @option{--help} and @option{--version} options in common with the other mpatrol
 command line tools.
+
+@cindex --skip
+If the mpatrol library cannot determine the name of a symbol for display in the
+log file then it will mark the symbol as @samp{???}.  If the debugger that is
+being used by @command{mpsym} also has problems determining the name of the
+symbol then you can pass the @option{--skip} option to @command{mpsym} to
+instruct it to skip any symbols marked as @samp{???} in the log file.
 
 The @command{mpsym} command currently uses @command{gdb} as the debugger with
 which to obtain the additional information about the code addresses in the
@@ -9998,13 +10006,13 @@ be determined, these will be replaced with @samp{today} and @samp{now}
 respectively.
 
 All of the following options (except @option{--dynamic}, @option{--help},
-@option{--show-env}, @option{--threads} and @option{--version}) correspond to
-their listed mpatrol library option (@pxref{Environment}).  Note that some of
-these options have a one character equivalent option that can be used for
-brevity.  The list of one character options can be viewed with the
-@option{--help} option or viewed in the UNIX manual pages.  Such options are
-parsed on the command line in a similar way to the UNIX function
-@code{getopt()}.
+@option{--read-env}, @option{--show-env}, @option{--threads} and
+@option{--version}) correspond to their listed mpatrol library option
+(@pxref{Environment}).  Note that some of these options have a one character
+equivalent option that can be used for brevity.  The list of one character
+options can be viewed with the @option{--help} option or viewed in the UNIX
+manual pages.  Such options are parsed on the command line in a similar way to
+the UNIX function @code{getopt()}.
 
 @table @asis
 @cindex --alloc-byte
@@ -10220,6 +10228,13 @@ memory allocation profiling information from the mpatrol library.
 @item @option{--prog-file} <@var{string}>
 [@option{PROGFILE}]  Specifies an alternative filename with which to locate the
 executable file containing the program's symbols.
+
+@cindex --read-env
+@item @option{--read-env}
+Reads and passes through the contents of the @env{MPATROL_OPTIONS} environment
+variable.  Such contents will be placed before any of the options resulting from
+@command{mpatrol} command line options so that they can be overridden and will
+only be parsed by the mpatrol library, @emph{not} the @command{mpatrol} command.
 
 @cindex --realloc-stop
 @item @option{--realloc-stop} <@var{unsigned-integer}>
@@ -12619,12 +12634,10 @@ could support @file{-} as the filename for reading the mpatrol log file from the
 standard input file stream.
 
 @item
-Perhaps add an option to the @command{mpatrol} command to read in the current
-value of the @env{MPATROL_OPTIONS} environment variable before adding options
-to it.  Another good idea might be to have the @command{mpatrol} command read
-options from a configuration file instead of an environment variable, but that
-will only work if it doesn't involve allocating any memory before the mpatrol
-library has been initialised.
+A good idea might be to have the @command{mpatrol} command read options from a
+configuration file instead of an environment variable, but that will only work
+if it doesn't involve allocating any memory before the mpatrol library has been
+initialised.
 
 @item
 Perhaps incorporate a C++ encoded name demangler into the mpatrol library.  The
@@ -13468,7 +13481,8 @@ Why does the @command{mpatrol} command ignore the current value of the
 Because I would most likely get lots of bug reports or queries from people who
 had forgotten that they had set some options in the environment variable and had
 then not seen the expected behaviour from the options they specified to the
-@command{mpatrol} command.
+@command{mpatrol} command.  Recently, though, I've added the @option{--read-env}
+option so that this can be achieved.
 
 @item
 Why do I get an error from the dynamic linker about not being able to locate
