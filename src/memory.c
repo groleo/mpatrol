@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.53 2001-02-27 19:40:53 graeme Exp $"
+#ident "$Id: memory.c,v 1.54 2001-03-05 19:27:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.53 2001-02-27 19:40:53 graeme Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.54 2001-03-05 19:27:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -253,7 +253,7 @@ progname(void)
     extern char **p_xargv;
 #elif SYSTEM == SYSTEM_HPUX
     extern char **__argv_value;
-#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_TRU64
     extern char **__Argv;
 #elif SYSTEM == SYSTEM_UNIXWARE
     extern char **___Argv;
@@ -285,9 +285,9 @@ progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-    /* AIX, HP/UX, IRIX, SINIX and UnixWare have global variables containing
-     * argc and argv which we can use to determine the filename that the
-     * program was invoked with.
+    /* AIX, HP/UX, IRIX, SINIX, Tru64 and UnixWare have global variables
+     * containing argc and argv which we can use to determine the filename
+     * that the program was invoked with.
      */
 #if SYSTEM == SYSTEM_AIX
     if (p_xargv[0] != NULL)
@@ -295,7 +295,7 @@ progname(void)
 #elif SYSTEM == SYSTEM_HPUX
     if (__argv_value[0] != NULL)
         return __argv_value[0];
-#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_TRU64
     if (__Argv[0] != NULL)
         return __Argv[0];
 #elif SYSTEM == SYSTEM_UNIXWARE
