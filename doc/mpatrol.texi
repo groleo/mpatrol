@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.265 2005-03-09 01:00:20 graeme Exp $
+@c $Id: mpatrol.texi,v 1.266 2005-03-10 00:16:28 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2146,8 +2146,9 @@ similar functions with a size of zero, the @option{CHECKREALLOCS} option warns
 only about calls to @code{realloc()} and similar functions with either a null
 pointer or a size of zero, and the @option{CHECKFREES} option warns only about
 calls to @code{free()} and similar functions with a null pointer.  The
-@option{CHECKMEMORY} option gives an error if a zero-size memory operation is
-performed on a @samp{NULL} pointer --- this is normally allowed by default.
+@option{CHECKMEMORY} option gives a warning if a zero-size memory operation is
+performed or an error if a memory operation is performed on a @samp{NULL}
+pointer --- this is normally allowed by default.
 
 @cindex allocation byte
 @cindex free byte
@@ -9789,8 +9790,8 @@ will be issued for every such case.
 
 @cindex CHECKMEMORY
 @item @option{CHECKMEMORY}
-Checks that no attempt is made to perform a zero-length memory operation on a
-@samp{NULL} pointer.
+Checks that no attempt is made to perform a zero-length memory operation or a
+memory operation on a @samp{NULL} pointer.
 
 @cindex CHECKREALLOCS
 @item @option{CHECKREALLOCS}
@@ -10247,7 +10248,7 @@ in case new log, profiling and tracing output files need to be started.
 @cindex --check-memory
 @item @option{--check-memory}
 [@option{CHECKMEMORY}]  Checks that no attempt is made to perform a zero-length
-memory operation on a @code{NULL} pointer.
+memory operation or a memory operation on a @code{NULL} pointer.
 
 @cindex --check-reallocs
 @item @option{--check-reallocs}

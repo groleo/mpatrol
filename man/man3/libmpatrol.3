@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.38 2002-02-04 23:51:24 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.39 2005-03-10 00:21:13 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "4 February 2002" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -1259,8 +1259,8 @@ Checks that no attempt is made to deallocate a \fBNULL\fP pointer.  A warning
 will be issued for every such case.
 .TP
 \fBCHECKMEMORY\fP
-Checks that no attempt is made to perform a zero-length memory operation on a
-\fBNULL\fP pointer.
+Checks that no attempt is made to perform a zero-length memory operation or a
+memory operation on a \fBNULL\fP pointer.
 .TP
 \fBCHECKREALLOCS\fP
 Checks that no attempt is made to reallocate a \fBNULL\fP pointer or resize an

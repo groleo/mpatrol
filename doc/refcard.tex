@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.34 2005-03-09 01:00:21 graeme Exp $
+% $Id: refcard.tex,v 1.35 2005-03-10 00:16:28 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -177,8 +177,8 @@ an existing block of memory to size zero.
 \item[\option{CHECKFREES}]
 Checks that no attempt is made to deallocate a \texttt{NULL} pointer.
 \item[\option{CHECKMEMORY}]
-Checks that no attempt is made to perform a zero-length memory operation on a
-\texttt{NULL} pointer.
+Checks that no attempt is made to perform a zero-length memory operation or a
+memory operation on a \texttt{NULL} pointer.
 \item[\option{CHECKALL}]
 Equivalent to the \option{CHECKALLOCS}, \option{CHECKREALLOCS},
 \option{CHECKFREES} and \option{CHECKMEMORY} options specified together.
