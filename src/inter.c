@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.13 2000-02-29 23:08:31 graeme Exp $"
+#ident "$Id: inter.c,v 1.14 2000-03-07 21:33:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -262,7 +262,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
         __mp_init();
     if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
         __mp_checkinfo(&memhead);
-    if (memhead.prologue)
+    if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue((void *) -1, l);
     /* Determine the call stack details.
      */
@@ -278,7 +278,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
     }
   retry:
     p = __mp_getmemory(&memhead, l, a, f, s, t, u, &i);
-    if (memhead.epilogue)
+    if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
      */
@@ -287,7 +287,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
         memhead.nomemory();
         if ((f == AT_NEW) || (f == AT_NEWVEC))
         {
-            if (memhead.prologue)
+            if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue((void *) -1, l);
             goto retry;
         }
@@ -320,7 +320,7 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         __mp_init();
     if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
         __mp_checkinfo(&memhead);
-    if (memhead.prologue)
+    if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -2);
     /* Determine the call stack details.
      */
@@ -346,7 +346,7 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
             __mp_memcopy(p, o, n + 1);
     }
-    if (memhead.epilogue)
+    if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
      */
@@ -378,7 +378,7 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         __mp_init();
     if (checkrange(memhead.lrange, memhead.count, memhead.urange))
         __mp_checkinfo(&memhead);
-    if (memhead.prologue)
+    if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, l);
     /* Determine the call stack details.
      */
@@ -393,7 +393,7 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         }
     }
     p = __mp_resizememory(&memhead, p, l, a, f, s, t, u, &i);
-    if (memhead.epilogue)
+    if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
      */
@@ -426,7 +426,7 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
         __mp_init();
     if (checkrange(memhead.lrange, memhead.count, memhead.urange))
         __mp_checkinfo(&memhead);
-    if (memhead.prologue)
+    if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -1);
     /* Determine the call stack details.
      */
@@ -441,7 +441,7 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
         }
     }
     __mp_freememory(&memhead, p, f, s, t, u, &i);
-    if (memhead.epilogue)
+    if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1);
     restoresignals();
 }
