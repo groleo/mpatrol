@@ -31,12 +31,13 @@
 #include "info.h"
 #include "diag.h"
 #include "utils.h"
+#include "version.h"
 #include <stdio.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.29 2000-11-13 21:44:06 graeme Exp $"
+#ident "$Id: profile.c,v 1.30 2000-11-15 00:02:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -343,6 +344,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
     profnode *n;
     FILE *f;
     size_t i, j, l;
+    unsigned long v;
 
     p->autocount = 0;
     /* The profiling file name can also be named as stderr and stdout which
@@ -370,9 +372,11 @@ MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
      * continue writing the rest of the file.
      */
     i = 1;
+    v = MP_VERNUM;
     __mp_memcopy(s, (char *) MP_PROFMAGIC, 4);
     fwrite(s, sizeof(char), 4, f);
     fwrite(&i, sizeof(size_t), 1, f);
+    fwrite(&v, sizeof(unsigned long), 1, f);
     fwrite(&p->sbound, sizeof(size_t), 1, f);
     fwrite(&p->mbound, sizeof(size_t), 1, f);
     fwrite(&p->lbound, sizeof(size_t), 1, f);
