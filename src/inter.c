@@ -35,7 +35,8 @@
 #if MP_THREADS_SUPPORT
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
-#if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || TARGET == TARGET_WINDOWS
+#if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
+    (TARGET == TARGET_WINDOWS && !defined(__GNUC__))
 #include "sbrk.h"
 #endif /* TARGET && __GNUC__ */
 #include "option.h"
@@ -46,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.63 2001-01-25 13:37:52 graeme Exp $"
+#ident "$Id: inter.c,v 1.64 2001-01-25 21:38:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -69,7 +70,7 @@ void _Inuse_close(void);
 static infohead memhead;
 
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
 /* These are global variables used by the Microsoft C run-time library to
  * indicate initialisation of the environment variables, the exit function
  * table and the streams buffers respectively.  The run-time library calls
@@ -95,7 +96,7 @@ msvcrt_initialised(void)
         return 1;
     return 0;
 }
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
 
 
 #if MP_INIT_SUPPORT
@@ -512,7 +513,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     loginfo v;
     int j, z;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we must
      * allocate new memory with sbrk().  We don't even attempt to do anything
      * with calls to memalign(), valloc() and pvalloc() but these shouldn't
@@ -531,7 +532,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
             __mp_memset(p, 0, l);
         return p;
     }
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -636,7 +637,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     size_t n;
     int j, z;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we must
      * allocate new memory with sbrk() and copy the string to the new
      * allocation.
@@ -663,7 +664,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             abort();
         return o;
     }
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -764,14 +765,14 @@ void *
 __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              unsigned long u, char *g, size_t h, size_t k)
 {
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     void *q;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     stackinfo i;
     loginfo v;
     int j, z;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we must
      * allocate new memory with sbrk() and copy the old contents to the new
      * allocation.  We can't free the old allocation as we know nothing
@@ -796,7 +797,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             abort();
         return q;
     }
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -882,14 +883,14 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     loginfo v;
     int j;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then just
      * return since we know nothing about any of the prior allocations anyway.
      */
     if (!msvcrt_initialised() || memhead.fini)
-#else /* TARGET */
+#else /* TARGET && __GNUC__ */
     if (memhead.fini)
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
         return;
     savesignals();
     if (!memhead.init)
@@ -1495,13 +1496,13 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     loginfo v;
     unsigned long u;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
     if (!msvcrt_initialised())
         return;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -1552,13 +1553,13 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     loginfo v;
     unsigned long u;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
     if (!msvcrt_initialised())
         return;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -1609,13 +1610,13 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     loginfo v;
     unsigned long u;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
     if (!msvcrt_initialised())
         return;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -1666,13 +1667,13 @@ chkr_check_str(char *p, unsigned char a)
     size_t l;
     unsigned long u;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
     if (!msvcrt_initialised())
         return;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -1722,13 +1723,13 @@ chkr_check_exec(void *p)
     loginfo v;
     unsigned long u;
 
-#if TARGET == TARGET_WINDOWS
+#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
     if (!msvcrt_initialised())
         return;
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
     savesignals();
     if (!memhead.init)
         __mp_init();
