@@ -28,11 +28,13 @@
 
 
 #include "trace.h"
+#include "diag.h"
 #include <stdio.h>
+#include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.1 2000-11-30 19:59:33 graeme Exp $"
+#ident "$Id: trace.c,v 1.2 2000-11-30 20:38:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -42,24 +44,72 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/* Initialise the fields of a tracehead so that the mpatrol library
- * is ready to trace memory allocations and open the tracing output file.
+/* The file pointer to the tracing output file.  This should not really be
+ * a file scope variable as it prevents this module from being re-entrant.
  */
 
-MP_GLOBAL void __mp_newtrace(tracehead *t, char *f)
+static FILE *tracefile;
+
+
+/* Initialise the fields of a tracehead so that the mpatrol library
+ * is ready to trace memory allocations.
+ */
+
+MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
 {
-    t->file = f;
+    t->file = __mp_tracefile(m, NULL);
     t->tracing = 0;
+    tracefile = NULL;
 }
 
 
-/* Finish tracing and close the tracing output file.
+/* Finish tracing and attempt to close the tracing output file.
  */
 
-MP_GLOBAL void __mp_endtrace(tracehead *t)
+MP_GLOBAL int __mp_endtrace(tracehead *t)
 {
+    int r;
+
+    r = 1;
+    if ((tracefile == NULL) || (tracefile == stderr) || (tracefile == stdout))
+    {
+        /* We don't want to close the stderr or stdout file streams so
+         * we just flush them instead.  If the tracing file hasn't been set,
+         * this will just flush all open output files.
+         */
+        if (fflush(tracefile))
+            r = 0;
+    }
+    else if (fclose(tracefile))
+        r = 0;
+    tracefile = NULL;
     t->file = NULL;
     t->tracing = 0;
+    return r;
+}
+
+
+/* Attempt to open the tracing output file.
+ */
+
+static int opentracefile(tracehead *t)
+{
+    /* The tracing file name can also be named as stderr and stdout which
+     * will go to the standard error and standard output streams respectively.
+     */
+    if (t->file == NULL)
+        return 0;
+    else if (strcmp(t->file, "stderr") == 0)
+        tracefile = stderr;
+    else if (strcmp(t->file, "stdout") == 0)
+        tracefile = stdout;
+    else if ((tracefile = fopen(t->file, "wb")) == NULL)
+    {
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", t->file);
+        t->file = NULL;
+        return 0;
+    }
+    return 1;
 }
 
 
@@ -68,7 +118,9 @@ MP_GLOBAL void __mp_endtrace(tracehead *t)
 
 MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 {
-    fprintf(stdout, "A %lu " MP_POINTER " %lu\n", n, a, l);
+    if (tracefile == NULL)
+        opentracefile(t);
+    fprintf(tracefile, "A %lu " MP_POINTER " %lu\n", n, a, l);
 }
 
 
@@ -77,7 +129,9 @@ MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 
 MP_GLOBAL void __mp_tracefree(tracehead *t, unsigned long n)
 {
-    fprintf(stdout, "F %lu\n", n);
+    if (tracefile == NULL)
+        opentracefile(t);
+    fprintf(tracefile, "F %lu\n", n);
 }
 
 
