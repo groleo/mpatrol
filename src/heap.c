@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.10 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: heap.c,v 1.11 2001-01-02 22:17:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -127,7 +127,7 @@ __mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
     if ((n = (heapnode *) __mp_getslot(&h->table)) == NULL)
     {
         s = h->memory.page * MP_ALLOCFACTOR;
-        if ((p = __mp_memalloc(&h->memory, &s, h->table.entalign)) == NULL)
+        if ((p = __mp_memalloc(&h->memory, &s, h->table.entalign, 0)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p, s);
         n = (heapnode *) __mp_getslot(&h->table);
@@ -144,7 +144,7 @@ __mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
     }
     /* Allocate the requested block of memory and add it to the heap.
      */
-    if ((p = __mp_memalloc(&h->memory, &l, a)) == NULL)
+    if ((p = __mp_memalloc(&h->memory, &l, a, !i)) == NULL)
     {
         __mp_freeslot(&h->table, n);
         return NULL;

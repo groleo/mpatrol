@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.7 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.8 2001-01-02 22:17:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -95,7 +95,7 @@ initbrk(void)
     l = MP_BREAK_SIZE;
     __mp_newmemory(&brkhead.memory);
     if ((brkhead.block = __mp_memalloc(&brkhead.memory, &l,
-          brkhead.memory.align)) == NULL)
+          brkhead.memory.align, 1)) == NULL)
         return 0;
     brkhead.size = l;
     brkhead.len = 0;
