@@ -1,3 +1,18 @@
+Changes for 1.4.2
+
+  * Added __mp_init_* initialisation function support.
+
+  * Removed calls to ZeroMemory(), etc. on Windows platforms as they ended up
+    calling memset(), etc. thus defeating the whole purpose of the original
+    change!
+
+  * Forgot to build the dbmalloc module and install its header file in the
+    previous release.  Also now read all relevant Dbmalloc environment variables
+    on initialisation.
+
+  * Added the AUTHORS and THANKS files.
+
+
 Changes for 1.4.1 (27th February, 2001)
 
   * Added the __mp_atexit() and __mp_setmark() functions.  Also added more

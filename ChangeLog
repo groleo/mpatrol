@@ -1,13 +1,56 @@
 2001-02-27  Graeme Roy  <graeme@epc.co.uk>
 
+	* THANKS: Added the THANKS file.
+
+	* AUTHORS: Added the AUTHORS file.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Forgot to add the dbmalloc module.
+
+	* pkg/sdux/mpatrol.psf, pkg/pkg/prototype: Forgot to install dbmalloc.h.
+
+	* src/config.h:
+	Added MP_MAXINITS.  Added MP_INITFUNC_SUPPORT.  Mentioned that
+	MP_INITFUNC_SUPPORT will not work if the object file has been stripped.
+
+	* src/memory.c:
+	Removed calls to ZeroMemory(), etc. for Windows as they are actually
+	defined to call memset() etc. in the system header files!!!  Bang goes
+	that good idea!
+
+	* src/info.h: Added the array of initialisation functions.
+
+	* src/info.c:
+	Initialised initcount.  Added the __mp_atinit() function.  Added
+	__mp_atinit().  Added the extra argument to the call to
+	__mp_newsymbols().
+
+	* src/symbol.c, src/symbol.h:
+	Added the inits field for initialisation functions.  Added support for
+	registering initialisation functions.
+
+	* src/inter.c: Call the initialisation functions.
+
 	* src/cplus.c, src/mpatrol.h:
 	Fixed std namespace problems for set_new_handler() and old libraries.
 
+	* src/mpatrol.h: Added MP_VOLATILE.
+
 	* tools/dbmalloc.h:
 	Provided documentation.  Added the settings for the MALLOC_WARN and
-	MALLOC_FATAL options.
+	MALLOC_FATAL options.  Added dbmallinit().  Changed the integer part of
+	dbmalloptarg to be long so that it works on 64-bit platforms.  Added
+	__mpt_init_dbmalloc to force the linking of the dbmalloc object file
+	from the mptools library.
 
-	* tools/dbmalloc.c: Added more options.
+	* tools/dbmalloc.c:
+	Added more options.  The default overflow size should be 1 byte.  Fixed
+	the behaviour of MALLOC_REUSE and added PRESERVE to the options set by
+	the MALLOC_FILLAREA option.  Added __mp_init_dbmalloc().  Now read
+	environment variables.  Added the 3 other environment variables that
+	cannot be set with dbmallopt().
 
 2001-02-26  Graeme Roy  <graeme@epc.co.uk>
 
