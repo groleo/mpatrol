@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.99 2001-12-18 21:15:02 graeme Exp $"
+#ident "$Id: info.c,v 1.100 2001-12-18 21:23:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.99 2001-12-18 21:15:02 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.100 2001-12-18 21:23:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1251,7 +1251,10 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
     if (p == NULL)
     {
         if ((s > 0) || (h->flags & FLG_CHECKMEMORY))
+        {
+            __mp_log(h, v);
             __mp_error(ET_NULOPN, v->type, v->file, v->line, NULL);
+        }
         return 0;
     }
     e = 1;
@@ -1260,11 +1263,13 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
     if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
+            __mp_log(h, v);
             __mp_error(ET_FREOPN, v->type, v->file, v->line, NULL);
             e = 0;
         }
         else if (m->data.flags & FLG_FREED)
         {
+            __mp_log(h, v);
             __mp_error(ET_FRDOPN, v->type, v->file, v->line, NULL);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
@@ -1287,6 +1292,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
             }
             b = (char *) b - h->alloc.oflow;
             l += h->alloc.oflow << 1;
+            __mp_log(h, v);
             if (h->flags & FLG_ALLOWOFLOW)
                 __mp_warn(ET_RNGOVF, v->type, v->file, v->line, NULL, p,
                           (char *) p + s - 1, b, (char *) b + l - 1);
@@ -1325,7 +1331,10 @@ __mp_checkstring(infohead *h, char *p, size_t *s, loginfo *v, int g)
     if (p == NULL)
     {
         if ((g == 0) || (u > p) || (h->flags & FLG_CHECKMEMORY))
+        {
+            __mp_log(h, v);
             __mp_error(ET_NULOPN, v->type, v->file, v->line, NULL);
+        }
         return 0;
     }
     e = 0;
@@ -1365,11 +1374,13 @@ __mp_checkstring(infohead *h, char *p, size_t *s, loginfo *v, int g)
     }
     else if ((m = (infonode *) n->info) == NULL)
     {
+        __mp_log(h, v);
         __mp_error(ET_FREOPN, v->type, v->file, v->line, NULL);
         return 0;
     }
     else if (m->data.flags & FLG_FREED)
     {
+        __mp_log(h, v);
         __mp_error(ET_FRDOPN, v->type, v->file, v->line, NULL);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -1413,6 +1424,7 @@ __mp_checkstring(infohead *h, char *p, size_t *s, loginfo *v, int g)
         }
         b = (char *) b - h->alloc.oflow;
         l += h->alloc.oflow << 1;
+        __mp_log(h, v);
         if (e == 1)
             __mp_error(ET_STROVF, v->type, v->file, v->line, NULL, p, b,
                        (char *) b + l - 1);
