@@ -2,14 +2,14 @@ README FOR THE MPATROL LIBRARY DOCUMENTATION
 
 
 This directory may contain preformatted documentation for the mpatrol library.
-The documents will have been generated from the TeXinfo source using a variety
-of tools and are provided partly for convenience and partly for people who do
-not have suitable formatting tools installed on their system.  In all cases
-these documents can be regenerated from the TeXinfo source, although there may
-be slight changes in some files due to differences in the systems that they were
-generated on.  Note that the UNIX manual pages are not considered part of this
-documentation (although they are kept up to date) and are located in a separate
-directory.
+The documents will have been generated from the TeXinfo source (or from the
+LaTeX source of the reference card) using a variety of tools and are provided
+partly for convenience and partly for people who do not have suitable formatting
+tools installed on their system.  In all cases these documents can be
+regenerated from the source, although there may be slight changes in some files
+due to differences in the systems that they were generated on.  Note that the
+UNIX manual pages are not considered part of this documentation (although they
+are kept up to date) and are located in a separate directory.
 
 
 The following files are provided with the main distribution and contain all of
@@ -19,6 +19,11 @@ the information necessary to generate each of the preformatted files.
         Format:    GNU TeXinfo
                    http://texinfo.org/
         Notes:     The unprocessed source of the mpatrol manual.
+
+  * refcard.tex
+        Format:    LaTeX
+                   http://www.tug.org/
+        Notes:     The unprocessed source of the reference card.
 
   * images/mpatrol.txt
         Format:    ASCII text
@@ -86,7 +91,7 @@ viewer program.
 The following files are all formatted for printed manuals.  All can be viewed
 with a variety of programs, not just the ones listed here.
 
-  * mpatrol.dvi
+  * mpatrol.dvi & refcard.dvi
         Format:    Device Independent format (DVI)
                    http://www.tug.org/
         Generator: TeX
@@ -97,7 +102,7 @@ with a variety of programs, not just the ones listed here.
                    Bitmapped fonts are built on demand to a suitable resolution
                    when viewing or printing.
 
-  * mpatrol.ps
+  * mpatrol.ps & refcard.ps
         Format:    Adobe Postscript
                    http://www.adobe.com/
         Generator: DVIPS
