@@ -1,3 +1,42 @@
+Tue Nov 16 01:07:15 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added information about manual layout and changed Examples appendix to a
+	chapter.
+
+Mon Nov 15 21:34:03 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added the section on memory allocations.
+
+	* doc/Makefile: Now use makeguide to build the AmigaGuide document.
+
+Sun Nov 14 18:14:11 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/Makefile:
+	Added the mpatrol logo to the various document formats.
+
+	* doc/images/mpatrol.pdf, doc/images/mpatrol.eps,
+	  doc/images/mpatrol.jpg:
+	New image files containing the mpatrol logo, which are required by the
+	various documentation formats.
+
+Wed Nov 10 20:49:19 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate: Added ability to update NEWS with latest changes as well.
+
+	* NEWS: Added changes from previous versions.
+
+	* doc/Makefile, doc/mpatrol.texi:
+	New TeXinfo manual for the library, and a Makefile to build various
+	documentation formats from it.
+
+Sun Nov  7 13:24:44 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.c:
+	Added the getmemory() function for implementing a simulated heap.
+
+	* src/config.h: Added support for allocating memory from a static array.
+
 Thu Oct 21 21:57:48 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* README, NOTES, EXAMPLES: Added information about the CHECK option.
