@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.34 2001-02-12 19:27:35 graeme Exp $"
+#ident "$Id: option.c,v 1.35 2001-02-13 22:12:05 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.34 2001-02-12 19:27:35 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.35 2001-02-13 22:12:05 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1304,6 +1304,17 @@ __mp_set(infohead *h, unsigned long o, unsigned long v)
             __mp_writeprofile(&h->prof, !(h->flags & FLG_NOPROTECT));
         h->prof.autosave = v;
         break;
+      case OPT_CHECKLOWER:
+        h->lrange = v;
+        break;
+      case OPT_CHECKUPPER:
+        h->urange = v;
+        break;
+      case OPT_CHECKFREQ:
+        if (v == 0)
+            v = 1;
+        h->check = v;
+        break;
       case OPT_NOFREE:
         if (v != 0)
             while (h->alloc.flist.size > v)
@@ -1456,6 +1467,15 @@ __mp_get(infohead *h, unsigned long o, unsigned long *v)
         break;
       case OPT_AUTOSAVE:
         *v = h->prof.autosave;
+        break;
+      case OPT_CHECKLOWER:
+        *v = h->lrange;
+        break;
+      case OPT_CHECKUPPER:
+        *v = h->urange;
+        break;
+      case OPT_CHECKFREQ:
+        *v = h->check;
         break;
       case OPT_NOFREE:
         *v = h->alloc.fmax;
