@@ -44,14 +44,24 @@
 #include <bfd.h>
 #endif /* FORMAT */
 #endif /* FORMAT */
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
+/* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
+ * many recent distributions and so we must use the GNU BFD library to read the
+ * symbols from the object files and libraries.  However, we still need the ELF
+ * definitions for reading the internal structures of the dynamic linker.
+ */
+#include <elf.h>
+#endif /* SYSTEM */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.2 1999-10-12 19:08:28 graeme Exp $"
+#ident "$Id: symbol.c,v 1.3 1999-12-20 20:42:26 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#if FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
 /* These definitions are not always defined in ELF header files on all
  * systems so we define them here as they are documented in most
  * System V ABI documents.
@@ -73,14 +83,15 @@ typedef struct Elf32_Dyn
 }
 Elf32_Dyn;
 #endif /* DT_NULL */
-#endif /* FORMAT */
+#endif /* SYSTEM */
 
 
-#if FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
 /* This is a structure that is internal to the dynamic linker on ELF systems,
  * and so it is not always guaranteed to be the same.  We try to rely on this
  * definition here for portability's sake as it is not publicly declared in
- * any header files.
+ * all ELF header files.
  */
 
 typedef struct dynamiclink
@@ -91,7 +102,7 @@ typedef struct dynamiclink
     struct dynamiclink *next; /* pointer to next shared object */
 }
 dynamiclink;
-#endif /* FORMAT */
+#endif /* SYSTEM */
 
 
 #ifdef __cplusplus
@@ -100,7 +111,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
 /* The declaration of the _DYNAMIC symbol, which allows us direct access to the
  * dynamic linker's internal data structures.  We make it have weak visibility
  * so that it is always defined, even in the statically linked case.  It is
@@ -112,7 +124,7 @@ extern "C"
 
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
-#endif /* FORMAT */
+#endif /* SYSTEM */
 
 
 /* Initialise the fields of a symhead so that the symbol table becomes empty.
@@ -477,7 +489,7 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 /* Allocate a set of symbol nodes for a BFD object file.
  */
 
-static int addsymbols(symhead *y, bfd *h, char *f)
+static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
 {
     asymbol **p;
     long i, n;
@@ -521,7 +533,7 @@ static int addsymbols(symhead *y, bfd *h, char *f)
                 !bfd_is_com_section(p[i]->section) &&
                 (p[i]->section->flags & SEC_CODE))
                 if (!addsymbol(y, p[i], f, (char *) p[i]->name,
-                    (size_t) p[i]->section->vma))
+                    (size_t) p[i]->section->vma + b))
                 {
                     r = 0;
                     break;
@@ -674,7 +686,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
         else if ((t = __mp_addstring(&y->strings, s)) == NULL)
             r = 0;
         else
-            r = addsymbols(y, h, t);
+            r = addsymbols(y, h, t, b);
         bfd_close(h);
     }
 #endif /* FORMAT */
@@ -687,12 +699,14 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 
 MP_GLOBAL int __mp_addextsymbols(symhead *y)
 {
-#if FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     Elf32_Dyn *d;
     dynamiclink *l;
-#endif /* FORMAT */
+#endif /* SYSTEM */
 
-#if FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     /* This function liaises with the dynamic linker when a program is
      * dynamically linked in order to read symbols from any required shared
      * objects.
@@ -717,7 +731,7 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
             l = l->next;
         }
     }
-#endif /* FORMAT */
+#endif /* SYSTEM */
     return 1;
 }
 
