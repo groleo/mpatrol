@@ -1,3 +1,24 @@
+Changes for 1.3.3 (6th January, 2001)
+
+  * Added support for the -fcheck-memory-usage option of the GNU compiler.
+
+  * Added the hexwords command to extract any words from a dictionary file that
+    can be written as hexadecimal numbers.
+
+  * The mpsym command can now make use of perl if it is installed rather than
+    using the slower method of calling awk and sed.
+
+  * The library now allocates internal memory with mmap() by default, and with
+    sbrk() when the USEMMAP option is used, but only if the mmap() system call
+    is supported.
+
+  * The MP_USE_ATEXIT feature macro has been added to force the mpatrol library
+    to be registered with atexit() instead of using alternative methods to
+    automatically terminate the library, if they exist.
+
+  * Added two new tests demonstrating the support for -fcheck-memory-usage.
+
+
 Changes for 1.3.2 (18th December, 2000)
 
   * Added the TRACE and TRACEFILE options to handle memory allocation tracing.
