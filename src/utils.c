@@ -29,7 +29,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: utils.c,v 1.1.1.1 1999-10-03 11:25:23 graeme Exp $"
+#ident "$Id: utils.c,v 1.2 1999-10-19 18:53:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -51,6 +51,7 @@ MP_GLOBAL unsigned char __mp_logtwo(unsigned long n)
 }
 
 
+#if !MP_MACROROUTINES
 /* Determine if an unsigned integer is a power of two.
  */
 
@@ -58,6 +59,7 @@ MP_GLOBAL int __mp_ispoweroftwo(unsigned long n)
 {
     return ((n > 0) && ((n & (n - 1)) == 0));
 }
+#endif /* MP_MACROROUTINES */
 
 
 /* Round an unsigned integer up to the nearest power of two.
@@ -71,6 +73,7 @@ MP_GLOBAL unsigned long __mp_poweroftwo(unsigned long n)
 }
 
 
+#if !MP_MACROROUTINES
 /* Round an unsigned integer down to a specified power of two alignment.
  */
 
@@ -78,8 +81,10 @@ MP_GLOBAL unsigned long __mp_rounddown(unsigned long n, unsigned long a)
 {
     return n & ~(a - 1);
 }
+#endif /* MP_MACROROUTINES */
 
 
+#if !MP_MACROROUTINES
 /* Round an unsigned integer up to a specified power of two alignment.
  */
 
@@ -87,6 +92,7 @@ MP_GLOBAL unsigned long __mp_roundup(unsigned long n, unsigned long a)
 {
     return ((n - 1) & ~(a - 1)) + a;
 }
+#endif /* MP_MACROROUTINES */
 
 
 #ifdef __cplusplus
