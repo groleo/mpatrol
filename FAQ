@@ -30,6 +30,19 @@ their corresponding answers or solutions.
     won't provide preformatted versions of the mpatrol manual in any other
     format which isn't already supported.
 
+ Q. Why is the reference card not centred in the middle of the page when I print
+    it?
+
+ A. The reference card has three columns in landscape format and as a result
+    requires smaller margins than LaTeX normally uses.  When dvips converts the
+    DVI file to a postscript file it refers to a configuration file set up for
+    a specific printer so that it knows what that printer's capabilities are.
+    However, you can instruct dvips to offset the page by a given amount with
+    the -O option so that it appears centred when printed.  I find that
+    -O -0.75in,0.25in works for me.  Note that the default paper size for the
+    reference card is DIN A4, but you can change it to US letter in the LaTeX
+    source file.
+
  Q. How do I install the mpatrol manual as a GNU info file?
 
  A. Assuming you have the GNU info file built and copied to your system's info
@@ -308,6 +321,16 @@ their corresponding answers or solutions.
  A. You can do this by setting the mpatrol log file to be your system's "bit
     bucket", which is /dev/null on UNIX platforms and NIL: on AmigaOS.  There
     doesn't appear to be an equivalent way to do this on Windows or Netware.
+
+ Q. I linked my program with the mpatrol library to trace all of its memory
+    operations, such as memcpy() and memcmp(), but I get nothing in the log
+    file.  Why is this?
+
+ A. The memory operation functions do not automatically initialise the mpatrol
+    library since on many systems the startup routines call them very early on.
+    If your program does not call any memory allocation functions to initialise
+    the mpatrol library then you must explicitly call the __mp_init() function.
+    All memory operation functions following that call with then be traced.
 
 
  5. FILES
