@@ -49,11 +49,13 @@
 #endif /* MP_GLOBAL */
 
 
-/* The keyword used to specify a constant variable or parameter.  This may
- * only be supported by ANSI C or C++ compilers so it is defined under a
- * macro just in case.  Note that constness is really only used for the
- * highest-level functions in the library to prevent clashes with any
- * functions that are being overridden.
+/* The keywords used to specify a constant variable or parameter and a variable
+ * that should not have accesses to it optimised away.  These may only be
+ * supported by ANSI C or C++ compilers so they are defined under a macro just
+ * in case.  Note that constness is really only used for the highest-level
+ * functions in the library to prevent clashes with any functions that are
+ * being overridden, and volatility is only used to prevent RCS identification
+ * strings from being removed by an optimising compiler.
  */
 
 #ifndef MP_CONST
@@ -63,6 +65,14 @@
 #define MP_CONST
 #endif /* __STDC__ */
 #endif /* MP_CONST */
+
+#ifndef MP_VOLATILE
+#ifdef __STDC__
+#define MP_VOLATILE volatile
+#else /* __STDC__ */
+#define MP_VOLATILE
+#endif /* __STDC__ */
+#endif /* MP_VOLATILE */
 
 
 /* Indicates if preprocessor macro versions of some internal library routines

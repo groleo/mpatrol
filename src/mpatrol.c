@@ -44,7 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.35 2001-01-03 18:24:59 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.36 2001-02-05 22:58:33 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.36 2001-02-05 22:58:33 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 

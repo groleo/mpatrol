@@ -32,7 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprealloc.c,v 1.1 2001-01-21 21:08:48 graeme Exp $"
+#ident "$Id: mprealloc.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *mprealloc_id = "$Id: mprealloc.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 

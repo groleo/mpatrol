@@ -36,7 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.1 2001-02-05 21:06:01 graeme Exp $"
+#ident "$Id: cplus.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
