@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.16 2000-03-30 17:58:01 graeme Exp $
+.\" $Id: mpatrol.3,v 1.17 2000-04-04 17:48:52 graeme Exp $
 .\"
-.TH MPATROL 3 "30 March 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 3 "4 April 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -62,6 +62,7 @@ void *memmem(const void *ptr1, size_t size1,
              const void *ptr2, size_t size2);
 
 int __mp_info(const void *ptr, __mp_allocinfo *info);
+int __mp_printinfo(const void *ptr);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
@@ -112,7 +113,7 @@ header files, although on UNIX and Windows platforms (and AmigaOS when using
 information:
 .TP
 \fBmalloc\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably
 aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
@@ -122,7 +123,7 @@ the heap then the null pointer will be returned and \fBerrno\fP will be set to
 reallocated with \fBrealloc\fP.
 .TP
 \fBcalloc\fP
-Allocates \fInelem\fP elements of \fIsize\fP zero-initialized bytes from the
+Allocates \fInelem\fP elements of \fIsize\fP zero-initialised bytes from the
 heap and returns a pointer to the first byte of the allocation.  The pointer
 returned will be suitably aligned for casting to any type and can be used to
 store data of up to \fInelem * size\fP bytes in length.  If \fInelem * size\fP
@@ -132,7 +133,7 @@ will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The allocated
 memory must be deallocated with \fBfree\fP or reallocated with \fBrealloc\fP.
 .TP
 \fBmemalign\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to
 \fIalign\fP bytes and can be used to store data of up to \fIsize\fP bytes in
 length.  If \fIalign\fP is zero then the default system alignment will be used.
@@ -146,7 +147,7 @@ reallocated with \fBrealloc\fP, although the latter will not guarantee the
 preservation of alignment.
 .TP
 \fBvalloc\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to the
 system page size and can be used to store data of up to \fIsize\fP bytes in
 length.  If \fIsize\fP is \fI0\fP then the memory allocated will be implicitly
@@ -157,7 +158,7 @@ allocated memory must be deallocated with \fBfree\fP or reallocated with
 alignment.
 .TP
 \fBpvalloc\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to the
 system page size and can be used to store data of up to \fIsize\fP bytes in
 length.  If \fIsize\fP is \fI0\fP then the memory allocated will be implicitly
@@ -229,7 +230,7 @@ aligned for casting to any type and can be used to store data of up to
 equivalent to \fBmalloc\fP.  If \fIsize\fP is \fI0\fP then the existing memory
 allocation will be freed and the null pointer will be returned.  If \fIsize\fP
 is greater than the original allocation then the extra space will be filled with
-uninitialized bytes.  If there is not enough space in the heap then the null
+uninitialised bytes.  If there is not enough space in the heap then the null
 pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
 allocated memory must be deallocated with \fBfree\fP and can be reallocated
 again with \fBrealloc\fP.
@@ -244,7 +245,7 @@ aligned for casting to any type and can be used to store data of up to
 equivalent to \fBcalloc\fP.  If \fIsize\fP is \fI0\fP then the existing memory
 allocation will be freed and the null pointer will be returned.  If \fIsize\fP
 is greater than the original allocation then the extra space will be filled with
-zero-initialized bytes.  If there is not enough space in the heap then the null
+zero-initialised bytes.  If there is not enough space in the heap then the null
 pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
 allocated memory must be deallocated with \fBfree\fP and can be reallocated
 again with \fBrealloc\fP.  This function is available for backwards
@@ -258,7 +259,7 @@ bytes and either returns \fIptr\fP if there was enough space to resize it, or
 \fIptr\fP is \fBNULL\fP then the call will be equivalent to \fBmalloc\fP.  If
 \fIsize\fP is \fB0\fP then the existing memory allocation will be freed and the
 \fBNULL\fP pointer will be returned.  If \fIsize\fP is greater than the original
-allocation then the extra space will be filled with uninitialized bytes and if
+allocation then the extra space will be filled with uninitialised bytes and if
 \fIsize\fP is less than the original allocation then the memory block will be
 truncated.  If there is not enough space in the heap then the \fBNULL\fP pointer
 will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The allocated
@@ -286,7 +287,7 @@ Windows platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway,
 albeit with slightly less tracing information:
 .TP
 \fBoperator new\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably
 aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
@@ -296,7 +297,7 @@ the heap then the null pointer will be returned and \fBerrno\fP will be set to
 deallocated with \fBoperator delete\fP.
 .TP
 \fBoperator new[]\fP
-Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably
 aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
@@ -410,7 +411,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 7 functions are available as support routines for additional
+The following 8 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -435,6 +436,13 @@ will be returned and \fIinfo\fP will contain the following information:
  \fBstack\fP   Pointer to function call stack.
  \fBfreed\fP   Indicates if alloc has been freed.
 .RE
+.TP
+\fB__mp_printinfo\fP
+Displays information about a specific memory allocation containing \fIptr\fP to
+the standard error file stream.  If \fIptr\fP does not belong to a previously
+allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
+will be returned.  This function is intended to be called from within a
+debugger.
 .TP
 \fB__mp_memorymap\fP
 If \fIstats\fP is non-zero then the current statistics of the mpatrol library
