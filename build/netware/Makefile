@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.45 2001-02-05 22:01:23 graeme Exp $
+# $Id: Makefile,v 1.46 2001-02-05 22:10:59 graeme Exp $
 
 
 # Definitions
@@ -269,6 +269,15 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.c $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/machine.h \
 	$(SOURCE)/version.c
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/info.h \
+	$(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/signals.h \
+	$(SOURCE)/mpalloc.h $(SOURCE)/mpfailure.c $(SOURCE)/mpsetfail.c \
+	$(SOURCE)/mpmalloc.c $(SOURCE)/mpcalloc.c $(SOURCE)/mpstrdup.c \
+	$(SOURCE)/mprealloc.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
