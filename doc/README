@@ -54,7 +54,7 @@ The following files are all formatted for on-line documentation.  They generally
 contain little or no formatting codes, leaving the final formatting up to the
 viewer program.
 
-  * mpatrol.doc
+  * mpatrol.txt
         Format:    ASCII text
                    http://www.bbsinc.com/iso8859.html
         Generator: GNU MakeInfo
