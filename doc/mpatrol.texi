@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.127 2000-11-01 19:24:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.128 2000-11-03 18:47:47 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 1st November, 2000
+@set UPDATED 3rd November, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -3570,6 +3570,12 @@ direct calls to @code{operator new} for example.  However, if you want to
 disable the redefinition of the C++ operators in @file{mpatrol.h} you can define
 the preprocessor macro @code{MP_NOCPLUSPLUS} before the inclusion of that file.
 
+If you are running on a system on which mpatrol supports full symbolic stack
+tracebacks the following information may still be useful if the source files
+were compiled with optimisation turned on.  This is because the calling function
+may have been inlined, in which case you will only see the name of the function
+into which the calling function was expanded in the stack traceback.
+
 @enumerate 6
 @cindex gcc
 @cindex g++
@@ -5643,7 +5649,8 @@ its settings and any relevant statistics.
 @item @code{void __mp_check(void)}
 Forces the library to perform an immediate check of the overflow buffers of
 every memory allocation and to ensure that nothing has overwritten any free
-blocks.
+blocks.  If any memory allocations made by the @code{alloca()} family of
+functions are out of scope then this function will also cause them to be freed.
 
 @findex __mp_prologue
 @item @code{void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t)}
@@ -7757,11 +7764,6 @@ same way as existing implementations, but at least there won't be link errors
 when compiling source code which uses them.
 
 @item
-Add a debugging version of the @code{alloca()} function that examines the stack
-pointer at each mpatrol library call to determine whether to clean up previous
-allocations.
-
-@item
 Perhaps add debugging/tracing versions of the string manipulation functions,
 such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
@@ -7818,11 +7820,6 @@ There is currently a problem when the mpatrol library encounters an illegal
 memory access on UNIX and Windows platforms, and there is a further illegal
 memory access when it is displaying the summary.  This should be prevented by
 disabling the signal handler at its first entry.
-
-@item
-The @command{mpatrol} command should explicitly search for the command it is to
-run if no directory component was supplied and set the @option{PROGFILE} option
-if it finds it.
 
 @item
 The @command{mpsym} command could optionally preserve any stack traceback lines
@@ -8307,6 +8304,17 @@ library then you still need to link with the system exception library,
 @file{libexc.so}.  If the symbols all begin with @code{Sym} on Windows platforms
 then you still need to link with the system symbol access library,
 @file{imagehlp.lib}.
+
+@item
+I tried all of the above, but why is the @code{SymGetLineFromAddr} symbol still
+undefined on Windows platforms?
+
+This is due to the @file{imagehlp.lib} or @file{imagehlp.dll} libraries on your
+system being out of date.  The @code{SymGetLineFromAddr()} function was added to
+this library at a much later date from the original release so if you want the
+@code{USEDEBUG} option to work you should try to get an updated library from
+Microsoft.  Alternatively, you can disable the call to it in
+@code{__mp_findsource()} but the @option{USEDEBUG} option will no longer work.
 
 @cindex duplicate symbols
 @item

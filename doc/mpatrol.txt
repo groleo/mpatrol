@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 1st
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 3rd
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 1st
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 3rd
 November, 2000.
 
 Foreword
@@ -3136,6 +3136,13 @@ new' for example.  However, if you want to disable the redefinition of
 the C++ operators in `mpatrol.h' you can define the preprocessor macro
 `MP_NOCPLUSPLUS' before the inclusion of that file.
 
+   If you are running on a system on which mpatrol supports full
+symbolic stack tracebacks the following information may still be useful
+if the source files were compiled with optimisation turned on.  This is
+because the calling function may have been inlined, in which case you
+will only see the name of the function into which the calling function
+was expanded in the stack traceback.
+
   6. Function where call to `malloc()' took place.  This information is
      only available if the source file containing the call to
      `malloc()' was compiled with `gcc' or `g++'.
@@ -5104,7 +5111,9 @@ you should include the `mpatrol.h' header file.
 `void __mp_check(void)'
      Forces the library to perform an immediate check of the overflow
      buffers of every memory allocation and to ensure that nothing has
-     overwritten any free blocks.
+     overwritten any free blocks.  If any memory allocations made by
+     the `alloca()' family of functions are out of scope then this
+     function will also cause them to be freed.
 
 `void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t)'
      Installs a prologue function to be called before any memory
@@ -6947,10 +6956,6 @@ H.1 Notes for all platforms
      there won't be link errors when compiling source code which uses
      them.
 
-   * Add a debugging version of the `alloca()' function that examines
-     the stack pointer at each mpatrol library call to determine
-     whether to clean up previous allocations.
-
    * Perhaps add debugging/tracing versions of the string manipulation
      functions, such as `strlen()' and `strcmp()' in much the same way
      as was done for the memory operation functions.  The only problem
@@ -7005,10 +7010,6 @@ H.1 Notes for all platforms
      is a further illegal memory access when it is displaying the
      summary.  This should be prevented by disabling the signal handler
      at its first entry.
-
-   * The `mpatrol' command should explicitly search for the command it
-     is to run if no directory component was supplied and set the
-     `PROGFILE' option if it finds it.
 
    * The `mpsym' command could optionally preserve any stack traceback
      lines that already have symbolic or debugging information
@@ -7438,7 +7439,18 @@ I.3 Linking
      symbols all begin with `Sym' on Windows platforms then you still
      need to link with the system symbol access library, `imagehlp.lib'.
 
-  3. Why do I get duplicate definitions of symbols when linking with
+  3. I tried all of the above, but why is the `SymGetLineFromAddr'
+     symbol still undefined on Windows platforms?
+
+     This is due to the `imagehlp.lib' or `imagehlp.dll' libraries on
+     your system being out of date.  The `SymGetLineFromAddr()'
+     function was added to this library at a much later date from the
+     original release so if you want the `USEDEBUG' option to work you
+     should try to get an updated library from Microsoft.
+     Alternatively, you can disable the call to it in
+     `__mp_findsource()' but the `USEDEBUG' option will no longer work.
+
+  4. Why do I get duplicate definitions of symbols when linking with
      the mpatrol library?
 
      This is most likely caused by your code, or a library, providing
@@ -7447,7 +7459,7 @@ I.3 Linking
      order to perform a successful link and use the replacements in
      mpatrol instead.
 
-  4. I linked my program to a shared library version of mpatrol.  Now,
+  5. I linked my program to a shared library version of mpatrol.  Now,
      when I try to run my program, the system complains that it cannot
      find the mpatrol library.  How do I get this to work?
 
@@ -7458,7 +7470,7 @@ I.3 Linking
      executable when you link your program by setting the `LD_RUN_PATH'
      environment variable.
 
-  5. I linked my program to a shared library version of mpatrol.  Will
+  6. I linked my program to a shared library version of mpatrol.  Will
      future releases of mpatrol remain compatible with this version or
      will I have to relink my program?
 
@@ -7468,7 +7480,7 @@ I.3 Linking
      For example, versions 1.0.3 and 1.0.8 should be compatible, but
      upgrading to version 1.1.0 may require a relink.
 
-  6. I have linked my program with the DLL version of the mpatrol
+  7. I have linked my program with the DLL version of the mpatrol
      library on Windows but it crashes when I run it.  I suspect that
      the crash is occurring when the mpatrol library is being
      initialised, so what is going wrong?
