@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.7 2000-01-30 20:31:03 graeme Exp $"
+#ident "$Id: malloc.c,v 1.8 2000-03-07 00:58:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -91,7 +91,7 @@ void *pvalloc(size_t l)
 /* Duplicate an existing string using memory from the heap.
  */
 
-char *strdup(const char *p)
+char *strdup(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRDUP, NULL, NULL, 0, 1);
 }
@@ -101,7 +101,7 @@ char *strdup(const char *p)
  * on the size of the memory allocated for the new string.
  */
 
-char *strndup(const char *p, size_t l)
+char *strndup(MP_CONST char *p, size_t l)
 {
     return __mp_strdup((char *) p, l, AT_STRNDUP, NULL, NULL, 0, 1);
 }
@@ -110,7 +110,7 @@ char *strndup(const char *p, size_t l)
 /* Duplicate an existing string using memory from the heap.
  */
 
-char *strsave(const char *p)
+char *strsave(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRSAVE, NULL, NULL, 0, 1);
 }
@@ -121,9 +121,9 @@ char *strsave(const char *p)
  */
 
 #if SYSTEM == SYSTEM_DGUX
-char *strnsave(const char *p, int l)
+char *strnsave(MP_CONST char *p, int l)
 #else /* SYSTEM */
-char *strnsave(const char *p, size_t l)
+char *strnsave(MP_CONST char *p, size_t l)
 #endif /* SYSTEM */
 {
     return __mp_strdup((char *) p, l, AT_STRNSAVE, NULL, NULL, 0, 1);
@@ -180,7 +180,7 @@ void cfree(void *p)
 
 void *memset(void *p, int c, size_t l)
 {
-    return __mp_setmem(p, l, c, AT_MEMSET, NULL, NULL, 0, 1);
+    return __mp_setmem(p, l, (unsigned char) c, AT_MEMSET, NULL, NULL, 0, 1);
 }
 
 
@@ -196,11 +196,7 @@ void bzero(void *p, size_t l)
 /* Copy a non-overlapping block of memory from one address to another.
  */
 
-#ifdef __GNUC__
-void *memcpy(void *q, const void *p, size_t l)
-#else /* __GNUC__ */
-void *memcpy(void *q, void *p, size_t l)
-#endif /* __GNUC__ */
+void *memcpy(void *q, MP_CONST void *p, size_t l)
 {
     return __mp_copymem((void *) p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
 }
@@ -209,47 +205,45 @@ void *memcpy(void *q, void *p, size_t l)
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
-void *memmove(void *q, void *p, size_t l)
+void *memmove(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem(p, q, l, AT_MEMMOVE, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 
 
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
-void bcopy(void *p, void *q, size_t l)
+void bcopy(MP_CONST void *p, void *q, size_t l)
 {
-    __mp_copymem(p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
+    __mp_copymem((void *) p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
 }
 
 
 /* Look for the first occurrence of a character in a block of memory.
  */
 
-void *memchr(void *p, int c, size_t l)
+void *memchr(MP_CONST void *p, int c, size_t l)
 {
-    return __mp_locatemem(p, l, NULL, c, AT_MEMCHR, NULL, NULL, 0, 1);
+    return __mp_locatemem((void *) p, l, NULL, (size_t) c, AT_MEMCHR, NULL,
+                          NULL, 0, 1);
 }
 
 
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-void *memmem(void *p, size_t l, void *q, size_t m)
+void *memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
-    return __mp_locatemem(p, l, q, m, AT_MEMMEM, NULL, NULL, 0, 1);
+    return __mp_locatemem((void *) p, l, (void *) q, m, AT_MEMMEM, NULL, NULL,
+                          0, 1);
 }
 
 
 /* Compare two blocks of memory.
  */
 
-#ifdef __GNUC__
-int memcmp(const void *p, const void *q, size_t l)
-#else /* __GNUC__ */
-int memcmp(void *p, void *q, size_t l)
-#endif /* __GNUC__ */
+int memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
     return __mp_comparemem((void *) p, (void *) q, l, AT_MEMCMP, NULL, NULL, 0,
                            1);
@@ -259,9 +253,10 @@ int memcmp(void *p, void *q, size_t l)
 /* Compare two blocks of memory.
  */
 
-int bcmp(void *p, void *q, size_t l)
+int bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
-    return __mp_comparemem(p, q, l, AT_BCMP, NULL, NULL, 0, 1);
+    return __mp_comparemem((void *) p, (void *) q, l, AT_BCMP, NULL, NULL, 0,
+                           1);
 }
 
 
