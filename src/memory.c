@@ -22,7 +22,10 @@
 
 /*
  * Memory handling.  All memory access or handling routines that directly
- * access the system memory are interfaced from this module.
+ * access the system memory are interfaced from this module.  For UNIX SVR4
+ * systems, a useful reference book on operating system memory management is
+ * The Magic Garden Explained, First Edition by Goodheart and Cox (Prentice
+ * Hall, 1994, ISBN 0-130-98138-9).
  */
 
 
@@ -53,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.22 2000-05-30 18:00:19 graeme Exp $"
+#ident "$Id: memory.c,v 1.23 2000-05-31 18:32:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
