@@ -64,37 +64,39 @@
 #include <bfd.h>
 #endif /* FORMAT */
 #endif /* FORMAT */
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_AIX
+#if DYNLINK == DYNLINK_AIX
 /* The shared libraries that an AIX executable has loaded can be obtained via
  * the loadquery() function.
  */
 #include <sys/ldr.h>
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
-/* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
- * many recent distributions and so we must use the GNU BFD library to read the
- * symbols from the object files and libraries.  However, we still need the ELF
- * definitions for reading the internal structures of the dynamic linker.
+#elif DYNLINK == DYNLINK_BSD
+/* The BSD COFF dynamic linker is based on the original SunOS implementation
+ * and is the precursor to the SVR4 ELF dynamic linker.  Most BSD systems now
+ * use ELF so this is for SunOS and the BSD systems that still use COFF.
  */
-#include <elf.h>
-#elif SYSTEM == SYSTEM_HPUX
+#include <sys/types.h>
+#include <nlist.h>
+#include <link.h>
+#elif DYNLINK == DYNLINK_HPUX
 /* The HP/UX dynamic linker support routines are available for use even by
  * statically linked programs.
  */
 #include <dl.h>
-#elif SYSTEM == SYSTEM_IRIX
+#elif DYNLINK == DYNLINK_IRIX
 /* IRIX doesn't have a conventional SVR4 dynamic linker and so does not have the
  * same interface for accessing information about any required shared objects at
  * run-time.
  */
 #include <obj.h>
 #include <obj_list.h>
-#endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS
+#elif DYNLINK == DYNLINK_SVR4
+/* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
+ * many recent distributions and so we must use the GNU BFD library to read the
+ * symbols from the object files and libraries.  However, we still need the ELF
+ * definitions for reading the internal structures of the dynamic linker.
+ */
+#include <elf.h>
+#elif DYNLINK == DYNLINK_WINDOWS
 /* We use the imagehlp library on Windows platforms to obtain information about
  * the symbols loaded from third-party and system DLLs.  We can also use it to
  * obtain information about any symbols contained in the executable file and
@@ -102,20 +104,15 @@
  */
 #include <windows.h>
 #include <imagehlp.h>
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.41 2001-01-11 23:55:17 graeme Exp $"
+#ident "$Id: symbol.c,v 1.42 2001-01-14 23:06:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if DYNLINK == DYNLINK_SVR4
 /* These definitions are not always defined in ELF header files on all
  * systems so we define them here as they are documented in most
  * System V ABI documents.
@@ -151,35 +148,10 @@ typedef struct Elf32_Dyn
 Elf32_Dyn;
 #endif /* ENVIRON */
 #endif /* DT_NULL */
-#endif /* SYSTEM */
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
-/* This is a structure that is internal to the dynamic linker on ELF systems,
- * and so it is not always guaranteed to be the same.  We try to rely on this
- * definition here for portability's sake as it is not publicly declared in
- * all ELF header files.
- */
-
-typedef struct dynamiclink
-{
-    size_t base;              /* virtual address of shared object */
-    char *name;               /* filename of shared object */
-#if ENVIRON == ENVIRON_64
-    Elf64_Dyn *dyn;           /* dynamic linking information */
-#else /* ENVIRON */
-    Elf32_Dyn *dyn;           /* dynamic linking information */
-#endif /* ENVIRON */
-    struct dynamiclink *next; /* pointer to next shared object */
-}
-dynamiclink;
-#elif SYSTEM == SYSTEM_IRIX
+#if DYNLINK == DYNLINK_IRIX
 /* This structure represents an N32 ABI shared object as opposed to an O32 ABI
  * shared object, and is defined on IRIX 6.0 and above platforms as
  * Elf32_Obj_Info.  In order for us to compile on earlier IRIX platforms we
@@ -199,8 +171,26 @@ typedef struct objectinfo
     Elf32_Word length; /* length of filename of shared object */
 }
 objectinfo;
-#endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS
+#elif DYNLINK == DYNLINK_SVR4
+/* This is a structure that is internal to the dynamic linker on ELF systems,
+ * and so it is not always guaranteed to be the same.  We try to rely on this
+ * definition here for portability's sake as it is not publicly declared in
+ * all ELF header files.
+ */
+
+typedef struct dynamiclink
+{
+    size_t base;              /* virtual address of shared object */
+    char *name;               /* filename of shared object */
+#if ENVIRON == ENVIRON_64
+    Elf64_Dyn *dyn;           /* dynamic linking information */
+#else /* ENVIRON */
+    Elf32_Dyn *dyn;           /* dynamic linking information */
+#endif /* ENVIRON */
+    struct dynamiclink *next; /* pointer to next shared object */
+}
+dynamiclink;
+#elif DYNLINK == DYNLINK_WINDOWS
 /* This structure is used to pass information to the callback function
  * called by SymEnumerateSymbols().
  */
@@ -224,7 +214,7 @@ typedef struct modinfo
     char libs;     /* only read DLLs */
 }
 modinfo;
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 #if FORMAT == FORMAT_BFD
@@ -267,12 +257,24 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if DYNLINK == DYNLINK_BSD
+/* The declaration of the _DYNAMIC symbol, which allows us direct access to the
+ * dynamic linker's internal data structures.  This is set up in crt0 and will
+ * be NULL in an object that does not need dynamic linking.
+ */
+#if SYSTEM == SYSTEM_SUNOS
+extern struct link_dynamic *_DYNAMIC;
+#else /* SYSTEM */
+extern struct _dynamic *_DYNAMIC;
+#endif /* SYSTEM */
+#elif DYNLINK == DYNLINK_IRIX
+/* The __rld_obj_head symbol is always defined in IRIX and points to the first
+ * entry in a list of shared object files that are required by the program.  For
+ * statically linked programs this will either be NULL or will only contain the
+ * entry for the program itself.
+ */
+extern struct obj_list *__rld_obj_head;
+#elif DYNLINK == DYNLINK_SVR4
 /* The declaration of the _DYNAMIC symbol, which allows us direct access to the
  * dynamic linker's internal data structures.  We make it have weak visibility
  * so that it is always defined, even in the statically linked case.  It is
@@ -284,15 +286,7 @@ extern "C"
 
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
-#elif SYSTEM == SYSTEM_IRIX
-/* The __rld_obj_head symbol is always defined in IRIX and points to the first
- * entry in a list of shared object files that are required by the program.  For
- * statically linked programs this will either be NULL or will only contain the
- * entry for the program itself.
- */
-extern struct obj_list *__rld_obj_head;
-#endif /* SYSTEM */
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 /* Initialise the fields of a symhead so that the symbol table becomes empty.
@@ -611,7 +605,7 @@ addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 #endif /* FORMAT */
 
 
-#if TARGET == TARGET_WINDOWS
+#if DYNLINK == DYNLINK_WINDOWS
 /* The callback function called to allocate a new symbol node for each
  * symbol located in a module by the imagehlp library.
  */
@@ -655,7 +649,7 @@ addsym(char *s, unsigned long a, unsigned long l, void *p)
     }
     return 1;
 }
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 #if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
@@ -996,7 +990,7 @@ addsymbols(symhead *y, bfd *h, char *f, size_t b)
 #endif /* FORMAT */
 
 
-#if TARGET == TARGET_WINDOWS
+#if DYNLINK == DYNLINK_WINDOWS
 /* The callback function called to allocate a set of symbol nodes for each
  * module located by the imagehlp library.
  */
@@ -1041,7 +1035,7 @@ addsyms(char *f, unsigned long b, void *p)
     i->index++;
     return r;
 }
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 /* Read a file and add all relevant symbols contained within it to the
@@ -1072,7 +1066,7 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
     int r;
 
     r = 1;
-#if TARGET == TARGET_WINDOWS
+#if DYNLINK == DYNLINK_WINDOWS
     /* We always want to initialise the imagehlp library here since we will
      * be using it to obtain the symbols from any loaded DLLs later on and
      * possibly also from the executable file if we are not using any other
@@ -1085,7 +1079,7 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
     else
         SymSetOptions(SYMOPT_UNDNAME);
     SymInitialize(GetCurrentProcess(), NULL, 1);
-#endif /* TARGET */
+#endif /* DYNLINK */
 #if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
     /* This is a very simple, yet portable, way to read symbols from COFF
      * and XCOFF executable files.
@@ -1270,42 +1264,43 @@ MP_GLOBAL
 int
 __mp_addextsymbols(symhead *y)
 {
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_AIX
+#if DYNLINK == DYNLINK_AIX
     static char b[4096];
     struct ld_info *l;
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#elif DYNLINK == DYNLINK_BSD
+#if SYSTEM == SYSTEM_SUNOS
+    struct link_dynamic *d;
+    struct link_map *l;
+#else /* SYSTEM */
+    struct _dynamic *d;
+    struct so_map *l;
+#endif /* SYSTEM */
+#elif DYNLINK == DYNLINK_HPUX
+    struct shl_descriptor d;
+    size_t i;
+    unsigned int o;
+#elif DYNLINK == DYNLINK_IRIX
+    struct obj_list *l;
+    struct obj *o;
+    objectinfo *i;
+    char *s;
+    size_t b;
+#elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
 #else /* ENVIRON */
     Elf32_Dyn *d;
 #endif /* ENVIRON */
     dynamiclink *l;
-#elif SYSTEM == SYSTEM_HPUX
-    struct shl_descriptor d;
-    size_t i;
-    unsigned int o;
-#elif SYSTEM == SYSTEM_IRIX
-    struct obj_list *l;
-    struct obj *o;
-    objectinfo *i;
-    char *s;
-    size_t b;
-#endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS
+#elif DYNLINK == DYNLINK_WINDOWS
     modinfo m;
-#endif /* TARGET */
+#endif /* DYNLINK */
 
     /* This function liaises with the dynamic linker when a program is
      * dynamically linked in order to read symbols from any required shared
      * objects.
      */
-#if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_AIX
+#if DYNLINK == DYNLINK_AIX
     if (loadquery(L_GETINFO, b, sizeof(b)) != -1)
     {
         /* We skip past the first item on the list since it represents the
@@ -1319,11 +1314,87 @@ __mp_addextsymbols(symhead *y)
                                  (unsigned long) l->ldinfo_textorg))
                 return 0;
     }
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#elif DYNLINK == DYNLINK_BSD
+    /* Check to see if the dynamic linker has set up the _DYNAMIC symbol
+     * and also check that it points to a valid _dynamic structure.
+     */
+    if ((d = _DYNAMIC) &&
+#if SYSTEM == SYSTEM_SUNOS
+        (d->ld_version > 1) && (d->ld_version <= 3) && (d->ld_un.ld_1 != NULL))
+#else /* SYSTEM */
+        (d->d_version == LD_VERSION_BSD) && (d->d_un.d_sdt != NULL))
+#endif /* SYSTEM */
+    {
+#if SYSTEM == SYSTEM_SUNOS
+        l = d->ld_un.ld_1->ld_loaded;
+#else /* SYSTEM */
+        l = d->d_un.d_sdt->sdt_loaded;
+#endif /* SYSTEM */
+        while (l != NULL)
+        {
+#if SYSTEM == SYSTEM_SUNOS
+            if ((l->lm_addr != 0) && (l->lm_name != NULL) &&
+                (*l->lm_name != '\0') &&
+                !__mp_addsymbols(y, l->lm_name, l->lm_addr))
+#else /* SYSTEM */
+            if ((l->som_addr != 0) && (l->som_path != NULL) &&
+                (*l->som_path != '\0') &&
+                !__mp_addsymbols(y, l->som_path, l->som_addr))
+#endif /* SYSTEM */
+                return 0;
+#if SYSTEM == SYSTEM_SUNOS
+            l = l->lm_next;
+#else /* SYSTEM */
+            l = l->som_next;
+#endif /* SYSTEM */
+        }
+    }
+#elif DYNLINK == DYNLINK_HPUX
+    /* An index of -1 indicates the dynamic linker and an index of 0 indicates
+     * the main executable program.  We are interested in all other object files
+     * that the program depends on.
+     */
+    for (i = 1; shl_get_r(i, &d) != -1; i++)
+    {
+        /* Determine the offset of the first text symbol in the library.  This
+         * is normally 0x1000 but may be something else on later systems.  The
+         * handle structure is not documented anywhere, but the fourth word
+         * appears to contain the information we need, based on trial and error.
+         */
+        if (d.handle != NULL)
+            o = ((unsigned int *) d.handle)[3];
+        else
+            o = 0;
+        if ((d.filename[0] != '\0') &&
+            !__mp_addsymbols(y, d.filename, d.tstart - o))
+            return 0;
+    }
+#elif DYNLINK == DYNLINK_IRIX
+    if (l = __rld_obj_head)
+        /* Determine if the shared object list we are looking at contains O32
+         * ABI object files or N32 ABI object files.
+         */
+        if (l->data == 0xFFFFFFFF)
+        {
+            i = (objectinfo *) l;
+            while (i = (objectinfo *) i->next)
+            {
+                s = (char *) i->name;
+                b = (long) i->ehdr - (long) i->ohdr;
+                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
+                    return 0;
+            }
+        }
+        else
+            while (l = l->next)
+            {
+                o = (struct obj *) l->data;
+                s = o->o_path;
+                b = (long) o->o_text_start - (long) o->o_base_address;
+                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
+                    return 0;
+            }
+#elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
     if ((&_DYNAMIC != NULL) && (d = (Elf64_Dyn *) _DYNAMIC))
 #else /* ENVIRON */
@@ -1350,53 +1421,7 @@ __mp_addextsymbols(symhead *y)
             l = l->next;
         }
     }
-#elif SYSTEM == SYSTEM_HPUX
-    /* An index of -1 indicates the dynamic linker and an index of 0 indicates
-     * the main executable program.  We are interested in all other object files
-     * that the program depends on.
-     */
-    for (i = 1; shl_get_r(i, &d) != -1; i++)
-    {
-        /* Determine the offset of the first text symbol in the library.  This
-         * is normally 0x1000 but may be something else on later systems.  The
-         * handle structure is not documented anywhere, but the fourth word
-         * appears to contain the information we need, based on trial and error.
-         */
-        if (d.handle != NULL)
-            o = ((unsigned int *) d.handle)[3];
-        else
-            o = 0;
-        if ((d.filename[0] != '\0') &&
-            !__mp_addsymbols(y, d.filename, d.tstart - o))
-            return 0;
-    }
-#elif SYSTEM == SYSTEM_IRIX
-    if (l = __rld_obj_head)
-        /* Determine if the shared object list we are looking at contains O32
-         * ABI object files or N32 ABI object files.
-         */
-        if (l->data == 0xFFFFFFFF)
-        {
-            i = (objectinfo *) l;
-            while (i = (objectinfo *) i->next)
-            {
-                s = (char *) i->name;
-                b = (long) i->ehdr - (long) i->ohdr;
-                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
-                    return 0;
-            }
-        }
-        else
-            while (l = l->next)
-            {
-                o = (struct obj *) l->data;
-                s = o->o_path;
-                b = (long) o->o_text_start - (long) o->o_base_address;
-                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
-                    return 0;
-            }
-#endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS
+#elif DYNLINK == DYNLINK_WINDOWS
     /* The imagehlp library allows us to locate the symbols contained in
      * all of the loaded DLLs without having to actually read the files
      * themselves.
@@ -1406,7 +1431,7 @@ __mp_addextsymbols(symhead *y)
     m.libs = 1;
     if (!SymEnumerateModules(GetCurrentProcess(), addsyms, &m))
         return 0;
-#endif /* TARGET */
+#endif /* DYNLINK */
     return 1;
 }
 
@@ -1620,12 +1645,12 @@ __mp_findsource(symhead *y, void *p, char **s, char **t, unsigned long *u)
     objectfile *n;
     sourcepos m;
 #endif /* FORMAT */
-#if TARGET == TARGET_WINDOWS
+#if DYNLINK == DYNLINK_WINDOWS
     static char b[1024];
     IMAGEHLP_SYMBOL *i;
     IMAGEHLP_LINE l;
     unsigned long d;
-#endif /* TARGET */
+#endif /* DYNLINK */
 
 #if FORMAT == FORMAT_BFD
     m.addr = (bfd_vma) p;
@@ -1646,7 +1671,7 @@ __mp_findsource(symhead *y, void *p, char **s, char **t, unsigned long *u)
 #endif /* FORMAT */
     *s = *t = NULL;
     *u = 0;
-#if TARGET == TARGET_WINDOWS
+#if DYNLINK == DYNLINK_WINDOWS
     if (y->lineinfo)
     {
         i = (IMAGEHLP_SYMBOL *) b;
@@ -1663,7 +1688,7 @@ __mp_findsource(symhead *y, void *p, char **s, char **t, unsigned long *u)
         if ((*s != NULL) || (*t != NULL))
             return 1;
     }
-#endif /* TARGET */
+#endif /* DYNLINK */
     return 0;
 }
 
