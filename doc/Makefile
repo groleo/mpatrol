@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.10 2000-05-11 00:05:15 graeme Exp $
+# $Id: Makefile,v 1.11 2000-05-11 19:38:51 graeme Exp $
 
 
 # Definitions
@@ -71,7 +71,7 @@ endif
 ifeq ($(SPLITHTML),true)
 # Build the HTML files from the Texinfo file using texi2html
 
-$(DOCUMENT).html: $(DOCUMENT).texi
+$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ texi2html -top_file $@ -split node -menu -number -verbose $<
