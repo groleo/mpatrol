@@ -47,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.67 2001-01-31 23:00:29 graeme Exp $"
+#ident "$Id: inter.c,v 1.68 2001-02-01 19:00:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -613,10 +613,10 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
                 memhead.fini = 1;
                 __mp_abort();
             }
-        if ((f == AT_XMALLOC) || (f == AT_XCALLOC))
+        if ((f == AT_ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
         {
-            /* The xmalloc() and xcalloc() functions should always return
-             * non-NULL pointers, which means we must abort here.
+            /* The alloca(), xmalloc() and xcalloc() functions should always
+             * return non-NULL pointers, which means we must abort here.
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
@@ -747,10 +747,10 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             z = 1;
             goto retry;
         }
-        if (f == AT_XSTRDUP)
+        if ((f == AT_STRDUPA) || (f == AT_STRNDUPA) || (f == AT_XSTRDUP))
         {
-            /* The xstrdup() function should always return a non-NULL pointer,
-             * which means we must abort here.
+            /* The strdupa(), strndupa() and xstrdup() functions should always
+             * return a non-NULL pointer, which means we must abort here.
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
