@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.71 2001-03-03 14:49:54 graeme Exp $
+ * $Id: config.h,v 1.72 2001-03-05 18:56:33 graeme Exp $
  */
 
 
@@ -166,6 +166,15 @@
 #ifndef MP_HASHTAB_SIZE
 #define MP_HASHTAB_SIZE 211
 #endif /* MP_HASHTAB_SIZE */
+
+
+/* The number of buckets in the hash table used to implement the leak table.
+ * This must be a prime number.
+ */
+
+#ifndef MP_LEAKTAB_SIZE
+#define MP_LEAKTAB_SIZE 97
+#endif /* MP_LEAKTAB_SIZE */
 
 
 /* The multiple of pages to allocate from the heap every time a new block of
