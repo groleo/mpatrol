@@ -36,7 +36,7 @@ int callback(MP_CONST void *p, void *t)
     __mp_allocstack *s;
     __mp_allocinfo d;
 
-    if (!__mp_info(p, &d))
+    if (!__mp_info(p, &d) || !d.allocated)
     {
         fprintf(stderr, "nothing known about address 0x%0*lX\n",
                 sizeof(void *) * 2, p);

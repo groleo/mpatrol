@@ -36,7 +36,7 @@ void display(void *p)
     __mp_allocinfo d;
     __mp_symbolinfo i;
 
-    if (!__mp_info(p, &d))
+    if (!__mp_info(p, &d) || !d.allocated)
     {
         fprintf(stderr, "nothing known about address 0x%0*lX\n",
                 sizeof(void *) * 2, p);
