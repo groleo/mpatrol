@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.107 2001-03-04 16:05:25 graeme Exp $
+ * $Id: mpatrol.h,v 1.108 2001-03-04 16:30:54 graeme Exp $
  */
 
 
@@ -705,6 +705,9 @@ extern "C"
 #endif /* __cplusplus */
 
 
+extern __mp_errortype __mp_errno;
+
+
 void __mp_init(void);
 void __mp_fini(void);
 int __mp_atexit(void (*)(void));
@@ -808,7 +811,8 @@ __mp_locprintf(MP_CONST char *m, ...)
 #define __mp_copymem(p, q, l, c, f, s, t, u, k) ((void *) NULL)
 #define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
-#define __mp_function(f) ((char *) NULL)
+#define __mp_strerror(f) ((MP_CONST char *) NULL)
+#define __mp_function(f) ((MP_CONST char *) NULL)
 #define __mp_setuser(p, d) ((int) 0)
 #define __mp_setmark(p) ((int) 0)
 #define __mp_info(p, d) ((int) 0)

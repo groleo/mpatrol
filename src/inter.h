@@ -31,12 +31,13 @@
 
 
 /*
- * $Id: inter.h,v 1.34 2001-03-04 15:57:19 graeme Exp $
+ * $Id: inter.h,v 1.35 2001-03-04 16:30:54 graeme Exp $
  */
 
 
 #include "config.h"
 #include "info.h"
+#include "diag.h"
 #include <stdarg.h>
 
 
@@ -110,6 +111,9 @@ heapinfo;
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+extern errortype __mp_errno;
 
 
 void __mp_init(void);

@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.67 2001-03-04 15:45:41 graeme Exp $"
+#ident "$Id: diag.c,v 1.68 2001-03-04 16:30:54 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.67 2001-03-04 15:45:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.68 2001-03-04 16:30:54 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,6 +59,9 @@ static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.67 2001-03-04 15:45
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+extern errortype __mp_errno;
 
 
 /* The file pointer to the log file.  This should not really be a file scope
@@ -204,12 +207,6 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "memcmp",
     "bcmp"
 };
-
-
-/* The last error encountered by the mpatrol library.
- */
-
-MP_GLOBAL errortype __mp_errno;
 
 
 /* The flags used to control the diagnostics from the mpatrol library.
