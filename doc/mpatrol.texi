@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.63 2000-04-27 19:07:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.64 2000-05-01 11:13:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 27th April, 2000
+@set UPDATED 1st May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -256,6 +256,13 @@ being tested might generate.  A wide variety of library settings can also be
 changed at run-time via an environment variable, thus removing the need to
 recompile or relink in order to change the library's behaviour.
 
+A file containing a summary of the memory allocation profiling statistics for a
+particular program can be produced by the mpatrol library.  This file can then
+be read by a profiling tool which will display a set of tables based upon the
+accumulated data.  The profiling information includes summaries of all of the
+memory allocations listed by size and the function that allocated them and a
+list of memory leaks with the call stack of the allocating function.
+
 The mpatrol library has been designed with the intention of replacing calls to
 existing C and C++ memory allocation functions as seamlessly as possible, but
 in many cases that may not be possible and slight code modifications may be
@@ -404,7 +411,8 @@ deallocation.
 @item
 A function is provided to return as much information as possible about a given
 memory allocation, and can be called at any time during program execution.  A
-similar function is also provided for calling from within a debugger.
+similar function is also provided for calling from within a debugger and an
+example command file is provided for use with @command{gdb}.
 
 @item
 A function is provided to display library settings and heap usage statistics,
@@ -431,6 +439,19 @@ deallocation when they occur.
 Options exist to halt the program at a specific memory allocation, reallocation
 or deallocation when running the program within a debugger.  These options have
 no effect when running the program without a debugger.
+
+@item
+An option exists to enable memory allocation profiling, which forces a summary
+of all memory allocation statistics to be written to a specified file for later
+use by a profiling command.  The profiling file can also be written at a
+specified frequency.
+
+@item
+A profiling command is provided which reads a profiling output file produced by
+the mpatrol library and displays a set of tables based on the accumulated data.
+The profiling information includes summaries of all of the memory allocations
+listed by size and the function that allocated them and a list of memory leaks
+with the call stack of the allocating function.
 
 @item
 On UNIX platforms, the @code{mmap()} function can optionally be used to allocate
@@ -679,8 +700,8 @@ then these should be recreated in the local library directory rather than simply
 copying them.
 
 @item
-Copy the mpatrol and memory leak programs that have been built into your local
-bin directory.
+Copy the @command{mpatrol}, @command{mprof} and @command{mleak} programs that
+have been built into your local bin directory.
 
 @item
 Go up two directory levels into the @file{src} directory and copy the
@@ -2200,8 +2221,6 @@ traverse all of the blocks you have created.
 
 @cindex arenas
 @cindex Digital UNIX
-@cindex SGI IRIX, MIPS
-@cindex IRIX, MIPS
 @cindex amalloc
 A memory allocation concept that is similar to this is called an @emph{arena}.
 This datatype requires functions which are built on top of the existing malloc
@@ -2269,17 +2288,16 @@ require these libraries will automatically receive these fixes without needing
 to be relinked.
 
 @cindex performance bottleneck
-@cindex memory profiler
+@cindex memory allocation profiler
 If all of the above suggestions do not seem to help and you still feel that you
 have a performance bottleneck in the part of your code that deals with
-dynamically allocated memory then you should try using a
-@emph{memory profiler}@footnote{There is currently at least one memory profiler
-available (@pxref{Related software}).}.  This can be used at run-time to analyse
-the dynamic memory allocation calls that your program makes during its
-execution, and builds statistics for later viewing.  It is then possible for you
-to see exactly how many calls were made to each function, where they came from
-and what proportion of time they each took.  Such information can then be put to
-good use in order to optimise the relevant parts of your code.
+dynamically allocated memory then you should try using the memory allocation
+profiling feature of mpatrol.  This can be used at run-time to analyse the
+dynamic memory allocation calls that your program makes during its execution,
+and builds statistics for later viewing with the @command{mprof} command.  It is
+then possible for you to see exactly how many calls were made to each function
+and where they came from.  Such information can then be put to good use in order
+to optimise the relevant parts of your code.
 
 @cindex hints
 @cindex tips
@@ -4564,6 +4582,16 @@ program will be halted, and its state may be examined at that point by using a
 suitable debugger.  Note that this setting will be ignored if its value is zero.
 Default value: @option{ALLOCSTOP=0}.
 
+@cindex AUTOSAVE
+@item @option{AUTOSAVE}=<@var{unsigned-integer}>
+Specifies the frequency at which to periodically write the profiling data to
+the profiling output file.  When the total number of profiled memory allocations
+and deallocations is a multiple of this number then the current profiling
+information will be written to the profiling output file.  This option can be
+used to instruct the mpatrol library to dump out any profiling information just
+before a fatal error occurs in a program, for example.  Note that this setting
+will be ignored if its value is zero.  Default value: @option{AUTOSAVE=0}.
+
 @cindex CHECK
 @item @option{CHECK}=<@var{unsigned-range}>
 Specifies a range of allocation indices at which to check the integrity of free
@@ -4642,6 +4670,12 @@ is zero.  Default value: @option{FREESTOP=0}.
 @item @option{HELP}
 Displays a quick-reference option summary to the @code{stderr} file stream.
 
+@cindex LARGEBOUND
+@item @option{LARGEBOUND}=<@var{unsigned-integer}>
+Specifies the limit in bytes up to which memory allocations should be classified
+as large allocations for profiling purposes.  This limit must be greater than
+the small and medium bounds.  Default value: @option{LARGEBOUND=2048}.
+
 @cindex LIMIT
 @item @option{LIMIT}=<@var{unsigned-integer}>
 Specifies the limit in bytes at which all memory allocations should fail if the
@@ -4691,6 +4725,13 @@ will not be logged.
 Specifies that all memory reallocations are to be logged and sent to the log
 file.  Note that any memory reallocations made internally by the library will
 not be logged.
+
+@cindex MEDIUMBOUND
+@item @option{MEDIUMBOUND}=<@var{unsigned-integer}>
+Specifies the limit in bytes up to which memory allocations should be classified
+as medium allocations for profiling purposes.  This limit must be greater than
+the small bound but less than the large bound.  Default value:
+@option{MEDIUMBOUND=256}.
 
 @cindex NOFREE
 @item @option{NOFREE}
@@ -4753,6 +4794,22 @@ Specifies that any reallocated or freed memory allocations should preserve their
 original contents.  This option must be used with the @option{NOFREE} option and
 has no effect otherwise.
 
+@cindex PROF
+@item @option{PROF}
+Specifies that all memory allocations and deallocations are to be profiled and
+sent to the profiling output file.  Memory reallocations are treated as a
+memory deallocation immediately followed by a memory allocation.
+
+@cindex PROFFILE
+@item @option{PROFFILE}=<@var{string}>
+Specifies an alternative file in which to place all memory allocation profiling
+information from the mpatrol library.  A filename of @samp{stderr} will send
+this information to the @code{stderr} file stream and a filename of
+@samp{stdout} will do the equivalent with the @code{stdout} file stream.  Note
+that if a problem occurs while opening the profiling output file then the
+profiling information will be sent to the @code{stderr} file stream.  Default
+value: @option{PROFFILE=mpatrol.out}.
+
 @cindex PROGFILE
 @item @option{PROGFILE}=<@var{string}>
 Specifies an alternative filename with which to locate the executable file
@@ -4809,6 +4866,13 @@ Specifies that a summary of all of the unfreed memory allocations should be
 displayed at the end of program execution.  This step will not be performed if
 an abnormal termination occurs or if there are no unfreed allocations.
 
+@cindex SMALLBOUND
+@item @option{SMALLBOUND}=<@var{unsigned-integer}>
+Specifies the limit in bytes up to which memory allocations should be classified
+as small allocations for profiling purposes.  This limit must be greater than
+zero but less than the medium and large bounds.  Default value:
+@option{SMALLBOUND=32}.
+
 @cindex UNFREEDABORT
 @item @option{UNFREEDABORT}=<@var{unsigned-integer}>
 Specifies the minimum number of unfreed allocations at which to abort the
@@ -4859,12 +4923,30 @@ dynamically linked.
 @cindex process id
 All mpatrol library diagnostics are sent to the file @file{mpatrol.%n.log} in
 the current directory by default (where @samp{%n} is the current process id) but
-this can be changed using the @option{-l} option.
+this can be changed using the @option{-l} option.  Similarly, the default
+profiling output filename is @file{mpatrol.%n.out}.  Note that the
+@option{LOGALL} option is always implicitly used for commands that are run by
+this command.
 
 All of the following options (except @option{-d} and @option{-V}) correspond to
 their listed mpatrol library option (@pxref{Environment}).
 
 @table @asis
+@cindex -1
+@item @option{-1} <@var{unsigned-integer}>
+[@option{SMALLBOUND}]  Specifies the limit in bytes up to which memory
+allocations should be classified as small allocations for profiling purposes.
+
+@cindex -2
+@item @option{-2} <@var{unsigned-integer}>
+[@option{MEDIUMBOUND}]  Specifies the limit in bytes up to which memory
+allocations should be classified as medium allocations for profiling purposes.
+
+@cindex -3
+@item @option{-3} <@var{unsigned-integer}>
+[@option{LARGEBOUND}]  Specifies the limit in bytes up to which memory
+allocations should be classified as large allocations for profiling purposes.
+
 @cindex -A
 @item @option{-A} <@var{unsigned-integer}>
 [@option{ALLOCSTOP}]  Specifies an allocation index at which to stop the program
@@ -4958,6 +5040,21 @@ buffers, which must be a power of two.
 @item @option{-o} <@var{unsigned-integer}>
 [@option{OFLOWBYTE}]  Specifies an 8-bit byte pattern with which to fill the
 overflow buffers of all memory allocations.
+
+@cindex -P
+@item @option{-P} <@var{string}>
+[@option{PROFFILE}]  Specifies an alternative file in which to place all
+memory allocation profiling information from the mpatrol library.
+
+@cindex -p
+@item @option{-p}
+[@option{PROF}]  Specifies that all memory allocations are to be profiled and
+sent to the profiling output file.
+
+@cindex -Q
+@item @option{-Q} <@var{unsigned-integer}>
+[@option{AUTOSAVE}]  Specifies the frequency at which to periodically write
+the profiling data to the profiling output file.
 
 @cindex -R
 @item @option{-R} <@var{unsigned-integer}>
@@ -5625,12 +5722,12 @@ the information can be used at program termination.  May also need to display
 this information in the @code{__mp_printinfo()} function.
 
 @item
-Perhaps add a memory allocation profiling feature (something similar to mprof),
-which could be used to determine where most of the memory allocations occur, or
-if bottlenecks could be removed from the code.  This could take the form of the
-library writing out an additional file which could be analysed by an external
-program, and could take advantage of the stack tracebacks and symbol tables in
-the mpatrol library.
+Perhaps add the ability to profile memory operations such as @code{memcpy()} and
+@code{memset()} to the existing memory allocation profiling facility.  Also, add
+options to @command{mprof} to write out files that can be used by graph drawing
+software for a better visualisation of the profiling information.  Finally,
+perhaps add an allocation call graph table to @command{mprof}, similar to that
+produced by @command{gprof} for execution call graphs.
 
 @item
 Perhaps add a memory usage profiling feature which would dump out memory usage
