@@ -29,7 +29,8 @@
 
 
 #include "stack.h"
-#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#include "memory.h"
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
 #include <setjmp.h>
 #include <signal.h>
 #if ARCH == ARCH_SPARC
@@ -38,16 +39,15 @@
 #define R_SP REG_SP
 #endif /* R_SP */
 #endif /* ARCH */
-#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
+#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.6 2000-05-30 17:52:50 graeme Exp $"
+#ident "$Id: stack.c,v 1.7 2000-05-31 20:39:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 #if MP_BUILTINSTACK_SUPPORT
-
 /* This method of call stack traversal uses two special builtin functions in
  * gcc called __builtin_frame_address() and __builtin_return_address().  Both
  * of these functions take the number of stack frames to traverse as a parameter
@@ -88,7 +88,14 @@
 #if MP_MAXSTACK > 8
 #error not enough frameaddress() and returnaddress() macros
 #endif /* MP_MAXSTACK */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_HPUX
+/* The following functions are defined in the HP/UX traceback library (libcl)
+ * but are not documented anywhere and have no associated header file.
+ */
+
+frameinfo U_get_current_frame(void);
+int U_get_previous_frame(frameinfo *, frameinfo *);
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 
 
 #ifdef __cplusplus
@@ -97,11 +104,11 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
 static jmp_buf environment;
 static void (*bushandler)(int);
 static void (*segvhandler)(int);
-#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
+#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
 
 
 /* Initialise the fields of a stackinfo structure.
@@ -114,13 +121,15 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
     for (s->index = 0; s->index < MP_MAXSTACK; s->index++)
         s->frames[s->index] = s->addrs[s->index] = NULL;
     s->index = 0;
-#else /* MP_BUILTINSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_HPUX
+    __mp_memset(&s->next, 0, sizeof(frameinfo));
+#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     s->next = NULL;
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 }
 
 
-#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
 /* Handles any signals that result from illegal memory accesses whilst
  * traversing the call stack.
  */
@@ -129,10 +138,10 @@ static void stackhandler(int s)
 {
     longjmp(environment, 1);
 }
-#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
+#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
 
 
-#if !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && SYSTEM != SYSTEM_HPUX
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -159,7 +168,7 @@ static unsigned int *getaddr(unsigned int *p)
     return a;
 }
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 
 
 #if TARGET == TARGET_UNIX && ARCH == ARCH_SPARC && !MP_BUILTINSTACK_SUPPORT
@@ -185,14 +194,16 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 {
 #if MP_BUILTINSTACK_SUPPORT
     void *f;
-#else /* MP_BUILTINSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_HPUX
+    frameinfo f;
+#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
       TARGET == NETWARE) && ARCH == ARCH_IX86)
     unsigned int *f;
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     int r;
 
     r = 0;
@@ -219,7 +230,28 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->addr = NULL;
         p->index = MP_MAXSTACK;
     }
-#else /* MP_BUILTINSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_HPUX
+    /* HP/UX provides a library for traversing function call stack frames since
+     * the stack frame format does not preserve frame pointers - this is done
+     * via a special section which can be read by debuggers.
+     */
+    if (p->frame == NULL)
+    {
+        p->next = U_get_current_frame();
+        p->frame = (void *) &p->next;
+    }
+    if (U_get_previous_frame(&p->next, &f) == 0)
+    {
+        p->addr = (void *) (p->next.addr - 3);
+        __mp_memcopy(&p->next, &f, sizeof(frameinfo));
+        r = 1;
+    }
+    else
+    {
+        p->frame = NULL;
+        p->addr = NULL;
+    }
+#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -277,7 +309,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     signal(SIGSEGV, segvhandler);
 #endif /* TARGET */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     return r;
 }
 
