@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.96 2001-02-23 23:09:53 graeme Exp $
+ * $Id: mpatrol.h,v 1.97 2001-02-25 23:52:46 graeme Exp $
  */
 
 
@@ -644,6 +644,8 @@ struct mallinfo
          p = NULL; } while (0)
 #define MP_FAILURE(f) ((__mp_failhandler) NULL)
 
+#define __mp_check() __mp_checkheap(MP_FUNCNAME, __FILE__, __LINE__)
+
 
 #ifdef __cplusplus
 extern "C"
@@ -687,7 +689,7 @@ size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 int __mp_stats(__mp_heapinfo *);
-void __mp_check(void);
+void __mp_checkheap(MP_CONST char *, MP_CONST char *, unsigned long);
 void (*__mp_prologue(void (*)(MP_CONST void *, size_t, MP_CONST void *)))
      (MP_CONST void *, size_t, MP_CONST void *);
 void (*__mp_epilogue(void (*)(MP_CONST void *, MP_CONST void *)))
@@ -741,7 +743,9 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_summary() ((void) 0)
 #define __mp_stats(d) ((int) 0)
 #define __mp_check() ((void) 0)
-#define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t, MP_CONST void *)) NULL)
+#define __mp_checkheap(s, t, u) ((void) 0)
+#define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t, MP_CONST void *)) \
+                          NULL)
 #define __mp_epilogue(h) ((void (*)(MP_CONST void *, MP_CONST void *)) NULL)
 #define __mp_nomemory(h) ((void (*)(void)) NULL)
 #define __mp_pushdelstack(s, t, u) ((void) 0)
