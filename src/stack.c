@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.5 2000-05-29 16:35:32 graeme Exp $"
+#ident "$Id: stack.c,v 1.6 2000-05-30 17:52:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -134,8 +134,9 @@ static void stackhandler(int s)
 
 #if !MP_BUILTINSTACK_SUPPORT
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
-      ARCH == ARCH_M88K || ARCH == ARCH_SPARC)) || \
-    ((TARGET == TARGET_WINDOWS || TARGET == NETWARE) && ARCH == ARCH_IX86)
+      ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
+      ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
+      TARGET == NETWARE) && ARCH == ARCH_IX86)
 /* Obtain the return address for the specified stack frame handle.
  */
 
@@ -149,6 +150,8 @@ static unsigned int *getaddr(unsigned int *p)
      */
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
     a = (unsigned int *) *(p + 1);
+#elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
+    a = (unsigned int *) *(p + 2);
 #elif ARCH == ARCH_SPARC
     if (a = (unsigned int *) *((unsigned int *) *p + 15))
         a += 2;
@@ -184,8 +187,9 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     void *f;
 #else /* MP_BUILTINSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
-      ARCH == ARCH_M88K || ARCH == ARCH_SPARC)) || \
-    ((TARGET == TARGET_WINDOWS || TARGET == NETWARE) && ARCH == ARCH_IX86)
+      ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
+      ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
+      TARGET == NETWARE) && ARCH == ARCH_IX86)
     unsigned int *f;
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT */
@@ -217,8 +221,9 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     }
 #else /* MP_BUILTINSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
-      ARCH == ARCH_M88K || ARCH == ARCH_SPARC)) || \
-    ((TARGET == TARGET_WINDOWS || TARGET == NETWARE) && ARCH == ARCH_IX86)
+      ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
+      ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
+      TARGET == NETWARE) && ARCH == ARCH_IX86)
     /* This function is not complete in any way for the OS / processor
      * combinations it supports, as it is intended to be as portable as possible
      * without writing in assembler.  In particular, optimised code is likely
@@ -237,6 +242,8 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
             f = (unsigned int *) &p - 2;
 #elif ARCH == ARCH_M88K
             f = (unsigned int *) &p - 4;
+#elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
+            f = (unsigned int *) &p - 6;
 #elif ARCH == ARCH_SPARC
             f = getframe();
 #endif /* ARCH */
@@ -248,7 +255,8 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
             /* We cache the next frame pointer in the call stack since on some
              * systems it may be overwritten by another call.
              */
-#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
+#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K || \
+    ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
 #if SYSTEM == SYSTEM_LYNXOS
             if (!getaddr((unsigned int *) *f))
                 p->next = NULL;
