@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.150 2001-12-05 23:09:21 graeme Exp $"
+#ident "$Id: inter.c,v 1.151 2001-12-05 23:35:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.150 2001-12-05 23:09:21 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.151 2001-12-05 23:35:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -303,6 +303,7 @@ checkalloca(loginfo *i, int f)
     addrnode *a, *b;
     stackcompare r;
 #endif /* MP_FULLSTACK */
+    alloctype t;
     int c;
 
     if (memhead.fini || (memhead.astack.size == 0))
@@ -376,7 +377,10 @@ checkalloca(loginfo *i, int f)
                 memhead.prologue(n->block, (size_t) -1, 0, i->func, i->file,
                                  i->line, i->stack->addr);
             memhead.event++;
-            __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
+            t = i->type;
+            i->type = AT_ALLOCA;
+            __mp_freememory(&memhead, n->block, i);
+            i->type = t;
             if (memhead.epilogue && (memhead.recur == 1))
                 memhead.epilogue((void *) -1, i->func, i->file, i->line,
                                  i->stack->addr);
@@ -913,7 +917,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         l = h;
     z = 0;
   retry:
-    p = __mp_getmemory(&memhead, l, a, f, &v);
+    p = __mp_getmemory(&memhead, l, a, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p, s, t, u, i.addr);
     if (p == NULL)
@@ -1047,7 +1051,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
      */
     if (__mp_checkstring(&memhead, o, &n, f, &v, j))
     {
-        if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, &v))
+        if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, &v))
         {
             __mp_memcopy(p, o, n);
             p[n] = '\0';
@@ -1177,7 +1181,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     q = p;
     z = 0;
   retry:
-    p = __mp_resizememory(&memhead, q, l, a, f, &v);
+    p = __mp_resizememory(&memhead, q, l, a, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p, s, t, u, i.addr);
     if (p == NULL)
@@ -1274,7 +1278,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     checkheap(&v, memhead.count);
     checkalloca(&v, 0);
     memhead.event++;
-    __mp_freememory(&memhead, p, f, &v);
+    __mp_freememory(&memhead, p, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1, s, t, u, i.addr);
     restoresignals();
