@@ -126,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.55 2001-03-07 01:12:35 graeme Exp $"
+#ident "$Id: symbol.c,v 1.56 2001-03-08 00:09:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.55 2001-03-07 01:12:35 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.56 2001-03-08 00:09:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1671,6 +1671,7 @@ __mp_addextsymbols(symhead *y, meminfo *e)
     ldr_module_t m;
     ldr_process_t p;
     size_t c, l, n;
+    size_t b;
 #elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
@@ -1834,8 +1835,9 @@ __mp_addextsymbols(symhead *y, meminfo *e)
                 if ((ldr_inq_region(p, m, (ldr_region_t) n, &r, sizeof(r),
                       &l) == 0) && (strcmp(r.lri_name, ".text") == 0))
                 {
+                    b = (long) r.lri_mapaddr - (long) r.lri_vaddr;
                     if ((i.lmi_name[0] != '\0') && !__mp_addsymbols(y,
-                         i.lmi_name, NULL, (size_t) r.lri_mapaddr))
+                         i.lmi_name, NULL, b))
                         return 0;
                     break;
                 }
