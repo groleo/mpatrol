@@ -52,8 +52,8 @@ profdata;
 
 
 /* A profnode belongs to a tree of profnodes and contains profiling
- * details for the topmost function in a call stack.  An internal profnode
- * stores details of a single memory block allocated for profnode slots.
+ * details for a function in a call stack.  An internal profnode stores
+ * details of a single memory block allocated for profnode slots.
  */
 
 typedef union profnode
@@ -86,7 +86,7 @@ typedef struct profhead
 {
     heaphead *heap;              /* pointer to heap */
     slottable table;             /* table of profnodes */
-    listhead list;               /* internal list of memory blocks */
+    listhead ilist;              /* internal list of memory blocks */
     treeroot tree;               /* tree of profnodes */
     size_t size;                 /* memory used by internal blocks */
     size_t acounts[MP_BIN_SIZE]; /* allocation bins */

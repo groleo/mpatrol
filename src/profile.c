@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.15 2000-04-23 15:41:29 graeme Exp $"
+#ident "$Id: profile.c,v 1.16 2000-04-23 22:45:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -63,7 +63,7 @@ MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h)
      */
     n = (char *) &z.y - &z.x;
     __mp_newslots(&p->table, sizeof(profnode), __mp_poweroftwo(n));
-    __mp_newlist(&p->list);
+    __mp_newlist(&p->ilist);
     __mp_newtree(&p->tree);
     p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
@@ -91,7 +91,7 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
     p->heap = NULL;
     p->table.free = NULL;
     p->table.size = 0;
-    __mp_newlist(&p->list);
+    __mp_newlist(&p->ilist);
     __mp_newtree(&p->tree);
     p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
@@ -122,7 +122,7 @@ static profnode *getprofnode(profhead *p)
             return NULL;
         __mp_initslots(&p->table, h->block, h->size);
         n = (profnode *) __mp_getslot(&p->table);
-        __mp_addtail(&p->list, &n->index.node);
+        __mp_addtail(&p->ilist, &n->index.node);
         n->index.block = h->block;
         n->index.size = h->size;
         p->size += h->size;
@@ -361,7 +361,7 @@ MP_GLOBAL int __mp_protectprofile(profhead *p, memaccess a)
 {
     profnode *n;
 
-    for (n = (profnode *) p->list.head; n->index.node.next != NULL;
+    for (n = (profnode *) p->ilist.head; n->index.node.next != NULL;
          n = (profnode *) n->index.node.next)
         if (!__mp_memprotect(&p->heap->memory, n->index.block, n->index.size,
              a))
