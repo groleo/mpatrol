@@ -6573,8 +6573,16 @@ defining the `NDEBUG' preprocessor macro, which is the same macro used
 to control the behaviour of the `assert()' function.  If `NDEBUG' is
 defined then no macro redefinition of functions will take place and all
 special mpatrol library functions will evaluate to empty statements.
-It is intended that the `NDEBUG' preprocessor macro be defined in
-release builds.
+The `mpalloc.h' header file will also be included in this case.  It is
+intended that the `NDEBUG' preprocessor macro be defined in release
+builds.
+
+   The `MP_MALLOC()' family of functions that are defined in `mpalloc.h'
+are also defined in `mpatrol.h' when `NDEBUG' is not defined.  The
+mpatrol versions of these functions contain more debugging information
+than the mpalloc versions do, but they do not call the allocation
+failure handler when no more memory is available (they cause the
+`OUTMEM' error message to be given instead).
 
 * Menu:
 
@@ -6669,17 +6677,17 @@ used.
      and can be used to store data of up to SIZE bytes in length.  If
      SIZE is `0' then the memory allocated will be implicitly rounded
      up to `1' byte.  If there is not enough space in the heap then the
-     `NULL' pointer will be returned and `errno' will be set to
-     `ENOMEM'.  The `alloca()' function normally allocates its memory
-     from the stack, with the result that all such allocations will be
-     freed when the function returns.  This version of `alloca()'
-     allocates its memory from the heap in order to provide better
-     debugging, but the allocations may not necessarily be freed
-     immediately when the function returns.  The allocated memory can
-     be deallocated explicitly with `dealloca()', but may not be
-     reallocated or deallocated in any other way.  This function is
-     available for backwards compatibility with older C source code and
-     should not be used in new code.
+     program will be terminated and the `OUTMEM' error will be given.
+     The `alloca()' function normally allocates its memory from the
+     stack, with the result that all such allocations will be freed
+     when the function returns.  This version of `alloca()' allocates
+     its memory from the heap in order to provide better debugging, but
+     the allocations may not necessarily be freed immediately when the
+     function returns.  The allocated memory can be deallocated
+     explicitly with `dealloca()', but may not be reallocated or
+     deallocated in any other way.  This function is available for
+     backwards compatibility with older C source code and should not be
+     used in new code.
 
 `char *strdup(const char *str)'
      Allocates exactly enough memory from the heap to duplicate STR
@@ -6749,14 +6757,14 @@ used.
      will have no alignment constraints and can be used to store
      character data up to the length of STR.  If STR is `NULL' then an
      error will be given and the `NULL' pointer will be returned.  If
-     there is not enough space in the heap then the `NULL' pointer will
-     be returned and `errno' will be set to `ENOMEM'.  The `strdupa()'
+     there is not enough space in the heap then the program will be
+     terminated and the `OUTMEM' error will be given.  The `strdupa()'
      function normally allocates its memory from the stack, with the
      result that all such allocations will be freed when the function
      returns.  This version of `strdupa()' allocates its memory from
      the heap in order to provide better debugging, but the allocations
-     may not necessarily be freed immediately when the function
-     returns.  The allocated memory can be deallocated explicitly with
+     may not necessarily be freed immediately when the function returns.
+     The allocated memory can be deallocated explicitly with
      `dealloca()', but may not be reallocated or deallocated in any
      other way.  This function is available for backwards compatibility
      with older C source code and should not be used in new code.
@@ -6772,17 +6780,17 @@ used.
      will be returned.  If the length of STR is greater than SIZE then
      only SIZE characters will be allocated and copied, with one
      additional byte for the nul character.  If there is not enough
-     space in the heap then the `NULL' pointer will be returned and
-     `errno' will be set to `ENOMEM'.  The `strndupa()' function
-     normally allocates its memory from the stack, with the result that
-     all such allocations will be freed when the function returns.
-     This version of `strndupa()' allocates its memory from the heap in
-     order to provide better debugging, but the allocations may not
-     necessarily be freed immediately when the function returns.  The
-     allocated memory can be deallocated explicitly with `dealloca()',
-     but may not be reallocated or deallocated in any other way.  This
-     function is available for backwards compatibility with older C
-     source code and should not be used in new code.
+     space in the heap then the program will be terminated and the
+     `OUTMEM' error will be given.  The `strndupa()' function normally
+     allocates its memory from the stack, with the result that all such
+     allocations will be freed when the function returns.  This version
+     of `strndupa()' allocates its memory from the heap in order to
+     provide better debugging, but the allocations may not necessarily
+     be freed immediately when the function returns.  The allocated
+     memory can be deallocated explicitly with `dealloca()', but may
+     not be reallocated or deallocated in any other way.  This function
+     is available for backwards compatibility with older C source code
+     and should not be used in new code.
 
 `void *realloc(void *ptr, size_t size)'
      Resizes the memory allocation beginning at PTR to SIZE bytes and
@@ -6974,10 +6982,11 @@ slightly less tracing information.
      will be suitably aligned for casting to any type and can be used
      to store data of up to SIZE bytes in length.  If SIZE is `0' then
      the memory allocated will be implicitly rounded up to `1' byte.
-     If there is not enough space in the heap then the `NULL' pointer
-     will be returned and `errno' will be set to `ENOMEM' -- no
-     exceptions will be thrown.  The allocated memory must be
-     deallocated with `operator delete'.
+     If there is not enough space in the heap then either the
+     `std::bad_alloc' exception will be thrown or the null pointer will
+     be returned and `errno' will be set to `ENOMEM' -- the behaviour
+     depends on whether the _nothrow_ version of the operator is used.
+     The allocated memory must be deallocated with `operator delete'.
 
 `void *operator new[](size_t size)'
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -6985,10 +6994,11 @@ slightly less tracing information.
      will be suitably aligned for casting to any type and can be used
      to store data of up to SIZE bytes in length.  If SIZE is `0' then
      the memory allocated will be implicitly rounded up to `1' byte.
-     If there is not enough space in the heap then the `NULL' pointer
-     will be returned and `errno' will be set to `ENOMEM' -- no
-     exceptions will be thrown.  The allocated memory must be
-     deallocated with `operator delete[]'.
+     If there is not enough space in the heap then either the
+     `std::bad_alloc' exception will be thrown or the null pointer will
+     be returned and `errno' will be set to `ENOMEM' -- the behaviour
+     depends on whether the _nothrow_ version of the operator is used.
+     The allocated memory must be deallocated with `operator delete[]'.
 
 `void operator delete(void *ptr)'
      Frees the memory allocation beginning at PTR so the memory can be
@@ -7007,15 +7017,12 @@ slightly less tracing information.
 `void (*set_new_handler(void (*func)(void)))(void)'
      Installs a low-memory handler specifically for use with `operator
      new' and `operator new[]' and returns a pointer to the previously
-     installed handler, or the `NULL' pointer if no handler had been
+     installed handler, or the null pointer if no handler had been
      previously installed.  This will be called repeatedly by both
      functions when they would normally return `NULL', and this loop
      will continue until they manage to allocate the requested space.
-     The default low-memory handler for the C++ operators will
-     terminate the program and write an out of memory message to the
-     log file.  Note that this function is equivalent to
-     `__mp_nomemory()' and will replace the handler installed by that
-     function.
+     Note that this function is equivalent to `__mp_nomemory()' and
+     will replace the handler installed by that function.
 
 
 File: mpatrol.info,  Node: Functions 4,  Next: Functions 5,  Prev: Functions 3,  Up: Functions
@@ -13797,42 +13804,42 @@ Ref: Tutorial-Footnote-3308804
 Ref: Tutorial-Footnote-4308941
 Ref: Tutorial-Footnote-5309040
 Node: Functions309321
-Node: Functions 1310678
-Node: Functions 2328280
-Node: Functions 3332053
-Node: Functions 4335638
-Node: Functions 5341491
-Node: Environment350285
-Node: Options371053
-Node: Diagnostic messages382440
-Node: Library performance399070
-Node: File formats401563
-Ref: File formats-Footnote-1401987
-Node: Profiling file format402199
-Node: Tracing file format405461
-Node: Supported systems407328
-Node: New system support422761
-Node: New processor support423957
-Node: New file format support424640
-Node: Notes425424
-Node: Generic notes427036
-Ref: Generic notes-Footnote-1444306
-Ref: Generic notes-Footnote-2444524
-Node: UNIX notes444746
-Node: Amiga notes449343
-Node: Windows notes453007
-Node: Netware notes454566
-Node: Frequently asked questions457126
-Node: Documentation457749
-Node: Building462579
-Node: Linking471295
-Node: Running476516
-Node: Files491624
-Node: Related software494620
-Ref: Related software-Footnote-1533630
-Node: References533871
-Node: Copying536464
-Node: Function index564353
-Node: Index567665
+Node: Functions 1311131
+Node: Functions 2328720
+Node: Functions 3332493
+Node: Functions 4336144
+Node: Functions 5341997
+Node: Environment350791
+Node: Options371559
+Node: Diagnostic messages382946
+Node: Library performance399576
+Node: File formats402069
+Ref: File formats-Footnote-1402493
+Node: Profiling file format402705
+Node: Tracing file format405967
+Node: Supported systems407834
+Node: New system support423267
+Node: New processor support424463
+Node: New file format support425146
+Node: Notes425930
+Node: Generic notes427542
+Ref: Generic notes-Footnote-1444812
+Ref: Generic notes-Footnote-2445030
+Node: UNIX notes445252
+Node: Amiga notes449849
+Node: Windows notes453513
+Node: Netware notes455072
+Node: Frequently asked questions457632
+Node: Documentation458255
+Node: Building463085
+Node: Linking471801
+Node: Running477022
+Node: Files492130
+Node: Related software495126
+Ref: Related software-Footnote-1534136
+Node: References534377
+Node: Copying536970
+Node: Function index564859
+Node: Index568171
 
 End Tag Table

@@ -6541,8 +6541,16 @@ preprocessor macro.
 the <code>NDEBUG</code> preprocessor macro, which is the same macro used to control
 the behaviour of the <code>assert()</code> function.  If <code>NDEBUG</code> is defined then
 no macro redefinition of functions will take place and all special mpatrol
-library functions will evaluate to empty statements.  It is intended that the
+library functions will evaluate to empty statements.  The <code>mpalloc.h</code>
+header file will also be included in this case.  It is intended that the
 <code>NDEBUG</code> preprocessor macro be defined in release builds.
+
+<p>The <code>MP_MALLOC()</code> family of functions that are defined in <code>mpalloc.h</code>
+are also defined in <code>mpatrol.h</code> when <code>NDEBUG</code> is not defined.  The
+mpatrol versions of these functions contain more debugging information than the
+mpalloc versions do, but they do not call the allocation failure handler when no
+more memory is available (they cause the <code>OUTMEM</code> error message to be given
+instead).
 
 <ul>
 <li><a href="#Functions%201">Functions 1</a>:                  C dynamic memory allocation functions. 
@@ -6633,16 +6641,15 @@ pointer to the first byte of the allocation.  The pointer returned will be
 suitably aligned for casting to any type and can be used to store data of up to
 <var>size</var> bytes in length.  If <var>size</var> is <code>0</code> then the memory allocated
 will be implicitly rounded up to <code>1</code> byte.  If there is not enough space in
-the heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be
-set to <code>ENOMEM</code>.  The <code>alloca()</code> function normally allocates its
-memory from the stack, with the result that all such allocations will be freed
-when the function returns.  This version of <code>alloca()</code> allocates its memory
-from the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with <code>dealloca()</code>, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+the heap then the program will be terminated and the <code>OUTMEM</code> error will be
+given.  The <code>alloca()</code> function normally allocates its memory from the
+stack, with the result that all such allocations will be freed when the function
+returns.  This version of <code>alloca()</code> allocates its memory from the heap in
+order to provide better debugging, but the allocations may not necessarily be
+freed immediately when the function returns.  The allocated memory can be
+deallocated explicitly with <code>dealloca()</code>, but may not be reallocated or
+deallocated in any other way.  This function is available for backwards
+compatibility with older C source code and should not be used in new code.
 
 <br><dt><code>char *strdup(const char *str)</code>
 <dd>Allocates exactly enough memory from the heap to duplicate <var>str</var> (including
@@ -6705,16 +6712,16 @@ byte of the allocation after copying <var>str</var> to the newly-allocated memor
 The pointer returned will have no alignment constraints and can be used to store
 character data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then
 an error will be given and the <code>NULL</code> pointer will be returned.  If there
-is not enough space in the heap then the <code>NULL</code> pointer will be returned
-and <code>errno</code> will be set to <code>ENOMEM</code>.  The <code>strdupa()</code> function
-normally allocates its memory from the stack, with the result that all such
-allocations will be freed when the function returns.  This version of
-<code>strdupa()</code> allocates its memory from the heap in order to provide better
-debugging, but the allocations may not necessarily be freed immediately when the
-function returns.  The allocated memory can be deallocated explicitly with
-<code>dealloca()</code>, but may not be reallocated or deallocated in any other way. 
-This function is available for backwards compatibility with older C source code
-and should not be used in new code.
+is not enough space in the heap then the program will be terminated and the
+<code>OUTMEM</code> error will be given.  The <code>strdupa()</code> function normally
+allocates its memory from the stack, with the result that all such allocations
+will be freed when the function returns.  This version of <code>strdupa()</code>
+allocates its memory from the heap in order to provide better debugging, but the
+allocations may not necessarily be freed immediately when the function returns. 
+The allocated memory can be deallocated explicitly with <code>dealloca()</code>, but
+may not be reallocated or deallocated in any other way.  This function is
+available for backwards compatibility with older C source code and should not be
+used in new code.
 
 <br><dt><code>char *strndupa(const char *str, size_t size)</code>
 <dd>Allocates exactly enough temporary memory from the heap to duplicate <var>str</var>
@@ -6726,16 +6733,15 @@ character data up to the length of <var>str</var>.  If <var>str</var> is <code>N
 will be returned.  If the length of <var>str</var> is greater than <var>size</var> then
 only <var>size</var> characters will be allocated and copied, with one additional
 byte for the nul character.  If there is not enough space in the heap then the
-<code>NULL</code> pointer will be returned and <code>errno</code> will be set to
-<code>ENOMEM</code>.  The <code>strndupa()</code> function normally allocates its memory
-from the stack, with the result that all such allocations will be freed when the
-function returns.  This version of <code>strndupa()</code> allocates its memory from
-the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with <code>dealloca()</code>, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+program will be terminated and the <code>OUTMEM</code> error will be given.  The
+<code>strndupa()</code> function normally allocates its memory from the stack, with
+the result that all such allocations will be freed when the function returns. 
+This version of <code>strndupa()</code> allocates its memory from the heap in order to
+provide better debugging, but the allocations may not necessarily be freed
+immediately when the function returns.  The allocated memory can be deallocated
+explicitly with <code>dealloca()</code>, but may not be reallocated or deallocated in
+any other way.  This function is available for backwards compatibility with
+older C source code and should not be used in new code.
 
 <br><dt><code>void *realloc(void *ptr, size_t size)</code>
 <dd>Resizes the memory allocation beginning at <var>ptr</var> to <var>size</var> bytes and
@@ -6923,9 +6929,10 @@ the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to <var>size</var> bytes
 in length.  If <var>size</var> is <code>0</code> then the memory allocated will be
 implicitly rounded up to <code>1</code> byte.  If there is not enough space in the
-heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be set
-to <code>ENOMEM</code> -- no exceptions will be thrown.  The allocated memory must be
-deallocated with <code>operator delete</code>.
+heap then either the <code>std::bad_alloc</code> exception will be thrown or the
+null pointer will be returned and <code>errno</code> will be set to <code>ENOMEM</code> --
+the behaviour depends on whether the <em>nothrow</em> version of the operator is
+used.  The allocated memory must be deallocated with <code>operator delete</code>.
 
 <br><dt><code>void *operator new[](size_t size)</code>
 <dd>Allocates <var>size</var> uninitialised bytes from the heap and returns a pointer to
@@ -6933,9 +6940,10 @@ the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to <var>size</var> bytes
 in length.  If <var>size</var> is <code>0</code> then the memory allocated will be
 implicitly rounded up to <code>1</code> byte.  If there is not enough space in the
-heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be set
-to <code>ENOMEM</code> -- no exceptions will be thrown.  The allocated memory must be
-deallocated with <code>operator delete[]</code>.
+heap then either the <code>std::bad_alloc</code> exception will be thrown or the
+null pointer will be returned and <code>errno</code> will be set to <code>ENOMEM</code> --
+the behaviour depends on whether the <em>nothrow</em> version of the operator is
+used.  The allocated memory must be deallocated with <code>operator delete[]</code>.
 
 <br><dt><code>void operator delete(void *ptr)</code>
 <dd>Frees the memory allocation beginning at <var>ptr</var> so the memory can be reused
@@ -6952,13 +6960,11 @@ must only be used with memory allocated by <code>operator new[]</code>.
 <br><dt><code>void (*set_new_handler(void (*func)(void)))(void)</code>
 <dd>Installs a low-memory handler specifically for use with <code>operator new</code> and
 <code>operator new[]</code> and returns a pointer to the previously installed handler,
-or the <code>NULL</code> pointer if no handler had been previously installed.  This
-will be called repeatedly by both functions when they would normally return
-<code>NULL</code>, and this loop will continue until they manage to allocate the
-requested space.  The default low-memory handler for the C++ operators will
-terminate the program and write an out of memory message to the log file.  Note
-that this function is equivalent to <code>__mp_nomemory()</code> and will replace the
-handler installed by that function. 
+or the null pointer if no handler had been previously installed.  This will be
+called repeatedly by both functions when they would normally return <code>NULL</code>,
+and this loop will continue until they manage to allocate the requested space. 
+Note that this function is equivalent to <code>__mp_nomemory()</code> and will replace
+the handler installed by that function. 
 </dl>
 
 <p><hr>

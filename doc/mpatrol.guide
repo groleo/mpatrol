@@ -6745,9 +6745,17 @@ contained in the @{b}MPATROL_VERSION@{ub} preprocessor macro.
 defining the @{b}NDEBUG@{ub} preprocessor macro, which is the same macro used to
 control the behaviour of the @{b}assert()@{ub} function.  If @{b}NDEBUG@{ub} is defined
 then no macro redefinition of functions will take place and all special
-mpatrol library functions will evaluate to empty statements.  It is
+mpatrol library functions will evaluate to empty statements.  The
+@{b}mpalloc.h@{ub} header file will also be included in this case.  It is
 intended that the @{b}NDEBUG@{ub} preprocessor macro be defined in release
 builds.
+
+   The @{b}MP_MALLOC()@{ub} family of functions that are defined in @{b}mpalloc.h@{ub}
+are also defined in @{b}mpatrol.h@{ub} when @{b}NDEBUG@{ub} is not defined.  The mpatrol
+versions of these functions contain more debugging information than the
+mpalloc versions do, but they do not call the allocation failure
+handler when no more memory is available (they cause the @{b}OUTMEM@{ub} error
+message to be given instead).
 
 
  @{" Functions 1                " link "Functions 1"}  C dynamic memory allocation functions.
@@ -6841,12 +6849,12 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      pointer returned will be suitably aligned for casting to any type
      and can be used to store data of up to SIZE bytes in length.  If
      SIZE is @{b}0@{ub} then the memory allocated will be implicitly rounded up
-     to @{b}1@{ub} byte.  If there is not enough space in the heap then the @{b}NULL@{ub}
-     pointer will be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The
-     @{b}alloca()@{ub} function normally allocates its memory from the stack,
-     with the result that all such allocations will be freed when the
-     function returns.  This version of @{b}alloca()@{ub} allocates its memory
-     from the heap in order to provide better debugging, but the
+     to @{b}1@{ub} byte.  If there is not enough space in the heap then the
+     program will be terminated and the @{b}OUTMEM@{ub} error will be given.
+     The @{b}alloca()@{ub} function normally allocates its memory from the
+     stack, with the result that all such allocations will be freed
+     when the function returns.  This version of @{b}alloca()@{ub} allocates its
+     memory from the heap in order to provide better debugging, but the
      allocations may not necessarily be freed immediately when the
      function returns.  The allocated memory can be deallocated
      explicitly with @{b}dealloca()@{ub}, but may not be reallocated or
@@ -6922,8 +6930,8 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      will have no alignment constraints and can be used to store
      character data up to the length of STR.  If STR is @{b}NULL@{ub} then an
      error will be given and the @{b}NULL@{ub} pointer will be returned.  If
-     there is not enough space in the heap then the @{b}NULL@{ub} pointer will
-     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The @{b}strdupa()@{ub}
+     there is not enough space in the heap then the program will be
+     terminated and the @{b}OUTMEM@{ub} error will be given.  The @{b}strdupa()@{ub}
      function normally allocates its memory from the stack, with the
      result that all such allocations will be freed when the function
      returns.  This version of @{b}strdupa()@{ub} allocates its memory from the
@@ -6945,8 +6953,8 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      be returned.  If the length of STR is greater than SIZE then only
      SIZE characters will be allocated and copied, with one additional
      byte for the nul character.  If there is not enough space in the
-     heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set
-     to @{b}ENOMEM@{ub}.  The @{b}strndupa()@{ub} function normally allocates its memory
+     heap then the program will be terminated and the @{b}OUTMEM@{ub} error will
+     be given.  The @{b}strndupa()@{ub} function normally allocates its memory
      from the stack, with the result that all such allocations will be
      freed when the function returns.  This version of @{b}strndupa()@{ub}
      allocates its memory from the heap in order to provide better
@@ -7154,10 +7162,11 @@ information.
      will be suitably aligned for casting to any type and can be used
      to store data of up to SIZE bytes in length.  If SIZE is @{b}0@{ub} then
      the memory allocated will be implicitly rounded up to @{b}1@{ub} byte.  If
-     there is not enough space in the heap then the @{b}NULL@{ub} pointer will
-     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub} -- no exceptions will
-     be thrown.  The allocated memory must be deallocated with @{b}operator
-     delete@{ub}.
+     there is not enough space in the heap then either the
+     @{b}std::bad_alloc@{ub} exception will be thrown or the null pointer will
+     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub} -- the behaviour
+     depends on whether the @{i}nothrow@{ui} version of the operator is used.
+     The allocated memory must be deallocated with @{b}operator delete@{ub}.
 
 @{b}void *operator new[](size_t size)@{ub}
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -7165,10 +7174,11 @@ information.
      will be suitably aligned for casting to any type and can be used
      to store data of up to SIZE bytes in length.  If SIZE is @{b}0@{ub} then
      the memory allocated will be implicitly rounded up to @{b}1@{ub} byte.  If
-     there is not enough space in the heap then the @{b}NULL@{ub} pointer will
-     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub} -- no exceptions will
-     be thrown.  The allocated memory must be deallocated with @{b}operator
-     delete[]@{ub}.
+     there is not enough space in the heap then either the
+     @{b}std::bad_alloc@{ub} exception will be thrown or the null pointer will
+     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub} -- the behaviour
+     depends on whether the @{i}nothrow@{ui} version of the operator is used.
+     The allocated memory must be deallocated with @{b}operator delete[]@{ub}.
 
 @{b}void operator delete(void *ptr)@{ub}
      Frees the memory allocation beginning at PTR so the memory can be
@@ -7187,13 +7197,11 @@ information.
 @{b}void (*set_new_handler(void (*func)(void)))(void)@{ub}
      Installs a low-memory handler specifically for use with @{b}operator
      new@{ub} and @{b}operator new[]@{ub} and returns a pointer to the previously
-     installed handler, or the @{b}NULL@{ub} pointer if no handler had been
+     installed handler, or the null pointer if no handler had been
      previously installed.  This will be called repeatedly by both
      functions when they would normally return @{b}NULL@{ub}, and this loop will
-     continue until they manage to allocate the requested space.  The
-     default low-memory handler for the C++ operators will terminate
-     the program and write an out of memory message to the log file.
-     Note that this function is equivalent to @{b}__mp_nomemory()@{ub} and will
+     continue until they manage to allocate the requested space.  Note
+     that this function is equivalent to @{b}__mp_nomemory()@{ub} and will
      replace the handler installed by that function.
 
 

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.181 2001-02-20 14:45:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.182 2001-02-20 15:25:04 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -7023,8 +7023,16 @@ All of the function definitions in @file{mpatrol.h} can be disabled by defining
 the @code{NDEBUG} preprocessor macro, which is the same macro used to control
 the behaviour of the @code{assert()} function.  If @code{NDEBUG} is defined then
 no macro redefinition of functions will take place and all special mpatrol
-library functions will evaluate to empty statements.  It is intended that the
+library functions will evaluate to empty statements.  The @file{mpalloc.h}
+header file will also be included in this case.  It is intended that the
 @code{NDEBUG} preprocessor macro be defined in release builds.
+
+The @code{MP_MALLOC()} family of functions that are defined in @file{mpalloc.h}
+are also defined in @file{mpatrol.h} when @code{NDEBUG} is not defined.  The
+mpatrol versions of these functions contain more debugging information than the
+mpalloc versions do, but they do not call the allocation failure handler when no
+more memory is available (they cause the @samp{OUTMEM} error message to be given
+instead).
 
 @menu
 * Functions 1::                 C dynamic memory allocation functions.
@@ -7116,16 +7124,15 @@ pointer to the first byte of the allocation.  The pointer returned will be
 suitably aligned for casting to any type and can be used to store data of up to
 @var{size} bytes in length.  If @var{size} is @samp{0} then the memory allocated
 will be implicitly rounded up to @samp{1} byte.  If there is not enough space in
-the heap then the @samp{NULL} pointer will be returned and @code{errno} will be
-set to @code{ENOMEM}.  The @code{alloca()} function normally allocates its
-memory from the stack, with the result that all such allocations will be freed
-when the function returns.  This version of @code{alloca()} allocates its memory
-from the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with @code{dealloca()}, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+the heap then the program will be terminated and the @samp{OUTMEM} error will be
+given.  The @code{alloca()} function normally allocates its memory from the
+stack, with the result that all such allocations will be freed when the function
+returns.  This version of @code{alloca()} allocates its memory from the heap in
+order to provide better debugging, but the allocations may not necessarily be
+freed immediately when the function returns.  The allocated memory can be
+deallocated explicitly with @code{dealloca()}, but may not be reallocated or
+deallocated in any other way.  This function is available for backwards
+compatibility with older C source code and should not be used in new code.
 
 @findex strdup
 @item @code{char *strdup(const char *str)}
@@ -7193,16 +7200,16 @@ byte of the allocation after copying @var{str} to the newly-allocated memory.
 The pointer returned will have no alignment constraints and can be used to store
 character data up to the length of @var{str}.  If @var{str} is @samp{NULL} then
 an error will be given and the @samp{NULL} pointer will be returned.  If there
-is not enough space in the heap then the @samp{NULL} pointer will be returned
-and @code{errno} will be set to @code{ENOMEM}.  The @code{strdupa()} function
-normally allocates its memory from the stack, with the result that all such
-allocations will be freed when the function returns.  This version of
-@code{strdupa()} allocates its memory from the heap in order to provide better
-debugging, but the allocations may not necessarily be freed immediately when the
-function returns.  The allocated memory can be deallocated explicitly with
-@code{dealloca()}, but may not be reallocated or deallocated in any other way.
-This function is available for backwards compatibility with older C source code
-and should not be used in new code.
+is not enough space in the heap then the program will be terminated and the
+@samp{OUTMEM} error will be given.  The @code{strdupa()} function normally
+allocates its memory from the stack, with the result that all such allocations
+will be freed when the function returns.  This version of @code{strdupa()}
+allocates its memory from the heap in order to provide better debugging, but the
+allocations may not necessarily be freed immediately when the function returns.
+The allocated memory can be deallocated explicitly with @code{dealloca()}, but
+may not be reallocated or deallocated in any other way.  This function is
+available for backwards compatibility with older C source code and should not be
+used in new code.
 
 @findex strndupa
 @item @code{char *strndupa(const char *str, size_t size)}
@@ -7215,16 +7222,15 @@ character data up to the length of @var{str}.  If @var{str} is @samp{NULL} and
 will be returned.  If the length of @var{str} is greater than @var{size} then
 only @var{size} characters will be allocated and copied, with one additional
 byte for the nul character.  If there is not enough space in the heap then the
-@samp{NULL} pointer will be returned and @code{errno} will be set to
-@code{ENOMEM}.  The @code{strndupa()} function normally allocates its memory
-from the stack, with the result that all such allocations will be freed when the
-function returns.  This version of @code{strndupa()} allocates its memory from
-the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with @code{dealloca()}, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+program will be terminated and the @samp{OUTMEM} error will be given.  The
+@code{strndupa()} function normally allocates its memory from the stack, with
+the result that all such allocations will be freed when the function returns.
+This version of @code{strndupa()} allocates its memory from the heap in order to
+provide better debugging, but the allocations may not necessarily be freed
+immediately when the function returns.  The allocated memory can be deallocated
+explicitly with @code{dealloca()}, but may not be reallocated or deallocated in
+any other way.  This function is available for backwards compatibility with
+older C source code and should not be used in new code.
 
 @findex realloc
 @item @code{void *realloc(void *ptr, size_t size)}
@@ -7418,9 +7424,10 @@ the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to @var{size} bytes
 in length.  If @var{size} is @samp{0} then the memory allocated will be
 implicitly rounded up to @samp{1} byte.  If there is not enough space in the
-heap then the @samp{NULL} pointer will be returned and @code{errno} will be set
-to @code{ENOMEM} --- no exceptions will be thrown.  The allocated memory must be
-deallocated with @code{operator delete}.
+heap then either the @code{std::bad_alloc} exception will be thrown or the
+null pointer will be returned and @code{errno} will be set to @code{ENOMEM} ---
+the behaviour depends on whether the @emph{nothrow} version of the operator is
+used.  The allocated memory must be deallocated with @code{operator delete}.
 
 @findex operator new[]
 @item @code{void *operator new[](size_t size)}
@@ -7429,9 +7436,10 @@ the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to @var{size} bytes
 in length.  If @var{size} is @samp{0} then the memory allocated will be
 implicitly rounded up to @samp{1} byte.  If there is not enough space in the
-heap then the @samp{NULL} pointer will be returned and @code{errno} will be set
-to @code{ENOMEM} --- no exceptions will be thrown.  The allocated memory must be
-deallocated with @code{operator delete[]}.
+heap then either the @code{std::bad_alloc} exception will be thrown or the
+null pointer will be returned and @code{errno} will be set to @code{ENOMEM} ---
+the behaviour depends on whether the @emph{nothrow} version of the operator is
+used.  The allocated memory must be deallocated with @code{operator delete[]}.
 
 @findex operator delete
 @item @code{void operator delete(void *ptr)}
@@ -7451,13 +7459,11 @@ must only be used with memory allocated by @code{operator new[]}.
 @item @code{void (*set_new_handler(void (*func)(void)))(void)}
 Installs a low-memory handler specifically for use with @code{operator new} and
 @code{operator new[]} and returns a pointer to the previously installed handler,
-or the @samp{NULL} pointer if no handler had been previously installed.  This
-will be called repeatedly by both functions when they would normally return
-@samp{NULL}, and this loop will continue until they manage to allocate the
-requested space.  The default low-memory handler for the C++ operators will
-terminate the program and write an out of memory message to the log file.  Note
-that this function is equivalent to @code{__mp_nomemory()} and will replace the
-handler installed by that function.
+or the null pointer if no handler had been previously installed.  This will be
+called repeatedly by both functions when they would normally return @samp{NULL},
+and this loop will continue until they manage to allocate the requested space.
+Note that this function is equivalent to @code{__mp_nomemory()} and will replace
+the handler installed by that function.
 @end table
 
 @node Functions 4, Functions 5, Functions 3, Functions
