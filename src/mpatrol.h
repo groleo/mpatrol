@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.129 2001-07-25 22:14:53 graeme Exp $
+ * $Id: mpatrol.h,v 1.130 2001-07-25 22:29:34 graeme Exp $
  */
 
 
@@ -276,11 +276,12 @@ typedef void *__mp_failhandler;
 #endif /* MP_MPALLOC_H */
 
 
-/* The types of the prologue and epilogue handlers.
+/* The types of the prologue, epilogue and low memory handlers.
  */
 
 typedef void (*__mp_prologuehandler)(MP_CONST void *, size_t, MP_CONST void *);
 typedef void (*__mp_epiloguehandler)(MP_CONST void *, MP_CONST void *);
+typedef void (*__mp_nomemoryhandler)(void);
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
@@ -782,7 +783,7 @@ int __mp_stats(__mp_heapinfo *);
 void __mp_checkheap(MP_CONST char *, MP_CONST char *, unsigned long);
 __mp_prologuehandler __mp_prologue(MP_CONST __mp_prologuehandler);
 __mp_epiloguehandler __mp_epilogue(MP_CONST __mp_epiloguehandler);
-void (*__mp_nomemory(void (*)(void)))(void);
+__mp_nomemoryhandler __mp_nomemory(MP_CONST __mp_nomemoryhandler);
 void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(MP_CONST char *, ...);
@@ -875,7 +876,7 @@ static int __mp_errno;
 #define __mp_check() ((void) 0)
 #define __mp_prologue(h) ((__mp_prologuehandler) NULL)
 #define __mp_epilogue(h) ((__mp_epiloguehandler) NULL)
-#define __mp_nomemory(h) ((void (*)(void)) NULL)
+#define __mp_nomemory(h) ((__mp_nomemoryhandler) NULL)
 #define __mp_pushdelstack(s, t, u) ((void) 0)
 #define __mp_popdelstack(s, t, u) ((void) 0)
 #define __mp_vprintf(s, v) ((int) 0)
