@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.12 2000-05-04 07:53:56 graeme Exp $"
+#ident "$Id: malloc.c,v 1.13 2000-05-04 20:07:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -277,14 +277,14 @@ void MP_ALTFUNCNAME(free)(void *p)
 /* Free an existing block of memory, usually a block allocated by calloc().
  */
 
-void cfree(void *p)
+void cfree(void *p, size_t l, size_t n)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(cfree)(void *p)
+void MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
 }

@@ -331,7 +331,8 @@ __mp_allocinfo;
 #define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, MP_FUNCNAME, \
                                   __FILE__, __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define cfree(p) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define cfree(p, l, n) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, \
+                                 __LINE__, 0)
 #define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), MP_AT_MEMSET, \
                                     MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, MP_FUNCNAME, \
