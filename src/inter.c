@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.97 2001-03-02 01:25:09 graeme Exp $"
+#ident "$Id: inter.c,v 1.98 2001-03-02 01:36:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.97 2001-03-02 01:25:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.98 2001-03-02 01:36:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -519,6 +519,15 @@ __mp_fini(void)
         memhead.init = 0;
     }
     restoresignals();
+}
+
+
+/* Provide a function which can be used as a breakpoint target in a debugger.
+ */
+
+void
+__mp_trap(void)
+{
 }
 
 

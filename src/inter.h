@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.32 2001-03-02 01:31:23 graeme Exp $
+ * $Id: inter.h,v 1.33 2001-03-02 01:34:19 graeme Exp $
  */
 
 
@@ -114,6 +114,7 @@ extern "C"
 
 void __mp_init(void);
 void __mp_fini(void);
+void __mp_trap(void);
 int __mp_atexit(void (*)(void));
 unsigned long __mp_setoption(long, unsigned long);
 int __mp_getoption(long, unsigned long *);

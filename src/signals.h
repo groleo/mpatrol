@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: signals.h,v 1.5 2001-02-10 16:45:39 graeme Exp $
+ * $Id: signals.h,v 1.6 2001-03-02 01:34:19 graeme Exp $
  */
 
 
@@ -61,7 +61,6 @@ MP_EXPORT void __mp_initsignals(sighead *);
 MP_EXPORT void __mp_savesignals(sighead *);
 MP_EXPORT void __mp_restoresignals(sighead *);
 MP_EXPORT void __mp_abort(void);
-MP_EXPORT void __mp_trap(void);
 
 
 #ifdef __cplusplus
