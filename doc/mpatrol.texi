@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.91 2000-06-16 17:55:41 graeme Exp $
+@c $Id: mpatrol.texi,v 1.92 2000-06-18 09:37:33 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.11
 @set VERSION 1.2.2
-@set UPDATED 16th June, 2000
+@set UPDATED 18th June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -1386,6 +1386,56 @@ be performed by using stack variables instead of global variables since every
 thread has its own local stack.  Care must be taken to write re-entrant
 functions --- i.e. a function will give exactly the same result with one thread
 as it will with multiple threads running it at the same time.
+
+The mpatrol library can be built as a thread-safe library with support for
+multi-threaded programs.  When this library is linked with your program, only
+one thread at a time can allocate, reallocate or deallocate dynamic memory, or
+perform a memory operation via @code{memcpy()}, @code{memset()}, etc.  This does
+not take full advantage of the potential concurrency in the library, but at
+least it will allow the debugging of multi-threaded programs.
+
+The process of making the mpatrol library thread-safe was made more complicated
+by the fact that the mutexes protecting the library's data structures had to be
+recursive, since some of the functions that the library will call may call
+@code{malloc()} and @code{free()} or any other functions redefined by the
+library.  If this was to happen with non-recursive mutexes then the recursive
+call would result in the thread attempting to lock a mutex that it already
+owned.  However, implementing recursive mutexes was only half the problem.
+
+The other problem with writing a thread-safe malloc library is that it must be
+initialised before the program becomes multi-threaded.  If the library is
+initialised when there are multiple threads running then one thread may be
+attempting to initialise the mutexes whilst another thread may be attempting
+to lock an uninitialised mutex.  Ideally, the best place to initialise the
+library would be at the start of @code{main()} but there is currently no way
+to do this other than getting users to explicitly plant calls to initialise the
+library in their code.  This is not a very satisfactory solution if all we want
+to do is link in the replacement malloc library without any need for
+recompilation.
+
+Fortunately, there are some ways to plant initialisation calls before
+@code{main()} is called, but they all have some drawbacks.  The first way is to
+use a static file-scope constructor in C++, which will then initialise the
+mutexes and the library data structures before the code in @code{main()} is
+executed.  However, on many systems this will require the final link to be
+performed by the C++ compiler that built the library.  That may not be desirable
+or even possible in many cases.  Unfortunately, this drawback appears in the
+second method, which involves using the GNU C compiler to compile the library.
+This compiler has an extension which allows functions to be specified as
+constructors which will be called before @code{main()}, but means that any
+program which is linked with the resulting library must be linked with the GNU C
+compiler driver.  However, many systems are now GNU-based which would mean that
+this would happen anyway.
+
+The final way of initialising the mutexes and the library data structures is to
+plant a call to the initialisation routines from a special section which the
+system will call before @code{main()} is called.  This section is called the
+@samp{.init} section on ELF-based platforms, but may exist in another form on
+other platforms too.  This has the advantage that the system linker can be used
+to link the final program, but a possible disadvantage is that the library may
+be initialised too early, possibly before the environment or file streams have
+been set up.  You may find that if one of the above methods does not work for
+you then perhaps another one will.
 
 @node Using mpatrol, Profiling, Operating system support, Top
 @chapter Using mpatrol
@@ -5964,7 +6014,9 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 IRIX 5.3, MIPS R4000, ELF32, @command{cc}
 @itemize @bullet
 @item
-The thread-safe version of the library does not work.
+The thread-safe version of the library does not work.  This is because there
+does not appear to be any evidence that this version of the operating system
+supports threads.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
@@ -6070,7 +6122,9 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 SINIX 5.43, MIPS R4000, ELF32, @command{cc}
 @itemize @bullet
 @item
-The thread-safe version of the library does not work.
+The thread-safe version of the library does not work.  This is because there
+does not appear to be any evidence that this version of the operating system
+supports threads.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
@@ -6571,8 +6625,9 @@ additional signals being caught so this may need to be improved.
 
 @item
 Need to add a way of initialising the thread-safe version of the library when
-it is not compiled on a system that supports init sections, or if it is not
-compiled with the GNU C compiler, or if it is not compiled with a C++ compiler.
+it is not compiled on a system that supports @samp{.init} sections, or if it is
+not compiled with the GNU C compiler, or if it is not compiled with a C++
+compiler.
 
 @item
 Need to add support for call stack traversal for the Alpha, and Itanium
@@ -6583,12 +6638,10 @@ the library and program are built unoptimised.
 @item
 Need to add support for obtaining the program name from the stack for the Alpha,
 Itanium and Motorola 88xx0 processor architectures, and also need to add support
-for obtaining the program name from somewhere other than the stack for systems
-where the mutexes are initialised from the init section.  Also need to add
-support for reading the program symbols from a suitable file in @file{/proc} for
-other operating systems that support it.  If there is no support for either of
-these methods then the @option{PROGFILE} option can currently be used to specify
-the program name at run-time.
+for obtaining the program name from somewhere other than the stack for the
+DYNIX/ptx platform.  If there is no support for either of these methods then the
+@option{PROGFILE} option can currently be used to specify the program name at
+run-time.
 
 @item
 If the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro is defined when
