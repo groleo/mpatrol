@@ -8538,12 +8538,11 @@ H.1 Notes for all platforms
      frames should differ by should be platform-dependent since the
      current value is way too high.
 
-   * Add a function to display a stack trace of the current call stack
-     to a file stream.  Note that there is still an issue with callback
-     functions if they call mpatrol library functions, since this will
-     lead to recursion.  Callback functions could also be defined for
-     `__malloc_hook()', `__realloc_hook()' and `__free_hook()' in much
-     the same way as for the GNU C library.
+   * There is an issue with callback functions if they call mpatrol
+     library functions, since this will lead to recursion.  Callback
+     functions could also be defined for `__malloc_hook()',
+     `__realloc_hook()' and `__free_hook()' in much the same way as for
+     the GNU C library.
 
    * Need to store filename and line number information in all call
      stacks so that the information can be used at program termination.
@@ -8582,7 +8581,8 @@ H.1 Notes for all platforms
 
    * Extend the `mptrace' command to graphically display the size of
      the heap plotted against time and the allocation size frequency.
-     Also rewrite the GUI support to use GNOME instead of Motif.
+     Also rewrite the GUI support to use GNOME instead of Motif,
+     possibly also using GLADE.
 
    * Improve the speed of watch points by setting a range of allocation
      indices for which they will be used.  This may require a lot of
@@ -8599,11 +8599,7 @@ H.1 Notes for all platforms
    * Add a CRC checksum to memory blocks and use it to check that freed
      memory allocations have not been corrupted when the `NOFREE' and
      `PRESERVE' options are in use on platforms which have no memory
-     protection.  This could also be extended to marking allocated
-     memory blocks and then displaying what blocks have changed after a
-     certain period from within a debugger.  Another idea could be to
-     display all memory allocations, etc.  made since a certain
-     function was called from within a program.
+     protection.
 
    * Add an option to set up a timer that will automatically check the
      heap after a certain number of clock cycles have elapsed.  This
@@ -8619,17 +8615,11 @@ H.1 Notes for all platforms
      `DIAGSTOP' option which would stop the program running after a
      certain number of diagnostics have been displayed.
 
-   * Perhaps add the string used as an argument to `malloc()',
-     `calloc()', etc. to the information stored about each memory
-     allocation.  This could aid greatly in debugging but might be a
-     bit cryptic if the original source code involved a lot of
-     preprocessor macros.  This could also be extended to providing a
-     function that could individually label each memory allocation with
-     a given string.
-
-   * Perhaps add time information to the details stored about each
-     memory allocation.  This is probably not useful unless the system
-     provides a high-resolution timer.
+   * Provide a function that could individually label each memory
+     allocation with a given string.  Perhaps also add time information
+     to the details stored about each memory allocation.  This is
+     probably not useful unless the system provides a high-resolution
+     timer.
 
    * Add an option (perhaps `NOINTERNAL') to suppress the display of
      internal (recursive) memory allocations in the mpatrol log file
@@ -8687,6 +8677,11 @@ H.1 Notes for all platforms
      to certain memory allocations and to return the current number of
      memory allocations or bytes allocated.
 
+   * Add support for the `-finstrument-functions' option of the GNU
+     compiler.  This would allow mpatrol to keep track of the entry to
+     and exit from every function, but would only work for code
+     compiled with this option.
+
    * Extend the Checker-support functions to store and check
      information about access permissions within heap memory and
      perhaps also in the stack as well.  Currently, the Checker-support
@@ -8727,6 +8722,11 @@ H.1 Notes for all platforms
      summary.  This should be prevented by disabling the signal handler
      at its first entry.
 
+   * Add an option to write the mpatrol log file in HTML format, or
+     even better XML format.  Could also write the tracing output file
+     in HATF format (Heap Allocation Trace Format) or the GNU `mtrace'
+     format for processing by other utilities.
+
    * The `mpsym' command could optionally preserve any stack traceback
      lines that already have symbolic or debugging information
      associated with them.  It could also support more debuggers other
@@ -8762,8 +8762,8 @@ H.1 Notes for all platforms
      it would help to see just how much worse so that speed
      improvements could be made.
 
-   * Add support for the BeOS operating system, as well as MacOS and
-     OS/2.  Perhaps MS-DOS might be possible as well.
+   * Add support for the BeOS operating system, as well as MacOS, NeXT
+     and OS/2.  Perhaps MS-DOS might be possible as well.
 
    ---------- Footnotes ----------
 
@@ -8852,10 +8852,10 @@ H.2 Notes for UNIX platforms
      command.  Also add a way to specify editor options to the `mpedit'
      command.
 
-   * Add support for Digital UNIX and other non-System V UNIX operating
-     systems.  Also test on NetBSD, OpenBSD and SunOS as support has
-     been written for these systems but is untested.  The SunOS port
-     requires an ANSI C compiler, though.
+   * Add support for Digital UNIX, SCO UNIX, Ultrix and other
+     non-System V UNIX operating systems.  Also test on NetBSD, OpenBSD
+     and SunOS as support has been written for these systems but is
+     untested.  The SunOS port requires an ANSI C compiler, though.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
