@@ -30,6 +30,7 @@ DESCRIPTION "dynamic memory allocation replacement library"
 EXPORTS
 	__mp_errno
 	__mp_init
+	__mp_reinit
 	__mp_fini
 	__mp_trap
 	__mp_atexit
@@ -79,6 +80,10 @@ EXPORTS
 	__mp_edit
 	__mp_list
 	__mp_view
+	__mp_readcontents
+	__mp_writecontents
+	__mp_cmpcontents
+	__mp_remcontents
 	chkr_set_right
 	chkr_copy_bitmap
 	chkr_check_addr
