@@ -222,7 +222,7 @@ out.
      `cfree()'     old     Frees memory allocated by `calloc()'.
      `dealloca()'  new     Explicitly frees temporary memory.
 
-   * Contains 4 replacement C++ dynamic memory allocation functions:
+   * Contains 4 replacement C++ dynamic memory allocation operators:
 
      `operator new'       Allocates memory.
      `operator new[]'     Allocates memory for an array.
@@ -248,6 +248,11 @@ out.
 
    * Contains support for a user-defined low-memory handler function,
      including a replacement for the C++ function, `set_new_handler()'.
+
+   * The C++ dynamic memory allocation operators make use of the
+     preprocessor in order to obtain source-level information.  If this
+     causes problems then replacement operator names may be used so
+     that the existing operators will still work.
 
    * Contains support for user-defined prologue and epilogue callback
      functions, which get called before and after every memory
@@ -3182,7 +3187,11 @@ information is obtained for the C++ operators, you may encounter some
 problems in existing C++ programs when making direct calls to `operator
 new' for example.  However, if you want to disable the redefinition of
 the C++ operators in `mpatrol.h' you can define the preprocessor macro
-`MP_NOCPLUSPLUS' before the inclusion of that file.
+`MP_NOCPLUSPLUS' before the inclusion of that file.  Alternatively, you
+may wish to define the `MP_NONEWDELETE' preprocessor macro in order to
+use `MP_NEW' and `MP_DELETE' instead of `new' and `delete'.  That way
+you can combine calls to mpatrol's operators and the standard
+operators.  Just make sure you don't mix them!
 
    If you are running on a system on which mpatrol supports full
 symbolic stack tracebacks the following information may still be useful
@@ -5369,10 +5378,15 @@ used.
 
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
-used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  To use
-these you must include `mpatrol.h' before all other header files,
-although on UNIX and Windows platforms (and AmigaOS when using `gcc')
-they will be used anyway, albeit with slightly less tracing information.
+used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  The
+replacement operators make use of the preprocessor in order to obtain
+source-level information.  If this causes problems then you should
+define the `MP_NONEWDELETE' preprocessor macro and use the `MP_NEW' and
+`MP_DELETE' macros instead of `new' and `delete' directly.  To use
+these C++ features you must include `mpatrol.h' before all other header
+files, although on UNIX and Windows platforms (and AmigaOS when using
+`gcc') they will be used anyway, albeit with slightly less tracing
+information.
 
 `void *operator new(size_t size)'
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -7294,16 +7308,11 @@ H.1 Notes for all platforms
 
    * C++ support is still fairly limited, and will possibly only work
      for older C++ code due to the way the operators are overridden
-     (i.e. there are no exceptions versions of the functions).  There
-     are also likely to be potential problems with the macros which
-     redefine `malloc()' and `operator new', etc., since there may be
-     member functions in code that will mistakenly be redefined if their
-     names match the macro definitions, and also means that calls to
-     placement `new' will not work at all.  Also, explicit references to
-     `operator new' rather than `new' are likely to result in
-     compilation errors, and the way that source level information is
-     obtained for `operator delete' means that the resulting code will
-     not be thread-safe.
+     (i.e. there are no exceptions versions of the functions).  Also,
+     explicit references to `operator new' rather than `new' are likely
+     to result in compilation errors, and the way that source level
+     information is obtained for `operator delete' means that the
+     resulting code will not be thread-safe.
 
    * Need to add support for other 64-bit processors in addition to the
      existing SPARC V9 support.  This shouldn't be too hard, but I
@@ -7514,10 +7523,9 @@ H.1 Notes for all platforms
 
    * Add a script to wrap around various popular C and C++ compiler
      drivers so that linking with the mpatrol library is much less
-     laborious.  Something similar could also be done with a script to
-     attach a running mpatrol process to a suitable debugger.  In
-     addition, a user-defined command or script file could be executed
-     at the end of every invocation of the `mpatrol' command.
+     laborious.  In addition, a user-defined command or script file
+     could be executed at the end of every invocation of the `mpatrol'
+     command.
 
    * Perhaps use GNU autoconf to automatically work out values for
      `config.h' on the platform it is being built on, and also use
@@ -7889,7 +7897,9 @@ I.2 Building
      either try not to use placement `new' or you can define the
      preprocessor macro `MP_NOCPLUSPLUS' when compiling your source
      file, which will disable the overriding of any C++ operators in
-     `mpatrol.h'.
+     `mpatrol.h'.  Alternatively, if you define `MP_NONEWDELETE' then
+     you can use `MP_NEW' and `MP_DELETE' in order to call the mpatrol
+     versions of the C++ operators.
 
   4. I still have the above problem, but I don't think it's due to
      placement `new' since the compiler complains about `operator
@@ -10533,10 +10543,16 @@ modules:                                            See 10.
 Motif:                                             
           See ``Appendix K References''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
+MP_DELETE:                                         
+          See ``Appendix A Functions''.
 MP_INLINE:                                         
           See ``I.2 Building''.
 MP_LIBRARYSTACK_SUPPORT:                            See 6.2.
+MP_NEW:                                            
+          See ``Appendix A Functions''.
 MP_NOCPLUSPLUS:                                    
+          See ``Appendix A Functions''.
+MP_NONEWDELETE:                                    
           See ``Appendix A Functions''.
 mpatrol:                                            See 1.
 mpatrol command:                                   

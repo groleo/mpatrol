@@ -350,7 +350,7 @@ allocated on the heap.
 <td>Explicitly frees temporary memory.
 <br></tr></table>
 
-<li>Contains 4 replacement C++ dynamic memory allocation functions:
+<li>Contains 4 replacement C++ dynamic memory allocation operators:
 
 <p><table><tr align="left"><td><code>operator new</code>
 <td>Allocates memory. 
@@ -402,6 +402,11 @@ in the system and third-party libraries.
 
 <li>Contains support for a user-defined low-memory handler function, including a
 replacement for the C++ function, <code>set_new_handler()</code>.
+
+<li>The C++ dynamic memory allocation operators make use of the preprocessor in
+order to obtain source-level information.  If this causes problems then
+replacement operator names may be used so that the existing operators will still
+work.
 
 <li>Contains support for user-defined prologue and epilogue callback functions,
 which get called before and after every memory allocation, reallocation or
@@ -3308,7 +3313,11 @@ Because of the convoluted way this information is obtained for the C++
 operators, you may encounter some problems in existing C++ programs when making
 direct calls to <code>operator new</code> for example.  However, if you want to
 disable the redefinition of the C++ operators in <code>mpatrol.h</code> you can define
-the preprocessor macro <code>MP_NOCPLUSPLUS</code> before the inclusion of that file.
+the preprocessor macro <code>MP_NOCPLUSPLUS</code> before the inclusion of that file. 
+Alternatively, you may wish to define the <code>MP_NONEWDELETE</code> preprocessor
+macro in order to use <code>MP_NEW</code> and <code>MP_DELETE</code> instead of <code>new</code>
+and <code>delete</code>.  That way you can combine calls to mpatrol's operators and
+the standard operators.  Just make sure you don't mix them!
 
 <p>If you are running on a system on which mpatrol supports full symbolic stack
 tracebacks the following information may still be useful if the source files
@@ -5460,10 +5469,15 @@ mpatrol-specific and should not be used in release code.
 
 <p>The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in <code>mpatrol.h</code> will only be used if the
-<code>MP_NOCPLUSPLUS</code> preprocessor macro is not defined.  To use these you must
-include <code>mpatrol.h</code> before all other header files, although on UNIX and
-Windows platforms (and AmigaOS when using <code>gcc</code>) they will be used
-anyway, albeit with slightly less tracing information.
+<code>MP_NOCPLUSPLUS</code> preprocessor macro is not defined.  The replacement
+operators make use of the preprocessor in order to obtain source-level
+information.  If this causes problems then you should define the
+<code>MP_NONEWDELETE</code> preprocessor macro and use the <code>MP_NEW</code> and
+<code>MP_DELETE</code> macros instead of <code>new</code> and <code>delete</code> directly.  To
+use these C++ features you must include <code>mpatrol.h</code> before all other header
+files, although on UNIX and Windows platforms (and AmigaOS when using
+<code>gcc</code>) they will be used anyway, albeit with slightly less tracing
+information.
 
 <dl>
 <dt><code>void *operator new(size_t size)</code>
@@ -7338,14 +7352,10 @@ Up:<a rel=up href="#Notes">Notes</a>
 <ul>
 <li>C++ support is still fairly limited, and will possibly only work for older C++
 code due to the way the operators are overridden (i.e. there are no exceptions
-versions of the functions).  There are also likely to be potential problems with
-the macros which redefine <code>malloc()</code> and <code>operator new</code>, etc., since
-there may be member functions in code that will mistakenly be redefined if their
-names match the macro definitions, and also means that calls to placement
-<code>new</code> will not work at all.  Also, explicit references to
-<code>operator new</code> rather than <code>new</code> are likely to result in compilation
-errors, and the way that source level information is obtained for
-<code>operator delete</code> means that the resulting code will not be thread-safe.
+versions of the functions).  Also, explicit references to <code>operator new</code>
+rather than <code>new</code> are likely to result in compilation errors, and the way
+that source level information is obtained for <code>operator delete</code> means that
+the resulting code will not be thread-safe.
 
 <li>Need to add support for other 64-bit processors in addition to the existing
 SPARC V9 support.  This shouldn't be too hard, but I haven't got access to such
@@ -7529,10 +7539,9 @@ could support <code>-</code> as the filename for reading the mpatrol log file fr
 standard input file stream.
 
 <li>Add a script to wrap around various popular C and C++ compiler drivers so that
-linking with the mpatrol library is much less laborious.  Something similar
-could also be done with a script to attach a running mpatrol process to a
-suitable debugger.  In addition, a user-defined command or script file could be
-executed at the end of every invocation of the <code>mpatrol</code> command.
+linking with the mpatrol library is much less laborious.  In addition, a
+user-defined command or script file could be executed at the end of every
+invocation of the <code>mpatrol</code> command.
 
 <li>Perhaps use GNU autoconf to automatically work out values for <code>config.h</code> on
 the platform it is being built on, and also use automake, libtool and install
@@ -7922,7 +7931,9 @@ causing lots of problems when calling placement <code>new</code> or explicitly
 calling <code>operator new</code>.  You can either try not to use placement
 <code>new</code> or you can define the preprocessor macro <code>MP_NOCPLUSPLUS</code> when
 compiling your source file, which will disable the overriding of any C++
-operators in <code>mpatrol.h</code>.
+operators in <code>mpatrol.h</code>.  Alternatively, if you define
+<code>MP_NONEWDELETE</code> then you can use <code>MP_NEW</code> and <code>MP_DELETE</code> in
+order to call the mpatrol versions of the C++ operators.
 
 </p><li>I still have the above problem, but I don't think it's due to placement
 <code>new</code> since the compiler complains about <code>operator new[]</code>, so could
@@ -10110,9 +10121,12 @@ Up:<a rel=up href="#Top">Top</a>
 <li>modules: <a href="#How%20it%20works">How it works</a>
 <li>Motif: <a href="#References">References</a>
 <li>MP_BUILTINSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>MP_DELETE: <a href="#Functions">Functions</a>
 <li>MP_INLINE: <a href="#Building">Building</a>
 <li>MP_LIBRARYSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>MP_NEW: <a href="#Functions">Functions</a>
 <li>MP_NOCPLUSPLUS: <a href="#Functions">Functions</a>
+<li>MP_NONEWDELETE: <a href="#Functions">Functions</a>
 <li>mpatrol: <a href="#Overview">Overview</a>
 <li>mpatrol command: <a href="#Options">Options</a>
 <li>mpatrol features: <a href="#Features">Features</a>

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.133 2000-11-09 20:32:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.134 2000-11-09 21:56:47 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -369,7 +369,7 @@ Contains 18 replacement C dynamic memory allocation functions:
 @end multitable
 
 @item
-Contains 4 replacement C++ dynamic memory allocation functions:
+Contains 4 replacement C++ dynamic memory allocation operators:
 
 @multitable @columnfractions .3 .7
 @item @code{operator new}
@@ -426,6 +426,12 @@ in the system and third-party libraries.
 @item
 Contains support for a user-defined low-memory handler function, including a
 replacement for the C++ function, @code{set_new_handler()}.
+
+@item
+The C++ dynamic memory allocation operators make use of the preprocessor in
+order to obtain source-level information.  If this causes problems then
+replacement operator names may be used so that the existing operators will still
+work.
 
 @item
 Contains support for user-defined prologue and epilogue callback functions,
@@ -3623,6 +3629,10 @@ operators, you may encounter some problems in existing C++ programs when making
 direct calls to @code{operator new} for example.  However, if you want to
 disable the redefinition of the C++ operators in @file{mpatrol.h} you can define
 the preprocessor macro @code{MP_NOCPLUSPLUS} before the inclusion of that file.
+Alternatively, you may wish to define the @code{MP_NONEWDELETE} preprocessor
+macro in order to use @code{MP_NEW} and @code{MP_DELETE} instead of @code{new}
+and @code{delete}.  That way you can combine calls to mpatrol's operators and
+the standard operators.  Just make sure you don't mix them!
 
 If you are running on a system on which mpatrol supports full symbolic stack
 tracebacks the following information may still be useful if the source files
@@ -5887,12 +5897,20 @@ mpatrol-specific and should not be used in release code.
 @end table
 
 @cindex MP_NOCPLUSPLUS
+@cindex MP_NONEWDELETE
+@cindex MP_NEW
+@cindex MP_DELETE
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in @file{mpatrol.h} will only be used if the
-@code{MP_NOCPLUSPLUS} preprocessor macro is not defined.  To use these you must
-include @file{mpatrol.h} before all other header files, although on UNIX and
-Windows platforms (and AmigaOS when using @command{gcc}) they will be used
-anyway, albeit with slightly less tracing information.
+@code{MP_NOCPLUSPLUS} preprocessor macro is not defined.  The replacement
+operators make use of the preprocessor in order to obtain source-level
+information.  If this causes problems then you should define the
+@code{MP_NONEWDELETE} preprocessor macro and use the @code{MP_NEW} and
+@code{MP_DELETE} macros instead of @code{new} and @code{delete} directly.  To
+use these C++ features you must include @file{mpatrol.h} before all other header
+files, although on UNIX and Windows platforms (and AmigaOS when using
+@command{gcc}) they will be used anyway, albeit with slightly less tracing
+information.
 
 @table @asis
 @findex operator new
@@ -8106,14 +8124,10 @@ attachment as a compressed tar archive.
 @item
 C++ support is still fairly limited, and will possibly only work for older C++
 code due to the way the operators are overridden (i.e.@: there are no exceptions
-versions of the functions).  There are also likely to be potential problems with
-the macros which redefine @code{malloc()} and @code{operator new}, etc., since
-there may be member functions in code that will mistakenly be redefined if their
-names match the macro definitions, and also means that calls to placement
-@code{new} will not work at all.  Also, explicit references to
-@code{operator new} rather than @code{new} are likely to result in compilation
-errors, and the way that source level information is obtained for
-@code{operator delete} means that the resulting code will not be thread-safe.
+versions of the functions).  Also, explicit references to @code{operator new}
+rather than @code{new} are likely to result in compilation errors, and the way
+that source level information is obtained for @code{operator delete} means that
+the resulting code will not be thread-safe.
 
 @item
 Need to add support for other 64-bit processors in addition to the existing
@@ -8331,10 +8345,9 @@ standard input file stream.
 
 @item
 Add a script to wrap around various popular C and C++ compiler drivers so that
-linking with the mpatrol library is much less laborious.  Something similar
-could also be done with a script to attach a running mpatrol process to a
-suitable debugger.  In addition, a user-defined command or script file could be
-executed at the end of every invocation of the @command{mpatrol} command.
+linking with the mpatrol library is much less laborious.  In addition, a
+user-defined command or script file could be executed at the end of every
+invocation of the @command{mpatrol} command.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
@@ -8758,7 +8771,9 @@ causing lots of problems when calling placement @code{new} or explicitly
 calling @code{operator new}.  You can either try not to use placement
 @code{new} or you can define the preprocessor macro @code{MP_NOCPLUSPLUS} when
 compiling your source file, which will disable the overriding of any C++
-operators in @file{mpatrol.h}.
+operators in @file{mpatrol.h}.  Alternatively, if you define
+@code{MP_NONEWDELETE} then you can use @code{MP_NEW} and @code{MP_DELETE} in
+order to call the mpatrol versions of the C++ operators.
 
 @item
 I still have the above problem, but I don't think it's due to placement

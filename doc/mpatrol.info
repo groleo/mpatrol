@@ -269,7 +269,7 @@ out.
      `cfree()'     old     Frees memory allocated by `calloc()'.
      `dealloca()'  new     Explicitly frees temporary memory.
 
-   * Contains 4 replacement C++ dynamic memory allocation functions:
+   * Contains 4 replacement C++ dynamic memory allocation operators:
 
      `operator new'       Allocates memory.
      `operator new[]'     Allocates memory for an array.
@@ -295,6 +295,11 @@ out.
 
    * Contains support for a user-defined low-memory handler function,
      including a replacement for the C++ function, `set_new_handler()'.
+
+   * The C++ dynamic memory allocation operators make use of the
+     preprocessor in order to obtain source-level information.  If this
+     causes problems then replacement operator names may be used so
+     that the existing operators will still work.
 
    * Contains support for user-defined prologue and epilogue callback
      functions, which get called before and after every memory
@@ -3335,7 +3340,11 @@ information is obtained for the C++ operators, you may encounter some
 problems in existing C++ programs when making direct calls to `operator
 new' for example.  However, if you want to disable the redefinition of
 the C++ operators in `mpatrol.h' you can define the preprocessor macro
-`MP_NOCPLUSPLUS' before the inclusion of that file.
+`MP_NOCPLUSPLUS' before the inclusion of that file.  Alternatively, you
+may wish to define the `MP_NONEWDELETE' preprocessor macro in order to
+use `MP_NEW' and `MP_DELETE' instead of `new' and `delete'.  That way
+you can combine calls to mpatrol's operators and the standard
+operators.  Just make sure you don't mix them!
 
    If you are running on a system on which mpatrol supports full
 symbolic stack tracebacks the following information may still be useful
@@ -5549,10 +5558,15 @@ used.
 
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
-used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  To use
-these you must include `mpatrol.h' before all other header files,
-although on UNIX and Windows platforms (and AmigaOS when using `gcc')
-they will be used anyway, albeit with slightly less tracing information.
+used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  The
+replacement operators make use of the preprocessor in order to obtain
+source-level information.  If this causes problems then you should
+define the `MP_NONEWDELETE' preprocessor macro and use the `MP_NEW' and
+`MP_DELETE' macros instead of `new' and `delete' directly.  To use
+these C++ features you must include `mpatrol.h' before all other header
+files, although on UNIX and Windows platforms (and AmigaOS when using
+`gcc') they will be used anyway, albeit with slightly less tracing
+information.
 
 `void *operator new(size_t size)'
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -7521,16 +7535,11 @@ Notes for all platforms
 
    * C++ support is still fairly limited, and will possibly only work
      for older C++ code due to the way the operators are overridden
-     (i.e. there are no exceptions versions of the functions).  There
-     are also likely to be potential problems with the macros which
-     redefine `malloc()' and `operator new', etc., since there may be
-     member functions in code that will mistakenly be redefined if their
-     names match the macro definitions, and also means that calls to
-     placement `new' will not work at all.  Also, explicit references to
-     `operator new' rather than `new' are likely to result in
-     compilation errors, and the way that source level information is
-     obtained for `operator delete' means that the resulting code will
-     not be thread-safe.
+     (i.e. there are no exceptions versions of the functions).  Also,
+     explicit references to `operator new' rather than `new' are likely
+     to result in compilation errors, and the way that source level
+     information is obtained for `operator delete' means that the
+     resulting code will not be thread-safe.
 
    * Need to add support for other 64-bit processors in addition to the
      existing SPARC V9 support.  This shouldn't be too hard, but I
@@ -7741,10 +7750,9 @@ Notes for all platforms
 
    * Add a script to wrap around various popular C and C++ compiler
      drivers so that linking with the mpatrol library is much less
-     laborious.  Something similar could also be done with a script to
-     attach a running mpatrol process to a suitable debugger.  In
-     addition, a user-defined command or script file could be executed
-     at the end of every invocation of the `mpatrol' command.
+     laborious.  In addition, a user-defined command or script file
+     could be executed at the end of every invocation of the `mpatrol'
+     command.
 
    * Perhaps use GNU autoconf to automatically work out values for
      `config.h' on the platform it is being built on, and also use
@@ -8145,7 +8153,9 @@ Building
      either try not to use placement `new' or you can define the
      preprocessor macro `MP_NOCPLUSPLUS' when compiling your source
      file, which will disable the overriding of any C++ operators in
-     `mpatrol.h'.
+     `mpatrol.h'.  Alternatively, if you define `MP_NONEWDELETE' then
+     you can use `MP_NEW' and `MP_DELETE' in order to call the mpatrol
+     versions of the C++ operators.
 
   4. I still have the above problem, but I don't think it's due to
      placement `new' since the compiler complains about `operator
@@ -10558,9 +10568,12 @@ Index
 * modules:                               How it works.
 * Motif:                                 References.
 * MP_BUILTINSTACK_SUPPORT:               Call stacks and symbol tables.
+* MP_DELETE:                             Functions.
 * MP_INLINE:                             Building.
 * MP_LIBRARYSTACK_SUPPORT:               Call stacks and symbol tables.
+* MP_NEW:                                Functions.
 * MP_NOCPLUSPLUS:                        Functions.
+* MP_NONEWDELETE:                        Functions.
 * mpatrol:                               Overview.
 * mpatrol command:                       Options.
 * mpatrol features:                      Features.
@@ -10808,106 +10821,106 @@ Node: Top1256
 Node: Foreword3409
 Node: Overview7893
 Node: Features10523
-Node: Installation26063
-Node: Integration31662
-Ref: Integration-Footnote-136697
-Node: Memory allocations36818
-Node: Static memory allocations37495
-Ref: Static memory allocations-Footnote-139956
-Node: Stack memory allocations39998
-Ref: Stack memory allocations-Footnote-141862
-Node: Dynamic memory allocations41901
-Ref: Dynamic memory allocations-Footnote-145323
-Ref: Dynamic memory allocations-Footnote-245442
-Node: Operating system support45546
-Node: Virtual memory47506
-Ref: Virtual memory-Footnote-153534
-Ref: Virtual memory-Footnote-253790
-Ref: Virtual memory-Footnote-353966
-Ref: Virtual memory-Footnote-454001
-Ref: Virtual memory-Footnote-554060
-Node: Call stacks and symbol tables54284
-Ref: Call stacks and symbol tables-Footnote-159962
-Ref: Call stacks and symbol tables-Footnote-260030
-Ref: Call stacks and symbol tables-Footnote-360081
-Ref: Call stacks and symbol tables-Footnote-460125
-Ref: Call stacks and symbol tables-Footnote-560167
-Ref: Call stacks and symbol tables-Footnote-660209
-Ref: Call stacks and symbol tables-Footnote-760257
-Node: Threads60363
-Ref: Threads-Footnote-166369
-Node: Using mpatrol66464
-Node: Library behaviour67330
-Ref: Library behaviour-Footnote-172132
-Node: Logging and tracing72190
-Node: General errors76022
-Ref: General errors-Footnote-180160
-Ref: General errors-Footnote-280316
-Node: Overwrites and underwrites80484
-Ref: Overwrites and underwrites-Footnote-188003
-Ref: Overwrites and underwrites-Footnote-288066
-Node: Using with a debugger88190
-Ref: Using with a debugger-Footnote-197234
-Ref: Using with a debugger-Footnote-297302
-Ref: Using with a debugger-Footnote-397558
-Node: Testing97647
-Ref: Testing-Footnote-1100384
-Ref: Testing-Footnote-2100565
-Node: Library functions100624
-Node: Utilities107505
-Node: Profiling117561
-Ref: Profiling-Footnote-1139963
-Node: Improving performance140187
-Ref: Improving performance-Footnote-1148881
-Ref: Improving performance-Footnote-2148923
-Ref: Improving performance-Footnote-3149000
-Ref: Improving performance-Footnote-4149072
-Node: How it works149116
-Node: Examples155761
-Node: Example 1159421
-Ref: Example 1-Footnote-1182269
-Node: Example 2182459
-Node: Example 3187839
-Node: Example 4194676
-Node: Example 5198149
-Ref: Example 5-Footnote-1201917
-Node: Example 6202046
-Node: Example 7203894
-Node: Example 8214110
-Node: Tutorial229266
-Ref: Tutorial-Footnote-1243755
-Ref: Tutorial-Footnote-2244046
-Ref: Tutorial-Footnote-3244195
-Ref: Tutorial-Footnote-4244332
-Ref: Tutorial-Footnote-5244431
-Node: Functions244712
-Node: Environment274862
-Node: Options292605
-Node: Diagnostic messages302538
-Node: Library performance317513
-Node: Profiling file format320015
-Ref: Profiling file format-Footnote-1323302
-Node: Supported systems323482
-Node: New system support336291
-Node: New processor support337487
-Node: New file format support338170
-Node: Notes338560
-Node: Generic notes340171
-Ref: Generic notes-Footnote-1353795
-Node: UNIX notes354017
-Node: Amiga notes358611
-Node: Windows notes362002
-Node: Netware notes363152
-Node: Frequently asked questions365442
-Node: Documentation366065
-Node: Building369858
-Node: Linking376302
-Node: Running380574
-Node: Files394210
-Node: Related software396798
-Ref: Related software-Footnote-1430549
-Node: References430790
-Node: Function index433390
-Node: Index435651
+Node: Installation26319
+Node: Integration31918
+Ref: Integration-Footnote-136953
+Node: Memory allocations37074
+Node: Static memory allocations37751
+Ref: Static memory allocations-Footnote-140212
+Node: Stack memory allocations40254
+Ref: Stack memory allocations-Footnote-142118
+Node: Dynamic memory allocations42157
+Ref: Dynamic memory allocations-Footnote-145579
+Ref: Dynamic memory allocations-Footnote-245698
+Node: Operating system support45802
+Node: Virtual memory47762
+Ref: Virtual memory-Footnote-153790
+Ref: Virtual memory-Footnote-254046
+Ref: Virtual memory-Footnote-354222
+Ref: Virtual memory-Footnote-454257
+Ref: Virtual memory-Footnote-554316
+Node: Call stacks and symbol tables54540
+Ref: Call stacks and symbol tables-Footnote-160218
+Ref: Call stacks and symbol tables-Footnote-260286
+Ref: Call stacks and symbol tables-Footnote-360337
+Ref: Call stacks and symbol tables-Footnote-460381
+Ref: Call stacks and symbol tables-Footnote-560423
+Ref: Call stacks and symbol tables-Footnote-660465
+Ref: Call stacks and symbol tables-Footnote-760513
+Node: Threads60619
+Ref: Threads-Footnote-166625
+Node: Using mpatrol66720
+Node: Library behaviour67586
+Ref: Library behaviour-Footnote-172388
+Node: Logging and tracing72446
+Node: General errors76278
+Ref: General errors-Footnote-180416
+Ref: General errors-Footnote-280572
+Node: Overwrites and underwrites80740
+Ref: Overwrites and underwrites-Footnote-188259
+Ref: Overwrites and underwrites-Footnote-288322
+Node: Using with a debugger88446
+Ref: Using with a debugger-Footnote-197490
+Ref: Using with a debugger-Footnote-297558
+Ref: Using with a debugger-Footnote-397814
+Node: Testing97903
+Ref: Testing-Footnote-1100640
+Ref: Testing-Footnote-2100821
+Node: Library functions100880
+Node: Utilities107761
+Node: Profiling117817
+Ref: Profiling-Footnote-1140219
+Node: Improving performance140443
+Ref: Improving performance-Footnote-1149137
+Ref: Improving performance-Footnote-2149179
+Ref: Improving performance-Footnote-3149256
+Ref: Improving performance-Footnote-4149328
+Node: How it works149372
+Node: Examples156017
+Node: Example 1159677
+Ref: Example 1-Footnote-1182795
+Node: Example 2182985
+Node: Example 3188365
+Node: Example 4195202
+Node: Example 5198675
+Ref: Example 5-Footnote-1202443
+Node: Example 6202572
+Node: Example 7204420
+Node: Example 8214636
+Node: Tutorial229792
+Ref: Tutorial-Footnote-1244281
+Ref: Tutorial-Footnote-2244572
+Ref: Tutorial-Footnote-3244721
+Ref: Tutorial-Footnote-4244858
+Ref: Tutorial-Footnote-5244957
+Node: Functions245238
+Node: Environment275674
+Node: Options293417
+Node: Diagnostic messages303350
+Node: Library performance318325
+Node: Profiling file format320827
+Ref: Profiling file format-Footnote-1324114
+Node: Supported systems324294
+Node: New system support337103
+Node: New processor support338299
+Node: New file format support338982
+Node: Notes339372
+Node: Generic notes340983
+Ref: Generic notes-Footnote-1354160
+Node: UNIX notes354382
+Node: Amiga notes358976
+Node: Windows notes362367
+Node: Netware notes363517
+Node: Frequently asked questions365807
+Node: Documentation366430
+Node: Building370223
+Node: Linking376826
+Node: Running381098
+Node: Files394734
+Node: Related software397322
+Ref: Related software-Footnote-1431073
+Node: References431314
+Node: Function index433914
+Node: Index436175
 
 End Tag Table

@@ -285,7 +285,7 @@ out.
      @{b}cfree()@{ub}       old     Frees memory allocated by @{b}calloc()@{ub}.
      @{b}dealloca()@{ub}    new     Explicitly frees temporary memory.
 
-   * Contains 4 replacement C++ dynamic memory allocation functions:
+   * Contains 4 replacement C++ dynamic memory allocation operators:
 
      @{b}operator new@{ub}         Allocates memory.
      @{b}operator new[]@{ub}       Allocates memory for an array.
@@ -311,6 +311,11 @@ out.
 
    * Contains support for a user-defined low-memory handler function,
      including a replacement for the C++ function, @{b}set_new_handler()@{ub}.
+
+   * The C++ dynamic memory allocation operators make use of the
+     preprocessor in order to obtain source-level information.  If this
+     causes problems then replacement operator names may be used so
+     that the existing operators will still work.
 
    * Contains support for user-defined prologue and epilogue callback
      functions, which get called before and after every memory
@@ -3439,7 +3444,11 @@ information is obtained for the C++ operators, you may encounter some
 problems in existing C++ programs when making direct calls to @{b}operator
 new@{ub} for example.  However, if you want to disable the redefinition of
 the C++ operators in @{b}mpatrol.h@{ub} you can define the preprocessor macro
-@{b}MP_NOCPLUSPLUS@{ub} before the inclusion of that file.
+@{b}MP_NOCPLUSPLUS@{ub} before the inclusion of that file.  Alternatively, you
+may wish to define the @{b}MP_NONEWDELETE@{ub} preprocessor macro in order to
+use @{b}MP_NEW@{ub} and @{b}MP_DELETE@{ub} instead of @{b}new@{ub} and @{b}delete@{ub}.  That way you can
+combine calls to mpatrol's operators and the standard operators.  Just
+make sure you don't mix them!
 
    If you are running on a system on which mpatrol supports full
 symbolic stack tracebacks the following information may still be useful
@@ -5688,8 +5697,12 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
 
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in @{b}mpatrol.h@{ub} will only be
-used if the @{b}MP_NOCPLUSPLUS@{ub} preprocessor macro is not defined.  To use
-these you must include @{b}mpatrol.h@{ub} before all other header files,
+used if the @{b}MP_NOCPLUSPLUS@{ub} preprocessor macro is not defined.  The
+replacement operators make use of the preprocessor in order to obtain
+source-level information.  If this causes problems then you should
+define the @{b}MP_NONEWDELETE@{ub} preprocessor macro and use the @{b}MP_NEW@{ub} and
+@{b}MP_DELETE@{ub} macros instead of @{b}new@{ub} and @{b}delete@{ub} directly.  To use these C++
+features you must include @{b}mpatrol.h@{ub} before all other header files,
 although on UNIX and Windows platforms (and AmigaOS when using @{b}gcc@{ub})
 they will be used anyway, albeit with slightly less tracing information.
 
@@ -7700,16 +7713,11 @@ Notes for all platforms
 
    * C++ support is still fairly limited, and will possibly only work
      for older C++ code due to the way the operators are overridden
-     (i.e. there are no exceptions versions of the functions).  There
-     are also likely to be potential problems with the macros which
-     redefine @{b}malloc()@{ub} and @{b}operator new@{ub}, etc., since there may be
-     member functions in code that will mistakenly be redefined if their
-     names match the macro definitions, and also means that calls to
-     placement @{b}new@{ub} will not work at all.  Also, explicit references to
-     @{b}operator new@{ub} rather than @{b}new@{ub} are likely to result in compilation
-     errors, and the way that source level information is obtained for
-     @{b}operator delete@{ub} means that the resulting code will not be
-     thread-safe.
+     (i.e. there are no exceptions versions of the functions).  Also,
+     explicit references to @{b}operator new@{ub} rather than @{b}new@{ub} are likely to
+     result in compilation errors, and the way that source level
+     information is obtained for @{b}operator delete@{ub} means that the
+     resulting code will not be thread-safe.
 
    * Need to add support for other 64-bit processors in addition to the
      existing SPARC V9 support.  This shouldn't be too hard, but I
@@ -7916,10 +7924,9 @@ Notes for all platforms
 
    * Add a script to wrap around various popular C and C++ compiler
      drivers so that linking with the mpatrol library is much less
-     laborious.  Something similar could also be done with a script to
-     attach a running mpatrol process to a suitable debugger.  In
-     addition, a user-defined command or script file could be executed
-     at the end of every invocation of the @{b}mpatrol@{ub} command.
+     laborious.  In addition, a user-defined command or script file
+     could be executed at the end of every invocation of the @{b}mpatrol@{ub}
+     command.
 
    * Perhaps use GNU autoconf to automatically work out values for
      @{b}config.h@{ub} on the platform it is being built on, and also use
@@ -8347,7 +8354,9 @@ Building
      @{b}new@{ub} or explicitly calling @{b}operator new@{ub}.  You can either try not to
      use placement @{b}new@{ub} or you can define the preprocessor macro
      @{b}MP_NOCPLUSPLUS@{ub} when compiling your source file, which will disable
-     the overriding of any C++ operators in @{b}mpatrol.h@{ub}.
+     the overriding of any C++ operators in @{b}mpatrol.h@{ub}.  Alternatively,
+     if you define @{b}MP_NONEWDELETE@{ub} then you can use @{b}MP_NEW@{ub} and @{b}MP_DELETE@{ub}
+     in order to call the mpatrol versions of the C++ operators.
 
   4. I still have the above problem, but I don't think it's due to
      placement @{b}new@{ub} since the compiler complains about @{b}operator new[]@{ub},
@@ -10815,9 +10824,12 @@ Index
  @{" modules                                  " link "How it works"}   How it works
  @{" Motif                                    " link "References"}   References
  @{" MP_BUILTINSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" MP_DELETE                                " link "Functions"}   Functions
  @{" MP_INLINE                                " link "Building"}   Building
  @{" MP_LIBRARYSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" MP_NEW                                   " link "Functions"}   Functions
  @{" MP_NOCPLUSPLUS                           " link "Functions"}   Functions
+ @{" MP_NONEWDELETE                           " link "Functions"}   Functions
  @{" mpatrol                                  " link "Overview"}   Overview
  @{" mpatrol command                          " link "Options"}   Options
  @{" mpatrol features                         " link "Features"}   Features
