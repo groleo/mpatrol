@@ -29,6 +29,7 @@ __mp_trap
 __mp_atexit
 __mp_setoption
 __mp_getoption
+__mp_memhead
 __mp_alloc
 __mp_strdup
 __mp_realloc
