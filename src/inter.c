@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.118 2001-03-08 22:07:59 graeme Exp $"
+#ident "$Id: inter.c,v 1.119 2001-03-10 17:56:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.118 2001-03-08 22:07:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.119 2001-03-10 17:56:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -141,13 +141,12 @@ extern void **__piob;
 
 static int *initsection = &__mp_initsection;
 #elif SYSTEM == SYSTEM_TRU64
-/* Tru64 has an interesting feature in that any functions whose names begin
- * with __init_* and __fini_* will be called before and after main()
+/* Tru64 has an interesting feature in that any global functions whose names
+ * begin with __init_* and __fini_* will be called before and after main()
  * respectively.  Note that we don't define __INIT_* and __FINI_* functions
  * since they are reserved for the system.
  */
 
-static
 void
 __init_mpatrol(void)
 {
@@ -158,7 +157,6 @@ __init_mpatrol(void)
 }
 
 #if !MP_USE_ATEXIT
-static
 void
 __fini_mpatrol(void)
 {
