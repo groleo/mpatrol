@@ -42,6 +42,11 @@ __mp_epilogue
 __mp_nomemory
 __mp_pushdelstack
 __mp_popdelstack
+__mp_printf
+__mp_logmemory
+__mp_logstack
+__mp_edit
+__mp_list
 chkr_set_right
 chkr_copy_bitmap
 chkr_check_addr

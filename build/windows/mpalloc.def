@@ -49,11 +49,16 @@ EXPORTS
 	__mp_nomemory		@19
 	__mp_pushdelstack	@20
 	__mp_popdelstack	@21
-	chkr_set_right		@22
-	chkr_copy_bitmap	@23
-	chkr_check_addr		@24
-	chkr_check_str		@25
-	chkr_check_exec		@26
+	__mp_printf		@22
+	__mp_logmemory		@23
+	__mp_logstack		@24
+	__mp_edit		@25
+	__mp_list		@26
+	chkr_set_right		@27
+	chkr_copy_bitmap	@28
+	chkr_check_addr		@29
+	chkr_check_str		@30
+	chkr_check_exec		@31
 	__mp_setfailhandler	@100
 	__mp_xmalloc		@101
 	__mp_xcalloc		@102
