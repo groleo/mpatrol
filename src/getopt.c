@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.7 2000-10-03 16:18:09 graeme Exp $"
+#ident "$Id: getopt.c,v 1.8 2000-10-09 19:28:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -279,9 +279,9 @@ MP_GLOBAL void __mp_showopts(option *l)
     while (l->name != NULL)
     {
         if ((l->value >= SHORTOPT_MIN) && (l->value <= SHORTOPT_MAX))
-            fprintf(stderr, "    -%c", l->value);
+            fprintf(stderr, "  -%c", l->value);
         else
-            fputs("      ", stderr);
+            fputs("    ", stderr);
         fprintf(stderr, "  --%s", l->name);
         if (l->arg)
             fprintf(stderr, "=<%s>", l->arg);
