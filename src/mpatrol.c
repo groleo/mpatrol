@@ -42,11 +42,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.9 2000-04-06 19:26:29 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.10 2000-04-19 00:20:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "2.0" /* the current version of this program */
+#define VERSION "2.1" /* the current version of this program */
 
 
 /* The buffer used to build up the environment variable containing options
@@ -77,7 +77,7 @@ static char *allocbyte, *freebyte;
 static char *oflowbyte, *oflowsize;
 static char *defalign, *limit;
 static char *failfreq, *failseed, *unfreedabort;
-static char *logfile, *progfile;
+static char *logfile, *proffile, *progfile;
 static char *check, *pagealloc;
 
 
@@ -86,7 +86,7 @@ static char *check, *pagealloc;
  */
 
 static int showmap, showfreed;
-static int checkall;
+static int checkall, prof;
 static int safesignals, noprotect;
 static int nofree, preserve;
 static int oflowwatch;
@@ -154,14 +154,6 @@ static char *options_help[] =
     "o", "unsigned integer",
     "", "Specifies an 8-bit byte pattern with which to fill the overflow",
     "", "buffers of all memory allocations.",
-    "P", NULL,
-    "", "Specifies that each individual memory allocation should occupy at",
-    "", "least one page of virtual memory and should be placed at the highest",
-    "", "point within these pages.",
-    "p", NULL,
-    "", "Specifies that each individual memory allocation should occupy at",
-    "", "least one page of virtual memory and should be placed at the lowest",
-    "", "point within these pages.",
     "R", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when a",
     "", "memory allocation is being reallocated.",
@@ -183,6 +175,14 @@ static char *options_help[] =
     "w", NULL,
     "", "Specifies that watch point areas should be used for overflow buffers",
     "", "rather than filling with the overflow byte.",
+    "X", NULL,
+    "", "Specifies that each individual memory allocation should occupy at",
+    "", "least one page of virtual memory and should be placed at the highest",
+    "", "point within these pages.",
+    "x", NULL,
+    "", "Specifies that each individual memory allocation should occupy at",
+    "", "least one page of virtual memory and should be placed at the lowest",
+    "", "point within these pages.",
     "Z", "unsigned integer",
     "", "Specifies the random number seed which will be used when determining",
     "", "which memory allocations will randomly fail.",
@@ -346,7 +346,7 @@ int main(int argc, char **argv)
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     while ((c = __mp_getopt(argc, argv,
-             "A:a:C:cD:de:F:f:GgL:l:mNnO:o:PpR:SsU:VvwZ:z:")) != EOF)
+             "A:a:C:cD:de:F:f:GgL:l:mNnO:o:R:SsU:VvwXxZ:z:")) != EOF)
         switch (c)
         {
           case 'A':
@@ -429,6 +429,12 @@ int main(int argc, char **argv)
             break;
           case 'w':
             oflowwatch = 1;
+            break;
+          case 'X':
+            pagealloc = "UPPER";
+            break;
+          case 'x':
+            pagealloc = "LOWER";
             break;
           case 'Z':
             failseed = __mp_optarg;
