@@ -73,7 +73,7 @@ void display(void *p)
             d.typestr ? d.typestr : "<unknown>");
     fprintf(stderr, "typesize: %lu\n", d.typesize);
     fprintf(stderr, "userdata: 0x%0*lX\n", sizeof(void *) * 2, d.userdata);
-    fputs("flags:    ", stderr);
+    fputs("flags:   ", stderr);
     if (!d.freed && !d.marked && !d.profiled && !d.traced && !d.internal)
         fputs(" none\n", stderr);
     else
