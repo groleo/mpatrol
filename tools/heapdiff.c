@@ -28,7 +28,7 @@
 
 
 /*
- * $Id: heapdiff.c,v 1.1 2001-02-15 19:50:11 graeme Exp $
+ * $Id: heapdiff.c,v 1.2 2001-02-23 20:59:48 graeme Exp $
  */
 
 
@@ -41,10 +41,10 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/* The number of calls that have been made to heapdiffstart(), which is also
- * used to uniquely identify each new heapdiff object.  Reading and modifying
- * this variable is not currently threadsafe but this should not really be an
- * issue unless the ids of two heapdiff objects clash.
+/* The number of calls that have been made to __mpt_heapdiffstart(), which is
+ * also used to uniquely identify each new heapdiff object.  Reading and
+ * modifying this variable is not currently threadsafe but this should not
+ * really be an issue unless the ids of two heapdiff objects clash.
  */
 
 static unsigned long count;
@@ -103,7 +103,8 @@ callback(MP_CONST void *p, void *t)
  */
 
 void
-heapdiffstart(heapdiff *h, unsigned long f, MP_CONST char *t, unsigned long u)
+__mpt_heapdiffstart(heapdiff *h, unsigned long f, MP_CONST char *t,
+                    unsigned long u)
 {
     h->id = ++count;
     h->event = __mp_snapshot();
@@ -126,7 +127,7 @@ heapdiffstart(heapdiff *h, unsigned long f, MP_CONST char *t, unsigned long u)
  */
 
 void
-heapdiffend(heapdiff *h, MP_CONST char *t, unsigned long u)
+__mpt_heapdiffend(heapdiff *h, MP_CONST char *t, unsigned long u)
 {
     unsigned long f;
 

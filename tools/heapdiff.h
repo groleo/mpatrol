@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: heapdiff.h,v 1.1 2001-02-15 19:50:11 graeme Exp $
+ * $Id: heapdiff.h,v 1.2 2001-02-23 20:59:48 graeme Exp $
  */
 
 
@@ -90,8 +90,8 @@ typedef struct heapdiff
 heapdiff;
 
 
-#define HEAPDIFFSTART(h, f) heapdiffstart(&(h), (f), __FILE__, __LINE__)
-#define HEAPDIFFEND(h) heapdiffend(&(h), __FILE__, __LINE__)
+#define HEAPDIFFSTART(h, f) __mpt_heapdiffstart(&(h), (f), __FILE__, __LINE__)
+#define HEAPDIFFEND(h) __mpt_heapdiffend(&(h), __FILE__, __LINE__)
 
 
 #ifdef __cplusplus
@@ -100,8 +100,9 @@ extern "C"
 #endif /* __cplusplus */
 
 
-void heapdiffstart(heapdiff *, unsigned long, MP_CONST char *, unsigned long);
-void heapdiffend(heapdiff *, MP_CONST char *, unsigned long);
+void __mpt_heapdiffstart(heapdiff *, unsigned long, MP_CONST char *,
+                         unsigned long);
+void __mpt_heapdiffend(heapdiff *, MP_CONST char *, unsigned long);
 
 
 #ifdef __cplusplus
