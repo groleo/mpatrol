@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.49 2001-09-05 22:17:31 graeme Exp $"
+#ident "$Id: version.c,v 1.50 2001-10-03 22:36:49 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.49 2001-09-05 22:17:31 graeme Exp $";
+static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.50 2001-10-03 22:36:49 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -41,9 +41,6 @@ static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.49 2001-09-05
 extern "C"
 {
 #endif /* __cplusplus */
-
-
-#define MP_VERSION "mpatrol 1.4.7" /* library name and version */
 
 
 #if TARGET == TARGET_UNIX

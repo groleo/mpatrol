@@ -30,7 +30,7 @@
 
 
 /*
- * $Id: version.h,v 1.18 2001-09-05 22:17:30 graeme Exp $
+ * $Id: version.h,v 1.19 2001-10-03 22:36:15 graeme Exp $
  */
 
 
@@ -43,6 +43,12 @@
  */
 
 #define MP_VERNUM 10407
+
+
+/* The version string for the mpatrol library.
+ */
+
+#define MP_VERSION "mpatrol 1.4.7"
 
 
 #ifdef __cplusplus
