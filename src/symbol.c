@@ -105,7 +105,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.35 2000-11-11 15:51:05 graeme Exp $"
+#ident "$Id: symbol.c,v 1.36 2000-11-13 21:40:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -653,20 +653,20 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
      */
     if (b < FILHSZ)
     {
-        __mp_warn(ET_MAX, AT_MAX, "%s: not an object file\n", f);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an object file\n", f);
         return 1;
     }
     o = (FILHDR *) e;
     b -= FILHSZ;
     if (!ISCOFF(o->f_magic) || (o->f_opthdr == 0) || (b < o->f_opthdr))
     {
-        __mp_warn(ET_MAX, AT_MAX, "%s: not an executable file\n", f);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an executable file\n", f);
         return 1;
     }
     b -= o->f_opthdr;
     if ((o->f_nscns == 0) || (b < o->f_nscns * SCNHSZ))
     {
-        __mp_warn(ET_MAX, AT_MAX, "%s: missing section table\n", f);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing section table\n", f);
         return 1;
     }
     /* Look for the section index of the text section.  This is
@@ -688,7 +688,7 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
     i = o->f_nsyms * SYMESZ;
     if ((o->f_symptr == 0) || (o->f_nsyms == 0) || (b < i))
     {
-        __mp_warn(ET_MAX, AT_MAX, "%s: missing symbol table\n", f);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
         return 1;
     }
     p = (SYMENT *) (e + o->f_symptr);
@@ -702,7 +702,7 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
         i = *((size_t *) m);
     if ((i == 0) || (b < i))
     {
-        __mp_warn(ET_MAX, AT_MAX, "%s: missing string table\n", f);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing string table\n", f);
         return 1;
     }
     /* Cycle through every symbol contained in the executable file.
@@ -763,9 +763,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing symbol table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
         else
-            __mp_warn(ET_MAX, AT_MAX, "%s: %s\n", f, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
     }
     t = h->sh_link;
@@ -776,9 +776,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing string table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
         else
-            __mp_warn(ET_MAX, AT_MAX, "%s: %s\n", f, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
     }
     if (a != NULL)
@@ -839,9 +839,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing symbol table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
         else
-            __mp_warn(ET_MAX, AT_MAX, "%s: %s\n", f, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
     }
     t = h->sh_link;
@@ -852,9 +852,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing string table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
         else
-            __mp_warn(ET_MAX, AT_MAX, "%s: %s\n", f, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
     }
     if (a != NULL)
@@ -897,7 +897,8 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
     d = 0;
     if ((n = bfd_get_symtab_upper_bound(h)) < 0)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: %s\n", f, bfd_errmsg(bfd_get_error()));
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
+                   bfd_errmsg(bfd_get_error()));
         return 0;
     }
     if (n == 0)
@@ -908,13 +909,13 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
          */
         if ((n = bfd_get_dynamic_symtab_upper_bound(h)) < 0)
         {
-            __mp_error(ET_MAX, AT_MAX, "%s: %s\n", f,
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
                        bfd_errmsg(bfd_get_error()));
             return 0;
         }
         if (n == 0)
         {
-            __mp_warn(ET_MAX, AT_MAX, "%s: missing symbol table\n", f);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
             return 1;
         }
         d = 1;
@@ -924,14 +925,15 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
      */
     if ((p = (asymbol **) malloc(n)) == NULL)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: no memory for symbols\n", f);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: no memory for symbols\n", f);
         return 0;
     }
     r = 1;
     if (((d == 0) && ((n = bfd_canonicalize_symtab(h, p)) < 0)) ||
         ((d == 1) && ((n = bfd_canonicalize_dynamic_symtab(h, p)) < 0)))
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: %s\n", f, bfd_errmsg(bfd_get_error()));
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
+                   bfd_errmsg(bfd_get_error()));
         r = 0;
     }
     else
@@ -1056,7 +1058,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
      */
     if ((f = open(s, O_RDONLY)) == -1)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: cannot open file\n", s);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         r = 0;
     }
     else
@@ -1069,7 +1071,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
         if (((o = lseek(f, 0, SEEK_END)) == (off_t) -1) ||
             (lseek(f, 0, SEEK_SET) == (off_t) -1))
         {
-            __mp_error(ET_MAX, AT_MAX, "%s: cannot seek file\n", s);
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot seek file\n", s);
             r = 0;
         }
         else if ((m = (char *) malloc((size_t) o)) == NULL)
@@ -1077,14 +1079,16 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
             /* It's actually safe to call malloc() here since the
              * library checks for recursive behaviour.
              */
-            __mp_error(ET_MAX, AT_MAX, "%s: no memory for symbols\n", s);
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: no memory for symbols\n",
+                       s);
             r = 0;
         }
         else
         {
             if (read(f, m, (size_t) o) != (size_t) o)
             {
-                __mp_error(ET_MAX, AT_MAX, "%s: cannot read file\n", s);
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot read file\n",
+                           s);
                 r = 0;
             }
             else if ((t = __mp_addstring(&y->strings, s)) == NULL)
@@ -1103,19 +1107,19 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
      */
     if (elf_version(EV_CURRENT) == EV_NONE)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: wrong version of libelf\n", s);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: wrong version of libelf\n", s);
         r = 0;
     }
     else if ((f = open(s, O_RDONLY)) == -1)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: cannot open file\n", s);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         r = 0;
     }
     else
     {
         if ((e = elf_begin(f, ELF_C_READ, NULL)) == NULL)
         {
-            __mp_error(ET_MAX, AT_MAX, "%s: %s\n", s, elf_errmsg(-1));
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s, elf_errmsg(-1));
             r = 0;
         }
         else if ((t = __mp_addstring(&y->strings, s)) == NULL)
@@ -1131,7 +1135,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
                 {
                     if ((h = elf_getarhdr(a)) == NULL)
                     {
-                        __mp_error(ET_MAX, AT_MAX, "%s: %s\n", s,
+                        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s,
                                    elf_errmsg(-1));
                         r = 0;
                     }
@@ -1160,14 +1164,15 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
     bfd_init();
     if ((h = bfd_openr(s, NULL)) == NULL)
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s,
+                   bfd_errmsg(bfd_get_error()));
         r = 0;
     }
     else
     {
         if (!bfd_check_format(h, bfd_object))
         {
-            __mp_error(ET_MAX, AT_MAX, "%s: %s\n", s,
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s,
                        bfd_errmsg(bfd_get_error()));
             r = 0;
         }
