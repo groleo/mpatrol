@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.21 2000-05-08 20:18:46 graeme Exp $"
+#ident "$Id: info.c,v 1.22 2000-05-08 20:45:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -585,25 +585,7 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
                               stackinfo *v)
 {
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
-        __mp_printsize(l);
-        __mp_diag(", 0x%02lX", c);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logmemset(h, p, l, c, f, s, t, u, v);
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
@@ -623,25 +605,7 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
                                stackinfo *v)
 {
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
-                  __mp_alloctypenames[f], p, q);
-        __mp_printsize(l);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logmemcopy(h, p, q, l, f, s, t, u, v);
     /* We must ensure that the memory to be copied does not overlap when
      * memcpy() is called.  This does not matter when calling __mp_memcopy()
      * but it will matter when calling the normal system function, in which
@@ -675,26 +639,7 @@ MP_GLOBAL void *__mp_locatememory(infohead *h, void *p, size_t l, void *q,
 
     r = NULL;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
-        __mp_printsize(l);
-        __mp_diag(", " MP_POINTER ", ", q);
-        __mp_printsize(m);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logmemlocate(h, p, l, q, m, f, s, t, u, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
@@ -721,25 +666,7 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
 
     c = 0;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
-                  __mp_alloctypenames[f], p, q);
-        __mp_printsize(l);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logmemcompare(h, p, q, l, f, s, t, u, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */

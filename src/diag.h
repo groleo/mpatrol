@@ -66,6 +66,16 @@ MP_EXPORT void __mp_logrealloc(infohead *, void *, size_t, size_t, alloctype,
                                char *, char *, unsigned long, stackinfo *);
 MP_EXPORT void __mp_logfree(infohead *, void *, alloctype, char *, char *,
                             unsigned long, stackinfo *);
+MP_EXPORT void __mp_logmemset(infohead *, void *, size_t, unsigned char,
+                              alloctype, char *, char *, unsigned long,
+                              stackinfo *);
+MP_EXPORT void __mp_logmemcopy(infohead *, void *, void *, size_t, alloctype,
+                               char *, char *, unsigned long, stackinfo *);
+MP_EXPORT void __mp_logmemlocate(infohead *, void *, size_t, void *, size_t,
+                                 alloctype, char *, char *, unsigned long,
+                                 stackinfo *);
+MP_EXPORT void __mp_logmemcompare(infohead *, void *, void *, size_t, alloctype,
+                                  char *, char *, unsigned long, stackinfo *);
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
 MP_EXPORT void __mp_printmap(infohead *);
