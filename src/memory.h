@@ -57,7 +57,8 @@ typedef struct meminfo
     size_t align; /* most restrictive alignment */
     size_t page;  /* system page size */
     char *prog;   /* program filename */
-    int file;     /* control file handle */
+    int mfile;    /* memory mapped file handle */
+    int wfile;    /* watch point control file handle */
 }
 meminfo;
 
