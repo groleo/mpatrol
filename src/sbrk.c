@@ -32,10 +32,11 @@
 #include "sbrk.h"
 #include "memory.h"
 #include <stdlib.h>
+#include <errno.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.2 2000-03-23 19:11:24 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.3 2000-03-23 19:14:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -111,6 +112,7 @@ int brk(void *p)
         brkhead.len = (char *) p - (char *) brkhead.block;
         return 0;
     }
+    errno = ENOMEM;
     return -1;
 }
 
@@ -142,6 +144,8 @@ void *sbrk(int l)
         }
         else
             p = (char *) brkhead.block + brkhead.len;
+    if (p == (void *) -1)
+        errno = ENOMEM;
     return p;
 }
 
