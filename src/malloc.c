@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.5 2000-01-27 21:26:13 graeme Exp $"
+#ident "$Id: malloc.c,v 1.6 2000-01-28 00:56:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -221,6 +221,29 @@ void *memmove(void *q, void *p, size_t l)
 void bcopy(void *p, void *q, size_t l)
 {
     __mp_copymem(p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
+}
+
+
+/* Compare two blocks of memory.
+ */
+
+#ifdef __GNUC__
+int memcmp(const void *p, const void *q, size_t l)
+#else /* __GNUC__ */
+int memcmp(void *p, void *q, size_t l)
+#endif /* __GNUC__ */
+{
+    return __mp_comparemem((void *) p, (void *) q, l, AT_MEMCMP, NULL, NULL, 0,
+                           1);
+}
+
+
+/* Compare two blocks of memory.
+ */
+
+int bcmp(void *p, void *q, size_t l)
+{
+    return __mp_comparemem(p, q, l, AT_BCMP, NULL, NULL, 0, 1);
 }
 
 
