@@ -60,7 +60,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.17 2000-06-29 12:52:15 graeme Exp $"
+#ident "$Id: stack.c,v 1.18 2000-07-13 20:20:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -205,9 +205,9 @@ static void stackhandler(int s)
 /* Obtain the return address for the specified stack frame handle.
  */
 
-static unsigned int *getaddr(unsigned int *p)
+static unsigned long *getaddr(unsigned long *p)
 {
-    unsigned int *a;
+    unsigned long *a;
 
     /* This function relies heavily on the stack frame format of supported
      * OS / processor combinations.  A better way to determine the return
@@ -215,11 +215,15 @@ static unsigned int *getaddr(unsigned int *p)
      * could be a nightmare.
      */
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
-    a = (unsigned int *) *(p + 1);
+    a = (unsigned long *) *(p + 1);
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
-    a = (unsigned int *) *(p + 2);
+    a = (unsigned long *) *(p + 2);
 #elif ARCH == ARCH_SPARC
-    if (a = (unsigned int *) *((unsigned int *) *p + 15))
+#if ENVIRON == ENVIRON_64
+    if (a = (unsigned long *) *((unsigned long *) (*p + 0x7FF) + 15))
+#else /* ENVIRON */
+    if (a = (unsigned long *) *((unsigned long *) *p + 15))
+#endif /* ENVIRON */
         a += 2;
 #endif /* ARCH */
     return a;
@@ -326,13 +330,17 @@ static int unwind(frameinfo *f)
 /* Return a handle for the frame pointer at the current point in execution.
  */
 
-static unsigned int *getframe(void)
+static unsigned long *getframe(void)
 {
     ucontext_t c;
 
     if (getcontext(&c) == -1)
         return NULL;
-    return (unsigned int *) c.uc_mcontext.gregs[R_SP] + 14;
+#if ENVIRON == ENVIRON_64
+    return (unsigned long *) (c.uc_mcontext.gregs[R_SP] + 0x7FF) + 14;
+#else /* ENVIRON */
+    return (unsigned long *) c.uc_mcontext.gregs[R_SP] + 14;
+#endif /* ENVIRON */
 }
 #endif /* ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && TARGET */
@@ -362,7 +370,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
       TARGET == NETWARE) && ARCH == ARCH_IX86)
-    unsigned int *f;
+    unsigned long *f;
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     int r;
@@ -528,18 +536,18 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         if (p->frame == NULL)
             if (p->first == NULL)
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K
-                f = (unsigned int *) &p - 2;
+                f = (unsigned long *) &p - 2;
 #elif ARCH == ARCH_M88K
-                f = (unsigned int *) &p - 4;
+                f = (unsigned long *) &p - 4;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
-                f = (unsigned int *) &p - 6;
+                f = (unsigned long *) &p - 6;
 #elif ARCH == ARCH_SPARC
                 f = getframe();
 #endif /* ARCH */
             else
-                f = (unsigned int *) p->first;
+                f = (unsigned long *) p->first;
         else
-            f = (unsigned int *) p->next;
+            f = (unsigned long *) p->next;
         if (p->frame = f)
         {
             p->addr = getaddr(f);
@@ -549,7 +557,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K || \
     ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
 #if SYSTEM == SYSTEM_LYNXOS
-            if (!getaddr((unsigned int *) *f))
+            if (!getaddr((unsigned long *) *f))
                 p->next = NULL;
             else
 #endif /* SYSTEM */
@@ -558,7 +566,11 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
             if (p->addr == NULL)
                 p->next = NULL;
             else
-                p->next = (void *) ((unsigned int *) *f + 14);
+#if ENVIRON == ENVIRON_64
+                p->next = (void *) ((unsigned long *) (*f + 0x7FF) + 14);
+#else /* ENVIRON */
+                p->next = (void *) ((unsigned long *) *f + 14);
+#endif /* ENVIRON */
 #endif /* ARCH */
             r = 1;
         }
