@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 20th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 20th
 February, 2001.
 
 
@@ -617,10 +617,8 @@ out.
      UNIX and Windows platforms (and AmigaOS when using @{b}gcc@{ub}), since the
      library automatically redefines the default system memory
      allocation functions.  All redefinitions in the header can also be
-     disabled by defining the @{b}NDEBUG@{ub} preprocessor macro, and a version
-     of the mpatrol library is also supplied for quickly removing all
-     mpatrol debugging, logging and tracing features with a simple
-     relink.
+     disabled by defining the @{b}NDEBUG@{ub} preprocessor macro, which also
+     disables the effect of calling any mpatrol library function.
 
    * A command is supplied to run a program that was linked with the
      mpatrol library with any specified options on the command line.
@@ -908,6 +906,27 @@ had their symbol tables stripped from them, although mpatrol can also
 fall back to using the dynamic symbol table from dynamically linked
 executable files.
 
+   Note that an Automake macro is now provided to allow you to
+integrate mpatrol into a new or existing project that uses the GNU
+Autoconf and Automake tools.  It is located in @{b}extra/mpatrol.m4@{ub}, which
+should be copied to the directory containing all of the local Autoconf
+and Automake macros on your system, usually @{b}/usr/local/share/aclocal@{ub}.
+The Automake macro it defines is called @{b}AM_WITH_MPATROL@{ub}, which should
+be added to the libraries section in the @{b}configure.in@{ub} file for your
+project.  It takes one optional parameter specifying whether mpatrol
+should be included in the project (@{b}yes@{ub}) or not (@{b}no@{ub}).  This can also be
+specified as @{b}threads@{ub} if you wish to use the threadsafe version of the
+mpatrol library.  You can override the value of the optional parameter
+with the @{b}--with-mpatrol@{ub} option to the resulting @{b}configure@{ub} shell script.
+
+   If you are using the @{b}AM_WITH_MPATROL@{ub} Automake macro then you may
+wish to use the @{b}mpdebug.h@{ub} header file instead of @{b}mpatrol.h@{ub}.  This
+ensures that the @{b}MP_MALLOC()@{ub} family of functions are always defined,
+even if libmpatrol or libmpalloc are unavailable.  It makes use of the
+@{b}HAVE_MPATROL@{ub} and @{b}HAVE_MPALLOC@{ub} preprocessor macros that are controlled
+by the Automake macro, but in other respects behaves in exactly the
+same way as @{b}mpatrol.h@{ub}.
+
    ---------- Footnotes ----------
 
    (1) Also available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59
@@ -928,7 +947,8 @@ help of the mpatrol library, there will come a time where you wish to
 build your program without any of its debugging features, either to
 improve the speed that it runs at, or perhaps even for a release.
 Choose one of the following steps to help you remove the mpatrol
-library from your program.
+library from your program (you only need to perform them if you linked
+your program with the mpatrol library).
 
   1. The quickest way to remove the mpatrol library from your
      application is to link with libmpalloc instead of libmpatrol.
@@ -946,6 +966,16 @@ library from your program.
      library functions.  Obviously, this option is the most
      time-consuming of the two, but will result in the complete removal
      of all references to the mpatrol library.
+
+   Note that if you used the @{b}AM_WITH_MPATROL@{ub} Automake macro as detailed
+in the previous section to build your application then you should
+perform a clean recompilation using the @{b}--without-mpatrol@{ub} option to the
+@{b}configure@{ub} shell script in order to completely remove the mpatrol
+library.
+
+   Note also that if you used the @{b}-fcheck-memory-usage@{ub} option of the GNU
+compiler to check all memory accesses then you must recompile without
+that option in order for your program to run at a reasonable speed.
 
 
 @endnode
@@ -8521,7 +8551,7 @@ occurred.
           new[]@{ub} C++ operators (not the @{i}nothrow@{ui} versions) when they
           would otherwise return a @{b}NULL@{ub} pointer and the mpatrol library
           was compiled with a C compiler (which means that it cannot
-          throw a @{b}bad_alloc@{ub} exception).
+          throw a @{b}std::bad_alloc@{ub} exception).
 
     Additional
           The library summary.
@@ -9769,9 +9799,9 @@ Notes for all platforms
      are likely to be different on every new build and will certainly
      be different across different platforms.
 
-   * Perhaps use GNU autoconf to automatically work out values for
+   * Perhaps use GNU Autoconf to automatically work out values for
      @{b}config.h@{ub} on the platform it is being built on, and also use
-     automake, libtool and install when building and installing files.
+     Automake, libtool and install when building and installing files.
      Also update the @{b}mupdate@{ub} shell script to automatically update the
      version numbers contained in the files in the @{b}pkg@{ub} directory.
 
@@ -10271,7 +10301,7 @@ Building
   6. I'm calling @{b}operator new@{ub} (not the @{i}nothrow@{ui} version) from my C++
      source code but when my program runs out of memory the @{b}OUTMEM@{ub}
      error is given in the mpatrol log file rather than throwing a
-     @{b}bad_alloc@{ub} exception.  Why is this?
+     @{b}std::bad_alloc@{ub} exception.  Why is this?
 
      Sounds like the mpatrol library was built with a C compiler.  In
      order for the mpatrol versions of @{b}operator new@{ub} and @{b}operator new[]@{ub}
@@ -13240,6 +13270,7 @@ Index
  @{" ALLOVF                                   " link "Diagnostic messages"}   Diagnostic messages
  @{" ALLOWOFLOW                               " link "Environment"}   Environment
  @{" ALLZER                                   " link "Diagnostic messages"}   Diagnostic messages
+ @{" AM_WITH_MPATROL                          " link "Adding mpatrol"}   Adding mpatrol
  @{" amalloc                                  " link "Improving performance"}   Improving performance
  @{" Amiga 4000-040                           " link "Installation"}   Installation
  @{" Amiga notes                              " link "Amiga notes"}   Amiga notes
@@ -13256,6 +13287,8 @@ Index
  @{" assembler                                " link "Profiling"}   Profiling
  @{" ATOM                                     " link "Related software"}   Related software
  @{" author, contacting                       " link "Foreword"}   Foreword
+ @{" autoconf                                 " link "Adding mpatrol"}   Adding mpatrol
+ @{" automake                                 " link "Adding mpatrol"}   Adding mpatrol
  @{" AutomatedQA                              " link "Related software"}   Related software
  @{" AUTOSAVE                                 " link "Environment"}   Environment
  @{" backwards compatibility                  " link "Linking"}   Linking
@@ -13459,6 +13492,8 @@ Index
  @{" GUI                                      " link "Tracing"}   Tracing
  @{" halting the library                      " link "Using with a debugger"}   Using with a debugger
  @{" handler functions                        " link "Example 1"}   Example 1
+ @{" HAVE_MPALLOC                             " link "Adding mpatrol"}   Adding mpatrol
+ @{" HAVE_MPATROL                             " link "Adding mpatrol"}   Adding mpatrol
  @{" heap                                     " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" heap usage                               " link "Example 1"}   Example 1
  @{" HeapAgent                                " link "Related software"}   Related software
@@ -13640,6 +13675,7 @@ Index
  @{" MPATROL_OPTIONS                          " link "Environment"}   Environment
  @{" MPATROL_SOURCEPATH                       " link "The mpedit command"}   The mpedit command
  @{" MPATROL_VERSION                          " link "Functions"}   Functions
+ @{" mpdebug.h                                " link "Adding mpatrol"}   Adding mpatrol
  @{" mpedit                                   " link "The mpedit command"}   The mpedit command
  @{" mpedit command                           " link "The mpedit command"}   The mpedit command
  @{" MPR                                      " link "Related software"}   Related software

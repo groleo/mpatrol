@@ -126,7 +126,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.5 of the mpatrol manual for version
-1.4.0, 19th February, 2001.
+1.4.0, 20th February, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -214,14 +214,14 @@ about mpatrol.
 
 <p>The latest version of the mpatrol library and this manual can always be found at
 <a href="http://www.cbmamiga.demon.co.uk/mpatrol/">http://www.cbmamiga.demon.co.uk/mpatrol/</a>, and any correspondence relating
-to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
-to <a href="mailto:mpatrol@cbmamiga.demon.co.uk">mpatrol@cbmamiga.demon.co.uk</a>.  I'd be very interested in hearing any
-success stories with using mpatrol to debug programs, since I get very little
-feedback apart from the occasional bug report.  The mpatrol library is also
-registered at FreshMeat (<a href="http://freshmeat.net/projects/mpatrol/">http://freshmeat.net/projects/mpatrol/</a>) and
-SourceForge (<a href="http://sourceforge.net/projects/mpatrol/">http://sourceforge.net/projects/mpatrol/</a>) and several other
-software sites so you can receive notification of updates there as well.  I
-normally only check my e-mail about once or twice a week, so don't expect an
+to mpatrol (bug reports, enhancement requests, compliments, etc.) should be
+sent to <a href="mailto:mpatrol@cbmamiga.demon.co.uk">mpatrol@cbmamiga.demon.co.uk</a>.  I'd be very interested in
+hearing any success stories with using mpatrol to debug programs, since I get
+very little feedback apart from the occasional bug report.  The mpatrol library
+is also registered at FreshMeat (<a href="http://freshmeat.net/projects/mpatrol/">http://freshmeat.net/projects/mpatrol/</a>)
+and SourceForge (<a href="http://sourceforge.net/projects/mpatrol/">http://sourceforge.net/projects/mpatrol/</a>) and several
+other software sites so you can receive notification of updates there as well. 
+I normally only check my e-mail about once or twice a week, so don't expect an
 immediate response.  I can also be reached at <a href="mailto:graeme@epc.co.uk">graeme@epc.co.uk</a> but that
 is my work e-mail address.  There is also a discussion group at
 <a href="http://groups.yahoo.com/group/mpatrol/">http://groups.yahoo.com/group/mpatrol/</a> where you can post mpatrol-related
@@ -708,9 +708,8 @@ macros in order to obtain more information about where they were called from.
 This is not strictly required on UNIX and Windows platforms (and AmigaOS when
 using <code>gcc</code>), since the library automatically redefines the default
 system memory allocation functions.  All redefinitions in the header can also
-be disabled by defining the <code>NDEBUG</code> preprocessor macro, and a version of
-the mpatrol library is also supplied for quickly removing all mpatrol debugging,
-logging and tracing features with a simple relink.
+be disabled by defining the <code>NDEBUG</code> preprocessor macro, which also
+disables the effect of calling any mpatrol library function.
 
 <li>A command is supplied to run a program that was linked with the mpatrol library
 with any specified options on the command line.  On some UNIX platforms, an
@@ -982,6 +981,27 @@ symbolic information will be available if the executable files have not had
 their symbol tables stripped from them, although mpatrol can also fall back to
 using the dynamic symbol table from dynamically linked executable files.
 
+<p>Note that an Automake macro is now provided to allow you to integrate mpatrol
+into a new or existing project that uses the GNU Autoconf and Automake tools. 
+It is located in <code>extra/mpatrol.m4</code>, which should be copied to the
+directory containing all of the local Autoconf and Automake macros on your
+system, usually <code>/usr/local/share/aclocal</code>.  The Automake macro it defines
+is called <code>AM_WITH_MPATROL</code>, which should be added to the libraries section
+in the <code>configure.in</code> file for your project.  It takes one optional
+parameter specifying whether mpatrol should be included in the project
+(<code>yes</code>) or not (<code>no</code>).  This can also be specified as <code>threads</code>
+if you wish to use the threadsafe version of the mpatrol library.  You can
+override the value of the optional parameter with the <code>--with-mpatrol</code>
+option to the resulting <code>configure</code> shell script.
+
+<p>If you are using the <code>AM_WITH_MPATROL</code> Automake macro then you may wish to
+use the <code>mpdebug.h</code> header file instead of <code>mpatrol.h</code>.  This ensures
+that the <code>MP_MALLOC()</code> family of functions are always defined, even if
+libmpatrol or libmpalloc are unavailable.  It makes use of the
+<code>HAVE_MPATROL</code> and <code>HAVE_MPALLOC</code> preprocessor macros that are
+controlled by the Automake macro, but in other respects behaves in exactly the
+same way as <code>mpatrol.h</code>.
+
 <p><hr>
 Node:<a name="Removing%20mpatrol">Removing mpatrol</a>,
 Previous:<a rel=previous href="#Adding%20mpatrol">Adding mpatrol</a>,
@@ -994,7 +1014,8 @@ Up:<a rel=up href="#Integration">Integration</a>
 mpatrol library, there will come a time where you wish to build your program
 without any of its debugging features, either to improve the speed that it runs
 at, or perhaps even for a release.  Choose one of the following steps to help
-you remove the mpatrol library from your program.
+you remove the mpatrol library from your program (you only need to perform them
+if you linked your program with the mpatrol library).
 
 <ol type=1 start=1>
 </p><li>The quickest way to remove the mpatrol library from your application is to
@@ -1012,6 +1033,15 @@ preprocessor macro.  This automatically disables the redefinition of
 functions.  Obviously, this option is the most time-consuming of the two, but
 will result in the complete removal of all references to the mpatrol library.
 </ol>
+
+<p>Note that if you used the <code>AM_WITH_MPATROL</code> Automake macro as detailed in
+the previous section to build your application then you should perform a clean
+recompilation using the <code>--without-mpatrol</code> option to the
+<code>configure</code> shell script in order to completely remove the mpatrol library.
+
+<p>Note also that if you used the <code>-fcheck-memory-usage</code> option of the GNU
+compiler to check all memory accesses then you must recompile without that
+option in order for your program to run at a reasonable speed.
 
 <p><hr>
 Node:<a name="Memory%20allocations">Memory allocations</a>,
@@ -8190,8 +8220,8 @@ allocate and the low-memory handler, if installed, could not free up sufficient
 memory.  This error can also be caused by a call to the <code>operator new</code> or
 <code>operator new[]</code> C++ operators (not the <em>nothrow</em> versions) when they
 would otherwise return a <code>NULL</code> pointer and the mpatrol library was
-compiled with a C compiler (which means that it cannot throw a <code>bad_alloc</code>
-exception). 
+compiled with a C compiler (which means that it cannot throw a
+<code>std::bad_alloc</code> exception). 
 <br><dt>Additional
 <dd>The library summary. 
 <br><dt>Result
@@ -9227,8 +9257,8 @@ with.  Also need to have better detection of internal and free blocks when
 displaying memory range errors.
 
 <li>Add wide-character equivalents of <code>memset()</code>, etc.  These are defined as
-<code>wmemset()</code>, etc. and are now part of ANSI C.  Also add <code>memdup()</code> and
-<code>xmemdup()</code>.
+<code>wmemset()</code>, etc. and are now part of ANSI C.  Also add <code>memdup()</code>
+and <code>xmemdup()</code>.
 
 <li>Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to <code>malloc()</code> each time a write to the log file
@@ -9328,8 +9358,8 @@ invocation of the <code>mpatrol</code> command.
 hard to verify the tests since the heap addresses are likely to be different on
 every new build and will certainly be different across different platforms.
 
-<li>Perhaps use GNU autoconf to automatically work out values for <code>config.h</code> on
-the platform it is being built on, and also use automake, libtool and install
+<li>Perhaps use GNU Autoconf to automatically work out values for <code>config.h</code> on
+the platform it is being built on, and also use Automake, libtool and install
 when building and installing files.  Also update the <code>mupdate</code> shell
 script to automatically update the version numbers contained in the files in the
 <code>pkg</code> directory.
@@ -9492,12 +9522,12 @@ for the script file or allocating memory in the process.
 <li>Add GUI support for the <code>mptrace</code> command.
 
 <li>When using SAS/C it is currently not possible to override the definition of
-<code>malloc()</code>, etc., without including the <code>mpatrol.h</code> header file first. 
-This is because the compiler startup code and libraries call <code>malloc()</code>
-before everything is set up, and so the library cannot properly initialise
-itself if the <code>malloc()</code> that the startup code finds is the <code>malloc()</code>
-in the mpatrol library.  This restriction does not exist when using
-<code>gcc</code>.
+<code>malloc()</code>, etc., without including the <code>mpatrol.h</code> header file
+first.  This is because the compiler startup code and libraries call
+<code>malloc()</code> before everything is set up, and so the library cannot properly
+initialise itself if the <code>malloc()</code> that the startup code finds is the
+<code>malloc()</code> in the mpatrol library.  This restriction does not exist when
+using <code>gcc</code>.
 
 <li>Add support for the Amiga in the threads test in <code>tests/pass/test5.c</code>. 
 The Amiga doesn't really have support for threads but its processes are similar
@@ -9781,8 +9811,8 @@ should compile your C++ source files with <code>MP_NOCPLUSPLUS</code> defined.
 
 </p><li>I'm calling <code>operator new</code> (not the <em>nothrow</em> version) from my C++
 source code but when my program runs out of memory the <code>OUTMEM</code> error is
-given in the mpatrol log file rather than throwing a <code>bad_alloc</code> exception. 
-Why is this?
+given in the mpatrol log file rather than throwing a <code>std::bad_alloc</code>
+exception.  Why is this?
 
 <p>Sounds like the mpatrol library was built with a C compiler.  In order for the
 mpatrol versions of <code>operator new</code> and <code>operator new[]</code> to throw an
@@ -12433,6 +12463,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>ALLOVF: <a href="#Diagnostic%20messages">Diagnostic messages</a>
 <li>ALLOWOFLOW: <a href="#Environment">Environment</a>
 <li>ALLZER: <a href="#Diagnostic%20messages">Diagnostic messages</a>
+<li>AM_WITH_MPATROL: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>amalloc: <a href="#Improving%20performance">Improving performance</a>
 <li>Amiga 4000/040: <a href="#Installation">Installation</a>
 <li>Amiga notes: <a href="#Amiga%20notes">Amiga notes</a>
@@ -12449,6 +12480,8 @@ Up:<a rel=up href="#Top">Top</a>
 <li>assembler: <a href="#Profiling">Profiling</a>
 <li>ATOM: <a href="#Related%20software">Related software</a>
 <li>author, contacting: <a href="#Foreword">Foreword</a>
+<li>autoconf: <a href="#Adding%20mpatrol">Adding mpatrol</a>
+<li>automake: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>AutomatedQA: <a href="#Related%20software">Related software</a>
 <li>AUTOSAVE: <a href="#Environment">Environment</a>
 <li>backwards compatibility: <a href="#Linking">Linking</a>
@@ -12652,6 +12685,8 @@ Up:<a rel=up href="#Top">Top</a>
 <li>GUI: <a href="#Tracing">Tracing</a>
 <li>halting the library: <a href="#Using%20with%20a%20debugger">Using with a debugger</a>
 <li>handler functions: <a href="#Example%201">Example 1</a>
+<li>HAVE_MPALLOC: <a href="#Adding%20mpatrol">Adding mpatrol</a>
+<li>HAVE_MPATROL: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>heap: <a href="#Dynamic%20memory%20allocations">Dynamic memory allocations</a>
 <li>heap usage: <a href="#Example%201">Example 1</a>
 <li>HeapAgent: <a href="#Related%20software">Related software</a>
@@ -12833,6 +12868,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>MPATROL_OPTIONS: <a href="#Environment">Environment</a>
 <li>MPATROL_SOURCEPATH: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>MPATROL_VERSION: <a href="#Functions">Functions</a>
+<li>mpdebug.h: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>mpedit: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>mpedit command: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>MPR: <a href="#Related%20software">Related software</a>

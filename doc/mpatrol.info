@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 20th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 20th
 February, 2001.
 
 * Menu:
@@ -602,10 +602,8 @@ out.
      UNIX and Windows platforms (and AmigaOS when using `gcc'), since
      the library automatically redefines the default system memory
      allocation functions.  All redefinitions in the header can also be
-     disabled by defining the `NDEBUG' preprocessor macro, and a
-     version of the mpatrol library is also supplied for quickly
-     removing all mpatrol debugging, logging and tracing features with
-     a simple relink.
+     disabled by defining the `NDEBUG' preprocessor macro, which also
+     disables the effect of calling any mpatrol library function.
 
    * A command is supplied to run a program that was linked with the
      mpatrol library with any specified options on the command line.
@@ -885,6 +883,28 @@ had their symbol tables stripped from them, although mpatrol can also
 fall back to using the dynamic symbol table from dynamically linked
 executable files.
 
+   Note that an Automake macro is now provided to allow you to
+integrate mpatrol into a new or existing project that uses the GNU
+Autoconf and Automake tools.  It is located in `extra/mpatrol.m4',
+which should be copied to the directory containing all of the local
+Autoconf and Automake macros on your system, usually
+`/usr/local/share/aclocal'.  The Automake macro it defines is called
+`AM_WITH_MPATROL', which should be added to the libraries section in
+the `configure.in' file for your project.  It takes one optional
+parameter specifying whether mpatrol should be included in the project
+(`yes') or not (`no').  This can also be specified as `threads' if you
+wish to use the threadsafe version of the mpatrol library.  You can
+override the value of the optional parameter with the `--with-mpatrol'
+option to the resulting `configure' shell script.
+
+   If you are using the `AM_WITH_MPATROL' Automake macro then you may
+wish to use the `mpdebug.h' header file instead of `mpatrol.h'.  This
+ensures that the `MP_MALLOC()' family of functions are always defined,
+even if libmpatrol or libmpalloc are unavailable.  It makes use of the
+`HAVE_MPATROL' and `HAVE_MPALLOC' preprocessor macros that are
+controlled by the Automake macro, but in other respects behaves in
+exactly the same way as `mpatrol.h'.
+
    ---------- Footnotes ----------
 
    (1) Also available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59
@@ -901,7 +921,8 @@ help of the mpatrol library, there will come a time where you wish to
 build your program without any of its debugging features, either to
 improve the speed that it runs at, or perhaps even for a release.
 Choose one of the following steps to help you remove the mpatrol
-library from your program.
+library from your program (you only need to perform them if you linked
+your program with the mpatrol library).
 
   1. The quickest way to remove the mpatrol library from your
      application is to link with libmpalloc instead of libmpatrol.
@@ -919,6 +940,17 @@ library from your program.
      any mpatrol library functions.  Obviously, this option is the most
      time-consuming of the two, but will result in the complete removal
      of all references to the mpatrol library.
+
+   Note that if you used the `AM_WITH_MPATROL' Automake macro as
+detailed in the previous section to build your application then you
+should perform a clean recompilation using the `--without-mpatrol'
+option to the `configure' shell script in order to completely remove
+the mpatrol library.
+
+   Note also that if you used the `-fcheck-memory-usage' option of the
+GNU compiler to check all memory accesses then you must recompile
+without that option in order for your program to run at a reasonable
+speed.
 
 
 File: mpatrol.info,  Node: Memory allocations,  Next: Operating system support,  Prev: Integration,  Up: Top
@@ -8326,7 +8358,7 @@ error occurred.
           `operator new[]' C++ operators (not the _nothrow_ versions)
           when they would otherwise return a `NULL' pointer and the
           mpatrol library was compiled with a C compiler (which means
-          that it cannot throw a `bad_alloc' exception).
+          that it cannot throw a `std::bad_alloc' exception).
 
     Additional
           The library summary.
@@ -9541,9 +9573,9 @@ Notes for all platforms
      are likely to be different on every new build and will certainly
      be different across different platforms.
 
-   * Perhaps use GNU autoconf to automatically work out values for
+   * Perhaps use GNU Autoconf to automatically work out values for
      `config.h' on the platform it is being built on, and also use
-     automake, libtool and install when building and installing files.
+     Automake, libtool and install when building and installing files.
      Also update the `mupdate' shell script to automatically update the
      version numbers contained in the files in the `pkg' directory.
 
@@ -10016,7 +10048,7 @@ Building
   6. I'm calling `operator new' (not the _nothrow_ version) from my C++
      source code but when my program runs out of memory the `OUTMEM'
      error is given in the mpatrol log file rather than throwing a
-     `bad_alloc' exception.  Why is this?
+     `std::bad_alloc' exception.  Why is this?
 
      Sounds like the mpatrol library was built with a C compiler.  In
      order for the mpatrol versions of `operator new' and `operator
@@ -12928,6 +12960,7 @@ Index
 * ALLOVF:                                Diagnostic messages.
 * ALLOWOFLOW:                            Environment.
 * ALLZER:                                Diagnostic messages.
+* AM_WITH_MPATROL:                       Adding mpatrol.
 * amalloc:                               Improving performance.
 * Amiga 4000/040:                        Installation.
 * Amiga notes:                           Amiga notes.
@@ -12944,6 +12977,8 @@ Index
 * assembler:                             Profiling.
 * ATOM:                                  Related software.
 * author, contacting:                    Foreword.
+* autoconf:                              Adding mpatrol.
+* automake:                              Adding mpatrol.
 * AutomatedQA:                           Related software.
 * AUTOSAVE:                              Environment.
 * backwards compatibility:               Linking.
@@ -13147,6 +13182,8 @@ Index
 * GUI:                                   Tracing.
 * halting the library:                   Using with a debugger.
 * handler functions:                     Example 1.
+* HAVE_MPALLOC:                          Adding mpatrol.
+* HAVE_MPATROL:                          Adding mpatrol.
 * heap:                                  Dynamic memory allocations.
 * heap usage:                            Example 1.
 * HeapAgent:                             Related software.
@@ -13328,6 +13365,7 @@ Index
 * MPATROL_OPTIONS:                       Environment.
 * MPATROL_SOURCEPATH:                    The mpedit command.
 * MPATROL_VERSION:                       Functions.
+* mpdebug.h:                             Adding mpatrol.
 * mpedit:                                The mpedit command.
 * mpedit command:                        The mpedit command.
 * MPR:                                   Related software.
@@ -13604,129 +13642,129 @@ Node: Top1257
 Node: Foreword3529
 Node: Overview8340
 Node: Features11317
-Node: Installation32165
-Node: Integration38340
-Node: Adding mpatrol38802
-Ref: Adding mpatrol-Footnote-145222
-Node: Removing mpatrol45343
-Node: Memory allocations46810
-Node: Static memory allocations47487
-Ref: Static memory allocations-Footnote-149948
-Node: Stack memory allocations49990
-Ref: Stack memory allocations-Footnote-151854
-Node: Dynamic memory allocations51893
-Ref: Dynamic memory allocations-Footnote-155315
-Ref: Dynamic memory allocations-Footnote-255434
-Node: Operating system support55538
-Node: Virtual memory57498
-Ref: Virtual memory-Footnote-163526
-Ref: Virtual memory-Footnote-263782
-Ref: Virtual memory-Footnote-363958
-Ref: Virtual memory-Footnote-463993
-Ref: Virtual memory-Footnote-564052
-Node: Call stacks and symbol tables64276
-Ref: Call stacks and symbol tables-Footnote-169954
-Ref: Call stacks and symbol tables-Footnote-270022
-Ref: Call stacks and symbol tables-Footnote-370073
-Ref: Call stacks and symbol tables-Footnote-470117
-Ref: Call stacks and symbol tables-Footnote-570159
-Ref: Call stacks and symbol tables-Footnote-670201
-Ref: Call stacks and symbol tables-Footnote-770249
-Node: Threads70355
-Ref: Threads-Footnote-176361
-Node: Using mpatrol76456
-Node: Library behaviour77322
-Ref: Library behaviour-Footnote-183219
-Node: Logging and tracing83277
-Node: General errors88143
-Ref: General errors-Footnote-192287
-Node: Overwrites and underwrites92455
-Ref: Overwrites and underwrites-Footnote-1100857
-Ref: Overwrites and underwrites-Footnote-2100920
-Node: Using with a debugger101044
-Ref: Using with a debugger-Footnote-1110098
-Ref: Using with a debugger-Footnote-2110166
-Ref: Using with a debugger-Footnote-3110422
-Node: Testing110511
-Ref: Testing-Footnote-1113248
-Ref: Testing-Footnote-2113429
-Node: Library functions113488
-Node: Utilities129362
-Node: The mpatrol command130332
-Ref: The mpatrol command-Footnote-1137026
-Ref: The mpatrol command-Footnote-2137160
-Node: The mleak command137240
-Node: The mpsym command139204
-Node: The mpedit command141772
-Node: The hexwords command145168
-Node: Profiling148409
-Ref: Profiling-Footnote-1176301
-Ref: Profiling-Footnote-2176525
-Node: Tracing176629
-Ref: Tracing-Footnote-1193819
-Ref: Tracing-Footnote-2193853
-Ref: Tracing-Footnote-3193975
-Node: Improving performance194081
-Ref: Improving performance-Footnote-1202981
-Ref: Improving performance-Footnote-2203023
-Ref: Improving performance-Footnote-3203100
-Ref: Improving performance-Footnote-4203172
-Node: How it works203216
-Node: Examples210409
-Node: Example 1214308
-Ref: Example 1-Footnote-1238432
-Node: Example 2238622
-Node: Example 3244022
-Node: Example 4250879
-Node: Example 5254384
-Node: Example 6256852
-Ref: Example 6-Footnote-1260652
-Node: Example 7260781
-Node: Example 8262639
-Node: Example 9272875
-Node: Tutorial288746
-Ref: Tutorial-Footnote-1303277
-Ref: Tutorial-Footnote-2303568
-Ref: Tutorial-Footnote-3303717
-Ref: Tutorial-Footnote-4303854
-Ref: Tutorial-Footnote-5303953
-Node: Functions304234
-Node: Functions 1305591
-Node: Functions 2323193
-Node: Functions 3326966
-Node: Functions 4330551
-Node: Functions 5336404
-Node: Environment345198
-Node: Options365966
-Node: Diagnostic messages377353
-Node: Library performance393978
-Node: File formats396471
-Ref: File formats-Footnote-1396895
-Node: Profiling file format397107
-Node: Tracing file format400369
-Node: Supported systems402236
-Node: New system support417669
-Node: New processor support418865
-Node: New file format support419548
-Node: Notes420332
-Node: Generic notes421944
-Ref: Generic notes-Footnote-1439214
-Ref: Generic notes-Footnote-2439432
-Node: UNIX notes439654
-Node: Amiga notes444251
-Node: Windows notes447915
-Node: Netware notes449474
-Node: Frequently asked questions452034
-Node: Documentation452657
-Node: Building457487
-Node: Linking466198
-Node: Running471419
-Node: Files486527
-Node: Related software489523
-Ref: Related software-Footnote-1528533
-Node: References528774
-Node: Copying531367
-Node: Function index559256
-Node: Index562568
+Node: Installation32078
+Node: Integration38253
+Node: Adding mpatrol38715
+Ref: Adding mpatrol-Footnote-146438
+Node: Removing mpatrol46559
+Node: Memory allocations48615
+Node: Static memory allocations49292
+Ref: Static memory allocations-Footnote-151753
+Node: Stack memory allocations51795
+Ref: Stack memory allocations-Footnote-153659
+Node: Dynamic memory allocations53698
+Ref: Dynamic memory allocations-Footnote-157120
+Ref: Dynamic memory allocations-Footnote-257239
+Node: Operating system support57343
+Node: Virtual memory59303
+Ref: Virtual memory-Footnote-165331
+Ref: Virtual memory-Footnote-265587
+Ref: Virtual memory-Footnote-365763
+Ref: Virtual memory-Footnote-465798
+Ref: Virtual memory-Footnote-565857
+Node: Call stacks and symbol tables66081
+Ref: Call stacks and symbol tables-Footnote-171759
+Ref: Call stacks and symbol tables-Footnote-271827
+Ref: Call stacks and symbol tables-Footnote-371878
+Ref: Call stacks and symbol tables-Footnote-471922
+Ref: Call stacks and symbol tables-Footnote-571964
+Ref: Call stacks and symbol tables-Footnote-672006
+Ref: Call stacks and symbol tables-Footnote-772054
+Node: Threads72160
+Ref: Threads-Footnote-178166
+Node: Using mpatrol78261
+Node: Library behaviour79127
+Ref: Library behaviour-Footnote-185024
+Node: Logging and tracing85082
+Node: General errors89948
+Ref: General errors-Footnote-194092
+Node: Overwrites and underwrites94260
+Ref: Overwrites and underwrites-Footnote-1102662
+Ref: Overwrites and underwrites-Footnote-2102725
+Node: Using with a debugger102849
+Ref: Using with a debugger-Footnote-1111903
+Ref: Using with a debugger-Footnote-2111971
+Ref: Using with a debugger-Footnote-3112227
+Node: Testing112316
+Ref: Testing-Footnote-1115053
+Ref: Testing-Footnote-2115234
+Node: Library functions115293
+Node: Utilities131167
+Node: The mpatrol command132137
+Ref: The mpatrol command-Footnote-1138831
+Ref: The mpatrol command-Footnote-2138965
+Node: The mleak command139045
+Node: The mpsym command141009
+Node: The mpedit command143577
+Node: The hexwords command146973
+Node: Profiling150214
+Ref: Profiling-Footnote-1178106
+Ref: Profiling-Footnote-2178330
+Node: Tracing178434
+Ref: Tracing-Footnote-1195624
+Ref: Tracing-Footnote-2195658
+Ref: Tracing-Footnote-3195780
+Node: Improving performance195886
+Ref: Improving performance-Footnote-1204786
+Ref: Improving performance-Footnote-2204828
+Ref: Improving performance-Footnote-3204905
+Ref: Improving performance-Footnote-4204977
+Node: How it works205021
+Node: Examples212214
+Node: Example 1216113
+Ref: Example 1-Footnote-1240237
+Node: Example 2240427
+Node: Example 3245827
+Node: Example 4252684
+Node: Example 5256189
+Node: Example 6258657
+Ref: Example 6-Footnote-1262457
+Node: Example 7262586
+Node: Example 8264444
+Node: Example 9274680
+Node: Tutorial290551
+Ref: Tutorial-Footnote-1305082
+Ref: Tutorial-Footnote-2305373
+Ref: Tutorial-Footnote-3305522
+Ref: Tutorial-Footnote-4305659
+Ref: Tutorial-Footnote-5305758
+Node: Functions306039
+Node: Functions 1307396
+Node: Functions 2324998
+Node: Functions 3328771
+Node: Functions 4332356
+Node: Functions 5338209
+Node: Environment347003
+Node: Options367771
+Node: Diagnostic messages379158
+Node: Library performance395788
+Node: File formats398281
+Ref: File formats-Footnote-1398705
+Node: Profiling file format398917
+Node: Tracing file format402179
+Node: Supported systems404046
+Node: New system support419479
+Node: New processor support420675
+Node: New file format support421358
+Node: Notes422142
+Node: Generic notes423754
+Ref: Generic notes-Footnote-1441024
+Ref: Generic notes-Footnote-2441242
+Node: UNIX notes441464
+Node: Amiga notes446061
+Node: Windows notes449725
+Node: Netware notes451284
+Node: Frequently asked questions453844
+Node: Documentation454467
+Node: Building459297
+Node: Linking468013
+Node: Running473234
+Node: Files488342
+Node: Related software491338
+Ref: Related software-Footnote-1530348
+Node: References530589
+Node: Copying533182
+Node: Function index561071
+Node: Index564383
 
 End Tag Table
