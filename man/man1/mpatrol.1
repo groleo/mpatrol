@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.8 2000-03-30 17:56:52 graeme Exp $
+.\" $Id: mpatrol.1,v 1.9 2000-04-05 20:27:04 graeme Exp $
 .\"
-.TH MPATROL 1 "30 March 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 1 "5 April 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -38,10 +38,11 @@ current directory by default (where \fI%n\fP is the current process id) but this
 can be changed using the \fB\-l\fP option.  Any existing \fBMPATROL_OPTIONS\fP
 environment variable settings which are not overridden by \fIoptions\fP will be
 passed through unchanged to the mpatrol library.  The \fBLOGALL\fP option is
-always implicitly used for commands that are run by this script.
+always implicitly used for commands that are run by this command.
 .SH OPTIONS
-All of the following options (except \fB\-d\fP) correspond to their listed
-mpatrol library option.  See \fBmpatrol\fP(3) for more details on these options.
+All of the following options (except \fB\-d\fP and \fB\-V\fP) correspond to
+their listed mpatrol library option.  See \fBmpatrol\fP(3) for more details on
+these options.
 .TP
 \fB\-A\fP <\fIunsigned integer\fP>
 [\fBALLOCSTOP\fP]  Specifies an allocation index at which to stop the program
@@ -145,6 +146,9 @@ execution.
 \fB\-U\fP <\fIunsigned integer\fP>
 [\fBUNFREEDABORT\fP]  Specifies the minimum number of unfreed allocations at
 which to abort the program just before program termination.
+.TP
+\fB\-V\fP
+Displays the version number of the \fBmpatrol\fP command.
 .TP
 \fB\-v\fP
 [\fBPRESERVE\fP]  Specifies that any reallocated or freed memory allocations

@@ -19,13 +19,13 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: memleak.1,v 1.1 2000-03-30 17:55:40 graeme Exp $
+.\" $Id: memleak.1,v 1.2 2000-04-05 20:27:03 graeme Exp $
 .\"
-.TH MEMLEAK 1 "30 March 2000" "Release 1.1" "mpatrol library"
+.TH MEMLEAK 1 "5 April 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 memleak \- locates memory leaks in an mpatrol log file
 .SH SYNOPSIS
-\fBmemleak\fP [\fIfile\fP]
+\fBmemleak\fP [\fB\-V\fP] [\fIfile\fP]
 .SH DESCRIPTION
 The \fBmemleak\fP command is used to display all unfreed memory allocations
 from a log file produced by the mpatrol library.  This should be used if the
@@ -45,7 +45,12 @@ allocations may not be entirely accurate.
 The \fIfile\fP argument must be a valid mpatrol log filename but if \fIfile\fP
 is omitted then \fBmemleak\fP will use \fImpatrol.log\fP as the name of the log
 file to use.  The \fBmemleak\fP command makes two passes over the log file so
-the file must be randomly-accessable.
+the file must be randomly-accessable.  If \fIfile\fP is given as \fI\-\fP then
+the standard input file stream will be used as the log file.
+.SH OPTIONS
+.TP
+\fB\-V\fP
+Displays the version number of the \fBmemleak\fP command.
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBmpatrol\fP(3).
 .PP
