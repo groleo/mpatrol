@@ -21,15 +21,15 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.17 2003-11-25 00:40:43 graeme Exp $
+# $Id: Makefile,v 1.18 2003-11-26 00:58:50 graeme Exp $
 
 
 # Definitions
 
 SHELL  = /bin/sh
 ROFF   = groff
-HTML   = man2html
-PSTILL = pstill
+HTML   = man2html -r
+PSTILL = pstill -c -c -p
 
 CATPAGES  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
 	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3 \
@@ -163,31 +163,31 @@ ps/libmpalloc.ps: man3/libmpalloc.3
 	$(ROFF) -Tps -man $< >$@
 
 pdf/mpatrol.pdf: ps/mpatrol.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/mprof.pdf: ps/mprof.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/mptrace.pdf: ps/mptrace.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/mleak.pdf: ps/mleak.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/mpsym.pdf: ps/mpsym.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/mpedit.pdf: ps/mpedit.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/hexwords.pdf: ps/hexwords.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 pdf/libmpalloc.pdf: ps/libmpalloc.ps
-	$(PSTILL) -c -c -p -o $@ $<
+	$(PSTILL) -o $@ $<
 
 all: $(CATPAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
