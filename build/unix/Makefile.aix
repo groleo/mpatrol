@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.31 2001-08-24 10:58:06 graeme Exp $
+# $Id: Makefile.aix,v 1.32 2001-08-27 22:42:53 graeme Exp $
 
 
 # Definitions
@@ -38,7 +38,7 @@ SOURCE = ../../src
 TOOLS  = ../../tools
 VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS	= -I$(SOURCE) -I$(TOOLS)
+CFLAGS	= -I$(SOURCE) -I$(TOOLS) -DMP_GUI_SUPPORT=1
 OFLAGS	= -O2 -Q!
 TFLAGS	= -DMP_THREADS_SUPPORT
 
