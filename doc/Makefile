@@ -21,14 +21,17 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.4 1999-11-15 20:01:35 graeme Exp $
+# $Id: Makefile,v 1.5 1999-11-16 20:26:52 graeme Exp $
 
 
 # Definitions
 
+SHELL = /bin/sh
+
 DOCUMENT = mpatrol
 
-VERBOSE  = false
+SPLITHTML = false
+VERBOSE   = false
 
 
 # Rules
@@ -65,6 +68,17 @@ else
 	@ makeguide --amiga $<
 endif
 
+ifeq ($(SPLITHTML),true)
+# Build the HTML files from the Texinfo file using texi2html
+
+$(DOCUMENT).html: $(DOCUMENT).texi
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ texi2html -top_file $@ -split node -menu -number -verbose $<
+else
+	@ texi2html -top_file $@ -split node -menu -number $<
+endif
+else
 # Build the HTML file from the Texinfo file using makeinfo
 
 $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg
@@ -76,6 +90,7 @@ else
 endif
 	@ sed "s/<[ ]*<[ ]*[Pp][ ]*>[ ]*[Ii][Mm][Gg][ ]*/<img /g" $@ >$@.new
 	@ mv $@.new $@
+endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
@@ -113,6 +128,9 @@ all: $(DOCUMENT).doc $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 clean:
 	-@ rm -f $(DOCUMENT).doc $(DOCUMENT).info >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
+ifeq ($(SPLITHTML),true)
+	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
+endif
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 
 clobber: clean
