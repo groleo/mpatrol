@@ -117,6 +117,8 @@ typedef struct profhead
     unsigned long autosave;      /* autosave frequency */
     unsigned long autocount;     /* autosave count */
     char *file;                  /* profiling filename */
+    memaccess prot;              /* protection status */
+    size_t protrecur;            /* protection recursion count */
     char profiling;              /* profiling status */
 }
 profhead;

@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.26 2000-05-15 22:34:06 graeme Exp $"
+#ident "$Id: profile.c,v 1.27 2000-11-05 23:10:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -80,6 +80,8 @@ MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h, symhead *s)
     p->lbound = MP_LARGEBOUND;
     p->autosave = p->autocount = 0;
     p->file = __mp_proffile(&h->memory, NULL);
+    p->prot = MA_NOACCESS;
+    p->protrecur = 0;
     p->profiling = 0;
 }
 
@@ -109,6 +111,8 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
     p->atotals = p->dtotals = 0;
     p->autocount = 0;
     p->file = NULL;
+    p->prot = MA_NOACCESS;
+    p->protrecur = 0;
     p->profiling = 0;
 }
 
@@ -468,6 +472,20 @@ MP_GLOBAL int __mp_protectprofile(profhead *p, memaccess a)
 {
     profnode *n;
 
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (p->prot == a)
+    {
+        p->protrecur++;
+        return 1;
+    }
+    else if (p->protrecur > 0)
+    {
+        p->protrecur--;
+        return 1;
+    }
+    p->prot = a;
     /* Even though there are likely to be profdata and profnode data structures
      * on the list of internal data blocks, it is safe to assume one or the
      * other since they both share the same internal data members.
