@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.5 2000-03-13 21:56:57 graeme Exp $"
+#ident "$Id: strtab.c,v 1.6 2000-03-13 22:16:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -53,11 +53,14 @@ MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
 {
     struct { char x; hashentry y; } w;
     struct { char x; strnode y; } z;
+    size_t i;
     long n;
 
     t->heap = h;
     n = (char *) &w.y - &w.x;
     __mp_newslots(&t->table, sizeof(hashentry), __mp_poweroftwo(n));
+    for (i = 0; i < MP_HASHTABSIZE; i++)
+        __mp_newlist(&t->slots[i]);
     __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
     t->size = 0;
@@ -74,12 +77,16 @@ MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
 
 MP_GLOBAL void __mp_deletestrtab(strtab *t)
 {
+    size_t i;
+
     /* We don't need to explicitly free any memory as this is dealt with
      * at a lower level by the heap manager.
      */
     t->heap = NULL;
     t->table.free = NULL;
     t->table.size = 0;
+    for (i = 0; i < MP_HASHTABSIZE; i++)
+        __mp_newlist(&t->slots[i]);
     __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
     t->size = 0;
@@ -140,12 +147,23 @@ static hashentry *gethashentry(strtab *t)
 
 MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
 {
+    hashentry *e;
     strnode *n;
     heapnode *p;
     char *r;
-    size_t l, m;
+    size_t k, l, m;
 
+    k = hash(s);
     l = strlen(s) + 1;
+    /* Search to see if the string already exists in the hash table and
+     * return it if it does.
+     */
+    for (e = (hashentry *) t->slots[k].head; e->node.next != NULL;
+         e = (hashentry *) e->node.next)
+        if ((e->size == l) && (strcmp(e->data.key, s) == 0))
+            return e->data.key;
+    if ((e = gethashentry(t)) == NULL)
+        return NULL;
     /* If we have no suitable space left then we must allocate some more
      * memory for the string table in order for it to be able to hold the
      * new string.  The size of the new string is rounded up to a multiple
@@ -155,7 +173,10 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
     {
         m = __mp_roundup(sizeof(strnode) + l, t->heap->memory.page);
         if ((p = __mp_heapalloc(t->heap, m, t->align)) == NULL)
+        {
+            __mp_freeslot(&t->table, e);
             return NULL;
+        }
         n = (strnode *) p->block;
         n->block = p->block;
         n->next = (char *) p->block + sizeof(strnode);
@@ -174,6 +195,11 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
      * insert the strnode back into the tree, reflecting its new status.
      */
     __mp_treeinsert(&t->tree, &n->node, n->avail);
+    /* We now add the string to the hash table.
+     */
+    __mp_addhead(&t->slots[k], &e->node);
+    e->data.key = r;
+    e->size = l;
     return r;
 }
 
