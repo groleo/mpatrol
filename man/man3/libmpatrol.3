@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.11 2001-02-09 00:59:06 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.12 2001-02-12 19:15:04 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "9 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "12 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -49,6 +49,12 @@ void *expand(void *ptr, size_t size);
 void free(void *ptr);
 void cfree(void *ptr, size_t nelem, size_t size);
 void dealloca(void *ptr);
+
+void *xmalloc(size_t size);
+void *xcalloc(size_t nelem, size_t size);
+char *xstrdup(const char *str);
+void *xrealloc(void *ptr, size_t size);
+void xfree(void *ptr);
 
 void *operator new(size_t size) throw(std::bad_alloc);
 .if n \{void *operator new(size_t size, const std::nothrow_t&)
@@ -104,7 +110,9 @@ void *memchr(const void *ptr, int byte, size_t size);
 \}
 
 unsigned long __mp_setoption(long opt, unsigned long val);
+int __mp_getoption(long opt, unsigned long *val);
 char *__mp_function(__mp_alloctype func);
+int __mp_setuser(const void *ptr, const void *data);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
@@ -154,6 +162,14 @@ no macro redefinition of functions will take place and all special mpatrol
 library functions will evaluate to empty statements.  The \fImpalloc.h\fP header
 file will also be included in this case.  It is intended that the \fBNDEBUG\fP
 preprocessor macro be defined in release builds.
+.PP
+The \fBMP_MALLOC\fP family of functions that are defined in \fImpalloc.h\fP are
+also defined in \fImpatrol.h\fP when \fBNDEBUG\fP is not defined.  The mpatrol
+versions of these functions contain more debugging information than the mpalloc
+versions do, but they do not call the allocation failure handler when no more
+memory is available (they cause the \fIOUTMEM\fP error message to be given
+instead).  See \fBmpalloc\fP(3) for the descriptions of the \fBMP_MALLOC\fP
+family of functions.
 .PP
 All diagnostics are sent to the file \fImpatrol.log\fP in the current directory
 by default but this can be changed at run-time.  Additional configuration
@@ -452,6 +468,63 @@ but is only really required if the mpatrol library does not automatically free
 such memory allocations when the allocating function returns.  This function is
 mpatrol-specific and should not be used in release code.
 .PP
+The following 5 functions are available as replacements for existing C library
+extension functions that always abort and never return \fBNULL\fP if there is
+insufficient memory to fulfil a request.  To use these you must include
+\fImpatrol.h\fP before all other header files, although on UNIX and Windows
+platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway, albeit
+with slightly less tracing information:
+.TP
+\fBxmalloc\fP
+Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the program will be terminated and the \fIOUTMEM\fP error will be
+given.  The allocated memory must be deallocated with \fBxfree\fP or reallocated
+with \fBxrealloc\fP.
+.TP
+\fBxcalloc\fP
+Allocates \fInelem\fP elements of \fIsize\fP zero-initialised bytes from the
+heap and returns a pointer to the first byte of the allocation.  The pointer
+returned will be suitably aligned for casting to any type and can be used to
+store data of up to \fInelem * size\fP bytes in length.  If \fInelem * size\fP
+is \fI0\fP then the amount of memory allocated will be implicitly rounded up to
+\fI1\fP byte.  If there is not enough space in the heap then the program will be
+terminated and the \fIOUTMEM\fP error will be given.  The allocated memory must
+be deallocated with \fBxfree\fP or reallocated with \fBxrealloc\fP.
+.TP
+\fBxstrdup\fP
+Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying \fIstr\fP to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then an error
+will be given and the null pointer will be returned.  If there is not enough
+space in the heap then the program will be terminated and the \fIOUTMEM\fP error
+will be given.  The allocated memory must be deallocated with \fBxfree\fP or
+reallocated with \fBxrealloc\fP.
+.TP
+\fBxrealloc\fP
+Resizes the memory allocation beginning at \fIptr\fP to \fIsize\fP bytes and
+returns a pointer to the first byte of the new allocation after copying
+\fIptr\fP to the newly-allocated memory, which will be truncated if \fIsize\fP
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIptr\fP is \fBNULL\fP then the call will be
+equivalent to \fBxmalloc\fP.  If \fIsize\fP is \fI0\fP then it will be implictly
+rounded up to \fI1\fP.  If \fIsize\fP is greater than the original allocation
+then the extra space will be filled with uninitialised bytes.  If there is not
+enough space in the heap then the program will be terminated and the
+\fIOUTMEM\fP error will be given.  The allocated memory must be deallocated with
+\fBxfree\fP and can be reallocated again with \fBxrealloc\fP.
+.TP
+\fBxfree\fP
+Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
+by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
+will be freed.  All of the previous contents will be destroyed.
+.PP
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in \fImpatrol.h\fP will only be used if the
 \fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  The replacement
@@ -600,25 +673,46 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 21 functions are available as support routines for additional
+The following 23 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
 \fB__mp_setoption\fP
-Sets an mpatrol option after the library has been initialised.  Options that
-require values are listed in \fImpatrol.h\fP prefixed with \fIMP_OPT_*\fP.  The
-\fIopt\fP argument should be set to one of these macros, and the \fIval\fP
-argument should be set to the option value, cast to an unsigned integer.  The
-return value will be \fI0\fP on success and \fI1\fP on failure.  Options that
-are flags are listed in \fImpatrol.h\fP prefixed with \fIMP_FLG_*\fP.  Multiple
-flags can be set or unset at once using the \fIMP_OPT_SETFLAGS\fP and
-\fIMP_OPT_UNSETFLAGS\fP options respectively, with the necessary flags specified
-in \fIval\fP.  The return value will be \fI0\fP on success and a combination of
-all of the flags that could not be set or unset on failure.
+Sets the value of an mpatrol option after the library has been initialised.
+Options that require values are listed in \fImpatrol.h\fP prefixed with
+\fIMP_OPT_*\fP.  The \fIopt\fP argument should be set to one of these macros,
+and the \fIval\fP argument should be set to the option value, cast to an
+unsigned integer.  The return value will be \fI0\fP on success and \fI1\fP on
+failure.  Options that are flags are listed in \fImpatrol.h\fP prefixed with
+\fIMP_FLG_*\fP.  Multiple flags can be set or unset at once using the
+\fIMP_OPT_SETFLAGS\fP and \fIMP_OPT_UNSETFLAGS\fP options respectively, with the
+necessary flags specified in \fIval\fP.  The return value will be \fI0\fP on
+success and a combination of all of the flags that could not be set or unset on
+failure.
+.TP
+\fB__mp_getoption\fP
+Gets the value of an mpatrol option after the library has been initialised.
+If \fIopt\fP is a valid option listed in \fImpatrol.h\fP then \fI1\fP will be
+returned and the associated value will be returned in \fIval\fP and cast to an
+unsigned integer, otherwise \fI0\fP will be returned.  If \fIopt\fP is
+\fIMP_OPT_SETFLAGS\fP then all of the mpatrol library flags that are set will be
+returned in \fIval\fP.  If \fIopt\fP is \fIMP_OPT_UNSETFLAGS\fP then all of the
+mpatrol library flags that are not set will be returned in \fIval\fP.
 .TP
 \fB__mp_function\fP
 Returns the name of the function corresponding to the allocation type \fIfunc\fP
 or \fBNULL\fP if no such allocation type exists.
+.TP
+\fB__mp_setuser\fP
+Sets the user data for the memory allocation containing \fIptr\fP.  The contents
+of \fIdata\fP are entirely application-specific as user data will never be
+examined by the mpatrol library.  Such data is associated with a memory
+allocation for its entire lifetime unless overridden by a subsequent call to
+\fB__mp_setuser\fP.  As such, the user data must be valid for the entire
+lifetime of the memory allocation, perhaps even after the allocation has been
+freed if the \fBNOFREE\fP option is being used.  This function returns \fI1\fP
+if there is an allocated (or freed) memory block containing \fIptr\fP, and
+\fI0\fP otherwise.
 .TP
 \fB__mp_info\fP
 Obtains information about a specific memory allocation by placing statistics
@@ -643,6 +737,7 @@ l l.
 \fBstack\fP	Pointer to function call stack.
 \fBtypestr\fP	Type stored in allocation.
 \fBtypesize\fP	Size of type stored in allocation.
+\fBuserdata\fP	User data associated with allocation.
 \fBfreed\fP	Indicates if alloc has been freed.
 .TE
 .TP
@@ -1194,8 +1289,9 @@ order to segregate it from user memory, and this behaviour is reversed with the
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBmprof\fP(1), \fBmptrace\fP(1), \fBmleak\fP(1),
 \fBmpsym\fP(1), \fBmpedit\fP(1), \fBhexwords\fP(1), \fBmmap\fP(2),
-\fBsbrk\fP(2), \fBlibmpalloc\fP(3), \fBmalloc\fP(3), \fBalloca\fP(3),
-\fBmemory\fP(3), \fBstring\fP(3), \fBassert\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBsbrk\fP(2), \fBlibmpalloc\fP(3), \fBmalloc\fP(3), \fBnew\fP(3c++),
+\fBalloca\fP(3), \fBmemory\fP(3), \fBstring\fP(3), \fBassert\fP(3),
+\fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP

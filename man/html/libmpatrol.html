@@ -3,7 +3,7 @@ Content-type: text/html
 <HTML><HEAD><TITLE>Manpage of LIBMPATROL</TITLE>
 </HEAD><BODY>
 <H1>LIBMPATROL</H1>
-Section: mpatrol library (3)<BR>Updated: 9 February 2001<BR><A HREF="#index">Index</A>
+Section: mpatrol library (3)<BR>Updated: 12 February 2001<BR><A HREF="#index">Index</A>
 <A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -36,6 +36,12 @@ void free(void *ptr);
 void cfree(void *ptr, size_t nelem, size_t size);
 void dealloca(void *ptr);
 
+void *xmalloc(size_t size);
+void *xcalloc(size_t nelem, size_t size);
+char *xstrdup(const char *str);
+void *xrealloc(void *ptr, size_t size);
+void xfree(void *ptr);
+
 void *operator new(size_t size) throw(std::bad_alloc);
 void *operator new(size_t size, const std::nothrow_t&amp;)
       throw();
@@ -66,7 +72,9 @@ void *memmem(const void *ptr1, size_t size1,
              const void *ptr2, size_t size2);
 
 unsigned long __mp_setoption(long opt, unsigned long val);
+int __mp_getoption(long opt, unsigned long *val);
 char *__mp_function(__mp_alloctype func);
+int __mp_setuser(const void *ptr, const void *data);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
@@ -111,6 +119,15 @@ no macro redefinition of functions will take place and all special mpatrol
 library functions will evaluate to empty statements.  The <I>mpalloc.h</I> header
 file will also be included in this case.  It is intended that the <B>NDEBUG</B>
 preprocessor macro be defined in release builds.
+<P>
+
+The <B>MP_MALLOC</B> family of functions that are defined in <I>mpalloc.h</I> are
+also defined in <I>mpatrol.h</I> when <B>NDEBUG</B> is not defined.  The mpatrol
+versions of these functions contain more debugging information than the mpalloc
+versions do, but they do not call the allocation failure handler when no more
+memory is available (they cause the <I>OUTMEM</I> error message to be given
+instead).  See <B><A HREF="http://localhost/cgi-bin/man/man2html?3+mpalloc">mpalloc</A></B>(3) for the descriptions of the <B>MP_MALLOC</B>
+family of functions.
 <P>
 
 All diagnostics are sent to the file <I>mpatrol.log</I> in the current directory
@@ -400,6 +417,61 @@ mpatrol-specific and should not be used in release code.
 </DL>
 <P>
 
+The following 5 functions are available as replacements for existing C library
+extension functions that always abort and never return <B>NULL</B> if there is
+insufficient memory to fulfil a request.  To use these you must include
+<I>mpatrol.h</I> before all other header files, although on UNIX and Windows
+platforms (and AmigaOS when using <B>gcc</B>) they will be used anyway, albeit
+with slightly less tracing information:
+<DL COMPACT>
+<DT><B>xmalloc</B><DD>
+Allocates <I>size</I> uninitialised bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+<I>size</I> bytes in length.  If <I>size</I> is <I>0</I> then the memory allocated
+will be implicitly rounded up to <I>1</I> byte.  If there is not enough space in
+the heap then the program will be terminated and the <I>OUTMEM</I> error will be
+given.  The allocated memory must be deallocated with <B>xfree</B> or reallocated
+with <B>xrealloc</B>.
+<DT><B>xcalloc</B><DD>
+Allocates <I>nelem</I> elements of <I>size</I> zero-initialised bytes from the
+heap and returns a pointer to the first byte of the allocation.  The pointer
+returned will be suitably aligned for casting to any type and can be used to
+store data of up to <I>nelem * size</I> bytes in length.  If <I>nelem * size</I>
+is <I>0</I> then the amount of memory allocated will be implicitly rounded up to
+<I>1</I> byte.  If there is not enough space in the heap then the program will be
+terminated and the <I>OUTMEM</I> error will be given.  The allocated memory must
+be deallocated with <B>xfree</B> or reallocated with <B>xrealloc</B>.
+<DT><B>xstrdup</B><DD>
+Allocates exactly enough memory from the heap to duplicate <I>str</I> (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying <I>str</I> to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of <I>str</I>.  If <I>str</I> is <B>NULL</B> then an error
+will be given and the null pointer will be returned.  If there is not enough
+space in the heap then the program will be terminated and the <I>OUTMEM</I> error
+will be given.  The allocated memory must be deallocated with <B>xfree</B> or
+reallocated with <B>xrealloc</B>.
+<DT><B>xrealloc</B><DD>
+Resizes the memory allocation beginning at <I>ptr</I> to <I>size</I> bytes and
+returns a pointer to the first byte of the new allocation after copying
+<I>ptr</I> to the newly-allocated memory, which will be truncated if <I>size</I>
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+<I>size</I> bytes in length.  If <I>ptr</I> is <B>NULL</B> then the call will be
+equivalent to <B>xmalloc</B>.  If <I>size</I> is <I>0</I> then it will be implictly
+rounded up to <I>1</I>.  If <I>size</I> is greater than the original allocation
+then the extra space will be filled with uninitialised bytes.  If there is not
+enough space in the heap then the program will be terminated and the
+<I>OUTMEM</I> error will be given.  The allocated memory must be deallocated with
+<B>xfree</B> and can be reallocated again with <B>xrealloc</B>.
+<DT><B>xfree</B><DD>
+Frees the memory allocation beginning at <I>ptr</I> so the memory can be reused
+by another call to allocate memory.  If <I>ptr</I> is <B>NULL</B> then no memory
+will be freed.  All of the previous contents will be destroyed.
+</DL>
+<P>
+
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in <I>mpatrol.h</I> will only be used if the
 <B>MP_NOCPLUSPLUS</B> preprocessor macro is not defined.  The replacement
@@ -539,24 +611,43 @@ and no bytes will be searched.
 </DL>
 <P>
 
-The following 21 functions are available as support routines for additional
+The following 23 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 <I>mpatrol.h</I> header file:
 <DL COMPACT>
 <DT><B>__mp_setoption</B><DD>
-Sets an mpatrol option after the library has been initialised.  Options that
-require values are listed in <I>mpatrol.h</I> prefixed with <I>MP_OPT_*</I>.  The
-<I>opt</I> argument should be set to one of these macros, and the <I>val</I>
-argument should be set to the option value, cast to an unsigned integer.  The
-return value will be <I>0</I> on success and <I>1</I> on failure.  Options that
-are flags are listed in <I>mpatrol.h</I> prefixed with <I>MP_FLG_*</I>.  Multiple
-flags can be set or unset at once using the <I>MP_OPT_SETFLAGS</I> and
-<I>MP_OPT_UNSETFLAGS</I> options respectively, with the necessary flags specified
-in <I>val</I>.  The return value will be <I>0</I> on success and a combination of
-all of the flags that could not be set or unset on failure.
+Sets the value of an mpatrol option after the library has been initialised.
+Options that require values are listed in <I>mpatrol.h</I> prefixed with
+<I>MP_OPT_*</I>.  The <I>opt</I> argument should be set to one of these macros,
+and the <I>val</I> argument should be set to the option value, cast to an
+unsigned integer.  The return value will be <I>0</I> on success and <I>1</I> on
+failure.  Options that are flags are listed in <I>mpatrol.h</I> prefixed with
+<I>MP_FLG_*</I>.  Multiple flags can be set or unset at once using the
+<I>MP_OPT_SETFLAGS</I> and <I>MP_OPT_UNSETFLAGS</I> options respectively, with the
+necessary flags specified in <I>val</I>.  The return value will be <I>0</I> on
+success and a combination of all of the flags that could not be set or unset on
+failure.
+<DT><B>__mp_getoption</B><DD>
+Gets the value of an mpatrol option after the library has been initialised.
+If <I>opt</I> is a valid option listed in <I>mpatrol.h</I> then <I>1</I> will be
+returned and the associated value will be returned in <I>val</I> and cast to an
+unsigned integer, otherwise <I>0</I> will be returned.  If <I>opt</I> is
+<I>MP_OPT_SETFLAGS</I> then all of the mpatrol library flags that are set will be
+returned in <I>val</I>.  If <I>opt</I> is <I>MP_OPT_UNSETFLAGS</I> then all of the
+mpatrol library flags that are not set will be returned in <I>val</I>.
 <DT><B>__mp_function</B><DD>
 Returns the name of the function corresponding to the allocation type <I>func</I>
 or <B>NULL</B> if no such allocation type exists.
+<DT><B>__mp_setuser</B><DD>
+Sets the user data for the memory allocation containing <I>ptr</I>.  The contents
+of <I>data</I> are entirely application-specific as user data will never be
+examined by the mpatrol library.  Such data is associated with a memory
+allocation for its entire lifetime unless overridden by a subsequent call to
+<B>__mp_setuser</B>.  As such, the user data must be valid for the entire
+lifetime of the memory allocation, perhaps even after the allocation has been
+freed if the <B>NOFREE</B> option is being used.  This function returns <I>1</I>
+if there is an allocated (or freed) memory block containing <I>ptr</I>, and
+<I>0</I> otherwise.
 <DT><B>__mp_info</B><DD>
 Obtains information about a specific memory allocation by placing statistics
 about <I>ptr</I> in <I>info</I>.  If <I>ptr</I> does not belong to a previously
@@ -579,6 +670,7 @@ will be returned and <I>info</I> will contain the following information:
 <TR VALIGN=top><TD><B>stack</B></TD><TD>Pointer to function call stack.<BR></TD></TR>
 <TR VALIGN=top><TD><B>typestr</B></TD><TD>Type stored in allocation.<BR></TD></TR>
 <TR VALIGN=top><TD><B>typesize</B></TD><TD>Size of type stored in allocation.<BR></TD></TR>
+<TR VALIGN=top><TD><B>userdata</B></TD><TD>User data associated with allocation.<BR></TD></TR>
 <TR VALIGN=top><TD><B>freed</B></TD><TD>Indicates if alloc has been freed.<BR></TD></TR>
 </TABLE>
 
@@ -1074,8 +1166,9 @@ order to segregate it from user memory, and this behaviour is reversed with the
 
 <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mpatrol">mpatrol</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mprof">mprof</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mptrace">mptrace</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mleak">mleak</A></B>(1),
 <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mpsym">mpsym</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?1+mpedit">mpedit</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?1+hexwords">hexwords</A></B>(1), <B><A HREF="http://localhost/cgi-bin/man/man2html?2+mmap">mmap</A></B>(2),
-<B><A HREF="http://localhost/cgi-bin/man/man2html?2+sbrk">sbrk</A></B>(2), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+libmpalloc">libmpalloc</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+malloc">malloc</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+alloca">alloca</A></B>(3),
-<B><A HREF="http://localhost/cgi-bin/man/man2html?3+memory">memory</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+string">string</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+assert">assert</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3e+elf">elf</A></B>(3e), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+bfd">bfd</A></B>(3).
+<B><A HREF="http://localhost/cgi-bin/man/man2html?2+sbrk">sbrk</A></B>(2), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+libmpalloc">libmpalloc</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+malloc">malloc</A></B>(3), <B>new</B>(3c++),
+<B><A HREF="http://localhost/cgi-bin/man/man2html?3+alloca">alloca</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+memory">memory</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+string">string</A></B>(3), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+assert">assert</A></B>(3),
+<B><A HREF="http://localhost/cgi-bin/man/man2html?3e+elf">elf</A></B>(3e), <B><A HREF="http://localhost/cgi-bin/man/man2html?3+bfd">bfd</A></B>(3).
 <P>
 
 The mpatrol manual and reference card.
@@ -1126,6 +1219,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 00:58:48 GMT, February 09, 2001
+Time: 19:14:04 GMT, February 12, 2001
 </BODY>
 </HTML>
