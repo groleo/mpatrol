@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.59 2001-02-14 22:05:40 graeme Exp $
+# $Id: mpatrol.spec,v 1.60 2001-02-21 09:58:36 graeme Exp $
 
 
 %define libversion 1.4
@@ -34,8 +34,6 @@ Release: 1
 License: LGPL
 Group: Development/Debuggers
 Source0: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_%{version}.tar.gz
-Source1: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_doc.tar.gz
-Source2: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_man.tar.gz
 URL: http://www.cbmamiga.demon.co.uk/mpatrol/
 Buildroot: %{_tmppath}/%{name}-root
 Prereq: /sbin/install-info /sbin/ldconfig
@@ -58,7 +56,7 @@ to recompile or relink in order to change the library's behaviour.
 
 
 %prep
-%setup -q -n %{name} -b 1 -b 2
+%setup -q -n %{name}
 
 
 %build

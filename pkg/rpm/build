@@ -24,7 +24,7 @@
 # UNIX shell script to build an RPM package file
 
 
-# $Id: build,v 1.23 2001-02-08 20:06:59 graeme Exp $
+# $Id: build,v 1.24 2001-02-21 09:58:36 graeme Exp $
 
 
 arch=i386
@@ -32,12 +32,11 @@ version=1.4.0
 base=/usr
 
 
-# Build the binary and source package files.  This assumes that the
-# source and documentation archives exist in /usr/src/redhat/SOURCES.
-# If this is impossible (because you are not the superuser) then you
-# can override the use of /usr as the base directory by placing a file
-# called .rpmmacros in your home directory and adding a new definition
-# of %_usr within it.
+# Build the binary and source package files.  This assumes that the source
+# archive exists in /usr/src/redhat/SOURCES.  If this is impossible (because
+# you are not the superuser) then you can override the use of /usr as the
+# base directory by placing a file called .rpmmacros in your home directory
+# and adding a new definition of %_usr within it.
 
 rpm -ba --clean mpatrol.spec
 cp $base/src/redhat/RPMS/$arch/mpatrol-$version-1.$arch.rpm .
