@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.10 2001-03-06 19:39:29 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.11 2001-03-06 20:21:53 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.10 2001-03-06 19:39:29 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.11 2001-03-06 20:21:53 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -559,7 +559,8 @@ __mpt_dmallocverify(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t,
 
     if (!malloc_initialised)
         __mp_init_dmalloc();
-    if ((p == NULL) || (__mp_info(p, &i) && (p == i.block) && !i.freed))
+    if ((p == NULL) || (__mp_info(p, &i) && (p == i.block) && i.allocated &&
+         !i.freed))
         r = 1;
     else
         r = 0;
@@ -609,7 +610,7 @@ __mpt_dmallocexamine(MP_CONST void *p, size_t *l, char **t, unsigned long *u,
 
     if (!malloc_initialised)
         __mp_init_dmalloc();
-    if (__mp_info(p, &i))
+    if (__mp_info(p, &i) && i.allocated)
     {
         if (l != NULL)
             *l = i.size;

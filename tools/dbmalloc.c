@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.10 2001-03-04 16:46:07 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.11 2001-03-06 20:21:53 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dbmalloc_id = "$Id: dbmalloc.c,v 1.10 2001-03-04 16:46:07 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dbmalloc_id = "$Id: dbmalloc.c,v 1.11 2001-03-06 20:21:53 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -429,7 +429,7 @@ __mpt_dbmallocsize(MP_CONST void *p)
 
     if (!malloc_initialised)
         __mp_init_dbmalloc();
-    if (__mp_info(p, &i) && !i.freed)
+    if (__mp_info(p, &i) && i.allocated && !i.freed)
         t = i.size;
     else
         t = (size_t) -1;
