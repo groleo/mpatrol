@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.46 2000-12-10 22:37:08 graeme Exp $"
+#ident "$Id: info.c,v 1.47 2000-12-20 22:35:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -58,7 +58,9 @@ void _Inuse_free(void *);
  * is ready to perform dynamic memory allocations.
  */
 
-MP_GLOBAL void __mp_newinfo(infohead *h)
+MP_GLOBAL
+void
+__mp_newinfo(infohead *h)
 {
     struct { char x; allocanode y; } w;
     struct { char x; infonode y; } z;
@@ -123,7 +125,9 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
 /* Free up all memory used by the infohead.
  */
 
-MP_GLOBAL void __mp_deleteinfo(infohead *h)
+MP_GLOBAL
+void
+__mp_deleteinfo(infohead *h)
 {
     /* We should close the log file first in case that calls a dynamic
      * memory allocation function, since once __mp_deleteallocs() is
@@ -151,7 +155,9 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
 /* Allocate a new allocation information node.
  */
 
-static infonode *getinfonode(infohead *h)
+static
+infonode *
+getinfonode(infohead *h)
 {
     infonode *n;
     heapnode *p;
@@ -180,7 +186,9 @@ static infonode *getinfonode(infohead *h)
 /* Allocate a new allocanode.
  */
 
-static allocanode *getallocanode(infohead *h)
+static
+allocanode *
+getallocanode(infohead *h)
 {
     allocanode *n;
     heapnode *p;
@@ -208,8 +216,10 @@ static allocanode *getallocanode(infohead *h)
 /* Allocate a new block of memory of a specified size and alignment.
  */
 
-MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
-                               char *s, char *t, unsigned long u, stackinfo *v)
+MP_GLOBAL
+void *
+__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
+               unsigned long u, stackinfo *v)
 {
     allocnode *n;
     allocanode *g;
@@ -396,9 +406,10 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
 /* Resize an existing block of memory to a new size and alignment.
  */
 
-MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
-                                  alloctype f, char *s, char *t,
-                                  unsigned long u, stackinfo *v)
+MP_GLOBAL
+void *
+__mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
+                  char *s, char *t, unsigned long u, stackinfo *v)
 {
     allocnode *n, *r;
     infonode *i, *m;
@@ -632,8 +643,10 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
 /* Free an existing block of memory.
  */
 
-MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
-                               char *t, unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
+                unsigned long u, stackinfo *v)
 {
     allocnode *n;
     allocanode *g;
@@ -795,9 +808,10 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
 /* Set a block of memory to contain a specific byte.
  */
 
-MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
-                              alloctype f, char *s, char *t, unsigned long u,
-                              stackinfo *v)
+MP_GLOBAL
+void
+__mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
+               char *s, char *t, unsigned long u, stackinfo *v)
 {
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
         __mp_logmemset(h, p, l, c, f, s, t, u, v);
@@ -815,9 +829,10 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
 /* Copy a block of memory from one address to another.
  */
 
-MP_GLOBAL void *__mp_copymemory(infohead *h, void *p, void *q, size_t l,
-                                unsigned char c, alloctype f, char *s, char *t,
-                                unsigned long u, stackinfo *v)
+MP_GLOBAL
+void *
+__mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
+                alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
 {
     void *r;
     int o;
@@ -876,9 +891,10 @@ MP_GLOBAL void *__mp_copymemory(infohead *h, void *p, void *q, size_t l,
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-MP_GLOBAL void *__mp_locatememory(infohead *h, void *p, size_t l, void *q,
-                                  size_t m, alloctype f, char *s, char *t,
-                                  unsigned long u, stackinfo *v)
+MP_GLOBAL
+void *
+__mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
+                  alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
 {
     void *r;
 
@@ -902,9 +918,10 @@ MP_GLOBAL void *__mp_locatememory(infohead *h, void *p, size_t l, void *q,
 /* Compare two blocks of memory.
  */
 
-MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
-                                 alloctype f, char *s, char *t, unsigned long u,
-                                 stackinfo *v)
+MP_GLOBAL
+int
+__mp_comparememory(infohead *h, void *p, void *q, size_t l, alloctype f,
+                   char *s, char *t, unsigned long u, stackinfo *v)
 {
     void *r;
     int c;
@@ -934,7 +951,9 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
  * with the supplied access permission.
  */
 
-MP_GLOBAL int __mp_protectinfo(infohead *h, memaccess a)
+MP_GLOBAL
+int
+__mp_protectinfo(infohead *h, memaccess a)
 {
     allocanode *m;
     infonode *n;
@@ -964,7 +983,9 @@ MP_GLOBAL int __mp_protectinfo(infohead *h, memaccess a)
  * a predefined pattern.
  */
 
-MP_GLOBAL void __mp_checkinfo(infohead *h)
+MP_GLOBAL
+void
+__mp_checkinfo(infohead *h)
 {
     allocnode *n;
     infonode *m;
@@ -1095,7 +1116,9 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
  * memory block.
  */
 
-MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
+MP_GLOBAL
+int
+__mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
 {
     allocnode *n;
     infonode *m;
@@ -1165,8 +1188,9 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
  * then return the length of the string.
  */
 
-MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f,
-                               int g)
+MP_GLOBAL
+int
+__mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, int g)
 {
     allocnode *n;
     infonode *m;
