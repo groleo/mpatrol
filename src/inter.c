@@ -28,6 +28,7 @@
 
 #include "inter.h"
 #include "diag.h"
+#include "machine.h"
 #if MP_THREADS_SUPPORT
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
@@ -42,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.48 2000-11-13 21:53:46 graeme Exp $"
+#ident "$Id: inter.c,v 1.49 2000-11-21 22:32:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -79,6 +80,65 @@ extern int __env_initialized;
 extern void *__onexitbegin;
 extern void **__piob;
 #endif /* TARGET */
+
+
+#if MP_INIT_SUPPORT
+/* On systems with .init and .fini sections we can plant calls to initialise
+ * the mpatrol mutexes and data structures before main() is called and also
+ * to terminate the mpatrol library after exit() is called.  However, we need
+ * to refer to a symbol within the machine module so that we can drag in the
+ * contents of the .init and .fini sections when the mpatrol library is built
+ * as an archive library.
+ */
+
+static int *initsection = &__mp_initsection;
+#elif defined(__GNUC__)
+/* The GNU C compiler allows us to indicate that a function is a constructor
+ * which should be called before main() or that a function is a destructor
+ * that should be called at or after exit().  However, these get entered into
+ * the .ctors and .dtors sections which means that the final link must also
+ * be performed by the GNU C compiler.
+ */
+
+static void initlibrary(void) __attribute__((__constructor__));
+static void finilibrary(void) __attribute__((__destructor__));
+
+static void initlibrary(void)
+{
+#if MP_THREADS_SUPPORT
+    __mp_initmutexes();
+#endif /* MP_THREADS_SUPPORT */
+    __mp_init();
+}
+
+static void finilibrary(void)
+{
+    __mp_fini();
+}
+#elif defined(__cplusplus)
+/* C++ provides a way to initialise the mpatrol library before main() is
+ * called and terminate it after exit() is called.  Note that if the C++
+ * compiler uses a special section for calling functions before main() that
+ * is not recognised by the system tools then the C++ compiler must also be
+ * used to perform the final link.
+ */
+
+static struct initlibrary
+{
+    initlibrary()
+    {
+#if MP_THREADS_SUPPORT
+        __mp_initmutexes();
+#endif /* MP_THREADS_SUPPORT */
+        __mp_init();
+    }
+    ~initlibrary()
+    {
+        __mp_fini();
+    }
+}
+meminit;
+#endif /* __cplusplus */
 
 
 /* Save the current signal handlers and set them to ignore.  Also lock the
@@ -262,7 +322,15 @@ void __mp_init(void)
 #if MP_INUSE_SUPPORT
         _Inuse_init(0, 0);
 #endif /* MP_INUSE_SUPPORT */
+#if !MP_INIT_SUPPORT && !defined(__GNUC__) && !defined(__cplusplus)
+        /* We will have to terminate the library using atexit() since there
+         * is no support for .init/.fini functions, constructor/destructor
+         * functions or C++.  This is usually OK to do but there may be
+         * problems if the mpatrol library is terminated before all memory
+         * allocations are freed.
+         */
         atexit(__mp_fini);
+#endif /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
         /* Read any options from the specified environment variable.
          */
         __mp_parseoptions(&memhead);
