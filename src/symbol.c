@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.3 1999-12-20 20:42:26 graeme Exp $"
+#ident "$Id: symbol.c,v 1.4 1999-12-21 20:57:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -493,10 +493,11 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
 {
     asymbol **p;
     long i, n;
-    int r;
+    int d, r;
 
     /* Look for the symbol table.
      */
+    d = 0;
     if ((n = bfd_get_symtab_upper_bound(h)) < 0)
     {
         __mp_error(AT_MAX, "%s: %s\n", f, bfd_errmsg(bfd_get_error()));
@@ -504,8 +505,21 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
     }
     if (n == 0)
     {
-        __mp_warn(AT_MAX, "%s: missing symbol table\n", f);
-        return 1;
+        /* If we couldn't find the symbol table then it is likely that the file
+         * has been stripped.  However, if the file was dynamically linked then
+         * we may be able to obtain some symbols from its dynamic symbol table.
+         */
+        if ((n = bfd_get_dynamic_symtab_upper_bound(h)) < 0)
+        {
+            __mp_error(AT_MAX, "%s: %s\n", f, bfd_errmsg(bfd_get_error()));
+            return 0;
+        }
+        if (n == 0)
+        {
+            __mp_warn(AT_MAX, "%s: missing symbol table\n", f);
+            return 1;
+        }
+        d = 1;
     }
     /* It's actually safe to call malloc() here since the library checks
      * for recursive behaviour.
@@ -516,7 +530,8 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
         return 0;
     }
     r = 1;
-    if ((n = bfd_canonicalize_symtab(h, p)) < 0)
+    if (((d == 0) && ((n = bfd_canonicalize_symtab(h, p)) < 0)) ||
+        ((d == 1) && ((n = bfd_canonicalize_dynamic_symtab(h, p)) < 0)))
     {
         __mp_error(AT_MAX, "%s: %s\n", f, bfd_errmsg(bfd_get_error()));
         r = 0;
