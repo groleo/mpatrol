@@ -124,6 +124,20 @@ typedef struct allocanode
 allocanode;
 
 
+/* A loginfo structure is used to pass around information about a calling
+ * function.
+ */
+
+typedef struct loginfo
+{
+    char *func;         /* calling function name */
+    char *file;         /* file name in which call took place */
+    unsigned long line; /* line number at which call took place */
+    stackinfo *stack;   /* call stack details */
+}
+loginfo;
+
+
 /* The structure used to record source level information about recursive
  * calls to C++ operator delete and operator delete[].
  */
@@ -227,23 +241,19 @@ extern "C"
 
 MP_EXPORT void __mp_newinfo(infohead *);
 MP_EXPORT void __mp_deleteinfo(infohead *);
-MP_EXPORT void *__mp_getmemory(infohead *, size_t, size_t, alloctype, char *,
-                               char *, unsigned long, stackinfo *);
+MP_EXPORT void *__mp_getmemory(infohead *, size_t, size_t, alloctype,
+                               loginfo *);
 MP_EXPORT void *__mp_resizememory(infohead *, void *, size_t, size_t, alloctype,
-                                  char *, char *, unsigned long, stackinfo *);
-MP_EXPORT void __mp_freememory(infohead *, void *, alloctype, char *, char *,
-                               unsigned long, stackinfo *);
+                                  loginfo *);
+MP_EXPORT void __mp_freememory(infohead *, void *, alloctype, loginfo *);
 MP_EXPORT void __mp_setmemory(infohead *, void *, size_t, unsigned char,
-                              alloctype, char *, char *, unsigned long,
-                              stackinfo *);
+                              alloctype, loginfo *);
 MP_EXPORT void *__mp_copymemory(infohead *, void *, void *, size_t,
-                                unsigned char, alloctype, char *, char *,
-                                unsigned long, stackinfo *);
+                                unsigned char, alloctype, loginfo *);
 MP_EXPORT void *__mp_locatememory(infohead *, void *, size_t, void *, size_t,
-                                  alloctype, char *, char *, unsigned long,
-                                  stackinfo *);
+                                  alloctype, loginfo *);
 MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, alloctype,
-                                 char *, char *, unsigned long, stackinfo *);
+                                 loginfo *);
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
 MP_EXPORT void __mp_checkinfo(infohead *);
 MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype);

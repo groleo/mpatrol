@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.47 2000-12-20 22:35:12 graeme Exp $"
+#ident "$Id: info.c,v 1.48 2000-12-21 23:14:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -218,8 +218,7 @@ getallocanode(infohead *h)
 
 MP_GLOBAL
 void *
-__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
-               unsigned long u, stackinfo *v)
+__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
 {
     allocnode *n;
     allocanode *g;
@@ -233,7 +232,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
     c = h->count;
     if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
     {
-        __mp_logalloc(h, l, a, f, s, t, u, v);
+        __mp_logalloc(h, l, a, f, v);
         o = 1;
     }
     else
@@ -251,11 +250,11 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
     {
         if ((o == 0) && (h->recur == 1))
         {
-            __mp_logalloc(h, l, a, f, s, t, u, v);
+            __mp_logalloc(h, l, a, f, v);
             o = 1;
         }
-        __mp_warn(ET_ALLZER, f, t, u, "attempt to create an allocation of size "
-                  "0");
+        __mp_warn(ET_ALLZER, f, v->file, v->line, "attempt to create an "
+                  "allocation of size 0");
         __mp_diag("\n");
     }
     if (f == AT_MEMALIGN)
@@ -269,8 +268,9 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                    __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(ET_ZERALN, f, t, u, "alignment 0 is invalid");
+                    __mp_logalloc(h, l, a, f, v);
+                __mp_warn(ET_ZERALN, f, v->file, v->line, "alignment 0 is "
+                          "invalid");
                 __mp_diag("\n");
             }
             a = h->alloc.heap.memory.page;
@@ -280,9 +280,9 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                    __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(ET_BADALN, f, t, u, "alignment %lu is not a power of "
-                          "two", a);
+                    __mp_logalloc(h, l, a, f, v);
+                __mp_warn(ET_BADALN, f, v->file, v->line, "alignment %lu is "
+                          "not a power of two", a);
                 __mp_diag("\n");
             }
             a = __mp_poweroftwo(a);
@@ -292,9 +292,9 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                    __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(ET_MAXALN, f, t, u, "alignment %lu is greater than "
-                          "the system page size", a);
+                    __mp_logalloc(h, l, a, f, v);
+                __mp_warn(ET_MAXALN, f, v->file, v->line, "alignment %lu is "
+                          "greater than the system page size", a);
                 __mp_diag("\n");
             }
             a = h->alloc.heap.memory.page;
@@ -333,10 +333,10 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
 #if MP_THREADS_SUPPORT
                 m->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
-                m->data.func = s;
-                m->data.file = t;
-                m->data.line = u;
-                m->data.stack = __mp_getaddrs(&h->addr, v);
+                m->data.func = v->func;
+                m->data.file = v->file;
+                m->data.line = v->line;
+                m->data.stack = __mp_getaddrs(&h->addr, v->stack);
                 if (h->recur > 1)
                     m->data.flags = FLG_INTERNAL;
                 else
@@ -409,7 +409,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
 MP_GLOBAL
 void *
 __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
-                  char *s, char *t, unsigned long u, stackinfo *v)
+                  loginfo *v)
 {
     allocnode *n, *r;
     infonode *i, *m;
@@ -418,7 +418,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
 
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
     {
-        __mp_logrealloc(h, p, l, a, f, s, t, u, v);
+        __mp_logrealloc(h, p, l, a, f, v);
         o = 1;
     }
     else
@@ -428,11 +428,12 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if ((o == 0) && (h->recur == 1))
-                __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-            __mp_warn(ET_RSZNUL, f, t, u, "attempt to resize a NULL pointer");
+                __mp_logrealloc(h, p, l, a, f, v);
+            __mp_warn(ET_RSZNUL, f, v->file, v->line, "attempt to resize a "
+                      "NULL pointer");
             __mp_diag("\n");
         }
-        p = __mp_getmemory(h, l, a, f, s, t, u, v);
+        p = __mp_getmemory(h, l, a, f, v);
     }
     else if (n = __mp_findfreed(&h->alloc, p))
     {
@@ -441,9 +442,9 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          */
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
-            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(ET_PRVFRD, f, t, u, MP_POINTER " was freed with %s", p,
-                   __mp_functionnames[m->data.type]);
+            __mp_logrealloc(h, p, l, a, f, v);
+        __mp_error(ET_PRVFRD, f, v->file, v->line, MP_POINTER " was freed with "
+                   "%s", p, __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -454,8 +455,9 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         /* We know nothing about this block of memory.
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated", p);
+            __mp_logrealloc(h, p, l, a, f, v);
+        __mp_error(ET_NOTALL, f, v->file, v->line, MP_POINTER " has not been "
+                   "allocated", p);
         __mp_diag("\n");
         p = NULL;
     }
@@ -465,9 +467,9 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          * address of the block we know about.
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(ET_MISMAT, f, t, u, MP_POINTER " does not match allocation "
-                   "of " MP_POINTER, p, n->block);
+            __mp_logrealloc(h, p, l, a, f, v);
+        __mp_error(ET_MISMAT, f, v->file, v->line, MP_POINTER " does not match "
+                   "allocation of " MP_POINTER, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -480,9 +482,9 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          * alloca(), strdupa(), strndupa(), operator new or operator new[].
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(ET_INCOMP, f, t, u, MP_POINTER " was allocated with %s", p,
-                   __mp_functionnames[m->data.type]);
+            __mp_logrealloc(h, p, l, a, f, v);
+        __mp_error(ET_INCOMP, f, v->file, v->line, MP_POINTER " was allocated "
+                   "with %s", p, __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -492,12 +494,12 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if ((o == 0) && (h->recur == 1))
-                __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-            __mp_warn(ET_RSZZER, f, t, u, "attempt to resize an allocation to "
-                      "size 0");
+                __mp_logrealloc(h, p, l, a, f, v);
+            __mp_warn(ET_RSZZER, f, v->file, v->line, "attempt to resize an "
+                      "allocation to size 0");
             __mp_diag("\n");
         }
-        __mp_freememory(h, p, f, s, t, u, v);
+        __mp_freememory(h, p, f, v);
         p = NULL;
     }
     else
@@ -550,10 +552,10 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
 #if MP_THREADS_SUPPORT
                     i->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
-                    i->data.func = s;
-                    i->data.file = t;
-                    i->data.line = u;
-                    i->data.stack = __mp_getaddrs(&h->addr, v);
+                    i->data.func = v->func;
+                    i->data.file = v->file;
+                    i->data.line = v->line;
+                    i->data.stack = __mp_getaddrs(&h->addr, v->stack);
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
@@ -645,8 +647,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
 
 MP_GLOBAL
 void
-__mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
-                unsigned long u, stackinfo *v)
+__mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
 {
     allocnode *n;
     allocanode *g;
@@ -655,7 +656,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
 
     if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
     {
-        __mp_logfree(h, p, f, s, t, u, v);
+        __mp_logfree(h, p, f, v);
         o = 1;
     }
     else
@@ -666,10 +667,11 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
         {
             if ((o == 0) && (h->recur == 1))
             {
-                __mp_logfree(h, p, f, s, t, u, v);
+                __mp_logfree(h, p, f, v);
                 o = 1;
             }
-            __mp_warn(ET_FRENUL, f, t, u, "attempt to free a NULL pointer");
+            __mp_warn(ET_FRENUL, f, v->file, v->line, "attempt to free a NULL "
+                      "pointer");
             __mp_diag("\n");
         }
         return;
@@ -681,9 +683,9 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
          */
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
-            __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(ET_PRVFRD, f, t, u, MP_POINTER " was freed with %s", p,
-                   __mp_functionnames[m->data.type]);
+            __mp_logfree(h, p, f, v);
+        __mp_error(ET_PRVFRD, f, v->file, v->line, MP_POINTER " was freed with "
+                   "%s", p, __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -693,8 +695,9 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
         /* We know nothing about this block of memory.
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated", p);
+            __mp_logfree(h, p, f, v);
+        __mp_error(ET_NOTALL, f, v->file, v->line, MP_POINTER " has not been "
+                   "allocated", p);
         __mp_diag("\n");
     }
     else if (p != n->block)
@@ -703,9 +706,9 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
          * address of the block we know about.
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(ET_MISMAT, f, t, u, MP_POINTER " does not match allocation "
-                   "of " MP_POINTER, p, n->block);
+            __mp_logfree(h, p, f, v);
+        __mp_error(ET_MISMAT, f, v->file, v->line, MP_POINTER " does not match "
+                   "allocation of " MP_POINTER, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -724,9 +727,9 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
          * the function used to free the block.
          */
         if ((o == 0) && (h->recur == 1))
-            __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(ET_INCOMP, f, t, u, MP_POINTER " was allocated with %s", p,
-                   __mp_functionnames[m->data.type]);
+            __mp_logfree(h, p, f, v);
+        __mp_error(ET_INCOMP, f, v->file, v->line, MP_POINTER " was allocated "
+                   "with %s", p, __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -762,10 +765,10 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
 #if MP_THREADS_SUPPORT
             m->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
-            m->data.func = s;
-            m->data.file = t;
-            m->data.line = u;
-            m->data.stack = __mp_getaddrs(&h->addr, v);
+            m->data.func = v->func;
+            m->data.file = v->file;
+            m->data.line = v->line;
+            m->data.stack = __mp_getaddrs(&h->addr, v->stack);
             m->data.flags |= FLG_FREED;
         }
         else
@@ -811,10 +814,10 @@ __mp_freememory(infohead *h, void *p, alloctype f, char *s, char *t,
 MP_GLOBAL
 void
 __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
-               char *s, char *t, unsigned long u, stackinfo *v)
+               loginfo *v)
 {
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemset(h, p, l, c, f, s, t, u, v);
+        __mp_logmemset(h, p, l, c, f, v);
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
@@ -832,14 +835,14 @@ __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
 MP_GLOBAL
 void *
 __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
-                alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
+                alloctype f, loginfo *v)
 {
     void *r;
     int o;
 
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
     {
-        __mp_logmemcopy(h, p, q, l, c, f, s, t, u, v);
+        __mp_logmemcopy(h, p, q, l, c, f, v);
         o = 1;
     }
     else
@@ -855,11 +858,11 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
     {
         if ((o == 0) && (h->recur == 1))
         {
-            __mp_logmemcopy(h, p, q, l, c, f, s, t, u, v);
+            __mp_logmemcopy(h, p, q, l, c, f, v);
             o = 1;
         }
-        __mp_warn(ET_RNGOVL, f, t, u, "range [" MP_POINTER "," MP_POINTER "] "
-                  "overlaps [" MP_POINTER "," MP_POINTER "]", p,
+        __mp_warn(ET_RNGOVL, f, v->file, v->line, "range [" MP_POINTER ","
+                  MP_POINTER "] overlaps [" MP_POINTER "," MP_POINTER "]", p,
                   (char *) p + l - 1, q, (char *) q + l - 1);
         __mp_diag("\n");
     }
@@ -894,13 +897,13 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
 MP_GLOBAL
 void *
 __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
-                  alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
+                  alloctype f, loginfo *v)
 {
     void *r;
 
     r = NULL;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemlocate(h, p, l, q, m, f, s, t, u, v);
+        __mp_logmemlocate(h, p, l, q, m, f, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
@@ -921,14 +924,14 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
 MP_GLOBAL
 int
 __mp_comparememory(infohead *h, void *p, void *q, size_t l, alloctype f,
-                   char *s, char *t, unsigned long u, stackinfo *v)
+                   loginfo *v)
 {
     void *r;
     int c;
 
     c = 0;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcompare(h, p, q, l, f, s, t, u, v);
+        __mp_logmemcompare(h, p, q, l, f, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */
