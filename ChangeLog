@@ -1,3 +1,47 @@
+2001-08-27  Graeme Roy  <graeme.roy@analog.com>
+
+	* build/unix/Makefile.aix: Explicitly add MP_GUI_SUPPORT.
+
+	* config/bin.am, config/doc.am, config/images.am, config/man.am,
+	  config/src.am, config/tools.am, config/top.am, config/tsrc.am:
+	Automake makefile templates.
+
+	* config/bin.in, config/doc.in, config/images.in, config/man.in,
+	  config/src.in, config/tools.in, config/top.in, config/tsrc.in:
+	Automatically-generated Makefile.in files.
+
+	* config/configure.in: Initial configure.in for mpatrol.
+
+	* config/aclocal.m4, config/configure: Autoconf-generated files.
+
+	* doc/README, doc/mpatrol.texi:
+	Documented the source code documentation.  Revised some text in the
+	About the Author chapter.
+
+	* pkg/auto/setup: Added images.in and images.am.
+
+	* src/config.h: Always default to not using GUI support.
+
+2001-08-24  Graeme Roy  <graeme.roy@analog.com>
+
+	* build/unix/Makefile:
+	Added more default include and library directories.  Added two more
+	required libraries when building mptrace.
+
+	* build/unix/Makefile.aix:
+	Removed an erroneous library path when building mptrace.
+
+	* doc/Makefile:
+	Don't delete in bin, src and tools directories until the thumbnails have
+	been produced.
+
+	* doc/mpatrol.texi:
+	Documented Red Hat 7.x supported.  Added the About the author chapter.
+
+	* doc/source.tex: Added the a4wide package.
+
+	* src/memory.c, src/mpalloc.c: The BSD systems don't have sysconf().
+
 2001-08-23  Graeme Roy  <graeme.roy@analog.com>
 
 	* build/unix/Makefile:

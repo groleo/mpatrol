@@ -1,4 +1,4 @@
-Changes for 1.4.6 (23rd August, 2001)
+Changes for 1.4.6 (28th August, 2001)
 
   * Added many new arguments that are passed to prologue, epilogue and low
     memory callback functions and updated the tools that already use them.
