@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.25 2000-04-19 17:51:04 graeme Exp $"
+#ident "$Id: inter.c,v 1.26 2000-04-19 19:56:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -231,6 +231,11 @@ void __mp_fini(void)
                     (memhead.alloc.asize >= memhead.uabort))
                     __mp_printallocs(&memhead, 1);
             }
+            /* Finally, write out any profiling information to the profiling
+             * output file.
+             */
+            if (memhead.prof.acount > 0)
+                __mp_writeprofile(&memhead.prof);
             memhead.fini = 1;
 #if MP_INUSE_SUPPORT
             _Inuse_close();
