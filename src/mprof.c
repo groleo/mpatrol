@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.32 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: mprof.c,v 1.33 2001-10-03 23:11:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.32 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.33 2001-10-03 23:11:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1474,7 +1474,8 @@ main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stdout, "%s %s\n%s\n\n", progname, PROGVERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s %s\n\n", progname, PROGVERSION,
+                __mp_copyright, __mp_author);
         fputs("This is free software, and you are welcome to redistribute it "
               "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
