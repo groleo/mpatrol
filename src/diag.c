@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.22 2000-05-08 20:58:24 graeme Exp $"
+#ident "$Id: diag.c,v 1.23 2000-05-08 21:31:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -498,6 +498,26 @@ MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
 }
 
 
+/* Log the details of where a function call came from.
+ */
+
+static logcall(infohead *h, char *s, char *t, unsigned long u, stackinfo *v)
+{
+    __mp_diag("[");
+#if MP_THREADS_SUPPORT
+    __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+    if (u == 0)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", u);
+    __mp_diag("]\n");
+    __mp_printstack(&h->syms, v);
+    __mp_diag("\n");
+}
+
+
 /* Log the details of a call to allocate memory.
  */
 
@@ -511,18 +531,8 @@ MP_GLOBAL void __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f,
         __mp_printsize(h->alloc.heap.memory.align);
     else
         __mp_printsize(a);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -540,18 +550,8 @@ MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
         __mp_printsize(h->alloc.heap.memory.align);
     else
         __mp_printsize(a);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -562,18 +562,8 @@ MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
                             unsigned long u, stackinfo *v)
 {
     __mp_diag("FREE: %s (" MP_POINTER, __mp_functionnames[f], p);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -587,18 +577,8 @@ MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
     __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", 0x%02lX", c);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -612,18 +592,8 @@ MP_GLOBAL void __mp_logmemcopy(infohead *h, void *p, void *q, size_t l,
     __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -638,18 +608,8 @@ MP_GLOBAL void __mp_logmemlocate(infohead *h, void *p, size_t l, void *q,
     __mp_printsize(l);
     __mp_diag(", " MP_POINTER ", ", q);
     __mp_printsize(m);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
@@ -663,18 +623,8 @@ MP_GLOBAL void __mp_logmemcompare(infohead *h, void *p, void *q, size_t l,
     __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
-    __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-    __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
-        __mp_diag("-");
-    else
-        __mp_diag("%lu", u);
-    __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
-    __mp_diag("\n");
+    __mp_diag(") ");
+    logcall(h, s, t, u, v);
 }
 
 
