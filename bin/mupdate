@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.16 2001-08-23 23:10:59 graeme Exp $
+# $Id: mupdate,v 1.17 2001-09-05 21:08:10 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -131,11 +131,15 @@ cvs commit -m "Updated to version $release" VERSION >/dev/null 2>&1
 cvs tag REL_${newver}_${newrev}_${newcnt} >/dev/null 2>&1
 
 
-# Remove the CVS subdirectories.
+# Remove the CVS subdirectories and .cvsignore files.
 
 for dir in `find . -name CVS -print`
 do
     rm -rf "$dir"
+done
+for file in `find . -name .cvsignore -print`
+do
+    rm -f "$file"
 done
 
 
