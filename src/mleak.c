@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.1 2000-04-27 18:48:21 graeme Exp $"
+#ident "$Id: mleak.c,v 1.2 2000-09-25 18:21:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
 
     e = v = 0;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "V")) != EOF)
+    while ((c = __mp_getopt(argc, argv, "V", NULL)) != EOF)
         switch (c)
         {
           case 'V':

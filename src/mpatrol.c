@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.16 2000-07-16 23:14:14 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.17 2000-09-25 18:21:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -385,8 +385,8 @@ int main(int argc, char **argv)
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv,
-             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:")) !=
-           EOF)
+             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:",
+             NULL)) != EOF)
         switch (c)
         {
           case '1':

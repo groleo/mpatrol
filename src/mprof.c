@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.16 2000-05-16 23:22:42 graeme Exp $"
+#ident "$Id: mprof.c,v 1.17 2000-09-25 18:21:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -839,7 +839,7 @@ int main(int argc, char **argv)
     e = v = 0;
     maxstack = 1;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "acn:V")) != EOF)
+    while ((c = __mp_getopt(argc, argv, "acn:V", NULL)) != EOF)
         switch (c)
         {
           case 'a':
