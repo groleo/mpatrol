@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.97 2001-12-06 00:10:56 graeme Exp $"
+#ident "$Id: diag.c,v 1.98 2001-12-06 00:54:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.97 2001-12-06 00:10:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.98 2001-12-06 00:54:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1342,7 +1342,7 @@ logcall(infohead *h, loginfo *i, size_t s)
 
 MP_GLOBAL
 void
-__mp_logalloc(infohead *h, size_t l, size_t a, loginfo *i)
+__mp_logalloc(infohead *h, loginfo *i)
 {
     if (i->logged)
         return;
@@ -1362,14 +1362,14 @@ __mp_logalloc(infohead *h, size_t l, size_t a, loginfo *i)
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("</TT>");
     __mp_diag(" (%lu, ", h->count);
-    __mp_printsize(l);
+    __mp_printsize(i->variant.logalloc.size);
     __mp_diag(", ");
-    if (a == 0)
+    if (i->variant.logalloc.align == 0)
         __mp_printsize(h->alloc.heap.memory.align);
     else
-        __mp_printsize(a);
+        __mp_printsize(i->variant.logalloc.align);
     __mp_diag(") ");
-    logcall(h, i, l);
+    logcall(h, i, i->variant.logalloc.size);
 }
 
 
@@ -1378,7 +1378,7 @@ __mp_logalloc(infohead *h, size_t l, size_t a, loginfo *i)
 
 MP_GLOBAL
 void
-__mp_logrealloc(infohead *h, void *p, size_t l, size_t a, loginfo *i)
+__mp_logrealloc(infohead *h, loginfo *i)
 {
     if (i->logged)
         return;
@@ -1397,15 +1397,15 @@ __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, loginfo *i)
     __mp_diag("%s", __mp_functionnames[i->type]);
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", ", p);
-    __mp_printsize(l);
+    __mp_diag(" (" MP_POINTER ", ", i->variant.logrealloc.block);
+    __mp_printsize(i->variant.logrealloc.size);
     __mp_diag(", ");
-    if (a == 0)
+    if (i->variant.logrealloc.align == 0)
         __mp_printsize(h->alloc.heap.memory.align);
     else
-        __mp_printsize(a);
+        __mp_printsize(i->variant.logrealloc.align);
     __mp_diag(") ");
-    logcall(h, i, l);
+    logcall(h, i, i->variant.logrealloc.size);
 }
 
 
@@ -1414,7 +1414,7 @@ __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, loginfo *i)
 
 MP_GLOBAL
 void
-__mp_logfree(infohead *h, void *p, loginfo *i)
+__mp_logfree(infohead *h, loginfo *i)
 {
     if (i->logged)
         return;
@@ -1433,7 +1433,7 @@ __mp_logfree(infohead *h, void *p, loginfo *i)
     __mp_diag("%s", __mp_functionnames[i->type]);
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ") ", p);
+    __mp_diag(" (" MP_POINTER ") ", i->variant.logfree.block);
     logcall(h, i, 0);
 }
 
