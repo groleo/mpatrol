@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.8 2000-01-24 20:33:28 graeme Exp $"
+#ident "$Id: info.c,v 1.9 2000-01-28 00:35:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,7 +76,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->size = h->count = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
-    h->ctotal = h->stotal = 0;
+    h->dtotal = h->ctotal = h->stotal = 0;
     h->ffreq = h->fseed = 0;
     h->prologue = NULL;
     h->epilogue = NULL;
@@ -122,7 +122,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     h->table.size = 0;
     __mp_newlist(&h->list);
     h->size = h->count = h->peak = 0;
-    h->ctotal = h->stotal = 0;
+    h->dtotal = h->ctotal = h->stotal = 0;
 }
 
 
@@ -627,8 +627,8 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
      */
     if (__mp_checkrange(h, p, l, f))
     {
-        __mp_memset(p, c, l);
         h->stotal += l;
+        __mp_memset(p, c, l);
     }
 }
 
@@ -676,9 +676,54 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
      */
     if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
     {
-        __mp_memcopy(q, p, l);
         h->ctotal += l;
+        __mp_memcopy(q, p, l);
     }
+}
+
+
+/* Compare two blocks of memory.
+ */
+
+MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
+                                 alloctype f, char *s, char *t, unsigned long u,
+                                 stackinfo *v)
+{
+    void *r;
+
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+    {
+        /* Write an entry into the log file.
+         */
+        __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
+                  __mp_alloctypenames[f], p, q);
+        __mp_printsize(l);
+        __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+        __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+        if (u == 0)
+            __mp_diag("-");
+        else
+            __mp_diag("%lu", u);
+        __mp_diag("]\n");
+        __mp_printstack(&h->syms, v);
+        __mp_diag("\n");
+    }
+    /* If the pointers are not NULL and do not overflow any memory blocks then
+     * proceed to compare the memory.
+     */
+    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
+    {
+        h->dtotal += l;
+        if (r = __mp_memcompare(p, q, l))
+        {
+            l = (char *) r - (char *) p;
+            return (int) ((char *) p)[l] - (int) ((char *) q)[l];
+        }
+    }
+    return 0;
 }
 
 
