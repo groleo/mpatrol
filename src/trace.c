@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.7 2000-12-07 00:50:39 graeme Exp $"
+#ident "$Id: trace.c,v 1.8 2000-12-08 00:13:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -64,15 +64,18 @@ extern "C"
  * keeps a count of the number of entries stored in the cache.
  */
 
-static rescache cache[128];
+static rescache cache[MP_RESCACHE_SIZE];
 static size_t cachecounter;
 
 
 /* The file pointer to the tracing output file.  This should not really be
  * a file scope variable as it prevents this module from being re-entrant.
+ * The traceready variable indicates when the tracing output file is ready
+ * to be used.
  */
 
 static FILE *tracefile;
+static int traceready;
 
 
 /* Initialise the fields of a tracehead so that the mpatrol library
@@ -84,6 +87,7 @@ MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
     t->file = __mp_tracefile(m, NULL);
     t->tracing = 0;
     tracefile = NULL;
+    traceready = 0;
 }
 
 
@@ -96,6 +100,7 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
     int r;
 
     r = 1;
+    traceready = 0;
     if ((t->tracing) && (tracefile != NULL))
     {
         __mp_memcopy(s, (char *) MP_TRACEMAGIC, 4);
@@ -150,6 +155,7 @@ static int opentracefile(tracehead *t)
     fwrite(s, sizeof(char), 4, tracefile);
     fwrite(&i, sizeof(size_t), 1, tracefile);
     fwrite(&v, sizeof(unsigned long), 1, tracefile);
+    traceready = 1;
     /* Write out all of the entries in the memory reservation cache.  This
      * only needs to be done when the tracing output file is opened since all
      * subsequent tracing events will be written out directly.
@@ -178,7 +184,7 @@ MP_GLOBAL void __mp_traceheap(void *a, size_t l, int i)
     void *b;
     size_t s;
 
-    if (tracefile == NULL)
+    if (!traceready)
     {
         /* If the tracing output file has not yet been opened then it is
          * likely that the mpatrol library is still being initialised, in
@@ -188,7 +194,7 @@ MP_GLOBAL void __mp_traceheap(void *a, size_t l, int i)
          * finally opened.  If the cache is full, simply discard the current
          * information.
          */
-        if (cachecounter < sizeof(cache) / sizeof(*cache))
+        if (cachecounter < MP_RESCACHE_SIZE)
         {
             cache[cachecounter].block = a;
             cache[cachecounter].size = l;
