@@ -1,3 +1,57 @@
+2001-01-05  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate: Now also build the documentation archives.
+
+	* doc/mpatrol.html, doc/mpatrol.info, doc/mpatrol.texi, doc/mpatrol.txt,
+	  doc/mpatrol.guide:
+	Updated just before 1.3.3 release.
+
+2001-01-04  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.texi, doc/mpatrol.txt:
+	Added information about mpsym now using perl.
+
+	* doc/refcard.tex: Added the hexwords command.
+
+	* man/man3/libmpatrol.3, man/man1/mpatrol.1, man/cat3/libmpatrol.3,
+	  man/cat1/mpatrol.1:
+	Documented the change to the USEMMAP option.
+
+	* man/man1/mpsym.1, man/cat1/mpsym.1:
+	Document that mpsym now uses perl if it is installed.
+
+2001-01-03  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/hexwords:
+	New command for obtaining hexadecimal words from a dictionary.
+
+	* bin/mpsym: Added perl support.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the hexwords command.
+
+	* src/config.h: Added MP_USE_ATEXIT.
+
+	* src/memory.h, src/memory.c, src/option.c, src/mpatrol.c:
+	Changed the behaviour of USEMMAP.
+
+	* src/inter.c, src/machine.c: Added support for MP_USE_ATEXIT.
+
+2001-01-02  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.h, src/memory.c:
+	Added an extra argument to the __mp_memalloc() function.  Made use of
+	mmap() to allocate internal memory, or sbrk() if USEMMAP is used.
+
+	* src/heap.c, src/sbrk.c:
+	Added an extra argument to the call to __mp_memalloc().
+
+	* src/mptrace.c:
+	Don't set the addrbase variable for internal allocations.
+
 2000-12-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.txt, doc/mpatrol.guide, doc/mpatrol.html,
@@ -9,7 +63,7 @@
 	* src/inter.c: Use debug information if available for checker functions.
 
 	* tests/fail/test17.c, tests/fail/test18.c:
-	New test for -fcheck-memory-usage.
+	New tests for -fcheck-memory-usage.
 
 2000-12-22  Graeme Roy  <graeme@epc.co.uk>
 
