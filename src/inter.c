@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.144 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: inter.c,v 1.145 2001-09-04 21:41:27 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.144 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.145 2001-09-04 21:41:27 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -90,9 +90,11 @@ extern char **__environ;
  * the heap in order to initialise the code address range tables.  We need
  * to ensure that we don't initialise mpatrol before this otherwise stack
  * unwinding will fail, so we check to ensure that the table has been set up
- * before we proceed.
+ * before we proceed.  We also need to ensure that we don't try to unwind the
+ * stack before the mpatrol library is initialised so we use a flag for this.
  */
 
+static int init_flag;
 extern void *__exc_crd_list_head;
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS && !defined(__GNUC__)
@@ -118,7 +120,7 @@ extern void **__piob;
 #if SYSTEM == SYSTEM_LINUX
 #define crt_initialised() (__environ)
 #elif SYSTEM == SYSTEM_TRU64
-#define crt_initialised() (__exc_crd_list_head)
+#define crt_initialised() (__exc_crd_list_head && init_flag)
 #else /* SYSTEM */
 #define crt_initialised() (1)
 #endif /* SYSTEM */
@@ -155,6 +157,7 @@ __init_mpatrol(void)
     __mp_initmutexes();
 #endif /* MP_THREADS_SUPPORT */
     __mp_init();
+    init_flag = 1;
 }
 
 #if !MP_USE_ATEXIT
