@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.7 2000-02-10 20:49:30 graeme Exp $"
+#ident "$Id: symbol.c,v 1.8 2000-02-10 21:27:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -146,6 +146,7 @@ MP_GLOBAL void __mp_newsymbols(symhead *y, heaphead *h)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
+    y->handle = NULL;
 }
 
 
@@ -164,6 +165,11 @@ MP_GLOBAL void __mp_deletesymbols(symhead *y)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
+#if FORMAT == FORMAT_BFD
+    if (y->handle != NULL)
+        bfd_close(y->handle);
+#endif /* FORMAT */
+    y->handle = NULL;
 }
 
 
@@ -683,7 +689,8 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
      * file formats that would otherwise be hard to support.  This is
      * probably a better choice to use than the in-built COFF implementation
      * but currently has no support for symbol sizes, so the ELF access
-     * library is still worth using for ELF file formats.
+     * library is still worth using for ELF file formats, but the BFD library
+     * comes with support for debugging information.  So take your pick!
      */
     bfd_init();
     if ((h = bfd_openr(s, NULL)) == NULL)
@@ -691,19 +698,19 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
         __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
         r = 0;
     }
-    else
+    else if (!bfd_check_format(h, bfd_object))
     {
-        if (!bfd_check_format(h, bfd_object))
-        {
-            __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
-            r = 0;
-        }
-        else if ((t = __mp_addstring(&y->strings, s)) == NULL)
-            r = 0;
-        else
-            r = addsymbols(y, h, t, b);
-        bfd_close(h);
+        __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
+        r = 0;
     }
+    else if ((t = __mp_addstring(&y->strings, s)) == NULL)
+        r = 0;
+    else if (r = addsymbols(y, h, t, b))
+        /* After successfully reading the symbols we won't close the BFD
+         * handle since we will need it to read debugging information.
+         * We will close it when __mp_deletesymbols() is called.
+         */
+        y->handle = h;
 #endif /* FORMAT */
     return r;
 }
