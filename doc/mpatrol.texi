@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.190 2001-02-22 22:39:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.191 2001-02-25 21:56:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.6
 @set VERSION 1.4.1
-@set UPDATED 22nd February, 2001
+@set UPDATED 25th February, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -10251,6 +10251,11 @@ No support for reading symbols.
 @item
 No detection of illegal memory accesses.
 @item
+The C++ compiler may come with an older version of the standard C++ library
+which does not place @code{set_new_hander()} in the @code{std} namespace.  The
+@file{mpatrol.h} header file and the @file{cplus.c} source file will need to be
+changed accordingly.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mptrace} command has no GUI.
@@ -10270,6 +10275,11 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEMMAP} option has no effect.
 @item
 The @option{EDIT} and @option{LIST} options have no effect.
+@item
+The C++ compiler may come with an older version of the standard C++ library
+which does not place @code{set_new_hander()} in the @code{std} namespace.  The
+@file{mpatrol.h} header file and the @file{cplus.c} source file will need to be
+changed accordingly.
 @item
 There is currently a problem when mixing the archive library version of
 mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa.
@@ -10650,12 +10660,7 @@ heap addresses, etc.  They would be disabled if @code{NDEBUG} is defined.
 @item
 Add support functions that could be added to user code to enter and leave
 scopes in a source file and ensure that all allocations allocated within the
-scope are freed by the time the scope has been exited.  A function could also
-be added to mark certain memory allocations as being validly in use so as to
-avoid leak warnings.  Any attempts to free such allocations would result in an
-error.  Other functions could be added to add or clear references to certain
-memory allocations and to return the current number of memory allocations or
-bytes allocated.
+scope are freed by the time the scope has been exited.
 
 @item
 Add support for the @option{-finstrument-functions} option of the GNU compiler.
@@ -11234,7 +11239,11 @@ to compile.  I'm using an old C++ compiler so could that be a problem?
 Yes.  The @file{mpatrol.h} header file defines new versions of the C++ dynamic
 memory allocation operators using exceptions and namespaces as required by the
 ANSI C++ standard.  If your C++ compiler has no support for these then you
-should compile your C++ source files with @code{MP_NOCPLUSPLUS} defined.
+should compile your C++ source files with @code{MP_NOCPLUSPLUS} defined.  You
+may also be using an older C++ library in which the @file{new} header file does
+not define @code{set_new_handler()} to be in the @code{std} namespace.  You will
+then have to change the @file{mpatrol.h} header file and @file{cplus.c} source
+file accordingly.
 
 @item
 I'm calling @code{operator new} (not the @emph{nothrow} version) from my C++
@@ -11329,6 +11338,15 @@ Motif and X Windows and so can only be built on systems with these libraries
 and run on systems with an X server.  This will most likely be possible only on
 UNIX platforms.  LessTif can be used instead of Motif if that is all that is
 available on your system.
+
+@cindex MP_GUI_SUPPORT
+@item
+How do I build the @command{mptrace} command without GUI support?
+
+This is done by default on non-UNIX platforms, but on UNIX platforms you will
+have to define the @code{MP_GUI_SUPPORT=0} preprocessor macro when compiling
+@command{mptrace}.  You might need to do this if your UNIX system does not have
+the correct header files and libraries installed needed for GUI support.
 @end enumerate
 
 @node Linking, Running, Building, Frequently asked questions
