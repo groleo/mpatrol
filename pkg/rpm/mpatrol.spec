@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.33 2000-11-13 19:12:10 graeme Exp $
+# $Id: mpatrol.spec,v 1.34 2000-11-13 22:28:12 graeme Exp $
 
 
 %define version 1.3.0
@@ -66,6 +66,9 @@ cd build/unix
 make libmpatrol.a libmpatrol.so.%{libversion}
 make libmpatrolmt.a libmpatrolmt.so.%{libversion}
 make mpatrol mprof mleak
+strip mpatrol
+strip mprof
+strip mleak
 
 
 %install
