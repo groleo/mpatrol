@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.205 2001-03-14 21:16:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.206 2001-03-14 23:15:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -131,6 +131,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
+* Utilities::                   External programs.
 * Profiling::                   Memory allocation profiling.
 * Tracing::                     Memory allocation tracing.
 * Memory leaks::                Detection and identification.
@@ -1816,7 +1817,7 @@ be initialised too early, possibly before the environment or file streams have
 been set up.  You may find that if one of the above methods does not work for
 you then perhaps another one will.
 
-@node Using mpatrol, Profiling, Operating system support, Top
+@node Using mpatrol, Utilities, Operating system support, Top
 @chapter Using mpatrol
 @cindex using mpatrol
 
@@ -1835,7 +1836,6 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Library functions::           What's provided.
 * Leak table::                  Memory leak table.
 * Tools::                       Additional tools.
-* Utilities::                   External programs.
 @end menu
 
 @node Library behaviour, Logging and tracing, , Using mpatrol
@@ -3194,7 +3194,7 @@ if the @option{NOFREE} option is used.  The leak table will provide less details
 on freed memory allocations but its advantage is that it does not require the
 use of the @option{NOFREE} option.
 
-@node Tools, Utilities, Leak table, Using mpatrol
+@node Tools, , Leak table, Using mpatrol
 @section Tools
 @cindex tools
 @cindex extensions
@@ -3415,8 +3415,8 @@ environment variable is set to the filename of the trace file to use.  The
 resulting trace files can be processed by the @command{mtrace} perl script which
 is distributed with the GNU C library.
 
-@node Utilities, , Tools, Using mpatrol
-@section Utilities
+@node Utilities, Profiling, Using mpatrol, Top
+@chapter Utilities
 @cindex utilities
 
 Several external programs are supplied with the mpatrol distribution in the
@@ -3437,7 +3437,7 @@ the tracing chapter (@pxref{Tracing}).
 @end menu
 
 @node The mpatrol command, The mleak command, , Utilities
-@subsection The @command{mpatrol} command
+@section The @command{mpatrol} command
 @cindex mpatrol command
 
 A command is provided with the mpatrol distribution which can run programs that
@@ -3574,7 +3574,7 @@ end
 @end smallexample
 
 @node The mleak command, The mpsym command, The mpatrol command, Utilities
-@subsection The @command{mleak} command
+@section The @command{mleak} command
 @cindex mleak command
 @cindex mleak
 
@@ -3610,7 +3610,7 @@ as the log file.  Note also that the @command{mleak} command supports the
 command line tools.
 
 @node The mpsym command, The mpedit command, The mleak command, Utilities
-@subsection The @command{mpsym} command
+@section The @command{mpsym} command
 @cindex mpsym command
 @cindex mpsym
 
@@ -3655,7 +3655,7 @@ definition in the @file{mpsym} file itself (this is only necessary if
 @command{perl} is not installed).
 
 @node The mpedit command, The hexwords command, The mpsym command, Utilities
-@subsection The @command{mpedit} command
+@section The @command{mpedit} command
 @cindex mpedit command
 @cindex mpedit
 
@@ -3724,7 +3724,7 @@ line if possible.  Note also that the @command{mpedit} command supports the
 command line tools.
 
 @node The hexwords command, , The mpedit command, Utilities
-@subsection The @command{hexwords} command
+@section The @command{hexwords} command
 @cindex hexwords command
 @cindex hexwords
 
@@ -3826,7 +3826,7 @@ equivalents.  As a result, the @command{hexwords} command is only likely to
 work on UNIX platforms or on systems which have the necessary commands
 installed.
 
-@node Profiling, Tracing, Using mpatrol, Top
+@node Profiling, Tracing, Utilities, Top
 @chapter Profiling
 @cindex profiling
 @cindex memory allocation profiling
