@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.3 2000-04-11 21:04:15 graeme Exp $
+# $Id: NMakefile,v 1.4 2000-04-18 22:27:23 graeme Exp $
 
 
 # Definitions
@@ -40,23 +40,24 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj malloc.obj \
-		  sbrk.obj version.obj
+		  signals.obj diag.obj option.obj profile.obj inter.obj \
+		  malloc.obj sbrk.obj version.obj
 SHARED_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj malloc.obj \
-		  sbrk.obj main.obj version.obj
+		  signals.obj diag.obj option.obj profile.obj inter.obj \
+		  malloc.obj sbrk.obj main.obj version.obj
 ARCHTS_OBJECTS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  inter.ts_obj malloc.ts_obj sbrk.ts_obj version.ts_obj
+		  profile.ts_obj inter.ts_obj malloc.ts_obj sbrk.ts_obj \
+		  version.ts_obj
 SHARTS_OBJECTS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  inter.ts_obj malloc.ts_obj sbrk.ts_obj main.ts_obj \
-		  version.ts_obj
+		  profile.ts_obj inter.ts_obj malloc.ts_obj sbrk.ts_obj \
+		  main.ts_obj version.ts_obj
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
 SHARED_LIBRARY	= $(LIBRARY).dll

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.9 2000-04-06 18:03:12 graeme Exp $
+# $Id: Makefile,v 1.10 2000-04-18 22:27:21 graeme Exp $
 
 
 # Definitions
@@ -44,11 +44,11 @@ VERSION	 = 1
 REVISION = 1
 
 OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
-	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o inter.o \
-	   malloc.o version.o
+	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
+	   profile.o inter.o malloc.o version.o
 TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
-	   inter.o malloc.o version.o
+	   profile.o inter.o malloc.o version.o
 
 ARCHIVE_OBJECTS	= $(OBJECTS)
 SHARED_OBJECTS	= $(OBJECTS:.o=.s.o)

@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.11 2000-04-06 18:09:20 graeme Exp $
+# $Id: SMakefile,v 1.12 2000-04-18 22:27:17 graeme Exp $
 
 
 # Definitions
@@ -39,11 +39,11 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-		  inter.o version.o
+		  profile.o inter.o version.o
 ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
-		  signals.t.o mutex.t.o diag.t.o option.t.o inter.t.o \
-		  version.t.o
+		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
+		  inter.t.o version.t.o
 
 ARCHIVE_LIBRARY	= $(LIBRARY).lib
 OBJECT_LIBRARY	= lib$(LIBRARY).o

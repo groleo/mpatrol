@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.9 2000-04-06 18:09:22 graeme Exp $
+# $Id: Makefile,v 1.10 2000-04-18 22:27:19 graeme Exp $
 
 
 # Definitions
@@ -41,11 +41,11 @@ LIBRARY	= mpatrol
 
 OBJECTS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
-	   diag.obj option.obj inter.obj version.obj
+	   diag.obj option.obj profile.obj inter.obj version.obj
 TOBJECTS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   heap.ts.obj alloc.ts.obj info.ts.obj stack.ts.obj addr.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
-	   option.ts.obj inter.ts.obj version.ts.obj
+	   option.ts.obj profile.ts.obj inter.ts.obj version.ts.obj
 
 ARCHIVE_LIBRARY	= $(LIBRARY).lib
 OBJECT_LIBRARY	= lib$(LIBRARY).obj
