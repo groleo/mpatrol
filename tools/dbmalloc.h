@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.5 2001-02-27 22:04:58 graeme Exp $
+ * $Id: dbmalloc.h,v 1.6 2001-02-27 22:13:27 graeme Exp $
  */
 
 
@@ -47,8 +47,8 @@
  * The dbmallopt() function does not support the setting of all of the
  * Dbmalloc options.  In fact, most of them do not make sense when applied
  * to the mpatrol library.  Some of them have slightly changed behaviour
- * due to the mapping process.  Note that reading the options from their
- * respective environment variables at start up is not yet implemented.
+ * due to the mapping process and some of them cannot be implemented due to
+ * the mpatrol library having been initialised beforehand.
  *
  * The malloc_dump() function does not support the full recognition of the
  * MALLOC_DETAIL option in that it does not display the additional columns
@@ -149,7 +149,7 @@
 
 union dbmalloptarg
 {
-    int i;     /* integer value */
+    long i;    /* integer value */
     char *str; /* string value */
 };
 
