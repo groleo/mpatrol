@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.78 2001-05-17 07:38:15 graeme Exp $"
+#ident "$Id: diag.c,v 1.79 2001-05-17 21:53:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.78 2001-05-17 07:38:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.79 2001-05-17 21:53:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1561,6 +1561,12 @@ __mp_printversion(void)
               "details.\n\n");
     __mp_diag("For the latest mpatrol release and documentation,\n");
     __mp_diag("visit %s.\n\n", __mp_homepage);
+    __mp_diag("operating system:       %s\n", TARGET_STR);
+    __mp_diag("system variant:         %s\n", SYSTEM_STR);
+    __mp_diag("processor architecture: %s\n", ARCH_STR);
+    __mp_diag("processor word size:    %s\n", ENVIRON_STR);
+    __mp_diag("object file format:     %s\n", FORMAT_STR);
+    __mp_diag("dynamic linker type:    %s\n\n", DYNLINK_STR);
     if (!currenttime)
         currenttime = time(NULL);
     if (currenttime != (time_t) -1)

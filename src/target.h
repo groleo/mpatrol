@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.29 2001-05-17 07:38:15 graeme Exp $
+ * $Id: target.h,v 1.30 2001-05-17 21:53:48 graeme Exp $
  */
 
 
@@ -44,7 +44,7 @@
 #define TARGET_ANY     0 /* no specific operating system */
 #define TARGET_UNIX    1 /* UNIX or UNIX-like */
 #define TARGET_AMIGA   2 /* Commodore AmigaOS */
-#define TARGET_WINDOWS 3 /* Microsoft Windows 95/98/NT */
+#define TARGET_WINDOWS 3 /* Microsoft Windows 95/98/ME/NT/2000 */
 #define TARGET_NETWARE 4 /* Novell Netware */
 
 
@@ -65,6 +65,22 @@
 #else /* TARGET */
 #define TARGET TARGET_ANY
 #endif /* TARGET */
+#endif /* TARGET */
+
+
+/* The string representation of the target operating system.
+ */
+
+#if TARGET == TARGET_UNIX
+#define TARGET_STR "UNIX"
+#elif TARGET == TARGET_AMIGA
+#define TARGET_STR "Commodore AmigaOS"
+#elif TARGET == TARGET_WINDOWS
+#define TARGET_STR "Microsoft Windows 95/98/ME/NT/2000"
+#elif TARGET == TARGET_NETWARE
+#define TARGET_STR "Novell Netware"
+#else /* TARGET */
+#define TARGET_STR "Unknown"
 #endif /* TARGET */
 
 
@@ -144,6 +160,52 @@
 #endif /* SYSTEM */
 
 
+/* The string representation of the UNIX system variant.
+ */
+
+#if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_AIX
+#define SYSTEM_STR "AIX"
+#elif SYSTEM == SYSTEM_CYGWIN
+#define SYSTEM_STR "Cygwin"
+#elif SYSTEM == SYSTEM_DGUX
+#define SYSTEM_STR "DG/UX"
+#elif SYSTEM == SYSTEM_DRSNX
+#define SYSTEM_STR "DRS/NX"
+#elif SYSTEM == SYSTEM_DYNIX
+#define SYSTEM_STR "DYNIX/ptx"
+#elif SYSTEM == SYSTEM_FREEBSD
+#define SYSTEM_STR "FreeBSD"
+#elif SYSTEM == SYSTEM_HPUX
+#define SYSTEM_STR "HP/UX"
+#elif SYSTEM == SYSTEM_IRIX
+#define SYSTEM_STR "IRIX"
+#elif SYSTEM == SYSTEM_LINUX
+#define SYSTEM_STR "Linux"
+#elif SYSTEM == SYSTEM_LYNXOS
+#define SYSTEM_STR "LynxOS"
+#elif SYSTEM == SYSTEM_NETBSD
+#define SYSTEM_STR "NetBSD"
+#elif SYSTEM == SYSTEM_OPENBSD
+#define SYSTEM_STR "OpenBSD"
+#elif SYSTEM == SYSTEM_SINIX
+#define SYSTEM_STR "SINIX"
+#elif SYSTEM == SYSTEM_SOLARIS
+#define SYSTEM_STR "Solaris"
+#elif SYSTEM == SYSTEM_SUNOS
+#define SYSTEM_STR "SunOS"
+#elif SYSTEM == SYSTEM_TRU64
+#define SYSTEM_STR "Tru64"
+#elif SYSTEM == SYSTEM_UNIXWARE
+#define SYSTEM_STR "UnixWare"
+#else /* SYSTEM */
+#define SYSTEM_STR "Unknown"
+#endif /* SYSTEM */
+#else /* TARGET */
+#define SYSTEM_STR "N/A"
+#endif /* TARGET */
+
+
 /* The processor architecture.  This defines families of compatible processors
  * from chip manufacturers rather than specific processor models.
  */
@@ -203,6 +265,32 @@
 #endif /* ARCH */
 
 
+/* The string representation of the processor architecture.
+ */
+
+#if ARCH == ARCH_ALPHA
+#define ARCH_STR "DEC Alpha"
+#elif ARCH == ARCH_IX86
+#define ARCH_STR "Intel 80x86"
+#elif ARCH == ARCH_M68K
+#define ARCH_STR "Motorola 680x0"
+#elif ARCH == ARCH_M88K
+#define ARCH_STR "Motorola 88xx0"
+#elif ARCH == ARCH_MIPS
+#define ARCH_STR "MIPS"
+#elif ARCH == ARCH_PARISC
+#define ARCH_STR "HP PA/RISC"
+#elif ARCH == ARCH_POWER
+#define ARCH_STR "IBM RS/6000"
+#elif ARCH == ARCH_POWERPC
+#define ARCH_STR "PowerPC"
+#elif ARCH == ARCH_SPARC
+#define ARCH_STR "SPARC"
+#else /* ARCH */
+#define ARCH_STR "Unknown"
+#endif /* ARCH */
+
+
 /* The processor word size.  This is used to determine the size of pointers
  * and long integers on the target processor.
  */
@@ -236,6 +324,18 @@
 #else /* SYSTEM */
 #define ENVIRON ENVIRON_32
 #endif /* SYSTEM */
+#endif /* ENVIRON */
+
+
+/* The string representation of the processor word size.
+ */
+
+#if ENVIRON == ENVIRON_32
+#define ENVIRON_STR "32-bit"
+#elif ENVIRON == ENVIRON_64
+#define ENVIRON_STR "64-bit"
+#else /* ENVIRON */
+#define ENVIRON_STR "Unknown"
 #endif /* ENVIRON */
 
 
@@ -301,6 +401,28 @@
 #endif /* FORMAT */
 
 
+/* The string representation of the object file format.
+ */
+
+#if FORMAT == FORMAT_AOUT
+#define FORMAT_STR "a.out"
+#elif FORMAT == FORMAT_COFF
+#define FORMAT_STR "COFF"
+#elif FORMAT == FORMAT_XCOFF
+#define FORMAT_STR "XCOFF"
+#elif FORMAT == FORMAT_ELF32
+#define FORMAT_STR "ELF32"
+#elif FORMAT == FORMAT_ELF64
+#define FORMAT_STR "ELF64"
+#elif FORMAT == FORMAT_BFD
+#define FORMAT_STR "BFD"
+#elif FORMAT == FORMAT_PE
+#define FORMAT_STR "PE"
+#else /* FORMAT */
+#define FORMAT_STR "Unknown"
+#endif /* FORMAT */
+
+
 /* The dynamic linker type.  This is used to specify the method used to obtain
  * information about the shared libraries that a program requires when it is
  * running.
@@ -348,6 +470,28 @@
 #else /* TARGET */
 #define DYNLINK DYNLINK_NONE
 #endif /* TARGET */
+#endif /* DYNLINK */
+
+
+/* The string representation of the dynamic linker type.
+ */
+
+#if DYNLINK == DYNLINK_AIX
+#define DYNLINK_STR "AIX"
+#elif DYNLINK == DYNLINK_BSD
+#define DYNLINK_STR "BSD"
+#elif DYNLINK == DYNLINK_HPUX
+#define DYNLINK_STR "HP/UX"
+#elif DYNLINK == DYNLINK_IRIX
+#define DYNLINK_STR "IRIX"
+#elif DYNLINK == DYNLINK_OSF
+#define DYNLINK_STR "OSF"
+#elif DYNLINK == DYNLINK_SVR4
+#define DYNLINK_STR "SVR4"
+#elif DYNLINK == DYNLINK_WINDOWS
+#define DYNLINK_STR "Windows"
+#else /* DYNLINK */
+#define DYNLINK_STR "Unknown"
 #endif /* DYNLINK */
 
 
