@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.2 2000-05-15 19:38:08 graeme Exp $
+% $Id: refcard.tex,v 1.3 2000-05-16 01:00:22 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -191,6 +191,10 @@ filling with the overflow byte.
 Specifies that each individual memory allocation should occupy at least one page
 of virtual memory and should be placed at the lowest or highest point within
 these pages.
+\item[\option{ALLOWOFLOW}]
+Specifies that a warning rather than an error should be produced if any memory
+operation function overflows the boundaries of a memory allocation, and that
+the operation should still be performed.
 \end{description}
 
 \vskip 12pt
@@ -415,6 +419,8 @@ also be traced, but only if they were dynamically linked.
 \hfill See \option{LIMIT}.
 \item[\flagpar{l}{string}]
 \hfill See \option{LOGFILE}.
+\item[\flag{M}]
+\hfill See \option{ALLOWOFLOW}.
 \item[\flag{m}]
 \hfill See \option{USEMMAP}.
 \item[\flag{N}]
