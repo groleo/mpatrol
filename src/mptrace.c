@@ -22,11 +22,15 @@
 
 /*
  * A tool designed to read a tracing output file produced by the mpatrol
- * library and display the tracing information that was obtained.
+ * library and display the tracing information that was obtained.  It can
+ * also produce a C source file containing a trace-driven memory allocation
+ * simulation of the program which produced the corresponding tracing output
+ * file.
  */
 
 
 #include "tree.h"
+#include "slots.h"
 #include "getopt.h"
 #include "utils.h"
 #include "version.h"
@@ -40,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.12 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.13 2001-03-08 18:41:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.12 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.13 2001-03-08 18:41:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.0" /* the current version of this program */
+#define VERSION "1.1" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -55,6 +59,7 @@ static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.12 2001-02-05
 typedef enum options_flags
 {
     OF_HELP    = 'h',
+    OF_SIMFILE = 's',
     OF_VERSION = 'V'
 }
 options_flags;
@@ -67,6 +72,7 @@ typedef struct allocation
 {
     treenode node;       /* tree node */
     unsigned long event; /* event number */
+    void *entry;         /* pointer array entry */
     void *addr;          /* allocation address */
     size_t size;         /* allocation size */
     unsigned long time;  /* allocation lifetime */
@@ -101,10 +107,26 @@ static char *bufferpos;
 static size_t bufferlen;
 
 
+/* The slot table allows us to reuse entries in the pointer array when we are
+ * writing a simulation file.  The size of the tableslots array sets a limit
+ * on the maximum number of allocations that can be in use at any one time.
+ */
+
+static slottable table;
+static void *tableslots[4096];
+static size_t maxslots;
+
+
 /* The tracing output file produced by mpatrol.
  */
 
 static FILE *tracefile;
+
+
+/* The simulation file produced from the tracing output file.
+ */
+
+static FILE *simfile;
 
 
 /* The filename used to invoke this tool.
@@ -234,17 +256,25 @@ static option options_table[] =
 {
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
+    {"sim-file", OF_SIMFILE, "file",
+     "\tSpecifies that a trace-driven memory allocation simulation program\n"
+     "\twritten in C should be written to a file.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
 };
 
 
+#define slotentry(n) \
+    (unsigned long) ((sizeof(tableslots) - ((char *) (n)->entry - \
+       (char *) tableslots)) / sizeof(void *))
+
+
 /* Create a new memory allocation.
  */
 
 static
-void
+allocation *
 newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
@@ -265,9 +295,20 @@ newalloc(unsigned long i, unsigned long e, void *a, size_t l)
         __mp_treeinsert(&alloctree, &n->node, i);
         n->event = e;
     }
+    if (simfile != NULL)
+    {
+        if ((n->entry = __mp_getslot(&table)) == NULL)
+        {
+            fprintf(stderr, "%s: Too many allocations in use\n", progname);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+        n->entry = NULL;
     n->addr = a;
     n->size = l;
     n->time = 0;
+    return n;
 }
 
 
@@ -525,7 +566,7 @@ readevent(void)
     char s[4];
     allocation *f;
     void *a;
-    size_t l;
+    size_t l, m;
     unsigned long n;
 
     if (refill(1))
@@ -538,9 +579,15 @@ readevent(void)
             n = getuleb128();
             a = (void *) getuleb128();
             l = getuleb128();
-            newalloc(n, currentevent, a, l);
+            f = newalloc(n, currentevent, a, l);
             fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu\n",
                     currentevent, n, a, l);
+            if (f->entry != NULL)
+            {
+                if ((m = slotentry(f)) > maxslots)
+                    maxslots = m;
+                fprintf(simfile, "    {%lu, %lu},\n", m, l);
+            }
 #if MP_GUI_SUPPORT
             if (addrbase == NULL)
                 addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
@@ -562,6 +609,12 @@ readevent(void)
                 f->time = currentevent - f->event;
                 fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
                         "%6lu\n", currentevent, n, f->addr, f->size, f->time);
+                if (f->entry != NULL)
+                {
+                    fprintf(simfile, "    {%lu, 0},\n", slotentry(f));
+                    __mp_freeslot(&table, f->entry);
+                    f->entry = NULL;
+                }
 #if MP_GUI_SUPPORT
                 drawmemory(f->addr, f->size, frgc);
 #endif /* MP_GUI_SUPPORT */
@@ -605,6 +658,24 @@ readevent(void)
           default:
             break;
         }
+    if (simfile != NULL)
+    {
+        fputs("    {0, 0}\n};\n\n\n", simfile);
+        fputs("int main(void)\n{\n", simfile);
+        fprintf(simfile, "    void *p[%lu];\n", maxslots);
+        fputs("    event *e;\n\n", simfile);
+        fputs("    for (e = events; e->index != 0; e++)\n", simfile);
+        fputs("        if (e->size == 0)\n", simfile);
+        fputs("            free(p[e->index - 1]);\n", simfile);
+        fputs("        else if ((p[e->index - 1] = malloc(e->size)) == NULL)\n",
+              simfile);
+        fputs("        {\n", simfile);
+        fputs("            fputs(\"out of memory\\n\", stderr);\n", simfile);
+        fputs("            exit(EXIT_FAILURE);\n", simfile);
+        fputs("        }\n", simfile);
+        fputs("    return EXIT_SUCCESS;\n}\n", simfile);
+        fclose(simfile);
+    }
     getentry(s, sizeof(char), 4, 0);
     if (memcmp(s, MP_TRACEMAGIC, 4) != 0)
     {
@@ -694,11 +765,13 @@ readfile(void)
 int
 main(int argc, char **argv)
 {
+    struct { char x; void *y; } z;
     char b[256];
-    char *f;
+    char *f, *s;
 #if MP_GUI_SUPPORT
     XGCValues g;
 #endif /* MP_GUI_SUPPORT */
+    long n;
     int c, e, h, v;
 
 #if MP_GUI_SUPPORT
@@ -709,6 +782,7 @@ main(int argc, char **argv)
     appdisplay = XtDisplay(appwidget);
     appscreen = XtScreen(appwidget);
 #endif /* MP_GUI_SUPPORT */
+    s = NULL;
     e = h = v = 0;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
@@ -717,6 +791,9 @@ main(int argc, char **argv)
         {
           case OF_HELP:
             h = 1;
+            break;
+          case OF_SIMFILE:
+            s = __mp_optarg;
             break;
           case OF_VERSION:
             v = 1;
@@ -766,6 +843,31 @@ main(int argc, char **argv)
     currentevent = 0;
     bufferpos = buffer;
     bufferlen = 0;
+    n = (char *) &z.y - &z.x;
+    __mp_newslots(&table, sizeof(void *), __mp_poweroftwo(n));
+    __mp_initslots(&table, tableslots, sizeof(tableslots));
+    maxslots = 1;
+    if (s != NULL)
+    {
+        if (strcmp(s, "stdout") == 0)
+            simfile = stdout;
+        else if (strcmp(s, "stderr") == 0)
+            simfile = stderr;
+        else if ((simfile = fopen(s, "w")) == NULL)
+        {
+            fprintf(stderr, "%s: Cannot open file `%s'\n", progname, s);
+            exit(EXIT_FAILURE);
+        }
+        fprintf(simfile, "/* produced by %s %s from %s */\n\n\n", progname,
+                VERSION, f);
+        fputs("#include <stdio.h>\n", simfile);
+        fputs("#include <stdlib.h>\n\n\n", simfile);
+        fputs("typedef struct event\n{\n", simfile);
+        fputs("    unsigned long index;\n", simfile);
+        fputs("    unsigned long size;\n", simfile);
+        fputs("}\nevent;\n\n\n", simfile);
+        fputs("static event events[] =\n{\n", simfile);
+    }
     readfile();
 #if MP_GUI_SUPPORT
     addrscale = (((addrspace * 1048576) - 1) / (width * height)) + 1;
