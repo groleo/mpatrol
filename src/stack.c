@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.1.1.1 1999-10-03 11:25:22 graeme Exp $"
+#ident "$Id: stack.c,v 1.2 1999-10-05 17:25:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -100,7 +100,7 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
 {
     s->frame = s->addr = NULL;
 #if MP_BUILTINSTACK_SUPPORT
-    for (s->index = 0; s->index <= MP_MAXSTACK; s->index++)
+    for (s->index = 0; s->index < MP_MAXSTACK; s->index++)
         s->frames[s->index] = s->addrs[s->index] = NULL;
     s->index = 0;
 #else /* MP_BUILTINSTACK_SUPPORT */
