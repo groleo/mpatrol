@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.51 2000-04-05 21:26:04 graeme Exp $
+@c $Id: mpatrol.texi,v 1.52 2000-04-05 23:55:33 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.8
 @set VERSION 1.1.4
-@set UPDATED 5th April, 2000
+@set UPDATED 6th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -4821,9 +4821,7 @@ dynamically linked.
 @cindex process id
 All mpatrol library diagnostics are sent to the file @file{mpatrol.%n.log} in
 the current directory by default (where @samp{%n} is the current process id) but
-this can be changed using the @option{-l} option.  Any existing
-@env{MPATROL_OPTIONS} environment variable settings which are not overridden by
-@var{options} will be passed through unchanged to the mpatrol library.
+this can be changed using the @option{-l} option.
 
 All of the following options (except @option{-d} and @option{-V}) correspond to
 their listed mpatrol library option (@pxref{Environment}).
