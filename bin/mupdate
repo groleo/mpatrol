@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.14 2001-02-21 10:21:01 graeme Exp $
+# $Id: mupdate,v 1.15 2001-02-28 00:51:26 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -146,6 +146,19 @@ make all >/dev/null 2>&1
 cd ../man
 make all >/dev/null 2>&1
 cd ..
+
+
+# Create the CHECKSUMS file.
+
+rm -f CHECKSUMS
+cat <<EOF >/tmp/mupdate.md5
+# Use the following command to check the integrity of this distribution:
+# md5sum --check CHECKSUMS
+
+EOF
+md5sum `find . -type f -print` >>/tmp/mupdate.md5
+cp /tmp/mupdate.md5 CHECKSUMS
+rm -f /tmp/mupdate.md5
 
 
 # Create a new release archive.
