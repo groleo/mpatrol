@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 18th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 18th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
 November, 2000.
 
 
@@ -341,7 +341,9 @@ out.
 
    * All diagnostics and logging are sent to a file in the current
      directory, but this can be overridden, including forcing the log
-     file to be the standard output or standard error file streams.
+     file to be the standard output or standard error file streams.  An
+     environment variable specifying a default directory in which to
+     place log files can also be set.
 
    * Options exist to log details of every memory allocation,
      reallocation or deallocation when they occur.
@@ -354,7 +356,9 @@ out.
    * An option exists to enable memory allocation profiling, which
      forces a summary of all memory allocation statistics to be written
      to a specified file for later use by a profiling command.  The
-     profiling file can also be written at a specified frequency.
+     profiling file can also be written at a specified frequency.  An
+     environment variable specifying a default directory in which to
+     place profiling output files can also be set.
 
    * A profiling command is provided which reads a profiling output
      file produced by the mpatrol library and displays a set of tables
@@ -479,6 +483,11 @@ out.
    * If the library is unable to automatically determine a program's
      executable filename to read symbols from then an option exists to
      specify the full path to the program's executable file.
+
+   * Options are provided to edit and list a source file at a specific
+     line number when a warning or error occurs due to that source
+     line.  An external command which provides this functionality
+     outwith the mpatrol library is included.
 
    * An option exists to change the default alignment used for
      general-purpose memory allocations.
@@ -3548,7 +3557,7 @@ library, the @{b}MPATROL_OPTIONS@{ub} environment variable should be set to be
 @{b}LOGALL@{ub} and the program should be executed, generating the following
 output in @{b}mpatrol.log@{ub}.
 
-     @(#) mpatrol 1.3.0 (00/11/16)
+     @(#) mpatrol 1.3.0 (00/11/19)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
