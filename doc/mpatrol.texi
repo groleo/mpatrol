@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.236 2001-08-27 19:50:49 graeme Exp $
+@c $Id: mpatrol.texi,v 1.237 2001-08-27 20:29:22 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -872,7 +872,8 @@ A small test suite is provided in order to test basic features.
 
 @item
 User documentation is currently available in @TeX{}info format as well as UNIX
-manual pages and a quick reference card.
+manual pages and a quick reference card.  The source code for the library and
+tools can also be formatted for a printed manual.
 @end itemize
 
 @node Installation, Integration, Features, Top
@@ -1017,6 +1018,12 @@ card and can be translated into formats suitable for printing onto a few pages.
 There should already be translated files in the @file{doc} directory, but if not
 you will have to generate them yourself using the @file{Makefile} provided.  You
 can then install or print these documents.
+
+@cindex source code documentation
+The mpatrol library source code can also be formatted for a printed manual for
+later perusal.  The @samp{source} target in the @file{Makefile} within the
+@file{doc} directory can be used to build the source code documentation in DVI,
+postscript and PDF formats, but be prepared for a large number of pages!
 
 If you are not installing on a system that supports UNIX manual pages then you
 should also check in the @file{man} directory to ensure that there are

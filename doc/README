@@ -25,6 +25,11 @@ the preformatted files.
                    http://www.tug.org/
         Notes:     The unprocessed source of the reference card.
 
+  * source.tex
+        Format:    LaTeX
+                   http://www.tug.org/
+                   The unprocessed source of the source code documentation.
+
   * texinfo.tex
         Format:    TeX
                    http://texinfo.org/
@@ -100,7 +105,7 @@ viewer program.
 The following files are all formatted for printed manuals.  All can be viewed
 with a variety of programs, not just the ones listed here.
 
-  * mpatrol.dvi & refcard.dvi
+  * mpatrol.dvi, refcard.dvi & source.dvi
         Format:    Device Independent format (DVI)
                    http://www.tug.org/
         Generator: TeX
@@ -111,7 +116,7 @@ with a variety of programs, not just the ones listed here.
                    Bitmapped fonts are built on demand to a suitable resolution
                    when viewing or printing.
 
-  * mpatrol.ps & refcard.ps
+  * mpatrol.ps, refcard.ps & source.ps
         Format:    Adobe Postscript
                    http://www.adobe.com/
         Generator: DVIPS
@@ -120,7 +125,7 @@ with a variety of programs, not just the ones listed here.
                    http://www.cs.wisc.edu/~ghost/ghostview/
         Notes:     Contains embedded EPS images and Postscript Type 1 fonts.
 
-  * mpatrol.pdf & refcard.pdf
+  * mpatrol.pdf, refcard.pdf & source.pdf
         Format:    Adobe Portable Document Format (PDF)
                    http://www.adobe.com/
         Generator: PDFTeX
