@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.12 2000-03-23 19:20:18 graeme Exp $"
+#ident "$Id: memory.c,v 1.13 2000-04-04 17:39:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -79,7 +79,7 @@ extern "C"
 
 #if MP_ARRAY_SUPPORT
 /* The static memory array used to implement a simulated heap.  This is
- * most likely to be zero-initialized at the beginning of program execution,
+ * most likely to be zero-initialised at the beginning of program execution,
  * but this should not be relied upon as the memory it contains will be reused.
  */
 
