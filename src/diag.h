@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.22 2001-02-10 16:45:39 graeme Exp $
+ * $Id: diag.h,v 1.23 2001-02-26 00:32:19 graeme Exp $
  */
 
 
@@ -56,6 +56,7 @@ typedef enum errortype
     ET_FRDOPN, /* attempt to perform operation on freed memory */
     ET_FRDOVF, /* freed allocation %1 has a corrupted overflow buffer at %2 */
     ET_FRECOR, /* free memory corruption at %1 */
+    ET_FREMRK, /* attempt to free a marked allocation */
     ET_FRENUL, /* attempt to free a NULL pointer */
     ET_FREOPN, /* attempt to perform operation on free memory */
     ET_ILLMEM, /* illegal memory access at address %1 */

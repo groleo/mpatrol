@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.65 2001-02-25 23:22:21 graeme Exp $"
+#ident "$Id: info.c,v 1.66 2001-02-26 00:36:54 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.65 2001-02-25 23:22:21 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.66 2001-02-26 00:36:54 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -764,6 +764,17 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
             __mp_logfree(h, p, f, v);
         __mp_error(ET_INCOMP, f, v->file, v->line, MP_POINTER " was allocated "
                    "with %s", p, __mp_functionnames[m->data.type]);
+        __mp_printalloc(&h->syms, n);
+        __mp_diag("\n");
+    }
+    else if (m->data.flags & FLG_MARKED)
+    {
+        /* An attempt was made to free a marked memory allocation.
+         */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logfree(h, p, f, v);
+        __mp_error(ET_FREMRK, f, v->file, v->line, "attempt to free marked "
+                   "memory allocation " MP_POINTER, p);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }

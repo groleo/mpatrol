@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.58 2001-02-07 23:58:37 graeme Exp $"
+#ident "$Id: diag.c,v 1.59 2001-02-26 00:32:19 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.58 2001-02-07 23:58:37 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.59 2001-02-26 00:32:19 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,6 +105,7 @@ static char *errornames[ET_MAX] =
     "FRDOPN",
     "FRDOVF",
     "FRECOR",
+    "FREMRK",
     "FRENUL",
     "FREOPN",
     "ILLMEM",
