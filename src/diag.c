@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.87 2001-09-27 23:51:16 graeme Exp $"
+#ident "$Id: diag.c,v 1.88 2001-10-04 00:12:54 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.87 2001-09-27 23:51:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.88 2001-10-04 00:12:54 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -519,6 +519,8 @@ __mp_openlogfile(char *s)
         __mp_diagflags |= FLG_HTML;
         __mp_diagtag("<HTML>\n");
         __mp_diagtag(" <HEAD>\n");
+        __mp_diagtag("  <META NAME=\"GENERATOR\" CONTENT=\"" MP_VERSION
+                     "\">\n");
         __mp_diagtag("  <TITLE>\n");
         __mp_diag("   mpatrol log\n");
         __mp_diagtag("  </TITLE>\n");
@@ -1637,23 +1639,69 @@ MP_GLOBAL
 void
 __mp_printversion(void)
 {
-    __mp_diag("%s\n%s\n\n", __mp_version, __mp_copyright);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diag("  %s\n", __mp_version);
+        __mp_diagtag("  <BR>\n");
+        __mp_diag("  %s ", __mp_copyright);
+        __mp_diagtag("<A HREF=\"mailto:");
+        __mp_diagtag(__mp_email);
+        __mp_diagtag("\">");
+        __mp_diag("%s", __mp_author);
+        __mp_diagtag("</A>\n");
+        __mp_diagtag("  <P>\n");
+        __mp_diag("  ");
+    }
+    else
+        __mp_diag("%s\n%s %s\n\n", __mp_version, __mp_copyright, __mp_author);
     __mp_diag("This is free software, and you are welcome to redistribute it "
               "under certain\n");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diag("  ");
     __mp_diag("conditions; see the GNU Library General Public License for "
-              "details.\n\n");
+              "details.\n");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("  <P>\n");
+        __mp_diag("  ");
+    }
+    else
+        __mp_diag("\n");
     __mp_diag("For the latest mpatrol release and documentation,\n");
-    __mp_diag("visit %s.\n\n", __mp_homepage);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diag("  visit ");
+        __mp_diagtag("<A HREF=\"");
+        __mp_diagtag(__mp_homepage);
+        __mp_diagtag("\">");
+        __mp_diag("%s", __mp_homepage);
+        __mp_diagtag("</A>.\n");
+        __mp_diagtag("  <P>\n");
+    }
+    else
+        __mp_diag("visit %s.\n\n", __mp_homepage);
     __mp_diag("operating system:       %s\n", TARGET_STR);
     __mp_diag("system variant:         %s\n", SYSTEM_STR);
     __mp_diag("processor architecture: %s\n", ARCH_STR);
     __mp_diag("processor word size:    %s\n", ENVIRON_STR);
     __mp_diag("object file format:     %s\n", FORMAT_STR);
-    __mp_diag("dynamic linker type:    %s\n\n", DYNLINK_STR);
+    __mp_diag("dynamic linker type:    %s\n", DYNLINK_STR);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("  <P>\n");
+    else
+        __mp_diag("\n");
     if (!currenttime)
         currenttime = time(NULL);
     if (currenttime != (time_t) -1)
-        __mp_diag("Log file generated on %s\n", ctime(&currenttime));
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diag("  ");
+        __mp_diag("Log file generated on %s", ctime(&currenttime));
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("  <P>\n");
+        else
+            __mp_diag("\n");
+    }
 }
 
 
