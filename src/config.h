@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.68 2001-02-27 20:56:36 graeme Exp $
+ * $Id: config.h,v 1.69 2001-02-28 23:08:04 graeme Exp $
  */
 
 
@@ -777,7 +777,13 @@
  */
 
 #ifndef MP_INITFUNC_SUPPORT
+#if TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE || \
+    ((SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LYNXOS) && \
+     (ARCH == ARCH_POWER || ARCH == ARCH_POWERPC))
+#define MP_INITFUNC_SUPPORT 0
+#else /* TARGET && SYSTEM && ARCH */
 #define MP_INITFUNC_SUPPORT 1
+#endif /* TARGET && SYSTEM && ARCH */
 #endif /* MP_INITFUNC_SUPPORT */
 
 
