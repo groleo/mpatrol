@@ -493,7 +493,8 @@
 
 
 /* The name of the file used to send memory allocation profiling information
- * to.  This may be overridden at run-time using the PROFFILE option.
+ * to.  This may be overridden at run-time using the PROFFILE option and may
+ * contain special formatting characters.
  */
 
 #ifndef MP_PROFFILE

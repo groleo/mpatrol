@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.13 2000-04-23 15:40:52 graeme Exp $"
+#ident "$Id: option.c,v 1.14 2000-05-01 10:11:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -775,7 +775,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_NOARGUMENT;
                     else
                     {
-                        h->prof.file = a;
+                        h->prof.file = __mp_proffile(a);
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "PROGFILE"))

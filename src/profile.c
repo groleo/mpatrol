@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.22 2000-04-26 23:24:00 graeme Exp $"
+#ident "$Id: profile.c,v 1.23 2000-05-01 10:11:07 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -79,7 +79,7 @@ MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h, symhead *s)
     p->mbound = MP_MEDIUMBOUND;
     p->lbound = MP_LARGEBOUND;
     p->autosave = p->autocount = 0;
-    p->file = MP_PROFFILE;
+    p->file = __mp_proffile(NULL);
     p->profiling = 0;
 }
 
