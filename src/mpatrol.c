@@ -44,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.34 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.35 2001-01-03 18:24:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -343,7 +343,7 @@ static option options_table[] =
      "\tshould be used to obtain additional source-level information.\n"},
     {"use-mmap", OF_USEMMAP, NULL,
      "\tSpecifies that the library should use mmap() instead of sbrk() to\n"
-     "\tallocate system memory.\n"},
+     "\tallocate user memory.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL

@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.38 2001-01-02 22:53:59 graeme Exp $"
+#ident "$Id: memory.c,v 1.39 2001-01-03 18:24:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -381,21 +381,27 @@ __mp_newmemory(meminfo *i)
     i->page = pagesize();
     i->stackdir = stackdirection(NULL);
     i->prog = progname();
-    /* On UNIX, we initially set the memory mapped file handle to be -1 as we
-     * default to using sbrk(), even on systems that support the mmap() function
-     * call.  We only set this to point to the memory mapped file if the USEMMAP
-     * option has been found when parsing the library options.  However, if the
+#if MP_MMAP_SUPPORT
+    /* On UNIX systems that support the mmap() function call, we default to
+     * using sbrk() for user memory and mmap() for internal memory.  If the
      * MP_MMAP_ANONYMOUS macro is set then we don't need to open a file for
-     * mapping so we just use the mfile field as an indicator as to whether the
-     * USEMMAP option has been given.
+     * mapping.
      */
+#if MP_MMAP_ANONYMOUS
+    i->mfile = 0;
+#else /* MP_MMAP_ANONYMOUS */
+    i->mfile = open(MP_MMAP_FILENAME, O_RDWR);
+#endif /* MP_MMAP_ANONYMOUS */
+#else /* MP_MMAP_SUPPORT */
     i->mfile = -1;
+#endif /* MP_MMAP_SUPPORT */
 #if MP_WATCH_SUPPORT
     sprintf(b, MP_PROCFS_CTLNAME, __mp_processid());
     i->wfile = open(b, O_WRONLY);
 #else /* MP_WATCH_SUPPORT */
     i->wfile = -1;
 #endif /* MP_WATCH_SUPPORT */
+    i->flags = 0;
 }
 
 
@@ -520,7 +526,11 @@ __mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
     /* Decide if we are using mmap() or sbrk() to allocate the memory.  Requests
      * for user memory will be allocated in the opposite way to internal memory.
      */
-    if ((i->mfile != -1) == (u != 0))
+    if ((((i->flags & FLG_USEMMAP) != 0) == (u != 0)) && (i->mfile != -1))
+        u = 1;
+    else
+        u = 0;
+    if (u != 0)
     {
 #if MP_MMAP_ANONYMOUS
         if ((p = mmap(NULL, *l, PROT_READ | PROT_WRITE,
@@ -579,7 +589,11 @@ __mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
      * memory, so we do this here for predictable behaviour.  This is also the
      * case if we are using a simulated heap.
      */
-    if ((i->mfile == -1) && (p != NULL))
+#if MP_MMAP_SUPPORT
+    if ((p != NULL) && (u == 0))
+#else /* MP_MMAP_SUPPORT */
+    if (p != NULL)
+#endif /* MP_MMAP_SUPPORT */
         __mp_memset(p, 0, *l);
 #endif /* MP_ARRAY_SUPPORT && TARGET */
     if (p == NULL)

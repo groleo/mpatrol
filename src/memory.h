@@ -36,6 +36,9 @@
 #include <stddef.h>
 
 
+#define FLG_USEMMAP 1 /* use mmap() to allocate user memory */
+
+
 /* The different types of memory access permissions.
  */
 
@@ -54,12 +57,13 @@ memaccess;
 
 typedef struct meminfo
 {
-    size_t align; /* most restrictive alignment */
-    size_t page;  /* system page size */
-    int stackdir; /* stack direction */
-    char *prog;   /* program filename */
-    int mfile;    /* memory mapped file handle */
-    int wfile;    /* watch point control file handle */
+    size_t align;        /* most restrictive alignment */
+    size_t page;         /* system page size */
+    int stackdir;        /* stack direction */
+    char *prog;          /* program filename */
+    int mfile;           /* memory mapped file handle */
+    int wfile;           /* watch point control file handle */
+    unsigned char flags; /* control flags */
 }
 meminfo;
 

@@ -35,13 +35,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#if MP_MMAP_SUPPORT && !MP_MMAP_ANONYMOUS
-#include <fcntl.h>
-#endif /* MP_MMAP_SUPPORT && MP_MMAP_ANONYMOUS */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.27 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: option.c,v 1.28 2001-01-03 18:24:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -221,7 +218,7 @@ static char *options_help[] =
     "", "should be used to obtain additional source-level information.",
     "USEMMAP", NULL,
     "", "Specifies that the library should use mmap() instead of sbrk() to",
-    "", "allocate system memory on UNIX platforms.",
+    "", "allocate user memory on UNIX platforms.",
     NULL
 };
 
@@ -996,12 +993,7 @@ __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
 #if MP_MMAP_SUPPORT
                     if (h->alloc.list.size == 0)
-#if MP_MMAP_ANONYMOUS
-                        h->alloc.heap.memory.mfile = 0;
-#else /* MP_MMAP_ANONYMOUS */
-                        h->alloc.heap.memory.mfile = open(MP_MMAP_FILENAME,
-                                                          O_RDWR);
-#endif /* MP_MMAP_ANONYMOUS */
+                        h->alloc.heap.memory.flags |= FLG_USEMMAP;
 #endif /* MP_MMAP_SUPPORT */
                 }
                 break;
