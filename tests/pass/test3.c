@@ -22,8 +22,7 @@
 
 /*
  * Demonstrates and tests the facility for specifying a user-defined
- * low memory handler.  For this test to correctly illustrate its use
- * it must be run with a LIMIT of around 1572864 bytes.
+ * low memory handler.
  */
 
 
@@ -56,6 +55,7 @@ int main(void)
     int r;
 
     r = EXIT_SUCCESS;
+    __mp_setoption(MP_OPT_LIMIT, 1572864);
     __mp_nomemory(handler);
     buffer = malloc(1048576);
     p = malloc(1048576);
