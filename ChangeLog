@@ -1,3 +1,23 @@
+Thu Oct 21 21:57:48 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* README, NOTES, EXAMPLES: Added information about the CHECK option.
+
+	* bin/mpatrol: Added the -C option.
+
+	* man/man3/mpatrol.3, man/man1/mpatrol.1, man/cat3/mpatrol.3,
+	  man/cat1/mpatrol.1:
+	Added the CHECK and -C options.
+
+	* src/inter.c:
+	Added the ability to only check the integrity of free memory and
+	overflow buffers when the allocation index is within a given range.
+
+	* src/info.h, src/diag.c, src/info.c:
+	Added lower and upper check ranges.
+
+	* src/option.h, src/option.c:
+	Added the readrange() function and the CHECK option.
+
 Tue Oct 19 19:23:11 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* EXAMPLES:

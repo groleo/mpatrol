@@ -33,7 +33,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MPATROL_VERSION 10003
+#define MPATROL_VERSION 10004
 
 
 /* The different types of memory allocation functions.
