@@ -1,3 +1,20 @@
+Mon Jun 26 23:06:12 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented IRIX siginfo support.
+
+	* src/config.h:
+	Enabled library stack traversal for Windows platforms.  Reintroduced
+	siginfo support for IRIX.
+
+	* src/stack.c:
+	Forgot to initialise the first field for all types of stack traversal.
+
+	* src/symbol.c:
+	Moved the call to SymInitialize() earlier on and removed the call to
+	SymCleanup() completely.
+
+	* src/signals.c: Added handling of SIGBUS on UNIX platforms as well.
+
 Fri Jun 23 20:17:02 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:

@@ -1,9 +1,10 @@
-Changes for 1.2.3
+Changes for 1.2.3 (27th June, 2000)
 
   * Added more robust stack traversal support for Windows platforms.
 
-  * Can now determine the address of an illegal memory access on Windows
-    platforms.
+  * Can now determine the address of an illegal memory access on IRIX and
+    Windows platforms and now also the address of a misaligned memory access
+    on UNIX platforms.
 
   * Added support for the XCOFF and Windows PE object file formats and
     provisional support for the ELF64 object file format.
