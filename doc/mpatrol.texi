@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.75 2000-05-14 23:48:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.76 2000-05-15 20:11:06 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 14th May, 2000
+@set UPDATED 15th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -375,7 +375,7 @@ Contains 4 replacement C++ dynamic memory allocation functions:
 @end multitable
 
 @item
-Contains 9 replacement C memory operation functions:
+Contains 10 replacement C memory operation functions:
 
 @multitable @columnfractions .2 .1 .7
 @item @code{memset()}
@@ -2738,6 +2738,17 @@ in @emph{hidden} memory usage which occurs behind the scenes and alters the peak
 memory usage in the summary.  This is particularly evident when the library uses
 an object file access library to read program symbols at the time of library
 initialisation.
+
+Memory allocation profiling support was added for mpatrol release 1.2.0.  Every
+allocation and deallocation is recorded, with the call stack information being
+used to differentiate all of the call sites within the program.  Unlike other
+profilers that come with UNIX systems, even the symbolic information about the
+program being run is written to the profiling output file, since it makes no
+sense for @command{mprof} to re-read the symbol table from the executable file
+when it has already been read and processed by the mpatrol library.  It also has
+the added bonus of allowing the user to save profiling output files for later
+use even when the executable files which produced them have changed or no longer
+exist.
 
 @cindex modules
 The library is written in a modular fashion so as to make it easy to add new
@@ -6318,8 +6329,10 @@ the platform it is being built on, and also use automake, libtool and install
 when building and installing files.
 
 @item
-Perhaps add an extra page to the quick reference card containing details of the
-related tools and functions.  Also add the ability to build a PDF version.
+The postscript version of the quick reference card seems to print at an unusual
+offset on some printers.  Also, the PDF version gets created with 1 inch margins
+rather than half inch margins which means that it is one inch too large in both
+dimensions.  Need to figure out what is happening in both cases.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
@@ -6772,6 +6785,24 @@ Various UNIX, AmigaOS, MS-DOS, Windows, MacOS
 A general-purpose, garbage-collecting storage allocator that is intended to be
 used as a plug-in replacement for @code{malloc()}, but can also be used to
 detect memory leaks.
+@end table
+
+@cindex GlowCode
+@cindex Electric Software, Inc.
+@item
+GlowCode
+@table @asis
+@item Author
+Electric Software, Inc. (@email{info@@glowcode.com})
+@item License
+Commercial Software
+@item Platforms
+Windows
+@item Location
+@uref{http://www.glowcode.com/}
+@item Overview
+Provides a profiler, call coverage tool and resource browser which can detail
+memory leaks.
 @end table
 
 @cindex Great Circle
