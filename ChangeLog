@@ -1,3 +1,103 @@
+Sun Mar 26 20:26:46 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate:
+	Used colons instead of tabs as field separators for rcs2log.
+
+Fri Mar 24 01:37:57 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added lots more questions and answers.
+
+	* build/amiga/Makefile, build/windows/Makefile:
+	Added utils.h dependency to sbrk.o.
+
+	* src/sbrk.c: Added alignment restrictions to brk() and sbrk().
+
+	* tests/fail/test11.c: New test for post-read errors.
+
+	* tests/fail/test12.c: New test for pre-read errors.
+
+Thu Mar 23 21:30:15 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* README: Mentioned that Windows now overrides malloc() as well.
+
+	* build/amiga/Makefile, build/windows/Makefile: Added the sbrk module.
+
+	* build/windows/Makefile: Added malloc module.
+
+	* build/windows/mpatrol.def:
+	Added overriding functions to the DLL specification.
+
+	* doc/mpatrol.texi: Brought documentation up to date with product.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Mentioned that on Windows platforms, malloc() is overridden as well.
+
+	* pkg/lha/mpatrol.readme: New file for Aminet distributions.
+
+	* src/config.h: Added a definition for MP_BREAK_SIZE.
+
+	* src/memory.c:
+	Always round up the allocation size to 64K on Windows as this is what
+	the VirtualAlloc() function does.
+
+	* src/sbrk.c, src/sbrk.h: New files for brk() and sbrk().
+
+	* src/inter.c:
+	Added support for Microsoft's C run-time library calling malloc() before
+	it is fully set up.
+
+	* src/mpatrol.c: Include malloc.c if on Windows platforms as well.
+
+Wed Mar 22 19:17:47 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* pkg/lha/build: Added Amiga LhA distribution archive build script.
+
+	* src/symbol.c: Always now include stdlib.h and string.h.
+
+Tue Mar 21 21:56:06 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* README:
+	Mentioned that malloc() is automatically overridden when using AmigaOS
+	with gcc.
+
+	* FAQ: Mentioned that the Amiga gcc makefile also uses libmpatrol.o.
+
+	* doc/mpatrol.texi:
+	Updated documentation for AmigaOS when gcc is being used.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Mentioned that malloc() is now automatically overridden on AmigaOS when
+	using gcc.
+
+	* src/symbol.c:
+	Fix base of first object file for AmigaOS with BFD support.
+
+	* src/inter.c: Don't call __mp_init() from memory operation functions.
+
+Mon Mar 20 23:45:09 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Removed mention of Amiga shared library.
+
+	* build/amiga/Attic/mpatrol_pragmas.h, build/amiga/Attic/mpatrol_lib.fd:
+	Removed support for Amiga shared library.
+
+	* build/amiga/Makefile:
+	New GNU makefile for compiling with GCC.
+
+	* doc/mpatrol.texi: Removed support for Amiga shared libraries.
+
+	* src/config.h: Added limited stack traversal for AmigaOS.
+
+	* src/target.h: Added BFD support for AmigaOS when compiling with GCC.
+
+	* src/symbol.c: Added support for reading symbols on AmigaOS.
+
+	* src/inter.c, src/inter.h, src/mpatrol.h:
+	Removed Amiga shared library support.
+
+	* src/mpatrol.c:
+	Added replacements for malloc() when compiling on Amiga with GCC.
+
 Wed Mar 15 01:42:53 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added a chapter on integration.
