@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.32 2000-12-03 22:29:48 graeme Exp $
+# $Id: Makefile,v 1.33 2000-12-03 23:08:45 graeme Exp $
 
 
 # Definitions
@@ -80,22 +80,22 @@ mpatrol: mpatrol.o getopt.o version.o
 mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
-mtrace: mtrace.o getopt.o tree.o utils.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mtrace.o getopt.o tree.o utils.o version.o
+mptrace: mptrace.o getopt.o tree.o utils.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o utils.o version.o
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof mtrace mleak
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof mptrace mleak
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.o mprof.o mtrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
+	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f mpatrol mprof mtrace mleak 2>&1 >/dev/null
+	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
 # Dependencies
@@ -244,7 +244,7 @@ mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
-mtrace.o: $(SOURCE)/mtrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+mptrace.o: $(SOURCE)/mptrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h \
 	$(SOURCE)/version.h
 mleak.o: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \

@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.16 2000-12-03 22:38:48 graeme Exp $
+rem $Id: build.bat,v 1.17 2000-12-03 23:03:49 graeme Exp $
 
 
 set version=1.3.1
@@ -36,7 +36,7 @@ cd ..\..\build\windows
 nmake -f NMakefile clobber
 nmake -f NMakefile libmpatrol.lib mpatrol.dll
 nmake -f NMakefile libmpatrolmt.lib mpatrolmt.dll
-nmake -f NMakefile mpatrol.exe mprof.exe mtrace.exe mleak.exe
+nmake -f NMakefile mpatrol.exe mprof.exe mptrace.exe mleak.exe
 cd ..\..\pkg\zip
 
 
@@ -54,7 +54,7 @@ copy ..\..\ChangeLog mpatrol\ChangeLog.txt
 mkdir mpatrol\bin
 copy ..\..\build\windows\mpatrol.exe mpatrol\bin
 copy ..\..\build\windows\mprof.exe mpatrol\bin
-copy ..\..\build\windows\mtrace.exe mpatrol\bin
+copy ..\..\build\windows\mptrace.exe mpatrol\bin
 copy ..\..\build\windows\mleak.exe mpatrol\bin
 copy ..\..\bin\mpsym mpatrol\bin
 copy ..\..\bin\mpedit mpatrol\bin
