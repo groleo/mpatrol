@@ -1,3 +1,123 @@
+2001-02-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/alloc.c: Changed the meaning of NOFREE=0.
+
+	* src/option.c:
+	Added support for getting the value of and setting the CHECK option.
+	Changed the behaviour of the NOFREE option.
+
+	* src/inter.h, src/mpatrol.h: Changed arguments to __mp_iterate().
+
+	* src/mpatrol.h, src/option.h:
+	Split up the CHECK option into its constituent parts.
+
+2001-02-12  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added more functions.  Added __mp_getoption() and __mp_setuser()
+
+	* man/man3/libmpatrol.3, man/html/libmpatrol.html,
+	  man/cat3/libmpatrol.3:
+	Added the __mp_getoption() and __mp_setuser() functions.
+
+	* src/memory.c: Call optimised memory operation routines for Windows.
+
+	* src/info.c, src/info.h: Added the userdata field.
+
+	* src/option.c, src/option.h: Added __mp_get().
+
+	* src/mpalloc.c, src/mpalloc.h, src/mpatrol.h, src/inter.c, src/inter.h:
+	Added __mp_getoption() and __mp_setuser().
+
+	* tests/pass/test4.c: Added the userdata field.
+
+	* tests/pass/test10.c:
+	The callback function should take a const argument.
+
+2001-02-11  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/man3/libmpalloc.3, man/html/libmpalloc.html,
+	  man/cat3/libmpalloc.3:
+	Changed the arguments to MP_MALLOC() and family.
+
+	* src/alloc.c, src/alloc.h: Made __mp_recyclefreed() global.
+
+	* src/option.c: Added NOFREE support to __mp_setopt().
+
+2001-02-10  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/mpalloc.h, src/mpatrol.h:
+	Changed the arguments to MP_MALLOC(), MP_CALLOC() and MP_STRDUP().
+
+	* src/mpdebug.h: New file for overall inclusion.
+
+	* tests/pass/test9.c: Changed the arguments to some of the functions.
+
+2001-02-09  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.c:
+	Use the default system alignment if alignment is zero in memalign().
+
+	* src/mpatrol.h:
+	Added const parameter to __mp_iterate's callback function.
+
+2001-02-08  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/Makefile: Added the libmpalloc manual page.
+
+	* man/html/libmpalloc.html, man/cat3/libmpalloc.3,
+	  man/man3/libmpalloc.3:
+	New manual page for the mpalloc library.
+
+	* man/man3/libmpatrol.3, man/cat3/libmpatrol.3:
+	Added reference to libmpalloc.
+
+	* man/man3/libmpatrol.3, man/html/libmpatrol.html,
+	  man/cat3/libmpatrol.3:
+	Documented seven new functions.  Documented another six functions.
+
+	* man/man1/hexwords.1, man/html/hexwords.html, man/cat1/hexwords.1:
+	Documented the other dictionaries tried if the first cannot be found.
+
+	* pkg/sdux/mpatrol.psf, pkg/pkg/prototype: Added test9.c.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build, pkg/pkg/build,
+	  pkg/lha/build:
+	Use wildcards when copying manual pages.  Use wildcards when copying
+	images.
+
+	* src/info.c, src/info.h, src/inter.c, src/option.c:
+	Added a frequency to CHECK and made the default zero.
+
+	* src/option.c, src/option.h: Added the __mp_setopt() function.
+
+	* src/inter.c:
+	For MP_MALLOC(), MP_CALLOC() and MP_REALLOC(), if size is zero, make it
+	the size of the type being allocated if available.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added the __mp_setoption(), __mp_function(), __mp_syminfo(),
+	__mp_vprintf(), __mp_logaddr() and __mp_view() functions.
+
+	* src/mpcalloc.c, src/mpmalloc.c, src/mprealloc.c:
+	If size is zero, make it the size of the type being allocated if
+	available.
+
+	* tests/pass/test3.c:
+	Added call to __mp_setoption() rather than relying on the user to set
+	the LIMIT option.
+
+	* tests/pass/test4.c:
+	Now make use of __mp_function() and __mp_syminfo().
+
+	* tests/pass/test9.c:
+	Added new test for the MP_MALLOC() family of functions.
+
+	* tests/pass/test10.c:
+	New file demonstrating __mp_snapshot() and __mp_iterate().
+
 2001-02-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/diag.c: Added the check frequency.

@@ -2,6 +2,8 @@ Changes for 1.4.0
 
   * Added release versions of all of the mpatrol library functions that can be
     used to quickly remove all mpatrol features by linking with libmpalloc.
+    Changed the arguments to the MP_MALLOC() family of functions so that the
+    pointer being manipulated is always the first argument.
 
   * The log file now displays a summary of all of the symbols loaded from the
     main executable file and any shared libraries.
@@ -14,6 +16,13 @@ Changes for 1.4.0
   * The alloca() family of functions now abort instead of returning NULL when
     there is no more memory available.  Also added the BSD reallocf() function.
 
+  * Added a function to read the value of any mpatrol option at runtime.  Also
+    added a function that can set most mpatrol options at any point in a
+    program's execution.  In addition, a function has been added to obtain
+    symbolic information about a code address from the mpatrol symbol manager
+    and another function added to associate user-specific data with a particular
+    memory allocaton.
+
   * Added functions to snapshot the heap and iterate across all memory
     allocations in the heap.  Also added functions to write strings, hex dumps,
     memory allocations and current call stacks to the mpatrol log file, as well
@@ -24,6 +33,15 @@ Changes for 1.4.0
     not perform as much checking by default as it did before.  Also added a
     frequency argument to the CHECK option so that checking can be performed
     every nth time across a given range.
+
+  * Changed the behaviour of the NOFREE option so that NOFREE=0 really does mean
+    that all memory allocations will be freed immediately.  A large finite
+    number must given to the NOFREE option in order to mimic the old behaviour
+    of the NOFREE=0 option.
+
+  * The mpatrol library now calls FillMemory(), etc. on Windows platforms in
+    order to perform memory operations faster than would normally be done with
+    __mp_memset(), etc.
 
   * Fixed a bug in memalign() which meant that if the alignment was specified as
     zero then the system page size would be used instead of the default system
@@ -36,6 +54,15 @@ Changes for 1.4.0
 
   * The hexwords command now searches for a dictionary in several other
     locations if the default dictionary is not found.
+
+  * Added an Automake macro for use when incorporating mpatrol into a new or
+    existing project.  Also added a new header file which can be used to
+    include mpatrol.h, mpalloc.h or neither depending on whether the mpatrol
+    or mpalloc libraries are available.
+
+  * Added new tests demonstrating the MP_MALLOC() family of functions and the
+    __mp_snapshot() and __mp_iterate() functions.  Also improved some of the
+    existing tests to make use of the new functions.
 
 
 Changes for 1.3.4 (25th January, 2001)
