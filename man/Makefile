@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.11 2001-01-25 22:02:11 graeme Exp $
+# $Id: Makefile,v 1.12 2001-02-08 20:25:46 graeme Exp $
 
 
 # Definitions
@@ -32,16 +32,20 @@ HTML   = man2html
 PSTILL = pstill
 
 PAGES	  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
-	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3
+	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3 \
+	    cat3/libmpalloc.3
 HTMLPAGES = html/mpatrol.html html/mprof.html html/mptrace.html \
 	    html/mleak.html html/mpsym.html html/mpedit.html \
-	    html/hexwords.html html/libmpatrol.html
+	    html/hexwords.html html/libmpatrol.html html/libmpalloc.html
 DVIPAGES  = dvi/mpatrol.dvi dvi/mprof.dvi dvi/mptrace.dvi dvi/mleak.dvi \
-	    dvi/mpsym.dvi dvi/mpedit.dvi dvi/hexwords.dvi dvi/libmpatrol.dvi
+	    dvi/mpsym.dvi dvi/mpedit.dvi dvi/hexwords.dvi dvi/libmpatrol.dvi \
+	    dvi/libmpalloc.dvi
 PSPAGES	  = ps/mpatrol.ps ps/mprof.ps ps/mptrace.ps ps/mleak.ps \
-	    ps/mpsym.ps ps/mpedit.ps ps/hexwords.ps ps/libmpatrol.ps
+	    ps/mpsym.ps ps/mpedit.ps ps/hexwords.ps ps/libmpatrol.ps \
+	    ps/libmpalloc.ps
 PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
-	    pdf/mpsym.pdf pdf/mpedit.pdf pdf/hexwords.pdf pdf/libmpatrol.pdf
+	    pdf/mpsym.pdf pdf/mpedit.pdf pdf/hexwords.pdf pdf/libmpatrol.pdf \
+	    pdf/libmpalloc.pdf
 
 
 # Rules
@@ -74,6 +78,9 @@ cat1/hexwords.1: man1/hexwords.1
 cat3/libmpatrol.3: man3/libmpatrol.3
 	$(ROFF) -Tascii -man -t $< >$@
 
+cat3/libmpalloc.3: man3/libmpalloc.3
+	$(ROFF) -Tascii -man $< >$@
+
 html/mpatrol.html: man1/mpatrol.1
 	$(HTML) $< >$@
 
@@ -96,6 +103,9 @@ html/hexwords.html: man1/hexwords.1
 	$(HTML) $< >$@
 
 html/libmpatrol.html: man3/libmpatrol.3
+	$(HTML) $< >$@
+
+html/libmpalloc.html: man3/libmpalloc.3
 	$(HTML) $< >$@
 
 dvi/mpatrol.dvi: man1/mpatrol.1
@@ -122,6 +132,9 @@ dvi/hexwords.dvi: man1/hexwords.1
 dvi/libmpatrol.dvi: man3/libmpatrol.3
 	$(ROFF) -Tdvi -man -t $< >$@
 
+dvi/libmpalloc.dvi: man3/libmpalloc.3
+	$(ROFF) -Tdvi -man $< >$@
+
 ps/mpatrol.ps: man1/mpatrol.1
 	$(ROFF) -Tps -man $< >$@
 
@@ -146,6 +159,9 @@ ps/hexwords.ps: man1/hexwords.1
 ps/libmpatrol.ps: man3/libmpatrol.3
 	$(ROFF) -Tps -man -t $< >$@
 
+ps/libmpalloc.ps: man3/libmpalloc.3
+	$(ROFF) -Tps -man $< >$@
+
 pdf/mpatrol.pdf: ps/mpatrol.ps
 	$(PSTILL) -c -o $@ $<
 
@@ -168,6 +184,9 @@ pdf/hexwords.pdf: ps/hexwords.ps
 	$(PSTILL) -c -o $@ $<
 
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/libmpalloc.pdf: ps/libmpalloc.ps
 	$(PSTILL) -c -o $@ $<
 
 all: $(PAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
