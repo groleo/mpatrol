@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.4 2001-03-01 22:29:12 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.5 2001-03-04 18:08:49 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.4 2001-03-01 22:29:12 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.5 2001-03-04 18:08:49 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -191,7 +191,6 @@ static size_t malloc_size;
  */
 
 char *dmalloc_logpath;
-int dmalloc_errno;
 void *dmalloc_address;
 unsigned long dmalloc_address_count;
 
@@ -723,6 +722,20 @@ __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
 }
 
 
+/* Return the string associated with a certain error value.
+ */
+
+MP_CONST char *
+__mpt_dmallocstrerror(__mp_errortype e)
+{
+    MP_CONST char *s;
+
+    if ((s = __mp_strerror(e)) == NULL)
+        s = "errno value is not valid";
+    return s;
+}
+
+
 /* Initialise the dmalloc module.
  */
 
@@ -741,7 +754,6 @@ __mp_init_dmalloc(void)
     malloc_interval = 1;
     malloc_tracker = NULL;
     dmalloc_logpath = NULL;
-    dmalloc_errno = 0;
     dmalloc_address = NULL;
     dmalloc_address_count = 0;
     readoptions();
