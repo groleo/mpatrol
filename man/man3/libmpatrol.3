@@ -19,11 +19,11 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.43 2000-12-12 19:52:25 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.1 2000-12-13 23:23:59 graeme Exp $
 .\"
-.TH MPATROL 3 "12 December 2000" "Release 1.3" "mpatrol library"
+.TH LIBMPATROL 3 "13 December 2000" "Release 1.3" "mpatrol library"
 .SH NAME
-mpatrol \- dynamic memory allocation and tracing library
+libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
 .nf
 #include <mpatrol.h>
@@ -55,27 +55,42 @@ void (*set_new_handler(void (*func)(void)))(void);
 
 void *memset(void *ptr, int byte, size_t size);
 void bzero(void *ptr, size_t size);
-void *memccpy(void *dest, const void *src, int byte,
+.if n \{void *memccpy(void *dest, const void *src, int byte,
               size_t size);
+\}
+.if t \{void *memccpy(void *dest, const void *src, int byte, size_t size);
+\}
 void *memcpy(void *dest, const void *src, size_t size);
 void *memmove(void *dest, const void *src, size_t size);
 void bcopy(const void *src, void *dest, size_t size);
-int memcmp(const void *ptr1, const void *ptr2,
+.if n \{int memcmp(const void *ptr1, const void *ptr2,
            size_t size);
+\}
+.if t \{int memcmp(const void *ptr1, const void *ptr2, size_t size);
+\}
 int bcmp(const void *ptr1, const void *ptr2, size_t size);
 void *memchr(const void *ptr, int byte, size_t size);
-void *memmem(const void *ptr1, size_t size1,
+.if n \{void *memmem(const void *ptr1, size_t size1,
              const void *ptr2, size_t size2);
+\}
+.if t \{void *memmem(const void *ptr1, size_t size1, const void *ptr2, size_t size2);
+\}
 
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_printinfo(const void *ptr);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*func)(const void *, size_t)))
+.if n \{void (*__mp_prologue(void (*func)(const void *, size_t)))
      (const void *, size_t);
-void (*__mp_epilogue(void (*func)(const void *)))
+\}
+.if t \{void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t);
+\}
+.if n \{void (*__mp_epilogue(void (*func)(const void *)))
      (const void *);
+\}
+.if t \{void (*__mp_epilogue(void (*func)(const void *)))(const void *);
+\}
 void (*__mp_nomemory(void (*func)(void)))(void);
 .fi
 .SH DESCRIPTION
@@ -531,22 +546,23 @@ Obtains information about a specific memory allocation by placing statistics
 about \fIptr\fP in \fIinfo\fP.  If \fIptr\fP does not belong to a previously
 allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
 will be returned and \fIinfo\fP will contain the following information:
-.RS 0.6i
 
- \fBField\fP   \fBDescription\fP
+.TS
+l l.
+\fBField\fP	\fBDescription\fP
 
- \fBblock\fP   Pointer to first byte of alloc.
- \fBsize\fP    Size of alloc in bytes.
- \fBtype\fP    Type of function which allocated memory.
- \fBalloc\fP   Allocation index.
- \fBrealloc\fP Number of times reallocated.
- \fBthread\fP  Thread identifier.
- \fBfunc\fP    Function in which alloc took place.
- \fBfile\fP    File in which alloc took place.
- \fBline\fP    Line number at which alloc took place.
- \fBstack\fP   Pointer to function call stack.
- \fBfreed\fP   Indicates if alloc has been freed.
-.RE
+\fBblock\fP	Pointer to first byte of alloc.
+\fBsize\fP	Size of alloc in bytes.
+\fBtype\fP	Type of function which allocated memory.
+\fBalloc\fP	Allocation index.
+\fBrealloc\fP	Number of times reallocated.
+\fBthread\fP	Thread identifier.
+\fBfunc\fP	Function in which alloc took place.
+\fBfile\fP	File in which alloc took place.
+\fBline\fP	Line number at which alloc took place.
+\fBstack\fP	Pointer to function call stack.
+\fBfreed\fP	Indicates if alloc has been freed.
+.TE
 .TP
 \fB__mp_printinfo\fP
 Displays information about a specific memory allocation containing \fIptr\fP to
@@ -576,15 +592,16 @@ reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
 function had been previously installed.  The following arguments will be used
 to call the prologue function:
-.RS 0.6i
 
- \fBArgument 1\fP \fBArgument 2\fP \fBCalled by\fP
+.TS
+c c l.
+\fBArgument 1\fP	\fBArgument 2\fP	\fBCalled by\fP
 
- \fI-1\fP         \fIsize\fP       \fBmalloc\fP, etc.
- \fIptr\fP        \fIsize\fP       \fBrealloc\fP, etc.
- \fIptr\fP        \fI-1\fP         \fBfree\fP, etc.
- \fIptr\fP        \fI-2\fP         \fBstrdup\fP, etc.
-.RE
+\fI-1\fP	\fIsize\fP	\fBmalloc\fP, etc.
+\fIptr\fP	\fIsize\fP	\fBrealloc\fP, etc.
+\fIptr\fP	\fI-1\fP	\fBfree\fP, etc.
+\fIptr\fP	\fI-2\fP	\fBstrdup\fP, etc.
+.TE
 .TP
 \fB__mp_epilogue\fP
 Installs an epilogue function to be called after any memory allocation,
@@ -592,13 +609,14 @@ reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
 function had been previously installed.  The following arguments will be used
 to call the epilogue function:
-.RS 0.6i
 
- \fBArgument\fP \fBCalled by\fP
+.TS
+c l.
+\fBArgument\fP	\fBCalled by\fP
 
- \fIptr\fP      \fBmalloc\fP, \fBrealloc\fP, \fBstrdup\fP, etc.
- \fI-1\fP       \fBfree\fP, etc.
-.RE
+\fIptr\fP	\fBmalloc\fP, \fBrealloc\fP, \fBstrdup\fP, etc.
+\fI-1\fP	\fBfree\fP, etc.
+.TE
 .TP
 \fB__mp_nomemory\fP
 Installs a low-memory handler and returns a pointer to the previously installed
@@ -611,20 +629,20 @@ handler installed by that function.
 In order to use the mpatrol library on UNIX platforms, the following libraries
 must be linked in before any other library that defines dynamic memory
 allocation functions with the same names:
-.RS 0
 
- \fBLibrary\fP      \fBReason\fP
+.TS
+l l.
+\fBLibrary\fP	\fBReason\fP
 
- \fI\-lmpatrol\fP    To use this library.
- \fI\-lmpatrolmt\fP  To use the thread-safe mpatrol library.
- \fI\-lelf\fP        If built with ELF support.
- \fI\-lbfd\fP &      If built with BFD support.
-   \fI\-liberty\fP
- \fI\-lcl\fP         If built on HP/UX.
- \fI\-lexc\fP        If built on IRIX with library stack support.
- \fI\-lthread\fP     If built on DG/UX with threads support.
- \fI\-lpthread\fP    If built on UNIX with threads support.
-.RE
+\fI\-lmpatrol\fP	To use this library.
+\fI\-lmpatrolmt\fP	To use the thread-safe mpatrol library.
+\fI\-lelf\fP	If built with ELF support.
+\fI\-lbfd\fP & \fI\-liberty\fP	If built with BFD support.
+\fI\-lcl\fP	If built on HP/UX.
+\fI\-lexc\fP	If built on IRIX with library stack support.
+\fI\-lthread\fP	If built on DG/UX with threads support.
+\fI\-lpthread\fP	If built on UNIX with threads support.
+.TE
 .PP
 On UNIX platforms, if there were no calls to memory allocation functions before
 \fI\-lmpatrol\fP or \fI\-lmpatrolmt\fP appears on the link line then the mpatrol
