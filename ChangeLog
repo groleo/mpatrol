@@ -1,3 +1,41 @@
+Tue Oct 19 19:23:11 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* EXAMPLES:
+	Added information about the total warnings and errors displayed at
+	program termination.
+
+	* NOTES: Added information about 64-bit processors.
+
+	* src/diag.c:
+	Added information about the total number of warnings and errors.
+
+	* src/utils.h:
+	Added macro versions of some routines for efficiency reasons.
+
+	* src/utils.c:
+	Conditionally compile some routines depending on the macro
+	MP_MACROROUTINES.
+
+	* src/config.h:
+	Added the MP_MACROROUTINES macro which indicates if macro versions of
+	certain routines are to be used for efficiency reasons.
+
+	* src/memory.c:
+	Improved __mp_memcheck() to be much more efficient for large blocks of
+	memory.
+
+Sun Oct 17 11:30:12 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* NOTES: Added library performance figures and more related software.
+
+	* README: Changed Solaris 2.7 to Solaris 7.
+
+	* EXAMPLES: Added note about not using the library in release builds.
+
+Fri Oct 15 00:14:46 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* README: Documented the USEMMAP option.
+
 Thu Oct 14 23:59:42 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/option.c:
