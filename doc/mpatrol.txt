@@ -1699,7 +1699,7 @@ you will see the following near the bottom of the file.
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
      
-     ERROR: free: 0x080620E8 has not been allocated
+     ERROR: [NOTALL]: free: 0x080620E8 has not been allocated
      
      ...
 
@@ -3094,7 +3094,7 @@ output in `mpatrol.log'.
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
      
-     ERROR: free: 0x080620E9 does not match allocation of 0x080620E8
+     ERROR: [MISMAT]: free: 0x080620E9 does not match allocation of 0x080620E8
          0x080620E8 (16 bytes) {malloc:52:0} [main|test1.c|36]
              0x0804942F main+31
              0x4007C9CB __libc_start_main+255
@@ -3253,15 +3253,15 @@ annotated them as before.
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
      
-      (1)   (2)
-       |     |
-       V     V
-     ERROR: free: 0x080620E9 does not match allocation of 0x080620E8
-            (3)        (4)       (5)  (6)(7)  (8)    (9)  (10)
+      (1)     (2)      (3)
+       |       |        |
+       V       V        V
+     ERROR: [MISMAT]: free: 0x080620E9 does not match allocation of 0x080620E8
+            (4)        (5)       (6)  (7)(8)  (9)    (10) (11)
              |          |         |    |  |    |      |    |
              V          V         V    V  V    V      V    V
          0x080620E8 (16 bytes) {malloc:52:0} [main|test1.c|36]
-     (11) -> 0x0804942F main+31
+     (12) -> 0x0804942F main+31
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
 
@@ -3273,7 +3273,15 @@ annotated them as before.
      terminates the program if it is fatal, displaying any relevant
      information as it does this.
 
-  2. Allocation function.  This is the name of the function used to
+  2. Error abbreviation code.  This is a code that is different for
+     each type of error that is detected by the mpatrol library.  Some
+     warnings and errors that are not directly related to the program
+     being run will not contain this field.  See the appendix on
+     diagnostic messages (*note Diagnostic messages::) for a complete
+     list of all possible error abbreviation codes and their
+     descriptions.
+
+  3. Allocation function.  This is the name of the function used to
      allocate, reallocate or free memory where the error was detected.
      This may be omitted if an error is detected elsewhere in the
      library.
@@ -3285,37 +3293,37 @@ individual memory allocations are required.  If any information is
 missing then it simply means that the library was not able to determine
 it when the memory block was first allocated.
 
-  3. Address of memory allocation.
+  4. Address of memory allocation.
 
-  4. Size of memory allocation.
+  5. Size of memory allocation.
 
-  5. Allocation function.  This is the name of the function that was
+  6. Allocation function.  This is the name of the function that was
      called to allocate the memory block, in this case `malloc'.  If
      the memory allocation has been resized then this will be either
      `realloc', `recalloc' or `expand'.
 
-  6. Allocation index.
+  7. Allocation index.
 
-  7. Reallocation index.  This is used to count the number of times a
+  8. Reallocation index.  This is used to count the number of times a
      memory allocation has been resized with `realloc()', `recalloc()'
      or `expand()'.
 
-  8. Function where original call to `malloc()' took place.  If the
+  9. Function where original call to `malloc()' took place.  If the
      memory allocation has been resized then this will be the name of
      the function which last called `realloc()', `recalloc()' or
      `expand()'.
 
-  9. Filename in which original call to `malloc()' took place.  If the
+ 10. Filename in which original call to `malloc()' took place.  If the
      memory allocation has been resized then this will be the filename
      in which the last call to `realloc()', `recalloc()' or `expand()'
      took place.
 
- 10. Line number at which original call to `malloc()' took place.  If
+ 11. Line number at which original call to `malloc()' took place.  If
      the memory allocation has been resized then this will be the line
      number at which the last call to `realloc()', `recalloc()' or
      `expand()' took place.
 
- 11. Function call stack of original memory allocation.  If the memory
+ 12. Function call stack of original memory allocation.  If the memory
      allocation has been resized then this will be the call stack of
      the last call to `realloc()', `recalloc()' or `expand()'.
 
@@ -3618,7 +3626,7 @@ of the log messages should be familiar to you now.
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
      
-     ERROR: realloc: 0x080620E8 has not been allocated
+     ERROR: [NOTALL]: realloc: 0x080620E8 has not been allocated
      
      returns 0x00000000
 
@@ -3660,7 +3668,7 @@ variable you should see the following entries in `mpatrol.log' instead.
              0x4007C9CB __libc_start_main+255
              0x08049381 _start+33
      
-     ERROR: realloc: 0x08062F54 was freed with free
+     ERROR: [PRVFRD]: realloc: 0x08062F54 was freed with free
          0x08062F54 (16 bytes) {free:52:0} [main|test2.c|38]
              0x08049456 main+70
              0x4007C9CB __libc_start_main+255
@@ -3731,7 +3739,7 @@ free memory.
 that this test was run using the same `MPATROL_OPTIONS' settings as the
 last example, but make sure that `PRESERVE' is not set.
 
-     ERROR: freed allocation 0x08062F54 has memory corruption at 0x08062F5C
+     ERROR: [FRDCOR]: freed allocation 0x08062F54 has memory corruption at 0x08062F5C
              0x08062F5C  00555555 55555555                    .UUUUUUU
      
          0x08062F54 (16 bytes) {free:52:0} [main|test4.c|38]
@@ -3791,7 +3799,7 @@ but will serve for this example) and each character represents 1 byte.
 the `MPATROL_OPTIONS' environment variable then the following error
 will be produced instead of the original error.
 
-     ERROR: illegal memory access at address 0x081C6008
+     ERROR: [ILLMEM]: illegal memory access at address 0x081C6008
          0x081C6000 (16 bytes) {free:52:0} [main|test4.c|38]
              0x08049456 main+70
              0x4007C9CB __libc_start_main+255
@@ -3882,7 +3890,8 @@ this example.  The test is located in `tests/fail/test5.c', and
 
    The following error should be produced in `mpatrol.log'.
 
-     ERROR: allocation 0x08062FB8 has a corrupted overflow buffer at 0x08062FB7
+     ERROR: [ALLOVF]: allocation 0x08062FB8 has a corrupted overflow buffer at
+                      0x08062FB7
              0x08062FB6  AA74                                 .t
      
          0x08062FB8 (16 bytes) {malloc:52:0} [main|test5.c|38]
@@ -3959,7 +3968,8 @@ source can be found in `tests/fail/test9.c'.
    When this is compiled and run, the following should appear in the
 log file.
 
-     ERROR: memset: range [0x08062FB7,0x08062FC8] overflows [0x08062FB8,0x08062FC7]
+     ERROR: [RNGOVF]: memset: range [0x08062FB7,0x08062FC8] overflows
+                      [0x08062FB8,0x08062FC7]
          0x08062FB8 (16 bytes) {malloc:52:0} [main|test9.c|37]
              0x0804942F main+31
              0x4007C9CB __libc_start_main+255
@@ -4055,7 +4065,7 @@ operators.  The source is in `tests/fail/test7.c', and
              0x400DB9CB __libc_start_main+255
              0x080494C1 _start+33
      
-     ERROR: operator delete: 0x08062FC0 was allocated with operator new[]
+     ERROR: [INCOMP]: operator delete: 0x08062FC0 was allocated with operator new[]
          0x08062FC0 (16 bytes) {operator new[]:74:0} [int main()|test7.c|36]
              0x0804955D main+13
              0x400DB9CB __libc_start_main+255
@@ -4369,7 +4379,7 @@ should see the following in `mpatrol.log'.
              0x00013524 main+20
              0x00013308 _start+100
      
-     ERROR: memcpy: attempt to perform operation on freed memory
+     ERROR: [FRDOPN]: memcpy: attempt to perform operation on freed memory
          0x0008C000 (5 bytes) {alloca:1:0} [g|test16.c|49]
              0x000134F8 g+120
              0x00013524 main+20
@@ -4381,7 +4391,7 @@ should see the following in `mpatrol.log'.
              0x00013550 main+64
              0x00013308 _start+100
      
-     ERROR: free: 0x0008C000 was freed with alloca
+     ERROR: [PRVFRD]: free: 0x0008C000 was freed with alloca
          0x0008C000 (5 bytes) {alloca:1:0} [g|test16.c|49]
              0x000134F8 g+120
              0x00013524 main+20
@@ -4798,7 +4808,7 @@ non-empty input lines should cause it to abort!
    If you look at the `mpatrol.log' file produced, you should see
 something along the lines of the following at the end of the log file.
 
-     ERROR: free memory corruption at 0x08067FF6
+     ERROR: [FRECOR]: free memory corruption at 0x08067FF6
              0x08067FF6  00555555 55555555 5555               .UUUUUUUUU
 
    This tells us that something has written a zero byte into free
@@ -4830,7 +4840,8 @@ add the option `OFLOWSIZE=8' to the `MPATROL_OPTIONS' environment
 variable then we get slightly more information about which memory
 allocation was affected(3).
 
-     ERROR: allocation 0x08071E34 has a corrupted overflow buffer at 0x08071E36
+     ERROR: [ALLOVF]: allocation 0x08071E34 has a corrupted overflow buffer at
+                      0x08071E36
              0x08071E36  00AAAAAA AAAAAAAA                    ........
      
          0x08071E34 (2 bytes) {malloc:68:0} [strtoupper|test1.c|42]
@@ -6245,161 +6256,10 @@ errors may also appear in the log file, but they are likely to be
 associated with parsing options and reading symbols from executable
 files and so should be self-explanatory.
 
-   * `%1 does not match allocation of %2'
-    Type
-          Error
+   * `ALLOVF'
+    Message
+          `allocation %1 has a corrupted overflow buffer at %2'
 
-    `%1'
-          The pointer to the memory allocation that is to be resized or
-          freed.
-
-    `%2'
-          The pointer to the memory allocation that the mpatrol library
-          knows about.
-
-    Cause
-          A function was called to resize or free a memory allocation
-          that begins at a different address from that supplied.
-
-    Additional
-          The log file entry and information about the original memory
-          allocation.
-
-    Result
-          The reallocation or deallocation fails and execution
-          continues.
-
-   * `%1 has not been allocated'
-    Type
-          Error
-
-    `%1'
-          The pointer to the memory allocation that is to be resized or
-          freed.
-
-    Cause
-          A function was called to resize or free a memory allocation
-          that has not been allocated.  It may be that the memory
-          allocation has just been freed, in which case the `NOFREE'
-          option should be used to provide a better diagnostic message.
-
-    Additional
-          The log file entry.
-
-    Result
-          The reallocation or deallocation fails and execution
-          continues.
-
-   * `%1 was allocated with %2'
-    Type
-          Error
-
-    `%1'
-          The pointer to the memory allocation that is to be resized or
-          freed.
-
-    `%2'
-          The name of the function which originally allocated the
-          memory allocation.
-
-    Cause
-          A function was called to resize or free a memory allocation
-          that was allocated with a function that is incompatible with
-          the current request.  For example, a memory allocation which
-          was allocated with `operator new' being resized with
-          `realloc()'.
-
-    Additional
-          The log file entry and information about the original memory
-          allocation.
-
-    Result
-          The reallocation or deallocation fails and execution
-          continues.
-
-   * `%1 was freed with %2'
-    Type
-          Error
-
-    `%1'
-          The pointer to the memory allocation that is to be resized or
-          freed.
-
-    `%2'
-          The name of the function which originally freed the memory
-          allocation.
-
-    Cause
-          A function was called to resize or free a memory allocation
-          that had previously been freed when the `NOFREE' option was
-          used.
-
-    Additional
-          The log file entry and information about the original memory
-          allocation.
-
-    Result
-          The reallocation or deallocation fails and execution
-          continues.
-
-   * `alignment 0 is invalid'
-    Type
-          Warning
-
-    Cause
-          The `memalign()' function was called to allocate memory with
-          an alignment of `0' when either of the `CHECKALL' or
-          `CHECKALLOCS' options were used.
-
-    Additional
-          The log file entry.
-
-    Result
-          The alignment is set to the system page size and execution
-          continues.
-
-   * `alignment %1 is greater than the system page size'
-    Type
-          Warning
-
-    `%1'
-          The alignment in bytes.
-
-    Cause
-          The `memalign()' function was called to allocate memory with
-          an alignment which was greater than the system page size when
-          either of the `CHECKALL' or `CHECKALLOCS' options were used.
-          The mpatrol library cannot currently align memory allocations
-          to a byte alignment over this limit, but then neither can
-          most other implementations.
-
-    Additional
-          The log file entry.
-
-    Result
-          The alignment is set to the system page size and execution
-          continues.
-
-   * `alignment %1 is not a power of two'
-    Type
-          Warning
-
-    `%1'
-          The alignment in bytes.
-
-    Cause
-          The `memalign()' function was called to allocate memory with
-          an alignment which was not a power of two when either of the
-          `CHECKALL' or `CHECKALLOCS' options were used.
-
-    Additional
-          The log file entry.
-
-    Result
-          The alignment is rounded up to the nearest power of two and
-          execution continues.
-
-   * `allocation %1 has a corrupted overflow buffer at %2'
     Type
           Error
 
@@ -6426,7 +6286,10 @@ files and so should be self-explanatory.
     Result
           Execution terminates.
 
-   * `attempt to create an allocation of size 0'
+   * `ALLZER'
+    Message
+          `attempt to create an allocation of size 0'
+
     Type
           Warning
 
@@ -6443,153 +6306,32 @@ files and so should be self-explanatory.
     Result
           The size is increased to 1 byte and execution continues.
 
-   * `attempt to free a NULL pointer'
+   * `BADALN'
+    Message
+          `alignment %1 is not a power of two'
+
     Type
           Warning
-
-    Cause
-          A function was called to free an existing memory allocation
-          with a pointer of `NULL' when either of the `CHECKALL' or
-          `CHECKFREES' options were used.  This warning will not occur
-          by default as the ANSI C/C++ standards allow this behaviour,
-          and it is really only a portability issue.
-
-    Additional
-          The log file entry.
-
-    Result
-          No memory allocation will be freed and execution continues.
-
-   * `attempt to perform operation on a NULL pointer'
-    Type
-          Error
-
-    Cause
-          A memory operation function was called to operate on a `NULL'
-          pointer.  If the length of the operation was zero then this
-          error will only occur when the `CHECKALL' or `CHECKMEMORY'
-          options were used as the ANSI C/C++ standards allow this
-          behaviour, and it is really only a portability issue.
-
-    Additional
-          No additional information.
-
-    Result
-          The memory operation fails and execution continues.
-
-   * `attempt to perform operation on free memory'
-    Type
-          Error
-
-    Cause
-          A memory operation function was called to operate on free
-          memory.
-
-    Additional
-          No additional information.
-
-    Result
-          The memory operation fails and execution continues.
-
-   * `attempt to perform operation on freed memory'
-    Type
-          Error
-
-    Cause
-          A memory operation function was called to operate on a
-          previously freed memory allocation when the `NOFREE' option
-          was used.
-
-    Additional
-          Information about the original memory allocation.
-
-    Result
-          The memory operation fails and execution continues.
-
-   * `attempt to resize a NULL pointer'
-    Type
-          Warning
-
-    Cause
-          A function was called to resize an existing memory allocation
-          with a pointer of `NULL' when either of the `CHECKALL' or
-          `CHECKREALLOCS' options were used.  This warning will not
-          occur by default as the ANSI C/C++ standards allow this
-          behaviour, and it is really only a portability issue.
-
-    Additional
-          The log file entry.
-
-    Result
-          A new memory allocation is returned and execution continues.
-
-   * `attempt to resize an allocation to size 0'
-    Type
-          Warning
-
-    Cause
-          A function was called to resize an existing memory allocation
-          to a size of `0' when either of the `CHECKALL' or
-          `CHECKREALLOCS' options were used.  This warning will not
-          occur by default as the ANSI C/C++ standards allow this
-          behaviour, and it is really only a portability issue.
-
-    Additional
-          The log file entry.
-
-    Result
-          The existing memory allocation will be freed and execution
-          continues.
-
-   * `free memory corruption at %1'
-    Type
-          Error
 
     `%1'
-          The pointer to the first byte of corruption in free memory.
+          The alignment in bytes.
 
     Cause
-          Something has corrupted the contents of the free memory pool
-          and this has been caught at the next invocation of an mpatrol
-          function.  This particular error message will not occur if
-          the `PAGEALLOC' option was used since all free memory will be
-          write protected.
+          The `memalign()' function was called to allocate memory with
+          an alignment which was not a power of two when either of the
+          `CHECKALL' or `CHECKALLOCS' options were used.
 
     Additional
-          The library summary and the contents of the free memory block.
+          The log file entry.
 
     Result
-          Execution terminates.
+          The alignment is rounded up to the nearest power of two and
+          execution continues.
 
-   * `freed allocation %1 has a corrupted overflow buffer at %2'
-    Type
-          Error
+   * `FRDCOR'
+    Message
+          `freed allocation %1 has memory corruption at %2'
 
-    `%1'
-          The pointer to the freed memory allocation that has a
-          corrupted overflow buffer.
-
-    `%2'
-          The pointer to the first byte of corruption in the freed
-          memory allocation's overflow buffer.
-
-    Cause
-          Something has corrupted the overflow buffer of a previously
-          freed memory allocation and this has been caught at the next
-          invocation of an mpatrol function when the `NOFREE' option
-          was used in conjunction with the `OFLOWSIZE' or `PAGEALLOC'
-          options.  This particular error message will not occur if the
-          `OFLOWWATCH' option was used since all overflow buffers will
-          be write protected.
-
-    Additional
-          The library summary, the contents of the overflow buffer and
-          information about the original memory allocation.
-
-    Result
-          Execution terminates.
-
-   * `freed allocation %1 has memory corruption at %2'
     Type
           Error
 
@@ -6618,7 +6360,119 @@ files and so should be self-explanatory.
     Result
           Execution terminates.
 
-   * `illegal memory access at address %1'
+   * `FRDOPN'
+    Message
+          `attempt to perform operation on freed memory'
+
+    Type
+          Error
+
+    Cause
+          A memory operation function was called to operate on a
+          previously freed memory allocation when the `NOFREE' option
+          was used.
+
+    Additional
+          Information about the original memory allocation.
+
+    Result
+          The memory operation fails and execution continues.
+
+   * `FRDOVF'
+    Message
+          `freed allocation %1 has a corrupted overflow buffer at %2'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the freed memory allocation that has a
+          corrupted overflow buffer.
+
+    `%2'
+          The pointer to the first byte of corruption in the freed
+          memory allocation's overflow buffer.
+
+    Cause
+          Something has corrupted the overflow buffer of a previously
+          freed memory allocation and this has been caught at the next
+          invocation of an mpatrol function when the `NOFREE' option
+          was used in conjunction with the `OFLOWSIZE' or `PAGEALLOC'
+          options.  This particular error message will not occur if the
+          `OFLOWWATCH' option was used since all overflow buffers will
+          be write protected.
+
+    Additional
+          The library summary, the contents of the overflow buffer and
+          information about the original memory allocation.
+
+    Result
+          Execution terminates.
+
+   * `FRECOR'
+    Message
+          `free memory corruption at %1'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the first byte of corruption in free memory.
+
+    Cause
+          Something has corrupted the contents of the free memory pool
+          and this has been caught at the next invocation of an mpatrol
+          function.  This particular error message will not occur if
+          the `PAGEALLOC' option was used since all free memory will be
+          write protected.
+
+    Additional
+          The library summary and the contents of the free memory block.
+
+    Result
+          Execution terminates.
+
+   * `FRENUL'
+    Message
+          `attempt to free a NULL pointer'
+
+    Type
+          Warning
+
+    Cause
+          A function was called to free an existing memory allocation
+          with a pointer of `NULL' when either of the `CHECKALL' or
+          `CHECKFREES' options were used.  This warning will not occur
+          by default as the ANSI C/C++ standards allow this behaviour,
+          and it is really only a portability issue.
+
+    Additional
+          The log file entry.
+
+    Result
+          No memory allocation will be freed and execution continues.
+
+   * `FREOPN'
+    Message
+          `attempt to perform operation on free memory'
+
+    Type
+          Error
+
+    Cause
+          A memory operation function was called to operate on free
+          memory.
+
+    Additional
+          No additional information.
+
+    Result
+          The memory operation fails and execution continues.
+
+   * `ILLMEM'
+    Message
+          `illegal memory access at address %1'
+
     Type
           Error
 
@@ -6643,7 +6497,136 @@ files and so should be self-explanatory.
     Result
           Execution terminates.
 
-   * `out of memory'
+   * `INCOMP'
+    Message
+          `%1 was allocated with %2'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the memory allocation that is to be resized or
+          freed.
+
+    `%2'
+          The name of the function which originally allocated the
+          memory allocation.
+
+    Cause
+          A function was called to resize or free a memory allocation
+          that was allocated with a function that is incompatible with
+          the current request.  For example, a memory allocation which
+          was allocated with `operator new' being resized with
+          `realloc()'.
+
+    Additional
+          The log file entry and information about the original memory
+          allocation.
+
+    Result
+          The reallocation or deallocation fails and execution
+          continues.
+
+   * `MAXALN'
+    Message
+          `alignment %1 is greater than the system page size'
+
+    Type
+          Warning
+
+    `%1'
+          The alignment in bytes.
+
+    Cause
+          The `memalign()' function was called to allocate memory with
+          an alignment which was greater than the system page size when
+          either of the `CHECKALL' or `CHECKALLOCS' options were used.
+          The mpatrol library cannot currently align memory allocations
+          to a byte alignment over this limit, but then neither can
+          most other implementations.
+
+    Additional
+          The log file entry.
+
+    Result
+          The alignment is set to the system page size and execution
+          continues.
+
+   * `MISMAT'
+    Message
+          `%1 does not match allocation of %2'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the memory allocation that is to be resized or
+          freed.
+
+    `%2'
+          The pointer to the memory allocation that the mpatrol library
+          knows about.
+
+    Cause
+          A function was called to resize or free a memory allocation
+          that begins at a different address from that supplied.
+
+    Additional
+          The log file entry and information about the original memory
+          allocation.
+
+    Result
+          The reallocation or deallocation fails and execution
+          continues.
+
+   * `NOTALL'
+    Message
+          `%1 has not been allocated'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the memory allocation that is to be resized or
+          freed.
+
+    Cause
+          A function was called to resize or free a memory allocation
+          that has not been allocated.  It may be that the memory
+          allocation has just been freed, in which case the `NOFREE'
+          option should be used to provide a better diagnostic message.
+
+    Additional
+          The log file entry.
+
+    Result
+          The reallocation or deallocation fails and execution
+          continues.
+
+   * `NULOPN'
+    Message
+          `attempt to perform operation on a NULL pointer'
+
+    Type
+          Error
+
+    Cause
+          A memory operation function was called to operate on a `NULL'
+          pointer.  If the length of the operation was zero then this
+          error will only occur when the `CHECKALL' or `CHECKMEMORY'
+          options were used as the ANSI C/C++ standards allow this
+          behaviour, and it is really only a portability issue.
+
+    Additional
+          No additional information.
+
+    Result
+          The memory operation fails and execution continues.
+
+   * `OUTMEM'
+    Message
+          `out of memory'
+
     Type
           Error
 
@@ -6658,7 +6641,38 @@ files and so should be self-explanatory.
     Result
           Execution terminates.
 
-   * `range [%1,%2] overflows [%3,%4]'
+   * `PRVFRD'
+    Message
+          `%1 was freed with %2'
+
+    Type
+          Error
+
+    `%1'
+          The pointer to the memory allocation that is to be resized or
+          freed.
+
+    `%2'
+          The name of the function which originally freed the memory
+          allocation.
+
+    Cause
+          A function was called to resize or free a memory allocation
+          that had previously been freed when the `NOFREE' option was
+          used.
+
+    Additional
+          The log file entry and information about the original memory
+          allocation.
+
+    Result
+          The reallocation or deallocation fails and execution
+          continues.
+
+   * `RNGOVF'
+    Message
+          `range [%1,%2] overflows [%3,%4]'
+
     Type
           Warning/Error
 
@@ -6687,7 +6701,10 @@ files and so should be self-explanatory.
           from an error to a warning) if the `ALLOWOFLOW' option was
           used, but execution will continue regardless.
 
-   * `range [%1,%2] overlaps [%3,%4]'
+   * `RNGOVL'
+    Message
+          `range [%1,%2] overlaps [%3,%4]'
+
     Type
           Warning
 
@@ -6716,7 +6733,51 @@ files and so should be self-explanatory.
           The copy operation will still be performed but it will deal
           correctly with overlapping memory regions.
 
-   * `string %1 overflows [%2,%3]'
+   * `RSZNUL'
+    Message
+          `attempt to resize a NULL pointer'
+
+    Type
+          Warning
+
+    Cause
+          A function was called to resize an existing memory allocation
+          with a pointer of `NULL' when either of the `CHECKALL' or
+          `CHECKREALLOCS' options were used.  This warning will not
+          occur by default as the ANSI C/C++ standards allow this
+          behaviour, and it is really only a portability issue.
+
+    Additional
+          The log file entry.
+
+    Result
+          A new memory allocation is returned and execution continues.
+
+   * `RSZZER'
+    Message
+          `attempt to resize an allocation to size 0'
+
+    Type
+          Warning
+
+    Cause
+          A function was called to resize an existing memory allocation
+          to a size of `0' when either of the `CHECKALL' or
+          `CHECKREALLOCS' options were used.  This warning will not
+          occur by default as the ANSI C/C++ standards allow this
+          behaviour, and it is really only a portability issue.
+
+    Additional
+          The log file entry.
+
+    Result
+          The existing memory allocation will be freed and execution
+          continues.
+
+   * `STROVF'
+    Message
+          `string %1 overflows [%2,%3]'
+
     Type
           Error
 
@@ -6738,6 +6799,25 @@ files and so should be self-explanatory.
 
     Result
           The operation will not be performed and execution continues.
+
+   * `ZERALN'
+    Message
+          `alignment 0 is invalid'
+
+    Type
+          Warning
+
+    Cause
+          The `memalign()' function was called to allocate memory with
+          an alignment of `0' when either of the `CHECKALL' or
+          `CHECKALLOCS' options were used.
+
+    Additional
+          The log file entry.
+
+    Result
+          The alignment is set to the system page size and execution
+          continues.
 
 Appendix E Library performance
 ******************************
@@ -7043,6 +7123,9 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
+        * The `mpedit' command does not work due to the lack of a `nl'
+          command on the system.
+
    * LynxOS 3.0.0, Intel Pentium Pro, COFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
@@ -7060,6 +7143,9 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
+        * The `mpedit' command does not work due to the lack of a `nl'
+          command on the system.
+
    * LynxOS 3.0.0, PowerPC, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
@@ -7074,6 +7160,9 @@ supported on that system.
 
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
+
+        * The `mpedit' command does not work due to the lack of a `nl'
+          command on the system.
 
    * LynxOS 3.0.0, PowerPC, XCOFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -7091,6 +7180,9 @@ supported on that system.
 
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
+
+        * The `mpedit' command does not work due to the lack of a `nl'
+          command on the system.
 
    * SINIX 5.43, MIPS R4000, ELF32, `cc'
         * The thread-safe version of the library does not work.  This
@@ -7397,10 +7489,6 @@ H.1 Notes for all platforms
 
    * Add functions to start and stop profiling, and perhaps also to
      clear the profiling tables and begin a new profiling output file.
-     In addition, support for the `PROFDIR' environment variable could
-     be added, with functionality similar to the other UNIX profiling
-     tools.  Something similar could also be done with the `LOGDIR'
-     environment variable.
 
    * Perhaps add the ability to profile memory operations such as
      `memcpy()' and `memset()' to the existing memory allocation
@@ -10557,8 +10645,12 @@ ALLOCBYTE:
           See ``Appendix B Environment''.
 ALLOCSTOP:                                         
           See ``Appendix B Environment''.
+ALLOVF:                                            
+          See ``Appendix D Diagnostic messages''.
 ALLOWOFLOW:                                        
           See ``Appendix B Environment''.
+ALLZER:                                            
+          See ``Appendix D Diagnostic messages''.
 amalloc:                                            See 9.
 Amiga 4000/040:                                     See 3.
 Amiga notes:                                       
@@ -10589,6 +10681,8 @@ AUTOSAVE:
           See ``Appendix B Environment''.
 backwards compatibility:                           
           See ``I.3 Linking''.
+BADALN:                                            
+          See ``Appendix D Diagnostic messages''.
 bash:                                               See 7.8.
 BASIC:                                              See 5.
 batch testing:                                      See 7.6.
@@ -10750,6 +10844,7 @@ ENVIRON:
 environment:                                       
           See ``Appendix B Environment''.
 epilogue function:                                  See 11.1.
+error abbreviation code:                            See 11.1.
 error severity:                                     See 11.1.
 errors:                                            
           See ``Appendix D Diagnostic messages''.
@@ -10788,6 +10883,14 @@ Fortify:
 FORTRAN:                                            See 5.
 frame pointer:                                     
           See ``I.4 Running''.
+FRDCOR:                                            
+          See ``Appendix D Diagnostic messages''.
+FRDOPN:                                            
+          See ``Appendix D Diagnostic messages''.
+FRDOVF:                                            
+          See ``Appendix D Diagnostic messages''.
+FRECOR:                                            
+          See ``Appendix D Diagnostic messages''.
 free blocks:                                        See 11.1.
 free byte:                                          See 7.3.
 free memory:                                        See 7.3.
@@ -10798,6 +10901,10 @@ freed memory:                                       See 7.3.
 freed queue:                                        See 11.1.
 FREESTOP:                                          
           See ``Appendix B Environment''.
+FRENUL:                                            
+          See ``Appendix D Diagnostic messages''.
+FREOPN:                                            
+          See ``Appendix D Diagnostic messages''.
 frequently asked questions:                        
           See ``Appendix I Frequently asked questions''.
 FreshMeat:                                         
@@ -10853,8 +10960,12 @@ Hyperlearning Center:
 IBM Corporation:                                   
           See ``Appendix J Related software''.
 illegal memory accesses:                            See 11.3.
+ILLMEM:                                            
+          See ``Appendix D Diagnostic messages''.
 implementation details:                             See 10.
 improving performance:                              See 9.
+INCOMP:                                            
+          See ``Appendix D Diagnostic messages''.
 INFOPATH:                                          
           See ``I.1 Documentation''.
 information about an allocation:                   
@@ -10985,6 +11096,8 @@ map of memory:                                      See 7.2.
 mapmalloc(3x):                                     
           See ``Appendix J Related software''.
 mapping files:                                      See 6.1.
+MAXALN:                                            
+          See ``Appendix D Diagnostic messages''.
 MCheck:                                            
           See ``Appendix J Related software''.
 MEDIUMBOUND:                                       
@@ -11035,6 +11148,8 @@ Microsoft:
           See ``Appendix G Supported systems''.
 misaligned data:                                    See 7.1.
 misaligned memory accesses:                         See 6.1.
+MISMAT:                                            
+          See ``Appendix D Diagnostic messages''.
 ML:                                                 See 5.3.
 mleak:                                              See 7.8.
 MM (Shared Memory Library):                        
@@ -11107,6 +11222,8 @@ NOFREE:
 non-static local variables:                         See 5.2.
 NOPROTECT:                                         
           See ``Appendix B Environment''.
+NOTALL:                                            
+          See ``Appendix D Diagnostic messages''.
 notes:                                             
           See ``Appendix H Notes''.
 notes for all platforms:                           
@@ -11119,6 +11236,8 @@ notes for UNIX platforms:
           See ``H.2 Notes for UNIX platforms''.
 notes for Windows platforms:                       
           See ``H.4 Notes for Windows platforms''.
+NULOPN:                                            
+          See ``Appendix D Diagnostic messages''.
 NuMega Corporation:                                
           See ``Appendix J Related software''.
 object file formats, adding support:               
@@ -11152,6 +11271,8 @@ options:
 original implementation:                            See 10.
 other programs:                                    
           See ``Appendix J Related software''.
+OUTMEM:                                            
+          See ``Appendix D Diagnostic messages''.
 overflow buffers:                                   See 7.4.
 overflow byte:                                      See 7.4.
 overflow size:                                      See 7.4.
@@ -11216,6 +11337,8 @@ program counter:                                    See 6.2.
 programs:                                          
           See ``Appendix J Related software''.
 prologue function:                                  See 11.1.
+PRVFRD:                                            
+          See ``Appendix D Diagnostic messages''.
 Purify:                                            
           See ``Appendix J Related software''.
 QC:                                                
@@ -11248,7 +11371,15 @@ resources:
           See ``Appendix K References''.
 return address:                                     See 6.2.
 RISC:                                               See 6.2.
+RNGOVF:                                            
+          See ``Appendix D Diagnostic messages''.
+RNGOVL:                                            
+          See ``Appendix D Diagnostic messages''.
 RPM package:                                        See 3.
+RSZNUL:                                            
+          See ``Appendix D Diagnostic messages''.
+RSZZER:                                            
+          See ``Appendix D Diagnostic messages''.
 run-time errors:                                    See 1.
 running questions:                                 
           See ``I.4 Running''.
@@ -11311,6 +11442,8 @@ Stratosware Corporation:
           See ``Appendix J Related software''.
 stress testing:                                     See 9.
 stripped executable file:                           See 7.1.
+STROVF:                                            
+          See ``Appendix D Diagnostic messages''.
 summary of options:                                
           See ``Appendix B Environment''.
 supported systems:                                 
@@ -11413,6 +11546,8 @@ YaMa:
           See ``Appendix J Related software''.
 YAMD (Yet Another Malloc Debugger):                
           See ``Appendix J Related software''.
+ZERALN:                                            
+          See ``Appendix D Diagnostic messages''.
 ZeroFault:                                         
           See ``Appendix J Related software''.
 ZIP archive:                                        See 3.
