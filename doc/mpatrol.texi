@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.4 1999-11-15 21:34:03 graeme Exp $
+@c $Id: mpatrol.texi,v 1.5 1999-11-16 01:05:13 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.0
 @set VERSION 1.0.5
-@set UPDATED 15th November, 1999
+@set UPDATED 16th November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -144,6 +144,15 @@ freeware or as commercial products.  Try to keep in mind that mpatrol comes with
 absolutely no warranty and so if it doesn't work for you and you need a fast
 solution, try some of the other libraries or products available.  I have listed
 some of the most popular at the end of this manual (@pxref{Related software}).
+
+@cindex manual layout
+This manual is arranged so that complete reference material on the mpatrol
+library can be found in the appendices, while introductory and background
+material can be found in the preceding chapters and sections.  For readers who
+wish to delve right in and use the library, the Installation
+(@pxref{Installation}) and Examples (@pxref{Examples}) chapters should be enough
+to get started.  Otherwise, this manual should be read from beginning to end in
+order to get the most out of the software it describes.
 
 @cindex bug reports
 @cindex reporting bugs
@@ -746,7 +755,7 @@ off the end of a dynamically-allocated array, etc.  It is these types of memory
 allocation problems that the mpatrol library loves to get its teeth into!
 
 @node Examples, Functions, Memory allocations, Top
-@appendix Examples
+@chapter Examples
 @cindex examples
 @cindex tutorial
 
@@ -810,7 +819,7 @@ then running a program that has been linked with the library.
 @end menu
 
 @node Example 1, Example 2, , Examples
-@appendixsec Getting started
+@section Getting started
 
 @cindex crash
 The first example we'll look at is when the argument in a call to @code{free()}
@@ -1317,7 +1326,7 @@ program termination.
 @end enumerate
 
 @node Example 2, Example 3, Example 1, Examples
-@appendixsec Detecting incorrect reuse of freed memory
+@section Detecting incorrect reuse of freed memory
 
 The next example uses @file{tests/fail/test2.c} to illustrate how the mpatrol
 library can detect whereabouts on the heap an address belongs.
@@ -1435,7 +1444,7 @@ help in situations when you need to determine exactly if a program is relying on
 the contents of freed memory.
 
 @node Example 3, Example 4, Example 2, Examples
-@appendixsec Detecting use of free memory
+@section Detecting use of free memory
 
 This next example illustrates how the mpatrol library is able to check to see
 if anything has been written into free memory.  The test is located in
@@ -1591,7 +1600,7 @@ means that the program would have to read six bytes beyond the end of the
 allocation before the illegal memory access would be detected.
 
 @node Example 4, Example 5, Example 3, Examples
-@appendixsec Using overflow buffers
+@section Using overflow buffers
 
 This example illustrates the use of overflow buffers and so the
 @env{MPATROL_OPTIONS} environment variable should have @option{OFLOWSIZE=2}
@@ -1671,7 +1680,7 @@ it accesses a watch point area.  Slowing the program down by a factor of 10,000
 is not uncommon on some systems when the @option{OFLOWWATCH} option is used.
 
 @node Example 5, Example 6, Example 4, Examples
-@appendixsec Incompatible function calls
+@section Incompatible function calls
 
 This example illustrates how the mpatrol library checks for calls to
 incompatible pairs of memory allocation functions.  It requires the use of
@@ -1728,7 +1737,7 @@ Hence, the library reports this as an error and does not free the memory
 allocation.
 
 @node Example 6, , Example 5, Examples
-@appendixsec Additional useful information
+@section Additional useful information
 
 @cindex memory leaks
 This last example illustrates the various @option{SHOW} options that are
