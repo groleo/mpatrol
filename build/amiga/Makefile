@@ -18,37 +18,38 @@
 # MA 02111-1307, USA.
 
 
-# SAS/C Makefile to compile on AmigaOS with SAS/C
+# GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: SMakefile,v 1.5 2000-03-20 23:14:32 graeme Exp $
+# $Id: Makefile,v 1.1 2000-03-20 23:14:31 graeme Exp $
 
 
 # Definitions
 
-CC = SC
-AR = OML
+CC = gcc
+AR = ar
 
-SOURCE = //src
+SOURCE = ../../src
+VPATH  = $(SOURCE)
 
-CFLAGS = STKEXT NOVER IDIR $(SOURCE)
-OFLAGS = OPT STRMER
-TFLAGS = DEF MP_THREADS_SUPPORT=1
+CFLAGS = -I$(SOURCE)
+OFLAGS = -O3 -fno-inline-functions
+TFLAGS = -DMP_THREADS_SUPPORT
 
 LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-		  inter.o version.o
+		  inter.o malloc.o version.o
 ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o inter.t.o \
-		  version.t.o
+		  malloc.t.o version.t.o
 
-ARCHIVE_LIBRARY	= $(LIBRARY).lib
-OBJECT_LIBRARY	= $(LIBRARY).o
-ARCHTS_LIBRARY	= $(LIBRARY)mt.lib
-OBJTS_LIBRARY	= $(LIBRARY)mt.o
+ARCHIVE_LIBRARY	= lib$(LIBRARY).a
+OBJECT_LIBRARY	= lib$(LIBRARY).o
+ARCHTS_LIBRARY	= lib$(LIBRARY)mt.a
+OBJTS_LIBRARY	= lib$(LIBRARY)mt.o
 
 
 # Rules
@@ -56,22 +57,22 @@ OBJTS_LIBRARY	= $(LIBRARY)mt.o
 .SUFFIXES: .c .o .t.o
 
 .c.o:
-	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $<
+	$(CC) $(CFLAGS) $(OFLAGS) -c $<
 
 .c.t.o:
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $<
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
-	$(AR) -n $@ REPLACE $(ARCHIVE_OBJECTS)
+	$(AR) cr $@ $(ARCHIVE_OBJECTS)
 
 $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
-	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
-	$(AR) -n $@ REPLACE $(ARCHTS_OBJECTS)
+	$(AR) cr $@ $(ARCHTS_OBJECTS)
 
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY)
 
@@ -160,6 +161,11 @@ inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h
+malloc.o malloc.t.o: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
