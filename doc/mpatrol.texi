@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.69 2000-05-10 20:06:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.70 2000-05-10 20:55:58 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -764,8 +764,8 @@ of all your code.
 
 @enumerate 1
 @item
-This step is currently only available on Linux and Solaris platforms and on
-DG/UX 4.20MU07 or later platforms with the @env{LD_PRELOAD} feature.
+This step is currently only available on IRIX, Linux and Solaris platforms and
+on DG/UX 4.20MU07 or later platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -840,6 +840,13 @@ to modify the source file:
 gcc -include /usr/local/include/mpatrol.h -c test.c
 @end smallexample
 @end enumerate
+
+In all cases, it will be desirable to compile your source files with
+compiler-generated debugging information since that may be able to be used by
+the @option{USEDEBUG} option.  In addition, more symbolic information will be
+available if the executable files have not had their symbol tables stripped
+from them, although mpatrol can also fall back to using the dynamic symbol
+table from dynamically linked executable files.
 
 @node Memory allocations, Operating system support, Integration, Top
 @chapter Memory allocations
@@ -2117,13 +2124,15 @@ directly onto their equivalent environment variable settings and exist mainly
 so that the user does not have to manually change the @env{MPATROL_OPTIONS}
 environment variable.
 
+@cindex LD_PRELOAD
+@cindex _RLD_LIST
 The one option that is the exception to this is the @option{-d} option, which
 can be used to run a program under the control of the mpatrol library, even if
 it wasn't originally linked with the mpatrol library.  This can only be done on
 systems that support dynamic linking and where the dynamic linker recognises the
-@env{LD_PRELOAD} environment variable.  Even then, it can only be used when the
-program that is being run has been dynamically linked with the system C library,
-rather than statically linked.
+@env{LD_PRELOAD} or @env{_RLD_LIST} environment variables.  Even then, it can
+only be used when the program that is being run has been dynamically linked with
+the system C library, rather than statically linked.
 
 The reason for all of these limitations is that some SVR4 UNIX platforms have a
 special feature in the dynamic linker which can be told to override the symbols
@@ -5325,12 +5334,11 @@ reallocate and deallocate memory have rigorous checks performed on them.
 allocations, which must be a power of two.
 
 @cindex -d
-@cindex LD_PRELOAD
 @item @option{-d}
-Specifies that the @env{LD_PRELOAD} environment variable should be set so that
-even programs that were not compiled with the mpatrol library can be traced, but
-only if they were dynamically linked.  This option will only work if the dynamic
-linker recognises the @env{LD_PRELOAD} environment variable.
+Specifies that programs which were not linked with the mpatrol library should
+also be traced, but only if they were dynamically linked.  This option will
+only work if the system dynamic linker has the ability to preload a set of
+user-specified shared libraries via a special environment variable.
 
 @cindex -e
 @item @option{-e} <@var{string}>
@@ -5776,8 +5784,6 @@ The @option{USEDEBUG} option has no effect.
 No support for call stack traversal.
 @item
 Symbols cannot be read from any shared libraries that a program uses.
-@item
-The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex RedHat
@@ -6328,9 +6334,10 @@ compiling @file{symbol.c}.
 
 @item
 The @option{-d} option to the @command{mpatrol} command does not always work on
-systems whose dynamic linkers support the @env{LD_PRELOAD} environment variable.
-This needs to be looked into in order to find out the cause.  There is also
-likely to be an issue when running with thread-safe libraries.
+systems whose dynamic linkers support the @env{LD_PRELOAD} or @env{_RLD_LIST}
+environment variables.  This is because the object file format access libraries
+do not exist in shared form on such systems.  There is also likely to be an
+issue when running with thread-safe libraries.
 @end itemize
 
 @node Amiga notes, Windows notes, UNIX notes, Notes
@@ -6612,6 +6619,7 @@ A heap debugging environment with stack traceback for IBM AS/400 servers.
 @end table
 
 @cindex Dmalloc
+@cindex Malloc_Dbg
 @item
 Dmalloc
 @table @asis
@@ -6625,7 +6633,8 @@ Various UNIX, MS-DOS, Windows
 @uref{http://www.dmalloc.com/}
 @item Overview
 A drop-in replacement for the system's memory management routines, providing
-powerful debugging facilities configurable at run-time.
+powerful debugging facilities configurable at run-time.  Formerly known as
+Malloc_Dbg.
 @end table
 
 @cindex Electric Fence
