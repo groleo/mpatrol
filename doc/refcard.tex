@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.4 2000-07-16 23:53:27 graeme Exp $
+% $Id: refcard.tex,v 1.5 2000-08-31 20:44:14 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -158,9 +158,12 @@ Checks that no attempt is made to reallocate a \texttt{NULL} pointer or resize
 an existing block of memory to size zero.
 \item[\option{CHECKFREES}]
 Checks that no attempt is made to deallocate a \texttt{NULL} pointer.
+\item[\option{CHECKMEMORY}]
+Checks that no attempt is made to perform a zero-length memory operation on a
+\texttt{NULL} pointer.
 \item[\option{CHECKALL}]
-Equivalent to the \option{CHECKALLOCS}, \option{CHECKREALLOCS} and
-\option{CHECKFREES} options specified together.
+Equivalent to the \option{CHECKALLOCS}, \option{CHECKREALLOCS},
+\option{CHECKFREES} and \option{CHECKMEMORY} options specified together.
 \item[\optionpar{ALLOCBYTE}{unsigned integer}]
 Specifies an 8-bit byte pattern with which to prefill newly-allocated memory.
 \item[\optionpar{FREEBYTE}{unsigned integer}]

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.113 2000-08-31 19:40:03 graeme Exp $
+@c $Id: mpatrol.texi,v 1.114 2000-08-31 20:41:52 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1622,17 +1622,19 @@ tested.  All of these options can be selected with the @option{SHOWALL} option.
 @cindex general errors
 
 By default, the mpatrol library follows the guidelines for ANSI C regarding the
-behaviour of the dynamic memory allocation functions it replaces@footnote{I
-attempted to do the same for ANSI C++ but there are still namespace and
-exception handling issues to be resolved.}.  This means that calling
-@code{malloc()} with a size of zero is allowed, for example.  However, warnings
-can be generated for all of these types of calls by using the @option{CHECKALL}
-option.  The @option{CHECKALLOCS} option warns only about calls to
-@code{malloc()} and similar functions with a size of zero, the
-@option{CHECKREALLOCS} option warns only about calls to @code{realloc()} and
-similar functions with either a null pointer or a size of zero, and the
-@option{CHECKFREES} option warns only about calls to @code{free()} and similar
-functions with a null pointer.
+behaviour of the dynamic memory allocation and memory operation functions it
+replaces@footnote{I attempted to do the same for the ANSI C++ memory allocation
+operators but there are still namespace and exception handling issues to be
+resolved.}.  This means that calling @code{malloc()} with a size of zero is
+allowed, for example.  However, warnings can be generated for all of these
+types of calls by using the @option{CHECKALL} option.  The @option{CHECKALLOCS}
+option warns only about calls to @code{malloc()} and similar functions with a
+size of zero, the @option{CHECKREALLOCS} option warns only about calls to
+@code{realloc()} and similar functions with either a null pointer or a size of
+zero, and the @option{CHECKFREES} option warns only about calls to @code{free()}
+and similar functions with a null pointer.  The @option{CHECKMEMORY} option
+gives an error if a zero-size memory operation is performed on a @samp{NULL}
+pointer --- this is normally allowed by default.
 
 @cindex allocation byte
 @cindex free byte
@@ -5311,8 +5313,8 @@ the execution speed of the library at the expense of checking.  Default value:
 
 @cindex CHECKALL
 @item @option{CHECKALL}
-Equivalent to the @option{CHECKALLOCS}, @option{CHECKREALLOCS} and
-@option{CHECKFREES} options specified together.
+Equivalent to the @option{CHECKALLOCS}, @option{CHECKREALLOCS},
+@option{CHECKFREES} and @option{CHECKMEMORY} options specified together.
 
 @cindex CHECKALLOCS
 @item @option{CHECKALLOCS}
@@ -5323,6 +5325,11 @@ warning will be issued for every such case.
 @item @option{CHECKFREES}
 Checks that no attempt is made to deallocate a @samp{NULL} pointer.  A warning
 will be issued for every such case.
+
+@cindex CHECKMEMORY
+@item @option{CHECKMEMORY}
+Checks that no attempt is made to perform a zero-length memory operation on a
+@samp{NULL} pointer.
 
 @cindex CHECKREALLOCS
 @item @option{CHECKREALLOCS}
@@ -5680,7 +5687,9 @@ integrity of free memory and overflow buffers.
 @cindex -c
 @item @option{-c}
 [@option{CHECKALL}]  Specifies that all arguments to functions which allocate,
-reallocate and deallocate memory have rigorous checks performed on them.
+reallocate and deallocate memory have rigorous checks performed on them.  In
+addition, functions which perform memory operations will be checked for
+zero-length @samp{NULL} pointers.
 
 @cindex -D
 @item @option{-D} <@var{unsigned-integer}>
@@ -6034,7 +6043,10 @@ No memory allocation will be freed and execution continues.
 @item Type
 Error
 @item Cause
-A memory operation function was called to operate on a @samp{NULL} pointer.
+A memory operation function was called to operate on a @samp{NULL} pointer.  If
+the length of the operation was zero then this error will only occur when the
+@option{CHECKALL} or @option{CHECKMEMORY} options were used as the ANSI C/C++
+standards allow this behaviour, and it is really only a portability issue.
 @item Additional
 No additional information.
 @item Result
@@ -7183,8 +7195,7 @@ such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
 with.  Also need to have better detection of internal and free blocks when
-displaying memory range errors and possibly don't fault memory operations on
-@samp{NULL} pointers if the operation is zero bytes in length.
+displaying memory range errors.
 
 @item
 Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc.@: which
