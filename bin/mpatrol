@@ -24,7 +24,7 @@
 # UNIX shell script to run programs using the mpatrol library
 
 
-# $Id: mpatrol,v 1.3 1999-10-21 21:38:22 graeme Exp $
+# $Id: mpatrol,v 1.4 1999-11-25 17:25:00 graeme Exp $
 
 
 # Display a command usage message.
@@ -117,6 +117,13 @@ Options:
     -w
         Specifies that watch point areas should be used for overflow buffers
         rather than filling with the overflow byte.
+    -Z <unsigned integer>
+        Specifies the random number seed which will be used when determining
+        which memory allocations will randomly fail.
+    -z <unsigned integer>
+        Specifies the frequency at which all memory allocations will randomly
+        fail.
+
 ENDUSAGE
 }
 
@@ -124,8 +131,8 @@ ENDUSAGE
 # Set up command and option variables.
 
 command=`basename "$0"`
-version="1.2"
-options="A:a:C:cD:de:F:f:L:l:mNnO:o:PpR:SsU:vw"
+version="1.3"
+options="A:a:C:cD:de:F:f:L:l:mNnO:o:PpR:SsU:vwZ:z:"
 preload="false"
 format="elf"
 
@@ -138,6 +145,8 @@ allocstop=""
 check=""
 checkall="false"
 defalign=""
+failfreq=""
+failseed=""
 freebyte=""
 freestop=""
 limit=""
@@ -236,6 +245,12 @@ do
         w)
             oflowwatch="true"
             ;;
+        Z)
+            failseed="$OPTARG"
+            ;;
+        z)
+            failfreq="$OPTARG"
+            ;;
         \?)
             usage
             exit 1
@@ -284,6 +299,14 @@ fi
 if [ "$defalign" != "" ]
 then
     MPATROL_OPTIONS="$MPATROL_OPTIONS DEFALIGN=\"$defalign\""
+fi
+if [ "$failfreq" != "" ]
+then
+    MPATROL_OPTIONS="$MPATROL_OPTIONS FAILFREQ=\"$failfreq\""
+fi
+if [ "$failseed" != "" ]
+then
+    MPATROL_OPTIONS="$MPATROL_OPTIONS FAILSEED=\"$failseed\""
 fi
 if [ "$freebyte" != "" ]
 then
