@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.18 1999-12-06 20:50:44 graeme Exp $
+@c $Id: mpatrol.texi,v 1.19 1999-12-20 22:06:49 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.3
 @set VERSION 1.0.8
-@set UPDATED 6th December, 1999
+@set UPDATED 20th December, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -1027,6 +1027,7 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Overwrites and underwrites::  Overflow buffers.
 * Using with a debugger::       Setting breakpoints.
 * Testing::                     Additional checks.
+* Library functions::           What's provided.
 * Utilities::                   External programs.
 @end menu
 
@@ -1489,7 +1490,7 @@ functions, the source line becomes line 16 because that was the location of the
 1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
 destination.
 
-@node Testing, Utilities, Using with a debugger, Using mpatrol
+@node Testing, Library functions, Using with a debugger, Using mpatrol
 @section Testing
 @cindex testing
 
@@ -1541,7 +1542,198 @@ number of unfreed allocations higher than this then it will abort the program at
 termination so that it fails.  All tests that fail in this way can then be
 examined after the test suite finishes.
 
-@node Utilities, , Testing, Using mpatrol
+@node Library functions, Utilities, Testing, Using mpatrol
+@section Library functions
+@cindex library functions
+
+Along with the standard set of C and C++ dynamic memory allocation functions,
+the mpatrol library also comes with an additional set of functions which can be
+used to provide additional information to your program, and which can be called
+at various points in your code for debugging purposes.  You must always include
+the @file{mpatrol.h} header file in order to use these functions, but you can
+check for a specific version of the mpatrol library by checking the
+@code{MPATROL_VERSION} preprocessor macro.
+
+It is possible to obtain a great deal of information about an existing memory
+allocation using the @code{__mp_info()} function.  This takes an address as an
+argument and fills in any details about its corresponding memory allocation in
+a supplied structure.  The following example illustrates this (it can be found
+in @file{tests/pass/test4.c}).
+
+@smallexample
+21  /*
+22   * Demonstrates and tests the facility for obtaining information
+23   * about the allocation a specific address belongs to.
+24   */
+
+
+25  #include "mpatrol.h"
+26  #include <stdio.h>
+
+
+27  void display(void *p)
+28  @{
+29      __mp_allocstack *s;
+30      __mp_allocinfo d;
+
+31      if (!__mp_info(p, &d))
+32      @{
+33          fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+34          return;
+35      @}
+36      fprintf(stderr, "block:   0x%08lX\n", d.block);
+37      fprintf(stderr, "size:    %lu\n", d.size);
+38      fprintf(stderr, "type:    %lu\n", d.type);
+39      fprintf(stderr, "alloc:   %lu\n", d.alloc);
+40      fprintf(stderr, "realloc: %lu\n", d.realloc);
+41      fprintf(stderr, "func:    %s\n", d.func ? d.func : "NULL");
+42      fprintf(stderr, "file:    %s\n", d.file ? d.file : "NULL");
+43      fprintf(stderr, "line:    %lu\n", d.line);
+44      for (s = d.stack; s != NULL; s = s->next)
+45      @{
+46          fprintf(stderr, "\t0x%08lX: ", s->addr);
+47          fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
+48      @}
+49      fprintf(stderr, "freed:   %d\n", d.freed);
+50  @}
+
+
+51  void func2(void)
+52  @{
+53      void *p;
+
+54      if (p = malloc(16))
+55      @{
+56          display(p);
+57          free(p);
+58      @}
+59      display(p);
+60  @}
+
+
+61  void func1(void)
+62  @{
+63      func2();
+64  @}
+
+
+65  int main(void)
+66  @{
+67      func1();
+68      return EXIT_SUCCESS;
+69  @}
+@end smallexample
+
+When this is compiled and run, it should give the following output, although
+the pointers are likely to be different.
+
+@smallexample
+block:   0x8000A068
+size:    16
+type:    0
+alloc:   10
+realloc: 0
+func:    func2
+file:    test4.c
+line:    54
+         0x80000BEC: func2
+         0x80000C3E: func1
+         0x80000C48: main
+         0x800009E8: _start
+freed:   0
+nothing known about address 0x8000A068
+@end smallexample
+
+As you can see, anything that the mpatrol library knows about any memory
+allocation can be obtained for use in your own code, which can be very useful
+if you need to write handlers to keep track of memory allocations, etc. for
+debugging purposes.
+
+It is also possible for you to be able to intercept calls to allocate,
+reallocate and deallocate memory for your own purposes.  You can install
+prologue and epilogue functions that the mpatrol library will call before and
+after every time one of its functions is called.  These can be used for
+additional tracing or simply to add extra checks to your code.  The following
+code is an example of this and can be found in @file{tests/pass/test2.c}.
+
+@smallexample
+21  /*
+22   * Demonstrates and tests the facility for specifying user-defined
+23   * prologue and epilogue functions.
+24   */
+
+
+25  #include "mpatrol.h"
+26  #include <stdio.h>
+
+
+27  void prologue(void *p, size_t l)
+28  @{
+29      if (p == (void *) -1)
+30          fprintf(stderr, "allocating %lu bytes\n", l);
+31      else if (l == (size_t) -1)
+32          fprintf(stderr, "freeing allocation 0x%08lX\n", p);
+33      else if (l == (size_t) -2)
+34          fprintf(stderr, "duplicating string `%s'\n", p);
+35      else
+36          fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
+37  @}
+
+
+38  void epilogue(void *p)
+39  @{
+40      if (p != (void *) -1)
+41          fprintf(stderr, "allocation returns 0x%08lX\n", p);
+42  @}
+
+
+43  int main(void)
+44  @{
+45      void *p, *q;
+
+46      __mp_prologue(prologue);
+47      __mp_epilogue(epilogue);
+48      if (p = malloc(16))
+49          if (q = realloc(p, 32))
+50              free(q);
+51          else
+52              free(p);
+53      if (p = (char *) strdup("test"))
+54          free(p);
+55      return EXIT_SUCCESS;
+56  @}
+@end smallexample
+
+Once again, if you compile and run the above code, you should see the following
+output.
+
+@smallexample
+allocating 16 bytes
+allocation returns 0x8000A068
+reallocating allocation 0x8000A068 to 32 bytes
+allocation returns 0x8000A068
+freeing allocation 0x8000A068
+duplicating string `test'
+allocation returns 0x8000A068
+freeing allocation 0x8000A068
+@end smallexample
+
+Along with being able to install prologue and epilogue functions, you can also
+install a low-memory handler with the @code{__mp_nomemory()} function, which
+will be called by the mpatrol library if it ever runs out of memory during the
+call to a memory allocation function.  This gives you the opportunity to use
+that handler to either free up any unneeded memory or simply to abort, thus
+removing the need to check for failed allocations.
+
+Finally, there are three functions which affect the mpatrol library globally.
+The first, @code{__mp_check()}, allows you to force an internal check of the
+mpatrol library's data structures at any point during program execution.  The
+other two functions, @code{__mp_memorymap()} and @code{__mp_summary()} allow you
+to force the generation of a memory map or library statistics at any point in
+your program, in much the same way as they would normally be displayed at the
+end of program execution.
+
+@node Utilities, , Library functions, Using mpatrol
 @section Utilities
 @cindex utilities
 
@@ -1574,6 +1766,17 @@ with any of the mpatrol library's debugging options.  This is mainly a
 @emph{toy} feature which allows you to view and manipulate the dynamic memory
 allocations of programs that you don't have the source for, but in theory it
 could be quite useful if you need to debug a previously released executable.
+
+Note that the @command{mpatrol} shell script must be set up to use the correct
+object file format access libraries that are required for your system if you
+wish to use the @option{-d} option.  If the mpatrol library was built with
+@code{FORMAT=FORMAT_ELF} support then it must be told to preload the ELF access
+library (normally @file{libelf.so}).  If it was built with
+@code{FORMAT=FORMAT_BFD} support then it must be told to preload the GNU BFD
+access libraries (normally @file{libbfd.so} and @file{libiberty.so}).  However,
+if these libraries only exist on your system in archive form then you must build
+@file{libmpatrol.so} with these extra libraries incorporated into it so that
+there are no dependencies on them at run-time.
 
 @node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
@@ -2954,7 +3157,6 @@ unfreed allocations: 2 (108 bytes)
 @node Functions, Environment, Examples, Top
 @appendix Functions
 @cindex functions
-@cindex library functions
 
 @cindex mpatrol.h
 @cindex MPATROL_VERSION
@@ -3937,9 +4139,24 @@ The @option{-d} option to the @command{mpatrol} shell script has no effect.
 @end itemize
 
 @cindex RedHat
+@cindex Linux, Intel 80x86
+@item
+RedHat Linux 6.0, Intel Pentium III, BFD, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} shell script does not work
+properly.
+@end itemize
+
 @cindex Linux, Motorola 680x0
 @item
-RedHat Linux 5.1, Motorola 68040, ELF32, @command{gcc}
+RedHat Linux 5.1, Motorola 68040, BFD, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work.
@@ -4278,13 +4495,6 @@ Script files similar to the @command{mpatrol} shell script provided for UNIX
 platforms could be added for the other operating systems that the mpatrol
 library is available on.  Perhaps this could even be extended to a common
 executable command that is written in C.
-
-@item
-Add a section in the mpatrol manual describing how to use its special functions
-effectively, and also a guide on how to use the @command{mpatrol} shell script.
-
-@item
-Add a document containing frequently asked questions.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
