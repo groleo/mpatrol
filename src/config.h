@@ -210,7 +210,8 @@
  * memory as well as sbrk().  This must only be set if the system also supports
  * the allocation of zero-initialised pages from either a special device file
  * or via a special flag.  Note that sbrk() will still be used by default, but
- * the USEMMAP option will instruct the library to use mmap() instead.
+ * mmap() will be used to allocate memory that is internal to the mpatrol
+ * library.  The USEMMAP option can be used to switch this behaviour.
  */
 
 #ifndef MP_MMAP_SUPPORT
@@ -670,6 +671,24 @@
 #define MP_INIT_SUPPORT 0
 #endif /* SYSTEM */
 #endif /* MP_INIT_SUPPORT */
+
+
+/* Indicates if the __mp_fini() function should be registered with atexit() in
+ * order to terminate the mpatrol library.  This is disabled by default on
+ * systems that support .init and .fini sections, or if the compiler is the GNU
+ * compiler or a C++ compiler since there are better ways to terminate the
+ * library in these cases.  However, if there are problems with the mpatrol
+ * library not being terminated at the correct point in a program's execution
+ * then try using atexit() instead.
+ */
+
+#ifndef MP_USE_ATEXIT
+#if MP_INIT_SUPPORT || defined(__GNUC__) || defined(__cplusplus)
+#define MP_USE_ATEXIT 0
+#else /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
+#define MP_USE_ATEXIT 1
+#endif /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
+#endif /* MP_USE_ATEXIT */
 
 
 /* Indicates if the compiler supports the ident preprocessor directive for
