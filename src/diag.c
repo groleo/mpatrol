@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.55 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.56 2001-02-06 19:54:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.55 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.56 2001-02-06 19:54:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -498,68 +498,6 @@ __mp_closelogfile(void)
 }
 
 
-/* Invokes a text editor on a given source file at a specific line.
- */
-
-static
-int
-editfile(char *f, unsigned long l, int d)
-{
-#if TARGET == TARGET_UNIX
-#if MP_PRELOAD_SUPPORT
-    char s[256];
-#endif /* MP_PRELOAD_SUPPORT */
-    char t[32];
-    char *v[5];
-    pid_t p;
-    int r;
-#endif /* TARGET */
-
-#if TARGET == TARGET_UNIX
-#if MP_PRELOAD_SUPPORT
-    sprintf(s, "%s=", MP_PRELOAD_NAME);
-#endif /* MP_PRELOAD_SUPPORT */
-    sprintf(t, "%lu", l);
-    if ((p = fork()) < 0)
-        return 0;
-    if (p == 0)
-    {
-#if MP_PRELOAD_SUPPORT
-        /* We have to ensure that we don't end up debugging the editor and its
-         * child processes as well!  Hopefully, if we ensure that the relevant
-         * environment variable is set then putenv() will not use malloc() to
-         * expand the environment.
-         */
-        if (getenv(MP_PRELOAD_NAME))
-            putenv(s);
-#endif /* MP_PRELOAD_SUPPORT */
-        v[0] = MP_EDITOR;
-        if (d == 0)
-        {
-            v[1] = f;
-            v[2] = t;
-            v[3] = NULL;
-        }
-        else
-        {
-            v[1] = "--listing";
-            v[2] = f;
-            v[3] = t;
-            v[4] = NULL;
-        }
-        execvp(v[0], v);
-        _exit(EXIT_FAILURE);
-    }
-    while (waitpid(p, &r, 0) < 0)
-        if (errno != EINTR)
-            return 0;
-    if (!WIFEXITED(r) || (WEXITSTATUS(r) != 0))
-        return 0;
-#endif /* TARGET */
-    return 1;
-}
-
-
 /* Sends a diagnostic message to the log file.
  */
 
@@ -612,7 +550,7 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             va_end(v);
             fputc('\n', stderr);
         }
-        if (!editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)))
+        if (__mp_editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)) == -1)
             fprintf(stderr, "ERROR: problems %sing file `%s'\n",
                     (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
     }
@@ -655,11 +593,75 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             va_end(v);
             fputc('\n', stderr);
         }
-        if (!editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)))
+        if (__mp_editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)) == -1)
             fprintf(stderr, "ERROR: problems %sing file `%s'\n",
                     (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
     }
     errors++;
+}
+
+
+/* Invoke a text editor on a given source file at a specific line.
+ */
+
+MP_GLOBAL
+int
+__mp_editfile(char *f, unsigned long l, int d)
+{
+#if TARGET == TARGET_UNIX
+#if MP_PRELOAD_SUPPORT
+    char s[256];
+#endif /* MP_PRELOAD_SUPPORT */
+    char t[32];
+    char *v[5];
+    pid_t p;
+    int r;
+#endif /* TARGET */
+
+#if TARGET == TARGET_UNIX
+#if MP_PRELOAD_SUPPORT
+    sprintf(s, "%s=", MP_PRELOAD_NAME);
+#endif /* MP_PRELOAD_SUPPORT */
+    sprintf(t, "%lu", l);
+    if ((p = fork()) < 0)
+        return -1;
+    if (p == 0)
+    {
+#if MP_PRELOAD_SUPPORT
+        /* We have to ensure that we don't end up debugging the editor and its
+         * child processes as well!  Hopefully, if we ensure that the relevant
+         * environment variable is set then putenv() will not use malloc() to
+         * expand the environment.
+         */
+        if (getenv(MP_PRELOAD_NAME))
+            putenv(s);
+#endif /* MP_PRELOAD_SUPPORT */
+        v[0] = MP_EDITOR;
+        if (d == 0)
+        {
+            v[1] = f;
+            v[2] = t;
+            v[3] = NULL;
+        }
+        else
+        {
+            v[1] = "--listing";
+            v[2] = f;
+            v[3] = t;
+            v[4] = NULL;
+        }
+        execvp(v[0], v);
+        _exit(EXIT_FAILURE);
+    }
+    while (waitpid(p, &r, 0) < 0)
+        if (errno != EINTR)
+            return -1;
+    if (!WIFEXITED(r) || (WEXITSTATUS(r) != 0))
+        return -1;
+    return 1;
+#else /* TARGET */
+    return 0;
+#endif /* TARGET */
 }
 
 
