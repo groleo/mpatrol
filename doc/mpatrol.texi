@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.86 2000-06-05 20:28:57 graeme Exp $
+@c $Id: mpatrol.texi,v 1.87 2000-06-07 21:52:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.11
 @set VERSION 1.2.2
-@set UPDATED 5th June, 2000
+@set UPDATED 7th June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -1236,6 +1236,7 @@ conventions are specified by the hardware and so the operating system must use
 these instead.
 
 @cindex stack tracebacks
+@cindex stack unwinding
 @cindex tracebacks
 On systems that have consistent calling conventions, it is usually possible to
 perform call stack @emph{tracebacks} from within the current function in order
@@ -1243,7 +1244,8 @@ to determine the stack of function calls that led to the current function.  This
 is extremely useful for debugging purposes and is done by examining the current
 stack frame to see if there is a pointer to the previous stack frame.  If there
 is, then it can be followed to find out all of the state information about the
-calling function.  This can be repeated until there are no more stack frames.
+calling function.  This can be repeated until there are no more stack
+frames@footnote{A process also known as @emph{stack unwinding}.}.
 This is generally how this information is determined by debuggers when a call
 stack traceback is requested.
 
@@ -1257,6 +1259,42 @@ called function returns@footnote{Also known as the @emph{return address}.}.
 This information can be used to identify which function performed the call,
 since the address of the instruction must lie between the start and end of one
 of the functions in the process.
+
+@cindex MP_BUILTINSTACK_SUPPORT
+@cindex MP_LIBRARYSTACK_SUPPORT
+There are several different ways to perform stack unwinding.  The first requires
+compiler support and uses builtin functions to determine the next stack frame
+and the return address.  The GNU C compiler, @command{gcc}, supports this but
+unfortunately the number of stack frames to traverse must be known at
+compile-time rather than run-time.  The second method requires operating system
+support, with a library of routines provided to perform call stack traversal.
+Unfortunately, such routines can be quite time consuming and may require a lot
+of resources, but on the other hand they are likely to be very reliable at
+obtaining the necessary information.  The mpatrol library can be built to
+support either of these methods, with the @code{MP_BUILTINSTACK_SUPPORT} and
+the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macros.
+
+@cindex RISC
+A third way to perform stack unwinding involves reading (or effectively
+disassembling) the instructions that are being executed in order to determine
+the size of the stack frame being used and the address of the instruction at
+which execution will resume when the function returns.  This can also be quite
+a reliable method of obtaining call stack information but is only likely to be
+feasible on a processor architecture which has a very simple instruction set,
+such as a RISC@footnote{Reduced Instruction Set Computer.} architecture.  MIPS
+processors are a good example of this.
+
+@cindex CISC
+The final method of stack unwinding requires that the frame pointer and return
+address are both stored on the stack whenever a new function is called.  The
+chain of frame pointers can then be followed down the stack, and the return
+addresses can be read at a given offset from the frame pointers.  This is
+usually possible with CISC@footnote{Complex Instruction Set Computer.} processor
+architectures that have dedicated call instructions which automatically save
+such information on the stack, although some RISC processors also save these as
+well.  However, inline functions and compiler optimisations can sometimes result
+in the frame pointer being omitted, usually resulting in an inability to walk
+the stack.
 
 @cindex object files
 @cindex executable files
@@ -2886,7 +2924,10 @@ cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
 
 If you need to link with other libraries, make sure that they don't contain
 definitions of @code{malloc()}, etc., or if they do then you must ensure that
-the mpatrol library appears before them on the link line.
+the mpatrol library appears before them on the link line.  Note also that if the
+mpatrol library was built on IRIX with the @code{MP_LIBRARYSTACK_SUPPORT}
+preprocessor macro defined, then the @file{libexc} library must be linked in as
+well.
 
 You should also know how to set an environment variable on your specific system.
 Again, this varies from system to system and also depends on the command line
@@ -6517,10 +6558,10 @@ this problem when it is compiled by a C++ compiler, but it may only work if the
 final program is linked with that specific compiler.
 
 @item
-Need to add support for call stack traversal for the Alpha, Itanium and non-IRIX
-MIPS processor architectures.  The current implementation of call stack
-traversal for the Motorola 88xx0 family is also a bit flaky and so should only
-be used when the library and program are built unoptimised.
+Need to add support for call stack traversal for the Alpha, and Itanium
+processor architectures.  The current implementation of call stack traversal for
+the Motorola 88xx0 family is also a bit flaky and so should only be used when
+the library and program are built unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for the Alpha,
@@ -6536,6 +6577,16 @@ archive version instead of the shared version otherwise a @samp{SIGABORT} will
 be raised.  This is probably due to the call to @code{U_get_current_frame()}
 using the traceback information from the shared library rather than the
 executable file, and the documentation warns against this.
+
+@item
+If the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro is defined when
+building the mpatrol library on IRIX platforms then the @file{libexc} library
+must also be linked in.  However, execution speed will fall dramatically since
+the @code{unwind()} function within that library calls @code{malloc()},
+@code{free()} and other memory operation functions every time it is invoked.
+The only reason to use this library rather than the default method of stack
+traversal on MIPS would be if that method failed due to a bug (in which case
+it should be reported anyway).
 
 @item
 The library cannot currently read any symbols from shared objects that have been
