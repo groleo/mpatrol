@@ -301,7 +301,11 @@
  */
 
 #ifndef MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_AMIGA && defined(__GNUC__)
+#define MP_BUILTINSTACK_SUPPORT 1
+#else /* TARGET && __GNUC__ */
 #define MP_BUILTINSTACK_SUPPORT 0
+#endif /* TARGET && __GNUC__ */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
@@ -312,7 +316,11 @@
 
 #if MP_BUILTINSTACK_SUPPORT
 #ifndef MP_MAXSTACK
+#if TARGET == TARGET_AMIGA && defined(__GNUC__)
+#define MP_MAXSTACK 3
+#else /* TARGET && __GNUC__ */
 #define MP_MAXSTACK 8
+#endif /* TARGET && __GNUC__ */
 #endif /* MP_MAXSTACK */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
