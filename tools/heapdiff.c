@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heapdiff.c,v 1.5 2001-06-12 17:58:19 graeme Exp $"
+#ident "$Id: heapdiff.c,v 1.6 2001-06-12 19:28:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.5 2001-06-12 17:58:19 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.6 2001-06-12 19:28:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -46,7 +46,7 @@ static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.5 2001-06-1
 #define CONTENTS_FILENAME ".heapdiff"
 
 
-typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
+typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
 
 
 #ifdef __cplusplus
@@ -72,32 +72,32 @@ static unsigned long count;
 static unsigned long total;
 
 
-/* The previous mpatrol epilogue handler.
+/* The previous mpatrol prologue handler.
  */
 
-static epilogue_handler old_epilogue;
+static prologue_handler old_prologue;
 
 
 /* Check to see if a memory allocation has been freed, and if so remove all
- * of its allocation contents files and possibly also call the old epilogue
+ * of its allocation contents files and possibly also call the old prologue
  * function if one was installed.
  */
 
 static
 void
-epilogue(MP_CONST void *p, MP_CONST void *a)
+prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
 {
     char b[64];
     size_t i;
 
-    if (p == (void *) -1)
-        for (i = 0; i < count; i++)
+    if (old_prologue != NULL)
+        old_prologue(p, l, a);
+    if (l == (size_t) -1)
+        for (i = 1; i <= count; i++)
         {
             sprintf(b, "%s.%lu", CONTENTS_FILENAME, i);
             __mp_remcontents(b, p);
         }
-    if (old_epilogue != NULL)
-        old_epilogue(p, a);
 }
 
 
@@ -112,7 +112,7 @@ cleanupcallback(MP_CONST void *p, void *t)
     char b[64];
     size_t i;
 
-    for (i = 0; i < count; i++)
+    for (i = 1; i <= count; i++)
     {
         sprintf(b, "%s.%lu", CONTENTS_FILENAME, i);
         __mp_remcontents(b, p);
@@ -144,7 +144,8 @@ writecallback(MP_CONST void *p, void *t)
         if (__mp_writecontents(b, p))
             r = 1;
         else
-            r = -1;
+            __mp_printf("error writing contents of allocation " MP_POINTER "\n",
+                        p);
     }
     return r;
 }
@@ -177,6 +178,8 @@ cmpcallback(MP_CONST void *p, void *t)
                     __mp_logaddr(d.block);
                 if ((h->flags & HD_VIEW) && (d.file != NULL) && (d.line != 0))
                     __mp_view(d.file, d.line);
+                h->count++;
+                h->total += n;
             }
             __mp_remcontents(b, p);
             return 1;
@@ -272,7 +275,7 @@ __mpt_heapdiffstart(heapdiff *h, unsigned long f, MP_CONST char *t,
     {
         __mp_iterate(writecallback, h, 0);
         if (total++ == 0)
-            old_epilogue = __mp_epilogue(epilogue);
+            old_prologue = __mp_prologue(prologue);
     }
     if (count == 1)
         __mp_atexit(cleanup);
@@ -291,17 +294,22 @@ __mpt_heapdiffend(heapdiff *h, MP_CONST char *t, unsigned long u)
 
     if (h->id == 0)
         return;
-    if (h->flags & HD_CONTENTS)
-    {
-        if (--total == 0)
-            __mp_epilogue(old_epilogue);
-    }
+    if ((h->flags & HD_CONTENTS) && (--total == 0))
+        __mp_prologue(old_prologue);
     if ((t != NULL) && (u != 0))
         __mp_printf("} HEAPDIFF %lu ENDING at %s line %lu\n", h->id, t, u);
     else
         __mp_printf("} HEAPDIFF %lu ENDING\n", h->id);
     __mp_logstack(1);
     f = h->flags;
+    if (f & HD_CONTENTS)
+    {
+        h->count = h->total = 0;
+        __mp_printf("allocation differences:\n\n");
+        __mp_iterate(cmpcallback, h, 0);
+        __mp_printf("total differences: %lu (%lu allocation%s)\n\n", h->total,
+                    h->count, (h->count == 1) ? "" : "s");
+    }
     if (f & HD_FREED)
     {
         h->flags &= ~HD_UNFREED;
