@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.31 2000-06-12 21:50:06 graeme Exp $
+.\" $Id: mpatrol.3,v 1.32 2000-06-20 17:55:48 graeme Exp $
 .\"
-.TH MPATROL 3 "12 June 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "20 June 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -530,21 +530,23 @@ must be linked in before any other library that defines dynamic memory
 allocation functions with the same names:
 .RS 0
 
- \fBLibrary\fP    \fBReason\fP
+ \fBLibrary\fP      \fBReason\fP
 
- \fI\-lmpatrol\fP  To use this library.
- \fI\-lelf\fP      If built with \fBFORMAT=FORMAT_ELF32\fP.
- \fI\-lbfd\fP &    If built with \fBFORMAT=FORMAT_BFD\fP.
+ \fI\-lmpatrol\fP    To use this library.
+ \fI\-lmpatrolmt\fP  To use the thread-safe mpatrol library.
+ \fI\-lelf\fP        If built with ELF support.
+ \fI\-lbfd\fP &      If built with BFD support.
    \fI\-liberty\fP
- \fI\-lcl\fP       If built on HP/UX.
- \fI\-lexc\fP      If built on IRIX with \fBMP_LIBRARYSTACK_SUPPORT\fP.
- \fI\-lpthread\fP  If built on UNIX with \fBMP_THREADS_SUPPORT\fP.
+ \fI\-lcl\fP         If built on HP/UX.
+ \fI\-lexc\fP        If built on IRIX with library stack support.
+ \fI\-lthread\fP     If built on DG/UX with threads support.
+ \fI\-lpthread\fP    If built on UNIX with threads support.
 .RE
 .PP
 On UNIX platforms, if there were no calls to memory allocation functions before
-\fI\-lmpatrol\fP appears on the link line then the mpatrol library will not be
-linked in.  However, this can be overridden by placing \fI\-umalloc\fP just
-before that point.
+\fI\-lmpatrol\fP or \fI\-lmpatrolmt\fP appears on the link line then the mpatrol
+library will not be linked in if it is an archive library.  However, this can be
+overridden by placing \fI\-umalloc\fP just before that point.
 .PP
 You may also wish to set your core file size limit to be zero before running
 any programs linked with the mpatrol library as the extra memory that the
