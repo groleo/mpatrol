@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.21 2000-03-30 17:47:58 graeme Exp $"
+#ident "$Id: inter.c,v 1.22 2000-04-03 18:21:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,6 +49,12 @@
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+#if MP_INUSE_SUPPORT
+int _Inuse_init(unsigned long, int);
+void _Inuse_close(void);
+#endif /* MP_INUSE_SUPPORT */
 
 
 /* The memory header structure used by the library to hold all of its data
@@ -147,6 +153,9 @@ void __mp_init(void)
     if (!memhead.init)
     {
         __mp_newinfo(&memhead);
+#if MP_INUSE_SUPPORT
+        _Inuse_init(0, 0);
+#endif /* MP_INUSE_SUPPORT */
         atexit(__mp_fini);
         /* Read any options from the specified environment variable.
          */
@@ -215,6 +224,9 @@ void __mp_fini(void)
                     __mp_printallocs(&memhead, 1);
             }
             memhead.fini = 1;
+#if MP_INUSE_SUPPORT
+            _Inuse_close();
+#endif /* MP_INUSE_SUPPORT */
         }
 #if MP_DELETE
         /* We only need to perform this step if the operating system does not
