@@ -1,3 +1,23 @@
+Changes for 1.2.3
+
+  * Added more robust stack traversal support for Windows platforms.
+
+  * Can now determine the address of an illegal memory access on Windows
+    platforms.
+
+  * Added support for the XCOFF and Windows PE object file formats and
+    provisional support for the ELF64 object file format.
+
+  * Can now read symbols from executable files and shared libraries on Windows
+    platforms.
+
+  * Added support for the USEDEBUG option on Windows platforms.
+
+  * Fixed long-standing problem with USEDEBUG and the GNU BFD library.
+
+  * C++ symbol names now automatically get demangled on Windows platforms.
+
+
 Changes for 1.2.2 (18th June, 2000)
 
   * The mpatrol library can now be built as a thread-safe library on many

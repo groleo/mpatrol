@@ -1,3 +1,57 @@
+Fri Jun 23 20:17:02 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ:
+	Documented automatic name demangling, USEDEBUG and imagehlp.lib on
+	Windows platforms.  Added information about preserving debugging
+	information for symbols on Windows platforms.
+
+	* build/windows/Makefile, build/windows/NMakefile:
+	Added the imagehlp library when building DLLs.
+
+	* doc/mpatrol.texi:
+	Added more up to date information about Windows platforms.
+
+	* src/stack.c, src/stack.h:
+	Added support for library stack traversal on Windows platforms.
+
+	* src/signals.c:
+	Added support for determining the address of an illegal memory access on
+	Windows platforms.  Fixed problem when using library stack support on
+	Windows platforms.
+
+	* src/memory.c, src/inter.c: New interface for __mp_newframe().
+
+Thu Jun 22 23:56:54 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Documented that problem with USEDEBUG and BFD has now been fixed.
+	Documented that symbols can now be read on Windows platforms and that
+	USEDEBUG also works there as well.
+
+	* src/target.h: Added the PE object file format.
+
+	* src/symbol.c: Added support for reading symbols on Windows platforms.
+
+Wed Jun 21 13:08:51 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Documented that AIX and LynxOS have been tested with XCOFF object file
+	reader.
+
+Tue Jun 20 18:07:07 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented XCOFF and ELF64 object file formats.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Revised the library list.
+
+	* pkg/lsm/mpatrol.lsm:
+	Forgot to update the version in the archive files.
+
+	* src/config.h, src/target.h: Added XCOFF and ELF64 object file formats.
+
+	* src/symbol.c:
+	Added direct XCOFF support and provisional support for ELF64.
+
 Sun Jun 18 09:43:06 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented problems making library thread-safe.
