@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.10 2001-02-08 18:15:26 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.11 2001-02-12 19:29:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.10 2001-02-08 18:15:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.11 2001-02-12 19:29:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -245,6 +245,16 @@ unsigned long
 __mp_setoption(long o, unsigned long v)
 {
     return ~0L;
+}
+
+
+/* Get an mpatrol option after the library has been initialised.
+ */
+
+int
+__mp_getoption(long o, unsigned long *v)
+{
+    return 0;
 }
 
 
@@ -537,6 +547,16 @@ char *
 __mp_function(alloctype f)
 {
     return NULL;
+}
+
+
+/* Set the user data for a given memory allocation.
+ */
+
+int
+__mp_setuser(void *p, void *d)
+{
+    return 0;
 }
 
 

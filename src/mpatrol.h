@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.82 2001-02-10 16:45:39 graeme Exp $
+ * $Id: mpatrol.h,v 1.83 2001-02-12 19:29:39 graeme Exp $
  */
 
 
@@ -217,6 +217,15 @@
 #define MP_FLG_LIST          0x02000000
 
 
+#ifndef MP_MPALLOC_H
+/* The type of the allocation failure handler.  This is only defined if
+ * mpalloc.h has not already been included.
+ */
+
+typedef void *__mp_failhandler;
+#endif /* MP_MPALLOC_H */
+
+
 /* The different types of memory allocation and operation functions.
  */
 
@@ -295,6 +304,7 @@ typedef struct __mp_allocinfo
     __mp_allocstack *stack; /* call stack details */
     char *typestr;          /* type stored in allocation */
     size_t typesize;        /* size of type stored in allocation */
+    void *userdata;         /* user data associated with allocation */
     char freed;             /* allocation has been freed */
 }
 __mp_allocinfo;
@@ -454,6 +464,9 @@ struct mallinfo
 #ifdef MP_FREE
 #undef MP_FREE
 #endif /* MP_FREE */
+#ifdef MP_FAILURE
+#undef MP_FAILURE
+#endif /* MP_FAILURE */
 
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
@@ -586,6 +599,7 @@ struct mallinfo
 #define MP_FREE(p) \
     do { __mp_free((p), MP_AT_XFREE, MP_FUNCNAME, __FILE__, __LINE__, 0); \
          p = NULL; } while (0)
+#define MP_FAILURE(f) ((__mp_failhandler) NULL)
 
 
 #ifdef __cplusplus
@@ -597,6 +611,7 @@ extern "C"
 void __mp_init(void);
 void __mp_fini(void);
 unsigned long __mp_setoption(long, unsigned long);
+int __mp_getoption(long, unsigned long *);
 void *__mp_alloc(size_t, size_t, __mp_alloctype, MP_CONST char *,
                  MP_CONST char *, unsigned long, MP_CONST char *, size_t,
                  size_t);
@@ -618,6 +633,7 @@ void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
 int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
 char *__mp_function(__mp_alloctype);
+int __mp_setuser(MP_CONST void *, MP_CONST void *);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
 int __mp_printinfo(MP_CONST void *);
@@ -657,6 +673,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_init() ((void) 0)
 #define __mp_fini() ((void) 0)
 #define __mp_setoption(o, v) ((unsigned long) ~0L)
+#define __mp_getoption(o, v) ((int) 0)
 #define __mp_alloc(l, a, f, s, t, u, g, h, k) ((void *) NULL)
 #define __mp_strdup(p, l, f, s, t, u, k) ((char *) NULL)
 #define __mp_realloc(p, l, a, f, s, t, u, g, h, k) ((void *) NULL)
@@ -666,6 +683,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
 #define __mp_function(f) ((char *) NULL)
+#define __mp_setuser(p, d) ((int) 0)
 #define __mp_info(p, d) ((int) 0)
 #define __mp_syminfo(p, d) ((int) 0)
 #define __mp_printinfo(p) ((int) 0)

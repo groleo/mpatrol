@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.79 2001-02-08 21:25:48 graeme Exp $"
+#ident "$Id: inter.c,v 1.80 2001-02-12 19:28:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.79 2001-02-08 21:25:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.80 2001-02-12 19:28:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -521,9 +521,36 @@ __mp_setoption(long o, unsigned long v)
     else
     {
         o = -o;
-        if ((r = __mp_setopt(&memhead, (unsigned long) o, v)) &&
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READWRITE);
+        if ((r = __mp_set(&memhead, (unsigned long) o, v)) &&
             (o != OPT_SETFLAGS) && (o != OPT_UNSETFLAGS))
             r = 1;
+        if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READONLY);
+    }
+    restoresignals();
+    return r;
+}
+
+
+/* Get an mpatrol option after the library has been initialised.
+ */
+
+int
+__mp_getoption(long o, unsigned long *v)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (o > 0)
+        r = 0;
+    else
+    {
+        o = -o;
+        r = __mp_get(&memhead, (unsigned long) o, v);
     }
     restoresignals();
     return r;
@@ -1237,6 +1264,38 @@ __mp_function(alloctype f)
 }
 
 
+/* Set the user data for a given memory allocation.
+ */
+
+int
+__mp_setuser(void *p, void *d)
+{
+    allocnode *n;
+    infonode *m;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = 0;
+    else
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READWRITE);
+        m->data.userdata = d;
+        if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READONLY);
+        r = 1;
+    }
+    restoresignals();
+    return r;
+}
+
+
 /* Obtain any details about the memory block that contains a given address.
  */
 
@@ -1278,6 +1337,7 @@ __mp_info(void *p, allocinfo *d)
     d->stack = m->data.stack;
     d->typestr = m->data.typestr;
     d->typesize = m->data.typesize;
+    d->userdata = m->data.userdata;
     d->freed = ((m->data.flags & FLG_FREED) != 0);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);
@@ -1392,6 +1452,8 @@ __mp_printinfo(void *p)
                 (m->data.typesize == 1) ? "" : "s");
     else
         fputs("<unknown>\n", stderr);
+    fprintf(stderr, "    user data:          " MP_POINTER "\n",
+            m->data.userdata);
     if (m->data.flags & FLG_FREED)
         fputs("    freed by:           ", stderr);
     else

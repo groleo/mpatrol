@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpalloc.h,v 1.3 2001-02-10 16:45:39 graeme Exp $
+ * $Id: mpalloc.h,v 1.4 2001-02-12 19:29:39 graeme Exp $
  */
 
 
@@ -58,11 +58,10 @@
 #endif /* MP_FUNCNAME */
 
 
+#if !defined(MP_MPATROL_H) || defined(NDEBUG)
+
 typedef void (*__mp_failhandler)(size_t, MP_CONST char *, MP_CONST char *,
                                  unsigned long, MP_CONST char *, size_t);
-
-
-#if !defined(MP_MPATROL_H) || defined(NDEBUG)
 
 #define MP_MALLOC(p, l, t) \
     (p = (t *) __mp_xmalloc((l) * sizeof(t), MP_FUNCNAME, __FILE__, __LINE__, \

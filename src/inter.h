@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.19 2001-02-10 16:45:39 graeme Exp $
+ * $Id: inter.h,v 1.20 2001-02-12 19:28:58 graeme Exp $
  */
 
 
@@ -60,6 +60,7 @@ typedef struct allocinfo
     addrnode *stack;       /* call stack details */
     char *typestr;         /* type stored in allocation */
     size_t typesize;       /* size of type stored in allocation */
+    void *userdata;        /* user data associated with allocation */
     char freed;            /* allocation has been freed */
 }
 allocinfo;
@@ -91,6 +92,7 @@ extern "C"
 void __mp_init(void);
 void __mp_fini(void);
 unsigned long __mp_setoption(long, unsigned long);
+int __mp_getoption(long, unsigned long *);
 infohead *__mp_memhead(void);
 void *__mp_alloc(size_t, size_t, alloctype, char *, char *, unsigned long,
                  char *, size_t, size_t);
@@ -108,6 +110,7 @@ void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *, char *,
 int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
                     unsigned long, size_t);
 char *__mp_function(alloctype);
+int __mp_setuser(void *, void *);
 int __mp_info(void *, allocinfo *);
 int __mp_syminfo(void *, symbolinfo *);
 int __mp_printinfo(void *);
