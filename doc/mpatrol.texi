@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.264 2003-11-26 16:11:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.265 2005-03-09 01:00:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -11056,6 +11056,25 @@ were used.
 The log file entry.
 @item Result
 The alignment is set to the default system alignment and execution continues.
+@end table
+
+@cindex ZEROPN
+@item
+@samp{ZEROPN}
+@table @asis
+@item Message
+@samp{attempt to perform a zero-sized operation}
+@item Type
+Warning
+@item Cause
+A memory operation function was called with a length of zero.  This warning
+will only occur when the @option{CHECKALL} or @option{CHECKMEMORY} options were
+used as the ANSI C/C++ standards allow this behaviour, and it is really only a
+portability issue.
+@item Additional
+The log file entry.
+@item Result
+The operation will not be performed and execution continues.
 @end table
 @end itemize
 
