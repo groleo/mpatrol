@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.239 2001-09-03 20:41:45 graeme Exp $
+@c $Id: mpatrol.texi,v 1.240 2001-09-03 22:40:31 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3758,17 +3758,21 @@ the text editor on the command line instead of using the value in the
 
 @cindex vi
 @cindex vim
+@cindex elvis
 @cindex emacs
 @cindex xemacs
-The currently supported editors are @command{vi}, @command{vim}, @command{emacs}
-and @command{xemacs}, and if the @env{EDITOR} environment variable is not set
-then the default will be @command{vi}.  Selecting an unsupported text editor
-will result in an error.  However, you can edit the @command{mpedit} file to add
-support for your own favourite text editor as long as it supports a way to
-immediately jump to a specific line number when it is first started up.  Note
-that the text editor must also open a new window to edit the source file so that
-it does not obscure any mpatrol diagnostic messages, and if it does not support
-this then a new terminal window must be opened for it to use.
+@cindex pico
+@cindex nano
+The currently supported editors are @command{vi}, @command{vim},
+@command{elvis}, @command{emacs}, @command{xemacs}, @command{pico} and
+@command{nano}, and if the @env{EDITOR} environment variable is not set then the
+default will be @command{vi}.  Selecting an unsupported text editor will result
+in an error.  However, you can edit the @command{mpedit} file to add support for
+your own favourite text editor as long as it supports a way to immediately jump
+to a specific line number when it is first started up.  Note that the text
+editor must also open a new window to edit the source file so that it does not
+obscure any mpatrol diagnostic messages, and if it does not support this then a
+new terminal window must be opened for it to use.
 
 @cindex --listing
 @cindex list
@@ -11252,9 +11256,6 @@ required on @file{a.out}-based systems.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not appear
 to work correctly, giving spurious errors in the log file.
-@item
-The @command{mpedit} command does not support the @option{--listing} option due
-to the lack of an @command{nl} command on the system.
 @end itemize
 
 @cindex HP/UX, HP PA/RISC
@@ -11415,9 +11416,6 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work if @command{perl} is not installed due
 to the lack of a @command{printf} command on the system.
-@item
-The @command{mpedit} command does not support the @option{--listing} option due
-to the lack of an @command{nl} command on the system.
 @end itemize
 
 @item
@@ -11441,9 +11439,6 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work if @command{perl} is not installed due
 to the lack of a @command{printf} command on the system.
-@item
-The @command{mpedit} command does not support the @option{--listing} option due
-to the lack of an @command{nl} command on the system.
 @end itemize
 
 @cindex LynxOS, PowerPC
@@ -11469,9 +11464,6 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work if @command{perl} is not installed due
 to the lack of a @command{printf} command on the system.
-@item
-The @command{mpedit} command does not support the @option{--listing} option due
-to the lack of an @command{nl} command on the system.
 @end itemize
 
 @item
@@ -11498,9 +11490,6 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work if @command{perl} is not installed due
 to the lack of a @command{printf} command on the system.
-@item
-The @command{mpedit} command does not support the @option{--listing} option due
-to the lack of an @command{nl} command on the system.
 @end itemize
 
 @cindex SINIX, MIPS
