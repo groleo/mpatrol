@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.255 2002-01-08 21:33:39 graeme Exp $
+@c $Id: mpatrol.texi,v 1.256 2002-01-08 22:07:02 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -10345,6 +10345,13 @@ checking functions (invoked through the use of the @option{-fcheck-memory-usage}
 option to the GNU compiler) then execution will halt regardless, despite what
 the description of the diagnostic message says.
 
+If a warning or error occurs due to a direct call to an mpatrol library function
+then an attempt will be made to provide a log entry for the call.  If the
+diagnostic was not caused by a normal memory allocation, reallocation or
+deallocation function then the log entry will be preceded by @samp{LOG:}.  The
+function type will be listed as @samp{check} if it does not fall into the normal
+categories or if not enough information is available.
+
 Note that on UNIX platforms, if the diagnostic message is caused by a line in
 the program source then the @option{EDIT} and @option{LIST} options can be used
 to illustrate more clearly where in the source code the warning or error
@@ -10371,8 +10378,8 @@ been caught at the next invocation of an mpatrol function when the
 error message will not occur if the @option{OFLOWWATCH} option was used since
 all overflow buffers will be write protected.
 @item Additional
-The library summary, the contents of the overflow buffer and information about
-the original memory allocation.
+The log file entry, the library summary, the contents of the overflow buffer and
+information about the original memory allocation.
 @item Result
 Execution terminates.
 @end table
@@ -10437,8 +10444,8 @@ will be write protected and will also not occur if the @option{PRESERVE} option
 was used since the free byte cannot be used to verify the freed allocation's
 contents.
 @item Additional
-The library summary, the contents of the freed memory block and information
-about the original memory allocation.
+The log file entry, the library summary, the contents of the freed memory block
+and information about the original memory allocation.
 @item Result
 Execution terminates.
 @end table
@@ -10455,7 +10462,7 @@ Error
 A memory operation function was called to operate on a previously freed memory
 allocation when the @option{NOFREE} option was used.
 @item Additional
-Information about the original memory allocation.
+The log file entry and information about the original memory allocation.
 @item Result
 The memory operation fails and execution continues.
 @end table
@@ -10481,8 +10488,8 @@ function when the @option{NOFREE} option was used in conjunction with the
 will not occur if the @option{OFLOWWATCH} option was used since all overflow
 buffers will be write protected.
 @item Additional
-The library summary, the contents of the overflow buffer and information about
-the original memory allocation.
+The log file entry, the library summary, the contents of the overflow buffer and
+information about the original memory allocation.
 @item Result
 Execution terminates.
 @end table
@@ -10503,7 +10510,8 @@ caught at the next invocation of an mpatrol function.  This particular error
 message will not occur if the @option{PAGEALLOC} option was used since all free
 memory will be write protected.
 @item Additional
-The library summary and the contents of the free memory block.
+The log file entry, the library summary and the contents of the free memory
+block.
 @item Result
 Execution terminates.
 @end table
@@ -10558,7 +10566,7 @@ Error
 @item Cause
 A memory operation function was called to operate on free memory.
 @item Additional
-No additional information.
+The log file entry.
 @item Result
 The memory operation fails and execution continues.
 @end table
@@ -10689,7 +10697,7 @@ the length of the operation was zero then this error will only occur when the
 @option{CHECKALL} or @option{CHECKMEMORY} options were used as the ANSI C/C++
 standards allow this behaviour, and it is really only a portability issue.
 @item Additional
-No additional information.
+The log file entry.
 @item Result
 The memory operation fails and execution continues.
 @end table
@@ -10758,7 +10766,7 @@ The end address of the memory allocation.
 A memory operation function was called to operate on a range of memory which
 overflowed the boundaries of a memory allocation.
 @item Additional
-Information about the original memory allocation.
+The log file entry and information about the original memory allocation.
 @item Result
 The operation will be only be performed (and will be changed from an error to a
 warning) if the @option{ALLOWOFLOW} option was used, but execution will continue
@@ -10848,7 +10856,7 @@ The end address of the memory allocation.
 A string function was called to operate on a string which overflowed the
 boundaries of a memory allocation.
 @item Additional
-Information about the original memory allocation.
+The log file entry and information about the original memory allocation.
 @item Result
 The operation will not be performed and execution continues.
 @end table
@@ -12353,9 +12361,7 @@ Need to store filename and line number information in all call stacks so that
 the information can be used at program termination.  May also need to display
 this information in the @code{__mp_printinfo()} function and add this
 information to the profiling output file so that @command{mprof} can make use of
-it.  Stack traces also need to be displayed when the @code{__mp_checkrange()}
-and @code{__mp_checkstring()} internal functions fail.  Likewise for the
-@code{strdup()} family of functions if the source string is invalid.
+it.
 
 @item
 In object file formats that support nested symbols (such as ELF), the current
