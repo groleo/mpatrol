@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.22 2000-07-18 23:16:38 graeme Exp $
+.\" $Id: mpatrol.1,v 1.23 2000-08-31 20:32:00 graeme Exp $
 .\"
-.TH MPATROL 1 "18 July 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 1 "31 August 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -69,7 +69,9 @@ integrity of free memory and overflow buffers.
 .TP
 \fB\-c\fP
 [\fBCHECKALL\fP]  Specifies that all arguments to functions which allocate,
-reallocate and deallocate memory have rigorous checks performed on them.
+reallocate and deallocate memory have rigorous checks performed on them.  In
+addition, functions which perform memory operations will be checked for
+zero-length \fBNULL\fP pointers.
 .TP
 \fB\-D\fP <\fIunsigned integer\fP>
 [\fBDEFALIGN\fP]  Specifies the default alignment for general-purpose memory
