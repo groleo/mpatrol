@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.196 2001-03-08 23:00:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.197 2001-03-09 00:05:17 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.7
 @set VERSION 1.4.2
-@set UPDATED 8th March, 2001
+@set UPDATED 9th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -3468,10 +3468,11 @@ be wrong.
 
 The second argument to @command{mpsym} must be a valid mpatrol log filename but
 if it is omitted then @command{mpsym} will use @file{mpatrol.log} as the name of
-the log file to use.  The @command{mpsym} command makes two passes over the log
-file so the file must be randomly-accessable.  Note also that the
-@command{mpsym} command supports the @option{--help} and @option{--version}
-options in common with the other mpatrol command line tools.
+the log file to use, or @file{progfile.log} if it can't find that.  The
+@command{mpsym} command makes two passes over the log file so the file must be
+randomly-accessable.  Note also that the @command{mpsym} command supports the
+@option{--help} and @option{--version} options in common with the other mpatrol
+command line tools.
 
 The @command{mpsym} command currently uses @command{gdb} as the debugger with
 which to obtain the additional information about the code addresses in the
@@ -4392,6 +4393,15 @@ mpatrol tracing output filename but if it is omitted then it will use
 @file{mpatrol.trace} as the name of the file to use.  If the filename argument
 is given as @samp{-} then the standard input file stream will be used as the
 tracing output file.
+
+@cindex --sim-file
+A C source file containing a trace-driven memory allocation simulation program
+can be written with the @option{--sim-file} option.  This program will have the
+identical memory allocation behaviour to the program which produced the original
+trace file, although reallocations will have been converted into their
+corresponding deallocations and allocations.  This option can be useful to use
+if you wish to determine which malloc library is most suitable to use for a
+specific application.
 
 @cindex GUI
 @cindex graphical user interface
