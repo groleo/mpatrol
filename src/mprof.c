@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.4 2000-04-25 01:06:24 graeme Exp $"
+#ident "$Id: mprof.c,v 1.5 2000-04-25 19:24:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -180,16 +180,14 @@ static void printdata(size_t *d, size_t t)
     size_t i;
     double n;
 
-    if (t == 0)
-        fputs("  -  -  -  -", stdout);
-    else
-        for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
+        if ((t == 0) || (d[i] == 0))
+            fputs("   ", stdout);
+        else
         {
             n = ((double) d[i] / (double) t) * 100.0;
             if (n >= 99.5)
                 fputs(" %%", stdout);
-            else if (n <= 0.5)
-                fputs("  -", stdout);
             else
                 fprintf(stdout, " %2.0f", n);
         }
@@ -355,7 +353,7 @@ static void bintable(void)
     int p;
 
     p = 0;
-    printchar(' ', 30);
+    printchar(' ', 32);
     fputs("ALLOCATION BINS\n\n", stdout);
     printchar(' ', 21);
     fputs("allocated", stdout);
@@ -416,7 +414,7 @@ static void directtable(void)
     size_t i;
     unsigned long a, b, c;
 
-    printchar(' ', 29);
+    printchar(' ', 31);
     fputs("DIRECT ALLOCATIONS\n\n", stdout);
     printchar(' ', 14);
     fputs("allocated", stdout);
@@ -439,7 +437,8 @@ static void directtable(void)
             {
                 n = p;
                 p = (profilenode *) __mp_successor(&n->node);
-                sumdata(&d, &data[n->data - 1]);
+                if (n->data != 0)
+                    sumdata(&d, &data[n->data - 1]);
             }
             a = b = c = 0;
             for (i = 0; i < 4; i++)
@@ -450,9 +449,9 @@ static void directtable(void)
             }
             fprintf(stdout, "%6.2f  %8lu ",
                     ((double) a / (double) atotal) * 100.0, a);
-            printdata(d.atotal, a);
+            printdata(d.atotal, atotal);
             fprintf(stdout, "  %8lu ", b);
-            printdata(d.dtotal, b);
+            printdata(d.dtotal, dtotal);
             fprintf(stdout, "  %6lu  ", c);
             if (n->symbol != 0)
                 fprintf(stdout, "%s\n", symbols + n->symbol);
