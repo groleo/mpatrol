@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.72 2001-05-23 20:23:45 graeme Exp $
+# $Id: Makefile,v 1.73 2001-07-12 22:19:19 graeme Exp $
 
 
 # Definitions
@@ -36,7 +36,13 @@ SOURCE = ../../src
 TOOLS  = ../../tools
 VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS	= -I$(SOURCE) -I$(TOOLS)
+GUISUP	= false
+
+ifeq ($(GUISUP),true)
+CFLAGS	= -I$(SOURCE) -I$(TOOLS) -DMP_GUI_SUPPORT=1
+else
+CFLAGS	= -I$(SOURCE) -I$(TOOLS) -DMP_GUI_SUPPORT=0
+endif
 OFLAGS	= -O3 -fno-inline-functions
 SFLAGS	= -fPIC
 TFLAGS	= -DMP_THREADS_SUPPORT
@@ -192,7 +198,11 @@ mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
 mptrace: mptrace.o getopt.o tree.o slots.o utils.o version.o
+ifeq ($(GUISUP),true)
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11/lib -lXm -lXt -lX11
+else
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o
+endif
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
