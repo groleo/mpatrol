@@ -153,6 +153,7 @@
 #define MP_FLG_ALLOCUPPER    0x00040000
 #define MP_FLG_USEMMAP       0x00080000
 #define MP_FLG_USEDEBUG      0x00100000
+#define MP_FLG_ALLOWOFLOW    0x00200000
 
 
 /* The different types of memory allocation and operation functions.

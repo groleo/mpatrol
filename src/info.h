@@ -51,6 +51,7 @@
 #define FLG_SHOWSYMBOLS   1024 /* show all symbols read */
 #define FLG_SAFESIGNALS   2048 /* save and restore signal handlers */
 #define FLG_NOPROTECT     4096 /* do not protect internal structures */
+#define FLG_ALLOWOFLOW    8192 /* allow memory operations to overflow */
 
 #define FLG_FREED         1    /* allocation has been freed */
 #define FLG_PROFILED      2    /* allocation has been profiled */

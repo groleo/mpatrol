@@ -92,6 +92,7 @@
 #define OPT_ALLOCUPPER    0x00040000
 #define OPT_USEMMAP       0x00080000
 #define OPT_USEDEBUG      0x00100000
+#define OPT_ALLOWOFLOW    0x00200000
 
 
 /* The different types of errors when parsing options.
