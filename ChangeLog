@@ -1,3 +1,227 @@
+2000-11-06  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def, build/windows/mpatrolmt.def:
+	Added the alloca() family of functions.
+
+	* doc/Makefile: Revised to work with the latest version of texi2html.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Document alloca() and related functions.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Documented the alloca() functions.
+
+	* src/config.h: Added MP_FULLSTACK support.
+
+	* src/info.c: Added MP_FULLSTACK support.
+
+	* src/stack.c: Fixed bugs when checking for Netware.
+
+	* src/symbol.c:
+	No longer protect the string table in __mp_protectsymbols().
+
+	* src/inter.c:
+	Added MP_FULLSTACK support.  Added a minimum number of bytes of stack
+	frame difference when MP_FULLSTACK is not supported in checkalloca().
+
+2000-11-05  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/addr.c: Added __mp_compareaddrs().
+
+	* src/addr.h:
+	Added the __mp_compareaddrs() function.
+	Added protection recursion count.
+
+	* src/profile.c, src/profile.h, src/alloc.c, src/alloc.h, src/heap.c,
+	  src/heap.h, src/symbol.c, src/symbol.h, src/strtab.c, src/strtab.h:
+	Improved the memory protection handling.
+
+2000-11-03  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Brought the documentation slightly more up to date.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Documented the alloca() change to __mp_check().
+
+	* src/diag.c, src/info.c, src/info.h, src/inter.c, src/malloc.c,
+	  src/mpatrol.h:
+	Added strdupa() and strndupa().
+
+	* tests/pass/test8.c: Added a new test demonstrating alloca().
+
+	* tests/fail/test16.c:
+	Added a new test demonstrating what errors can be detecting with
+	alloca().
+
+2000-11-02  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.c:
+	Forced stackdirection() to take the address of its parameter, otherwise
+	it may be inlined.
+
+	* src/diag.c, src/info.c, src/info.h:
+	Added more alloca() support.  Added the dealloca() function.
+
+	* src/malloc.c: Added alloca().  Added the dealloca() function.
+
+	* src/mpatrol.h: Added alloca() support.  Added the dealloca() function.
+
+	* src/mpatrol.c:
+	Added the execpath() function to fix the problem with no path to the
+	executable called via execvp().
+
+2000-11-01  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpsym: Fixed a problem working with different awks.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Updated example 7 and documented mpsym.
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
+	  pkg/lha/build, man/man1/mpsym.1, man/cat1/mpsym.1, man/Makefile:
+	Added the mpsym manual page.
+
+2000-10-31  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpsym:
+	New command for post-processing the mpatrol log file.  Fixed problem
+	with non-stack traceback lines that begin with an address.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Updated some of the examples to reflect the new function offsets in the
+	stack tracebacks.  Added information about the mallopt command.  Changed
+	almost all of the other examples to the new stack trace format.
+
+	* man/man3/mpatrol.3, man/man1/mprof.1, man/man1/mleak.1,
+	  man/man1/mpatrol.1, man/cat3/mpatrol.3, man/cat1/mprof.1,
+	  man/cat1/mleak.1, man/cat1/mpatrol.1:
+	Added a reference to the mpsym command.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the mpsym command.
+
+2000-10-30  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Changed the format of the USEDEBUG stack trace.
+
+	* extra/.cshrc, extra/.gdbinit, extra/.profile:
+	Added the mallopt command.
+
+	* src/diag.c, src/diag.h:
+	Changed the format of the USEDEBUG stack trace.  Tidied up
+	__mp_printsymbol() and added byte offset.
+
+	* src/signals.c: Removed the third parameter from __mp_printsymbol().
+
+2000-10-29  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/mpatrol.txt, doc/refcard.tex,
+	  man/man1/mpatrol.1, man/cat1/mpatrol.1:
+	Added the --check-* options.
+
+	* src/mpatrol.c: Added the --check-* options.
+
+2000-10-26  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/Makefile:
+	Now automatically include postscript fonts in postscript formats.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Added extra section on graphs in the profiling chapter.
+
+	* extra/cc1.dot, extra/collect2.dot, extra/cpp.dot, extra/gcc.dot:
+	New example graph specification files.
+
+2000-10-25  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/Makefile, doc/README:
+	Added the graph image files.  Also, the PDF image file is now really a
+	PDF file.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt: Added the example graphs.
+
+	* doc/texinfo.tex: Updated to the latest texinfo file.
+
+	* doc/images/mpatrol.pdf: Reintroduced a proper PDF image this time.
+
+	* doc/images/cc1.pdf, doc/images/collect2.pdf, doc/images/cpp.pdf,
+	  doc/images/gcc.pdf:
+	Added PDF files for example graphs.
+
+	* doc/images/cc1.eps, doc/images/collect2.eps, doc/images/cpp.eps,
+	  doc/images/gcc.eps:
+	Added EPS files for example graphs.
+
+	* doc/images/cc1.jpg, doc/images/collect2.jpg, doc/images/cpp.jpg,
+	  doc/images/gcc.jpg:
+	Added JPEG files for example graphs.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the graph image files.
+
+2000-10-19  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/mpatrol.txt:
+	Updated the mpatrol and mprof command line options.
+
+	* doc/refcard.tex:
+	Don't need the pdfcompress setting any more.  Updated the options for
+	mpatrol and mprof.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1:
+	Removed implicit LOGALL and added the --log* and --show* options.
+
+	* man/man1/mprof.1, man/cat1/mprof.1:
+	Added the --graph-file and the --leaks options.
+
+	* src/mpatrol.c: Added the --show* and --log* options.
+
+	* src/mprof.c: Added the -l option.
+
+2000-10-17  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added dependency to graph.h for mprof.
+
+	* src/mprof.c: Added the -g option.
+
+2000-10-16  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.txt: Updated to latest version of manual.
+
+2000-10-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added the long options and also the references section.
+
+2000-10-11  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/README:
+	Documented the texinfo.tex file.
+
+	* doc/Makefile:
+	Added texinfo.tex to the dvi and pdf file dependencies for the mpatrol
+	manual.
+
+	* doc/texinfo.tex:
+	Added the latest version of texinfo.tex to the distribution.
+
+	* man/Makefile: New Makefile for manual pages.
+
+2000-10-10  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/refcard.tex:
+	Added the long options.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1, man/man1/mprof.1,
+	  man/cat1/mprof.1, man/man1/mleak.1, man/cat1/mleak.1:
+	Added all of the long options.
+
 2000-10-09  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/getopt.c: Changed the format of the quick reference table.

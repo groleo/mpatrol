@@ -3,6 +3,12 @@ Changes for 1.3.0
   * Added the CHECKMEMORY option for displaying an error for each zero-size
     memory operation on a NULL pointer.
 
+  * Changed the format of stack traces in the mpatrol log file so that symbol
+    names also contain a byte offset from the beginning of the symbol.
+
+  * Added the alloca(), strdupa(), strndupa() and dealloca() functions for
+    tracing and debugging temporary stack-based memory allocations.
+
   * ICL DRS/NX is now supported.
 
   * The OFLOWWATCH option is now supported on IRIX.
@@ -10,19 +16,44 @@ Changes for 1.3.0
   * Finally fixed the determination of the address of an illegal memory access
     on IRIX platforms and added support for the SGI N32 object file format.
 
+  * MP_FUNCNAME is now supported for C9X compilers.
+
   * Added long options to the external commands and added --help.
 
+  * Added the --show-env option to the mpatrol command and removed the implicit
+    LOGALL that was always being added to MPATROL_OPTIONS.
+
+  * Fixed a problem with the mpatrol command on UNIX platforms when the command
+    to be run was not supplied with a pathname.
+
+  * Added the --graph-file and --leaks options to the mprof command for writing
+    out graph specification files for later visualisation with dot.
+
   * Added the ability to read the unfreed allocations table from the log file
-    with the mleak command and also added the -i option.
+    with the mleak command and also added the --ignore option.
 
-  * Added a new section to the mpatrol manual on diagnostic messages.
+  * Added the mpsym command, which makes use of a debugger to locate any missing
+    symbolic information in an mpatrol log file if the USEDEBUG option does not
+    work.
 
-  * The ASCII version of the mpatrol manual is now provided with the main
-    distribution.
+  * Added instructions on how to define a mallopt command in the shell which
+    will set the MPATROL_OPTIONS environment variable in the current process.
+
+  * Added new sections to the mpatrol manual on diagnostic messages and
+    references to other documentation.  The manual also contains example graph
+    images illustrating the new --graph-file mprof option.
+
+  * The ASCII version of the mpatrol manual and the texinfo.tex file used to
+    build the printed manuals are now provided with the main distribution.  The
+    PDF version of the manual now includes the mpatrol logo as a proper PDF
+    image file instead of a PNG file.
+
+  * A Makefile is now provided to build the UNIX manual pages.
 
   * Added a new definition file for the Windows thread-safe DLL.
 
-  * Made the tests work on 64-bit platforms.
+  * Made the tests work on 64-bit platforms and added 2 new tests demonstrating
+    the alloca() family of functions.
 
 
 Changes for 1.2.6 (18th July, 2000)
