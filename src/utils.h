@@ -51,6 +51,7 @@ extern "C"
 
 
 MP_EXPORT unsigned char __mp_logtwo(unsigned long);
+MP_EXPORT unsigned long __mp_squareroot(unsigned long);
 #if !MP_MACROROUTINES
 MP_EXPORT int __mp_ispoweroftwo(unsigned long);
 #endif /* MP_MACROROUTINES */

@@ -29,7 +29,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: utils.c,v 1.3 2000-01-09 20:35:24 graeme Exp $"
+#ident "$Id: utils.c,v 1.4 2000-01-31 21:06:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,6 +48,18 @@ MP_GLOBAL unsigned char __mp_logtwo(unsigned long n)
 
     for (l = 0; n > 0; l++, n >>= 1);
     return (unsigned char) ((l == 0) ? 0 : l - 1);
+}
+
+
+/* Return the truncated square root of an unsigned integer.
+ */
+
+MP_GLOBAL unsigned long __mp_squareroot(unsigned long n)
+{
+    unsigned long r, t;
+
+    for (r = 0, t = 1; n >= t; n -= t, r++, t += 2);
+    return r;
 }
 
 
