@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.22 2000-05-31 20:48:41 graeme Exp $
+# $Id: SMakefile,v 1.23 2000-06-12 21:54:13 graeme Exp $
 
 
 # Definitions
@@ -125,7 +125,7 @@ info.t.o: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/utils.h $(SOURCE)/profile.h
 stack.o stack.t.o: $(SOURCE)/stack.c $(SOURCE)/stack.h $(SOURCE)/memory.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/machine.h $(SOURCE)/config.h $(SOURCE)/target.h
 addr.o addr.t.o: $(SOURCE)/addr.c $(SOURCE)/addr.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
