@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.18 2000-04-20 18:13:08 graeme Exp $"
+#ident "$Id: info.c,v 1.19 2000-04-20 23:35:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -452,11 +452,6 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     i->data.stack = __mp_getaddrs(&h->addr, v);
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
-                    if (m->data.flags & FLG_PROFILED)
-                    {
-                        __mp_profilefree(&h->prof, d, m);
-                        __mp_profilealloc(&h->prof, l, m);
-                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -485,11 +480,6 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
-                    if (m->data.flags & FLG_PROFILED)
-                    {
-                        __mp_profilefree(&h->prof, d, m);
-                        __mp_profilealloc(&h->prof, l, m);
-                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -498,16 +488,14 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                 }
                 else
                     p = NULL;
-            else
-            {
-                if (m->data.flags & FLG_PROFILED)
-                {
-                    __mp_profilefree(&h->prof, d, m);
-                    __mp_profilealloc(&h->prof, l, m);
-                }
 #if MP_INUSE_SUPPORT
+            else
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
+            if ((p != NULL) && (m->data.flags & FLG_PROFILED))
+            {
+                __mp_profilefree(&h->prof, d, m);
+                __mp_profilealloc(&h->prof, l, m);
             }
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
