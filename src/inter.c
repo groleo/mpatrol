@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.85 2001-02-16 23:02:56 graeme Exp $"
+#ident "$Id: inter.c,v 1.86 2001-02-22 18:38:37 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.85 2001-02-16 23:02:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.86 2001-02-22 18:38:37 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -590,7 +590,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (l == 0)
             l = 1;
         if ((p = sbrk(l)) == (void *) -1)
-            if ((f == ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
+            if ((f == AT_ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
                 abort();
             else
                 p = NULL;
