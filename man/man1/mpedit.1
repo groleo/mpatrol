@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpedit.1,v 1.8 2001-08-23 23:00:04 graeme Exp $
+.\" $Id: mpedit.1,v 1.9 2001-09-03 22:37:56 graeme Exp $
 .\"
-.TH MPEDIT 1 "23 August 2001" "Release 1.4" "mpatrol library"
+.TH MPEDIT 1 "3 September 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpedit \- edits a text file at a specific line number in a new window
 .SH SYNOPSIS
@@ -51,15 +51,16 @@ the \fBEDITOR\fP environment variable.  This can be set to the full pathname of
 the text editor to use or it can be set to the command that would normally be
 used to invoke the text editor, but it cannot also contain command line options.
 .PP
-The currently supported editors are \fBvi\fP, \fBvim\fP, \fBemacs\fP and
-\fBxemacs\fP, and if the \fBEDITOR\fP environment variable is not set then the
-default will be \fBvi\fP.  Selecting an unsupported text editor will result in
-an error.  However, you can edit the \fBmpedit\fP file to add support for your
-own favourite text editor as long as it supports a way to immediately jump to a
-specific line number when it is first started up.  Note that the text editor
-must also open a new window to edit the source file so that it does not obscure
-any mpatrol diagnostic messages, and if it does not support this then a new
-terminal window must be opened for it to use.
+The currently supported editors are \fBvi\fP, \fBvim\fP, \fBelvis\fP,
+\fBemacs\fP, \fBxemacs\fP, \fBpico\fP and \fBnano\fP, and if the \fBEDITOR\fP
+environment variable is not set then the default will be \fBvi\fP.  Selecting an
+unsupported text editor will result in an error.  However, you can edit the
+\fBmpedit\fP file to add support for your own favourite text editor as long as
+it supports a way to immediately jump to a specific line number when it is first
+started up.  Note that the text editor must also open a new window to edit the
+source file so that it does not obscure any mpatrol diagnostic messages, and if
+it does not support this then a new terminal window must be opened for it to
+use.
 .PP
 If the \fB\-\-listing\fP option is given on the command line then the
 \fBmpedit\fP command will display a context listing of the source file at the
@@ -90,8 +91,9 @@ line.
 Displays the version number of the \fBmpedit\fP command.
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBmprof\fP(1), \fBmptrace\fP(1), \fBmleak\fP(1),
-\fBmpsym\fP(1), \fBhexwords\fP(1), \fBvi\fP(1), \fBvim\fP(1), \fBemacs\fP(1),
-\fBxemacs\fP(1), \fBlibmpatrol\fP(3), \fBlibmpalloc\fP(3).
+\fBmpsym\fP(1), \fBhexwords\fP(1), \fBvi\fP(1), \fBvim\fP(1), \fBelvis\fP(1),
+\fBemacs\fP(1), \fBxemacs\fP(1), \fBpico\fP(1), \fBnano\fP(1),
+\fBlibmpatrol\fP(3), \fBlibmpalloc\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP
