@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.43 2001-02-04 21:27:16 graeme Exp $
+# $Id: Makefile,v 1.44 2001-02-05 21:42:23 graeme Exp $
 
 
 # Definitions
@@ -56,6 +56,7 @@ ARCHTS_MPATROL	= $(MPATROL)mt.lib
 OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 ARCHIVE_MPALLOC	= $(MPALLOC).lib
+OBJECT_MPALLOC	= lib$(MPALLOC).obj
 
 
 # Rules
@@ -83,6 +84,9 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c
 $(ARCHIVE_MPALLOC): $(MPAOBJS)
 	$(AR) -xar -o $@ $(MPAOBJS)
 
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c
+	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
+
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
@@ -105,7 +109,7 @@ clean:
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm 2>&1 >/dev/null
 
 

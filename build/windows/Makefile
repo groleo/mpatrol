@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.51 2001-02-05 21:19:24 graeme Exp $
+# $Id: Makefile,v 1.52 2001-02-05 21:42:25 graeme Exp $
 
 
 # Definitions
@@ -75,6 +75,7 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).lib
 SHARED_MPALLOC	= $(MPALLOC).dll
+OBJECT_MPALLOC	= lib$(MPALLOC).obj
 
 
 # Rules
@@ -111,6 +112,9 @@ $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 $(SHARED_MPALLOC): $(SHARED_MPAOBJS) $(MPALLOC).def
 	$(LD) -dll -nologo -def:$(MPALLOC).def -out:$@ $(SHARED_MPAOBJS)
 
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c
+	$(CC) $(CFLAGS) $(OFLAGS) -TP -c -Fo$@ $<
+
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
@@ -140,6 +144,7 @@ clobber: clean
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(MPALLOC).lib $(MPALLOC).exp 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol.exe mprof.exe mptrace.exe mleak.exe 2>&1 >/dev/null
 
 

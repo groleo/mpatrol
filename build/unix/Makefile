@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.53 2001-02-04 21:31:54 graeme Exp $
+# $Id: Makefile,v 1.54 2001-02-05 21:42:24 graeme Exp $
 
 
 # Definitions
@@ -77,6 +77,7 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= lib$(MPALLOC).so
+OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 
@@ -143,6 +144,9 @@ $(SHARED_MPALLOC).$(VERSION).$(REVISION): $(SHARED_MPAOBJS)
 $(SHARED_MPALLOC): $(SHARED_MPALLOC).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
 
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c
+	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
+
 $(LINT_MPALLOC): $(LINT_MPAOBJS)
 	$(LINT) -o $(MPALLOC) $(LINT_MPAOBJS)
 
@@ -200,7 +204,8 @@ clobber: clean
 	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPALLOC).$(VERSION).$(REVISION) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_MPALLOC) $(LINT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.44 2001-02-04 21:28:36 graeme Exp $
+# $Id: Makefile,v 1.45 2001-02-05 21:42:19 graeme Exp $
 
 
 # Definitions
@@ -55,6 +55,7 @@ ARCHTS_MPATROL	= lib$(MPATROL)mt.a
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
+OBJECT_MPALLOC	= lib$(MPALLOC).o
 
 
 # Rules
@@ -82,6 +83,9 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c
 $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 	$(AR) cr $@ $(ARCHIVE_MPAOBJS)
 
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c
+	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
+
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
@@ -104,7 +108,7 @@ clean:
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 

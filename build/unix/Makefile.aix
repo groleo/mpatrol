@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.11 2001-02-01 20:46:21 graeme Exp $
+# $Id: Makefile.aix,v 1.12 2001-02-05 21:42:24 graeme Exp $
 
 
 # Definitions
@@ -72,6 +72,7 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= shra.o
+OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 
@@ -126,6 +127,9 @@ $(ARCHIVE_MPALLOC): $(SHARED_MPALLOC) $(ARCHIVE_MPAOBJS)
 $(SHARED_MPALLOC): $(ARCHIVE_MPAOBJS) $(MPALLOC).exp
 	$(LD) -bmodtype:SRE -bexport:$(MPALLOC).exp -bnoentry -o $@ $(ARCHIVE_MPAOBJS)
 
+$(OBJECT_MPALLOC): $(SOURCE)/library2.c
+	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
+
 $(LINT_MPALLOC): $(LINT_MPAOBJS)
 	$(LINT) -o $(MPALLOC) $(LINT_MPAOBJS)
 
@@ -168,7 +172,7 @@ clobber: clean
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
-	-@ rm -f $(LINT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_MPALLOC) $(LINT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
