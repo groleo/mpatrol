@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.25 2000-10-19 19:32:02 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.26 2000-10-29 22:51:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -91,7 +91,11 @@ typedef enum options_flags
     OF_PAGEALLOCLOWER = 'x',
     OF_FAILSEED       = 'Z',
     OF_FAILFREQ       = 'z',
-    OF_LOGALL         = SHORTOPT_MAX + 1,
+    OF_CHECKALLOCS    = SHORTOPT_MAX + 1,
+    OF_CHECKFREES,
+    OF_CHECKMEMORY,
+    OF_CHECKREALLOCS,
+    OF_LOGALL,
     OF_LOGALLOCS,
     OF_LOGFREES,
     OF_LOGMEMORY,
@@ -146,11 +150,12 @@ static int logallocs, logreallocs;
 static int logfrees, logmemory;
 static int showmap, showsymbols;
 static int showfreed, showunfreed;
-static int checkall, prof;
-static int safesignals, noprotect;
-static int preserve, oflowwatch;
-static int usemmap, usedebug;
-static int allowoflow;
+static int checkallocs, checkreallocs;
+static int checkfrees, checkmemory;
+static int prof, safesignals;
+static int noprotect, preserve;
+static int oflowwatch, usemmap;
+static int usedebug, allowoflow;
 
 
 /* The table describing all recognised options.
@@ -175,8 +180,19 @@ static option options_table[] =
      "\tSpecifies a range of allocation indices at which to check the\n"
      "\tintegrity of free memory and overflow buffers.\n"},
     {"check-all", OF_CHECKALL, NULL,
-     "\tSpecifies that all arguments to functions which allocate, reallocate\n"
-     "\tand deallocate memory have rigorous checks performed on them.\n"},
+     "\tEquivalent to the --check-allocs, --check-reallocs, --check-frees and\n"
+     "\t--check-memory options specified together.\n"},
+    {"check-allocs", OF_CHECKALLOCS, NULL,
+     "\tChecks that no attempt is made to allocate a block of memory of size\n"
+     "\tzero.\n"},
+    {"check-frees", OF_CHECKFREES, NULL,
+     "\tChecks that no attempt is made to deallocate a NULL pointer.\n"},
+    {"check-memory", OF_CHECKMEMORY, NULL,
+     "\tChecks that no attempt is made to perform a zero-length memory\n"
+     "\toperation on a NULL pointer.\n"},
+    {"check-reallocs", OF_CHECKREALLOCS, NULL,
+     "\tChecks that no attempt is made to reallocate a NULL pointer or resize\n"
+     "\tan existing block of memory to size zero.\n"},
     {"def-align", OF_DEFALIGN, "unsigned integer",
      "\tSpecifies the default alignment for general-purpose memory\n"
      "\tallocations, which must be a power of two.\n"},
@@ -356,8 +372,19 @@ static void setoptions(int s)
         addoption("AUTOSAVE", autosave, 0);
     if (check)
         addoption("CHECK", check, 0);
-    if (checkall)
+    if (checkallocs && checkfrees && checkmemory && checkreallocs)
         addoption("CHECKALL", NULL, 0);
+    else
+    {
+        if (checkallocs)
+            addoption("CHECKALLOCS", NULL, 0);
+        if (checkfrees)
+            addoption("CHECKFREES", NULL, 0);
+        if (checkmemory)
+            addoption("CHECKMEMORY", NULL, 0);
+        if (checkreallocs)
+            addoption("CHECKREALLOCS", NULL, 0);
+    }
     if (defalign)
         addoption("DEFALIGN", defalign, 0);
     if (failfreq)
@@ -372,14 +399,19 @@ static void setoptions(int s)
         addoption("LARGEBOUND", largebound, 0);
     if (limit)
         addoption("LIMIT", limit, 0);
-    if (logallocs)
-        addoption("LOGALLOCS", NULL, 0);
-    if (logfrees)
-        addoption("LOGFREES", NULL, 0);
-    if (logmemory)
-        addoption("LOGMEMORY", NULL, 0);
-    if (logreallocs)
-        addoption("LOGREALLOCS", NULL, 0);
+    if (logallocs && logfrees && logmemory && logreallocs)
+        addoption("LOGALL", NULL, 0);
+    else
+    {
+        if (logallocs)
+            addoption("LOGALLOCS", NULL, 0);
+        if (logfrees)
+            addoption("LOGFREES", NULL, 0);
+        if (logmemory)
+            addoption("LOGMEMORY", NULL, 0);
+        if (logreallocs)
+            addoption("LOGREALLOCS", NULL, 0);
+    }
     if (mediumbound)
         addoption("MEDIUMBOUND", mediumbound, 0);
     if (nofree)
@@ -406,14 +438,19 @@ static void setoptions(int s)
         addoption("REALLOCSTOP", reallocstop, 0);
     if (safesignals)
         addoption("SAFESIGNALS", NULL, 0);
-    if (showfreed)
-        addoption("SHOWFREED", NULL, 0);
-    if (showmap)
-        addoption("SHOWMAP", NULL, 0);
-    if (showsymbols)
-        addoption("SHOWSYMBOLS", NULL, 0);
-    if (showunfreed)
-        addoption("SHOWUNFREED", NULL, 0);
+    if (showfreed && showmap && showsymbols && showunfreed)
+        addoption("SHOWALL", NULL, 0);
+    else
+    {
+        if (showfreed)
+            addoption("SHOWFREED", NULL, 0);
+        if (showmap)
+            addoption("SHOWMAP", NULL, 0);
+        if (showsymbols)
+            addoption("SHOWSYMBOLS", NULL, 0);
+        if (showunfreed)
+            addoption("SHOWUNFREED", NULL, 0);
+    }
     if (smallbound)
         addoption("SMALLBOUND", smallbound, 0);
     if (unfreedabort)
@@ -479,7 +516,22 @@ int main(int argc, char **argv)
             check = __mp_optarg;
             break;
           case OF_CHECKALL:
-            checkall = 1;
+            checkallocs = 1;
+            checkreallocs = 1;
+            checkfrees = 1;
+            checkmemory = 1;
+            break;
+          case OF_CHECKALLOCS:
+            checkallocs = 1;
+            break;
+          case OF_CHECKFREES:
+            checkfrees = 1;
+            break;
+          case OF_CHECKMEMORY:
+            checkmemory = 1;
+            break;
+          case OF_CHECKREALLOCS:
+            checkreallocs = 1;
             break;
           case OF_DEFALIGN:
             defalign = __mp_optarg;
