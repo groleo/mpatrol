@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.10 2000-01-30 20:30:13 graeme Exp $"
+#ident "$Id: info.c,v 1.11 2000-02-10 21:16:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -115,9 +115,9 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
      */
     __mp_closelogfile();
     h->log = NULL;
-    __mp_deleteallocs(&h->alloc);
-    __mp_deleteaddrs(&h->addr);
     __mp_deletesymbols(&h->syms);
+    __mp_deleteaddrs(&h->addr);
+    __mp_deleteallocs(&h->alloc);
     h->table.free = NULL;
     h->table.size = 0;
     __mp_newlist(&h->list);
