@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.5 2000-01-09 20:35:22 graeme Exp $"
+#ident "$Id: symbol.c,v 1.6 2000-02-10 20:24:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,8 +122,12 @@ extern "C"
  * a text symbol.
  */
 
+#ifdef __GNUC__
+void _DYNAMIC(void) __attribute__ ((weak));
+#else /* __GNUC__ */
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
+#endif /* __GNUC__ */
 #endif /* SYSTEM */
 
 
