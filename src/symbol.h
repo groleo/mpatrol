@@ -98,7 +98,7 @@ extern "C"
 MP_EXPORT void __mp_newsymbols(symhead *, heaphead *);
 MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
-MP_EXPORT int __mp_addsymbols(symhead *, char *, size_t);
+MP_EXPORT int __mp_addsymbols(symhead *, char *, char *, size_t);
 MP_EXPORT int __mp_addextsymbols(symhead *);
 MP_EXPORT void __mp_fixsymbols(symhead *);
 MP_EXPORT int __mp_protectsymbols(symhead *, memaccess);

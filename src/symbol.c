@@ -34,6 +34,7 @@
 #include "symbol.h"
 #include "diag.h"
 #include "utils.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || \
@@ -46,6 +47,12 @@
 #elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 #include <a.out.h>
 #if SYSTEM == SYSTEM_AIX
+#ifdef FREAD
+#undef FREAD
+#endif /* FREAD */
+#ifdef FWRITE
+#undef FWRITE
+#endif /* FWRITE */
 #ifndef ISCOFF
 #define ISCOFF(m) (((m) == U800TOCMAGIC) || ((m) == U802TOCMAGIC))
 #endif /* ISCOFF */
@@ -61,6 +68,7 @@
 #define n_name _n._n_name
 #endif /* n_name */
 #endif /* SYSTEM */
+#include <ldfcn.h>
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
 #include <libelf.h>
 #elif FORMAT == FORMAT_BFD
@@ -110,7 +118,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.43 2001-01-17 23:40:22 graeme Exp $"
+#ident "$Id: symbol.c,v 1.44 2001-01-24 13:18:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -706,24 +714,32 @@ addsym(char *s, unsigned long a, unsigned long l, void *p)
 
 static
 int
-addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
+addsymbols(symhead *y, char *e, char *l, char *f, size_t b, size_t a)
 {
     struct exec *o;
     struct nlist *p;
-    char *m;
+    char *c, *m;
     size_t i, n;
 
     /* Check that we have a valid a.out executable file.
      */
     if (b < sizeof(struct exec))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an object file\n", f);
+        c = "not an object file";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     o = (struct exec *) e;
     if (N_BADMAG(*o))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an executable file\n", f);
+        c = "not an executable file";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     /* Look for the symbol table.
@@ -732,7 +748,11 @@ addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
     n = o->a_syms;
     if ((i == 0) || (n == 0) || (b < i + n))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
+        c = "missing symbol table";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     p = (struct nlist *) (e + i);
@@ -747,9 +767,15 @@ addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
         i = *((size_t *) m);
     if ((i == 0) || (b < i))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing string table\n", f);
+        c = "missing string table";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
+    if (l != NULL)
+        f = l;
     /* Cycle through every symbol contained in the executable file.
      */
     for (i = 0; i < n; i++, p++)
@@ -766,33 +792,45 @@ addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
 
 static
 int
-addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
+addsymbols(symhead *y, char *e, char *l, char *f, size_t b, size_t a)
 {
     char n[SYMNMLEN + 1];
     FILHDR *o;
     SCNHDR *h;
     SYMENT *p;
-    char *m, *s;
+    char *c, *m, *s;
     size_t i, t;
 
     /* Check that we have a valid COFF or XCOFF executable file.
      */
     if (b < FILHSZ)
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an object file\n", f);
+        c = "not an object file";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     o = (FILHDR *) e;
     b -= FILHSZ;
     if (!ISCOFF(o->f_magic) || (o->f_opthdr == 0) || (b < o->f_opthdr))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an executable file\n", f);
+        c = "not an executable file";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     b -= o->f_opthdr;
     if ((o->f_nscns == 0) || (b < o->f_nscns * SCNHSZ))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing section table\n", f);
+        c = "missing section table";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     /* Look for the section index of the text section.  This is
@@ -814,7 +852,11 @@ addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
     i = o->f_nsyms * SYMESZ;
     if ((o->f_symptr == 0) || (o->f_nsyms == 0) || (b < i))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
+        c = "missing symbol table";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
     p = (SYMENT *) (e + o->f_symptr);
@@ -828,9 +870,15 @@ addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
         i = *((size_t *) m);
     if ((i == 0) || (b < i))
     {
-        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing string table\n", f);
+        c = "missing string table";
+        if (l != NULL)
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", l, f, c);
+        else
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
     }
+    if (l != NULL)
+        f = l;
     /* Cycle through every symbol contained in the executable file.
      */
     for (i = 0; i < o->f_nsyms; i += p->n_numaux + 1,
@@ -891,7 +939,7 @@ addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing symbol table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
         else
             __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
@@ -904,7 +952,7 @@ addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing string table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
         else
             __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
@@ -969,7 +1017,7 @@ addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing symbol table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
         else
             __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
@@ -982,7 +1030,7 @@ addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
     {
         m = "missing string table";
         if (a != NULL)
-            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", f, a, m);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
         else
             __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 1;
@@ -1018,9 +1066,10 @@ addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 
 static
 int
-addsymbols(symhead *y, bfd *h, char *f, size_t b)
+addsymbols(symhead *y, bfd *h, char *a, char *f, size_t b)
 {
     asymbol **p;
+    char *m;
     long i, n;
     int d, r;
 
@@ -1029,8 +1078,11 @@ addsymbols(symhead *y, bfd *h, char *f, size_t b)
     d = 0;
     if ((n = bfd_get_symtab_upper_bound(h)) < 0)
     {
-        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
-                   bfd_errmsg(bfd_get_error()));
+        m = (char *) bfd_errmsg(bfd_get_error());
+        if (a != NULL)
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
+        else
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 0;
     }
     if (n == 0)
@@ -1041,13 +1093,20 @@ addsymbols(symhead *y, bfd *h, char *f, size_t b)
          */
         if ((n = bfd_get_dynamic_symtab_upper_bound(h)) < 0)
         {
-            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
-                       bfd_errmsg(bfd_get_error()));
+            m = (char *) bfd_errmsg(bfd_get_error());
+            if (a != NULL)
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
+            else
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
             return 0;
         }
         if (n == 0)
         {
-            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
+            m = "missing symbol table";
+            if (a != NULL)
+                __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
+            else
+                __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
             return 1;
         }
         d = 1;
@@ -1057,20 +1116,30 @@ addsymbols(symhead *y, bfd *h, char *f, size_t b)
      */
     if ((p = (asymbol **) malloc(n)) == NULL)
     {
-        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: no memory for symbols\n", f);
+        m = "no memory for symbols";
+        if (a != NULL)
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
+        else
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 0;
     }
     r = 1;
     if (((d == 0) && ((n = bfd_canonicalize_symtab(h, p)) < 0)) ||
         ((d == 1) && ((n = bfd_canonicalize_dynamic_symtab(h, p)) < 0)))
     {
-        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f,
-                   bfd_errmsg(bfd_get_error()));
+        m = (char *) bfd_errmsg(bfd_get_error());
+        if (a != NULL)
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", a, f, m);
+        else
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         r = 0;
     }
     else
+    {
         /* Cycle through every symbol contained in the object file.
          */
+        if (a != NULL)
+            f = a;
         for (i = 0; i < n; i++)
             /* We don't need to bother looking at undefined, absolute or common
              * symbols, and we only need to store non-data symbols.
@@ -1085,6 +1154,7 @@ addsymbols(symhead *y, bfd *h, char *f, size_t b)
                     r = 0;
                     break;
                 }
+    }
     /* If we are making use of line number information in the object files then
      * we store the symbol table along with the access library handle; otherwise
      * we can free the symbol table now.
@@ -1152,23 +1222,29 @@ addsyms(char *f, unsigned long b, void *p)
 
 MP_GLOBAL
 int
-__mp_addsymbols(symhead *y, char *s, size_t b)
+__mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 {
 #if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || \
     FORMAT == FORMAT_XCOFF || FORMAT == FORMAT_ELF32 || \
     FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
-#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+#if FORMAT == FORMAT_AOUT
     char *m;
     off_t o;
+    int f;
+#elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+    LDFILE *f;
+    char *c, *m, *n;
+    ARCHDR a;
+    size_t o;
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
     Elf *a, *e;
     Elf_Arhdr *h;
+    int f;
 #elif FORMAT == FORMAT_BFD
     objectfile *p, *q;
-    bfd *h;
+    bfd *a, *g, *h;
 #endif /* FORMAT */
     char *t;
-    int f;
 #elif FORMAT == FORMAT_PE
     modinfo m;
 #endif /* FORMAT */
@@ -1189,9 +1265,9 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
         SymSetOptions(SYMOPT_UNDNAME);
     SymInitialize(GetCurrentProcess(), NULL, 1);
 #endif /* DYNLINK */
-#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
-    /* This is a very simple, yet portable, way to read symbols from a.out,
-     * COFF and XCOFF executable files.
+#if FORMAT == FORMAT_AOUT
+    /* This is a very simple, yet portable, way to read symbols from a.out
+     * executable files.
      */
     if ((f = open(s, O_RDONLY)) == -1)
     {
@@ -1213,8 +1289,8 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
         }
         else if ((m = (char *) malloc((size_t) o)) == NULL)
         {
-            /* It's actually safe to call malloc() here since the
-             * library checks for recursive behaviour.
+            /* It's actually safe to call malloc() here since the library
+             * checks for recursive behaviour.
              */
             __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: no memory for symbols\n",
                        s);
@@ -1231,10 +1307,89 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
             else if ((t = __mp_addstring(&y->strings, s)) == NULL)
                 r = 0;
             else
-                r = addsymbols(y, m, t, (size_t) o, b);
+                r = addsymbols(y, m, NULL, t, (size_t) o, b);
             free(m);
         }
         close(f);
+    }
+#elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+    /* We use the libld COFF and XCOFF access library in order to simplify
+     * the reading of symbols.  If this library is not available on a certain
+     * platform then use the above code for reading a.out files and comment
+     * this code out.  However, a better solution would be to use the GNU
+     * BFD library if it is available.
+     */
+    t = NULL;
+    if ((f = ldopen(s, NULL)) == NULL)
+    {
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
+        r = 0;
+    }
+    while (r == 1)
+    {
+        if (ldahread(f, &a))
+        {
+            n = a.ar_name;
+            o = a.ar_size;
+            if (((v != NULL) && (strcmp(n, v) != 0)) ||
+                (FSEEK(f, 0, BEGINNING) == -1))
+            {
+                if (ldclose(f))
+                    break;
+                if ((f = ldopen(s, f)) == NULL)
+                    r = 0;
+                continue;
+            }
+        }
+        else
+            n = NULL;
+        /* Find out the size of the file by doing a seek to the end of the file
+         * and then a seek back to the start of the file, but only if this is
+         * not an archive member.
+         */
+        if ((n == NULL) && ((FSEEK(f, 0, END) == -1) ||
+             ((o = FTELL(f)) == (size_t) -1) || (FSEEK(f, 0, BEGINNING) == -1)))
+        {
+            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot seek file\n", s);
+            r = 0;
+        }
+        else if ((m = (char *) malloc(o)) == NULL)
+        {
+            /* It's actually safe to call malloc() here since the library
+             * checks for recursive behaviour.
+             */
+            c = "no memory for symbols";
+            if (n != NULL)
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", s, n, c);
+            else
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s, c);
+            r = 0;
+        }
+        else
+        {
+            if (FREAD(m, sizeof(char), o, f) != o)
+            {
+                c = "cannot read file";
+                if (n != NULL)
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", s, n,
+                               c);
+                else
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s, c);
+                r = 0;
+            }
+            else if ((t == NULL) &&
+                     ((t = __mp_addstring(&y->strings, s)) == NULL))
+                r = 0;
+            else if (n != NULL)
+                r = addsymbols(y, m, t, n, o, b);
+            else
+                r = addsymbols(y, m, NULL, t, o, b);
+            free(m);
+        }
+        if (ldclose(f))
+            break;
+        if ((r == 1) && ((f = ldopen(s, f)) == NULL))
+            r = 0;
     }
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
     /* We use the libelf ELF access library in order to simplify the reading
@@ -1276,7 +1431,8 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
                                    elf_errmsg(-1));
                         r = 0;
                     }
-                    else if (*h->ar_name != '/')
+                    else if ((*h->ar_name != '/') && ((v == NULL) ||
+                              (strcmp(h->ar_name, v) == 0)))
                         r = addsymbols(y, a, t, h->ar_name, b);
                     if (r == 1)
                         elf_next(a);
@@ -1289,15 +1445,15 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
         close(f);
     }
 #elif FORMAT == FORMAT_BFD
-    /* Using the GNU BFD library allows us to read weird and wonderful
-     * file formats that would otherwise be hard to support.  This is
-     * probably a better choice to use than the in-built COFF and XCOFF
-     * implementations but currently has no support for symbol sizes, so
-     * the ELF access library is still worth using for ELF file formats,
-     * but the BFD library comes with support for debugging information.
-     * So take your pick!
+    /* Using the GNU BFD library allows us to read weird and wonderful file
+     * formats that would otherwise be hard to support.  This is probably a
+     * better choice to use than the in-built a.out, COFF and XCOFF
+     * implementations but currently has no support for symbol sizes, so the
+     * ELF access library is still worth using for ELF file formats, but the
+     * BFD library comes with support for debugging information.  So take
+     * your pick!
      */
-    p = NULL;
+    t = NULL;
     bfd_init();
     if ((h = bfd_openr(s, NULL)) == NULL)
     {
@@ -1307,50 +1463,87 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
     }
     else
     {
-        if (!bfd_check_format(h, bfd_object))
+        /* Normally we wouldn't ever need to read symbols from an archive
+         * library, but this is just provided for completeness, and for AIX
+         * where shared libraries can be embedded within archive libraries.
+         */
+        if (bfd_check_format(h, bfd_archive))
         {
-            __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s,
-                       bfd_errmsg(bfd_get_error()));
-            r = 0;
+            a = h;
+            h = bfd_openr_next_archived_file(a, NULL);
         }
-        else if (y->lineinfo &&
-                 ((p = (objectfile *) malloc(sizeof(objectfile))) == NULL))
-            r = 0;
-        else if ((t = __mp_addstring(&y->strings, s)) == NULL)
-            r = 0;
         else
+            a = NULL;
+        while (h != NULL)
         {
-            if (y->lineinfo)
+            p = NULL;
+            if ((a != NULL) && (v != NULL) && (strcmp(h->filename, v) != 0))
             {
-                if (y->hhead == NULL)
-                    y->hhead = p;
-                else
-                {
-                    q = (objectfile *) y->htail;
-                    q->next = p;
-                }
-                y->htail = p;
-                p->next = NULL;
-                p->file = h;
-                p->symbols = NULL;
-                p->base = b;
+                g = h;
+                h = bfd_openr_next_archived_file(a, g);
+                bfd_close(g);
+                continue;
             }
-            r = addsymbols(y, h, t, b);
-            if (y->lineinfo && (r == 0))
-                if (y->hhead == p)
-                    y->hhead = y->htail = NULL;
+            if (!bfd_check_format(h, bfd_object))
+            {
+                if (a != NULL)
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s [%s]: %s\n", s,
+                               h->filename, bfd_errmsg(bfd_get_error()));
                 else
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", s,
+                               bfd_errmsg(bfd_get_error()));
+                r = 0;
+            }
+            else if (y->lineinfo &&
+                     ((p = (objectfile *) malloc(sizeof(objectfile))) == NULL))
+                r = 0;
+            else if ((t == NULL) &&
+                     ((t = __mp_addstring(&y->strings, s)) == NULL))
+                r = 0;
+            else
+            {
+                if (y->lineinfo)
                 {
-                    y->htail = q;
-                    q->next = NULL;
+                    if (y->hhead == NULL)
+                        y->hhead = p;
+                    else
+                    {
+                        q = (objectfile *) y->htail;
+                        q->next = p;
+                    }
+                    y->htail = p;
+                    p->next = NULL;
+                    p->file = h;
+                    p->symbols = NULL;
+                    p->base = b;
                 }
+                if (a != NULL)
+                    r = addsymbols(y, h, t, (char *) h->filename, b);
+                else
+                    r = addsymbols(y, h, NULL, t, b);
+                if (y->lineinfo && (r == 0))
+                    if (y->hhead == p)
+                        y->hhead = y->htail = NULL;
+                    else
+                    {
+                        y->htail = q;
+                        q->next = NULL;
+                    }
+            }
+            g = h;
+            if ((a != NULL) && (r == 1))
+                h = bfd_openr_next_archived_file(a, g);
+            else
+                h = NULL;
+            if (!y->lineinfo || (r == 0))
+            {
+                if (p != NULL)
+                    free(p);
+                bfd_close(g);
+            }
         }
-        if (!y->lineinfo || (r == 0))
-        {
-            if (p != NULL)
-                free(p);
-            bfd_close(h);
-        }
+        if (a != NULL)
+            bfd_close(a);
     }
 #elif FORMAT == FORMAT_PE
     /* We only want to obtain the symbols from the executable file using the
@@ -1376,6 +1569,7 @@ __mp_addextsymbols(symhead *y)
 #if DYNLINK == DYNLINK_AIX
     static char b[4096];
     struct ld_info *l;
+    char *s;
 #elif DYNLINK == DYNLINK_BSD
 #if SYSTEM == SYSTEM_SUNOS
     struct link_dynamic *d;
@@ -1418,10 +1612,18 @@ __mp_addextsymbols(symhead *y)
         l = (struct ld_info *) b;
         while (l = l->ldinfo_next ? (struct ld_info *)
                                     ((char *) l + l->ldinfo_next) : NULL)
-            if ((*l->ldinfo_filename != '\0') &&
-                !__mp_addsymbols(y, l->ldinfo_filename,
-                                 (unsigned long) l->ldinfo_textorg))
-                return 0;
+            if (*l->ldinfo_filename != '\0')
+            {
+                /* If the filename represents an archive file then the member
+                 * name within the archive will follow immediately after it.
+                 */
+                s = l->ldinfo_filename + strlen(l->ldinfo_filename) + 1;
+                if (*s == '\0')
+                    s = NULL;
+                if (!__mp_addsymbols(y, l->ldinfo_filename, s,
+                                     (unsigned long) l->ldinfo_textorg))
+                    return 0;
+            }
     }
 #elif DYNLINK == DYNLINK_BSD
     /* Check to see if the dynamic linker has set up the _DYNAMIC symbol
@@ -1444,11 +1646,11 @@ __mp_addextsymbols(symhead *y)
 #if SYSTEM == SYSTEM_SUNOS
             if ((l->lm_addr != 0) && (l->lm_name != NULL) &&
                 (*l->lm_name != '\0') &&
-                !__mp_addsymbols(y, l->lm_name, l->lm_addr))
+                !__mp_addsymbols(y, l->lm_name, NULL, l->lm_addr))
 #else /* SYSTEM */
             if ((l->som_addr != 0) && (l->som_path != NULL) &&
                 (*l->som_path != '\0') &&
-                !__mp_addsymbols(y, l->som_path, l->som_addr))
+                !__mp_addsymbols(y, l->som_path, NULL, l->som_addr))
 #endif /* SYSTEM */
                 return 0;
 #if SYSTEM == SYSTEM_SUNOS
@@ -1475,7 +1677,7 @@ __mp_addextsymbols(symhead *y)
         else
             o = 0;
         if ((d.filename[0] != '\0') &&
-            !__mp_addsymbols(y, d.filename, d.tstart - o))
+            !__mp_addsymbols(y, d.filename, NULL, d.tstart - o))
             return 0;
     }
 #elif DYNLINK == DYNLINK_IRIX
@@ -1490,7 +1692,8 @@ __mp_addextsymbols(symhead *y)
             {
                 s = (char *) i->name;
                 b = (long) i->ehdr - (long) i->ohdr;
-                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
+                if ((s != NULL) && (*s != '\0') &&
+                    !__mp_addsymbols(y, s, NULL, b))
                     return 0;
             }
         }
@@ -1500,7 +1703,8 @@ __mp_addextsymbols(symhead *y)
                 o = (struct obj *) l->data;
                 s = o->o_path;
                 b = (long) o->o_text_start - (long) o->o_base_address;
-                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
+                if ((s != NULL) && (*s != '\0') &&
+                    !__mp_addsymbols(y, s, NULL, b))
                     return 0;
             }
 #elif DYNLINK == DYNLINK_SVR4
@@ -1525,7 +1729,7 @@ __mp_addextsymbols(symhead *y)
         while (l != NULL)
         {
             if ((l->base != 0) && (l->name != NULL) && (*l->name != '\0') &&
-                !__mp_addsymbols(y, l->name, l->base))
+                !__mp_addsymbols(y, l->name, NULL, l->base))
                 return 0;
             l = l->next;
         }
