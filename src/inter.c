@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.154 2001-12-06 00:08:49 graeme Exp $"
+#ident "$Id: inter.c,v 1.155 2001-12-11 21:30:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.154 2001-12-06 00:08:49 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.155 2001-12-11 21:30:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -630,6 +630,7 @@ __mp_fini(void)
             __mp_newframe(&i, NULL);
             if (__mp_getframe(&i))
                 __mp_getframe(&i);
+            v.ltype = LT_MAX;
             v.type = AT_MAX;
             v.func = NULL;
             v.file = NULL;
@@ -904,6 +905,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue((void *) -1, l, __mp_fixalign(&memhead, f, a), s, t, u,
                          i.addr);
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1030,6 +1032,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     }
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -2, 1, s, t, u, i.addr);
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1169,6 +1172,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     }
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, l, __mp_fixalign(&memhead, f, a), s, t, u, i.addr);
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1272,6 +1276,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     }
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -1, 0, s, t, u, i.addr);
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1337,6 +1342,7 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1411,6 +1417,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1481,6 +1488,7 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -1548,6 +1556,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = f;
     v.func = s;
     v.file = t;
@@ -2313,6 +2322,7 @@ __mp_checkheap(char *s, char *t, unsigned long u)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
@@ -3042,6 +3052,7 @@ chkr_set_right(void *p, size_t l, unsigned char a)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
@@ -3104,6 +3115,7 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
@@ -3166,6 +3178,7 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
@@ -3228,6 +3241,7 @@ chkr_check_str(char *p, unsigned char a)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
@@ -3289,6 +3303,7 @@ chkr_check_exec(void *p)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    v.ltype = LT_MAX;
     v.type = AT_MAX;
     v.func = s;
     v.file = t;
