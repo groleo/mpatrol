@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.88 2001-02-23 22:41:18 graeme Exp $"
+#ident "$Id: inter.c,v 1.89 2001-02-23 23:01:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.88 2001-02-23 22:41:18 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.89 2001-02-23 23:01:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1401,6 +1401,7 @@ __mp_info(void *p, allocinfo *d)
     d->typesize = m->data.typesize;
     d->userdata = m->data.userdata;
     d->freed = ((m->data.flags & FLG_FREED) != 0);
+    d->marked = ((m->data.flags & FLG_MARKED) != 0);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);
     /* The names of the symbols in the call stack may not have been determined
@@ -1527,6 +1528,23 @@ __mp_printinfo(void *p)
     fprintf(stderr, "    thread identifier:  %lu\n", m->data.thread);
 #endif /* MP_THREADS_SUPPORT */
     fprintf(stderr, "    modification event: %lu\n", m->data.event);
+    fputs("    flags:             ", stderr);
+    if (m->data.flags == 0)
+        fputs(" none\n", stderr);
+    else
+    {
+        if (m->data.flags & FLG_FREED)
+            fputs(" freed", stderr);
+        if (m->data.flags & FLG_MARKED)
+            fputs(" marked", stderr);
+        if (m->data.flags & FLG_PROFILED)
+            fputs(" profiled", stderr);
+        if (m->data.flags & FLG_TRACED)
+            fputs(" traced", stderr);
+        if (m->data.flags & FLG_INTERNAL)
+            fputs(" internal", stderr);
+        fputc('\n', stderr);
+    }
     fprintf(stderr, "    calling function:   %s\n",
             m->data.func ? m->data.func : "<unknown>");
     fprintf(stderr, "    called from file:   %s\n",
