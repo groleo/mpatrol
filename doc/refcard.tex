@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.19 2001-02-20 20:10:18 graeme Exp $
+% $Id: refcard.tex,v 1.20 2001-03-07 18:45:52 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -134,6 +134,9 @@ output file.
 \item[\optionpar{TRACEFILE}{string}]
 Specifies an alternative file in which to place all memory allocation tracing
 information from the mpatrol library.
+\item[\option{LEAKTABLE}]
+Specifies that the leak table should be automatically used and a leak table
+summary should be displayed at the end of program execution.
 \item[\option{SHOWFREE}]
 Specifies that a summary of all of the free memory blocks should be displayed at
 the end of program execution.
@@ -297,6 +300,13 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \texttt{MP\_NEW}, \texttt{MP\_NEW\_NOTHROW} and \texttt{MP\_DELETE} will then
 have to be used instead.
 
+On systems that support it, global functions (with C linkage) in an executable
+file or shared library whose names begin with \texttt{\_\_mp\_init\_} will be
+noted when the mpatrol library first starts up and is reading the symbols.  Such
+functions will then be called as soon as the mpatrol library is initialised,
+which can be useful if the initialisation occurs before \function{main} is
+called.  These functions must accept no arguments and must return no value.
+
 \vskip 12pt
 \heading{C dynamic memory allocation functions}
 \vskip 6pt
@@ -427,14 +437,20 @@ have to be used instead.
 \vskip 6pt
 
 \begin{description}
+\item[\function{\_\_mp\_atexit}]
+\hfill Registers termination functions.
 \item[\function{\_\_mp\_setoption}]
 \hfill Sets an mpatrol library option.
 \item[\function{\_\_mp\_getoption}]
 \hfill Returns an mpatrol library option.
+\item[\function{\_\_mp\_strerror}]
+\hfill Returns an error message string.
 \item[\function{\_\_mp\_function}]
 \hfill Returns an allocation type function name.
 \item[\function{\_\_mp\_setuser}]
 \hfill Sets the user data for an allocation.
+\item[\function{\_\_mp\_setmark}]
+\hfill Sets the marked flag for an allocation.
 \item[\function{\_\_mp\_info}]
 \hfill Returns information for an allocation.
 \item[\function{\_\_mp\_syminfo}]
@@ -445,6 +461,20 @@ have to be used instead.
 \hfill Returns the current heap event number.
 \item[\function{\_\_mp\_iterate}]
 \hfill Iterates over allocations in the heap.
+\item[\function{\_\_mp\_iterateall}]
+\hfill Iterates over all allocations in the heap.
+\item[\function{\_\_mp\_addallocentry}]
+\hfill Adds an allocation to the leak table.
+\item[\function{\_\_mp\_addfreeentry}]
+\hfill Adds a deallocation to the leak table.
+\item[\function{\_\_mp\_clearleaktable}]
+\hfill Clears the leak table.
+\item[\function{\_\_mp\_startleaktable}]
+\hfill Starts automatic leak table entries.
+\item[\function{\_\_mp\_stopleaktable}]
+\hfill Stops automatic leak table entries.
+\item[\function{\_\_mp\_leaktable}]
+\hfill Displays the leak table.
 \item[\function{\_\_mp\_memorymap}]
 \hfill Displays a map of memory in the heap.
 \item[\function{\_\_mp\_summary}]
@@ -463,6 +493,10 @@ have to be used instead.
 \hfill Writes user data to the log file.
 \item[\function{\_\_mp\_vprintf}]
 \hfill Writes user data to the log file.
+\item[\function{\_\_mp\_locprintf}]
+\hfill Logs user data and the location.
+\item[\function{\_\_mp\_vlocprintf}]
+\hfill Logs user data and the location.
 \item[\function{\_\_mp\_logmemory}]
 \hfill Displays a hex dump of memory.
 \item[\function{\_\_mp\_logstack}]
@@ -504,6 +538,8 @@ symbols from executable files and so should be self-explanatory.
 \hfill Freed allocation has a corrupted overflow buffer.
 \item[\error{FRECOR}]
 \hfill Free memory corruption.
+\item[\error{FREMRK}]
+\hfill Attempt to free a marked memory allocation.
 \item[\error{FRENUL}]
 \hfill Attempt to free a \texttt{NULL} pointer.
 \item[\error{FREOPN}]
@@ -592,6 +628,8 @@ also be traced, but only if they were dynamically linked.
 Displays a quick-reference option summary.
 \item[\flagpar{large-bound}{unsigned integer}]
 \hfill See \option{LARGEBOUND}.
+\item[\flag{leak-table}]
+\hfill See \option{LEAKTABLE}.
 \item[\flagpar{limit}{unsigned integer}]
 \hfill See \option{LIMIT}.
 \item[\flag{list}]
