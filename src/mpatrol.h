@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.122 2001-05-16 07:48:47 graeme Exp $
+ * $Id: mpatrol.h,v 1.123 2001-05-22 19:41:15 graeme Exp $
  */
 
 
@@ -726,6 +726,7 @@ extern __mp_errortype __mp_errno;
 
 
 void __mp_init(void);
+void __mp_reinit(void);
 void __mp_fini(void);
 int __mp_atexit(void (*)(void));
 unsigned long __mp_setoption(long, unsigned long);
@@ -830,6 +831,7 @@ static int __mp_errno;
 #define MP_DELETE delete
 
 #define __mp_init() ((void) 0)
+#define __mp_reinit() ((void) 0)
 #define __mp_fini() ((void) 0)
 #define __mp_setoption(o, v) ((unsigned long) ~0L)
 #define __mp_getoption(o, v) ((int) 0)

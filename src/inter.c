@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.121 2001-05-16 07:48:47 graeme Exp $"
+#ident "$Id: inter.c,v 1.122 2001-05-22 19:41:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.121 2001-05-16 07:48:47 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.122 2001-05-22 19:41:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -449,7 +449,9 @@ __mp_init(void)
 
     savesignals();
     if (memhead.fini)
-        /* We currently don't allow the library to be reinitialised.
+        /* We currently don't allow the library to be reinitialised after it
+         * has been terminated.  To reinitialise the library before it has been
+         * terminated use __mp_reinit().
          */
         __mp_abort();
     if (!memhead.init)
@@ -525,6 +527,51 @@ __mp_init(void)
 }
 
 
+/* Reinitialise the mpatrol library.
+ */
+
+void
+__mp_reinit(void)
+{
+    char l[256];
+    unsigned long i;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    else if ((i = __mp_processid()) != memhead.pid)
+    {
+        memhead.pid = i;
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READWRITE);
+        if (memhead.log == NULL)
+            strcpy(l, "stderr");
+        else
+            strcpy(l, memhead.log);
+        memhead.log = __mp_logfile(&memhead.alloc.heap.memory, "%n.%p.log");
+        __mp_diag("Log file split to %s\n\n", memhead.log);
+        __mp_closelogfile();
+        /* Attempt to open the log file.
+         */
+        if (!__mp_openlogfile(memhead.log))
+            memhead.log = NULL;
+        /* Output the header and version information.
+         */
+        __mp_printversion();
+        __mp_diag("Log file continued from %s\n\n", l);
+        /* Write out any profiling information to the profiling output file.
+         */
+        if (memhead.prof.autocount > 0)
+            __mp_writeprofile(&memhead.prof, !(memhead.flags & FLG_NOPROTECT));
+        memhead.prof.file = __mp_proffile(&memhead.alloc.heap.memory,
+                                          "%n.%p.out");
+        if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READONLY);
+    }
+    restoresignals();
+}
+
+
 /* Finalise the mpatrol library.
  */
 
@@ -537,6 +584,8 @@ __mp_fini(void)
     savesignals();
     if (memhead.init)
     {
+        if (__mp_processid() != memhead.pid)
+            __mp_reinit();
         if (!memhead.fini)
         {
             /* First, determine the call stack details in case we need to
@@ -661,6 +710,8 @@ __mp_atexit(void (*f)(void))
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (memhead.finicount == MP_MAXFINIS)
         r = 0;
     else
@@ -684,6 +735,8 @@ __mp_setoption(long o, unsigned long v)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (o > 0)
         r = 1;
     else
@@ -713,6 +766,8 @@ __mp_getoption(long o, unsigned long *v)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (o > 0)
         r = 0;
     else
@@ -770,6 +825,8 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -890,6 +947,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1024,6 +1083,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1121,6 +1182,8 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1183,6 +1246,8 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
         return p;
     }
     savesignals();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1252,6 +1317,8 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
             return q;
         }
     savesignals();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1317,6 +1384,8 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     if (!memhead.init || memhead.fini)
         return __mp_memfind(p, l, q, m);
     savesignals();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1379,6 +1448,8 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         else
             return 0;
     savesignals();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1456,6 +1527,8 @@ __mp_setuser(void *p, void *d)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -1488,6 +1561,8 @@ __mp_setmark(void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -1525,6 +1600,8 @@ __mp_info(void *p, allocinfo *d)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if ((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL)
@@ -1616,6 +1693,8 @@ __mp_syminfo(void *p, symbolinfo *d)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     n = __mp_findsymbol(&memhead.syms, p);
     r = __mp_findsource(&memhead.syms, p, &s, &t, &u);
     if (((n == NULL) && (s != NULL)) || (t != NULL))
@@ -1668,6 +1747,8 @@ __mp_printinfo(void *p)
     infonode *m;
 
     savesignals();
+    if (memhead.init && (__mp_processid() != memhead.pid))
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     n = NULL;
@@ -1780,6 +1861,8 @@ __mp_snapshot(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     i = memhead.event;
     restoresignals();
     return i;
@@ -1802,6 +1885,8 @@ __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     i = 0;
     for (n = (allocnode *) memhead.alloc.list.head;
          p = (allocnode *) n->lnode.next; n = p)
@@ -1836,6 +1921,8 @@ __mp_iterateall(int (*f)(void *, void *), void *d)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     i = 0;
     for (n = (allocnode *) memhead.alloc.list.head;
          p = (allocnode *) n->lnode.next; n = p)
@@ -1865,6 +1952,8 @@ __mp_addallocentry(char *f, unsigned long l, size_t c)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);
     r = __mp_allocentry(&memhead.ltable, f, l, c);
@@ -1886,6 +1975,8 @@ __mp_addfreeentry(char *f, unsigned long l, size_t c)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
     r = __mp_freeentry(&memhead.ltable, f, l, c);
@@ -1905,6 +1996,8 @@ __mp_clearleaktable(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
     __mp_clearleaktab(&memhead.ltable);
@@ -1925,6 +2018,8 @@ __mp_startleaktable(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     r = memhead.ltable.tracing;
     memhead.ltable.tracing = 1;
     restoresignals();
@@ -1943,6 +2038,8 @@ __mp_stopleaktable(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     r = memhead.ltable.tracing;
     memhead.ltable.tracing = 0;
     restoresignals();
@@ -1959,6 +2056,8 @@ __mp_leaktable(size_t l, int o, unsigned char f)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
     __mp_printleaktab(&memhead, l, o, f);
@@ -1978,6 +2077,8 @@ __mp_memorymap(int s)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (s != 0)
         __mp_printsummary(&memhead);
     if (memhead.alloc.list.size > 0)
@@ -1999,6 +2100,8 @@ __mp_summary(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     __mp_printsummary(&memhead);
     restoresignals();
 }
@@ -2013,6 +2116,8 @@ __mp_stats(heapinfo *d)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     d->acount = memhead.alloc.atree.size;
     d->atotal = memhead.alloc.asize;
     d->fcount = memhead.alloc.ftree.size;
@@ -2048,6 +2153,8 @@ __mp_checkheap(char *s, char *t, unsigned long u)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to free any
      * allocations that were made by alloca().
      */
@@ -2103,6 +2210,8 @@ void
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     p = memhead.prologue;
     memhead.prologue = h;
     restoresignals();
@@ -2121,6 +2230,8 @@ void
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     p = memhead.epilogue;
     memhead.epilogue = h;
     restoresignals();
@@ -2139,6 +2250,8 @@ void
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     p = memhead.nomemory;
     memhead.nomemory = h;
     restoresignals();
@@ -2154,6 +2267,8 @@ __mp_pushdelstack(char *s, char *t, unsigned long u)
 {
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if ((memhead.delpos >= 0) && (memhead.delpos < MP_MAXDELSTACK))
     {
         memhead.dels[memhead.delpos].func = s;
@@ -2172,6 +2287,8 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
 {
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if ((--memhead.delpos >= 0) && (memhead.delpos < MP_MAXDELSTACK))
     {
         *s = memhead.dels[memhead.delpos].func;
@@ -2201,6 +2318,8 @@ __mp_printf(char *s, ...)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     va_start(v, s);
     r = vsprintf(b, s, v);
     va_end(v);
@@ -2242,6 +2361,8 @@ __mp_vprintf(char *s, va_list v)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     r = vsprintf(b, s, v);
     if (r >= 0)
     {
@@ -2281,6 +2402,8 @@ __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     va_start(v, m);
     vsprintf(b, m, v);
     va_end(v);
@@ -2342,6 +2465,8 @@ __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     vsprintf(b, m, v);
     for (r = b; p = strchr(r, '\n'); r = p + 1)
     {
@@ -2397,6 +2522,8 @@ __mp_logmemory(void *p, size_t l)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     __mp_printmemory(p, l);
     __mp_diag("\n");
     restoresignals();
@@ -2415,6 +2542,8 @@ __mp_logstack(size_t k)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     __mp_newframe(&i, NULL);
     if (r = __mp_getframe(&i))
     {
@@ -2448,6 +2577,8 @@ __mp_logaddr(void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
         (n->info == NULL))
         r = 0;
@@ -2473,6 +2604,8 @@ __mp_edit(char *f, unsigned long l)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     r = __mp_editfile(f, l, 0);
     restoresignals();
     return r;
@@ -2490,6 +2623,8 @@ __mp_list(char *f, unsigned long l)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     r = __mp_editfile(f, l, 1);
     restoresignals();
     return r;
@@ -2508,6 +2643,8 @@ __mp_view(char *f, unsigned long l)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     if (__mp_diagflags & FLG_EDIT)
         r = __mp_editfile(f, l, 0);
     else if (__mp_diagflags & FLG_LIST)
@@ -2532,6 +2669,8 @@ __mp_readcontents(char *s, void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -2557,6 +2696,8 @@ __mp_writecontents(char *s, void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -2582,6 +2723,8 @@ __mp_cmpcontents(char *s, void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -2607,6 +2750,8 @@ __mp_remcontents(char *s, void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
@@ -2669,6 +2814,8 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to report any errors.
      */
     __mp_newframe(&i, NULL);
@@ -2726,6 +2873,8 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to report any errors.
      */
     __mp_newframe(&i, NULL);
@@ -2783,6 +2932,8 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to report any errors.
      */
     __mp_newframe(&i, NULL);
@@ -2840,6 +2991,8 @@ chkr_check_str(char *p, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to report any errors.
      */
     __mp_newframe(&i, NULL);
@@ -2896,6 +3049,8 @@ chkr_check_exec(void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
     /* Determine the call stack details in case we need to report any errors.
      */
     __mp_newframe(&i, NULL);

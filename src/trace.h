@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: trace.h,v 1.9 2001-04-26 22:56:48 graeme Exp $
+ * $Id: trace.h,v 1.10 2001-05-22 19:41:15 graeme Exp $
  */
 
 
@@ -59,6 +59,7 @@ extern "C"
 
 
 MP_EXPORT void __mp_newtrace(tracehead *, meminfo *);
+MP_EXPORT int __mp_changetrace(tracehead *, char *, int);
 MP_EXPORT int __mp_endtrace(tracehead *);
 MP_EXPORT void __mp_traceheap(void *, size_t, int);
 MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t);

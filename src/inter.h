@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.44 2001-05-16 07:48:47 graeme Exp $
+ * $Id: inter.h,v 1.45 2001-05-22 19:41:15 graeme Exp $
  */
 
 
@@ -120,6 +120,7 @@ extern errortype __mp_errno;
 
 
 void __mp_init(void);
+void __mp_reinit(void);
 void __mp_fini(void);
 void __mp_trap(void);
 int __mp_atexit(void (*)(void));

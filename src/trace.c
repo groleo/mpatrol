@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.12 2001-04-26 22:56:48 graeme Exp $"
+#ident "$Id: trace.c,v 1.13 2001-05-22 19:41:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.12 2001-04-26 22:56:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.13 2001-05-22 19:41:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,6 +92,31 @@ __mp_newtrace(tracehead *t, meminfo *m)
     t->tracing = 0;
     tracefile = NULL;
     traceready = 0;
+}
+
+
+/* Change the tracing output file and optionally terminate the old file.
+ */
+
+MP_GLOBAL
+int
+__mp_changetrace(tracehead *t, char *f, int e)
+{
+    int r;
+    char s;
+
+    s = t->tracing;
+    if (e == 1)
+        r = __mp_endtrace(t);
+    else if (fclose(tracefile))
+        r = 0;
+    else
+        r = 1;
+    t->file = f;
+    t->tracing = s;
+    tracefile = NULL;
+    traceready = 0;
+    return r;
 }
 
 
