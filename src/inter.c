@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.84 2001-02-15 21:33:47 graeme Exp $"
+#ident "$Id: inter.c,v 1.85 2001-02-16 23:02:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.84 2001-02-15 21:33:47 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.85 2001-02-16 23:02:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1581,6 +1581,34 @@ __mp_summary(void)
         __mp_init();
     __mp_printsummary(&memhead);
     restoresignals();
+}
+
+
+/* Return statistics about the current state of the heap.
+ */
+
+int
+__mp_stats(heapinfo *d)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    d->acount = memhead.alloc.atree.size;
+    d->atotal = memhead.alloc.asize;
+    d->fcount = memhead.alloc.ftree.size;
+    d->ftotal = memhead.alloc.fsize;
+    d->gcount = memhead.alloc.gtree.size;
+    d->gtotal = memhead.alloc.gsize;
+    d->icount = memhead.alloc.heap.itree.size + memhead.alloc.itree.size +
+                memhead.addr.list.size + memhead.syms.strings.list.size +
+                memhead.syms.strings.tree.size + memhead.syms.itree.size +
+                memhead.prof.ilist.size + memhead.list.size +
+                memhead.alist.size;
+    d->itotal = memhead.alloc.heap.isize + memhead.alloc.isize +
+                memhead.addr.size + memhead.syms.strings.size +
+                memhead.syms.size + memhead.prof.size + memhead.size;
+    restoresignals();
+    return 1;
 }
 
 

@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.13 2001-02-15 21:03:43 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.14 2001-02-16 23:02:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.13 2001-02-15 21:03:43 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.14 2001-02-16 23:02:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -630,6 +630,16 @@ __mp_memorymap(int s)
 void
 __mp_summary(void)
 {
+}
+
+
+/* Return statistics about the current state of the heap.
+ */
+
+int
+__mp_stats(heapinfo *d)
+{
+    return 0;
 }
 
 

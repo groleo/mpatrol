@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.88 2001-02-15 21:00:48 graeme Exp $
+ * $Id: mpatrol.h,v 1.89 2001-02-16 23:02:56 graeme Exp $
  */
 
 
@@ -347,6 +347,23 @@ typedef struct __mp_symbolinfo
 __mp_symbolinfo;
 
 
+/* The details of the current heap state.
+ */
+
+typedef struct __mp_heapinfo
+{
+    size_t acount; /* total number of allocated blocks */
+    size_t atotal; /* total size of allocated blocks */
+    size_t fcount; /* total number of free blocks */
+    size_t ftotal; /* total size of free blocks */
+    size_t gcount; /* total number of freed blocks */
+    size_t gtotal; /* total size of freed blocks */
+    size_t icount; /* total number of internal blocks */
+    size_t itotal; /* total size of internal blocks */
+}
+__mp_heapinfo;
+
+
 /* The structure filled by mallinfo().
  */
 
@@ -663,6 +680,7 @@ unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
+int __mp_stats(__mp_heapinfo *);
 void __mp_check(void);
 void (*__mp_prologue(void (*)(MP_CONST void *, size_t, MP_CONST void *)))
      (MP_CONST void *, size_t, MP_CONST void *);
@@ -714,6 +732,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_iterate(p, d, s) ((size_t) 0)
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)
+#define __mp_stats(d) ((int) 0)
 #define __mp_check() ((void) 0)
 #define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t, MP_CONST void *)) NULL)
 #define __mp_epilogue(h) ((void (*)(MP_CONST void *, MP_CONST void *)) NULL)

@@ -3,7 +3,7 @@ Content-type: text/html
 <HTML><HEAD><TITLE>Manpage of LIBMPATROL</TITLE>
 </HEAD><BODY>
 <H1>LIBMPATROL</H1>
-Section: mpatrol library (3)<BR>Updated: 15 February 2001<BR><A HREF="#index">Index</A>
+Section: mpatrol library (3)<BR>Updated: 16 February 2001<BR><A HREF="#index">Index</A>
 <A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -83,6 +83,7 @@ size_t __mp_iterate(int (*func)(const void *, void *),
                     void *data, unsigned long event);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
+int __mp_stats(__mp_heapinfo *info);
 void __mp_check(void);
 void (*__mp_prologue(void (*func)(const void *, size_t,
                                   const void *)))
@@ -613,7 +614,7 @@ and no bytes will be searched.
 </DL>
 <P>
 
-The following 23 functions are available as support routines for additional
+The following 24 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 <I>mpatrol.h</I> header file:
 <DL COMPACT>
@@ -721,6 +722,25 @@ block then a map of the current heap will also be displayed.
 <DT><B>__mp_summary</B><DD>
 Displays information about the current state of the mpatrol library, including
 its settings and any relevant statistics.
+<DT><B>__mp_stats</B><DD>
+Obtains statistics about the current state of the heap and places them in
+<I>info</I>.  If this information could not be determined then <I>0</I> will be
+returned, otherwise <I>1</I> will be returned and <I>info</I> will contain the
+following information:
+<P>
+<TABLE>
+<TR VALIGN=top><TD><B>Field</B></TD><TD><B>Description</B><BR></TD></TR>
+<TR VALIGN=top><TD></TD><TD><BR></TD></TR>
+<TR VALIGN=top><TD><B>acount</B></TD><TD>Total number of allocated blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>atotal</B></TD><TD>Total size of allocated blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>fcount</B></TD><TD>Total number of free blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>ftotal</B></TD><TD>Total size of free blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>gcount</B></TD><TD>Total number of freed blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>gtotal</B></TD><TD>Total size of freed blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>icount</B></TD><TD>Total number of internal blocks.<BR></TD></TR>
+<TR VALIGN=top><TD><B>itotal</B></TD><TD>Total size of internal blocks.<BR></TD></TR>
+</TABLE>
+
 <DT><B>__mp_check</B><DD>
 Forces the library to perform an immediate check of the overflow buffers of
 every memory allocation and to ensure that nothing has overwritten any free
@@ -829,6 +849,7 @@ allocation functions with the same names:
 <TR VALIGN=top><TD><I>-lbfd</I> &amp; <I>-liberty</I></TD><TD>If built with BFD support.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lcl</I></TD><TD>If built on HP/UX.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lexc</I></TD><TD>If built on IRIX with library stack support.<BR></TD></TR>
+<TR VALIGN=top><TD><I>-limagehlp</I></TD><TD>If built on Windows.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lpthreads</I></TD><TD>If built on AIX with threads support.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lthread</I></TD><TD>If built on DG/UX with threads support.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lpthread</I></TD><TD>If built on UNIX with threads support.<BR></TD></TR>
@@ -1227,6 +1248,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 22:32:01 GMT, February 15, 2001
+Time: 23:00:41 GMT, February 16, 2001
 </BODY>
 </HTML>

@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.22 2001-02-15 21:00:48 graeme Exp $
+ * $Id: inter.h,v 1.23 2001-02-16 23:02:56 graeme Exp $
  */
 
 
@@ -83,6 +83,25 @@ typedef struct symbolinfo
 symbolinfo;
 
 
+/* A heapinfo structure provides statistics about the current state of the
+ * heap.  This must be kept up to date with the definition of __mp_heapinfo
+ * in mpatrol.h
+ */
+
+typedef struct heapinfo
+{
+    size_t acount; /* total number of allocated blocks */
+    size_t atotal; /* total size of allocated blocks */
+    size_t fcount; /* total number of free blocks */
+    size_t ftotal; /* total size of free blocks */
+    size_t gcount; /* total number of freed blocks */
+    size_t gtotal; /* total size of freed blocks */
+    size_t icount; /* total number of internal blocks */
+    size_t itotal; /* total size of internal blocks */
+}
+heapinfo;
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -118,6 +137,7 @@ unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
+int __mp_stats(heapinfo *);
 void __mp_check(void);
 void (*__mp_prologue(void (*)(void *, size_t, void *)))(void *, size_t, void *);
 void (*__mp_epilogue(void (*)(void *, void *)))(void *, void *);

@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.15 2001-02-15 22:32:45 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.16 2001-02-16 23:01:23 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "15 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "16 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -124,6 +124,7 @@ unsigned long __mp_snapshot(void);
 \}
 void __mp_memorymap(int stats);
 void __mp_summary(void);
+int __mp_stats(__mp_heapinfo *info);
 void __mp_check(void);
 .if n \{void (*__mp_prologue(void (*func)(const void *, size_t,
                                   const void *)))
@@ -675,7 +676,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 23 functions are available as support routines for additional
+The following 24 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -794,6 +795,26 @@ block then a map of the current heap will also be displayed.
 Displays information about the current state of the mpatrol library, including
 its settings and any relevant statistics.
 .TP
+\fB__mp_stats\fP
+Obtains statistics about the current state of the heap and places them in
+\fIinfo\fP.  If this information could not be determined then \fI0\fP will be
+returned, otherwise \fI1\fP will be returned and \fIinfo\fP will contain the
+following information:
+
+.TS
+l l.
+\fBField\fP	\fBDescription\fP
+
+\fBacount\fP	Total number of allocated blocks.
+\fBatotal\fP	Total size of allocated blocks.
+\fBfcount\fP	Total number of free blocks.
+\fBftotal\fP	Total size of free blocks.
+\fBgcount\fP	Total number of freed blocks.
+\fBgtotal\fP	Total size of freed blocks.
+\fBicount\fP	Total number of internal blocks.
+\fBitotal\fP	Total size of internal blocks.
+.TE
+.TP
 \fB__mp_check\fP
 Forces the library to perform an immediate check of the overflow buffers of
 every memory allocation and to ensure that nothing has overwritten any free
@@ -911,6 +932,7 @@ l l.
 \fI\-lbfd\fP & \fI\-liberty\fP	If built with BFD support.
 \fI\-lcl\fP	If built on HP/UX.
 \fI\-lexc\fP	If built on IRIX with library stack support.
+\fI\-limagehlp\fP	If built on Windows.
 \fI\-lpthreads\fP	If built on AIX with threads support.
 \fI\-lthread\fP	If built on DG/UX with threads support.
 \fI\-lpthread\fP	If built on UNIX with threads support.
