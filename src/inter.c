@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.112 2001-03-06 19:47:55 graeme Exp $"
+#ident "$Id: inter.c,v 1.113 2001-03-07 20:22:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.112 2001-03-06 19:47:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.113 2001-03-07 20:22:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1444,8 +1444,9 @@ __mp_setmark(void *p)
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
-        ((m = (infonode *) n->info) == NULL) ||(m->data.type == AT_ALLOCA) ||
-        (m->data.type == AT_STRDUPA) || (m->data.type == AT_STRNDUPA))
+        ((m = (infonode *) n->info) == NULL) || (m->data.flags & FLG_MARKED) ||
+        (m->data.type == AT_ALLOCA) || (m->data.type == AT_STRDUPA) ||
+        (m->data.type == AT_STRNDUPA))
         r = 0;
     else
     {
@@ -1454,6 +1455,7 @@ __mp_setmark(void *p)
         m->data.flags |= FLG_MARKED;
         if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READONLY);
+        memhead.mtotal += n->size;
         r = 1;
     }
     restoresignals();
