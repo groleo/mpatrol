@@ -67,9 +67,11 @@
 #define SYSTEM_IRIX     7  /* IRIX */
 #define SYSTEM_LINUX    8  /* Linux */
 #define SYSTEM_LYNXOS   9  /* LynxOS */
-#define SYSTEM_SINIX    10 /* SINIX */
-#define SYSTEM_SOLARIS  11 /* Solaris */
-#define SYSTEM_UNIXWARE 12 /* UnixWare */
+#define SYSTEM_NETBSD   10 /* NetBSD */
+#define SYSTEM_OPENBSD  11 /* OpenBSD */
+#define SYSTEM_SINIX    12 /* SINIX */
+#define SYSTEM_SOLARIS  13 /* Solaris */
+#define SYSTEM_UNIXWARE 14 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -92,6 +94,10 @@
 #define SYSTEM SYSTEM_LINUX
 #elif defined(__Lynx) || defined(__Lynx__)
 #define SYSTEM SYSTEM_LYNXOS
+#elif defined(__NetBSD) || defined(__NetBSD__)
+#define SYSTEM SYSTEM_NETBSD
+#elif defined(__OpenBSD) || defined(__OpenBSD__)
+#define SYSTEM SYSTEM_OPENBSD
 #elif defined(sinix) || defined(_sinix) || defined(__sinix) || \
       defined(__sinix__) || defined(SNI) || defined(_SNI) || defined(__SNI) || \
       defined(__SNI__)
