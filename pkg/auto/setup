@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.15 2003-11-25 16:23:45 graeme Exp $
+# $Id: setup,v 1.16 2003-11-25 23:15:45 graeme Exp $
 
 
 uselinks=0
@@ -112,6 +112,7 @@ echo "Creating doc directory" >&2
 makedir doc
 cd doc
 copyfile ../../../doc/mpatrol.texi mpatrol.texi
+copyfile ../../../doc/texinfo.tex texinfo.tex
 copyfile ../../../config/doc.am Makefile.am
 makedir images
 cd images

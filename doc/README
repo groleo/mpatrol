@@ -30,6 +30,12 @@ the preformatted files.
                    http://www.tug.org/
                    The unprocessed source of the source code documentation.
 
+  * texinfo.tex
+        Format:    TeX
+                   http://texinfo.org/
+        Notes:     The TeXinfo macro package required by the DVI and PDF
+                   versions of the mpatrol manual.
+
   * images/mpatrol.txt
         Format:    ASCII text
                    http://www.bbsinc.com/iso8859.html
