@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.112 2000-08-29 00:09:34 graeme Exp $
+@c $Id: mpatrol.texi,v 1.113 2000-08-31 19:40:03 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 29th August, 2000
+@set UPDATED 31st August, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -194,7 +194,9 @@ about mpatrol.
 The latest version of the mpatrol library and this manual can always be found at
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/}, and any correspondence relating
 to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
-to @email{mpatrol@@cbmamiga.demon.co.uk}.  The mpatrol library is also
+to @email{mpatrol@@cbmamiga.demon.co.uk}.  I'd be very interested in hearing any
+success stories with using mpatrol to debug programs, since I get very little
+feedback apart from the occasional bug report.  The mpatrol library is also
 registered at FreshMeat (@uref{http://freshmeat.net/}) and several other
 software sites so you can receive notification of updates there as well.  I
 normally only check my e-mail about once or twice a week, so don't expect an
@@ -662,12 +664,15 @@ manual pages and a quick reference card.
 @cindex library, building
 
 @cindex Amiga 4000/040
+@cindex Dell Inspiron 7500
 The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
 3.1.  I then installed RedHat Linux 5.1 on my Amiga and added support for
-Linux/m68k.  I've tried my best to make it as easy as possible to build and
-install mpatrol on any system, but it isn't likely to run smoothly for
-everybody.  However, there shouldn't be any major problems if you perform the
-following steps.
+Linux/m68k.  I've now just recently purchased a Dell Inspiron 7500 Notebook PC
+and put my Amiga in retirement, so development will now continue on RedHat Linux
+6 and above on the Intel platform.  I've tried my best to make it as easy as
+possible to build and install mpatrol on any system, but it isn't likely to run
+smoothly for everybody.  However, there shouldn't be any major problems if you
+perform the following steps.
 
 @enumerate 1
 @item
@@ -1637,7 +1642,12 @@ newly-allocated memory to be zeroed, although this option will have no effect on
 memory that was allocated with @code{calloc()}.  All free memory can also be
 pre-filled with a different specified byte by using the @option{FREEBYTE}
 option.  This will catch out code that expects to be able to use the contents of
-freed memory.
+freed memory.  Note that you may wish to change these options from their default
+values on your system so that the contents can be filled with values that are
+least likely to be used at run-time.  For example, ensuring that the pointer
+representation of the value can never be a valid pointer, or that the floating
+point representation will always be invalid.  These values will vary across
+operating systems and processor architectures.
 
 @cindex prevent freeing memory
 @cindex free memory
@@ -1720,6 +1730,14 @@ sooner.  The option which governs this is @option{OFLOWSIZE}.  The byte with
 which they get pre-filled can be changed with @option{OFLOWBYTE}.  Depending on
 what gets written, it might only be possible to see such errors when a different
 size of buffer or a different pre-fill byte is used.
+
+Note that you may wish to change the @option{OFLOWBYTE} from its default value
+on your system so that the contents can be filled with values that are least
+likely to be used at run-time.  For example, ensuring that the pointer
+representation of the value can never be a valid pointer, or that the floating
+point representation will always be invalid.  These values will vary across
+operating systems and processor architectures, but may also vary depending on
+the datatypes that you will be expecting to store in the memory allocations.
 
 A worse situation can occur when it is only reads from memory that overflow or
 underflow; i.e.@: with the faulty code reading just before or just past a memory
@@ -6975,9 +6993,9 @@ Bugs should be reported to @email{mpatrol@@cbmamiga.demon.co.uk} along with the
 details of the operating system, processor architecture and object file format
 that the mpatrol library is being used with --- and don't forget to include the
 version of the mpatrol library you are using!  Keep in mind that I only have
-access to an Amiga running RedHat Linux/m68k 5.1 and AmigaOS 3.1, so I will be
-most likely unable to reproduce most of the system-specific bugs.  A bug report
-that comes with an associated fix will be most welcome.
+access to a Pentium III Notebook PC running RedHat Linux 6 and Windows 98, so I
+will be most likely unable to reproduce most of the system-specific bugs.  A bug
+report that comes with an associated fix will be most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk} or the mpatrol discussion group at
@@ -8083,10 +8101,10 @@ system.  On the Amiga, Enforcer by Michael Sinz runs in the background and
 detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
-A list of over sixty different items of software which help in debugging dynamic
-memory allocation problems is given below@footnote{This list can be considered
-to be a slightly more up to date version of @cite{Debugging Tools for Dynamic
-Storage Allocation and Memory Management}
+A list of over sixty five different items of software which help in debugging
+dynamic memory allocation problems is given below@footnote{This list can be
+considered to be a slightly more up to date version of @cite{Debugging Tools
+for Dynamic Storage Allocation and Memory Management}
 (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
 (@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
@@ -8200,6 +8218,23 @@ Various UNIX
 Detects illegal memory accesses when reading from uninitialised memory, writing
 to freed memory or outside memory blocks.  Also contains a garbage collector for
 detecting memory leaks.
+@end table
+
+@cindex CMEM
+@item
+CMEM
+@table @asis
+@item Author
+Brett Hunsaker (@email{hunsaker@@eisner.decus.org})
+@item License
+Free Software
+@item Platforms
+VMS
+@item Location
+@uref{http://www.openvms.compaq.com/freeware/CMEM/}
+@item Overview
+Provides debugging versions of the C run-time library memory allocation
+routines, with support for stack tracebacks and page protection.
 @end table
 
 @cindex CSRI malloc
@@ -8572,6 +8607,23 @@ A program which helps find memory leaks and helps debug reference count problems
 with xpcom objects.
 @end table
 
+@cindex LibKmalloc
+@item
+LibKmalloc
+@table @asis
+@item Author
+Akira Higuchi (@email{a@@kondara.org})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://www.kondara.org/~a/libkmalloc.html}
+@item Overview
+A tiny malloc debugger which detects multiple frees and buffer overruns and
+underruns.
+@end table
+
 @cindex Malloc Debug
 @item
 Malloc Debug
@@ -8911,6 +8963,25 @@ Various UNIX
 Profiles the dynamic memory allocation behaviour of programs by logging details
 for each function than makes a memory allocation, including call stack
 tracebacks.
+@end table
+
+@cindex MSS (Memory Supervision System)
+@item
+MSS (Memory Supervision System)
+@table @asis
+@item Author
+Juan Jesus Alcolea Picazo (@email{a920101@@zipi.fi.upm.es}) and
+Peter Palotas (@email{blizzar@@hem1.passagen.se})
+@item License
+GNU General Public License
+@item Platforms
+Linux, Windows, MS-DOS
+@item Location
+@uref{http://hem.passagen.se/blizzar/mss/}
+@item Overview
+Full-featured malloc library for C and C++ providing detection of memory leaks,
+use of uninitialised memory and out of range block accesses as well as lots of
+tracing facilities.
 @end table
 
 @cindex MuForce
