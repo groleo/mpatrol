@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.40 2001-09-27 23:38:48 graeme Exp $
+ * $Id: diag.h,v 1.41 2001-12-05 23:49:05 graeme Exp $
  */
 
 
@@ -136,17 +136,16 @@ MP_EXPORT void __mp_printsymbols(symhead *);
 MP_EXPORT void __mp_printaddrs(symhead *, addrnode *);
 MP_EXPORT void __mp_printstack(symhead *, stackinfo *);
 MP_EXPORT void __mp_printalloc(symhead *, allocnode *);
-MP_EXPORT void __mp_logalloc(infohead *, size_t, size_t, alloctype, loginfo *);
-MP_EXPORT void __mp_logrealloc(infohead *, void *, size_t, size_t, alloctype,
-                               loginfo *);
-MP_EXPORT void __mp_logfree(infohead *, void *, alloctype, loginfo *);
+MP_EXPORT void __mp_logalloc(infohead *, size_t, size_t, loginfo *);
+MP_EXPORT void __mp_logrealloc(infohead *, void *, size_t, size_t, loginfo *);
+MP_EXPORT void __mp_logfree(infohead *, void *, loginfo *);
 MP_EXPORT void __mp_logmemset(infohead *, void *, size_t, unsigned char,
-                              alloctype, loginfo *);
+                              loginfo *);
 MP_EXPORT void __mp_logmemcopy(infohead *, void *, void *, size_t,
-                               unsigned char, alloctype, loginfo *);
+                               unsigned char, loginfo *);
 MP_EXPORT void __mp_logmemlocate(infohead *, void *, size_t, void *, size_t,
-                                 alloctype, loginfo *);
-MP_EXPORT void __mp_logmemcompare(infohead *, void *, void *, size_t, alloctype,
+                                 loginfo *);
+MP_EXPORT void __mp_logmemcompare(infohead *, void *, void *, size_t,
                                   loginfo *);
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
