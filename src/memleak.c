@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memleak.c,v 1.2 2000-04-05 17:50:15 graeme Exp $"
+#ident "$Id: memleak.c,v 1.3 2000-04-05 19:17:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -303,6 +303,7 @@ int main(int argc, char **argv)
             break;
         }
     argc -= __mp_optindex;
+    argv += __mp_optindex;
     if (v == 1)
         fprintf(stderr, "%s %s\n", progname, VERSION);
     if ((argc > 1) || (e == 1))
@@ -311,7 +312,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     if (argc == 1)
-        f = argv[__mp_optindex];
+        f = argv[0];
     else
         f = MP_LOGFILE;
     __mp_newtree(&alloctree);
