@@ -8,14 +8,14 @@ how to extend mpatrol.  If you wish to use one of the source files in this
 directory then you should first compile it and then link it into your program
 along with the mpatrol library.
 
-Alternatively, if you're likely to want to use some or all of this code at some
-point in the future then you could firstly copy all of the header files into an
-mpatrol subdirectory that should be installed in the same directory as the
-mpatrol.h header file.  You could then build an mptools library from the source
-files in this directory and install it in the same directory that you have the
-mpatrol library installed in.  This is actually what is currently done by the
-package scripts when building an mpatrol package so you won't need to do any of
-the above if you installed mpatrol from such a package.
+Alternatively, if you've already installed mpatrol on your system then there
+should be an mpatrol subdirectory within the include directory where mpatrol.h
+is installed that contains all of the header files in this directory.  There
+should also be a libmptools library within the library directory where
+libmpatrol is installed that contains an object file for each of the source
+files in this directory.  You can then make use of a particular tool by
+including its header file from the mpatrol include subdirectory and then linking
+with the libmptools library.
 
 If you've written a useful extension to mpatrol then you might wish to submit
 it for inclusion in the next release of mpatrol.  Even if it's just for a
