@@ -161,8 +161,8 @@ their corresponding answers or solutions.
     function) called abort() due to a fatal error.  However, there are a
     multitude of different options that you can pass to the mpatrol library via
     the MPATROL_OPTIONS environment variable that will allow you to control what
-    is logged and what is not.  Note that the mpatrol shell script will always
-    log all calls to allocate, reallocate and free memory by default.
+    is logged and what is not.  Note that the mpatrol command will always log
+    all calls to allocate, reallocate and free memory by default.
 
  Q. Why does the USEDEBUG option not work for me?
 
@@ -175,11 +175,11 @@ their corresponding answers or solutions.
     The file and line number information will hopefully then appear in the
     log file for all symbols that have associated debugging information.
 
- Q. I am trying to use the mpatrol shell script to debug an executable file that
-    was not originally compiled with the mpatrol library.  However, even though
-    it runs successfully, no mpatrol log file is produced.  Why is this?
+ Q. I am trying to use the mpatrol command to debug an executable file that was
+    not originally compiled with the mpatrol library.  However, even though it
+    runs successfully, no mpatrol log file is produced.  Why is this?
 
- A. First, check that you are passing the -d option to the mpatrol shell script.
+ A. First, check that you are passing the -d option to the mpatrol command.
     If that doesn't work then check that the executable file has been
     dynamically linked; statically linked executables cannot be forced to use
     the mpatrol library.  If it still doesn't work then it may be that the

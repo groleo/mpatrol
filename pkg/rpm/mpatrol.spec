@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.9 2000-03-30 18:10:11 graeme Exp $
+# $Id: mpatrol.spec,v 1.10 2000-04-05 19:58:17 graeme Exp $
 
 
 %define version 1.1.3
@@ -63,13 +63,13 @@ to recompile or relink in order to change the library's behaviour.
 
 %build
 cd build/unix
-make libmpatrol.a libmpatrol.so.%{libversion} memleak
+make libmpatrol.a libmpatrol.so.%{libversion} mpatrol memleak
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/bin
-cp bin/mpatrol $RPM_BUILD_ROOT/usr/bin
+cp build/unix/mpatrol $RPM_BUILD_ROOT/usr/bin
 cp build/unix/memleak $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
