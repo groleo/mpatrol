@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.25 2000-05-10 21:00:39 graeme Exp $
+.\" $Id: mpatrol.3,v 1.26 2000-05-11 20:59:47 graeme Exp $
 .\"
-.TH MPATROL 3 "10 May 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "11 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -81,6 +81,13 @@ except the inclusion of the \fImpatrol.h\fP header file, although additional
 functions are supplied for extra tracing and control.  Note that the current
 version of the mpatrol library is contained in the \fBMPATROL_VERSION\fP
 preprocessor macro.
+.PP
+All of the function definitions in \fImpatrol.h\fP can be disabled by defining
+the \fBNDEBUG\fP preprocessor macro, which is the same macro used to control
+the behaviour of the \fBassert\fP function.  If \fBNDEBUG\fP is defined then
+no macro redefinition of functions will take place and all special mpatrol
+library functions will evaluate to empty statements.  It is intended that the
+\fBNDEBUG\fP preprocessor macro be defined in release builds.
 .PP
 All diagnostics are sent to the file \fImpatrol.log\fP in the current directory
 by default but this can be changed at run-time.  Additional configuration
@@ -548,7 +555,7 @@ can be given in lowercase as well as uppercase, or a mixture of both.
 Specifies an 8-bit byte pattern with which to prefill newly-allocated memory.
 This can be used to detect the use of memory which has not been initialised
 after allocation.  Note that this setting will not affect memory allocated with
-\fBcalloc()\fP or \fBrecalloc()\fP as these functions always prefill allocated
+\fBcalloc\fP or \fBrecalloc\fP as these functions always prefill allocated
 memory with an 8-bit byte pattern of zero.  Default value:
 \fBALLOCBYTE\fP=\fI0xFF\fP.
 .TP
@@ -672,8 +679,8 @@ not be logged.
 .TP
 \fBLOGMEMORY\fP
 Specifies that all memory operations are to be logged and sent to the log file.
-These operations will be made by calls to functions such as \fBmemset()\fP and
-\fBmemcpy()\fP.  Note that any memory operations made internally by the library
+These operations will be made by calls to functions such as \fBmemset\fP and
+\fBmemcpy\fP.  Note that any memory operations made internally by the library
 will not be logged.
 .TP
 \fBLOGREALLOCS\fP
@@ -694,7 +701,7 @@ can be used by the library to provide better diagnostics.  However, as no system
 memory will ever be reused by the mpatrol library, this option can quickly lead
 to a shortage of available system memory for a process.  Note that this option
 will always force a memory reallocation to return a pointer to newly-allocated
-memory, but the \fBexpand()\fP function will never be affected by this option.
+memory, but the \fBexpand\fP function will never be affected by this option.
 .TP
 \fBNOPROTECT\fP
 Specifies that the mpatrol library's internal data structures should not be made
@@ -825,16 +832,19 @@ and will be ignored if the mpatrol library was built to support an object file
 access library that cannot read line tables from object files.
 .TP
 \fBUSEMMAP\fP
-Specifies that the library should use \fBmmap()\fP instead of \fBsbrk()\fP to
+Specifies that the library should use \fBmmap\fP instead of \fBsbrk\fP to
 allocate system memory on UNIX platforms.  This option should be used if there
 are problems when using the mpatrol library in combination with another malloc
-library which uses \fBsbrk()\fP to allocate its memory.  It is ignored on
-systems that do not support the \fBmmap()\fP system call.
+library which uses \fBsbrk\fP to allocate its memory.  It is ignored on
+systems that do not support the \fBmmap\fP system call.
 .SH SEE ALSO
-\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBmalloc\fP(3),
-\fBmemory\fP(3), \fBstring\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBmmap\fP(2), \fBsbrk\fP(2),
+\fBmalloc\fP(3), \fBmemory\fP(3), \fBstring\fP(3), \fBassert\fP(3),
+\fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and FAQ.
+.PP
+http://www.cbmamiga.demon.co.uk/mpatrol/
 .SH AUTHOR
 Graeme S. Roy <graeme@epc.co.uk>
 .SH COPYRIGHT
