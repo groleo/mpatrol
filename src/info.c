@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.58 2001-02-06 19:53:52 graeme Exp $"
+#ident "$Id: info.c,v 1.59 2001-02-06 22:23:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.58 2001-02-06 19:53:52 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.59 2001-02-06 22:23:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -660,6 +660,11 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
             if (h->peak < h->alloc.asize)
                 h->peak = h->alloc.asize;
         }
+        /* If we are returning NULL from a call to reallocf() then we must
+         * also free the original allocation.
+         */
+        if ((p == NULL) && (f == AT_REALLOCF))
+            __mp_freememory(h, n->block, f, v);
     }
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
         __mp_diag("returns " MP_POINTER "\n\n", p);
