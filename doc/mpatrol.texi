@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.8 1999-11-21 14:19:56 graeme Exp $
+@c $Id: mpatrol.texi,v 1.9 1999-11-23 20:25:58 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.1
 @set VERSION 1.0.6
-@set UPDATED 21st November, 1999
+@set UPDATED 23rd November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -900,6 +900,18 @@ byte level.  Unfortunately, as this feature is implemented in
 software@footnote{The operating system is still considered software.} rather
 than in hardware, watch points tend to be incredibly slow, mainly as a result of
 the operating system having to check every instruction before it is executed.
+
+@cindex misaligned memory accesses
+There is also an additional problem when using watch points, which is due to
+misaligned reads from memory.  These can occur with compiler-generated code or
+with optimised library routines where memory read, move or write operations have
+been optimised to work at word level rather than byte level.  For example, the
+@code{memcpy()} function would normally be written to copy memory a byte at a
+time, but on some systems this can be improved by copying a word at a time.
+Unfortunately, care has to be taken when reading and writing such words as the
+equivalent bytes may not be aligned on word boundaries.  Technically, reading
+additional bytes before or after a memory allocation when they share the same
+word is legal, but when using watch points such errors will be picked up.
 
 An operating system with virtual memory is usually going to run ever so slightly
 slower than an operating system without it@footnote{Due to the overhead of
@@ -3426,6 +3438,20 @@ Possibly add ability to interface with various debuggers, including
 information as well as complete debugging information if available.
 
 @item
+Perhaps add a memory allocation profiling feature (something similar to mprof),
+which could be used to determine where most of the memory allocations occur, or
+if bottlenecks could be removed from the code.  This could take the form of the
+library writing out an additional file which could be analysed by an external
+program, and could take advantage of the stack tracebacks and symbol tables in
+the mpatrol library.
+
+@item
+Improve use of watch points by allowing an option which will only install write
+watch points instead of both read and write watch points.  Not only will this
+speed up the use of watch points, but will also cause less problems with reading
+from misaligned memory allocations.
+
+@item
 Add a @option{SHOWFREE} option to display a list of all free memory blocks at
 program termination for debugging purposes to view memory fragmentation.  If
 that option is added then perhaps @option{SHOWALL} should only be equivalent to
@@ -3433,11 +3459,29 @@ that option is added then perhaps @option{SHOWALL} should only be equivalent to
 @option{SHOWMAP} and @option{SHOWSYMBOLS} should be explicitly given.
 
 @item
+Add an option, similar in function to @option{LIMIT}, which would cause every
+@emph{nth} memory allocation to fail.  This would provide even better stress
+testing for badly-written programs that expect all memory allocations to
+succeed.
+
+@item
+Add an option, similar to @option{NOFREE}, that would prevent a freed memory
+allocation from being used until a certain number of memory allocations later.
+This would be far less of a resource-hogger than the @option{NOFREE} option and
+might catch just as many errors.
+
+@item
 Add versions of @code{mallopt()}, @code{mallinfo()}, @code{memorymap()} and
 @code{mallocctl()} which are provided in many other malloc libraries.  These
 won't necessarily behave in exactly the same way as existing implementations,
 but at least there won't be link errors when compiling source code which uses
 them.
+
+@item
+Perhaps add debugging/tracing versions of the memory and string manipulation
+functions, such as @code{memcpy()} and @code{strcmp()}.  These could perform
+additional checks if the source or destination was a known address in the heap,
+but would require a lot more functions to be written within the library.
 
 @item
 Script files similar to the @command{mpatrol} shell script provided for UNIX
@@ -3449,9 +3493,9 @@ executable command that is written in C.
 Add a document containing frequently asked questions.
 
 @item
-Perhaps use a configure script to automatically work out values for
-@file{config.h} on the platform it is being built on, and provide locations for
-installing files.
+Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
+the platform it is being built on, and also use automake, libtool and install
+when building and installing files.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
@@ -3630,8 +3674,25 @@ that mpatrol contains and you may wish to use one of them to solve your problem
 if you have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
 Fence, so I can't vouch for any of the others, although if you have any
 recommendations feel free to let me know so I can add them to this list.  In
-particular, there seems to be a shortage of such programs for AmigaOS and
-Netware platforms.
+particular, there seems to be a shortage of such programs for Netware platforms.
+
+@cindex APurify
+@cindex Devulder, Samuel
+@item
+APurify
+@table @asis
+@item Author
+Samuel Devulder (@email{Samuel.Devulder@@info.unicaen.fr})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
+@item Overview
+Instruments an assembler source file to insert code that checks all memory
+accesses.
+@end table
 
 @cindex BoundsChecker
 @cindex NuMega Corporation
@@ -3742,6 +3803,24 @@ Various UNIX
 @item Overview
 Uses virtual memory hardware to protect dynamically allocated memory in order to
 detect illegal memory accesses.
+@end table
+
+@cindex Enforcer
+@cindex Sinz, Michael
+@item
+Enforcer
+@table @asis
+@item Author
+Michael Sinz (@email{Enforcer@@sinz.org})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://www.iam.com/amiga/enforcer.html}
+@item Overview
+Sets up MMU tables to watch for illegal accesses to memory, such as the low page
+and non-existent pages.
 @end table
 
 @cindex FDA (Free Debug Allocator)
@@ -3891,6 +3970,24 @@ error checking instructions, then re-assembles the code.  Can also replace
 existing malloc libraries in order to provide greater error checking.
 @end table
 
+@cindex MemWatch
+@cindex Walker, Doug
+@item
+MemWatch
+@table @asis
+@item Author
+Doug Walker (@email{walker@@unx.sas.com})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
+@item Overview
+Provides replacement memory allocation routines for adding lots of memory
+debugging features that you link into your program.
+@end table
+
 @cindex Mmalloc
 @cindex Haertel, Mike
 @cindex Fish, Fred
@@ -3929,6 +4026,75 @@ for each function than makes a memory allocation, including call stack
 tracebacks.
 @end table
 
+@cindex MuForce
+@cindex Richter, Thomas
+@item
+MuForce
+@table @asis
+@item Author
+Thomas Richter (@email{thor@@einstein.math.tu-berlin.de})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://www.math.tu-berlin.de/~thor/thor/index.html}
+@item Overview
+Uses the MMU to monitor the system for any writes to non-existent memory and
+reports them over the serial port or any other output stream.
+@end table
+
+@cindex MuGuardianAngel
+@item
+MuGuardianAngel
+@table @asis
+@item Author
+Thomas Richter (@email{thor@@einstein.math.tu-berlin.de})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://www.math.tu-berlin.de/~thor/thor/index.html}
+@item Overview
+An extension to the MuForce program which protects free memory and detects all
+illegal memory accesses.
+@end table
+
+@cindex MuLib
+@item
+MuLib
+@table @asis
+@item Author
+Thomas Richter (@email{thor@@einstein.math.tu-berlin.de})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://www.math.tu-berlin.de/~thor/thor/index.html}
+@item Overview
+Provides access to the MMU in modern Amigas so that features such as virtual
+memory can be implemented.
+@end table
+
+@cindex Mungwall
+@cindex Commodore-Amiga, Inc.
+@item
+Mungwall
+@table @asis
+@item Author
+Commodore-Amiga, Inc. (@email{info@@amiga.de})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
+@item Overview
+Patches the system to check for free memory corruption.
+@end table
+
 @cindex Purify
 @cindex Rational Software
 @item
@@ -3963,6 +4129,23 @@ MacOS
 @item Overview
 Runs in the background as a control panel and detects various memory errors
 which can then be caught and run under a debugger.
+@end table
+
+@cindex Wipeout
+@cindex Barthel, Olaf
+@item
+Wipeout
+@table @asis
+@item Author
+Olaf Barthel (@email{olsen@@sourcery.han.de})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
+@item Overview
+Runs in the background checking free memory for corruption.
 @end table
 
 @cindex ZeroFault
