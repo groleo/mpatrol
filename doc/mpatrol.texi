@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.30 2000-01-28 01:22:17 graeme Exp $
+@c $Id: mpatrol.texi,v 1.31 2000-01-30 20:28:24 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3048,6 +3048,33 @@ with the execution of the program.  Note that this will only be done for known
 memory allocations.  Reading and writing past the boundaries of static and stack
 memory allocations cannot be detected in this way.
 
+If the @option{LOGMEMORY} option is added to the @env{MPATROL_OPTIONS}
+environment variable then it is possible to see a log of all the mpatrol library
+memory operation functions that were called during program execution.  For
+example, adding this option and running the above program again will produce
+something similar to the following.
+
+@smallexample
+MEMSET: memset (0x00027FFF, 18 bytes, 0x00) [main|test9.c|39]
+        0x00010B18 main
+        0x00010A0C _start
+@end smallexample
+
+This is similar to the tracing produced for memory allocation functions, except
+that the arguments in parentheses mean different things.  For @samp{MEMSET},
+the first argument represents the start of the memory block to set, the second
+argument represents the number of bytes to set and the third argument represents
+the actual byte to set.
+
+For @samp{MEMCOPY}, the first argument represents the source memory block, the
+second argument represents the destination memory block and the third argument
+represents the number of bytes to copy.  This is similar for @samp{MEMCMP}.
+
+Note that as with the memory allocation functions, @samp{MEMCMP}, @samp{MEMCOPY}
+and @samp{MEMSET} are used to generalise the types of operations being performed
+and are followed by the names of the actual functions being used.  In some cases
+the functions may use a different ordering of parameters than that shown.
+
 @node Example 6, Example 7, Example 5, Examples
 @section Incompatible function calls
 
@@ -3670,7 +3697,7 @@ functions are supplied for extra tracing and control.  Note that the current
 version of the mpatrol library is contained in the @code{MPATROL_VERSION}
 preprocessor macro.
 
-The following 13 functions are available as replacements for existing C library
+The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include @file{mpatrol.h} before all other
 header files, although on UNIX platforms they will be used anyway, albeit with
 slightly less tracing information.
@@ -5089,11 +5116,11 @@ This would be far less of a resource-hogger than the @option{NOFREE} option and
 might catch just as many errors.
 
 @item
-Add versions of @code{mallopt()}, @code{mallinfo()}, @code{memorymap()} and
-@code{mallocctl()} which are provided in many other malloc libraries.  These
-won't necessarily behave in exactly the same way as existing implementations,
-but at least there won't be link errors when compiling source code which uses
-them.
+Add versions of @code{mallopt()}, @code{mallinfo()}, @code{memorymap()},
+@code{mallocctl()}, @code{mallocblksize()} and @code{msize()} which are provided
+in many other malloc libraries.  These won't necessarily behave in exactly the
+same way as existing implementations, but at least there won't be link errors
+when compiling source code which uses them.
 
 @item
 Perhaps add debugging/tracing versions of the string manipulation functions,
