@@ -418,18 +418,18 @@ static inline new_handler set_new_handler(new_handler h)
 /* Override operator new.
  */
 
-static inline void *operator new(size_t l)
+static inline void *operator new(size_t l, char *s, char *t, unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEW, NULL, NULL, 0, 0);
+    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
 }
 
 
 /* Override operator new[].
  */
 
-static inline void *operator new[](size_t l)
+static inline void *operator new[](size_t l, char *s, char *t, unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEWVEC, NULL, NULL, 0, 0);
+    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
 }
 
 
@@ -449,6 +449,9 @@ static inline void operator delete[](void *p)
 {
     __mp_free(p, MP_AT_DELETEVEC, NULL, NULL, 0, 0);
 }
+
+
+#define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
 
 #endif /* __cplusplus */
 
