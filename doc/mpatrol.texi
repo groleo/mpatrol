@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.243 2001-09-04 22:56:09 graeme Exp $
+@c $Id: mpatrol.texi,v 1.244 2001-09-04 23:23:10 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.12
 @set VERSION 1.4.7
-@set UPDATED 4th September, 2001
+@set UPDATED 5th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -11574,8 +11574,8 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The system exception-handling library (libexc) is used for call stack traversal.
 Unfortunately, this library makes several calls to @code{malloc()} when
-initialising itself and this results in a recursive loop when used in
-combination with the mpatrol library.  Until this is resolved, either
+initialising itself and this can sometimes result in a recursive loop when used
+in combination with the mpatrol library.  If this occurs, either
 @code{MP_BUILTINSTACK_SUPPORT=1} must be defined or the mpatrol library must
 be built without the @file{malloc.o} module.
 @item
