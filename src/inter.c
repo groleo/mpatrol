@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.20 2000-03-23 21:30:15 graeme Exp $"
+#ident "$Id: inter.c,v 1.21 2000-03-30 17:47:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -460,7 +460,7 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
                 l = 1;
             if ((q = sbrk(l)) == (void *) -1)
                 q = NULL;
-            else if (f == AT_CREALLOC)
+            else if (f == AT_RECALLOC)
                 __mp_memset(q, 0, l);
         }
         else if ((l == 0) || (f == AT_EXPAND) || ((q = sbrk(l)) == (void *) -1))
