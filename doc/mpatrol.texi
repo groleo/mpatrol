@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.62 2000-04-27 18:41:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.63 2000-04-27 19:07:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -5226,6 +5226,24 @@ No support for call stack traversal.
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
+@cindex IRIX, MIPS
+@item
+IRIX 5.3, MIPS R4000, ELF32, @command{cc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+No support for call stack traversal.
+@item
+Symbols cannot be read from any shared libraries that a program uses.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
 @cindex RedHat
 @cindex Linux, Intel 80x86
 @item
@@ -5754,7 +5772,7 @@ unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for at least
-the Alpha, Motorola 88xx0, MIPS, PA/RISC, PowerPC and RS/6000 processor
+the Alpha, Motorola 88xx0, non-IRIX MIPS, PA/RISC, PowerPC and RS/6000 processor
 architectures.  Also need to add support for reading the program symbols from
 a suitable file in @file{/proc} for other operating systems that support it.
 If there is no support for either of these methods then the @option{PROGFILE}
@@ -5762,7 +5780,10 @@ option can currently be used to specify the program name at run-time.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
-read via @code{dlopen()}.
+read via @code{dlopen()}.  Also, on IRIX platforms no symbols can currently be
+read from any shared libraries that were used by a program.  This is because SGI
+have a slightly different interface to their dynamic linker that I haven't been
+able to figure out yet.
 
 @item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
