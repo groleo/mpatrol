@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
 February, 2001.
 
 
@@ -290,7 +290,7 @@ out.
      can be used to quickly determine if an address has been allocated
      on the heap.
 
-   * Contains 18 replacement C dynamic memory allocation functions:
+   * Contains 19 replacement C dynamic memory allocation functions:
 
      @{b}malloc()@{ub}      ANSI    Allocates memory.
      @{b}calloc()@{ub}      ANSI    Allocates zero-filled memory.
@@ -305,11 +305,20 @@ out.
      @{b}strdupa()@{ub}     old     Duplicates a string.
      @{b}strndupa()@{ub}    old     Duplicates a string with a maximum length.
      @{b}realloc()@{ub}     ANSI    Resizes memory.
+     @{b}reallocf()@{ub}    BSD     Resizes memory and frees on failure.
      @{b}recalloc()@{ub}    old     Resizes memory allocated by @{b}calloc()@{ub}.
      @{b}expand()@{ub}      old     Resizes memory but does not relocate it.
      @{b}free()@{ub}        ANSI    Frees memory.
      @{b}cfree()@{ub}       old     Frees memory allocated by @{b}calloc()@{ub}.
      @{b}dealloca()@{ub}    new     Explicitly frees temporary memory.
+
+   * Contains 5 replacement C dynamic memory extension functions:
+
+     @{b}xmalloc()@{ub}            Allocates memory without failure.
+     @{b}xcalloc()@{ub}            Allocates zero-filled memory without failure.
+     @{b}xstrdup()@{ub}            Duplicates a string without failure.
+     @{b}xrealloc()@{ub}           Resizes memory without failure.
+     @{b}xfree()@{ub}              Frees memory.
 
    * Contains 4 replacement C++ dynamic memory allocation operators (in
      both @{i}throw@{ui} and @{i}nothrow@{ui} forms):
@@ -579,7 +588,10 @@ out.
      UNIX and Windows platforms (and AmigaOS when using @{b}gcc@{ub}), since the
      library automatically redefines the default system memory
      allocation functions.  All redefinitions in the header can also be
-     disabled by defining the @{b}NDEBUG@{ub} preprocessor macro.
+     disabled by defining the @{b}NDEBUG@{ub} preprocessor macro, and a version
+     of the mpatrol library is also supplied for quickly removing all
+     mpatrol debugging, logging and tracing features with a simple
+     relink.
 
    * A command is supplied to run a program that was linked with the
      mpatrol library with any specified options on the command line.
@@ -2772,9 +2784,10 @@ corresponding letters are given in the following table.
 
    The argument to @{b}hexwords@{ub} must be a valid dictionary filename but if
 it is omitted then @{b}hexwords@{ub} will use @{b}/usr/dict/words@{ub} as the name of the
-dictionary file to use.  The dictionary file must be a plain text file
-that contains one word per line, otherwise few to no words will be
-matched.
+dictionary file to use.  If that cannot be found then hexwords will try
+@{b}/usr/lib/dict/words@{ub} and @{b}/usr/share/dict/words@{ub}.  The dictionary file
+must be a plain text file that contains one word per line, otherwise
+few to no words will be matched.
 
    The words that are matched from the dictionary file can be
 controlled by using the @{b}--match@{ub} option, which sets the type of
@@ -4250,7 +4263,7 @@ items with a number that corresponds to the descriptions below.
 
   3. Allocation index.  This is incremented every time a new memory
      allocation is requested, and persists even if the memory
-     allocation is resized with @{b}realloc()@{ub}, @{b}recalloc()@{ub} or @{b}expand()@{ub}, so
+     allocation is resized with @{b}realloc()@{ub} and its related functions, so
      can be useful to keep track of a memory allocation, even if its
      start address changes.  The mpatrol library may use up the first
      few allocation indices when it gets initialised.
@@ -4382,31 +4395,31 @@ it when the memory block was first allocated.
   6. Allocation function.  This is the name of the function that was
      called to allocate the memory block, in this case @{b}malloc@{ub}.  If the
      memory allocation has been resized then this will be either
-     @{b}realloc@{ub}, @{b}recalloc@{ub} or @{b}expand@{ub}.
+     @{b}realloc@{ub}, @{b}reallocf@{ub}, @{b}recalloc@{ub}, @{b}expand@{ub} or @{b}xrealloc@{ub}.
 
   7. Allocation index.
 
   8. Reallocation index.  This is used to count the number of times a
-     memory allocation has been resized with @{b}realloc()@{ub}, @{b}recalloc()@{ub} or
-     @{b}expand()@{ub}.
+     memory allocation has been resized with @{b}realloc()@{ub} and its related
+     functions.
 
   9. Function where original call to @{b}malloc()@{ub} took place.  If the memory
      allocation has been resized then this will be the name of the
-     function which last called @{b}realloc()@{ub}, @{b}recalloc()@{ub} or @{b}expand()@{ub}.
+     function which last called @{b}realloc()@{ub} and its related functions.
 
  10. Filename in which original call to @{b}malloc()@{ub} took place.  If the
      memory allocation has been resized then this will be the filename
-     in which the last call to @{b}realloc()@{ub}, @{b}recalloc()@{ub} or @{b}expand()@{ub} took
+     in which the last call to @{b}realloc()@{ub} and its related functions took
      place.
 
  11. Line number at which original call to @{b}malloc()@{ub} took place.  If the
      memory allocation has been resized then this will be the line
-     number at which the last call to @{b}realloc()@{ub}, @{b}recalloc()@{ub} or @{b}expand()@{ub}
-     took place.
+     number at which the last call to @{b}realloc()@{ub} and its related
+     functions took place.
 
  12. Function call stack of original memory allocation.  If the memory
      allocation has been resized then this will be the call stack of
-     the last call to @{b}realloc()@{ub}, @{b}recalloc()@{ub} or @{b}expand()@{ub}.
+     the last call to @{b}realloc()@{ub} and related functions.
 
    So, the mpatrol library detected the error in the above program and
 terminated it.  When the library terminates it always displays a
@@ -6358,7 +6371,7 @@ mpatrol library functions will evaluate to empty statements.  It is
 intended that the @{b}NDEBUG@{ub} preprocessor macro be defined in release
 builds.
 
-   The following 18 functions are available as replacements for
+   The following 19 functions are available as replacements for
 existing C library functions.  To use these you must include @{b}mpatrol.h@{ub}
 before all other header files, although on UNIX and Windows platforms
 (and AmigaOS when using @{b}gcc@{ub}) they will be used anyway, albeit with
@@ -6565,6 +6578,24 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      allocated memory must be deallocated with @{b}free()@{ub} and can be
      reallocated again with @{b}realloc()@{ub}.
 
+@{b}void *reallocf(void *ptr, size_t size)@{ub}
+     Resizes the memory allocation beginning at PTR to SIZE bytes and
+     returns a pointer to the first byte of the new allocation after
+     copying PTR to the newly-allocated memory, which will be truncated
+     if SIZE is smaller than the original allocation.  The pointer
+     returned will be suitably aligned for casting to any type and can
+     be used to store data of up to SIZE bytes in length.  If PTR is
+     @{b}NULL@{ub} then the call will be equivalent to @{b}malloc()@{ub}.  If SIZE is @{b}0@{ub}
+     then the existing memory allocation will be freed and the @{b}NULL@{ub}
+     pointer will be returned.  If SIZE is greater than the original
+     allocation then the extra space will be filled with uninitialised
+     bytes.  If there is not enough space in the heap then the @{b}NULL@{ub}
+     pointer will be returned, the original allocation will be freed
+     and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The allocated memory must be
+     deallocated with @{b}free()@{ub} and can be reallocated again with
+     @{b}realloc()@{ub}.  This function is available for backwards compatibility
+     with older C libraries and should not be used in new code.
+
 @{b}void *recalloc(void *ptr, size_t nelem, size_t size)@{ub}
      Resizes the memory allocation beginning at PTR to NELEM elements of
      SIZE bytes and returns a pointer to the first byte of the new
@@ -6627,15 +6658,78 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      mpatrol-specific and should not be used in release code.
 
    The following 5 functions are available as replacements for existing
+C library extension functions that always abort and never return @{b}NULL@{ub}
+if there is insufficient memory to fulfil a request.  To use these you
+must include @{b}mpatrol.h@{ub} before all other header files, although on UNIX
+and Windows platforms (and AmigaOS when using @{b}gcc@{ub}) they will be used
+anyway, albeit with slightly less tracing information.
+
+@{b}void *xmalloc(size_t size)@{ub}
+     Allocates SIZE uninitialised bytes from the heap and returns a
+     pointer to the first byte of the allocation.  The pointer returned
+     will be suitably aligned for casting to any type and can be used
+     to store data of up to SIZE bytes in length.  If SIZE is @{b}0@{ub} then
+     the memory allocated will be implicitly rounded up to @{b}1@{ub} byte.  If
+     there is not enough space in the heap then the program will be
+     terminated and the @{b}OUTMEM@{ub} error will be given.  The allocated
+     memory must be deallocated with @{b}xfree()@{ub} or reallocated with
+     @{b}xrealloc()@{ub}.
+
+@{b}void *xcalloc(size_t nelem, size_t size)@{ub}
+     Allocates NELEM elements of SIZE zero-initialised bytes from the
+     heap and returns a pointer to the first byte of the allocation.
+     The pointer returned will be suitably aligned for casting to any
+     type and can be used to store data of up to @{b}nelem * size@{ub} bytes in
+     length.  If @{b}nelem * size@{ub} is @{b}0@{ub} then the amount of memory allocated
+     will be implicitly rounded up to @{b}1@{ub} byte.  If there is not enough
+     space in the heap then the program will be terminated and the
+     @{b}OUTMEM@{ub} error will be given.  The allocated memory must be
+     deallocated with @{b}xfree()@{ub} or reallocated with @{b}xrealloc()@{ub}.
+
+@{b}char *xstrdup(const char *str)@{ub}
+     Allocates exactly enough memory from the heap to duplicate STR
+     (including the terminating nul character) and returns a pointer to
+     the first byte of the allocation after copying STR to the
+     newly-allocated memory.  The pointer returned will have no
+     alignment constraints and can be used to store character data up
+     to the length of STR.  If STR is @{b}NULL@{ub} then an error will be given
+     and the @{b}NULL@{ub} pointer will be returned.  If there is not enough
+     space in the heap then the program will be terminated and the
+     @{b}OUTMEM@{ub} error will be given.  The allocated memory must be
+     deallocated with @{b}xfree()@{ub} or reallocated with @{b}xrealloc()@{ub}.
+
+@{b}void *xrealloc(void *ptr, size_t size)@{ub}
+     Resizes the memory allocation beginning at PTR to SIZE bytes and
+     returns a pointer to the first byte of the new allocation after
+     copying PTR to the newly-allocated memory, which will be truncated
+     if SIZE is smaller than the original allocation.  The pointer
+     returned will be suitably aligned for casting to any type and can
+     be used to store data of up to SIZE bytes in length.  If PTR is
+     @{b}NULL@{ub} then the call will be equivalent to @{b}xmalloc()@{ub}.  If SIZE is @{b}0@{ub}
+     then it will be implicitly rounded up to @{b}1@{ub}.  If SIZE is greater
+     than the original allocation then the extra space will be filled
+     with uninitialised bytes.  If there is not enough space in the
+     heap then the program will be terminated and the @{b}OUTMEM@{ub} error will
+     be given.  The allocated memory must be deallocated with @{b}xfree()@{ub}
+     and can be reallocated again with @{b}xrealloc()@{ub}.
+
+@{b}void xfree(void *ptr)@{ub}
+     Frees the memory allocation beginning at PTR so the memory can be
+     reused by another call to allocate memory.  If PTR is @{b}NULL@{ub} then no
+     memory will be freed.  All of the previous contents will be
+     destroyed.
+
+   The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in @{b}mpatrol.h@{ub} will only be
 used if the @{b}MP_NOCPLUSPLUS@{ub} preprocessor macro is not defined.  The
 replacement operators make use of the preprocessor in order to obtain
 source-level information.  If this causes problems then you should
-define the @{b}MP_NONEWDELETE@{ub} preprocessor macro and use the @{b}MP_NEW@{ub} and
-@{b}MP_DELETE@{ub} macros instead of @{b}new@{ub} and @{b}delete@{ub} directly.  To use these C++
-features you must include @{b}mpatrol.h@{ub} before all other header files,
-although on UNIX and Windows platforms (and AmigaOS when using @{b}gcc@{ub})
-they will be used anyway, albeit with slightly less tracing information.
+define the @{b}MP_NONEWDELETE@{ub} preprocessor macro and use the @{b}MP_NEW@{ub},
+@{b}MP_NEW_NOTHROW@{ub} and @{b}MP_DELETE@{ub} macros instead of @{b}new@{ub} and @{b}delete@{ub} directly.
+To use these C++ features you must include @{b}mpatrol.h@{ub} before all other
+header files, although on UNIX and Windows platforms (and AmigaOS when
+using @{b}gcc@{ub}) they will be used anyway, albeit with slightly less tracing
+information.
 
 @{b}void *operator new(size_t size)@{ub}
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -9051,9 +9145,14 @@ Notes for all platforms
      the first few profiling tables.
 
    * Extend the @{b}mptrace@{ub} command to graphically display the size of the
-     heap plotted against time and the allocation size frequency.  Also
-     rewrite the GUI support to use GNOME instead of Motif, possibly
-     also using GLADE.
+     heap plotted against time and the allocation size frequency, and
+     also display some useful statistics at the end.  Also rewrite the
+     GUI support to use GNOME instead of Motif, possibly also using
+     GLADE.
+
+   * Add an option to @{b}mptrace@{ub} to prevent the window being opened on
+     systems where GUI support is enabled.  Also add widgets to the
+     @{b}mptrace@{ub} window to pause and quit.
 
    * Improve the speed of watch points by setting a range of allocation
      indices for which they will be used.  This may require a lot of
@@ -9086,11 +9185,9 @@ Notes for all platforms
      option which would stop the program running after a certain number
      of diagnostics have been displayed.
 
-   * Provide a function that could individually label each memory
-     allocation with a given string.  Perhaps also add time information
-     to the details stored about each memory allocation.  This is
-     probably not useful unless the system provides a high-resolution
-     timer.
+   * Perhaps add time information to the details stored about each
+     memory allocation.  This is probably not useful unless the system
+     provides a high-resolution timer.
 
    * Add an option (perhaps @{b}NOINTERNAL@{ub}) to suppress the display of
      internal (recursive) memory allocations in the mpatrol log file
@@ -9435,6 +9532,8 @@ Notes for Windows platforms
    * Need to add support for processors other than the Intel 80x86.
      However, about 99% of Windows platforms run on this processor
      family -- does anyone really use Windows with other processors?
+     Also finish Cygwin support, although this is effectively mpatrol
+     built with @{b}-DTARGET=TARGET_UNIX@{ub} support on Windows platforms.
 
    * Perhaps add support for compiling the mpatrol library with @{b}gcc@{ub} on
      Windows platforms so that the GNU BFD library can be used as well.
@@ -10608,6 +10707,24 @@ Netware platforms.
           A drop-in replacement for the system's memory management
           routines, providing powerful debugging facilities
           configurable at run-time.  Formerly known as Malloc_Dbg.
+
+   * DPCRTLMM
+    Author
+          David Duncan Ross Palmer (<overlord@daybologic.co.uk>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Windows, DOS
+
+    Location
+          `http://daybologic.com/Dev/dpcrtlmm/'
+
+    Overview
+          Detects failures to release memory and attempts to release
+          memory which has not been allocated, and can also provide
+          statistics and logging facilities.
 
    * Electric Fence
     Author
@@ -12512,6 +12629,7 @@ Function index
  @{" operator new[]                           " link "Functions"}   Functions
  @{" pvalloc                                  " link "Functions"}   Functions
  @{" realloc                                  " link "Functions"}   Functions
+ @{" reallocf                                 " link "Functions"}   Functions
  @{" recalloc                                 " link "Functions"}   Functions
  @{" set_new_handler                          " link "Functions"}   Functions
  @{" strdup                                   " link "Functions"}   Functions
@@ -12521,6 +12639,11 @@ Function index
  @{" strnsave                                 " link "Functions"}   Functions
  @{" strsave                                  " link "Functions"}   Functions
  @{" valloc                                   " link "Functions"}   Functions
+ @{" xcalloc                                  " link "Functions"}   Functions
+ @{" xfree                                    " link "Functions"}   Functions
+ @{" xmalloc                                  " link "Functions"}   Functions
+ @{" xrealloc                                 " link "Functions"}   Functions
+ @{" xstrdup                                  " link "Functions"}   Functions
 
 
 @endnode
@@ -12763,6 +12886,7 @@ Index
  @{" documentation questions                  " link "Documentation"}   Documentation
  @{" dot                                      " link "Profiling"}   Profiling
  @{" dotty                                    " link "Profiling"}   Profiling
+ @{" DPCRTLMM                                 " link "Related software"}   Related software
  @{" driver                                   " link "Profiling"}   Profiling
  @{" DRS-NX, SPARC                            " link "Supported systems"}   Supported systems
  @{" dumping memory                           " link "Example 4"}   Example 4
@@ -13031,6 +13155,7 @@ Index
  @{" MP_INLINE                                " link "Building"}   Building
  @{" MP_LIBRARYSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" MP_NEW                                   " link "Functions"}   Functions
+ @{" MP_NEW_NOTHROW                           " link "Functions"}   Functions
  @{" MP_NOCPLUSPLUS                           " link "Functions"}   Functions
  @{" MP_NONEWDELETE                           " link "Functions"}   Functions
  @{" MP_USE_ATEXIT                            " link "Running"}   Running

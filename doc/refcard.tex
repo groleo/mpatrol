@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.17 2001-01-04 22:10:37 graeme Exp $
+% $Id: refcard.tex,v 1.18 2001-02-12 19:12:21 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -276,9 +276,17 @@ All of the function definitions in \texttt{mpatrol.h} can be disabled by
 defining the \texttt{NDEBUG} preprocessor macro, which is the same macro used
 to control the behaviour of the \function{assert} function.  If \texttt{NDEBUG}
 is defined then no macro redefinition of functions will take place and all
-special mpatrol library functions will evaluate to empty statements.  It is
+special mpatrol library functions will evaluate to empty statements.  The
+\texttt{mpalloc.h} header file will also be included in this case.  It is
 intended that the \texttt{NDEBUG} preprocessor macro be defined in release
 builds.
+
+The \function{MP\_MALLOC} family of functions that are defined in
+\texttt{mpalloc.h} are also defined in \texttt{mpatrol.h} when \texttt{NDEBUG}
+is not defined.  The mpatrol versions of these functions contain more debugging
+information than the mpalloc versions do, but they do not call the allocation
+failure handler when no more memory is available (they cause the \error{OUTMEM}
+error message to be given instead).
 
 There may be problems during preprocessing when the preprocessor macros defining
 the replacement C$++$ operators in \texttt{mpatrol.h} are used.  If this is the
@@ -286,7 +294,8 @@ case then either the \texttt{MP\_NOCPLUSPLUS} preprocessor macro can be defined
 to disable all C$++$ support, or the \texttt{MP\_NONEWDELETE} preprocessor macro
 can be defined to prevent the debugging versions of \texttt{operator new} and
 \texttt{operator delete} from being used by default.  The preprocessor macros
-\texttt{MP\_NEW} and \texttt{MP\_DELETE} will then have to be used instead.
+\texttt{MP\_NEW}, \texttt{MP\_NEW\_NOTHROW} and \texttt{MP\_DELETE} will then
+have to be used instead.
 
 \vskip 12pt
 \heading{C dynamic memory allocation functions}
@@ -319,6 +328,8 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \hfill Duplicates a string with a maximum length.
 \item[\function{realloc}]
 \hfill Resizes memory.
+\item[\function{reallocf}]
+\hfill Resizes memory and frees on failure.
 \item[\function{recalloc}]
 \hfill Resizes memory allocated by \function{calloc}.
 \item[\function{expand}]
@@ -329,6 +340,23 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \hfill Frees memory allocated by \function{calloc}.
 \item[\function{dealloca}]
 \hfill Explicitly frees temporary memory.
+\end{description}
+
+\vskip 12pt
+\heading{C dynamic memory extension functions}
+\vskip 6pt
+
+\begin{description}
+\item[\function{xmalloc}]
+\hfill Allocates memory without failure.
+\item[\function{xcalloc}]
+\hfill Allocates zero-filled memory without failure.
+\item[\function{xstrdup}]
+\hfill Duplicates a string without failure.
+\item[\function{xrealloc}]
+\hfill Resizes memory without failure.
+\item[\function{xfree}]
+\hfill Frees memory.
 \end{description}
 
 \vskip 12pt
@@ -380,10 +408,24 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \vskip 6pt
 
 \begin{description}
+\item[\function{\_\_mp\_setoption}]
+\hfill Sets an mpatrol library option.
+\item[\function{\_\_mp\_getoption}]
+\hfill Returns an mpatrol library option.
+\item[\function{\_\_mp\_function}]
+\hfill Returns an allocation type function name.
+\item[\function{\_\_mp\_setuser}]
+\hfill Sets the user data for an allocation.
 \item[\function{\_\_mp\_info}]
 \hfill Returns information for an allocation.
+\item[\function{\_\_mp\_syminfo}]
+\hfill Returns symbol information for an address.
 \item[\function{\_\_mp\_printinfo}]
 \hfill Displays information for an allocation.
+\item[\function{\_\_mp\_snapshot}]
+\hfill Returns the current heap event number.
+\item[\function{\_\_mp\_iterate}]
+\hfill Iterates over allocations in the heap.
 \item[\function{\_\_mp\_memorymap}]
 \hfill Displays a map of memory in the heap.
 \item[\function{\_\_mp\_summary}]
@@ -396,6 +438,22 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \hfill Sets up an allocation epilogue handler.
 \item[\function{\_\_mp\_nomemory}]
 \hfill Sets up an allocation failure handler.
+\item[\function{\_\_mp\_printf}]
+\hfill Writes user data to the log file.
+\item[\function{\_\_mp\_vprintf}]
+\hfill Writes user data to the log file.
+\item[\function{\_\_mp\_logmemory}]
+\hfill Displays a hex dump of memory.
+\item[\function{\_\_mp\_logstack}]
+\hfill Displays the current call stack.
+\item[\function{\_\_mp\_logaddr}]
+\hfill Displays information for an allocation.
+\item[\function{\_\_mp\_edit}]
+\hfill Invokes a text editor on a source file.
+\item[\function{\_\_mp\_list}]
+\hfill Lists a source file at a specific line.
+\item[\function{\_\_mp\_view}]
+\hfill Edits or lists a source file.
 \end{description}
 
 \vskip 12pt

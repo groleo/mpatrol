@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.173 2001-02-06 21:32:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.174 2001-02-12 19:12:21 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -36,8 +36,8 @@
 
 @c Remember to change these after each revision!
 @set EDITION 2.5
-@set VERSION 1.3.5
-@set UPDATED 6th February, 2001
+@set VERSION 1.4.0
+@set UPDATED 12th February, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -352,7 +352,7 @@ allocations and can be used to quickly determine if an address has been
 allocated on the heap.
 
 @item
-Contains 18 replacement C dynamic memory allocation functions:
+Contains 19 replacement C dynamic memory allocation functions:
 
 @multitable @columnfractions .2 .1 .7
 @item @code{malloc()}
@@ -394,6 +394,9 @@ Contains 18 replacement C dynamic memory allocation functions:
 @item @code{realloc()}
 @tab ANSI
 @tab Resizes memory.
+@item @code{reallocf()}
+@tab BSD
+@tab Resizes memory and frees on failure.
 @item @code{recalloc()}
 @tab old
 @tab Resizes memory allocated by @code{calloc()}.
@@ -409,6 +412,22 @@ Contains 18 replacement C dynamic memory allocation functions:
 @item @code{dealloca()}
 @tab new
 @tab Explicitly frees temporary memory.
+@end multitable
+
+@item
+Contains 5 replacement C dynamic memory extension functions:
+
+@multitable @columnfractions .3 .7
+@item @code{xmalloc()}
+@tab Allocates memory without failure.
+@item @code{xcalloc()}
+@tab Allocates zero-filled memory without failure.
+@item @code{xstrdup()}
+@tab Duplicates a string without failure.
+@item @code{xrealloc()}
+@tab Resizes memory without failure.
+@item @code{xfree()}
+@tab Frees memory.
 @end multitable
 
 @item
@@ -725,7 +744,9 @@ macros in order to obtain more information about where they were called from.
 This is not strictly required on UNIX and Windows platforms (and AmigaOS when
 using @command{gcc}), since the library automatically redefines the default
 system memory allocation functions.  All redefinitions in the header can also
-be disabled by defining the @code{NDEBUG} preprocessor macro.
+be disabled by defining the @code{NDEBUG} preprocessor macro, and a version of
+the mpatrol library is also supplied for quickly removing all mpatrol debugging,
+logging and tracing features with a simple relink.
 
 @item
 A command is supplied to run a program that was linked with the mpatrol library
@@ -2874,8 +2895,10 @@ are given in the following table.
 
 The argument to @command{hexwords} must be a valid dictionary filename but if it
 is omitted then @command{hexwords} will use @file{/usr/dict/words} as the name
-of the dictionary file to use.  The dictionary file must be a plain text file
-that contains one word per line, otherwise few to no words will be matched.
+of the dictionary file to use.  If that cannot be found then hexwords will try
+@file{/usr/lib/dict/words} and @file{/usr/share/dict/words}.  The dictionary
+file must be a plain text file that contains one word per line, otherwise few to
+no words will be matched.
 
 @cindex --match
 The words that are matched from the dictionary file can be controlled by using
@@ -3509,10 +3532,13 @@ driver.  From the graph you can see that the vast majority of memory allocations
 appear to be required for reading the driver specification file, which details
 default options and platform-specific features.  Almost all of the memory
 allocations go through the @code{xmalloc()} routine, which is an error-checking
-function built on top of @code{malloc()}.  A large amount of memory is also
-allocated by the @emph{obstack} module, which provides a functionality similar
-to @emph{arenas} for variable-sized data structures.  You'll see extensive use
-of both of these types of routines throughout the following graphs.
+function built on top of @code{malloc()}@footnote{The mpatrol version of
+@code{xmalloc()} was not used in this case since another version of
+@code{xmalloc()} was originally statically linked into the program being run,
+and so could not be overridden.}.  A large amount of memory is also allocated by
+the @emph{obstack} module, which provides a functionality similar to
+@emph{arenas} for variable-sized data structures.  You'll see extensive use of
+both of these types of routines throughout the following graphs.
 
 @image{images/cpp}
 
@@ -4507,9 +4533,9 @@ allocate the memory, in this case @samp{malloc}.
 @item
 Allocation index.  This is incremented every time a new memory allocation is
 requested, and persists even if the memory allocation is resized with
-@code{realloc()}, @code{recalloc()} or @code{expand()}, so can be useful to keep
-track of a memory allocation, even if its start address changes.  The mpatrol
-library may use up the first few allocation indices when it gets initialised.
+@code{realloc()} and its related functions, so can be useful to keep track of a
+memory allocation, even if its start address changes.  The mpatrol library may
+use up the first few allocation indices when it gets initialised.
 
 @item
 Size of requested allocation.
@@ -4666,36 +4692,35 @@ Size of memory allocation.
 @item
 Allocation function.  This is the name of the function that was called to
 allocate the memory block, in this case @samp{malloc}.  If the memory allocation
-has been resized then this will be either @samp{realloc}, @samp{recalloc} or
-@samp{expand}.
+has been resized then this will be either @samp{realloc}, @samp{reallocf},
+@samp{recalloc}, @samp{expand} or @samp{xrealloc}.
 
 @item
 Allocation index.
 
 @item
 Reallocation index.  This is used to count the number of times a memory
-allocation has been resized with @code{realloc()}, @code{recalloc()} or
-@code{expand()}.
+allocation has been resized with @code{realloc()} and its related functions.
 
 @item
 Function where original call to @code{malloc()} took place.  If the memory
 allocation has been resized then this will be the name of the function which
-last called @code{realloc()}, @code{recalloc()} or @code{expand()}.
+last called @code{realloc()} and its related functions.
 
 @item
 Filename in which original call to @code{malloc()} took place.  If the memory
 allocation has been resized then this will be the filename in which the last
-call to @code{realloc()}, @code{recalloc()} or @code{expand()} took place.
+call to @code{realloc()} and its related functions took place.
 
 @item
 Line number at which original call to @code{malloc()} took place.  If the memory
 allocation has been resized then this will be the line number at which the last
-call to @code{realloc()}, @code{recalloc()} or @code{expand()} took place.
+call to @code{realloc()} and its related functions took place.
 
 @item
 Function call stack of original memory allocation.  If the memory allocation has
 been resized then this will be the call stack of the last call to
-@code{realloc()}, @code{recalloc()} or @code{expand()}.
+@code{realloc()} and related functions.
 @end enumerate
 
 So, the mpatrol library detected the error in the above program and terminated
@@ -6631,7 +6656,7 @@ no macro redefinition of functions will take place and all special mpatrol
 library functions will evaluate to empty statements.  It is intended that the
 @code{NDEBUG} preprocessor macro be defined in release builds.
 
-The following 18 functions are available as replacements for existing C library
+The following 19 functions are available as replacements for existing C library
 functions.  To use these you must include @file{mpatrol.h} before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
 @command{gcc}) they will be used anyway, albeit with slightly less tracing
@@ -6836,6 +6861,24 @@ then the @samp{NULL} pointer will be returned and @code{errno} will be set to
 @code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} and
 can be reallocated again with @code{realloc()}.
 
+@findex reallocf
+@item @code{void *reallocf(void *ptr, size_t size)}
+Resizes the memory allocation beginning at @var{ptr} to @var{size} bytes and
+returns a pointer to the first byte of the new allocation after copying
+@var{ptr} to the newly-allocated memory, which will be truncated if @var{size}
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+@var{size} bytes in length.  If @var{ptr} is @samp{NULL} then the call will be
+equivalent to @code{malloc()}.  If @var{size} is @samp{0} then the existing
+memory allocation will be freed and the @samp{NULL} pointer will be returned.
+If @var{size} is greater than the original allocation then the extra space will
+be filled with uninitialised bytes.  If there is not enough space in the heap
+then the @samp{NULL} pointer will be returned, the original allocation will be
+freed and @code{errno} will be set to @code{ENOMEM}.  The allocated memory must
+be deallocated with @code{free()} and can be reallocated again with
+@code{realloc()}.  This function is available for backwards compatibility with
+older C libraries and should not be used in new code.
+
 @findex recalloc
 @item @code{void *recalloc(void *ptr, size_t nelem, size_t size)}
 Resizes the memory allocation beginning at @var{ptr} to @var{nelem} elements of
@@ -6899,21 +6942,86 @@ memory allocations when the allocating function returns.  This function is
 mpatrol-specific and should not be used in release code.
 @end table
 
+The following 5 functions are available as replacements for existing C library
+extension functions that always abort and never return @samp{NULL} if there is
+insufficient memory to fulfil a request.  To use these you must include
+@file{mpatrol.h} before all other header files, although on UNIX and Windows
+platforms (and AmigaOS when using @command{gcc}) they will be used anyway,
+albeit with slightly less tracing information.
+
+@table @asis
+@findex xmalloc
+@item @code{void *xmalloc(size_t size)}
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably aligned
+for casting to any type and can be used to store data of up to @var{size} bytes
+in length.  If @var{size} is @samp{0} then the memory allocated will be
+implicitly rounded up to @samp{1} byte.  If there is not enough space in the
+heap then the program will be terminated and the @samp{OUTMEM} error will be
+given.  The allocated memory must be deallocated with @code{xfree()} or
+reallocated with @code{xrealloc()}.
+
+@findex xcalloc
+@item @code{void *xcalloc(size_t nelem, size_t size)}
+Allocates @var{nelem} elements of @var{size} zero-initialised bytes from the
+heap and returns a pointer to the first byte of the allocation.  The pointer
+returned will be suitably aligned for casting to any type and can be used to
+store data of up to @code{nelem * size} bytes in length.  If @code{nelem * size}
+is @samp{0} then the amount of memory allocated will be implicitly rounded up to
+@samp{1} byte.  If there is not enough space in the heap then the program will
+be terminated and the @samp{OUTMEM} error will be given.  The allocated memory
+must be deallocated with @code{xfree()} or reallocated with @code{xrealloc()}.
+
+@findex xstrdup
+@item @code{char *xstrdup(const char *str)}
+Allocates exactly enough memory from the heap to duplicate @var{str} (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying @var{str} to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of @var{str}.  If @var{str} is @samp{NULL} then an error
+will be given and the @samp{NULL} pointer will be returned.  If there is not
+enough space in the heap then the program will be terminated and the
+@samp{OUTMEM} error will be given.  The allocated memory must be deallocated
+with @code{xfree()} or reallocated with @code{xrealloc()}.
+
+@findex xrealloc
+@item @code{void *xrealloc(void *ptr, size_t size)}
+Resizes the memory allocation beginning at @var{ptr} to @var{size} bytes and
+returns a pointer to the first byte of the new allocation after copying
+@var{ptr} to the newly-allocated memory, which will be truncated if @var{size}
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+@var{size} bytes in length.  If @var{ptr} is @samp{NULL} then the call will be
+equivalent to @code{xmalloc()}.  If @var{size} is @samp{0} then it will be
+implicitly rounded up to @samp{1}.  If @var{size} is greater than the original
+allocation then the extra space will be filled with uninitialised bytes.  If
+there is not enough space in the heap then the program will be terminated and
+the @samp{OUTMEM} error will be given.  The allocated memory must be deallocated
+with @code{xfree()} and can be reallocated again with @code{xrealloc()}.
+
+@findex xfree
+@item @code{void xfree(void *ptr)}
+Frees the memory allocation beginning at @var{ptr} so the memory can be reused
+by another call to allocate memory.  If @var{ptr} is @samp{NULL} then no memory
+will be freed.  All of the previous contents will be destroyed.
+@end table
+
 @cindex MP_NOCPLUSPLUS
 @cindex MP_NONEWDELETE
 @cindex MP_NEW
+@cindex MP_NEW_NOTHROW
 @cindex MP_DELETE
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in @file{mpatrol.h} will only be used if the
 @code{MP_NOCPLUSPLUS} preprocessor macro is not defined.  The replacement
 operators make use of the preprocessor in order to obtain source-level
 information.  If this causes problems then you should define the
-@code{MP_NONEWDELETE} preprocessor macro and use the @code{MP_NEW} and
-@code{MP_DELETE} macros instead of @code{new} and @code{delete} directly.  To
-use these C++ features you must include @file{mpatrol.h} before all other header
-files, although on UNIX and Windows platforms (and AmigaOS when using
-@command{gcc}) they will be used anyway, albeit with slightly less tracing
-information.
+@code{MP_NONEWDELETE} preprocessor macro and use the @code{MP_NEW},
+@code{MP_NEW_NOTHROW} and @code{MP_DELETE} macros instead of @code{new} and
+@code{delete} directly.  To use these C++ features you must include
+@file{mpatrol.h} before all other header files, although on UNIX and Windows
+platforms (and AmigaOS when using @command{gcc}) they will be used anyway,
+albeit with slightly less tracing information.
 
 @table @asis
 @findex operator new
@@ -9546,8 +9654,14 @@ software for a better visualisation of the first few profiling tables.
 
 @item
 Extend the @command{mptrace} command to graphically display the size of the heap
-plotted against time and the allocation size frequency.  Also rewrite the GUI
-support to use GNOME instead of Motif, possibly also using GLADE.
+plotted against time and the allocation size frequency, and also display some
+useful statistics at the end.  Also rewrite the GUI support to use GNOME instead
+of Motif, possibly also using GLADE.
+
+@item
+Add an option to @command{mptrace} to prevent the window being opened on systems
+where GUI support is enabled.  Also add widgets to the @command{mptrace} window
+to pause and quit.
 
 @item
 Improve the speed of watch points by setting a range of allocation indices for
@@ -9584,10 +9698,8 @@ would stop the program running after a certain number of diagnostics have been
 displayed.
 
 @item
-Provide a function that could individually label each memory allocation with a
-given string.  Perhaps also add time information to the details stored about
-each memory allocation.  This is probably not useful unless the system provides
-a high-resolution timer.
+Perhaps add time information to the details stored about each memory allocation.
+This is probably not useful unless the system provides a high-resolution timer.
 
 @item
 Add an option (perhaps @option{NOINTERNAL}) to suppress the display of internal
@@ -9928,7 +10040,9 @@ Perhaps add an @command{Installer} installation script with icons.
 @item
 Need to add support for processors other than the Intel 80x86.  However, about
 99% of Windows platforms run on this processor family --- does anyone really use
-Windows with other processors?
+Windows with other processors?  Also finish Cygwin support, although this is
+effectively mpatrol built with @option{-DTARGET=TARGET_UNIX} support on Windows
+platforms.
 
 @item
 Perhaps add support for compiling the mpatrol library with @command{gcc} on
@@ -11088,6 +11202,23 @@ Various UNIX, Windows, MS-DOS
 A drop-in replacement for the system's memory management routines, providing
 powerful debugging facilities configurable at run-time.  Formerly known as
 Malloc_Dbg.
+@end table
+
+@cindex DPCRTLMM
+@item
+DPCRTLMM
+@table @asis
+@item Author
+David Duncan Ross Palmer (@email{overlord@@daybologic.co.uk})
+@item License
+GNU General Public License
+@item Platforms
+Windows, DOS
+@item Location
+@uref{http://daybologic.com/Dev/dpcrtlmm/}
+@item Overview
+Detects failures to release memory and attempts to release memory which has not
+been allocated, and can also provide statistics and logging facilities.
 @end table
 
 @cindex Electric Fence

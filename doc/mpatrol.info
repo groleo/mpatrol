@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
 February, 2001.
 
 * Menu:
@@ -274,7 +274,7 @@ out.
      can be used to quickly determine if an address has been allocated
      on the heap.
 
-   * Contains 18 replacement C dynamic memory allocation functions:
+   * Contains 19 replacement C dynamic memory allocation functions:
 
      `malloc()'    ANSI    Allocates memory.
      `calloc()'    ANSI    Allocates zero-filled memory.
@@ -289,11 +289,20 @@ out.
      `strdupa()'   old     Duplicates a string.
      `strndupa()'  old     Duplicates a string with a maximum length.
      `realloc()'   ANSI    Resizes memory.
+     `reallocf()'  BSD     Resizes memory and frees on failure.
      `recalloc()'  old     Resizes memory allocated by `calloc()'.
      `expand()'    old     Resizes memory but does not relocate it.
      `free()'      ANSI    Frees memory.
      `cfree()'     old     Frees memory allocated by `calloc()'.
      `dealloca()'  new     Explicitly frees temporary memory.
+
+   * Contains 5 replacement C dynamic memory extension functions:
+
+     `xmalloc()'          Allocates memory without failure.
+     `xcalloc()'          Allocates zero-filled memory without failure.
+     `xstrdup()'          Duplicates a string without failure.
+     `xrealloc()'         Resizes memory without failure.
+     `xfree()'            Frees memory.
 
    * Contains 4 replacement C++ dynamic memory allocation operators (in
      both _throw_ and _nothrow_ forms):
@@ -565,7 +574,10 @@ out.
      UNIX and Windows platforms (and AmigaOS when using `gcc'), since
      the library automatically redefines the default system memory
      allocation functions.  All redefinitions in the header can also be
-     disabled by defining the `NDEBUG' preprocessor macro.
+     disabled by defining the `NDEBUG' preprocessor macro, and a
+     version of the mpatrol library is also supplied for quickly
+     removing all mpatrol debugging, logging and tracing features with
+     a simple relink.
 
    * A command is supplied to run a program that was linked with the
      mpatrol library with any specified options on the command line.
@@ -2665,9 +2677,10 @@ _digit_        _letter_
 
    The argument to `hexwords' must be a valid dictionary filename but
 if it is omitted then `hexwords' will use `/usr/dict/words' as the name
-of the dictionary file to use.  The dictionary file must be a plain
-text file that contains one word per line, otherwise few to no words
-will be matched.
+of the dictionary file to use.  If that cannot be found then hexwords
+will try `/usr/lib/dict/words' and `/usr/share/dict/words'.  The
+dictionary file must be a plain text file that contains one word per
+line, otherwise few to no words will be matched.
 
    The words that are matched from the dictionary file can be
 controlled by using the `--match' option, which sets the type of
@@ -4127,10 +4140,10 @@ items with a number that corresponds to the descriptions below.
 
   3. Allocation index.  This is incremented every time a new memory
      allocation is requested, and persists even if the memory
-     allocation is resized with `realloc()', `recalloc()' or
-     `expand()', so can be useful to keep track of a memory allocation,
-     even if its start address changes.  The mpatrol library may use up
-     the first few allocation indices when it gets initialised.
+     allocation is resized with `realloc()' and its related functions,
+     so can be useful to keep track of a memory allocation, even if its
+     start address changes.  The mpatrol library may use up the first
+     few allocation indices when it gets initialised.
 
   4. Size of requested allocation.
 
@@ -4260,32 +4273,32 @@ it when the memory block was first allocated.
   6. Allocation function.  This is the name of the function that was
      called to allocate the memory block, in this case `malloc'.  If
      the memory allocation has been resized then this will be either
-     `realloc', `recalloc' or `expand'.
+     `realloc', `reallocf', `recalloc', `expand' or `xrealloc'.
 
   7. Allocation index.
 
   8. Reallocation index.  This is used to count the number of times a
-     memory allocation has been resized with `realloc()', `recalloc()'
-     or `expand()'.
+     memory allocation has been resized with `realloc()' and its
+     related functions.
 
   9. Function where original call to `malloc()' took place.  If the
      memory allocation has been resized then this will be the name of
-     the function which last called `realloc()', `recalloc()' or
-     `expand()'.
+     the function which last called `realloc()' and its related
+     functions.
 
  10. Filename in which original call to `malloc()' took place.  If the
      memory allocation has been resized then this will be the filename
-     in which the last call to `realloc()', `recalloc()' or `expand()'
+     in which the last call to `realloc()' and its related functions
      took place.
 
  11. Line number at which original call to `malloc()' took place.  If
      the memory allocation has been resized then this will be the line
-     number at which the last call to `realloc()', `recalloc()' or
-     `expand()' took place.
+     number at which the last call to `realloc()' and its related
+     functions took place.
 
  12. Function call stack of original memory allocation.  If the memory
      allocation has been resized then this will be the call stack of
-     the last call to `realloc()', `recalloc()' or `expand()'.
+     the last call to `realloc()' and related functions.
 
    So, the mpatrol library detected the error in the above program and
 terminated it.  When the library terminates it always displays a
@@ -6191,7 +6204,7 @@ special mpatrol library functions will evaluate to empty statements.
 It is intended that the `NDEBUG' preprocessor macro be defined in
 release builds.
 
-   The following 18 functions are available as replacements for
+   The following 19 functions are available as replacements for
 existing C library functions.  To use these you must include
 `mpatrol.h' before all other header files, although on UNIX and Windows
 platforms (and AmigaOS when using `gcc') they will be used anyway,
@@ -6401,6 +6414,25 @@ used.
      `ENOMEM'.  The allocated memory must be deallocated with `free()'
      and can be reallocated again with `realloc()'.
 
+`void *reallocf(void *ptr, size_t size)'
+     Resizes the memory allocation beginning at PTR to SIZE bytes and
+     returns a pointer to the first byte of the new allocation after
+     copying PTR to the newly-allocated memory, which will be truncated
+     if SIZE is smaller than the original allocation.  The pointer
+     returned will be suitably aligned for casting to any type and can
+     be used to store data of up to SIZE bytes in length.  If PTR is
+     `NULL' then the call will be equivalent to `malloc()'.  If SIZE is
+     `0' then the existing memory allocation will be freed and the
+     `NULL' pointer will be returned.  If SIZE is greater than the
+     original allocation then the extra space will be filled with
+     uninitialised bytes.  If there is not enough space in the heap
+     then the `NULL' pointer will be returned, the original allocation
+     will be freed and `errno' will be set to `ENOMEM'.  The allocated
+     memory must be deallocated with `free()' and can be reallocated
+     again with `realloc()'.  This function is available for backwards
+     compatibility with older C libraries and should not be used in new
+     code.
+
 `void *recalloc(void *ptr, size_t nelem, size_t size)'
      Resizes the memory allocation beginning at PTR to NELEM elements of
      SIZE bytes and returns a pointer to the first byte of the new
@@ -6465,16 +6497,78 @@ used.
      code.
 
    The following 5 functions are available as replacements for existing
+C library extension functions that always abort and never return `NULL'
+if there is insufficient memory to fulfil a request.  To use these you
+must include `mpatrol.h' before all other header files, although on
+UNIX and Windows platforms (and AmigaOS when using `gcc') they will be
+used anyway, albeit with slightly less tracing information.
+
+`void *xmalloc(size_t size)'
+     Allocates SIZE uninitialised bytes from the heap and returns a
+     pointer to the first byte of the allocation.  The pointer returned
+     will be suitably aligned for casting to any type and can be used
+     to store data of up to SIZE bytes in length.  If SIZE is `0' then
+     the memory allocated will be implicitly rounded up to `1' byte.
+     If there is not enough space in the heap then the program will be
+     terminated and the `OUTMEM' error will be given.  The allocated
+     memory must be deallocated with `xfree()' or reallocated with
+     `xrealloc()'.
+
+`void *xcalloc(size_t nelem, size_t size)'
+     Allocates NELEM elements of SIZE zero-initialised bytes from the
+     heap and returns a pointer to the first byte of the allocation.
+     The pointer returned will be suitably aligned for casting to any
+     type and can be used to store data of up to `nelem * size' bytes
+     in length.  If `nelem * size' is `0' then the amount of memory
+     allocated will be implicitly rounded up to `1' byte.  If there is
+     not enough space in the heap then the program will be terminated
+     and the `OUTMEM' error will be given.  The allocated memory must
+     be deallocated with `xfree()' or reallocated with `xrealloc()'.
+
+`char *xstrdup(const char *str)'
+     Allocates exactly enough memory from the heap to duplicate STR
+     (including the terminating nul character) and returns a pointer to
+     the first byte of the allocation after copying STR to the
+     newly-allocated memory.  The pointer returned will have no
+     alignment constraints and can be used to store character data up
+     to the length of STR.  If STR is `NULL' then an error will be
+     given and the `NULL' pointer will be returned.  If there is not
+     enough space in the heap then the program will be terminated and
+     the `OUTMEM' error will be given.  The allocated memory must be
+     deallocated with `xfree()' or reallocated with `xrealloc()'.
+
+`void *xrealloc(void *ptr, size_t size)'
+     Resizes the memory allocation beginning at PTR to SIZE bytes and
+     returns a pointer to the first byte of the new allocation after
+     copying PTR to the newly-allocated memory, which will be truncated
+     if SIZE is smaller than the original allocation.  The pointer
+     returned will be suitably aligned for casting to any type and can
+     be used to store data of up to SIZE bytes in length.  If PTR is
+     `NULL' then the call will be equivalent to `xmalloc()'.  If SIZE
+     is `0' then it will be implicitly rounded up to `1'.  If SIZE is
+     greater than the original allocation then the extra space will be
+     filled with uninitialised bytes.  If there is not enough space in
+     the heap then the program will be terminated and the `OUTMEM'
+     error will be given.  The allocated memory must be deallocated
+     with `xfree()' and can be reallocated again with `xrealloc()'.
+
+`void xfree(void *ptr)'
+     Frees the memory allocation beginning at PTR so the memory can be
+     reused by another call to allocate memory.  If PTR is `NULL' then
+     no memory will be freed.  All of the previous contents will be
+     destroyed.
+
+   The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
 used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  The
 replacement operators make use of the preprocessor in order to obtain
 source-level information.  If this causes problems then you should
-define the `MP_NONEWDELETE' preprocessor macro and use the `MP_NEW' and
-`MP_DELETE' macros instead of `new' and `delete' directly.  To use
-these C++ features you must include `mpatrol.h' before all other header
-files, although on UNIX and Windows platforms (and AmigaOS when using
-`gcc') they will be used anyway, albeit with slightly less tracing
-information.
+define the `MP_NONEWDELETE' preprocessor macro and use the `MP_NEW',
+`MP_NEW_NOTHROW' and `MP_DELETE' macros instead of `new' and `delete'
+directly.  To use these C++ features you must include `mpatrol.h'
+before all other header files, although on UNIX and Windows platforms
+(and AmigaOS when using `gcc') they will be used anyway, albeit with
+slightly less tracing information.
 
 `void *operator new(size_t size)'
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -8850,9 +8944,14 @@ Notes for all platforms
      visualisation of the first few profiling tables.
 
    * Extend the `mptrace' command to graphically display the size of
-     the heap plotted against time and the allocation size frequency.
-     Also rewrite the GUI support to use GNOME instead of Motif,
-     possibly also using GLADE.
+     the heap plotted against time and the allocation size frequency,
+     and also display some useful statistics at the end.  Also rewrite
+     the GUI support to use GNOME instead of Motif, possibly also using
+     GLADE.
+
+   * Add an option to `mptrace' to prevent the window being opened on
+     systems where GUI support is enabled.  Also add widgets to the
+     `mptrace' window to pause and quit.
 
    * Improve the speed of watch points by setting a range of allocation
      indices for which they will be used.  This may require a lot of
@@ -8885,11 +8984,9 @@ Notes for all platforms
      `DIAGSTOP' option which would stop the program running after a
      certain number of diagnostics have been displayed.
 
-   * Provide a function that could individually label each memory
-     allocation with a given string.  Perhaps also add time information
-     to the details stored about each memory allocation.  This is
-     probably not useful unless the system provides a high-resolution
-     timer.
+   * Perhaps add time information to the details stored about each
+     memory allocation.  This is probably not useful unless the system
+     provides a high-resolution timer.
 
    * Add an option (perhaps `NOINTERNAL') to suppress the display of
      internal (recursive) memory allocations in the mpatrol log file
@@ -9221,6 +9318,8 @@ Notes for Windows platforms
    * Need to add support for processors other than the Intel 80x86.
      However, about 99% of Windows platforms run on this processor
      family -- does anyone really use Windows with other processors?
+     Also finish Cygwin support, although this is effectively mpatrol
+     built with `-DTARGET=TARGET_UNIX' support on Windows platforms.
 
    * Perhaps add support for compiling the mpatrol library with `gcc' on
      Windows platforms so that the GNU BFD library can be used as well.
@@ -10366,6 +10465,24 @@ Netware platforms.
           A drop-in replacement for the system's memory management
           routines, providing powerful debugging facilities
           configurable at run-time.  Formerly known as Malloc_Dbg.
+
+   * DPCRTLMM
+    Author
+          David Duncan Ross Palmer (<overlord@daybologic.co.uk>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Windows, DOS
+
+    Location
+          `http://daybologic.com/Dev/dpcrtlmm/'
+
+    Overview
+          Detects failures to release memory and attempts to release
+          memory which has not been allocated, and can also provide
+          statistics and logging facilities.
 
    * Electric Fence
     Author
@@ -12233,6 +12350,7 @@ Function index
 * operator new[]:                        Functions.
 * pvalloc:                               Functions.
 * realloc:                               Functions.
+* reallocf:                              Functions.
 * recalloc:                              Functions.
 * set_new_handler:                       Functions.
 * strdup:                                Functions.
@@ -12242,6 +12360,11 @@ Function index
 * strnsave:                              Functions.
 * strsave:                               Functions.
 * valloc:                                Functions.
+* xcalloc:                               Functions.
+* xfree:                                 Functions.
+* xmalloc:                               Functions.
+* xrealloc:                              Functions.
+* xstrdup:                               Functions.
 
 
 File: mpatrol.info,  Node: Index,  Prev: Function index,  Up: Top
@@ -12479,6 +12602,7 @@ Index
 * documentation questions:               Documentation.
 * dot:                                   Profiling.
 * dotty:                                 Profiling.
+* DPCRTLMM:                              Related software.
 * driver:                                Profiling.
 * DRS/NX, SPARC:                         Supported systems.
 * dumping memory:                        Example 4.
@@ -12747,6 +12871,7 @@ Index
 * MP_INLINE:                             Building.
 * MP_LIBRARYSTACK_SUPPORT:               Call stacks and symbol tables.
 * MP_NEW:                                Functions.
+* MP_NEW_NOTHROW:                        Functions.
 * MP_NOCPLUSPLUS:                        Functions.
 * MP_NONEWDELETE:                        Functions.
 * MP_USE_ATEXIT:                         Running.
@@ -13032,126 +13157,126 @@ Index
 
 
 Tag Table:
-Node: Top1256
-Node: Foreword3527
-Node: Overview8338
-Node: Features11315
-Node: Installation29920
-Node: Integration36060
-Ref: Integration-Footnote-142460
-Node: Memory allocations42581
-Node: Static memory allocations43258
-Ref: Static memory allocations-Footnote-145719
-Node: Stack memory allocations45761
-Ref: Stack memory allocations-Footnote-147625
-Node: Dynamic memory allocations47664
-Ref: Dynamic memory allocations-Footnote-151086
-Ref: Dynamic memory allocations-Footnote-251205
-Node: Operating system support51309
-Node: Virtual memory53269
-Ref: Virtual memory-Footnote-159297
-Ref: Virtual memory-Footnote-259553
-Ref: Virtual memory-Footnote-359729
-Ref: Virtual memory-Footnote-459764
-Ref: Virtual memory-Footnote-559823
-Node: Call stacks and symbol tables60047
-Ref: Call stacks and symbol tables-Footnote-165725
-Ref: Call stacks and symbol tables-Footnote-265793
-Ref: Call stacks and symbol tables-Footnote-365844
-Ref: Call stacks and symbol tables-Footnote-465888
-Ref: Call stacks and symbol tables-Footnote-565930
-Ref: Call stacks and symbol tables-Footnote-665972
-Ref: Call stacks and symbol tables-Footnote-766020
-Node: Threads66126
-Ref: Threads-Footnote-172132
-Node: Using mpatrol72227
-Node: Library behaviour73093
-Ref: Library behaviour-Footnote-178990
-Node: Logging and tracing79048
-Node: General errors83914
-Ref: General errors-Footnote-188058
-Node: Overwrites and underwrites88226
-Ref: Overwrites and underwrites-Footnote-196628
-Ref: Overwrites and underwrites-Footnote-296691
-Node: Using with a debugger96815
-Ref: Using with a debugger-Footnote-1105869
-Ref: Using with a debugger-Footnote-2105937
-Ref: Using with a debugger-Footnote-3106193
-Node: Testing106282
-Ref: Testing-Footnote-1109019
-Ref: Testing-Footnote-2109200
-Node: Library functions109259
-Node: Utilities116140
-Node: The mpatrol command117110
-Ref: The mpatrol command-Footnote-1123804
-Ref: The mpatrol command-Footnote-2123938
-Node: The mleak command124018
-Node: The mpsym command125982
-Node: The mpedit command128550
-Node: The hexwords command131946
-Node: Profiling135088
-Ref: Profiling-Footnote-1162980
-Ref: Profiling-Footnote-2163204
-Node: Tracing163308
-Ref: Tracing-Footnote-1180498
-Ref: Tracing-Footnote-2180532
-Ref: Tracing-Footnote-3180654
-Node: Improving performance180760
-Ref: Improving performance-Footnote-1189660
-Ref: Improving performance-Footnote-2189702
-Ref: Improving performance-Footnote-3189779
-Ref: Improving performance-Footnote-4189851
-Node: How it works189895
-Node: Examples197088
-Node: Example 1200987
-Ref: Example 1-Footnote-1225103
-Node: Example 2225293
-Node: Example 3230693
-Node: Example 4237550
-Node: Example 5241055
-Node: Example 6243523
-Ref: Example 6-Footnote-1247323
-Node: Example 7247452
-Node: Example 8249310
-Node: Example 9259546
-Node: Tutorial275417
-Ref: Tutorial-Footnote-1289948
-Ref: Tutorial-Footnote-2290239
-Ref: Tutorial-Footnote-3290388
-Ref: Tutorial-Footnote-4290525
-Ref: Tutorial-Footnote-5290624
-Node: Functions290905
-Node: Environment321341
-Node: Options342109
-Node: Diagnostic messages353496
-Node: Library performance370121
-Node: File formats372614
-Ref: File formats-Footnote-1373038
-Node: Profiling file format373250
-Node: Tracing file format376512
-Node: Supported systems378379
-Node: New system support393812
-Node: New processor support395008
-Node: New file format support395691
-Node: Notes396475
-Node: Generic notes398087
-Ref: Generic notes-Footnote-1414024
-Ref: Generic notes-Footnote-2414242
-Node: UNIX notes414464
-Node: Amiga notes419061
-Node: Windows notes422725
-Node: Netware notes424145
-Node: Frequently asked questions426705
-Node: Documentation427328
-Node: Building432158
-Node: Linking440869
-Node: Running446090
-Node: Files461198
-Node: Related software464194
-Ref: Related software-Footnote-1502767
-Node: References503008
-Node: Copying505601
-Node: Function index533490
-Node: Index535748
+Node: Top1257
+Node: Foreword3529
+Node: Overview8340
+Node: Features11317
+Node: Installation30511
+Node: Integration36651
+Ref: Integration-Footnote-143051
+Node: Memory allocations43172
+Node: Static memory allocations43849
+Ref: Static memory allocations-Footnote-146310
+Node: Stack memory allocations46352
+Ref: Stack memory allocations-Footnote-148216
+Node: Dynamic memory allocations48255
+Ref: Dynamic memory allocations-Footnote-151677
+Ref: Dynamic memory allocations-Footnote-251796
+Node: Operating system support51900
+Node: Virtual memory53860
+Ref: Virtual memory-Footnote-159888
+Ref: Virtual memory-Footnote-260144
+Ref: Virtual memory-Footnote-360320
+Ref: Virtual memory-Footnote-460355
+Ref: Virtual memory-Footnote-560414
+Node: Call stacks and symbol tables60638
+Ref: Call stacks and symbol tables-Footnote-166316
+Ref: Call stacks and symbol tables-Footnote-266384
+Ref: Call stacks and symbol tables-Footnote-366435
+Ref: Call stacks and symbol tables-Footnote-466479
+Ref: Call stacks and symbol tables-Footnote-566521
+Ref: Call stacks and symbol tables-Footnote-666563
+Ref: Call stacks and symbol tables-Footnote-766611
+Node: Threads66717
+Ref: Threads-Footnote-172723
+Node: Using mpatrol72818
+Node: Library behaviour73684
+Ref: Library behaviour-Footnote-179581
+Node: Logging and tracing79639
+Node: General errors84505
+Ref: General errors-Footnote-188649
+Node: Overwrites and underwrites88817
+Ref: Overwrites and underwrites-Footnote-197219
+Ref: Overwrites and underwrites-Footnote-297282
+Node: Using with a debugger97406
+Ref: Using with a debugger-Footnote-1106460
+Ref: Using with a debugger-Footnote-2106528
+Ref: Using with a debugger-Footnote-3106784
+Node: Testing106873
+Ref: Testing-Footnote-1109610
+Ref: Testing-Footnote-2109791
+Node: Library functions109850
+Node: Utilities116731
+Node: The mpatrol command117701
+Ref: The mpatrol command-Footnote-1124395
+Ref: The mpatrol command-Footnote-2124529
+Node: The mleak command124609
+Node: The mpsym command126573
+Node: The mpedit command129141
+Node: The hexwords command132537
+Node: Profiling135778
+Ref: Profiling-Footnote-1163670
+Ref: Profiling-Footnote-2163894
+Node: Tracing163998
+Ref: Tracing-Footnote-1181188
+Ref: Tracing-Footnote-2181222
+Ref: Tracing-Footnote-3181344
+Node: Improving performance181450
+Ref: Improving performance-Footnote-1190350
+Ref: Improving performance-Footnote-2190392
+Ref: Improving performance-Footnote-3190469
+Ref: Improving performance-Footnote-4190541
+Node: How it works190585
+Node: Examples197778
+Node: Example 1201677
+Ref: Example 1-Footnote-1225801
+Node: Example 2225991
+Node: Example 3231391
+Node: Example 4238248
+Node: Example 5241753
+Node: Example 6244221
+Ref: Example 6-Footnote-1248021
+Node: Example 7248150
+Node: Example 8250008
+Node: Example 9260244
+Node: Tutorial276115
+Ref: Tutorial-Footnote-1290646
+Ref: Tutorial-Footnote-2290937
+Ref: Tutorial-Footnote-3291086
+Ref: Tutorial-Footnote-4291223
+Ref: Tutorial-Footnote-5291322
+Node: Functions291603
+Node: Environment326822
+Node: Options347590
+Node: Diagnostic messages358977
+Node: Library performance375602
+Node: File formats378095
+Ref: File formats-Footnote-1378519
+Node: Profiling file format378731
+Node: Tracing file format381993
+Node: Supported systems383860
+Node: New system support399293
+Node: New processor support400489
+Node: New file format support401172
+Node: Notes401956
+Node: Generic notes403568
+Ref: Generic notes-Footnote-1419634
+Ref: Generic notes-Footnote-2419852
+Node: UNIX notes420074
+Node: Amiga notes424671
+Node: Windows notes428335
+Node: Netware notes429894
+Node: Frequently asked questions432454
+Node: Documentation433077
+Node: Building437907
+Node: Linking446618
+Node: Running451839
+Node: Files466947
+Node: Related software469943
+Ref: Related software-Footnote-1508953
+Node: References509194
+Node: Copying511787
+Node: Function index539676
+Node: Index542246
 
 End Tag Table
