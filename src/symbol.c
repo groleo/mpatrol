@@ -105,7 +105,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.36 2000-11-13 21:40:33 graeme Exp $"
+#ident "$Id: symbol.c,v 1.37 2000-12-06 22:53:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -374,7 +374,7 @@ static symnode *getsymnode(symhead *y)
     if ((n = (symnode *) __mp_getslot(&y->table)) == NULL)
     {
         if ((p = __mp_heapalloc(y->heap, y->heap->memory.page * MP_ALLOCFACTOR,
-              y->table.entalign)) == NULL)
+              y->table.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&y->table, p->block, p->size);
         n = (symnode *) __mp_getslot(&y->table);

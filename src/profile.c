@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.30 2000-11-15 00:02:38 graeme Exp $"
+#ident "$Id: profile.c,v 1.31 2000-12-06 22:53:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -134,7 +134,7 @@ static profdata *getprofdata(profhead *p)
     if ((d = (profdata *) __mp_getslot(&p->dtable)) == NULL)
     {
         if ((h = __mp_heapalloc(p->heap, p->heap->memory.page * MP_ALLOCFACTOR,
-              p->dtable.entalign)) == NULL)
+              p->dtable.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&p->dtable, h->block, h->size);
         d = (profdata *) __mp_getslot(&p->dtable);
@@ -170,7 +170,7 @@ static profnode *getprofnode(profhead *p)
     if ((n = (profnode *) __mp_getslot(&p->ntable)) == NULL)
     {
         if ((h = __mp_heapalloc(p->heap, p->heap->memory.page * MP_ALLOCFACTOR,
-              p->ntable.entalign)) == NULL)
+              p->ntable.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&p->ntable, h->block, h->size);
         n = (profnode *) __mp_getslot(&p->ntable);

@@ -78,7 +78,7 @@ extern "C"
 
 MP_EXPORT void __mp_newheap(heaphead *);
 MP_EXPORT void __mp_deleteheap(heaphead *);
-MP_EXPORT heapnode *__mp_heapalloc(heaphead *, size_t, size_t);
+MP_EXPORT heapnode *__mp_heapalloc(heaphead *, size_t, size_t, int);
 MP_EXPORT void __mp_heapfree(heaphead *, heapnode *);
 MP_EXPORT int __mp_heapprotect(heaphead *, memaccess);
 

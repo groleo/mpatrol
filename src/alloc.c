@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.10 2000-11-05 23:18:31 graeme Exp $"
+#ident "$Id: alloc.c,v 1.11 2000-12-06 22:57:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -123,7 +123,7 @@ static allocnode *getnode(allochead *h)
     if ((n = (allocnode *) __mp_getslot(&h->table)) == NULL)
     {
         if ((p = __mp_heapalloc(&h->heap, h->heap.memory.page * MP_ALLOCFACTOR,
-              h->table.entalign)) == NULL)
+              h->table.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);
         n = (allocnode *) __mp_getslot(&h->table);
@@ -346,7 +346,7 @@ MP_GLOBAL allocnode *__mp_getalloc(allochead *h, size_t l, size_t a, void *i)
         else
             m = a;
         if ((p = __mp_heapalloc(&h->heap,
-              __mp_roundup(l + b, h->heap.memory.page), m)) == NULL)
+              __mp_roundup(l + b, h->heap.memory.page), m, 0)) == NULL)
         {
             __mp_freeslot(&h->table, n);
             return NULL;

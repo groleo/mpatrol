@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.44 2000-11-30 21:32:00 graeme Exp $"
+#ident "$Id: info.c,v 1.45 2000-12-06 22:54:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -163,7 +163,7 @@ static infonode *getinfonode(infohead *h)
     if ((n = (infonode *) __mp_getslot(&h->table)) == NULL)
     {
         if ((p = __mp_heapalloc(&h->alloc.heap, h->alloc.heap.memory.page *
-              MP_ALLOCFACTOR, h->table.entalign)) == NULL)
+              MP_ALLOCFACTOR, h->table.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);
         n = (infonode *) __mp_getslot(&h->table);
@@ -191,7 +191,7 @@ static allocanode *getallocanode(infohead *h)
     if ((n = (allocanode *) __mp_getslot(&h->atable)) == NULL)
     {
         if ((p = __mp_heapalloc(&h->alloc.heap, h->alloc.heap.memory.page *
-              MP_ALLOCFACTOR, h->atable.entalign)) == NULL)
+              MP_ALLOCFACTOR, h->atable.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&h->atable, p->block, p->size);
         n = (allocanode *) __mp_getslot(&h->atable);

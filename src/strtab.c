@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.10 2000-11-05 22:45:12 graeme Exp $"
+#ident "$Id: strtab.c,v 1.11 2000-12-06 22:53:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -132,7 +132,7 @@ static hashentry *gethashentry(strtab *t)
     if ((e = (hashentry *) __mp_getslot(&t->table)) == NULL)
     {
         if ((p = __mp_heapalloc(t->heap, t->heap->memory.page * MP_ALLOCFACTOR,
-              t->table.entalign)) == NULL)
+              t->table.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&t->table, p->block, p->size);
         e = (hashentry *) __mp_getslot(&t->table);
@@ -176,7 +176,7 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
     if ((n = (strnode *) __mp_searchhigher(t->tree.root, l)) == NULL)
     {
         m = __mp_roundup(sizeof(strnode) + l, t->heap->memory.page);
-        if ((p = __mp_heapalloc(t->heap, m, t->align)) == NULL)
+        if ((p = __mp_heapalloc(t->heap, m, t->align, 1)) == NULL)
         {
             __mp_freeslot(&t->table, e);
             return NULL;

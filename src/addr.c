@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: addr.c,v 1.4 2000-11-05 22:38:46 graeme Exp $"
+#ident "$Id: addr.c,v 1.5 2000-12-06 22:57:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -98,7 +98,7 @@ static addrnode *getaddrnode(addrhead *h)
     if ((n = (addrnode *) __mp_getslot(&h->table)) == NULL)
     {
         if ((p = __mp_heapalloc(h->heap, h->heap->memory.page * MP_ALLOCFACTOR,
-              h->table.entalign)) == NULL)
+              h->table.entalign, 1)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);
         n = (addrnode *) __mp_getslot(&h->table);

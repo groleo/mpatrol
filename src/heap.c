@@ -33,7 +33,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.6 2000-11-05 23:00:47 graeme Exp $"
+#ident "$Id: heap.c,v 1.7 2000-12-06 22:59:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,7 +105,7 @@ MP_GLOBAL void __mp_deleteheap(heaphead *h)
  * memory block could be allocated.
  */
 
-MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a)
+MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
 {
     heapnode *n;
     void *p;
