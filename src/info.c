@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.1.1.1 1999-10-03 11:25:21 graeme Exp $"
+#ident "$Id: info.c,v 1.2 1999-10-05 17:34:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -673,12 +673,13 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
              * need to perform the following checks.
              */
             continue;
-        if (h->alloc.flags & FLG_PAGEALLOC)
+        if ((h->alloc.flags & FLG_PAGEALLOC) && !m->data.freed)
         {
-            /* Check that all allocated and freed blocks have overflow buffers
-             * filled with the overflow byte, but only if all allocations are
-             * pages as this check examines the overflow buffers within the page
-             * boundaries.
+            /* Check that all allocated blocks have overflow buffers filled with
+             * the overflow byte, but only if all allocations are pages as this
+             * check examines the overflow buffers within the page boundaries.
+             * This does not have to be done for freed allocations as their
+             * overflow buffers will be at least read-only.
              */
             b = (void *) __mp_rounddown((unsigned long) n->block,
                                         h->alloc.heap.memory.page);
@@ -709,7 +710,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
                 __mp_abort();
             }
         }
-        else if ((l = h->alloc.oflow) > 0)
+        if (!(h->alloc.flags & FLG_PAGEALLOC) && ((l = h->alloc.oflow) > 0))
             /* Check that all allocated and freed blocks have overflow buffers
              * filled with the overflow byte, but only if all allocations are
              * not pages and the overflow buffer size is greater than zero.
