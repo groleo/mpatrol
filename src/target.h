@@ -70,26 +70,30 @@
 
 #define SYSTEM_ANY      0  /* no specific system */
 #define SYSTEM_AIX      1  /* AIX */
-#define SYSTEM_DGUX     2  /* DG/UX */
-#define SYSTEM_DRSNX    3  /* DRS/NX */
-#define SYSTEM_DYNIX    4  /* DYNIX/ptx */
-#define SYSTEM_FREEBSD  5  /* FreeBSD */
-#define SYSTEM_HPUX     6  /* HP/UX */
-#define SYSTEM_IRIX     7  /* IRIX */
-#define SYSTEM_LINUX    8  /* Linux */
-#define SYSTEM_LYNXOS   9  /* LynxOS */
-#define SYSTEM_NETBSD   10 /* NetBSD */
-#define SYSTEM_OPENBSD  11 /* OpenBSD */
-#define SYSTEM_SINIX    12 /* SINIX */
-#define SYSTEM_SOLARIS  13 /* Solaris */
-#define SYSTEM_SUNOS    14 /* SunOS */
-#define SYSTEM_UNIXWARE 15 /* UnixWare */
+#define SYSTEM_CYGWIN   2  /* Cygwin */
+#define SYSTEM_DGUX     3  /* DG/UX */
+#define SYSTEM_DRSNX    4  /* DRS/NX */
+#define SYSTEM_DYNIX    5  /* DYNIX/ptx */
+#define SYSTEM_FREEBSD  6  /* FreeBSD */
+#define SYSTEM_HPUX     7  /* HP/UX */
+#define SYSTEM_IRIX     8  /* IRIX */
+#define SYSTEM_LINUX    9  /* Linux */
+#define SYSTEM_LYNXOS   10 /* LynxOS */
+#define SYSTEM_NETBSD   11 /* NetBSD */
+#define SYSTEM_OPENBSD  12 /* OpenBSD */
+#define SYSTEM_SINIX    13 /* SINIX */
+#define SYSTEM_SOLARIS  14 /* Solaris */
+#define SYSTEM_SUNOS    15 /* SunOS */
+#define SYSTEM_UNIXWARE 16 /* UnixWare */
 
 
 #ifndef SYSTEM
 #if TARGET == TARGET_UNIX
 #if defined(AIX) || defined(_AIX) || defined(__AIX) || defined(__AIX__)
 #define SYSTEM SYSTEM_AIX
+#elif defined(CYGWIN) || defined(_CYGWIN) || defined(__CYGWIN) || \
+      defined(__CYGWIN__)
+#define SYSTEM SYSTEM_CYGWIN
 #elif defined(DGUX) || defined(_DGUX) || defined(__DGUX) || defined(__DGUX__)
 #define SYSTEM SYSTEM_DGUX
 #elif defined(sequent) || defined(_sequent) || defined(__sequent) || \
@@ -251,13 +255,18 @@
 #else /* __ELF__ */
 #define FORMAT FORMAT_AOUT
 #endif /* __ELF__ */
-#elif SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
+#elif SYSTEM == SYSTEM_CYGWIN || SYSTEM == SYSTEM_HPUX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
 #define FORMAT FORMAT_BFD
 #else /* SYSTEM */
 #define FORMAT FORMAT_NONE
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
+#ifdef __GNUC__
+#define FORMAT FORMAT_BFD
+#else /* __GNUC__ */
 #define FORMAT FORMAT_PE
+#endif /* __GNUC__ */
 #else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define FORMAT FORMAT_BFD
@@ -286,6 +295,8 @@
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
 #define DYNLINK DYNLINK_AIX
+#elif SYSTEM == SYSTEM_CYGWIN
+#define DYNLINK DYNLINK_WINDOWS
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
       SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
       SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
