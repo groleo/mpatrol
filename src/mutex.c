@@ -33,6 +33,9 @@
 #include <stddef.h>
 #if TARGET == TARGET_UNIX
 #include <pthread.h>
+#if SYSTEM == SYSTEM_TRU64
+#include <tis.h>
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
 #include <proto/exec.h>
 #include <exec/semaphores.h>
@@ -46,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.16 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: mutex.c,v 1.17 2002-01-08 00:05:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mutex_id = "$Id: mutex.c,v 1.16 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mutex_id = "$Id: mutex.c,v 1.17 2002-01-08 00:05:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,8 +125,13 @@ __mp_initmutexes(void)
         {
             locks[i].init = 1;
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_TRU64
+            tis_mutex_init(&locks[i].guard);
+            tis_mutex_init(&locks[i].real);
+#else /* SYSTEM */
             pthread_mutex_init(&locks[i].guard, NULL);
             pthread_mutex_init(&locks[i].real, NULL);
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
             InitSemaphore(&locks[i].guard);
             InitSemaphore(&locks[i].real);
@@ -158,8 +166,13 @@ __mp_finimutexes(void)
         {
             locks[i].init = 0;
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_TRU64
+            tis_mutex_destroy(&locks[i].guard);
+            tis_mutex_destroy(&locks[i].real);
+#else /* SYSTEM */
             pthread_mutex_destroy(&locks[i].guard);
             pthread_mutex_destroy(&locks[i].real);
+#endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
             CloseHandle(locks[i].guard);
             CloseHandle(locks[i].real);
@@ -184,7 +197,11 @@ void
 lockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_TRU64
+    tis_mutex_lock(m);
+#else /* SYSTEM */
     pthread_mutex_lock(m);
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
     ObtainSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
@@ -203,7 +220,11 @@ void
 unlockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_TRU64
+    tis_mutex_unlock(m);
+#else /* SYSTEM */
     pthread_mutex_unlock(m);
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
     ReleaseSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
@@ -227,7 +248,11 @@ __mp_lockmutex(mutextype m)
     l = &locks[m];
     i = __mp_threadid();
 #if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_LYNXOS
+#if SYSTEM == SYSTEM_TRU64
+    tis_once(&lockflag, __mp_initmutexes);
+#else /* SYSTEM */
     pthread_once(&lockflag, __mp_initmutexes);
+#endif /* SYSTEM */
 #else /* TARGET && SYSTEM */
     if (!l->init)
         __mp_initmutexes();
@@ -284,7 +309,11 @@ unsigned long
 __mp_threadid(void)
 {
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_TRU64
+    return (unsigned long) tis_self();
+#else /* SYSTEM */
     return (unsigned long) pthread_self();
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
     return (unsigned long) FindTask(NULL);
 #elif TARGET == TARGET_WINDOWS
