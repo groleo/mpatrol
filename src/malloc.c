@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.17 2000-05-14 12:10:15 graeme Exp $"
+#ident "$Id: malloc.c,v 1.18 2000-11-02 19:08:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -39,6 +39,23 @@
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* Allocate a temporary uninitialised memory block of a given size.
+ */
+
+void *alloca(size_t l)
+{
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *MP_ALTFUNCNAME(alloca)(size_t l)
+{
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
 
 
 /* Allocate an uninitialised memory block of a given size.
