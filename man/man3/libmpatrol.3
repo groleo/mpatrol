@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.28 2001-06-13 22:42:36 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.29 2001-07-25 22:23:59 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "13 June 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "25 July 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -153,17 +153,15 @@ void __mp_memorymap(int stats);
 void __mp_summary(void);
 int __mp_stats(__mp_heapinfo *info);
 void __mp_check(void);
-.if n \{void (*__mp_prologue(void (*func)(const void *, size_t,
-                                  const void *)))
-     (const void *, size_t, const void *);
+.if n \{__mp_prologuehandler __mp_prologue(const
+                                   __mp_prologuehandler);
 \}
-.if t \{void (*__mp_prologue(void (*func)(const void *, size_t, const void *)))(const void *, size_t, const void *);
+.if t \{__mp_prologuehandler __mp_prologue(const __mp_prologuehandler);
 \}
-.if n \{void (*__mp_epilogue(void (*func)(const void *,
-                                  const void *)))
-     (const void *, const void *);
+.if n \{__mp_epiloguehandler __mp_epilogue(const
+                                   __mp_epiloguehandler);
 \}
-.if t \{void (*__mp_epilogue(void (*func)(const void *, const void *)))(const void *, const void *);
+.if t \{__mp_epiloguehandler __mp_epilogue(const __mp_epiloguehandler);
 \}
 void (*__mp_nomemory(void (*func)(void)))(void);
 int __mp_printf(const char *fmt, ...);
