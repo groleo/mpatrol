@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.4 2000-03-23 19:58:27 graeme Exp $"
+#ident "$Id: library.c,v 1.1 2000-04-03 18:04:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
