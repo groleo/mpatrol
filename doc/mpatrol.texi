@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.251 2001-09-25 22:16:22 graeme Exp $
+@c $Id: mpatrol.texi,v 1.252 2001-09-26 21:50:09 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.13
 @set VERSION 1.4.8
-@set UPDATED 25th September, 2001
+@set UPDATED 26th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -13247,16 +13247,22 @@ UNIX platforms.  LessTif can be used instead of Motif if that is all that is
 available on your system.  The UNIX @file{Makefile} has a macro called
 @code{GUISUP} which can be set to @code{true} or @code{false} depending on
 whether you wish to have GUI support or not.  The default is @code{false}.
+GUI support is automatically enabled on platforms that support it if the
+@file{configure} script in @file{pkg/auto} is used.
 
 @cindex MP_GUI_SUPPORT
 @item
 How do I build the @command{mptrace} command without GUI support?
 
-This is done by default on all platforms.  However, if for some reason that is
-not the case then on UNIX platforms you will have to set the @code{GUISUP}
-@file{Makefile} macro to @code{false} when compiling @command{mptrace}.  You
-might need to do this if your UNIX system does not have the correct header files
-and libraries installed needed for GUI support.
+This is done by default on most platforms when using the @file{Makefile}s in
+the @file{build} directory.  However, if for some reason that is not the case
+then on UNIX platforms you will have to set the @code{GUISUP} @file{Makefile}
+macro to @code{false} when compiling @command{mptrace}.  You might need to do
+this if your UNIX system does not have the correct header files and libraries
+installed needed for GUI support.  If you are using the @file{configure} script
+in @file{pkg/auto} then GUI support will be automatically disabled on platforms
+that do not support it, but you can force it to be disabled by using the
+@option{--without-x} option.
 @end enumerate
 
 @node Linking, Running, Building, Frequently asked questions
