@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.16 2000-03-14 00:08:18 graeme Exp $"
+#ident "$Id: inter.c,v 1.17 2000-03-14 00:57:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -297,9 +297,24 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
      */
-    if ((p == NULL) && memhead.nomemory)
+    if (p == NULL)
     {
-        memhead.nomemory();
+        if (memhead.nomemory)
+            memhead.nomemory();
+        else if ((f == AT_NEW) || (f == AT_NEWVEC))
+        {
+            /* The C++ standard specifies that operators new and new[] should
+             * always return non-NULL pointers.  Since we have ascertained that
+             * we have no low-memory handler, this either means throwing an
+             * exception or aborting.  Since this is a no-throw version of new
+             * we'll opt for the latter.
+             */
+            __mp_printsummary(&memhead);
+            __mp_diag("\n");
+            __mp_error(f, "out of memory");
+            memhead.fini = 1;
+            __mp_abort();
+        }
         if ((f == AT_NEW) || (f == AT_NEWVEC))
         {
             if (memhead.prologue && (memhead.recur == 1))
