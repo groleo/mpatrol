@@ -111,6 +111,16 @@
 #endif /* MP_BREAK_SIZE */
 
 
+/* The size of the input line buffer in the memleak tool.  If any of the lines
+ * in the log file are longer than this then an error message will be generated
+ * and memleak will terminate.
+ */
+
+#ifndef MP_BUFFER_SIZE
+#define MP_BUFFER_SIZE 1024
+#endif /* MP_BUFFER_SIZE */
+
+
 /* The multiple of pages to allocate from the heap every time a new block of
  * internal memory is required.  The higher the value, the less distinct
  * internal blocks to keep track of, but the potential for more memory wastage
