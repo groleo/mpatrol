@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.89 2000-06-12 21:41:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.90 2000-06-15 20:15:26 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.11
 @set VERSION 1.2.2
-@set UPDATED 12th June, 2000
+@set UPDATED 15th June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -795,7 +795,9 @@ of all your code.
 @enumerate 1
 @item
 This step is currently only available on IRIX, Linux and Solaris platforms and
-on DG/UX 4.20MU07 or later platforms with the @env{LD_PRELOAD} feature.
+on DG/UX 4.20MU07@footnote{Also available on DG/UX 4.20MU05 with patch
+dgux_R4.20MU05.p59 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.} or later
+platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -5984,8 +5986,6 @@ Stack traversal may be unreliable from signal-handlers.
 RedHat Linux 6.0, Intel Pentium III, BFD, @command{gcc}
 @itemize @bullet
 @item
-The thread-safe version of the library does not work.
-@item
 The @option{OFLOWWATCH} option has no effect.
 @item
 The address of an illegal memory access cannot be determined.
@@ -6167,6 +6167,8 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 AmigaOS 3.1, Motorola 68040, BFD, @command{gcc}
 @itemize @bullet
 @item
+The thread-safe version of the library does not work.
+@item
 No memory protection so the @option{PAGEALLOC} option has no effect.
 @item
 The @option{OFLOWWATCH} option has no effect.
@@ -6187,6 +6189,8 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 @item
 AmigaOS 3.1, Motorola 68040, n/a, SAS/C
 @itemize @bullet
+@item
+The thread-safe version of the library does not work.
 @item
 No automatic override of @code{malloc()}, etc., without inclusion of
 @file{mpatrol.h}.
@@ -6213,6 +6217,8 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 @item
 Microsoft Windows NT 4.0, Intel Pentium III, n/a, Microsoft Visual C/C++
 @itemize @bullet
+@item
+The thread-safe version of the library does not work.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
@@ -6377,9 +6383,9 @@ haven't got access to a 64-bit environment to test it, so I haven't bothered
 yet.
 
 @item
-The thread-safe code in the library doesn't yet work properly, probably because
-of the recursion flag which is incremented or decremented before the mutex is
-locked.  Hence, the threads test (@file{tests/pass/test5.c}) doesn't work yet.
+The thread-safe code in the library doesn't yet work properly on all platforms,
+due to problems initialising the mpatrol library before a program becomes
+multi-threaded.
 
 @item
 Need to make the library re-entrant.  This could be achieved by moving the
@@ -6581,10 +6587,9 @@ Also, signal handlers shouldn't technically call I/O functions in case of
 additional signals being caught so this may need to be improved.
 
 @item
-Need to add a portable way of initialising the thread-safe version of the
-library when it is compiled by a C compiler.  There is already a solution to
-this problem when it is compiled by a C++ compiler, but it may only work if the
-final program is linked with that specific compiler.
+Need to add a way of initialising the thread-safe version of the library when
+it is not compiled on a system that supports init sections, or if it is not
+compiled with the GNU C compiler, or if it is not compiled with a C++ compiler.
 
 @item
 Need to add support for call stack traversal for the Alpha, and Itanium
@@ -6594,11 +6599,13 @@ the library and program are built unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for the Alpha,
-Itanium and Motorola 88xx0 processor architectures.  Also need to add support
-for reading the program symbols from a suitable file in @file{/proc} for other
-operating systems that support it.  If there is no support for either of these
-methods then the @option{PROGFILE} option can currently be used to specify the
-program name at run-time.
+Itanium and Motorola 88xx0 processor architectures, and also need to add support
+for obtaining the program name from somewhere other than the stack for systems
+where the mutexes are initialised from the init section.  Also need to add
+support for reading the program symbols from a suitable file in @file{/proc} for
+other operating systems that support it.  If there is no support for either of
+these methods then the @option{PROGFILE} option can currently be used to specify
+the program name at run-time.
 
 @item
 If the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro is defined when
