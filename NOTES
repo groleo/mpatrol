@@ -103,9 +103,8 @@ Notes for all platforms
     command that is written in C.
 
   * TeXinfo documentation should be written, containing most of the information
-    from the UNIX manual pages as well as a set of tutorials and examples
-    illustrating how best to use mpatrol.  TeXinfo documentation can be
-    converted to wide variety of documentation formats.
+    from the UNIX manual pages as well most of the text from EXAMPLES.  TeXinfo
+    documentation can be converted to wide variety of documentation formats.
 
   * Perhaps use a configure script to automatically work out values for config.h
     on the platform it is being built on, and provide locations for installing
