@@ -524,6 +524,23 @@
 #endif /* MP_ALTFUNCNAMES */
 
 
+/* Indicates if the system supports an .init section for placing calls to
+ * routines that will be called before main().  This is only likely to be
+ * true for ELF systems and will only be required for initialising the
+ * mpatrol mutexes and data structures for thread-safe code.
+ */
+
+#ifndef MP_INIT_SUPPORT
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
+    SYSTEM == SYSTEM_UNIXWARE
+#define MP_INIT_SUPPORT 1
+#else /* SYSTEM */
+#define MP_INIT_SUPPORT 0
+#endif /* SYSTEM */
+#endif /* MP_INIT_SUPPORT */
+
+
 /* Indicates if the compiler supports the ident preprocessor directive for
  * placing a version string in the comment section of an object file.
  */
