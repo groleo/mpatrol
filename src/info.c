@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.88 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: info.c,v 1.89 2001-09-26 23:02:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.88 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.89 2001-09-26 23:02:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -139,11 +139,6 @@ MP_GLOBAL
 void
 __mp_deleteinfo(infohead *h)
 {
-    /* We should close the log file first in case that calls a dynamic
-     * memory allocation function, since once __mp_deleteallocs() is
-     * called the heap no longer exists.
-     */
-    __mp_closelogfile();
     h->log = NULL;
     __mp_deleteprofile(&h->prof);
     __mp_deleteleaktab(&h->ltable);
