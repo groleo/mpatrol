@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.187 2001-02-21 10:50:14 graeme Exp $
+@c $Id: mpatrol.texi,v 1.188 2001-02-21 13:38:01 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -437,6 +437,24 @@ Contains 5 replacement C dynamic memory extension functions:
 @end multitable
 
 @item
+Contains 6 replacement C dynamic memory alternative functions:
+
+@multitable @columnfractions .3 .7
+@item @code{MP_MALLOC()}
+@tab Allocates memory without failure.
+@item @code{MP_CALLOC()}
+@tab Allocates zero-filled memory without failure.
+@item @code{MP_STRDUP()}
+@tab Duplicates a string without failure.
+@item @code{MP_REALLOC()}
+@tab Resizes memory without failure.
+@item @code{MP_FREE()}
+@tab Frees memory.
+@item @code{MP_FAILURE()}
+@tab Sets the allocation failure handler.
+@end multitable
+
+@item
 Contains 4 replacement C++ dynamic memory allocation operators (in both
 @emph{throw} and @emph{nothrow} forms):
 
@@ -788,6 +806,10 @@ graphical memory usage tool that can display the current memory map of a running
 process.  Inuse is supplied with Parasoft Insure++.
 
 @item
+Comes with a library of tools that are built on top of the mpatrol library and
+can be used to extend it for specific applications.
+
+@item
 An Automake macro is provided to ease the integration of mpatrol into a new or
 existing project.
 
@@ -901,6 +923,11 @@ supports Bourne shell scripts.
 Go up two directory levels into the @file{src} directory and copy the
 @file{mpatrol.h}, @file{mpalloc.h} and @file{mpdebug.h} header files into your
 local include directory.
+
+@item
+Go up one directory level into the @file{tools} directory and copy all of the
+header files into the @file{mpatrol} subdirectory (which you'll need to create)
+in your local include directory.
 
 @cindex manual pages
 @item
@@ -1743,6 +1770,7 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Using with a debugger::       Setting breakpoints.
 * Testing::                     Additional checks.
 * Library functions::           What's provided.
+* Tools::                       Additional tools.
 * Utilities::                   External programs.
 @end menu
 
@@ -2438,7 +2466,7 @@ number of unfreed allocations higher than this then it will abort the program at
 termination so that it fails.  All tests that fail in this way can then be
 examined after the test suite finishes.
 
-@node Library functions, Utilities, Testing, Using mpatrol
+@node Library functions, Tools, Testing, Using mpatrol
 @section Library functions
 @cindex library functions
 
@@ -2866,7 +2894,36 @@ library statistics to the mpatrol log file, while the @code{__mp_stats()}
 function fills in a data structure with selected statistics for examination in
 user code.
 
-@node Utilities, , Library functions, Using mpatrol
+@node Tools, Utilities, Library functions, Using mpatrol
+@section Additional tools
+@cindex additional tools
+@cindex tools
+@cindex extensions
+
+The @file{tools} directory that comes with the mpatrol distribution contains the
+source code for tools that are built on top of the mpatrol library.  The
+functions that are defined in these files are intended to be useful for specific
+applications as well as providing real-world examples of how to extend mpatrol.
+If you wish to use one of the source files in the @file{tools} directory then
+you should first compile it and then link it into your program along with the
+mpatrol library.
+
+Alternatively, if you've already installed mpatrol on your system then there
+should be an @file{mpatrol} subdirectory within the include directory where
+@file{mpatrol.h} is installed that contains all of the header files in the
+@file{tools} directory.  There should also be a libmptools library within the
+library directory where libmpatrol is installed that contains an object file for
+each of the source files in the @file{tools} directory.  You can then make use
+of a particular tool by including its header file from the @file{mpatrol}
+include subdirectory and then linking with the libmptools library.
+
+If you've written a useful extension to mpatrol then you might wish to submit
+it for inclusion in the next release of mpatrol.  Even if it's just for a
+specific application, there might be other users out there that may benefit
+from it.  You'll even get a credit in the manual!  Note that any documentation
+should be written in the associated header file.
+
+@node Utilities, , Tools, Using mpatrol
 @section Utilities
 @cindex utilities
 
@@ -4614,7 +4671,6 @@ each memory allocation can be added to the @emph{allocation information} module
 in @file{src/info.h} and @file{src/info.c} without having to change much code in
 any other files.
 
-@cindex tools
 The @file{tools} directory in the mpatrol distribution comes with a collection
 of functions that are built on top of the mpatrol library using its interface
 functions.  This provides a way to extend the mpatrol library for specific
