@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.12 2001-02-08 20:25:46 graeme Exp $
+# $Id: Makefile,v 1.13 2001-02-21 10:06:15 graeme Exp $
 
 
 # Definitions
@@ -31,7 +31,7 @@ ROFF   = groff
 HTML   = man2html
 PSTILL = pstill
 
-PAGES	  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
+CATPAGES  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
 	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3 \
 	    cat3/libmpalloc.3
 HTMLPAGES = html/mpatrol.html html/mprof.html html/mptrace.html \
@@ -52,7 +52,7 @@ PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
 
 .SUFFIXES: .1 .3 .html .dvi .ps .pdf
 
-default: $(PAGES) $(HTMLPAGES)
+default: $(CATPAGES)
 
 cat1/mpatrol.1: man1/mpatrol.1
 	$(ROFF) -Tascii -man $< >$@
@@ -189,7 +189,7 @@ pdf/libmpatrol.pdf: ps/libmpatrol.ps
 pdf/libmpalloc.pdf: ps/libmpalloc.ps
 	$(PSTILL) -c -o $@ $<
 
-all: $(PAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
+all: $(CATPAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
 mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
 	@ mkdir -p mpatrol/man/dvi
@@ -204,7 +204,7 @@ mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
 	-@ rm -rf mpatrol >/dev/null 2>&1
 
 clean:
-	-@ rm -f $(PAGES) $(HTMLPAGES) >/dev/null 2>&1
+	-@ rm -f $(CATPAGES) $(HTMLPAGES) >/dev/null 2>&1
 	-@ rm -f $(DVIPAGES) $(PSPAGES) $(PDFPAGES) >/dev/null 2>&1
 	-@ rm -f mpatrol_man.tar.gz >/dev/null 2>&1
 
