@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.92 2001-10-05 22:32:06 graeme Exp $"
+#ident "$Id: diag.c,v 1.93 2001-10-05 23:08:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.92 2001-10-05 22:32:06 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.93 2001-10-05 23:08:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1059,16 +1059,34 @@ __mp_printsymbol(symhead *y, void *a)
     __mp_findsource(y, (char *) a - 1, &s, &t, &u);
     if (n = __mp_findsymbol(y, a))
     {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", n->data.name);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
         if (a != n->data.addr)
             __mp_diag("%+ld", (char *) a - (char *) n->data.addr);
     }
     else if (s != NULL)
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", s);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+    }
     else
         __mp_diag("???");
     if ((t != NULL) && (u != 0))
-        __mp_diag(" at %s:%lu", t, u);
+    {
+        __mp_diag(" at ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
+        __mp_diag("%s", t);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+        __mp_diag(":%lu", u);
+    }
 }
 
 
@@ -1095,7 +1113,19 @@ __mp_printsymbols(symhead *y)
         else
             __mp_diag("    " MP_POINTER "-" MP_POINTER, n->data.addr,
                       (char *) n->data.addr + n->data.size - 1);
-        __mp_diag(" %s [%s] (", n->data.name, n->data.file);
+        __mp_diag(" ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
+        __mp_diag("%s", n->data.name);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+        __mp_diag(" [");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
+        __mp_diag("%s", n->data.file);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+        __mp_diag("] (");
         __mp_printsize(n->data.size);
         __mp_diag(")\n");
     }
@@ -1112,10 +1142,7 @@ __mp_printaddrs(symhead *y, addrnode *n)
     while (n != NULL)
     {
         __mp_diag("\t" MP_POINTER " ", n->data.addr);
-        if (n->data.name == NULL)
-            __mp_printsymbol(y, n->data.addr);
-        else
-            __mp_diag("%s", n->data.name);
+        __mp_printsymbol(y, n->data.addr);
         __mp_diag("\n");
         n = n->data.next;
     }
