@@ -8390,7 +8390,7 @@ Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
-  7. What does the MP_INLINE definition in @{b}mpatrol.h@{ub} do?
+  7. What does the @{b}MP_INLINE@{ub} definition in @{b}mpatrol.h@{ub} do?
 
      It is used in the definition of the debugging versions of the C++
      operators in @{b}mpatrol.h@{ub} so that they are inlined correctly.  We
