@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mptrace.1,v 1.10 2001-05-30 22:00:02 graeme Exp $
+.\" $Id: mptrace.1,v 1.11 2001-06-13 22:27:17 graeme Exp $
 .\"
-.TH MPTRACE 1 "30 May 2001" "Release 1.4" "mpatrol library"
+.TH MPTRACE 1 "13 June 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mptrace \- displays tracing information produced by the mpatrol library
 .SH SYNOPSIS
@@ -111,9 +111,13 @@ Trace Format (HATF).
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
 .TP
-\fB\-\-sim\-file\fP \fIfile\fP [\fB\-s\fP]
+\fB\-\-sim\-file\fP \fIfile\fP [\fB\-S\fP]
 Specifies that a trace-driven memory allocation simulation program written in C
 should be written to a file.
+.TP
+\fB\-\-source\fP [\fB\-s\fP]
+Displays source-level information for each event in the tracing table, if
+available.
 .TP
 \fB\-\-verbose\fP [\fB\-v\fP]
 Specifies that the tracing table should be displayed.
