@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.9 1999-11-23 20:25:58 graeme Exp $
+@c $Id: mpatrol.texi,v 1.10 1999-11-25 11:18:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.1
 @set VERSION 1.0.6
-@set UPDATED 23rd November, 1999
+@set UPDATED 25th November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -109,6 +109,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Installation::                Building and installing.
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
+* Improving performance::       Life beyond mpatrol.
 * Examples::                    Examples of usage.
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
@@ -345,12 +346,10 @@ or standard error file streams.
 Options exist to log details of every memory allocation, reallocation or
 deallocation when they occur.
 
-@cindex trap signal
-@cindex signal, trap
 @item
 Options exist to halt the program at a specific memory allocation, reallocation
-or deallocation on systems that support the trap signal.  This can be extremely
-useful when running the program under a debugger.
+or deallocation when running the program within a debugger.  These options have
+no effect when running the program without a debugger.
 
 @item
 On UNIX platforms, the @code{mmap()} function can optionally be used to allocate
@@ -760,7 +759,7 @@ useful warnings about using uninitialised variables, using freed memory, running
 off the end of a dynamically-allocated array, etc.  It is these types of memory
 allocation problems that the mpatrol library loves to get its teeth into!
 
-@node Operating system support, Examples, Memory allocations, Top
+@node Operating system support, Improving performance, Memory allocations, Top
 @chapter Operating system support
 @cindex operating systems
 
@@ -993,7 +992,157 @@ is usually necessary to liaise with the @emph{dynamic linker}@footnote{Which is
 the part of the operating system that performs the run-time linking of shared
 libraries.} on many systems.
 
-@node Examples, Functions, Operating system support, Top
+@node Improving performance, Examples, Operating system support, Top
+@chapter Improving performance
+@cindex improving performance
+@cindex performance improvements
+
+Because of their need to cover every eventuality, malloc library implementations
+are very general and most do their job well when you consider what is thrown at
+them.  However, your program may not be performing as well as it should simply
+because there may be a more efficient way of dealing with dynamic memory
+allocations.  Indeed, there may even be a more efficient malloc library
+available for you to use.
+
+If you need to allocate lots of blocks of the same size@footnote{Such as for use
+in a linked list.}, but you won't know the number of blocks you'll require until
+run-time then you could take the easy approach by simply allocating a new block
+of memory for each occurrence.  However, this is going to create a lot of
+(typically small) memory blocks that the underlying malloc library will have to
+keep track of, and even in many good malloc libraries this is likely to cause
+memory fragmentation and possibly even result in the blocks scattered throughout
+the address space rather than all in the one place, which is not necessarily a
+good thing on systems with virtual memory.
+
+An alternative approach would be to allocate memory in multiples of the block
+size, so that several blocks would be allocated at once.  This would require
+slightly more work on your part since you would need to write interface code to
+return a single block, while possible allocating space for more blocks if no
+free blocks were available.  However, this approach has several advantages.  The
+first is that the malloc library only needs to keep track of a few large
+allocations rather than lots of small allocations, so splitting and merging free
+blocks is less likely to occur.  Secondly, your blocks will be scattered about
+less in the address space of the process, which means that on systems with
+virtual memory there are less likely to be page faults if you need to access or
+traverse all of the blocks you have created.
+
+@cindex arenas
+@cindex SGI IRIX, MIPS
+@cindex IRIX, MIPS
+@cindex amalloc
+A memory allocation concept that is similar to this is called an @emph{arena}.
+This datatype requires functions which are built on top of the existing malloc
+library functions and which associate each memory allocation with a particular
+arena.  An arena can have as many allocations added to it as required, but
+allocations cannot usually be freed until the whole arena is freed.  Note that
+there are not really any generic implementations of arenas that are available as
+everyone tends to write their own version when they require it, although SGI
+IRIX systems do come with an arena library called @emph{amalloc}.
+
+@cindex slot tables
+However, what if you don't plan to free all of the blocks at the same time?  A
+slight modification to the above design could be to have a @emph{slot table}.
+This would involve allocating chunks of blocks as they are required, adding each
+individual block within a chunk to a singly-linked list of free blocks.  Then,
+as new blocks are required, the allocator would simply choose the first block on
+the free list, otherwise it would allocate memory for a new chunk of blocks and
+add them to the free list.  Freeing individual blocks would simply involve
+returning the block to the free list.  If this description isn't clear enough,
+have a look in @file{src/slots.h} and @file{src/slots.c}.  This is how the
+mpatrol library allocates memory from the system for all of its internal
+structures.  For variable-sized structures, a slightly different approach needs
+to be taken, but for an example of this using strings see @file{src/strtab.h}
+and @file{src/strtab.c}.
+
+Another optimisation that is possible on UNIX and Windows platforms is making
+use of memory-mapped files.  This allows you to map a filesystem object into the
+address space of your process, thus allowing you to treat a file as an array of
+bytes.  Because it uses the virtual memory system to map the file, any changes
+you make to the mapped memory will be applied to the file.  This is implemented
+through the virtual memory system treating the file as a pseudo swap file and
+will therefore only use up physical memory when pages are accessed.  It also
+means that file operations can be replaced by memory read and write operations,
+leading to a very fast and efficient way of performing I/O.  Another added bonus
+of this system means that entire blocks of process memory can be written to a
+file for later re-use, just as long as the file can later be mapped to the same
+address.  This can be a lot faster than writing to and reading from a specific
+format of file.
+
+If you really don't want to keep track of dynamic memory allocations at all then
+perhaps you should consider @emph{garbage collection}.  This allows you to make
+dynamic memory allocations that need not necessarily be matched by corresponding
+calls to free these allocations.  A garbage collector will (at certain points
+during program execution) attempt to look for memory allocations that are no
+longer referenced by the program and free them for later re-use, hence removing
+all possibility of memory leaks.  However, the garbage collection process can
+take a sizable chunk of processor time depending on how large the program is, so
+it is not really an option for real-time programming.  It is also very
+platform-dependent as it examines very low-level structures within a process in
+order to determine which pointers point to which memory allocations.  But there
+is at least one garbage collector@footnote{A freely distributably library
+called GC (@pxref{Related software}).} that works well with C and C++ and acts
+as a replacement for @code{malloc()} and @code{free()}, so it may be the ideal
+solution for you.
+
+If you do choose to use an alternative malloc library make sure that you have a
+license to do so and that you follow any distribution requirements.  On systems
+that support dynamic linking you may want to link the library statically rather
+than dynamically so that you don't have to worry about an additional file that
+would need to be installed.  However, whether you have that choice depends on
+the license for the specific library, and some licenses also require that the
+source code for the library be made readily available.  Shared libraries have
+the advantage that they can be updated with bug fixes so that all programs that
+require these libraries will automatically receive these fixes without needing
+to be relinked.
+
+@cindex performance bottleneck
+@cindex memory profiler
+If all of the above suggestions do not seem to help and you still feel that you
+have a performance bottleneck in the part of your code that deals with
+dynamically allocated memory then you should try using a
+@emph{memory profiler}@footnote{There is currently at least one memory profiler
+available (@pxref{Related software}).}.  This can be used at run-time to analyse
+the dynamic memory allocation calls that your program makes during its
+execution, and builds statistics for later viewing.  It is then possible for you
+to see exactly how many calls were made to each function, where they came from
+and what proportion of time they each took.  Such information can then be put to
+good use in order to optimise the relevant parts of your code.
+
+@cindex hints
+@cindex tips
+And finally, some tips on how to correctly use dynamic memory allocations.  The
+first, most basic rule is to @emph{always} check the return values from
+@code{malloc()} and related functions.  @emph{Never} assume that a call to
+@code{malloc()} will succeed, because you're unlikely to be able to read the
+future@footnote{If you can, why are you reading this --- you've already read
+it!}.  Alternatively, use (or write) an @code{xmalloc()} or similar function,
+which calls @code{malloc()} but never returns @samp{NULL} since it will abort
+instead.  With the C++ operators it is slightly different because some versions
+use exceptions to indicate failure, so you should always provide a handler to
+deal with this eventuality.
+
+@cindex portability
+@cindex ANSI
+Never use @emph{features}@footnote{Whether they are documented or not.} of
+specific malloc libraries if you want your code to be portable.  Always follow
+the ANSI C or C++ calling conventions and never make assumptions about the
+function or operator you are about to call --- the standards committees went to
+great lengths to explicitly specify its behaviour.  For example, don't assume
+that the contents of a freed memory allocation will remain valid until the next
+called to @code{malloc()}, and don't assume that the contents of a newly
+allocated memory block will be zeroed unless you created it with
+@code{calloc()}.
+
+@cindex stress testing
+Finally, try stress-testing your program in low memory conditions.  The mpatrol
+library contains the @option{LIMIT} option which can place an upper bound on the
+size of the heap, but there are likely to be more specialised utilities around
+that will be able to fail on specific memory allocations.  Doing this will test
+parts of your code that you would probably never expect to be called, but
+perhaps they will one day!  Who would you rather have debugging your program ---
+yourself or the user?
+
+@node Examples, Functions, Improving performance, Top
 @chapter Examples
 @cindex examples
 @cindex tutorial
@@ -2630,7 +2779,6 @@ is zero.  Default value: @option{FREESTOP=0}.
 Displays a quick-reference option summary to the @code{stderr} file stream.
 
 @cindex LIMIT
-@cindex stress testing
 @item @option{LIMIT}=<@var{unsigned-integer}>
 Specifies the limit in bytes at which all memory allocations should fail if the
 total allocated memory should increase beyond this.  This can be used to
@@ -2966,7 +3114,7 @@ overflow buffers rather than filling with the overflow byte.
 
 @node Library performance, Supported systems, Options, Top
 @appendix Library performance
-@cindex performance
+@cindex performance times
 @cindex times
 
 The following times were obtained on a Sun Ultra 5 with an UltraSPARC IIi
@@ -3202,9 +3350,6 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-The @option{ALLOCSTOP}, @option{FREESTOP} and @option{REALLOCSTOP} options have
-no effect.
-@item
 No support for call stack traversal.
 @item
 No support for reading symbols.
@@ -3224,9 +3369,6 @@ No automatic override of @code{malloc()}, etc., without inclusion of
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
-@item
-The @option{ALLOCSTOP}, @option{FREESTOP} and @option{REALLOCSTOP} options have
-no effect.
 @item
 No support for reading symbols.
 @item
@@ -3839,6 +3981,24 @@ Linux, Windows
 @item Overview
 Provides routines that can be plugged in to replace @code{malloc()},
 @code{calloc()}, @code{realloc()} and @code{free()}.
+@end table
+
+@cindex Fortify
+@cindex Bullen, Simon
+@item
+Fortify
+@table @asis
+@item Author
+Simon Bullen (@email{sbullen@@cybergraphic.com.au})
+@item License
+Free Software
+@item Platforms
+AmigaOS
+@item Location
+@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_c.html}
+@item Overview
+Provides a fortified shell for memory allocations, trapping memory leaks,
+writes beyond and before memory blocks and writes to freed memory.
 @end table
 
 @cindex GC (Garbage Collector)
