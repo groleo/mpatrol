@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.86 2001-09-27 00:02:02 graeme Exp $"
+#ident "$Id: diag.c,v 1.87 2001-09-27 23:51:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.86 2001-09-27 00:02:02 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.87 2001-09-27 23:51:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -514,8 +514,9 @@ __mp_openlogfile(char *s)
 #else /* HAVE_CONFIG_H && SETVBUF_REVERSED */
         setvbuf(logfile, NULL, _IONBF, 0);
 #endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
-    if (__mp_diagflags & FLG_HTML)
+    if ((__mp_diagflags & FLG_HTMLNEXT) && (s != NULL))
     {
+        __mp_diagflags |= FLG_HTML;
         __mp_diagtag("<HTML>\n");
         __mp_diagtag(" <HEAD>\n");
         __mp_diagtag("  <TITLE>\n");
@@ -528,6 +529,8 @@ __mp_openlogfile(char *s)
         __mp_diagtag("  </H3>\n");
         __mp_diagtag("  <P>\n");
     }
+    else
+        __mp_diagflags &= ~FLG_HTML;
     return 1;
 }
 
