@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.62 2001-01-24 13:17:43 graeme Exp $"
+#ident "$Id: inter.c,v 1.63 2001-01-25 13:37:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -82,6 +82,19 @@ static infohead memhead;
 extern int __env_initialized;
 extern void *__onexitbegin;
 extern void **__piob;
+
+
+/* Determine if the Microsoft C run-time library is initialised.
+ */
+
+static
+int
+msvcrt_initialised(void)
+{
+    if (__env_initialized && __onexitbegin && __piob)
+        return 1;
+    return 0;
+}
 #endif /* TARGET */
 
 
@@ -505,7 +518,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
      * with calls to memalign(), valloc() and pvalloc() but these shouldn't
      * be coming through anyway.
      */
-    if (!__env_initialized || !__onexitbegin || !__piob)
+    if (!msvcrt_initialised())
     {
         if (l == 0)
             l = 1;
@@ -628,7 +641,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
      * allocate new memory with sbrk() and copy the string to the new
      * allocation.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
     {
         if (p == NULL)
             o = NULL;
@@ -764,7 +777,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
      * allocation.  We can't free the old allocation as we know nothing
      * about it.
      */
-    if (!__env_initialized || !__onexitbegin || !__piob)
+    if (!msvcrt_initialised())
     {
         if (p == NULL)
         {
@@ -873,7 +886,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     /* If the C run-time library has not finished initialising then just
      * return since we know nothing about any of the prior allocations anyway.
      */
-    if (!__env_initialized || !__onexitbegin || !__piob || memhead.fini)
+    if (!msvcrt_initialised() || memhead.fini)
 #else /* TARGET */
     if (memhead.fini)
 #endif /* TARGET */
@@ -1486,7 +1499,7 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
         return;
 #endif /* TARGET */
     savesignals();
@@ -1543,7 +1556,7 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
         return;
 #endif /* TARGET */
     savesignals();
@@ -1600,7 +1613,7 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
         return;
 #endif /* TARGET */
     savesignals();
@@ -1657,7 +1670,7 @@ chkr_check_str(char *p, unsigned char a)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
         return;
 #endif /* TARGET */
     savesignals();
@@ -1713,7 +1726,7 @@ chkr_check_exec(void *p)
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
      */
-    if (!__piob || !__onexitbegin || !__env_initialized)
+    if (!msvcrt_initialised())
         return;
 #endif /* TARGET */
     savesignals();
