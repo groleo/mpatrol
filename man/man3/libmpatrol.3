@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.13 2001-02-12 20:18:39 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.14 2001-02-14 00:24:01 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "12 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "14 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -117,10 +117,10 @@ int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
 unsigned long __mp_snapshot(void);
-.if n \{size_t __mp_iterate(int (*func)(const void *),
-                    unsigned long event);
+.if n \{size_t __mp_iterate(int (*func)(const void *, void *),
+                    void *data, unsigned long event);
 \}
-.if t \{size_t __mp_iterate(int (*func)(const void *), unsigned long event);
+.if t \{size_t __mp_iterate(int (*func)(const void *, void *), void *data, unsigned long event);
 \}
 void __mp_memorymap(int stats);
 void __mp_summary(void);
@@ -779,7 +779,9 @@ been modified since event number \fIevent\fP.  If \fIfunc\fP is \fBNULL\fP then
 allocation.  If \fIfunc\fP returns a negative number then the iteration process
 will be stopped immediately.  If \fIfunc\fP returns a positive number above zero
 then \fB__mp_iterate\fP will return the number of times \fIfunc\fP returned a
-non-zero number after the iteration process has stopped.
+non-zero number after the iteration process has stopped.  The \fIdata\fP
+argument is passed directly to \fIfunc\fP as its second argument and is not
+read by the mpatrol library.
 .TP
 \fB__mp_memorymap\fP
 If \fIstats\fP is non-zero then the current statistics of the mpatrol library
@@ -1116,12 +1118,12 @@ the small bound but less than the large bound.  Default value:
 Specifies that a number of recently-freed memory allocations should be prevented
 from being returned to the free memory pool.  Such freed memory allocations will
 then be flagged as freed and can be used by the library to provide better
-diagnostics.  However, if the size of the freed queue is specified as zero then
-no system memory will ever be reused by the mpatrol library, which can quickly
-lead to a shortage of available system memory for a process.  Note that this
-option will always force a memory reallocation to return a pointer to
-newly-allocated memory, but the \fBexpand\fP function will never be affected
-by this option.
+diagnostics.  If the size of the freed queue is specified as zero then all
+freed memory will be immediately reused by the mpatrol library.  Note that if
+this option is given a non-zero value then the mpatrol library will always force
+a memory reallocation to return a pointer to newly-allocated memory, but the
+\fBexpand\fP function will never be affected by this option.  Default value:
+\fBNOFREE\fP=\fI0\fP.
 .TP
 \fBNOPROTECT\fP
 Specifies that the mpatrol library's internal data structures should not be made

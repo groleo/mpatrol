@@ -3,7 +3,7 @@ Content-type: text/html
 <HTML><HEAD><TITLE>Manpage of LIBMPATROL</TITLE>
 </HEAD><BODY>
 <H1>LIBMPATROL</H1>
-Section: mpatrol library (3)<BR>Updated: 12 February 2001<BR><A HREF="#index">Index</A>
+Section: mpatrol library (3)<BR>Updated: 14 February 2001<BR><A HREF="#index">Index</A>
 <A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -79,8 +79,8 @@ int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
 unsigned long __mp_snapshot(void);
-size_t __mp_iterate(int (*func)(const void *),
-                    unsigned long event);
+size_t __mp_iterate(int (*func)(const void *, void *),
+                    void *data, unsigned long event);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
@@ -709,7 +709,9 @@ been modified since event number <I>event</I>.  If <I>func</I> is <B>NULL</B> th
 allocation.  If <I>func</I> returns a negative number then the iteration process
 will be stopped immediately.  If <I>func</I> returns a positive number above zero
 then <B>__mp_iterate</B> will return the number of times <I>func</I> returned a
-non-zero number after the iteration process has stopped.
+non-zero number after the iteration process has stopped.  The <I>data</I>
+argument is passed directly to <I>func</I> as its second argument and is not
+read by the mpatrol library.
 <DT><B>__mp_memorymap</B><DD>
 If <I>stats</I> is non-zero then the current statistics of the mpatrol library
 will be displayed.  If the heap contains at least one allocated, freed or free
@@ -1013,12 +1015,12 @@ the small bound but less than the large bound.  Default value:
 Specifies that a number of recently-freed memory allocations should be prevented
 from being returned to the free memory pool.  Such freed memory allocations will
 then be flagged as freed and can be used by the library to provide better
-diagnostics.  However, if the size of the freed queue is specified as zero then
-no system memory will ever be reused by the mpatrol library, which can quickly
-lead to a shortage of available system memory for a process.  Note that this
-option will always force a memory reallocation to return a pointer to
-newly-allocated memory, but the <B>expand</B> function will never be affected
-by this option.
+diagnostics.  If the size of the freed queue is specified as zero then all
+freed memory will be immediately reused by the mpatrol library.  Note that if
+this option is given a non-zero value then the mpatrol library will always force
+a memory reallocation to return a pointer to newly-allocated memory, but the
+<B>expand</B> function will never be affected by this option.  Default value:
+<B>NOFREE</B>=<I>0</I>.
 <DT><B>NOPROTECT</B><DD>
 Specifies that the mpatrol library's internal data structures should not be made
 read-only after every memory allocation reallocation or deallocation.  This may
@@ -1219,6 +1221,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 20:18:17 GMT, February 12, 2001
+Time: 00:23:06 GMT, February 14, 2001
 </BODY>
 </HTML>

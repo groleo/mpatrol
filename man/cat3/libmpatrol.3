@@ -61,7 +61,7 @@ SSYYNNOOPPSSIISS
 
 
 
-Release 1.4              12 February 2001                       1
+Release 1.4              14 February 2001                       1
 
 
 
@@ -85,8 +85,8 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
        int __mp_printinfo(const void *ptr);
        unsigned long __mp_snapshot(void);
-       size_t __mp_iterate(int (*func)(const void *),
-                           unsigned long event);
+       size_t __mp_iterate(int (*func)(const void *, void *),
+                           void *data, unsigned long event);
        void __mp_memorymap(int stats);
        void __mp_summary(void);
        void __mp_check(void);
@@ -127,7 +127,7 @@ DDEESSCCRRIIPPTTIIOONN
 
 
 
-Release 1.4              12 February 2001                       2
+Release 1.4              14 February 2001                       2
 
 
 
@@ -193,7 +193,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       3
+Release 1.4              14 February 2001                       3
 
 
 
@@ -259,7 +259,7 @@ FFUUNNCCTTIIOONNSS
 
 
 
-Release 1.4              12 February 2001                       4
+Release 1.4              14 February 2001                       4
 
 
 
@@ -325,7 +325,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       5
+Release 1.4              14 February 2001                       5
 
 
 
@@ -391,7 +391,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       6
+Release 1.4              14 February 2001                       6
 
 
 
@@ -457,7 +457,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       7
+Release 1.4              14 February 2001                       7
 
 
 
@@ -523,7 +523,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       8
+Release 1.4              14 February 2001                       8
 
 
 
@@ -589,7 +589,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                       9
+Release 1.4              14 February 2001                       9
 
 
 
@@ -655,7 +655,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      10
+Release 1.4              14 February 2001                      10
 
 
 
@@ -721,7 +721,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      11
+Release 1.4              14 February 2001                      11
 
 
 
@@ -787,7 +787,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      12
+Release 1.4              14 February 2001                      12
 
 
 
@@ -853,7 +853,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      13
+Release 1.4              14 February 2001                      13
 
 
 
@@ -919,7 +919,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      14
+Release 1.4              14 February 2001                      14
 
 
 
@@ -985,7 +985,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      15
+Release 1.4              14 February 2001                      15
 
 
 
@@ -1051,7 +1051,7 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-Release 1.4              12 February 2001                      16
+Release 1.4              14 February 2001                      16
 
 
 
@@ -1084,7 +1084,9 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               _f_u_n_c returns a  positive  number  above  zero  then
               ____mmpp__iitteerraattee  will  return the number of times _f_u_n_c
               returned a non-zero number after the iteration pro-
-              cess has stopped.
+              cess  has  stopped.   The  _d_a_t_a  argument is passed
+              directly to _f_u_n_c as its second argument and is  not
+              read by the mpatrol library.
 
        ____mmpp__mmeemmoorryymmaapp
               If _s_t_a_t_s is non-zero then the current statistics of
@@ -1111,13 +1113,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               any memory allocation, reallocation or deallocation
               function.  This function will return a  pointer  to
               the  previously installed prologue function, or the
-              null pointer if no prologue function had been  pre-
-              viously installed.  The following arguments will be
-              used to call the prologue function:
+              null pointer  if  no  prologue  function  had  been
 
 
 
-Release 1.4              12 February 2001                      17
+Release 1.4              14 February 2001                      17
 
 
 
@@ -1125,6 +1125,9 @@ Release 1.4              12 February 2001                      17
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              previously installed.  The following arguments will
+              be used to call the prologue function:
 
               AArrgguummeenntt 11   AArrgguummeenntt 22   CCaalllleedd bbyy
 
@@ -1177,13 +1180,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        ____mmpp__llooggmmeemmoorryy
               Displays the contents of a block of  memory  begin-
               ning  at _p_t_r, dumping _s_i_z_e consecutive bytes to the
-              log file in hexadecimal format.
 
 
 
-
-
-Release 1.4              12 February 2001                      18
+Release 1.4              14 February 2001                      18
 
 
 
@@ -1191,6 +1191,8 @@ Release 1.4              12 February 2001                      18
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              log file in hexadecimal format.
 
        ____mmpp__llooggssttaacckk
               Displays the current call  stack,  skipping  _f_r_a_m_e_s
@@ -1243,13 +1245,11 @@ LLIINNKKIINNGG
 
        LLiibbrraarryy            RReeaassoonn
 
-       _-_l_m_p_a_t_r_o_l          To use this library.
-       _-_l_m_p_a_t_r_o_l_m_t        To use the thread-safe mpatrol library.
 
 
 
 
-Release 1.4              12 February 2001                      19
+Release 1.4              14 February 2001                      19
 
 
 
@@ -1258,6 +1258,8 @@ Release 1.4              12 February 2001                      19
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       _-_l_m_p_a_t_r_o_l          To use this library.
+       _-_l_m_p_a_t_r_o_l_m_t        To use the thread-safe mpatrol library.
        _-_l_m_p_a_l_l_o_c          To use the release library.
        _-_l_l_d               If built with COFF or XCOFF support.
        _-_l_e_l_f              If built with ELF support.
@@ -1310,12 +1312,10 @@ EENNVVIIRROONNMMEENNTT
               will  not  affect  memory  allocated with ccaalllloocc or
               rreeccaalllloocc as these functions  always  prefill  allo-
               cated  memory  with  an 8-bit byte pattern of zero.
-              Default value: AALLLLOOCCBBYYTTEE=_0_x_F_F.
 
 
 
-
-Release 1.4              12 February 2001                      20
+Release 1.4              14 February 2001                      20
 
 
 
@@ -1323,6 +1323,8 @@ Release 1.4              12 February 2001                      20
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              Default value: AALLLLOOCCBBYYTTEE=_0_x_F_F.
 
        AALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies an allocation index at which to stop  the
@@ -1376,12 +1378,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        CCHHEECCKKAALLLL
               Equivalent   to   the  CCHHEECCKKAALLLLOOCCSS,  CCHHEECCKKRREEAALLLLOOCCSS,
               CCHHEECCKKFFRREEEESS  and   CCHHEECCKKMMEEMMOORRYY   options   specified
-              together.
 
 
 
-
-Release 1.4              12 February 2001                      21
+Release 1.4              14 February 2001                      21
 
 
 
@@ -1389,6 +1389,8 @@ Release 1.4              12 February 2001                      21
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              together.
 
        CCHHEECCKKAALLLLOOCCSS
               Checks  that no attempt is made to allocate a block
@@ -1442,12 +1444,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               when determining which memory allocations will ran-
               domly fail.  A value of _0 will instruct the library
               to  pick  a  random seed every time it is run.  Any
-              other value will mean that the random failures will
-              be the same every time the program is run, but only
 
 
 
-Release 1.4              12 February 2001                      22
+Release 1.4              14 February 2001                      22
 
 
 
@@ -1456,6 +1456,8 @@ Release 1.4              12 February 2001                      22
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              other value will mean that the random failures will
+              be the same every time the program is run, but only
               as long as the seed stays the same.  Default value:
               FFAAIILLSSEEEEDD=_0.
 
@@ -1507,13 +1509,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        LLIISSTT   Specifies that a context listing  should  be  shown
               for  any  relevant source files that are associated
               with any warnings or errors when they occur.   Only
-              diagnostics which occur at source lines in the pro-
-              gram will be affected and only then if they contain
-              source-level information.  This option is currently
+              diagnostics  which  occur  at  source  lines in the
 
 
 
-Release 1.4              12 February 2001                      23
+Release 1.4              14 February 2001                      23
 
 
 
@@ -1522,8 +1522,10 @@ Release 1.4              12 February 2001                      23
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              only available on UNIX platforms as it makes use of
-              the   mmppeeddiitt   command.    It  also  overrides  the
+              program will be affected and only then if they con-
+              tain source-level information.  This option is cur-
+              rently only available on UNIX platforms as it makes
+              use  of  the mmppeeddiitt command.  It also overrides the
               behaviour  of  the  EEDDIITT  option  and  affects  the
               behaviour of the ____mmpp__vviieeww function.
 
@@ -1574,12 +1576,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        MMEEDDIIUUMMBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies  the  limit  in  bytes up to which memory
-              allocations should be classified as medium  alloca-
-              tions  for  profiling purposes.  This limit must be
 
 
 
-Release 1.4              12 February 2001                      24
+Release 1.4              14 February 2001                      24
 
 
 
@@ -1588,6 +1588,8 @@ Release 1.4              12 February 2001                      24
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              allocations should be classified as medium  alloca-
+              tions  for  profiling purposes.  This limit must be
               greater than the small  bound  but  less  than  the
               large bound.  Default value: MMEEDDIIUUMMBBOOUUNNDD=_2_5_6.
 
@@ -1596,15 +1598,15 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               allocations should be prevented from being returned
               to the free memory pool.  Such freed memory alloca-
               tions will then be flagged as freed and can be used
-              by the library to provide better diagnostics.  How-
-              ever, if the size of the freed queue  is  specified
-              as  zero  then no system memory will ever be reused
-              by the mpatrol library, which can quickly lead to a
-              shortage  of available system memory for a process.
-              Note that this option will always  force  a  memory
-              reallocation to return a pointer to newly-allocated
-              memory, but  the  eexxppaanndd  function  will  never  be
-              affected by this option.
+              by  the  library to provide better diagnostics.  If
+              the size of the freed queue is  specified  as  zero
+              then all freed memory will be immediately reused by
+              the mpatrol library.  Note that if this  option  is
+              given  a  non-zero  value  then the mpatrol library
+              will always force a memory reallocation to return a
+              pointer  to  newly-allocated memory, but the eexxppaanndd
+              function will never be  affected  by  this  option.
+              Default value: NNOOFFRREEEE=_0.
 
        NNOOPPRROOTTEECCTT
               Specifies  that the mpatrol library's internal data
@@ -1639,13 +1641,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               size.  No overflow buffers will  be  used  if  this
               setting is zero.  Default value: OOFFLLOOWWSSIIZZEE=_0.
 
-       OOFFLLOOWWWWAATTCCHH
-              Specifies that watch point areas should be used for
-              overflow  buffers  rather  than  filling  with  the
 
 
 
-Release 1.4              12 February 2001                      25
+
+Release 1.4              14 February 2001                      25
 
 
 
@@ -1654,10 +1654,13 @@ Release 1.4              12 February 2001                      25
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              overflow  byte.   This can significantly reduce the
-              speed of program execution.  Note that this  option
-              has  no effect on systems that do not support watch
-              point areas.
+       OOFFLLOOWWWWAATTCCHH
+              Specifies that watch point areas should be used for
+              overflow buffers rather than filling with the over-
+              flow byte.  This can significantly reduce the speed
+              of program execution.  Note that this option has no
+              effect  on  systems that do not support watch point
+              areas.
 
        PPAAGGEEAALLLLOOCC=_L_O_W_E_R|_U_P_P_E_R
               Specifies that each  individual  memory  allocation
@@ -1705,13 +1708,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               locate the executable file containing the program's
               symbols.  On most systems, the library  will  auto-
               matically  be  able to determine this filename, but
-              on a few systems this option may have  to  be  used
-              before any or all symbols can be read.
 
 
 
-
-Release 1.4              12 February 2001                      26
+Release 1.4              14 February 2001                      26
 
 
 
@@ -1719,6 +1719,9 @@ Release 1.4              12 February 2001                      26
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              on a few systems this option may have  to  be  used
+              before any or all symbols can be read.
 
        RREEAALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies a reallocation index at which to stop the
@@ -1770,14 +1773,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        SSHHOOWWSSYYMMBBOOLLSS
               Specifies  that  a  summary  of all of the function
               symbols read from  the  program's  executable  file
-              should  be  displayed  at the end of program execu-
-              tion.  This step will not be performed if an abnor-
-              mal  termination  occurs  or if no symbols could be
-              read from the executable file.
+              should   be   displayed   at  the  end  of  program
 
 
 
-Release 1.4              12 February 2001                      27
+Release 1.4              14 February 2001                      27
 
 
 
@@ -1785,6 +1785,10 @@ Release 1.4              12 February 2001                      27
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              execution.  This step will not be performed  if  an
+              abnormal  termination occurs or if no symbols could
+              be read from the executable file.
 
        SSHHOOWWUUNNFFRREEEEDD
               Specifies that a summary of all of the unfreed mem-
@@ -1835,15 +1839,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               ignored if  its  value  is  zero.   Default  value:
               UUNNFFRREEEEDDAABBOORRTT=_0.
 
-       UUSSEEDDEEBBUUGG
-              Specifies  that  any  debugging  information in the
-              executable file should be used to obtain additional
-              source-level  information.   This  option will only
-              have an effect if the executable  file  contains  a
 
 
 
-Release 1.4              12 February 2001                      28
+
+Release 1.4              14 February 2001                      28
 
 
 
@@ -1852,6 +1852,11 @@ Release 1.4              12 February 2001                      28
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       UUSSEEDDEEBBUUGG
+              Specifies  that  any  debugging  information in the
+              executable file should be used to obtain additional
+              source-level  information.   This  option will only
+              have an effect if the executable  file  contains  a
               compiler-generated  line  number  table and will be
               ignored if the mpatrol library was built to support
               an object file access library that cannot read line
@@ -1901,6 +1906,18 @@ CCOOPPYYRRIIGGHHTT
        You should have received a copy of the GNU Library General
        Public License along with this library; if not,  write  to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
+
+
+
+Release 1.4              14 February 2001                      29
+
+
+
+
+
+LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
+
+
        330, Boston, MA 02111-1307, USA.
 
 
@@ -1909,6 +1926,55 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.4              12 February 2001                      29
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Release 1.4              14 February 2001                      30
 
 
