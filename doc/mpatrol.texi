@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.235 2001-08-24 00:55:34 graeme Exp $
+@c $Id: mpatrol.texi,v 1.236 2001-08-27 19:50:49 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 24th August, 2001
+@set UPDATED 26th August, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -15582,11 +15582,11 @@ programming languages and operating systems (mainly UNIX variants).  A few years
 ago it became a wholly-owned subsidiary of Analog Devices and our focus was
 shifted to write C and C++ compilers for the various ADI DSPs.
 
-I started working at EPC immediately after obtaining my honours degree at
-Edinburgh University.  My interests lie in operating systems and programming
-tools so this was an ideal working environment for me to apply my knowledge and
-learn more about the bits and pieces that most programmers and computer users
-know little or nothing about.
+I started working at EPC immediately after obtaining my honours degree in
+Computer Science at Edinburgh University.  My interests lie in operating systems
+and programming tools so this was an ideal working environment for me to apply
+my knowledge and learn more about the bits and pieces that most programmers and
+computer users know little or nothing about.
 
 Writing compilers is a complex business that most people take for granted.  The
 popular view is that once you have a lexer and a parser for a particular
@@ -15594,16 +15594,17 @@ programming language then you are 90% of the way to having a compiler.  However,
 modern compilers are required to perform more and more aggressive optimisations
 on user code, all of which require complex algorithms, and most of which are
 applied at the code-generator level.  Add accurate debugging information
-generation, C++ exceptions and templates, inline assembler and an efficient
-run-time library and you begin to see why writing and maintaining a compiler is
-not a solo effort!
+generation, C++ exceptions and templates, inline assembler support and an
+efficient run-time library and you begin to see why writing and maintaining a
+compiler is not a solo effort!
 
-I wrote the mpatrol library in my spare time with the intention of selling it
-to EPC as a comprehensive memory debugging solution for their UNIX compilers.
-Unfortunately, EPC was taken over by ADI before it was finished and ADI had no
-need for using such a library with their DSPs.  However, I still feel that it
-was worth the effort (not least because of all the knowledge I gained whilst
-writing it), and I hope you do too.
+I originally wrote the mpatrol library in my spare time with the intention of
+selling it to EPC as a comprehensive memory debugging solution for integration
+with their UNIX compilers.  Unfortunately, EPC was taken over by ADI before it
+was finished and ADI had no use for such a library in their DSP toolchain.
+However, I still feel that it was worth the effort (not least because of all the
+knowledge of other operating systems that I gained whilst writing it), and I
+hope you do too!
 
 @node Copying, Function index, About the author, Top
 @appendix Copying
