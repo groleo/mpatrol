@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.80 2000-05-23 21:30:56 graeme Exp $
+@c $Id: mpatrol.texi,v 1.81 2000-05-29 16:58:01 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.10
 @set VERSION 1.2.1
-@set UPDATED 23rd May, 2000
+@set UPDATED 29th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -5968,6 +5968,39 @@ The @option{-d} option to the @command{mpatrol} command does not work unless
 @file{libelf.so} is available.
 @end itemize
 
+@cindex LynxOS, Intel 80x86
+@item
+LynxOS 3.0.0, Intel Pentium Pro, BFD, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEMMAP} option has no effect.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
+@item
+LynxOS 3.0.0, Intel Pentium Pro, COFF, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{USEMMAP} option has no effect.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
 @cindex LynxOS, PowerPC
 @item
 LynxOS 3.0.0, PowerPC, BFD, @command{gcc}
@@ -6012,8 +6045,9 @@ Solaris 2.5, SPARC V9, BFD, @command{gcc}
 @item
 The thread-safe version of the library does not work.
 @item
-The @option{OFLOWWATCH} option has no effect.  The @option{-DMP_WATCH_SUPPORT=0}
-option must be added to @code{CFLAGS} in the @file{Makefile}.
+The @option{OFLOWWATCH} option has no effect.  The
+@option{-DMP_PROCFS_SUPPORT=0} and @option{-DMP_WATCH_SUPPORT=0} options must
+be added to @code{CFLAGS} in the @file{Makefile}.
 @end itemize
 
 @item
@@ -6022,8 +6056,9 @@ Solaris 2.5, SPARC V9, ELF32, @command{gcc}
 @item
 The thread-safe version of the library does not work.
 @item
-The @option{OFLOWWATCH} option has no effect.  The @option{-DMP_WATCH_SUPPORT=0}
-option must be added to @code{CFLAGS} in the @file{Makefile}.
+The @option{OFLOWWATCH} option has no effect.  The
+@option{-DMP_PROCFS_SUPPORT=0} and @option{-DMP_WATCH_SUPPORT=0} options must
+be added to @code{CFLAGS} in the @file{Makefile}.
 @item
 The @option{USEDEBUG} option has no effect.
 @end itemize
