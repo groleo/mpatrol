@@ -33,6 +33,10 @@
 #include "config.h"
 
 
+#define SHORTOPT_MIN 1   /* minimum value for short options */
+#define SHORTOPT_MAX 255 /* maximum value for short options */
+
+
 /* Contains all of the details about long options.
  */
 
@@ -58,6 +62,7 @@ MP_EXPORT char *__mp_optarg;
 
 MP_EXPORT int __mp_getnum(char *, char *, long *, int);
 MP_EXPORT int __mp_getopt(unsigned long, char **, char *, option *);
+MP_EXPORT char *__mp_shortopts(char *, option *);
 MP_EXPORT void __mp_showopts(option *);
 
 

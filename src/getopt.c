@@ -32,13 +32,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.6 2000-09-25 21:02:20 graeme Exp $"
+#ident "$Id: getopt.c,v 1.7 2000-10-03 16:18:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -248,6 +247,29 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s, option *l)
 }
 
 
+/* Build a string of short options letters from the long options table.
+ */
+
+MP_GLOBAL char *__mp_shortopts(char *s, option *l)
+{
+    char *t;
+
+    t = s;
+    while (l->name != NULL)
+    {
+        if ((l->value >= SHORTOPT_MIN) && (l->value <= SHORTOPT_MAX))
+        {
+            *t++ = l->value;
+            if (l->arg)
+                *t++ = ':';
+        }
+        l++;
+    }
+    *t = '\0';
+    return s;
+}
+
+
 /* Display a quick-reference option summary.
  */
 
@@ -256,7 +278,7 @@ MP_GLOBAL void __mp_showopts(option *l)
     fputs("Options:\n", stderr);
     while (l->name != NULL)
     {
-        if (isalnum(l->value))
+        if ((l->value >= SHORTOPT_MIN) && (l->value <= SHORTOPT_MAX))
             fprintf(stderr, "    -%c", l->value);
         else
             fputs("      ", stderr);
