@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.20 2003-11-26 23:05:33 graeme Exp $
+# $Id: Makefile,v 1.21 2003-11-26 23:26:54 graeme Exp $
 
 
 # Definitions
@@ -29,9 +29,9 @@
 SHELL     = /bin/sh
 MAN2ASCII = groff -man -Tascii
 MAN2HTML  = man2html -r
-MAN2DVI   = groff -man -Tdvi
-MAN2PS    = groff -man -Tps
-MAN2PDF   = pstill -c -c -p
+MAN2DVI   = groff -ma4 -man -Tdvi
+MAN2PS    = groff -ma4 -man -Tps
+MAN2PDF   = pstill -Fa4 -c -c -p
 
 CATPAGES  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
 	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3 \
