@@ -21,11 +21,11 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.2 1999-12-20 20:52:54 graeme Exp $
+# $Id: mpatrol.spec,v 1.3 1999-12-23 18:50:55 graeme Exp $
 
 
-%define version 1.0.8
-%define libversion 1.0
+%define version 1.1.0
+%define libversion 1.1
 
 
 Summary: A library for controlling and tracing dynamic memory allocations
@@ -73,6 +73,7 @@ cp bin/mpatrol $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
+cp FAQ $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp COPYING $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp COPYING.LIB $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp NEWS $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
