@@ -1,7 +1,23 @@
-Mon Jul 17 00:01:11 2000  Graeme Roy  <graeme@epc.co.uk>
+Mon Jul 17 23:40:03 2000  Graeme Roy  <graeme@epc.co.uk>
 
-	* man/cat1/mpatrol.1, man/man1/mpatrol.1:
+	* README:
+	Changed FAQ to frequently asked questions as it's now in the manual.
+
+	* Attic/FAQ: Moved frequently asked questions to the mpatrol manual.
+
+	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/SMakefile, build/amiga/Makefile:
+	Added mutex.h to the dependencies for the thread-safe signals module.
+
+	* doc/mpatrol.texi:
+	Added the FAQ as an appendix.  Added more things to do.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1:
 	Added an argument to the -n option.
+
+	* src/signals.c:
+	Fixed regression when displaying the summary after a crash and also made
+	the signal-handler thread-safe.
 
 Sun Jul 16 23:58:17 2000  Graeme Roy  <graeme@epc.co.uk>
 

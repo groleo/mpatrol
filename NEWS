@@ -1,14 +1,19 @@
-Changes for 1.2.6
+Changes for 1.2.6 (18th July, 2000)
 
   * The NOFREE option now takes an argument which specifies the maximum number
     of freed memory allocations to preserve before returning the oldest to the
     free memory pool.
+
+  * Fixed a regression when displaying the summary after an illegal memory
+    access and also made the signal-handler thread-safe.
 
   * Added 64-bit support for SPARC Solaris platforms.
 
   * Added support for the -d option on DYNIX/ptx.
 
   * Added support for threads on DYNIX/ptx.
+
+  * Moved the FAQ into the mpatrol manual.
 
 
 Changes for 1.2.5 (12th July, 2000)
