@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.19 2001-02-08 20:15:50 graeme Exp $
+# $Id: build,v 1.20 2001-02-08 20:20:49 graeme Exp $
 
 
 version=1.4.0
@@ -75,28 +75,10 @@ cp ../../doc/mpatrol.pdf mpatrol/doc/mpatrol
 cp ../../doc/refcard.dvi mpatrol/doc/mpatrol
 cp ../../doc/refcard.ps mpatrol/doc/mpatrol
 cp ../../doc/refcard.pdf mpatrol/doc/mpatrol
-cp ../../doc/images/mpatrol.txt mpatrol/doc/mpatrol/images
-cp ../../doc/images/mpatrol.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/mpatrol.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/mpatrol.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/test.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/test.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/test.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/gcc.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/gcc.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/gcc.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/cpp.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/cpp.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/cpp.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/cc1.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/cc1.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/cc1.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/collect2.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/collect2.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/collect2.pdf mpatrol/doc/mpatrol/images
-cp ../../doc/images/trace.jpg mpatrol/doc/mpatrol/images
-cp ../../doc/images/trace.eps mpatrol/doc/mpatrol/images
-cp ../../doc/images/trace.pdf mpatrol/doc/mpatrol/images
+cp ../../doc/images/*.txt mpatrol/doc/mpatrol/images
+cp ../../doc/images/*.jpg mpatrol/doc/mpatrol/images
+cp ../../doc/images/*.eps mpatrol/doc/mpatrol/images
+cp ../../doc/images/*.pdf mpatrol/doc/mpatrol/images
 mkdir -p mpatrol/doc/mpatrol/html
 cp ../../man/html/*.html mpatrol/doc/mpatrol/html
 mkdir -p mpatrol/doc/mpatrol/dvi

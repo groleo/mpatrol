@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.57 2001-02-08 20:15:48 graeme Exp $
+# $Id: build,v 1.58 2001-02-08 20:20:48 graeme Exp $
 
 
 version=1.4.0
@@ -79,28 +79,10 @@ cp ../../doc/mpatrol.pdf doc/mpatrol
 cp ../../doc/refcard.dvi doc/mpatrol
 cp ../../doc/refcard.ps doc/mpatrol
 cp ../../doc/refcard.pdf doc/mpatrol
-cp ../../doc/images/mpatrol.txt doc/mpatrol/images
-cp ../../doc/images/mpatrol.jpg doc/mpatrol/images
-cp ../../doc/images/mpatrol.eps doc/mpatrol/images
-cp ../../doc/images/mpatrol.pdf doc/mpatrol/images
-cp ../../doc/images/test.jpg doc/mpatrol/images
-cp ../../doc/images/test.eps doc/mpatrol/images
-cp ../../doc/images/test.pdf doc/mpatrol/images
-cp ../../doc/images/gcc.jpg doc/mpatrol/images
-cp ../../doc/images/gcc.eps doc/mpatrol/images
-cp ../../doc/images/gcc.pdf doc/mpatrol/images
-cp ../../doc/images/cpp.jpg doc/mpatrol/images
-cp ../../doc/images/cpp.eps doc/mpatrol/images
-cp ../../doc/images/cpp.pdf doc/mpatrol/images
-cp ../../doc/images/cc1.jpg doc/mpatrol/images
-cp ../../doc/images/cc1.eps doc/mpatrol/images
-cp ../../doc/images/cc1.pdf doc/mpatrol/images
-cp ../../doc/images/collect2.jpg doc/mpatrol/images
-cp ../../doc/images/collect2.eps doc/mpatrol/images
-cp ../../doc/images/collect2.pdf doc/mpatrol/images
-cp ../../doc/images/trace.jpg doc/mpatrol/images
-cp ../../doc/images/trace.eps doc/mpatrol/images
-cp ../../doc/images/trace.pdf doc/mpatrol/images
+cp ../../doc/images/*.txt doc/mpatrol/images
+cp ../../doc/images/*.jpg doc/mpatrol/images
+cp ../../doc/images/*.eps doc/mpatrol/images
+cp ../../doc/images/*.pdf doc/mpatrol/images
 mkdir -p doc/mpatrol/html
 cp ../../man/html/*.html doc/mpatrol/html
 mkdir -p doc/mpatrol/dvi

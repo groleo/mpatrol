@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.33 2001-02-08 20:15:52 graeme Exp $
+rem $Id: build.bat,v 1.34 2001-02-08 20:20:51 graeme Exp $
 
 
 set version=1.4.0
@@ -77,28 +77,10 @@ copy ..\..\doc\refcard.dvi mpatrol\doc
 copy ..\..\doc\refcard.ps mpatrol\doc
 copy ..\..\doc\refcard.pdf mpatrol\doc
 mkdir mpatrol\doc\images
-copy ..\..\doc\images\mpatrol.txt mpatrol\doc\images
-copy ..\..\doc\images\mpatrol.jpg mpatrol\doc\images
-copy ..\..\doc\images\mpatrol.eps mpatrol\doc\images
-copy ..\..\doc\images\mpatrol.pdf mpatrol\doc\images
-copy ..\..\doc\images\test.jpg mpatrol\doc\images
-copy ..\..\doc\images\test.eps mpatrol\doc\images
-copy ..\..\doc\images\test.pdf mpatrol\doc\images
-copy ..\..\doc\images\gcc.jpg mpatrol\doc\images
-copy ..\..\doc\images\gcc.eps mpatrol\doc\images
-copy ..\..\doc\images\gcc.pdf mpatrol\doc\images
-copy ..\..\doc\images\cpp.jpg mpatrol\doc\images
-copy ..\..\doc\images\cpp.eps mpatrol\doc\images
-copy ..\..\doc\images\cpp.pdf mpatrol\doc\images
-copy ..\..\doc\images\cc1.jpg mpatrol\doc\images
-copy ..\..\doc\images\cc1.eps mpatrol\doc\images
-copy ..\..\doc\images\cc1.pdf mpatrol\doc\images
-copy ..\..\doc\images\collect2.jpg mpatrol\doc\images
-copy ..\..\doc\images\collect2.eps mpatrol\doc\images
-copy ..\..\doc\images\collect2.pdf mpatrol\doc\images
-copy ..\..\doc\images\trace.jpg mpatrol\doc\images
-copy ..\..\doc\images\trace.eps mpatrol\doc\images
-copy ..\..\doc\images\trace.pdf mpatrol\doc\images
+copy ..\..\doc\images\*.txt mpatrol\doc\images
+copy ..\..\doc\images\*.jpg mpatrol\doc\images
+copy ..\..\doc\images\*.eps mpatrol\doc\images
+copy ..\..\doc\images\*.pdf mpatrol\doc\images
 mkdir mpatrol\doc\man
 copy ..\..\man\README mpatrol\doc\man\README.txt
 mkdir mpatrol\doc\man\html

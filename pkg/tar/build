@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.52 2001-02-08 20:15:51 graeme Exp $
+# $Id: build,v 1.53 2001-02-08 20:20:50 graeme Exp $
 
 
 version=1.4.0
@@ -77,28 +77,10 @@ cp ../../doc/mpatrol.pdf mpatrol/doc
 cp ../../doc/refcard.dvi mpatrol/doc
 cp ../../doc/refcard.ps mpatrol/doc
 cp ../../doc/refcard.pdf mpatrol/doc
-cp ../../doc/images/mpatrol.txt mpatrol/doc/images
-cp ../../doc/images/mpatrol.jpg mpatrol/doc/images
-cp ../../doc/images/mpatrol.eps mpatrol/doc/images
-cp ../../doc/images/mpatrol.pdf mpatrol/doc/images
-cp ../../doc/images/test.jpg mpatrol/doc/images
-cp ../../doc/images/test.eps mpatrol/doc/images
-cp ../../doc/images/test.pdf mpatrol/doc/images
-cp ../../doc/images/gcc.jpg mpatrol/doc/images
-cp ../../doc/images/gcc.eps mpatrol/doc/images
-cp ../../doc/images/gcc.pdf mpatrol/doc/images
-cp ../../doc/images/cpp.jpg mpatrol/doc/images
-cp ../../doc/images/cpp.eps mpatrol/doc/images
-cp ../../doc/images/cpp.pdf mpatrol/doc/images
-cp ../../doc/images/cc1.jpg mpatrol/doc/images
-cp ../../doc/images/cc1.eps mpatrol/doc/images
-cp ../../doc/images/cc1.pdf mpatrol/doc/images
-cp ../../doc/images/collect2.jpg mpatrol/doc/images
-cp ../../doc/images/collect2.eps mpatrol/doc/images
-cp ../../doc/images/collect2.pdf mpatrol/doc/images
-cp ../../doc/images/trace.jpg mpatrol/doc/images
-cp ../../doc/images/trace.eps mpatrol/doc/images
-cp ../../doc/images/trace.pdf mpatrol/doc/images
+cp ../../doc/images/*.txt mpatrol/doc/images
+cp ../../doc/images/*.jpg mpatrol/doc/images
+cp ../../doc/images/*.eps mpatrol/doc/images
+cp ../../doc/images/*.pdf mpatrol/doc/images
 mkdir -p mpatrol/doc/man
 cp ../../man/README mpatrol/doc/man
 mkdir -p mpatrol/doc/man/html
