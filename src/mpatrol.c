@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.10 2000-04-19 00:20:15 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.11 2000-04-19 00:27:21 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -154,6 +154,12 @@ static char *options_help[] =
     "o", "unsigned integer",
     "", "Specifies an 8-bit byte pattern with which to fill the overflow",
     "", "buffers of all memory allocations.",
+    "P", "string",
+    "", "Specifies an alternative file in which to place all memory allocation",
+    "", "profiling information from the mpatrol library.",
+    "p", NULL,
+    "", "Specifies that all memory allocations are to be profiled and sent to",
+    "", "the profiling output file.",
     "R", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when a",
     "", "memory allocation is being reallocated.",
@@ -291,6 +297,10 @@ static void setoptions(void)
         addoption("PAGEALLOC", pagealloc, 0);
     if (preserve)
         addoption("PRESERVE", NULL, 0);
+    if (prof)
+        addoption("PROF", NULL, 0);
+    if (proffile)
+        addoption("PROFFILE", proffile, 0);
     if (progfile)
         addoption("PROGFILE", progfile, 0);
     if (reallocstop)
@@ -346,7 +356,7 @@ int main(int argc, char **argv)
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     while ((c = __mp_getopt(argc, argv,
-             "A:a:C:cD:de:F:f:GgL:l:mNnO:o:R:SsU:VvwXxZ:z:")) != EOF)
+             "A:a:C:cD:de:F:f:GgL:l:mNnO:o:P:pR:SsU:VvwXxZ:z:")) != EOF)
         switch (c)
         {
           case 'A':
@@ -404,10 +414,10 @@ int main(int argc, char **argv)
             oflowbyte = __mp_optarg;
             break;
           case 'P':
-            pagealloc = "UPPER";
+            proffile = __mp_optarg;
             break;
           case 'p':
-            pagealloc = "LOWER";
+            prof = 1;
             break;
           case 'R':
             reallocstop = __mp_optarg;
