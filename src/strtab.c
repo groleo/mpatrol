@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.8 2000-06-07 20:08:52 graeme Exp $"
+#ident "$Id: strtab.c,v 1.9 2000-07-13 20:16:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,9 +103,9 @@ static unsigned long hash(char *s)
     for (h = 0; *s != '\0'; s++)
     {
         h = (h << 4) + *s;
-        if (g = h & 0xF0000000)
+        if (g = h & (0xFUL << ((sizeof(unsigned long) << 3) - 4)))
         {
-            h ^= g >> 24;
+            h ^= g >> ((sizeof(unsigned long) << 3) - 8);
             h ^= g;
         }
     }
