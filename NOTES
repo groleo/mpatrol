@@ -113,11 +113,6 @@ Notes for all platforms
 
 Notes for UNIX platforms
 
-  * Perhaps add support for allocating new heap space using mmap() instead of
-    sbrk().  This could be controlled by a run-time option, since using mmap()
-    would add the feature of being able to map memory onto files for later
-    reading.
-
   * Need to add watch point area support for non-Solaris operating systems.
     This may be a case of preventing all heap memory from being accessed and
     providing a signal handler that is called when a read from or write to such
@@ -366,6 +361,15 @@ Related software
             Overview:  Provides memory management error detection, memory usage
                        error detection, memory usage profiling and error
                        simulation.
+
+      * Mmalloc
+            Author:    Mike Haertel <mike@ai.mit.edu> and
+                       Fred Fish <fnf@cygnus.com>
+            License:   GNU General Public License
+            Platforms: Various UNIX
+            Location:  http://www.gnu.org/
+            Overview:  Uses mmap() to allocate separate pools of memory which
+                       can be mapped onto files for later reuse.
 
       * Purify
             Author:    Rational Software <info@rational.com>
