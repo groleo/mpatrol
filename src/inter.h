@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.48 2001-07-25 22:48:31 graeme Exp $
+ * $Id: inter.h,v 1.49 2001-07-26 17:26:40 graeme Exp $
  */
 
 
@@ -116,17 +116,17 @@ extern "C"
 #endif /* __cplusplus */
 
 
-extern errortype __mp_errno;
+MP_API extern errortype __mp_errno;
 
 
-void __mp_init(void);
-void __mp_reinit(void);
-void __mp_fini(void);
-void __mp_trap(void);
-int __mp_atexit(void (*)(void));
-unsigned long __mp_setoption(long, unsigned long);
-int __mp_getoption(long, unsigned long *);
-infohead *__mp_memhead(void);
+MP_API void __mp_init(void);
+MP_API void __mp_reinit(void);
+MP_API void __mp_fini(void);
+MP_API void __mp_trap(void);
+MP_API int __mp_atexit(void (*)(void));
+MP_API unsigned long __mp_setoption(long, unsigned long);
+MP_API int __mp_getoption(long, unsigned long *);
+MP_API infohead *__mp_memhead(void);
 void *__mp_alloc(size_t, size_t, alloctype, char *, char *, unsigned long,
                  char *, size_t, size_t);
 char *__mp_strdup(char *, size_t, alloctype, char *, char *, unsigned long,

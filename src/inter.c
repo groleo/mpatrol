@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.133 2001-07-26 16:51:10 graeme Exp $"
+#ident "$Id: inter.c,v 1.134 2001-07-26 17:26:40 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.133 2001-07-26 16:51:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.134 2001-07-26 17:26:40 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -445,12 +445,13 @@ finishmarked(void)
 /* The last error encountered by the mpatrol library.
  */
 
-errortype __mp_errno;
+MP_API errortype __mp_errno;
 
 
 /* Initialise the mpatrol library.
  */
 
+MP_API
 void
 __mp_init(void)
 {
@@ -539,6 +540,7 @@ __mp_init(void)
 /* Reinitialise the mpatrol library.
  */
 
+MP_API
 void
 __mp_reinit(void)
 {
@@ -599,6 +601,7 @@ __mp_reinit(void)
 /* Finalise the mpatrol library.
  */
 
+MP_API
 void
 __mp_fini(void)
 {
@@ -717,6 +720,7 @@ __mp_fini(void)
 /* Provide a function which can be used as a breakpoint target in a debugger.
  */
 
+MP_API
 void
 __mp_trap(void)
 {
@@ -726,6 +730,7 @@ __mp_trap(void)
 /* Register a finalisation function to be called when __mp_fini() is called.
  */
 
+MP_API
 int
 __mp_atexit(void (*f)(void))
 {
@@ -751,6 +756,7 @@ __mp_atexit(void (*f)(void))
 /* Set an mpatrol option after the library has been initialised.
  */
 
+MP_API
 unsigned long
 __mp_setoption(long o, unsigned long v)
 {
@@ -782,6 +788,7 @@ __mp_setoption(long o, unsigned long v)
 /* Get an mpatrol option after the library has been initialised.
  */
 
+MP_API
 int
 __mp_getoption(long o, unsigned long *v)
 {
@@ -807,6 +814,7 @@ __mp_getoption(long o, unsigned long *v)
 /* Return the memory header structure.
  */
 
+MP_API
 infohead *
 __mp_memhead(void)
 {
