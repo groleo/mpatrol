@@ -1,0 +1,133 @@
+# mpatrol
+# A library for controlling and tracing dynamic memory allocations.
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+
+
+# SD/UX package specification file
+
+
+# $Id: mpatrol.psf,v 1.1 2000-11-22 21:56:26 graeme Exp $
+
+
+product
+    tag				mpatrol
+    title			"mpatrol library"
+    revision			1.3.0
+    category			language
+    category_title		"Languages"
+    description			"The mpatrol library for controlling and tracing dynamic memory allocations."
+    copyright			"Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>"
+    fileset
+	tag			mpatrol
+	file_permissions	-m 0664 -o bin -g bin
+	directory		mpatrol=/usr/local
+	directory		mpatrol/bin=/usr/local/bin
+	file -m 0775		mpatrol
+	file -m 0775		mprof
+	file -m 0775		mleak
+	file -m 0775		mpsym
+	file -m 0775		mpedit
+	directory		mpatrol/doc=/usr/local/doc
+	directory		mpatrol/doc/mpatrol=/usr/local/doc/mpatrol
+	file			README
+	file			README.DOC
+	file			COPYING
+	file			COPYING.LIB
+	file			NEWS
+	file			ChangeLog
+	file			mpatrol.txt
+	file			mpatrol.guide
+	file			mpatrol.html
+	file			mpatrol.dvi
+	file			mpatrol.ps
+	file			mpatrol.pdf
+	file			refcard.dvi
+	file			refcard.ps
+	file			refcard.pdf
+	directory		mpatrol/doc/mpatrol/images=/usr/local/doc/mpatrol/images
+	file			mpatrol.txt
+	file			mpatrol.jpg
+	file			mpatrol.eps
+	file			mpatrol.pdf
+	file			test.jpg
+	file			test.eps
+	file			test.pdf
+	file			gcc.jpg
+	file			gcc.eps
+	file			gcc.pdf
+	file			cpp.jpg
+	file			cpp.eps
+	file			cpp.pdf
+	file			cc1.jpg
+	file			cc1.eps
+	file			cc1.pdf
+	file			collect2.jpg
+	file			collect2.eps
+	file			collect2.pdf
+	directory		mpatrol/doc/mpatrol/tests=/usr/local/doc/mpatrol/tests
+	directory		mpatrol/doc/mpatrol/tests/pass=/usr/local/doc/mpatrol/tests/pass
+	file			test1.c
+	file			test2.c
+	file			test3.c
+	file			test4.c
+	file			test5.c
+	file			test6.c
+	file			test7.c
+	file			test8.c
+	directory		mpatrol/doc/mpatrol/tests/fail=/usr/local/doc/mpatrol/tests/fail
+	file			test1.c
+	file			test2.c
+	file			test3.c
+	file			test4.c
+	file			test5.c
+	file			test6.c
+	file			test7.c
+	file			test8.c
+	file			test9.c
+	file			test10.c
+	file			test11.c
+	file			test12.c
+	file			test13.c
+	file			test14.c
+	file			test15.c
+	file			test16.c
+	directory		mpatrol/doc/mpatrol/tests/profile=/usr/local/doc/mpatrol/tests/profile
+	file			test1.c
+	file			test2.c
+	directory		mpatrol/doc/mpatrol/tests/tutorial=/usr/local/doc/mpatrol/tests/tutorial
+	file			test1.c
+	file			test2.c
+	file			test3.c
+	directory		mpatrol/info=/usr/local/info
+	file			mpatrol.info
+	directory		mpatrol/include=/usr/local/include
+	file			mpatrol.h
+	directory		mpatrol/lib=/usr/local/lib
+	file			libmpatrol.a
+	file -m 0775		libmpatrol.sl
+	directory		mpatrol/man=/usr/local/man
+	directory		mpatrol/man/man1=/usr/local/man/man1
+	file			mpatrol.1
+	file			mprof.1
+	file			mleak.1
+	file			mpsym.1
+	file			mpedit.1
+	directory		mpatrol/man/man3=/usr/local/man/man3
+	file			mpatrol.3
+    end
+end
