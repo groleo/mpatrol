@@ -60,6 +60,12 @@ MP_EXPORT void __mp_printsymbols(symhead *);
 MP_EXPORT void __mp_printaddrs(symhead *, addrnode *);
 MP_EXPORT void __mp_printstack(symhead *, stackinfo *);
 MP_EXPORT void __mp_printalloc(symhead *, allocnode *);
+MP_EXPORT void __mp_logalloc(infohead *, size_t, size_t, alloctype, char *,
+                             char *, unsigned long, stackinfo *);
+MP_EXPORT void __mp_logrealloc(infohead *, void *, size_t, size_t, alloctype,
+                               char *, char *, unsigned long, stackinfo *);
+MP_EXPORT void __mp_logfree(infohead *, void *, alloctype, char *, char *,
+                            unsigned long, stackinfo *);
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
 MP_EXPORT void __mp_printmap(infohead *);

@@ -29,6 +29,9 @@
 
 
 #include "diag.h"
+#if MP_THREADS_SUPPORT
+#include "mutex.h"
+#endif /* MP_THREADS_SUPPORT */
 #include "utils.h"
 #include "version.h"
 #include <stdio.h>
@@ -40,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.19 2000-05-04 07:55:11 graeme Exp $"
+#ident "$Id: diag.c,v 1.20 2000-05-08 20:11:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -492,6 +495,85 @@ MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
     __mp_printloc(m);
     __mp_diag("\n");
     __mp_printaddrs(y, m->data.stack);
+}
+
+
+/* Log the details of a call to allocate memory.
+ */
+
+MP_GLOBAL void __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f,
+                             char *s, char *t, unsigned long u, stackinfo *v)
+{
+    __mp_diag("ALLOC: %s (%lu, ", __mp_alloctypenames[f], h->count);
+    __mp_printsize(l);
+    __mp_diag(", ");
+    if (a == 0)
+        __mp_printsize(h->alloc.heap.memory.align);
+    else
+        __mp_printsize(a);
+    __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+    __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+    if (u == 0)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", u);
+    __mp_diag("]\n");
+    __mp_printstack(&h->syms, v);
+    __mp_diag("\n");
+}
+
+
+/* Log the details of a call to reallocate memory.
+ */
+
+MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
+                               alloctype f, char *s, char *t, unsigned long u,
+                               stackinfo *v)
+{
+    __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+    __mp_printsize(l);
+    __mp_diag(", ");
+    if (a == 0)
+        __mp_printsize(h->alloc.heap.memory.align);
+    else
+        __mp_printsize(a);
+    __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+    __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+    if (u == 0)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", u);
+    __mp_diag("]\n");
+    __mp_printstack(&h->syms, v);
+    __mp_diag("\n");
+}
+
+
+/* Log the details of a call to deallocate memory.
+ */
+
+MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
+                            unsigned long u, stackinfo *v)
+{
+    __mp_diag("FREE: %s (" MP_POINTER, __mp_alloctypenames[f], p);
+    __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+    __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+    if (u == 0)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", u);
+    __mp_diag("]\n");
+    __mp_printstack(&h->syms, v);
+    __mp_diag("\n");
 }
 
 
