@@ -49,10 +49,21 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.61 2001-03-04 12:31:57 graeme Exp $"
+#ident "$Id: diag.c,v 1.62 2001-03-04 12:59:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.61 2001-03-04 12:31:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.62 2001-03-04 12:59:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
+
+
+/* The structure containing details about each error reported by the mpatrol
+ * library.
+ */
+
+typedef struct errorinfo
+{
+    char *code; /* error abbreviation code */
+}
+errorinfo;
 
 
 #ifdef __cplusplus
@@ -96,33 +107,33 @@ static unsigned long errors, warnings;
 /* This array should always be kept in step with the errortype enumeration.
  */
 
-static char *errornames[ET_MAX] =
+static errorinfo errordetails[ET_MAX] =
 {
-    "NOERR",
-    "ALLOVF",
-    "ALLZER",
-    "BADALN",
-    "FRDCOR",
-    "FRDOPN",
-    "FRDOVF",
-    "FRECOR",
-    "FREMRK",
-    "FRENUL",
-    "FREOPN",
-    "ILLMEM",
-    "INCOMP",
-    "MAXALN",
-    "MISMAT",
-    "NOTALL",
-    "NULOPN",
-    "OUTMEM",
-    "PRVFRD",
-    "RNGOVF",
-    "RNGOVL",
-    "RSZNUL",
-    "RSZZER",
-    "STROVF",
-    "ZERALN"
+    {"NOERR"},
+    {"ALLOVF"},
+    {"ALLZER"},
+    {"BADALN"},
+    {"FRDCOR"},
+    {"FRDOPN"},
+    {"FRDOVF"},
+    {"FRECOR"},
+    {"FREMRK"},
+    {"FRENUL"},
+    {"FREOPN"},
+    {"ILLMEM"},
+    {"INCOMP"},
+    {"MAXALN"},
+    {"MISMAT"},
+    {"NOTALL"},
+    {"NULOPN"},
+    {"OUTMEM"},
+    {"PRVFRD"},
+    {"RNGOVF"},
+    {"RNGOVL"},
+    {"RSZNUL"},
+    {"RSZZER"},
+    {"STROVF"},
+    {"ZERALN"}
 };
 
 
@@ -537,7 +548,7 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
         __mp_openlogfile(NULL);
     __mp_diag("WARNING: ");
     if (e != ET_MAX)
-        __mp_diag("[%s]: ", errornames[e]);
+        __mp_diag("[%s]: ", errordetails[e].code);
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
@@ -551,7 +562,7 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
         {
             fputs("WARNING: ", stderr);
             if (e != ET_MAX)
-                fprintf(stderr, "[%s]: ", errornames[e]);
+                fprintf(stderr, "[%s]: ", errordetails[e].code);
             if (f != AT_MAX)
                 fprintf(stderr, "%s: ", __mp_functionnames[f]);
             va_start(v, s);
@@ -581,7 +592,7 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
         __mp_openlogfile(NULL);
     __mp_diag("ERROR: ");
     if (e != ET_MAX)
-        __mp_diag("[%s]: ", errornames[e]);
+        __mp_diag("[%s]: ", errordetails[e].code);
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
@@ -595,7 +606,7 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
         {
             fputs("ERROR: ", stderr);
             if (e != ET_MAX)
-                fprintf(stderr, "[%s]: ", errornames[e]);
+                fprintf(stderr, "[%s]: ", errordetails[e].code);
             if (f != AT_MAX)
                 fprintf(stderr, "%s: ", __mp_functionnames[f]);
             va_start(v, s);
