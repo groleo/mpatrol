@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.96 2001-12-05 23:58:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.97 2001-12-06 00:10:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.96 2001-12-05 23:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.97 2001-12-06 00:10:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1344,6 +1344,9 @@ MP_GLOBAL
 void
 __mp_logalloc(infohead *h, size_t l, size_t a, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1377,6 +1380,9 @@ MP_GLOBAL
 void
 __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1410,6 +1416,9 @@ MP_GLOBAL
 void
 __mp_logfree(infohead *h, void *p, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1436,6 +1445,9 @@ MP_GLOBAL
 void
 __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1465,6 +1477,9 @@ void
 __mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
                 loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1493,6 +1508,9 @@ MP_GLOBAL
 void
 __mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1523,6 +1541,9 @@ MP_GLOBAL
 void
 __mp_logmemcompare(infohead *h, void *p, void *q, size_t l, loginfo *i)
 {
+    if (i->logged)
+        return;
+    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");

@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.153 2001-12-05 23:47:14 graeme Exp $"
+#ident "$Id: inter.c,v 1.154 2001-12-06 00:08:49 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.153 2001-12-05 23:47:14 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.154 2001-12-06 00:08:49 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -637,6 +637,7 @@ __mp_fini(void)
             v.stack = &i;
             v.typestr = NULL;
             v.typesize = 0;
+            v.logged = 0;
             __mp_checkinfo(&memhead, &v);
             checkalloca(&v, 1);
             /* Then call any finalisation functions in the reverse order in
@@ -910,6 +911,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.stack = &i;
     v.typestr = g;
     v.typesize = h;
+    v.logged = 0;
     checkheap(&v, memhead.count + 1);
     checkalloca(&v, 0);
     memhead.event++;
@@ -1035,6 +1037,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.stack = &i;
     v.typestr = "char";
     v.typesize = sizeof(char);
+    v.logged = 0;
     checkheap(&v, memhead.count + 1);
     checkalloca(&v, 0);
     memhead.event++;
@@ -1173,6 +1176,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.stack = &i;
     v.typestr = g;
     v.typesize = h;
+    v.logged = 0;
     checkheap(&v, memhead.count);
     checkalloca(&v, 0);
     memhead.event++;
@@ -1275,6 +1279,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     checkheap(&v, memhead.count);
     checkalloca(&v, 0);
     memhead.event++;
@@ -1339,6 +1344,7 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     checkalloca(&v, 0);
     __mp_setmemory(&memhead, p, l, c, &v);
     restoresignals();
@@ -1412,6 +1418,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     checkalloca(&v, 0);
     q = __mp_copymemory(&memhead, p, q, l, c, &v);
     restoresignals();
@@ -1481,6 +1488,7 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     checkalloca(&v, 0);
     r = __mp_locatememory(&memhead, p, l, q, m, &v);
     restoresignals();
@@ -1547,6 +1555,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     checkalloca(&v, 0);
     r = __mp_comparememory(&memhead, p, q, l, &v);
     restoresignals();
@@ -2311,6 +2320,7 @@ __mp_checkheap(char *s, char *t, unsigned long u)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     __mp_checkinfo(&memhead, &v);
     checkalloca(&v, 0);
     restoresignals();
@@ -3039,6 +3049,7 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     if (!__mp_checkrange(&memhead, p, l, &v))
     {
         memhead.fini = 1;
@@ -3100,6 +3111,7 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     if (!__mp_checkrange(&memhead, p, l, &v) ||
         !__mp_checkrange(&memhead, q, l, &v))
     {
@@ -3161,6 +3173,7 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     if (!__mp_checkrange(&memhead, p, l, &v))
     {
         memhead.fini = 1;
@@ -3222,6 +3235,7 @@ chkr_check_str(char *p, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     if (!__mp_checkstring(&memhead, p, &l, &v, 0))
     {
         memhead.fini = 1;
@@ -3282,6 +3296,7 @@ chkr_check_exec(void *p)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    v.logged = 0;
     restoresignals();
 }
 

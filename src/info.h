@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.64 2001-12-05 23:13:32 graeme Exp $
+ * $Id: info.h,v 1.65 2001-12-06 00:08:49 graeme Exp $
  */
 
 
@@ -163,6 +163,7 @@ typedef struct loginfo
     stackinfo *stack;   /* call stack details */
     char *typestr;      /* type stored in allocation */
     size_t typesize;    /* size of type stored in allocation */
+    char logged;        /* logged flag */
 }
 loginfo;
 
