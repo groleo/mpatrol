@@ -26,7 +26,7 @@
  * the resulting string.  However, the string is not null-terminated and
  * the call to printf() will result in bytes being read past the end of
  * the allocation.  This test must be run on a system with memory
- * protection and the failure will be detected if PAGESIZE=UPPER is used.
+ * protection and the failure will be detected if PAGEALLOC=UPPER is used.
  */
 
 

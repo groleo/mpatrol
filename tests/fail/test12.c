@@ -24,7 +24,7 @@
  * Duplicates a string of 4 bytes before printing out one byte before the
  * resulting string.  The call to printf() will result in bytes being read
  * before the start of the allocation.  This test must be run on a system
- * with memory protection and the failure will be detected if PAGESIZE=LOWER
+ * with memory protection and the failure will be detected if PAGEALLOC=LOWER
  * is used.
  */
 
