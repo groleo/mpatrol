@@ -1,3 +1,131 @@
+2001-02-07  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/diag.c: Added the check frequency.
+
+2001-02-06  Graeme Roy  <graeme@epc.co.uk>
+
+	* README: The discussion group is now at yahoo.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added reallocf(), __mp_snapshot(), __mp_iterate(), __mp_printf(),
+	__mp_logmemory(), __mp_logstack(), __mp_edit() and __mp_list().
+
+	* src/config.h: Added MP_PRINTPREFIX.
+
+	* src/info.c, src/info.h: Added the last modification event.
+
+	* src/diag.c, src/diag.h: Made __mp_editfile() global.
+
+	* src/info.c, src/inter.c, src/malloc.c, src/mpalloc.c, src/mpatrol.h,
+	  src/diag.c, src/info.h:
+	Added the reallocf() function.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added the __mp_snapshot(), __mp_iterate(), __mp_printf(),
+	__mp_logmemory(), __mp_logstack(), __mp_edit() and __mp_list()
+	functions.
+
+	* tests/pass/test4.c: Added allocation event.
+
+2001-02-05  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/hexwords: Check for locations of other dictionaries if not found.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added the mpalloc object library.  Updated dependencies for the object
+	library.  Added the dependencies for the object libmpalloc library.
+	Added the cplus module.  Added the dependencies for the threadsafe
+	cplus module.
+
+	* build/windows/Makefile, build/windows/NMakefile:
+	Added DLL versions of libmpalloc.
+
+	* build/windows/main.c:
+	Added alternative RCS ids if not MP_IDENT_SUPPORT.
+
+	* build/windows/main2.c: Added new file for DllMain for libmpalloc.
+
+	* pkg/zip/build.bat: Added the mpalloc DLL.
+
+	* src/memory.c:
+	Changed names of some variables to avoid clashes when building object
+	library.
+
+	* src/inter.c: Added the type information to __mp_printinfo().
+
+	* src/malloc.c:
+	Make sure no macros are defined which will conflict with the new
+	definitions.
+
+	* src/cplus.c:
+	Moved C++ functions to cplus.c.  Provide better out of memory
+	diagnostics when this file is compiled with a C compiler.
+
+	* src/library.c: Added cplus.c.
+
+	* src/library2.c: New file for building the mpalloc object library.
+
+2001-02-04  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile: Now build with a C++ compiler.
+
+	* build/netware/Makefile: Now use a C++ compiler to build with.
+
+	* build/unix/Makefile: Now build with a C++ compiler.
+
+	* build/unix/mpatrol.exp: Added new mangled names for C++ operators.
+
+	* build/windows/Makefile, build/windows/NMakefile:
+	Now compile files as C++.
+
+	* src/config.h: Added MP_MEMALIGN_SUPPORT.
+
+	* src/symbol.c: Added recognition of GNU C++ destructor symbols.
+
+	* src/inter.c:
+	No longer abort when operator new or operator new[] runs out of memory.
+
+	* src/malloc.c, src/mpatrol.h:
+	Added new Standard C++ implementations of the C++ operators.
+
+	* src/mpalloc.c:
+	Now use memalign() if available.  Need to include malloc.h on Linux to
+	get definition of memalign().
+
+2001-02-01  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/mpalloc.def,
+	  build/windows/NMakefile, build/unix/Makefile, build/unix/Makefile.aix,
+	  build/unix/mpalloc.exp, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added the mpalloc module.
+
+	* src/info.c:
+	Changed the default alignment for memalign() when it is zero.
+
+	* src/symbol.c:
+	Added ability to determine the program filename from the dynamic linker.
+
+	* src/inter.c:
+	alloca(), strdupa() and strndupa() now no longer return NULL on error.
+
+	* src/mpalloc.c:
+	New file replacing inter.c for release mode.  Don't free() if
+	dealloca().
+
+2001-01-31  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/inter.c, src/symbol.c, src/symbol.h:
+	Now display information about the symbols loaded from each object file.
+	Read symbols from any shared libraries before reading symbols from the
+	executable file.  This allows us to use the dynamic linker to determine
+	the executable filename where possible.  Added the meminfo extra
+	argument to __mp_addextsymbols().
+
 2001-01-25  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpalloc.def: New DLL definition file for libmpalloc.

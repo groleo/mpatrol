@@ -1,3 +1,43 @@
+Changes for 1.4.0
+
+  * Added release versions of all of the mpatrol library functions that can be
+    used to quickly remove all mpatrol features by linking with libmpalloc.
+
+  * The log file now displays a summary of all of the symbols loaded from the
+    main executable file and any shared libraries.
+
+  * The C++ operators are now ANSI standard conforming, with new versions that
+    throw the std::bad_alloc exception when no more memory is available.  The
+    mpatrol library is now built with a C++ compiler by default on some
+    platforms.
+
+  * The alloca() family of functions now abort instead of returning NULL when
+    there is no more memory available.  Also added the BSD reallocf() function.
+
+  * Added functions to snapshot the heap and iterate across all memory
+    allocations in the heap.  Also added functions to write strings, hex dumps,
+    memory allocations and current call stacks to the mpatrol log file, as well
+    as the ability to edit or view specific source files from within a program
+    when it is running.
+
+  * The CHECK option is now zero by default, which means that the library does
+    not perform as much checking by default as it did before.  Also added a
+    frequency argument to the CHECK option so that checking can be performed
+    every nth time across a given range.
+
+  * Fixed a bug in memalign() which meant that if the alignment was specified as
+    zero then the system page size would be used instead of the default system
+    alignment.
+
+  * GNU C++ destructor symbols are now recognised and preserved when reading
+    the symbol tables from object files.  Previously this meant that memory
+    allocations from such destructors were recorded as having occurred in the
+    wrong place.
+
+  * The hexwords command now searches for a dictionary in several other
+    locations if the default dictionary is not found.
+
+
 Changes for 1.3.4 (25th January, 2001)
 
   * Added the MP_MALLOC() family of functions for recording the type name and
