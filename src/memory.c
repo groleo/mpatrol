@@ -45,7 +45,11 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #if MP_WATCH_SUPPORT
+#if SYSTEM == SYSTEM_SOLARIS
 #include <procfs.h>
+#else /* SYSTEM */
+#include <sys/procfs.h>
+#endif /* SYSTEM */
 #endif /* MP_WATCH_SUPPORT */
 #elif TARGET == TARGET_AMIGA
 #include <proto/dos.h>
@@ -62,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.32 2000-07-14 00:16:40 graeme Exp $"
+#ident "$Id: memory.c,v 1.33 2000-07-31 23:46:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -73,7 +77,7 @@
 
 typedef struct watchcmd
 {
-    long cmd;       /* always PCWATCH */
+    long cmd;       /* the command to set a watch point */
     prwatch_t data; /* details of addresses to watch */
 }
 watchcmd;
@@ -215,8 +219,9 @@ static char *progname(void)
     static char c[256];
     ssize_t l;
     int f;
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-      SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_SOLARIS
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LYNXOS || \
+      SYSTEM == SYSTEM_SOLARIS
     extern char **environ;
     char **e;
     char *t;
@@ -227,9 +232,9 @@ static char *progname(void)
     unsigned long *p;
     stackinfo s;
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
-#if MP_PROCFS_SUPPORT
+#ifdef MP_PROCFS_EXENAME
     static char b[64];
-#endif /* MP_PROCFS_SUPPORT */
+#endif /* MP_PROCFS_EXENAME */
 #elif TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS
     static char p[256];
 #elif TARGET == TARGET_NETWARE
@@ -254,8 +259,7 @@ static char *progname(void)
      * vector that a process was invoked with.
      */
     l = 0;
-    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
-            MP_PROCFS_CMDNAME);
+    sprintf(b, MP_PROCFS_CMDNAME, __mp_processid());
     if ((f = open(b, O_RDONLY)) != -1)
     {
         if ((l = read(f, c, sizeof(c) - 1)) == -1)
@@ -267,13 +271,14 @@ static char *progname(void)
         c[l] = '\0';
         return c;
     }
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-      SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_SOLARIS
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LYNXOS || \
+      SYSTEM == SYSTEM_SOLARIS
     /* We can access the argument vector from the pointer to the environment
-     * array on DG/UX, DYNIX/ptx, LynxOS and Solaris.  On DG/UX Intel, DYNIX/ptx
-     * and Solaris we stop scanning backwards along the array when we reach
-     * argc.  On DG/UX M88K and LynxOS we stop scanning forwards along the array
-     * when we reach a NULL pointer.  The contents of the argument vector then
+     * array on all other UNIX systems.  On DG/UX Intel, DRS/NX, DYNIX/ptx and
+     * Solaris we stop scanning backwards along the array when we reach argc.
+     * On DG/UX M88K and LynxOS we stop scanning forwards along the array when
+     * we reach a NULL pointer.  The contents of the argument vector then
      * follow.
      */
 #if (SYSTEM == SYSTEM_DGUX && ARCH == ARCH_M88K) || SYSTEM == SYSTEM_LYNXOS
@@ -326,15 +331,14 @@ static char *progname(void)
             return (char *) *p;
 #endif /* ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
-#if MP_PROCFS_SUPPORT
+#ifdef MP_PROCFS_EXENAME
     /* If the /proc filesystem is supported then we can usually access the
      * actual executable file that contains the current program through a
      * special file in the current /proc entry.
      */
-    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
-            MP_PROCFS_EXENAME);
+    sprintf(b, MP_PROCFS_EXENAME, __mp_processid());
     return b;
-#endif /* MP_PROCFS_SUPPORT */
+#endif /* MP_PROCFS_EXENAME */
 #elif TARGET == TARGET_AMIGA
     if (GetProgramName(p, sizeof(p)))
         return p;
@@ -376,8 +380,7 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
      */
     i->mfile = -1;
 #if MP_WATCH_SUPPORT
-    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
-            MP_PROCFS_CTLNAME);
+    sprintf(b, MP_PROCFS_CTLNAME, __mp_processid());
     i->wfile = open(b, O_WRONLY);
 #else /* MP_WATCH_SUPPORT */
     i->wfile = -1;
@@ -664,6 +667,7 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
 #if MP_WATCH_SUPPORT
     if (l == 0)
         return 1;
+#if SYSTEM == SYSTEM_SOLARIS
     w.cmd = PCWATCH;
     w.data.pr_vaddr = (uintptr_t) p;
     w.data.pr_size = l;
@@ -676,6 +680,27 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
     if ((i->wfile == -1) ||
         (write(i->wfile, (void *) &w, sizeof(watchcmd)) != sizeof(watchcmd)))
         return 0;
+#else /* SYSTEM */
+    w.cmd = PIOCSWATCH;
+    w.data.pr_vaddr = (caddr_t) p;
+    if (a == MA_NOACCESS)
+    {
+        w.data.pr_size = l;
+        w.data.pr_wflags = MA_READ | MA_WRITE;
+    }
+    else if (a == MA_READONLY)
+    {
+        w.data.pr_size = l;
+        w.data.pr_wflags = MA_WRITE;
+    }
+    else
+    {
+        w.data.pr_size = 0;
+        w.data.pr_wflags = 0;
+    }
+    if ((i->wfile == -1) || (ioctl(i->wfile, w.cmd, &w.data) == -1))
+        return 0;
+#endif /* SYSTEM */
 #endif /* MP_WATCH_SUPPORT */
     return 1;
 }
