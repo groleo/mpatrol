@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.9 2001-03-04 16:46:07 graeme Exp $
+ * $Id: dbmalloc.h,v 1.10 2001-03-04 17:50:55 graeme Exp $
  */
 
 
@@ -125,23 +125,23 @@
  * in this implementation and are here in case user code relies on them.
  */
 
-#define M_CODE_CHAIN_BROKE  1
-#define M_CODE_NO_END       2
-#define M_CODE_BAD_PTR      3
-#define M_CODE_BAD_MAGIC    4
-#define M_CODE_BAD_CONNECT  5
-#define M_CODE_OVERRUN      6
-#define M_CODE_REUSE        7
-#define M_CODE_NOT_INUSE    8
-#define M_CODE_NOMORE_MEM   9
-#define M_CODE_OUTOF_BOUNDS 10
-#define M_CODE_FREELIST_BAD 11
-#define M_CODE_NOBOUND      12
-#define M_CODE_STK_NOCUR    13
-#define M_CODE_STK_BADFUNC  14
-#define M_CODE_UNDERRUN     15
-#define M_CODE_FREEMARK     16
-#define M_CODE_ZERO_ALLOC   17
+#define M_CODE_CHAIN_BROKE  MP_ET_MAX
+#define M_CODE_NO_END       MP_ET_MAX
+#define M_CODE_BAD_PTR      MP_ET_NOTALL
+#define M_CODE_BAD_MAGIC    MP_ET_NOTALL
+#define M_CODE_BAD_CONNECT  MP_ET_MAX
+#define M_CODE_OVERRUN      MP_ET_ALLOVF
+#define M_CODE_REUSE        MP_ET_FRDCOR
+#define M_CODE_NOT_INUSE    MP_ET_PRVFRD
+#define M_CODE_NOMORE_MEM   MP_ET_OUTMEM
+#define M_CODE_OUTOF_BOUNDS MP_ET_RNGOVF
+#define M_CODE_FREELIST_BAD MP_ET_MAX
+#define M_CODE_NOBOUND      MP_ET_MAX
+#define M_CODE_STK_NOCUR    MP_ET_MAX
+#define M_CODE_STK_BADFUNC  MP_ET_MAX
+#define M_CODE_UNDERRUN     MP_ET_ALLOVF
+#define M_CODE_FREEMARK     MP_ET_FREMRK
+#define M_CODE_ZERO_ALLOC   MP_ET_ALLZER
 
 
 /* The union used to supply a command argument to dbmallopt().
@@ -155,6 +155,8 @@ union dbmalloptarg
 
 
 #ifndef NDEBUG
+
+#define malloc_errno __mp_errno
 
 #define dbmallinit() __mp_init_dbmalloc()
 #define dbmallopt(c, v) __mpt_dbmallocoption((c), (v))
@@ -195,6 +197,8 @@ static MP_VOLATILE void *__mpt_init_dbmalloc = (void *) __mp_init_dbmalloc;
 #endif /* __cplusplus */
 
 #else /* NDEBUG */
+
+#define malloc_errno __mp_errno
 
 #define dbmallinit() ((void) 0)
 #define dbmallopt(c, v) ((int) 1)
