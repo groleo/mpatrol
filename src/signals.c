@@ -45,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.19 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: signals.c,v 1.20 2001-01-15 19:06:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -71,9 +71,16 @@ static
 void
 signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
-#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_LYNXOS
-#if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_FREEBSD || \
+    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_NETBSD || \
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+static
+void
+signalhandler(int s, int c, struct sigcontext *n, void *f)
+#elif SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
 static
 void
 signalhandler(int s, struct sigcontext n)
@@ -137,8 +144,10 @@ signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
     __mp_diag("\n");
 #if TARGET == TARGET_UNIX
-#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_IRIX || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
+#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_FREEBSD || \
+    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_NETBSD || \
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -164,6 +173,9 @@ signalhandler(EXCEPTION_POINTERS *e)
         a = NULL;
 #if SYSTEM == SYSTEM_AIX
         a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+        a = f;
 #elif SYSTEM == SYSTEM_IRIX
         a = (void *) ((long) n->sc_badvaddr);
 #elif SYSTEM == SYSTEM_LINUX
