@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.6 1999-12-21 20:14:30 graeme Exp $"
+#ident "$Id: option.c,v 1.7 2000-01-09 20:12:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -149,6 +149,9 @@ static char *options_help[] =
     "REALLOCSTOP", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when a",
     "", "memory allocation is being reallocated.",
+    "SAFESIGNALS", NULL,
+    "", "Instructs the library to save and replace certain signal handlers",
+    "", "during the execution of library code and to restore them afterwards.",
     "SHOWALL", NULL,
     "", "Equivalent to the SHOWFREED, SHOWUNFREED, SHOWMAP and SHOWSYMBOLS",
     "", "options specified together.",
@@ -710,7 +713,15 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     }
                 break;
               case 'S':
-                if (matchoption(o, "SHOWALL"))
+                if (matchoption(o, "SAFESIGNALS"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_SAFESIGNALS;
+                }
+                else if (matchoption(o, "SHOWALL"))
                 {
                     if (*a != '\0')
                         i = OE_IGNARGUMENT;
