@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mprof.1,v 1.14 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: mprof.1,v 1.15 2001-03-22 19:26:28 graeme Exp $
 .\"
-.TH MPROF 1 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH MPROF 1 "22 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mprof \- displays profiling information produced by the mpatrol library
 .SH SYNOPSIS
@@ -70,6 +70,11 @@ differentiated and that the names of all functions should be displayed with
 their call site offset in bytes.  This affects the direct allocation and
 memory leak tables, as well as the allocation call graph and the graph
 specification file.
+.TP
+\fB\-\-call\-graph\fP [\fB\-v\fP]
+Specifies that the allocation call graph should be displayed.  This is not
+displayed by default as it can get very large for even a moderately sized
+profiling output file.
 .TP
 \fB\-\-counts\fP [\fB\-c\fP]
 Specifies that certain tables should be sorted by the number of allocations or
