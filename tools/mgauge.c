@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mgauge.c,v 1.6 2001-07-25 21:58:23 graeme Exp $"
+#ident "$Id: mgauge.c,v 1.7 2001-07-26 15:52:59 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.6 2001-07-25 21:58:23 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.7 2001-07-26 15:52:59 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -125,12 +125,13 @@ updategauge(void)
 
 static
 void
-epilogue(MP_CONST void *p, MP_CONST void *a)
+epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t, unsigned long u,
+         MP_CONST void *a)
 {
     if ((update_count++ % update_frequency) == 0)
         updategauge();
     if (old_epilogue != NULL)
-        old_epilogue(p, a);
+        old_epilogue(p, s, t, u, a);
 }
 
 
