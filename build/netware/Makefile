@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.56 2001-03-07 22:50:33 graeme Exp $
+# $Id: Makefile,v 1.57 2001-03-08 20:13:37 graeme Exp $
 
 
 # Definitions
@@ -103,8 +103,8 @@ mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 mprof.nlm: mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 
-mptrace.nlm: mptrace.obj getopt.obj tree.obj utils.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.obj getopt.obj tree.obj utils.obj version.obj
+mptrace.nlm: mptrace.obj getopt.obj tree.obj slots.obj utils.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.obj getopt.obj tree.obj slots.obj utils.obj version.obj
 
 mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.obj getopt.obj tree.obj version.obj
@@ -307,8 +307,8 @@ mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mptrace.obj: $(SOURCE)/mptrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h \
-	$(SOURCE)/version.h
+	$(SOURCE)/slots.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/utils.h $(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \

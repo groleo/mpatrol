@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.66 2001-03-07 22:50:35 graeme Exp $
+# $Id: Makefile,v 1.67 2001-03-08 20:13:40 graeme Exp $
 
 
 # Definitions
@@ -131,8 +131,8 @@ mpatrol.exe: mpatrol.obj getopt.obj version.obj
 mprof.exe: mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 
-mptrace.exe: mptrace.obj getopt.obj tree.obj utils.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) mptrace.obj getopt.obj tree.obj utils.obj version.obj
+mptrace.exe: mptrace.obj getopt.obj tree.obj slots.obj utils.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mptrace.obj getopt.obj tree.obj slots.obj utils.obj version.obj
 
 mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
@@ -375,8 +375,8 @@ mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mptrace.obj: $(SOURCE)/mptrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h \
-	$(SOURCE)/version.h
+	$(SOURCE)/slots.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/utils.h $(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \

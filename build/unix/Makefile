@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.70 2001-03-07 22:50:34 graeme Exp $
+# $Id: Makefile,v 1.71 2001-03-08 20:13:38 graeme Exp $
 
 
 # Definitions
@@ -191,8 +191,8 @@ mpatrol: mpatrol.o getopt.o version.o
 mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
-mptrace: mptrace.o getopt.o tree.o utils.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o utils.o version.o -L/usr/X11/lib -lXm -lXt -lX11
+mptrace: mptrace.o getopt.o tree.o slots.o utils.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11/lib -lXm -lXt -lX11
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
@@ -445,8 +445,8 @@ mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mptrace.o: $(SOURCE)/mptrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h \
-	$(SOURCE)/version.h
+	$(SOURCE)/slots.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/utils.h $(SOURCE)/version.h
 mleak.o: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
