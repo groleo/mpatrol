@@ -29,12 +29,13 @@
 
 #include "trace.h"
 #include "diag.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.2 2000-11-30 20:38:04 graeme Exp $"
+#ident "$Id: trace.c,v 1.3 2000-11-30 21:03:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -118,9 +119,21 @@ static int opentracefile(tracehead *t)
 
 MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 {
-    if (tracefile == NULL)
-        opentracefile(t);
-    fprintf(tracefile, "A %lu " MP_POINTER " %lu\n", n, a, l);
+    void *b;
+    size_t s;
+
+    if ((tracefile == NULL) && !opentracefile(t))
+        return;
+    fputc('A', tracefile);
+    /* Some of the following values are written as LEB128 numbers.  This is so
+     * that the size of the tracing output file can be kept to a minimum.
+     */
+    b = __mp_encodeuleb128(n, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128((unsigned long) a, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(l, &s);
+    fwrite(b, s, 1, tracefile);
 }
 
 
@@ -129,9 +142,17 @@ MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 
 MP_GLOBAL void __mp_tracefree(tracehead *t, unsigned long n)
 {
-    if (tracefile == NULL)
-        opentracefile(t);
-    fprintf(tracefile, "F %lu\n", n);
+    void *b;
+    size_t s;
+
+    if ((tracefile == NULL) && !opentracefile(t))
+        return;
+    fputc('F', tracefile);
+    /* Some of the following values are written as LEB128 numbers.  This is so
+     * that the size of the tracing output file can be kept to a minimum.
+     */
+    b = __mp_encodeuleb128(n, &s);
+    fwrite(b, s, 1, tracefile);
 }
 
 
