@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.64 2000-05-01 11:13:20 graeme Exp $
+@c $Id: mpatrol.texi,v 1.65 2000-05-01 16:30:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -111,6 +111,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
+* Profiling::                   Memory allocation profiling.
 * Improving performance::       Life beyond mpatrol.
 * How it works::                Implementation details.
 * Examples::                    Examples of usage.
@@ -1304,7 +1305,7 @@ thread has its own local stack.  Care must be taken to write re-entrant
 functions --- i.e. a function will give exactly the same result with one thread
 as it will with multiple threads running it at the same time.
 
-@node Using mpatrol, Improving performance, Operating system support, Top
+@node Using mpatrol, Profiling, Operating system support, Top
 @chapter Using mpatrol
 @cindex using mpatrol
 
@@ -2185,7 +2186,228 @@ over the log file so the file must be randomly-accessible.  If the filename
 argument is given as @samp{-} then the standard input file stream will be used
 as the log file.
 
-@node Improving performance, How it works, Using mpatrol, Top
+@node Profiling, Improving performance, Using mpatrol, Top
+@chapter Profiling
+@cindex profiling
+
+We'll now look at an example of using the mpatrol library to profile the dynamic
+memory allocations in a program.  However, remember that this example will only
+fully work on your machine if the mpatrol library supports call stack traversal
+and reading symbols from executable files on that platform.  If that is not the
+case then only some of the features will be available.
+
+The following example program performs some simple calculations and displays a
+list of numbers on its standard output file stream, but it serves to illustrate
+all of the different features of memory allocation profiling that mpatrol is
+capable of.  The source for the program can also be found in
+@file{tests/profile/test1.c}.
+
+@smallexample
+23  /*
+24   * Associates an integer value with its negative string equivalent in a
+25   * structure, and then allocates 256 such pairs randomly, displays them
+26   * then frees them.
+27   */
+
+
+30  #include <stdio.h>
+31  #include <stdlib.h>
+32  #include <string.h>
+
+
+35  typedef struct pair
+36  @{
+37      int value;
+38      char *string;
+39  @}
+40  pair;
+
+
+43  pair *new_pair(int n)
+44  @{
+45      static char s[16];
+46      pair *p;
+
+48      if ((p = (pair *) malloc(sizeof(pair))) == NULL)
+49      @{
+50          fputs("Out of memory\n", stderr);
+51          exit(EXIT_FAILURE);
+52      @}
+53      p->value = n;
+54      sprintf(s, "%d", -n);
+55      if ((p->string = strdup(s)) == NULL)
+56      @{
+57          fputs("Out of memory\n", stderr);
+58          exit(EXIT_FAILURE);
+59      @}
+60      return p;
+61  @}
+
+
+64  int main(void)
+65  @{
+66      pair *a[256];
+67      int i, n;
+
+69      for (i = 0; i < 256; i++)
+70      @{
+71          n = (int) ((rand() * 256.0) / (RAND_MAX + 1.0)) - 128;
+72          a[i] = new_pair(n);
+73      @}
+74      for (i = 0; i < 256; i++)
+75          printf("%3d: %4d -> \"%s\"\n", i, a[i]->value, a[i]->string);
+76      for (i = 0; i < 256; i++)
+77          free(a[i]);
+78      return EXIT_SUCCESS;
+79  @}
+@end smallexample
+
+After the above program has been compiled and linked with the mpatrol library,
+it should be run with the @option{PROF} option set in the @env{MPATROL_OPTIONS}
+environment variable.  Note that @file{mpatrol.h} was not included as it is not
+necessary for profiling purposes.
+
+If all went well, a list of numbers should be listed on the screen and a file
+called @file{mpatrol.out} should have been produced in the current directory.
+This is a binary file containing the total amount of profiling information that
+the mpatrol library gathered, but it contains compact binary data rather than
+human-readable data.  To make use of this file, the @command{mprof} command must
+be run.  The result of running @command{mprof} with no options is shown below.
+
+@smallexample
+                                ALLOCATION BINS
+
+                             (number of bins: 1024)
+
+                     allocated                          unfreed
+          --------------------------------  --------------------------------
+    size   count       %     bytes       %   count       %     bytes       %
+
+       2       8    1.56        16    0.54       8    3.12        16    1.70
+       3      99   19.34       297    9.94      99   38.67       297   31.60
+       4     118   23.05       472   15.80     118   46.09       472   50.21
+       5      31    6.05       155    5.19      31   12.11       155   16.49
+       8     256   50.00      2048   68.54       0    0.00         0    0.00
+
+   total     512              2988             256               940
+@end smallexample
+
+@smallexample
+                               DIRECT ALLOCATIONS
+
+                    (0 < s <= 32 < m <= 256 < l <= 2048 < x)
+
+          allocated                       unfreed
+-----------------------------  -----------------------------
+   bytes       %   s  m  l  x     bytes       %   s  m  l  x   count  function
+
+    2988  100.00  %%                940  100.00  %%              512  new_pair
+
+    2988          %%                940          %%              512  total
+@end smallexample
+
+@smallexample
+                                  MEMORY LEAKS
+
+                            (maximum stack depth: 1)
+
+                unfreed                      allocated
+----------------------------------------  ----------------
+     %     bytes       %   count       %     bytes   count  function
+
+100.00       940   31.46     256   50.00      2988     512  new_pair
+
+             940   31.46     256   50.00      2988     512  total
+@end smallexample
+
+The first table is labeled @samp{ALLOCATION BINS} and shows a summary of all
+memory allocations, sorted by their size in bytes.  There are 1024 allocation
+bins, one of which is incremented each time a memory allocation is made.
+There are also the same number of corresponding deallocation bins, one of
+which is incremented each time a memory deallocation is made.  The largest
+allocation bin is incremented every time a memory allocation of over 1024
+bytes is made and the total size of all such allocations is recorded.
+
+As can be seen from the allocation bin table, 8 allocations of 2 bytes, 99
+allocations of 3 bytes, 118 allocations of 4 bytes, 31 allocations of 5 bytes
+and 256 allocations of 8 bytes were made during the execution of the program.
+However, all of the memory allocations except the 8 byte allocations were
+unfreed by the time the program terminated, resulting in a total memory leak
+of 940 bytes.
+
+The next table is labeled @samp{DIRECT ALLOCATIONS} and shows a summary of all
+functions that directly allocated memory, sorted by the total number of bytes
+that were allocated by them.  In the example, this table shows us that 2988
+bytes were allocated over 512 calls to allocate memory by @code{new_pair()} and
+that 940 bytes were left unfreed at program termination.  We could choose to
+sort the table by the number of calls to allocate memory rather than the number
+of bytes allocated with the @option{-c} option to @command{mprof}, but that is
+not relevant in this example.
+
+However, we know that there are two calls to allocate memory from
+@code{new_pair()}, so we can use the @option{-a} option to @command{mprof} to
+show all call sites within functions rather than just the total for each
+function.  This option does not affect the allocation bin table so the new
+output from @command{mprof} with the @option{-a} option looks like:
+
+@smallexample
+                               DIRECT ALLOCATIONS
+
+                    (0 < s <= 32 < m <= 256 < l <= 2048 < x)
+
+          allocated                       unfreed
+-----------------------------  -----------------------------
+   bytes       %   s  m  l  x     bytes       %   s  m  l  x   count  function
+
+    2048   68.54  69                  0    0.00                  256  new_pair+14
+     940   31.46  31                940  100.00  %%              256  new_pair+110
+
+    2988          %%                940          %%              512  total
+@end smallexample
+
+@smallexample
+                                  MEMORY LEAKS
+
+                            (maximum stack depth: 1)
+
+                unfreed                      allocated
+----------------------------------------  ----------------
+     %     bytes       %   count       %     bytes   count  function
+
+100.00       940  100.00     256  100.00       940     256  new_pair+110
+
+             940   31.46     256   50.00      2988     512  total
+@end smallexample
+
+Now it is possible to see that the first call to allocate memory from within
+@code{new_pair()} has all of its memory freed, but the second call has none of
+its memory freed.  This is also visible in the next table, labeled
+@samp{MEMORY LEAKS}, which shows the list of functions that allocated memory
+but did not free their memory by program termination.  The default behaviour of
+@command{mprof} is to show only the function that directly allocated the memory
+in the memory leak table, but this can be changed with the @option{-n} option.
+This accepts an argument specifying the maximum number of functions to display
+in one call stack, with zero indicating that all functions in a call stack
+should be displayed in the memory leak table.  The new memory leak table
+displayed by @command{mprof} with the @option{-n0} option looks like:
+
+@smallexample
+                                  MEMORY LEAKS
+
+                            (maximum stack depth: 0)
+
+                unfreed                      allocated
+----------------------------------------  ----------------
+     %     bytes       %   count       %     bytes   count  function
+
+100.00       940  100.00     256  100.00       940     256  new_pair+110
+                                                            main+88
+                                                            _start+68
+
+             940   31.46     256   50.00      2988     512  total
+@end smallexample
+
+@node Improving performance, How it works, Profiling, Top
 @chapter Improving performance
 @cindex improving performance
 @cindex performance improvements
