@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.17 2000-05-16 00:00:16 graeme Exp $"
+#ident "$Id: memory.c,v 1.18 2000-05-16 00:39:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -275,7 +275,7 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
 #endif /* MP_ARRAY_SUPPORT */
     i->align = minalign();
     i->page = pagesize();
-    i->stackdir = stackdirection();
+    i->stackdir = stackdirection(NULL);
     i->prog = progname();
     /* On UNIX, we initially set the memory mapped file handle to be -1 as we
      * default to using sbrk(), even on systems that support the mmap() function
