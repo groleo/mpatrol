@@ -110,6 +110,8 @@ Example 1
     reallocation stop: 0
     free stop:         0
     unfreed abort:     0
+    lower check range: -
+    upper check range: -
     prologue function: <unset>
     epilogue function: <unset>
     handler function:  <unset>
@@ -298,22 +300,24 @@ Example 1
  8  reallocation stop: 0
  9  free stop:         0
 10  unfreed abort:     0
-11  prologue function: <unset>
-12  epilogue function: <unset>
-13  handler function:  <unset>
-14  log file:          mpatrol.log
-15  program filename:  /proc/729/object/a.out
-16  symbols read:      3240
-17  allocation count:  13
-18  allocation peak:   4720 bytes
-19  allocation limit:  0 bytes
-20  allocated blocks:  1 (16 bytes)
-21  freed blocks:      0 (0 bytes)
-22  free blocks:       1 (8176 bytes)
-23  internal blocks:   25 (204800 bytes)
-24  total heap usage:  212992 bytes
-25  total warnings:    0
-26  total errors:      1
+11  lower check range: -
+12  upper check range: -
+13  prologue function: <unset>
+14  epilogue function: <unset>
+15  handler function:  <unset>
+16  log file:          mpatrol.log
+17  program filename:  /proc/729/object/a.out
+18  symbols read:      3240
+19  allocation count:  13
+20  allocation peak:   4720 bytes
+21  allocation limit:  0 bytes
+22  allocated blocks:  1 (16 bytes)
+23  freed blocks:      0 (0 bytes)
+24  free blocks:       1 (8176 bytes)
+25  internal blocks:   25 (204800 bytes)
+26  total heap usage:  212992 bytes
+27  total warnings:    0
+28  total errors:      1
     ----------------------------------------------------------------------------
 
      1. System page size.  This value is used on some platforms when allocating
@@ -357,52 +361,62 @@ Example 1
         the program to abort with an error.  It can be changed at run-time using
         the UNFREEDABORT option.
 
-    11. Prologue function.
-    12. Epilogue function.
-    13. Handler function.  These values contain addresses or names of functions
+    11. Lower check range.
+    12. Upper check range.  These values specify the range of allocation indices
+        through which the library will physically check every area of free
+        memory and every overflow buffer for errors.  A dash specifies that
+        either the lower or upper range is infinite, but if they are both zero
+        then no such checking will ever be performed, thus speeding up execution
+        speed dramatically.  The library defaults to performing checks for every
+        allocation index.  These can be changed at run-time using the CHECK
+        option.
+
+    13. Prologue function.
+    14. Epilogue function.
+    15. Handler function.  These values contain addresses or names of functions
         that have been installed as callback functions for the library.  These
         functions, if set, will be called from the library at appropriate times
         during program execution in order to handle specific events.  These can
         be changed at compile-time using the __mp_prologue(), __mp_epilogue()
         and __mp_nomemory() functions.
 
-    14. Log file.  Simply contains the name of the file where all mpatrol
+    16. Log file.  Simply contains the name of the file where all mpatrol
         library diagnostics go to.  It can be changed at run-time using the
         LOGFILE option.
 
-    15. Program filename.  Contains the full pathname to the program's
+    17. Program filename.  Contains the full pathname to the program's
         executable file.  This is used by the mpatrol library to read the
         symbol table in order to provide symbolic information in function call
         stacks.  It can be changed at run-time using the PROGFILE option.
 
-    16. Symbols read.  This value contains the total number of symbols read
+    18. Symbols read.  This value contains the total number of symbols read
         from a program's executable file and/or the dynamic linker, if
         applicable.
 
-    17. Allocation count.  This value contains the total number of memory
+    19. Allocation count.  This value contains the total number of memory
         allocations that were created by the mpatrol library.  This value may
         be more than expected if the mpatrol library makes any memory
         allocations during initialisation.
 
-    18. Allocation peak.  This value contains the peak memory usage set by the
+    20. Allocation peak.  This value contains the peak memory usage set by the
         program when running.  This value may be more than expected if the
         mpatrol library makes any memory allocations during initialisation.
 
-    19. Allocation limit.  This value is used to limit the amount of memory
+    21. Allocation limit.  This value is used to limit the amount of memory
         that can be allocated by a program, which can be useful for
         stress-testing in simulated low memory conditions.  It can be changed
         at run-time using the LIMIT option.
 
-    20. Allocated blocks.
-    21. Freed blocks.
-    22. Free blocks.  These values contain the total number of allocated, freed
+    22. Allocated blocks.
+    23. Freed blocks.
+    24. Free blocks.  These values contain the total number of allocated, freed
         and free blocks at the time the summary was produced.  A freed block is
         an allocated block that has been freed but has not been returned to the
         free memory list for later allocation.  These values may be different
         from those expected if the mpatrol library makes any memory allocations
         during initialisation.
 
-    23. Internal blocks.  This value contains the total number of memory blocks
+    25. Internal blocks.  This value contains the total number of memory blocks
         (of varying sizes) that have been allocated from the system for the
         mpatrol library to use internally.  These memory blocks will be
         write-protected on systems that support memory protection in order to
@@ -410,11 +424,11 @@ Example 1
         can be overridden at run-time using the NOPROTECT option in order to
         speed up program execution slightly.
 
-    24. Total heap usage.  This value contains the total amount of system heap
+    26. Total heap usage.  This value contains the total amount of system heap
         memory that has been allocated by the mpatrol library.
 
-    25. Total warnings.
-    26. Total errors.  The library keeps a count of the total number of warnings
+    27. Total warnings.
+    28. Total errors.  The library keeps a count of the total number of warnings
         and errors it has displayed so that you can quickly work out this
         information at program termination.
 
@@ -743,6 +757,16 @@ Example 4
     are larger then they'll take longer to check and will use up more memory.
     However, larger buffers mean that there is less chance of the program
     writing past one memory allocation into another.
+
+    Alternatively, the CHECK option can be used to limit the number of checks
+    that the library has to perform, thus speeding up program execution.  This
+    option specifies a range of allocation indices through which the library
+    will check overflow buffers and free memory for corruption.  Such checks
+    occur when they normally would, but only if the current allocation index
+    falls within the specified range.  This feature can be used when there is a
+    suspicion that free memory corruption or overflow buffer corruption occurs
+    at a certain point during program execution, but checking them at every
+    library call would take too long.
 
     On systems which support software watch points, there is an extra option
     called OFLOWWATCH which allows additional memory protection.  Watch points

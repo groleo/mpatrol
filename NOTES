@@ -298,7 +298,8 @@ Library performance
     these times can only be an approximation, but should serve to illustrate the
     effects on performance that each option can have.  All times are given in
     seconds, and the second time on each line was obtained with the same
-    options plus the NOPROTECT option.
+    options plus the NOPROTECT option.  Running with the CHECK=0 option would
+    speed things up dramatically, albeit at the expense of less error checking.
 
       * [no options]
             0.748   0.396

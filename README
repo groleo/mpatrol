@@ -106,7 +106,9 @@ Overview of features
         value to pre-fill them with can be modified at run-time.  The checks
         will be performed before every memory allocation call to ensure that
         nothing has overwritten the overflow buffers, but a function is also
-        provided to perform additional checks under the programmer's control.
+        provided to perform additional checks under the programmer's control
+        and an option exists to specify a range in which checks will be
+        performed.
 
       * On systems that support them, watch point areas can be used instead of
         overflow buffers so that every read and write to memory is checked to
@@ -117,7 +119,8 @@ Overview of features
         be modified at run-time.  The check will be performed before every
         memory allocation call to ensure that nothing has overwritten the free
         memory block, but a function is also provided to perform additional
-        checks under the programmer's control.
+        checks under the programmer's control and an option exists to specify a
+        range in which checks will be performed.
 
       * On systems that support memory protection, every memory allocation can
         optionally be allocated at least one page of memory.  That way, any
