@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.23 2001-07-19 21:47:23 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.24 2001-07-19 22:52:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.23 2001-07-19 21:47:23 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.24 2001-07-19 22:52:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1212,7 +1212,7 @@ main(int argc, char **argv)
 #endif /* MP_GUI_SUPPORT */
     s = t = NULL;
     e = h = v = 0;
-    progname = argv[0];
+    progname = __mp_basename(argv[0]);
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)

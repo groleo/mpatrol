@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.29 2001-06-07 17:59:05 graeme Exp $"
+#ident "$Id: mprof.c,v 1.30 2001-07-19 22:52:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.29 2001-06-07 17:59:05 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.30 2001-07-19 22:52:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1436,7 +1436,7 @@ main(int argc, char **argv)
     e = h = v = 0;
     r = EXIT_SUCCESS;
     maxstack = 1;
-    progname = argv[0];
+    progname = __mp_basename(argv[0]);
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)

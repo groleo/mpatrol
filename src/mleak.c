@@ -41,9 +41,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.11 2001-04-26 22:57:46 graeme Exp $"
+#ident "$Id: mleak.c,v 1.12 2001-07-19 22:52:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.11 2001-04-26 22:57:46 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.12 2001-07-19 22:52:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -397,7 +397,7 @@ main(int argc, char **argv)
 
     e = h = v = 0;
     maxstack = ~0;
-    progname = argv[0];
+    progname = __mp_basename(argv[0]);
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)

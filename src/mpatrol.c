@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.38 2001-06-12 17:54:45 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.39 2001-07-19 22:52:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.38 2001-06-12 17:54:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.39 2001-07-19 22:52:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -620,7 +620,7 @@ main(int argc, char **argv)
     int c, d, e, h, r, t, v, w;
 
     d = e = h = r = t = v = w = 0;
-    progname = argv[0];
+    progname = __mp_basename(argv[0]);
     if ((a = getenv(MP_LOGDIR)) && (*a != '\0'))
         logfile = "%n.%p.log";
     else
