@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.31 2000-07-24 20:02:07 graeme Exp $
+# $Id: Makefile,v 1.32 2000-09-25 18:37:36 graeme Exp $
 
 
 # Definitions
@@ -91,8 +91,8 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
+$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY)mt.def
+	$(LD) -dll -nologo -def:$(LIBRARY)mt.def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
 
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
