@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.7 2000-04-19 19:58:46 graeme Exp $"
+#ident "$Id: profile.c,v 1.8 2000-04-19 20:39:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -53,6 +53,7 @@ MP_GLOBAL void __mp_newprofile(profhead *p)
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;
     p->acountl = p->dcountl = 0;
+    p->acountt = p->dcountt = 0;
     p->acount = p->dcount = 0;
     p->sbound = MP_SMALLBOUND;
     p->mbound = MP_MEDIUMBOUND;
@@ -81,6 +82,7 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;
     p->acountl = p->dcountl = 0;
+    p->acountt = p->dcountt = 0;
     p->acount = p->dcount = 0;
     p->file = NULL;
     p->profiling = 0;
@@ -103,6 +105,7 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
         p->acounts[MP_BIN_SIZE - 1]++;
         p->acountl += l;
     }
+    p->acountt += l;
     p->acount++;
     return 1;
 }
@@ -124,6 +127,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
         p->dcounts[MP_BIN_SIZE - 1]++;
         p->dcountl += l;
     }
+    p->dcountt += l;
     p->dcount++;
     return 1;
 }
