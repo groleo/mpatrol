@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.35 2000-05-14 12:43:04 graeme Exp $"
+#ident "$Id: inter.c,v 1.36 2000-05-23 21:52:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,7 +92,7 @@ static void savesignals(void)
     if (!memhead.recur)
     {
 #if MP_THREADS_SUPPORT
-        __mp_lockmutex();
+        __mp_lockmutex(MT_MAIN);
 #endif /* MP_THREADS_SUPPORT */
         if (!memhead.init)
             __mp_initsignals(&memhead.signals);
@@ -116,7 +116,7 @@ static void restoresignals(void)
     {
         __mp_restoresignals(&memhead.signals);
 #if MP_THREADS_SUPPORT
-        __mp_unlockmutex();
+        __mp_unlockmutex(MT_MAIN);
 #endif /* MP_THREADS_SUPPORT */
     }
 }
@@ -256,7 +256,7 @@ void __mp_fini(void)
         __mp_deleteinfo(&memhead);
 #endif /* MP_DELETE */
 #if MP_THREADS_SUPPORT
-        __mp_deletemutex();
+        __mp_finimutexes();
 #endif /* MP_THREADS_SUPPORT */
         memhead.init = 0;
     }
