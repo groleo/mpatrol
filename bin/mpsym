@@ -26,12 +26,12 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.9 2001-08-23 23:10:59 graeme Exp $
+# $Id: mpsym,v 1.10 2001-09-03 23:34:26 graeme Exp $
 
 
 # Program version.
 
-VERSION="1.2"
+VERSION="1.3"
 
 
 # The following value must match how pointers are formatted in the mpatrol
@@ -248,12 +248,9 @@ else
     # highly unlikely to appear in either a symbol name or a file name.
 
     gdb --batch --nx --command "$dbtemp" "$progfile" 2>/dev/null |
-        sed -n 's/>:.*$/>/p' |
-        ( while read addr sym
-          do
-              printf "s;\\t$POINTER;\\t$POINTER |%s|;\n" "$addr" "$addr" "$sym"
-          done ) |
-        sed -e 's/|<//' -e 's/>|//' >"$edtemp"
+        sed -n 's/>:.*$//p' | sed 's/ </|/' |
+        awk 'BEGIN { FS = "|"; }
+             { printf("s;\t'$POINTER';\t'$POINTER' %s;\n", $1, $1, $2); }' >$edtemp
 
     # Finally, scan through the mpatrol log file again, this time replacing any
     # existing symbols that appear after any code addresses with the new symbol
