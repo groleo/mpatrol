@@ -41,11 +41,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.2 2000-09-25 18:21:19 graeme Exp $"
+#ident "$Id: mleak.c,v 1.3 2000-09-25 21:47:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.1" /* the current version of this program */
+#define VERSION "1.2" /* the current version of this program */
 
 
 /* Structure containing the allocation details and log file offset for a
@@ -90,6 +90,17 @@ static long fileoffset;
  */
 
 static char *progname;
+
+
+/* The table describing all recognised options.
+ */
+
+static option options_table[] =
+{
+    {"version", 'V', NULL,
+     "\tDisplays the version number of this program.\n"},
+    NULL
+};
 
 
 /* Create a new memory allocation and record its log file offset.
@@ -293,7 +304,7 @@ int main(int argc, char **argv)
 
     e = v = 0;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "V", NULL)) != EOF)
+    while ((c = __mp_getopt(argc, argv, "V", options_table)) != EOF)
         switch (c)
         {
           case 'V':
@@ -317,7 +328,8 @@ int main(int argc, char **argv)
     }
     if ((argc > 1) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [-V] [file]\n", progname);
+        fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
+        __mp_showopts(options_table);
         exit(EXIT_FAILURE);
     }
     if (argc == 1)
