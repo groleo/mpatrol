@@ -82,6 +82,7 @@ typedef enum alloctype
     AT_DELETEVEC, /* operator delete[] */
     AT_MEMSET,    /* memset() */
     AT_BZERO,     /* bzero() */
+    AT_MEMCCPY,   /* memccpy() */
     AT_MEMCPY,    /* memcpy() */
     AT_MEMMOVE,   /* memmove() */
     AT_BCOPY,     /* bcopy() */

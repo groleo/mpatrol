@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.15 2000-05-14 11:37:27 graeme Exp $"
+#ident "$Id: malloc.c,v 1.16 2000-05-14 11:58:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -325,19 +325,43 @@ void MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 #endif /* MP_ALTFUNCNAMES */
 
 
+/* Copy a possibly-overlapping block of memory from one address to another,
+ * stopping when a specific character is found.
+ */
+
+void *memccpy(void *q, MP_CONST void *p, int c, size_t l)
+{
+    return __mp_copymem((void *) p, q, l, (unsigned char) c, AT_MEMCCPY, NULL,
+                        NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+/* Copy a possibly-overlapping block of memory from one address to another,
+ * stopping when a specific character is found.
+ */
+
+void *MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
+{
+    return __mp_copymem((void *) p, q, l, (unsigned char) c, AT_MEMCCPY, NULL,
+                        NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
 /* Copy a non-overlapping block of memory from one address to another.
  */
 
 void *memcpy(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, -1, AT_MEMCPY, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, 0, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, -1, AT_MEMCPY, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, 0, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -347,14 +371,14 @@ void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 
 void *memmove(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, -1, AT_MEMMOVE, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, 0, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, -1, AT_MEMMOVE, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, 0, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -364,14 +388,14 @@ void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 
 void bcopy(MP_CONST void *p, void *q, size_t l)
 {
-    __mp_copymem((void *) p, q, l, -1, AT_BCOPY, NULL, NULL, 0, 1);
+    __mp_copymem((void *) p, q, l, 0, AT_BCOPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 {
-    __mp_copymem((void *) p, q, l, -1, AT_BCOPY, NULL, NULL, 0, 1);
+    __mp_copymem((void *) p, q, l, 0, AT_BCOPY, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.24 2000-05-10 19:50:48 graeme Exp $"
+#ident "$Id: diag.c,v 1.25 2000-05-14 11:57:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,6 +105,7 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "operator delete[]",
     "memset",
     "bzero",
+    "memccpy",
     "memcpy",
     "memmove",
     "bcopy",

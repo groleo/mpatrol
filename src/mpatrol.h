@@ -180,6 +180,7 @@ typedef enum __mp_alloctype
     MP_AT_DELETEVEC, /* operator delete[] */
     MP_AT_MEMSET,    /* memset() */
     MP_AT_BZERO,     /* bzero() */
+    MP_AT_MEMCCPY,   /* memccpy() */
     MP_AT_MEMCPY,    /* memcpy() */
     MP_AT_MEMMOVE,   /* memmove() */
     MP_AT_BCOPY,     /* bcopy() */
@@ -274,6 +275,9 @@ __mp_allocinfo;
 #ifdef bzero
 #undef bzero
 #endif /* bzero */
+#ifdef memccpy
+#undef memccpy
+#endif /* memccpy */
 #ifdef memcpy
 #undef memcpy
 #endif /* memcpy */
@@ -335,15 +339,19 @@ __mp_allocinfo;
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define cfree(p, l, n) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, \
                                  __LINE__, 0)
-#define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), MP_AT_MEMSET, \
-                                    MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), \
+                                    MP_AT_MEMSET, MP_FUNCNAME, __FILE__, \
+                                    __LINE__, 0)
 #define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, MP_FUNCNAME, \
                                        __FILE__, __LINE__, 0)
-#define memcpy(q, p, l) __mp_copymem((p), (q), (l), -1, MP_AT_MEMCPY, \
+#define memccpy(q, p, c, l) __mp_copymem((p), (q), (l), (unsigned char) (c), \
+                                         MP_AT_MEMCCPY, MP_FUNCNAME, __FILE__, \
+                                         __LINE__, 0)
+#define memcpy(q, p, l) __mp_copymem((p), (q), (l), 0, MP_AT_MEMCPY, \
                                      MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define memmove(q, p, l) __mp_copymem((p), (q), (l), -1, MP_AT_MEMMOVE, \
+#define memmove(q, p, l) __mp_copymem((p), (q), (l), 0, MP_AT_MEMMOVE, \
                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), -1, MP_AT_BCOPY, \
+#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), 0, MP_AT_BCOPY, \
                                            MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (size_t) (c), \
                                        MP_AT_MEMCHR, MP_FUNCNAME, __FILE__, \
@@ -374,8 +382,9 @@ void __mp_free(void *, __mp_alloctype, MP_CONST char *, MP_CONST char *,
                unsigned long, size_t);
 void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype,
                   MP_CONST char *, MP_CONST char *, unsigned long, size_t);
-void *__mp_copymem(MP_CONST void *, void *, size_t, int, __mp_alloctype,
-                   MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+void *__mp_copymem(MP_CONST void *, void *, size_t, unsigned char,
+                   __mp_alloctype, MP_CONST char *, MP_CONST char *,
+                   unsigned long, size_t);
 void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
                      __mp_alloctype, MP_CONST char *, MP_CONST char *,
                      unsigned long, size_t);
