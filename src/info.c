@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.82 2001-04-26 22:56:48 graeme Exp $"
+#ident "$Id: info.c,v 1.83 2001-05-17 07:37:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.82 2001-04-26 22:56:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.83 2001-05-17 07:37:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -479,7 +479,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                  * allocations made by alloca(), strdupa() or strndupa() that
                  * are now out of scope.
                  */
-                g->data.frame = (void *) &v->frame;
+                g->data.frame = (void *) &v->stack->frame;
 #endif /* MP_FULLSTACK */
             }
             else
