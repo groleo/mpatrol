@@ -27,13 +27,22 @@
 
 
 #include "getopt.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#if TARGET == TARGET_UNIX
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#elif TARGET == TARGET_WINDOWS
+#include <process.h>
+#endif /* TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.7 2000-04-06 00:25:51 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.8 2000-04-06 17:59:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -321,11 +330,19 @@ int main(int argc, char **argv)
 #if MP_PRELOAD_SUPPORT
     static char p[256];
 #endif /* MP_PRELOAD_SUPPORT */
+#if TARGET == TARGET_UNIX
+    pid_t f;
+#else /* TARGET */
+#if TARGET == TARGET_WINDOWS
+    char **s;
+#else /* TARGET */
     char *s;
+#endif /* TARGET */
     size_t i, l;
+#endif /* TARGET */
     int c, d, e, r, v;
 
-    d = e = v = 0;
+    d = e = r = v = 0;
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     while ((c = __mp_getopt(argc, argv,
@@ -426,12 +443,23 @@ int main(int argc, char **argv)
     argc -= __mp_optindex;
     argv += __mp_optindex;
     if (v == 1)
-        fprintf(stderr, "%s %s\n", progname, VERSION);
+    {
+        fprintf(stderr, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fputs("This is free software, and you are welcome to redistribute it "
+              "under certain\n", stderr);
+        fputs("conditions; see the GNU Library General Public License for "
+              "details.\n\n", stderr);
+        fputs("For the latest mpatrol release and documentation,\n", stderr);
+        fprintf(stderr, "visit %s.\n\n", __mp_homepage);
+    }
     if ((argc == 0) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [options] <command> [arguments]\n\n",
-                progname);
-        showoptions();
+        if ((v == 0) || (e == 1))
+        {
+            fprintf(stderr, "Usage: %s [options] <command> [arguments]\n\n",
+                    progname);
+            showoptions();
+        }
         exit(EXIT_FAILURE);
     }
     setoptions();
@@ -455,14 +483,81 @@ int main(int argc, char **argv)
         }
     }
 #endif /* MP_PRELOAD_SUPPORT */
-    /* We now prepare to run the command that is to be tested.  Because we
-     * are using system() to run the command, we need to ensure that all
-     * arguments that contain spaces are correctly quoted.  We also need to
-     * convert the argument array to a string, so we perform two passes.
-     * The first pass counts the number of characters required for the final
-     * command string and allocates that amount of memory from the heap.
-     * The second pass then fills in the command string and executes the
-     * command.
+    /* Prepare to run the command that is to be tested.  We return the exit
+     * status from the command after it has been run in case it was originally
+     * run from a script.
+     */
+    fflush(NULL);
+#if TARGET == TARGET_UNIX
+    /* We need to use the fork() and execvp() combination on UNIX platforms
+     * in case we are using the -d option, in which case we cannot use system()
+     * since that will use the shell to invoke the command, possibly resulting
+     * in an extra log file tracing the shell itself.
+     */
+    if ((f = fork()) < 0)
+    {
+        fprintf(stderr, "%s: Cannot create process\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    if (f == 0)
+    {
+        execvp(argv[0], argv);
+        fprintf(stderr, "%s: Cannot execute command `%s'\n", progname, argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    while (waitpid(f, &r, 0) < 0)
+        if (errno != EINTR)
+        {
+            fprintf(stderr, "%s: Process could not be created\n", progname);
+            exit(EXIT_FAILURE);
+        }
+    if (!WIFEXITED(r))
+        exit(EXIT_FAILURE);
+    r = WEXITSTATUS(r);
+#elif TARGET == TARGET_WINDOWS
+    /* To avoid extra overhead we call the spawnvp() function on Windows
+     * platforms.  However, for some strange reason, it concatenates all
+     * of its arguments into a single string with spaces in between arguments,
+     * but does NOT quote arguments with spaces in them!  For that reason,
+     * we'll have to do some extra work here.
+     */
+    if ((s = (char **) calloc(argc + 1, sizeof(char *))) == NULL)
+    {
+        fprintf(stderr, "%s: Out of memory\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    for (i = 0; i < argc; i++)
+        if (strchr(argv[i], ' '))
+        {
+            l = strlen(argv[i]) + 3;
+            if ((s[i] = (char *) malloc(l)) == NULL)
+            {
+                fprintf(stderr, "%s: Out of memory\n", progname);
+                exit(EXIT_FAILURE);
+            }
+            sprintf(s[i], "\"%s\"", argv[i]);
+        }
+        else if ((s[i] = strdup(argv[i])) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+    if ((r = spawnvp(_P_WAIT, s[0], s)) == -1)
+    {
+        fprintf(stderr, "%s: Cannot execute command `%s'\n", progname, argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    for (i = 0; i < argc; i++)
+        free(s[i]);
+    free(s);
+#else /* TARGET */
+    /* Because we are using system() to run the command, we need to ensure
+     * that all arguments that contain spaces are correctly quoted.  We also
+     * need to convert the argument array to a string, so we perform two
+     * passes.  The first pass counts the number of characters required for
+     * the final command string and allocates that amount of memory from the
+     * heap.  The second pass then fills in the command string and executes
+     * the command.
      */
     for (i = l = 0; i < argc; i++)
     {
@@ -492,5 +587,6 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     free(s);
-    return ((unsigned int) r >> 8) & 0xFF;
+#endif /* TARGET */
+    return r;
 }

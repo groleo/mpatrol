@@ -34,13 +34,14 @@
 
 #include "tree.h"
 #include "getopt.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memleak.c,v 1.3 2000-04-05 19:17:43 graeme Exp $"
+#ident "$Id: memleak.c,v 1.4 2000-04-06 17:59:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -305,7 +306,15 @@ int main(int argc, char **argv)
     argc -= __mp_optindex;
     argv += __mp_optindex;
     if (v == 1)
-        fprintf(stderr, "%s %s\n", progname, VERSION);
+    {
+        fprintf(stderr, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fputs("This is free software, and you are welcome to redistribute it "
+              "under certain\n", stderr);
+        fputs("conditions; see the GNU Library General Public License for "
+              "details.\n\n", stderr);
+        fputs("For the latest mpatrol release and documentation,\n", stderr);
+        fprintf(stderr, "visit %s.\n\n", __mp_homepage);
+    }
     if ((argc > 1) || (e == 1))
     {
         fprintf(stderr, "Usage: %s [-V] [file]\n", progname);
