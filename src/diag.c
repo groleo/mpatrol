@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.33 2000-10-30 23:34:17 graeme Exp $"
+#ident "$Id: diag.c,v 1.34 2000-11-02 18:17:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -85,6 +85,7 @@ static unsigned long errors, warnings;
 
 MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 {
+    "alloca",
     "malloc",
     "calloc",
     "memalign",

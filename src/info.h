@@ -64,6 +64,7 @@
 
 typedef enum alloctype
 {
+    AT_ALLOCA,    /* alloca() */
     AT_MALLOC,    /* malloc() */
     AT_CALLOC,    /* calloc() */
     AT_MEMALIGN,  /* memalign() */

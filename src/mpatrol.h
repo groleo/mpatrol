@@ -52,7 +52,9 @@
  */
 
 #ifndef MP_FUNCNAME
-#ifdef __GNUC__
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
+#define MP_FUNCNAME __func__
+#elif defined(__GNUC__)
 #define MP_FUNCNAME __PRETTY_FUNCTION__
 #else /* __GNUC__ */
 #define MP_FUNCNAME NULL
@@ -162,6 +164,7 @@
 
 typedef enum __mp_alloctype
 {
+    MP_AT_ALLOCA,    /* alloca() */
     MP_AT_MALLOC,    /* malloc() */
     MP_AT_CALLOC,    /* calloc() */
     MP_AT_MEMALIGN,  /* memalign() */
