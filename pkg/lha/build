@@ -21,7 +21,7 @@
 ; Amiga shell script to build an LhA distribution file
 
 
-; $Id: build,v 1.35 2001-01-03 21:38:12 graeme Exp $
+; $Id: build,v 1.36 2001-01-04 21:28:44 graeme Exp $
 
 
 ; Build both the GCC and SAS/C versions of the mpatrol library.
@@ -96,6 +96,7 @@ Copy //man/dvi/mptrace.dvi mpatrol/doc/man/dvi
 Copy //man/dvi/mleak.dvi mpatrol/doc/man/dvi
 Copy //man/dvi/mpsym.dvi mpatrol/doc/man/dvi
 Copy //man/dvi/mpedit.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/hexwords.dvi mpatrol/doc/man/dvi
 Copy //man/dvi/libmpatrol.dvi mpatrol/doc/man/dvi
 MakeDir mpatrol/doc/man/ps
 Copy //man/ps/mpatrol.ps mpatrol/doc/man/ps
@@ -104,6 +105,7 @@ Copy //man/ps/mptrace.ps mpatrol/doc/man/ps
 Copy //man/ps/mleak.ps mpatrol/doc/man/ps
 Copy //man/ps/mpsym.ps mpatrol/doc/man/ps
 Copy //man/ps/mpedit.ps mpatrol/doc/man/ps
+Copy //man/ps/hexwords.ps mpatrol/doc/man/ps
 Copy //man/ps/libmpatrol.ps mpatrol/doc/man/ps
 MakeDir mpatrol/doc/man/pdf
 Copy //man/pdf/mpatrol.pdf mpatrol/doc/man/pdf
@@ -112,6 +114,7 @@ Copy //man/pdf/mptrace.pdf mpatrol/doc/man/pdf
 Copy //man/pdf/mleak.pdf mpatrol/doc/man/pdf
 Copy //man/pdf/mpsym.pdf mpatrol/doc/man/pdf
 Copy //man/pdf/mpedit.pdf mpatrol/doc/man/pdf
+Copy //man/pdf/hexwords.pdf mpatrol/doc/man/pdf
 Copy //man/pdf/libmpatrol.pdf mpatrol/doc/man/pdf
 MakeDir mpatrol/extra
 Copy //extra/.profile mpatrol/extra
@@ -137,6 +140,7 @@ Copy //man/cat1/mptrace.1 mpatrol/man/cat1
 Copy //man/cat1/mleak.1 mpatrol/man/cat1
 Copy //man/cat1/mpsym.1 mpatrol/man/cat1
 Copy //man/cat1/mpedit.1 mpatrol/man/cat1
+Copy //man/cat1/hexwords.1 mpatrol/man/cat1
 MakeDir mpatrol/man/man1
 Copy //man/man1/mpatrol.1 mpatrol/man/man1
 Copy //man/man1/mprof.1 mpatrol/man/man1
@@ -144,6 +148,7 @@ Copy //man/man1/mptrace.1 mpatrol/man/man1
 Copy //man/man1/mleak.1 mpatrol/man/man1
 Copy //man/man1/mpsym.1 mpatrol/man/man1
 Copy //man/man1/mpedit.1 mpatrol/man/man1
+Copy //man/man1/hexwords.1 mpatrol/man/man1
 MakeDir mpatrol/man/cat3
 Copy //man/cat3/libmpatrol.3 mpatrol/man/cat3
 MakeDir mpatrol/man/man3

@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.49 2001-01-03 21:38:15 graeme Exp $
+# $Id: mpatrol.spec,v 1.50 2001-01-04 21:28:46 graeme Exp $
 
 
 %define libversion 1.3
@@ -99,6 +99,7 @@ install -m644 man/man1/mptrace.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mleak.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpsym.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpedit.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/hexwords.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
 install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 

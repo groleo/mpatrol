@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.24 2001-01-03 21:38:19 graeme Exp $
+rem $Id: build.bat,v 1.25 2001-01-04 21:28:49 graeme Exp $
 
 
 set version=1.3.2
@@ -106,6 +106,7 @@ copy ..\..\man\dvi\mptrace.dvi mpatrol\doc\man\dvi
 copy ..\..\man\dvi\mleak.dvi mpatrol\doc\man\dvi
 copy ..\..\man\dvi\mpsym.dvi mpatrol\doc\man\dvi
 copy ..\..\man\dvi\mpedit.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\hexwords.dvi mpatrol\doc\man\dvi
 copy ..\..\man\dvi\libmpatrol.dvi mpatrol\doc\man\dvi
 mkdir mpatrol\doc\man\ps
 copy ..\..\man\ps\mpatrol.ps mpatrol\doc\man\ps
@@ -114,6 +115,7 @@ copy ..\..\man\ps\mptrace.ps mpatrol\doc\man\ps
 copy ..\..\man\ps\mleak.ps mpatrol\doc\man\ps
 copy ..\..\man\ps\mpsym.ps mpatrol\doc\man\ps
 copy ..\..\man\ps\mpedit.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\hexwords.ps mpatrol\doc\man\ps
 copy ..\..\man\ps\libmpatrol.ps mpatrol\doc\man\ps
 mkdir mpatrol\doc\man\pdf
 copy ..\..\man\pdf\mpatrol.pdf mpatrol\doc\man\pdf
@@ -122,6 +124,7 @@ copy ..\..\man\pdf\mptrace.pdf mpatrol\doc\man\pdf
 copy ..\..\man\pdf\mleak.pdf mpatrol\doc\man\pdf
 copy ..\..\man\pdf\mpsym.pdf mpatrol\doc\man\pdf
 copy ..\..\man\pdf\mpedit.pdf mpatrol\doc\man\pdf
+copy ..\..\man\pdf\hexwords.pdf mpatrol\doc\man\pdf
 copy ..\..\man\pdf\libmpatrol.pdf mpatrol\doc\man\pdf
 mkdir mpatrol\include
 copy ..\..\src\mpatrol.h mpatrol\include
@@ -140,6 +143,7 @@ copy ..\..\man\cat1\mptrace.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mleak.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mpsym.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mpedit.1 mpatrol\man\cat1
+copy ..\..\man\cat1\hexwords.1 mpatrol\man\cat1
 mkdir mpatrol\man\man1
 copy ..\..\man\man1\mpatrol.1 mpatrol\man\man1
 copy ..\..\man\man1\mprof.1 mpatrol\man\man1
@@ -147,6 +151,7 @@ copy ..\..\man\man1\mptrace.1 mpatrol\man\man1
 copy ..\..\man\man1\mleak.1 mpatrol\man\man1
 copy ..\..\man\man1\mpsym.1 mpatrol\man\man1
 copy ..\..\man\man1\mpedit.1 mpatrol\man\man1
+copy ..\..\man\man1\hexwords.1 mpatrol\man\man1
 mkdir mpatrol\man\cat3
 copy ..\..\man\cat3\libmpatrol.3 mpatrol\man\cat3
 mkdir mpatrol\man\man3

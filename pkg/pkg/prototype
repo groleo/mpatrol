@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.36 2001-01-03 21:38:14 graeme Exp $
+# $Id: prototype,v 1.37 2001-01-04 21:28:45 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -80,6 +80,7 @@ f none doc/mpatrol/dvi/mptrace.dvi 0664 bin bin
 f none doc/mpatrol/dvi/mleak.dvi 0664 bin bin
 f none doc/mpatrol/dvi/mpsym.dvi 0664 bin bin
 f none doc/mpatrol/dvi/mpedit.dvi 0664 bin bin
+f none doc/mpatrol/dvi/hexwords.dvi 0664 bin bin
 f none doc/mpatrol/dvi/libmpatrol.dvi 0664 bin bin
 d none doc/mpatrol/ps 0775 bin bin
 f none doc/mpatrol/ps/mpatrol.ps 0664 bin bin
@@ -88,6 +89,7 @@ f none doc/mpatrol/ps/mptrace.ps 0664 bin bin
 f none doc/mpatrol/ps/mleak.ps 0664 bin bin
 f none doc/mpatrol/ps/mpsym.ps 0664 bin bin
 f none doc/mpatrol/ps/mpedit.ps 0664 bin bin
+f none doc/mpatrol/ps/hexwords.ps 0664 bin bin
 f none doc/mpatrol/ps/libmpatrol.ps 0664 bin bin
 d none doc/mpatrol/pdf 0775 bin bin
 f none doc/mpatrol/pdf/mpatrol.pdf 0664 bin bin
@@ -96,6 +98,7 @@ f none doc/mpatrol/pdf/mptrace.pdf 0664 bin bin
 f none doc/mpatrol/pdf/mleak.pdf 0664 bin bin
 f none doc/mpatrol/pdf/mpsym.pdf 0664 bin bin
 f none doc/mpatrol/pdf/mpedit.pdf 0664 bin bin
+f none doc/mpatrol/pdf/hexwords.pdf 0664 bin bin
 f none doc/mpatrol/pdf/libmpatrol.pdf 0664 bin bin
 d none doc/mpatrol/tests 0775 bin bin
 d none doc/mpatrol/tests/pass 0775 bin bin
@@ -154,6 +157,7 @@ f none man/man1/mptrace.1 0664 bin bin
 f none man/man1/mleak.1 0664 bin bin
 f none man/man1/mpsym.1 0664 bin bin
 f none man/man1/mpedit.1 0664 bin bin
+f none man/man1/hexwords.1 0664 bin bin
 d none man/man3 0775 bin bin
 f none man/man3/libmpatrol.3 0664 bin bin
 i pkginfo

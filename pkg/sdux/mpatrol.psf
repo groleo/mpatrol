@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.12 2001-01-03 21:38:17 graeme Exp $
+# $Id: mpatrol.psf,v 1.13 2001-01-04 21:28:47 graeme Exp $
 
 
 product
@@ -92,6 +92,7 @@ product
 	file			mleak.dvi
 	file			mpsym.dvi
 	file			mpedit.dvi
+	file			hexwords.dvi
 	file			libmpatrol.dvi
 	directory		mpatrol/doc/mpatrol/ps=/usr/local/doc/mpatrol/ps
 	file			mpatrol.ps
@@ -100,6 +101,7 @@ product
 	file			mleak.ps
 	file			mpsym.ps
 	file			mpedit.ps
+	file			hexwords.ps
 	file			libmpatrol.ps
 	directory		mpatrol/doc/mpatrol/pdf=/usr/local/doc/mpatrol/pdf
 	file			mpatrol.pdf
@@ -108,6 +110,7 @@ product
 	file			mleak.pdf
 	file			mpsym.pdf
 	file			mpedit.pdf
+	file			hexwords.pdf
 	file			libmpatrol.pdf
 	directory		mpatrol/doc/mpatrol/tests=/usr/local/doc/mpatrol/tests
 	directory		mpatrol/doc/mpatrol/tests/pass=/usr/local/doc/mpatrol/tests/pass
@@ -160,6 +163,7 @@ product
 	file			mleak.1
 	file			mpsym.1
 	file			mpedit.1
+	file			hexwords.1
 	directory		mpatrol/man/man3=/usr/local/man/man3
 	file			libmpatrol.3
     end
