@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: getopt.h,v 1.10 2001-08-23 22:46:42 graeme Exp $
+ * $Id: getopt.h,v 1.11 2001-12-18 20:45:32 graeme Exp $
  */
 
 
@@ -70,6 +70,7 @@ MP_EXPORT int __mp_getnum(char *, char *, long *, int);
 MP_EXPORT int __mp_getopt(unsigned long, char **, char *, option *);
 MP_EXPORT char *__mp_shortopts(char *, option *);
 MP_EXPORT void __mp_showopts(option *);
+MP_EXPORT int __mp_match(char *, char *);
 
 
 #ifdef __cplusplus

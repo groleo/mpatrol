@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.15 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: getopt.c,v 1.16 2001-12-18 20:45:32 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.15 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.16 2001-12-18 20:45:32 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -326,6 +326,59 @@ __mp_showopts(option *l)
         fputs(l->desc, stdout);
         l++;
     }
+}
+
+
+/* Perform pattern-matching with shell metacharacters.
+ */
+
+MP_GLOBAL
+int
+__mp_match(char *s, char *t)
+{
+    int i, n;
+    char c, d;
+
+    while ((c = *t++) != '\0')
+        if (c == '[')
+        {
+            i = 0;
+            if (n = (*t == '!'))
+                t++;
+            if ((*t == ']') || ((d = *s++) == '\0'))
+                return 0;
+            while ((c = *t++) != ']')
+                if (*t == '-')
+                {
+                    if ((c <= d) && (d <= t[1]))
+                        i = 1;
+                    t += 2;
+                }
+                else if (c == d)
+                    i = 1;
+                else if (c == '\0')
+                    return 0;
+            if (i == n)
+                return 0;
+        }
+        else if (c == '*')
+        {
+            if (*t == '\0')
+                return 1;
+            do
+                if (__mp_match(s, t))
+                    return 1;
+            while (*s++ != '\0');
+            return 0;
+        }
+        else if (c == '?')
+        {
+            if (*s++ == '\0')
+                return 0;
+        }
+        else if (*s++ != c)
+            return 0;
+    return (*s == '\0');
 }
 
 
