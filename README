@@ -3,8 +3,9 @@ README FOR THE MPATROL LIBRARY
 
 This file contains an overview of the mpatrol library.  The documentation for
 the library currently exists as a manual in TeXinfo format located in the doc
-directory or as a set of UNIX manual pages located in the man directory.  For
-instructions on how to build and install the mpatrol library see the manual.
+directory or as a set of UNIX manual pages located in the man directory.  A
+quick reference card is also available.  For instructions on how to build and
+install the mpatrol library see the manual.
 
 
 Introduction
