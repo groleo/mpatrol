@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.26 2001-03-05 19:31:44 graeme Exp $
+ * $Id: target.h,v 1.27 2001-03-07 00:39:43 graeme Exp $
  */
 
 
@@ -310,8 +310,9 @@
 #define DYNLINK_BSD     2 /* BSD dynamic linker */
 #define DYNLINK_HPUX    3 /* HP/UX dynamic linker */
 #define DYNLINK_IRIX    4 /* IRIX dynamic linker */
-#define DYNLINK_SVR4    5 /* SVR4 dynamic linker */
-#define DYNLINK_WINDOWS 6 /* Windows dynamic linker */
+#define DYNLINK_OSF     5 /* OSF dynamic linker */
+#define DYNLINK_SVR4    6 /* SVR4 dynamic linker */
+#define DYNLINK_WINDOWS 7 /* Windows dynamic linker */
 
 
 #ifndef DYNLINK
@@ -336,6 +337,8 @@
 #define DYNLINK DYNLINK_HPUX
 #elif SYSTEM == SYSTEM_IRIX
 #define DYNLINK DYNLINK_IRIX
+#elif SYSTEM == SYSTEM_TRU64
+#define DYNLINK DYNLINK_OSF
 #else /* SYSTEM */
 #define DYNLINK DYNLINK_NONE
 #endif /* SYSTEM */
