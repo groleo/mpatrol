@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.20 2001-02-08 20:07:00 graeme Exp $
+# $Id: mpatrol.psf,v 1.21 2001-02-11 21:00:47 graeme Exp $
 
 
 product
@@ -94,6 +94,7 @@ product
 	file			mpedit.html
 	file			hexwords.html
 	file			libmpatrol.html
+	file			libmpalloc.html
 	directory		mpatrol/doc/mpatrol/dvi=/usr/local/doc/mpatrol/dvi
 	file			mpatrol.dvi
 	file			mprof.dvi
@@ -103,6 +104,7 @@ product
 	file			mpedit.dvi
 	file			hexwords.dvi
 	file			libmpatrol.dvi
+	file			libmpalloc.dvi
 	directory		mpatrol/doc/mpatrol/ps=/usr/local/doc/mpatrol/ps
 	file			mpatrol.ps
 	file			mprof.ps
@@ -112,6 +114,7 @@ product
 	file			mpedit.ps
 	file			hexwords.ps
 	file			libmpatrol.ps
+	file			libmpalloc.ps
 	directory		mpatrol/doc/mpatrol/pdf=/usr/local/doc/mpatrol/pdf
 	file			mpatrol.pdf
 	file			mprof.pdf
@@ -121,6 +124,7 @@ product
 	file			mpedit.pdf
 	file			hexwords.pdf
 	file			libmpatrol.pdf
+	file			libmpalloc.pdf
 	directory		mpatrol/doc/mpatrol/tests=/usr/local/doc/mpatrol/tests
 	directory		mpatrol/doc/mpatrol/tests/pass=/usr/local/doc/mpatrol/tests/pass
 	file			test1.c
@@ -163,6 +167,7 @@ product
 	directory		mpatrol/include=/usr/local/include
 	file			mpatrol.h
 	file			mpalloc.h
+	file			mpdebug.h
 	directory		mpatrol/lib=/usr/local/lib
 	file			libmpatrol.a
 	file -m 0775		libmpatrol.sl
@@ -179,5 +184,6 @@ product
 	file			hexwords.1
 	directory		mpatrol/man/man3=/usr/local/man/man3
 	file			libmpatrol.3
+	file			libmpalloc.3
     end
 end

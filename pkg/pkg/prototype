@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.42 2001-02-08 20:06:57 graeme Exp $
+# $Id: prototype,v 1.43 2001-02-11 21:00:45 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -82,6 +82,7 @@ f none doc/mpatrol/html/mpsym.html 0664 bin bin
 f none doc/mpatrol/html/mpedit.html 0664 bin bin
 f none doc/mpatrol/html/hexwords.html 0664 bin bin
 f none doc/mpatrol/html/libmpatrol.html 0664 bin bin
+f none doc/mpatrol/html/libmpalloc.html 0664 bin bin
 d none doc/mpatrol/dvi 0775 bin bin
 f none doc/mpatrol/dvi/mpatrol.dvi 0664 bin bin
 f none doc/mpatrol/dvi/mprof.dvi 0664 bin bin
@@ -91,6 +92,7 @@ f none doc/mpatrol/dvi/mpsym.dvi 0664 bin bin
 f none doc/mpatrol/dvi/mpedit.dvi 0664 bin bin
 f none doc/mpatrol/dvi/hexwords.dvi 0664 bin bin
 f none doc/mpatrol/dvi/libmpatrol.dvi 0664 bin bin
+f none doc/mpatrol/dvi/libmpalloc.dvi 0664 bin bin
 d none doc/mpatrol/ps 0775 bin bin
 f none doc/mpatrol/ps/mpatrol.ps 0664 bin bin
 f none doc/mpatrol/ps/mprof.ps 0664 bin bin
@@ -100,6 +102,7 @@ f none doc/mpatrol/ps/mpsym.ps 0664 bin bin
 f none doc/mpatrol/ps/mpedit.ps 0664 bin bin
 f none doc/mpatrol/ps/hexwords.ps 0664 bin bin
 f none doc/mpatrol/ps/libmpatrol.ps 0664 bin bin
+f none doc/mpatrol/ps/libmpalloc.ps 0664 bin bin
 d none doc/mpatrol/pdf 0775 bin bin
 f none doc/mpatrol/pdf/mpatrol.pdf 0664 bin bin
 f none doc/mpatrol/pdf/mprof.pdf 0664 bin bin
@@ -109,6 +112,7 @@ f none doc/mpatrol/pdf/mpsym.pdf 0664 bin bin
 f none doc/mpatrol/pdf/mpedit.pdf 0664 bin bin
 f none doc/mpatrol/pdf/hexwords.pdf 0664 bin bin
 f none doc/mpatrol/pdf/libmpatrol.pdf 0664 bin bin
+f none doc/mpatrol/pdf/libmpalloc.pdf 0664 bin bin
 d none doc/mpatrol/tests 0775 bin bin
 d none doc/mpatrol/tests/pass 0775 bin bin
 f none doc/mpatrol/tests/pass/test1.c 0664 bin bin
@@ -151,6 +155,7 @@ f none info/mpatrol.info 0664 bin bin
 d none include 0775 bin bin
 f none include/mpatrol.h 0664 bin bin
 f none include/mpalloc.h 0664 bin bin
+f none include/mpdebug.h 0664 bin bin
 d none lib 0775 bin bin
 f none lib/libmpatrol.a 0664 bin bin
 f none lib/libmpatrol.so.1.4 0775 bin bin
@@ -175,4 +180,5 @@ f none man/man1/mpedit.1 0664 bin bin
 f none man/man1/hexwords.1 0664 bin bin
 d none man/man3 0775 bin bin
 f none man/man3/libmpatrol.3 0664 bin bin
+f none man/man3/libmpalloc.3 0664 bin bin
 i pkginfo

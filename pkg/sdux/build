@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.20 2001-02-08 20:20:49 graeme Exp $
+# $Id: build,v 1.21 2001-02-11 21:00:47 graeme Exp $
 
 
 version=1.4.0
@@ -98,6 +98,7 @@ cp ../../tests/tutorial/test*.c mpatrol/doc/mpatrol/tests/tutorial
 mkdir -p mpatrol/include
 cp ../../src/mpatrol.h mpatrol/include
 cp ../../src/mpalloc.h mpatrol/include
+cp ../../src/mpdebug.h mpatrol/include
 mkdir -p mpatrol/info
 cp ../../doc/mpatrol.info mpatrol/info
 mkdir -p mpatrol/lib

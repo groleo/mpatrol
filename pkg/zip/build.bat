@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.34 2001-02-08 20:20:51 graeme Exp $
+rem $Id: build.bat,v 1.35 2001-02-11 21:00:49 graeme Exp $
 
 
 set version=1.4.0
@@ -94,6 +94,7 @@ copy ..\..\man\pdf\*.pdf mpatrol\doc\man\pdf
 mkdir mpatrol\include
 copy ..\..\src\mpatrol.h mpatrol\include
 copy ..\..\src\mpalloc.h mpatrol\include
+copy ..\..\src\mpdebug.h mpatrol\include
 mkdir mpatrol\lib
 copy ..\..\build\windows\libmpatrol.lib mpatrol\lib
 copy ..\..\build\windows\libmpatrolmt.lib mpatrol\lib
