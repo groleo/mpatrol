@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.11 2000-04-06 18:03:14 graeme Exp $
+# $Id: Makefile,v 1.12 2000-04-06 18:09:40 graeme Exp $
 
 
 # Definitions
@@ -62,10 +62,10 @@ SHARTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
 SHARED_LIBRARY	= $(LIBRARY).dll
-OBJECT_LIBRARY	= $(LIBRARY).obj
+OBJECT_LIBRARY	= lib$(LIBRARY).obj
 ARCHTS_LIBRARY	= lib$(LIBRARY)mt.lib
 SHARTS_LIBRARY	= $(LIBRARY)mt.dll
-OBJTS_LIBRARY	= $(LIBRARY)mt.obj
+OBJTS_LIBRARY	= lib$(LIBRARY)mt.obj
 
 
 # Rules

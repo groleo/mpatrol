@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.10 2000-04-06 18:03:08 graeme Exp $
+# $Id: SMakefile,v 1.11 2000-04-06 18:09:20 graeme Exp $
 
 
 # Definitions
@@ -46,9 +46,9 @@ ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  version.t.o
 
 ARCHIVE_LIBRARY	= $(LIBRARY).lib
-OBJECT_LIBRARY	= $(LIBRARY).o
+OBJECT_LIBRARY	= lib$(LIBRARY).o
 ARCHTS_LIBRARY	= $(LIBRARY)mt.lib
-OBJTS_LIBRARY	= $(LIBRARY)mt.o
+OBJTS_LIBRARY	= lib$(LIBRARY)mt.o
 
 
 # Rules

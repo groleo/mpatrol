@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.8 2000-04-06 18:03:11 graeme Exp $
+# $Id: Makefile,v 1.9 2000-04-06 18:09:22 graeme Exp $
 
 
 # Definitions
@@ -48,9 +48,9 @@ TOBJECTS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   option.ts.obj inter.ts.obj version.ts.obj
 
 ARCHIVE_LIBRARY	= $(LIBRARY).lib
-OBJECT_LIBRARY	= $(LIBRARY).obj
+OBJECT_LIBRARY	= lib$(LIBRARY).obj
 ARCHTS_LIBRARY	= $(LIBRARY)mt.lib
-OBJTS_LIBRARY	= $(LIBRARY)mt.obj
+OBJTS_LIBRARY	= lib$(LIBRARY)mt.obj
 
 
 # Rules
