@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.40 2001-01-11 22:48:43 graeme Exp $"
+#ident "$Id: memory.c,v 1.41 2001-01-11 23:59:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -224,7 +224,8 @@ progname(void)
     extern char **__Argv;
 #elif SYSTEM == SYSTEM_UNIXWARE
     extern char **___Argv;
-#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
+      SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
     static char c[256];
     ssize_t l;
     int f;
@@ -263,9 +264,10 @@ progname(void)
     return __Argv[0];
 #elif SYSTEM == SYSTEM_UNIXWARE
     return ___Argv[0];
-#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX
-    /* FreeBSD and Linux have a file in the /proc filesystem which contains the
-     * argument vector that a process was invoked with.
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
+      SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
+    /* The BSD variants and Linux have a file in the /proc filesystem which
+     * contains the argument vector that a process was invoked with.
      */
     l = 0;
     sprintf(b, MP_PROCFS_CMDNAME, __mp_processid());
@@ -312,7 +314,8 @@ progname(void)
     for (p = NULL; __mp_getframe(&s); p = (unsigned long *) s.frame);
     if (p != NULL)
 #if ARCH == ARCH_IX86
-#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX
+#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
         if (p = (unsigned long *) p[4])
             return (char *) *p;
 #elif SYSTEM == SYSTEM_LYNXOS
