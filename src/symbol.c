@@ -104,7 +104,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.29 2000-06-26 22:57:22 graeme Exp $"
+#ident "$Id: symbol.c,v 1.30 2000-07-13 20:20:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -121,6 +121,19 @@
 #define DT_NULL  0
 #define DT_DEBUG 21
 
+#if ENVIRON == ENVIRON_64
+typedef struct Elf64_Dyn
+{
+    Elf64_Xword d_tag;     /* tag indicating type of data stored */
+    union
+    {
+        Elf64_Xword d_val; /* data is a value */
+        Elf64_Addr d_ptr;  /* data is a pointer */
+    }
+    d_un;
+}
+Elf64_Dyn;
+#else /* ENVIRON */
 typedef struct Elf32_Dyn
 {
     Elf32_Sword d_tag;    /* tag indicating type of data stored */
@@ -132,6 +145,7 @@ typedef struct Elf32_Dyn
     d_un;
 }
 Elf32_Dyn;
+#endif /* ENVIRON */
 #endif /* DT_NULL */
 #endif /* SYSTEM */
 #endif /* TARGET */
@@ -151,7 +165,11 @@ typedef struct dynamiclink
 {
     size_t base;              /* virtual address of shared object */
     char *name;               /* filename of shared object */
+#if ENVIRON == ENVIRON_64
+    Elf64_Dyn *dyn;           /* dynamic linking information */
+#else /* ENVIRON */
     Elf32_Dyn *dyn;           /* dynamic linking information */
+#endif /* ENVIRON */
     struct dynamiclink *next; /* pointer to next shared object */
 }
 dynamiclink;
@@ -1191,7 +1209,11 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
       SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
       SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if ENVIRON == ENVIRON_64
+    Elf64_Dyn *d;
+#else /* ENVIRON */
     Elf32_Dyn *d;
+#endif /* ENVIRON */
     dynamiclink *l;
 #elif SYSTEM == SYSTEM_HPUX
     struct shl_descriptor d;
@@ -1230,7 +1252,11 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
       SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
       SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if ENVIRON == ENVIRON_64
+    if ((&_DYNAMIC != NULL) && (d = (Elf64_Dyn *) _DYNAMIC))
+#else /* ENVIRON */
     if ((&_DYNAMIC != NULL) && (d = (Elf32_Dyn *) _DYNAMIC))
+#endif /* ENVIRON */
     {
         /* Search for the DT_DEBUG tag in the _DYNAMIC symbol.
          */
@@ -1239,7 +1265,7 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
             {
                 if (!d->d_un.d_ptr)
                     l = NULL;
-                else if (l = (dynamiclink *) *((unsigned int *) d->d_un.d_ptr +
+                else if (l = (dynamiclink *) *((unsigned long *) d->d_un.d_ptr +
                           1))
                     l = l->next;
                 break;
