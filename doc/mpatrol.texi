@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.220 2001-05-30 23:23:25 graeme Exp $
+@c $Id: mpatrol.texi,v 1.221 2001-06-13 21:41:44 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.9
-@set VERSION 1.4.4
-@set UPDATED 31st May, 2001
+@set EDITION 2.10
+@set VERSION 1.4.5
+@set UPDATED 13th June, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -1889,6 +1889,24 @@ from the keyboard if a lot of processor time is spent in mpatrol routines,
 which is why this behaviour is disabled by default@footnote{In mpatrol release
 1.0 it was enabled by default.}.
 
+@cindex forked processes
+@cindex fork
+@cindex exec
+On UNIX platforms, the @code{fork()} function can cause problems if it is used
+to make a copy of the parent process without immediately calling one of the
+@code{exec()} family of functions.  This is because the child process inherits
+all of the memory allocations of the parent process, but also inherits the log,
+profile and trace files as well.  If both the parent and child processes make
+subsequent memory allocations there will be multiple entries with the same
+allocation indices written to the log, profile or trace files.  This can be
+most confusing when processing these files afterwards!  As a workaround, the
+mpatrol library will always check the current process identifier every time one
+of its functions is called if the @option{CHECKFORK} option is used and will
+open new log, profile or trace files if it has determined that the process has
+been forked.  If the @option{CHECKFORK} option is not used then a call to
+@code{__mp_reinit()} should be added as the first function call in the child
+process in order to duplicate the behaviour of the @option{CHECKFORK} option.
+
 @cindex sbrk
 @cindex mmap
 On UNIX systems, the usual way for malloc libraries to allocate memory from the
@@ -2588,19 +2606,6 @@ the executable file or shared library before the program is run, and the order
 in which such functions will be called if there are more than one is
 unspecified.  The @code{__mp_atexit()} function can also be used to register
 functions that should be called when the mpatrol library terminates.
-
-@cindex forked processes
-On UNIX platforms, the @code{fork()} function can cause problems if it is used
-to make a copy of the parent process without immediately calling one of the
-@code{exec()} family of functions.  This is because the child process inherits
-all of the memory allocations of the parent process, but also inherits the log,
-profile and trace files as well.  If both the parent and child processes make
-subsequent memory allocations there will be multiple entries with the same
-allocation indices written to the log, profile or trace files.  This can be
-most confusing when processing these files afterwards!  As a workaround, the
-mpatrol library will always check the current process identifier every time one
-of its functions is called and will open new log, profile or trace files if it
-has determined that the process has been forked.
 
 It is possible to obtain a great deal of information about an existing memory
 allocation or free block using the @code{__mp_info()} function.  This takes an
@@ -3399,6 +3404,13 @@ allocation.  If the filename and line number for an allocation is known and the
 @option{EDIT} or @option{LIST} option is being used then using @code{HD_VIEW}
 will edit or list the relevant source file at the correct line number, but only
 if the @option{EDIT} or @option{LIST} options are supported.
+
+If the @code{HD_CONTENTS} flag is specified then the contents of all current
+memory allocations will be written to files and then compared with their
+subsequent contents when @code{heapdiffend()} is called.  If the heap is large
+then this option can require a substantial amount of disk space.  All of the
+allocation contents files will be deleted when the matching call to
+@code{heapdiffend()} is made.
 
 @node mgauge, mtrace, heapdiff, Tools
 @section Memory allocation gauge
@@ -4525,6 +4537,11 @@ unfreed memory can be produced to detect where memory leaks come from (via the
 @option{--leaks} option).
 @end ifnotinfo
 
+Although @command{mprof} does not currently offer this facility, a small tool
+called @command{profdiff} which reports differences between two mpatrol
+profiling output files can be downloaded from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch3.tar.gz}.
+
 @cindex VAX
 Much of the functionality of this implementation of memory allocation profiling
 is based upon @command{mprof} by Benjamin Zorn and Paul Hilfinger, which was
@@ -5271,6 +5288,18 @@ operation functions.  Finally, if you are using the GNU compiler then the
 the source files that you think might contain the problem.  However, the error
 may be hidden behind a call to a library function that is not compiled with that
 option, as is the case with our example.
+
+Another slightly less common problem associated with heap corruption is when
+the contents of a memory allocation have been overwritten unexpectedly but do
+not overflow its boundaries.  This is not a misuse of the heap and so mpatrol
+will not report any errors or warnings, but it may be an error in the user's
+code.  The heapdiff tool (@pxref{heapdiff}) provided in libmptools has an option
+called @code{HD_CONTENTS} which allows the entire @emph{live} contents of the
+heap to be written to disk and then compared when @code{heapdiffend()} is
+called.  Every single difference (at the byte level) in each memory allocation
+is reported and this information can be extremely useful in narrowing down heap
+corruption.  However, the @code{HD_CONTENTS} option will require a lot of disk
+space if the heap is very large.
 
 To conclude, the mpatrol library contains a wide variety of options and
 functions that you can add to your debugging toolkit, but only if you know how
@@ -8923,8 +8952,10 @@ and no bytes will be searched.
 @section mpatrol library functions
 
 The following 41 functions are available as support routines for additional
-control and tracing in the mpatrol library.  To use these you should include the
-@file{mpatrol.h} header file.
+control and tracing in the mpatrol library.  Although they are documented here
+as being prefixed by @samp{__mp_}, their equivalent functions that are prefixed
+by @samp{mpatrol_} are also defined as aliases in the @file{mpatrol.h} header
+file.  To use these you should include the @file{mpatrol.h} header file.
 
 @findex __mp_atexit
 @table @asis
@@ -9480,6 +9511,13 @@ Equivalent to the @option{CHECKALLOCS}, @option{CHECKREALLOCS},
 Checks that no attempt is made to allocate a block of memory of size zero.  A
 warning will be issued for every such case.
 
+@cindex CHECKFORK
+@item @option{CHECKFORK}
+Checks at every call to see if the process has been forked in case new log,
+profiling and tracing output files need to be started.  This option only has an
+effect on UNIX platforms, but should not be used in multithreaded programs if
+each thread has a different process identifier.
+
 @cindex CHECKFREES
 @item @option{CHECKFREES}
 Checks that no attempt is made to deallocate a @samp{NULL} pointer.  A warning
@@ -9931,6 +9969,11 @@ options specified together.
 @item @option{--check-allocs}
 [@option{CHECKALLOCS}]  Checks that no attempt is made to allocate a block of
 memory of size zero.
+
+@cindex --check-fork
+@item @option{--check-fork}
+[@option{CHECKFORK}]  Checks at every call to see if the process has been forked
+in case new log, profiling and tracing output files need to be started.
 
 @cindex --check-frees
 @item @option{--check-frees}
@@ -10988,17 +11031,51 @@ as unsigned LEB128 numbers.
 @item
 If the event is a memory allocation then the event record will begin with the
 character @samp{A} followed by the allocation index, start address and size in
-bytes of the memory allocation encoded as unsigned LEB128 numbers.
+bytes of the memory allocation encoded as unsigned LEB128 numbers.  From version
+1.4.5 of the mpatrol library, the thread identifier, function name, file name
+and line number are also written out as part of the event record (see below).
 
 @item
 If the event is a memory reallocation then the event record will begin with the
 character @samp{R} followed by the allocation index, start address and size of
-the new memory allocation encoded as an unsigned LEB128 number.
+the new memory allocation encoded as an unsigned LEB128 number.  From version
+1.4.5 of the mpatrol library, the thread identifier, function name, file name
+and line number are also written out as part of the event record (see below).
 
 @item
 If the event is a memory deallocation then the event record will begin with the
 character @samp{F} followed by the allocation index of the memory allocation
-encoded as an unsigned LEB128 number.
+encoded as an unsigned LEB128 number.  From version 1.4.5 of the mpatrol
+library, the thread identifier, function name, file name and line number are
+also written out as part of the event record (see below).
+@end itemize
+
+@item
+From version 1.4.5 of the mpatrol library, event records contain the following
+additional information.
+
+@itemize @bullet
+@item
+The thread identifier as an unsigned LEB128 number.
+
+@item
+The cached source function name.  If the first byte is zero then there is no
+associated function name.  If the first byte has the most significant bit set
+then the following null-terminated string defines a source function name
+associated with the number in the remaining 7 bits.  If the first byte does not
+have the most significant bit set then it is taken to be the index of a
+previously defined source function name.
+
+@item
+The cached source file name.  If the first byte is zero then there is no
+associated file name.  If the first byte has the most significant bit set then
+the following null-terminated string defines a source file name associated with
+the number in the remaining 7 bits.  If the first byte does not have the most
+significant bit set then it is taken to be the index of a previously defined
+source file name.
+
+@item
+The source line number as an unsigned LEB128 number.
 @end itemize
 
 @item
@@ -11189,6 +11266,9 @@ Red Hat Linux 6.0, Intel Pentium III, BFD, @command{g++}
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libiberty.so} is available.
 @end itemize
@@ -11202,6 +11282,9 @@ library calling @code{malloc()} and @code{bzero()} recursively.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libiberty.so} is available.
 @end itemize
@@ -11211,6 +11294,9 @@ Red Hat Linux 6.2, Intel Pentium III, BFD, @command{g++}
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libiberty.so} is available.
@@ -11226,6 +11312,9 @@ library calling @code{malloc()} and @code{bzero()} recursively.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libiberty.so} is available.
 @end itemize
@@ -11239,6 +11328,9 @@ library calling @code{malloc()} and @code{bzero()} recursively.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
+@item
 The @option{USEDEBUG} option has no effect.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
@@ -11251,6 +11343,9 @@ SuSE Linux 7.1, Intel Pentium II, BFD, @command{g++}
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{CHECKFORK} option does not work properly in multithreaded programs
+due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libiberty.so} is available.
@@ -12075,7 +12170,7 @@ Bugs should be reported to @email{mpatrol@@cbmamiga.demon.co.uk} along with the
 details of the operating system, processor architecture and object file format
 that the mpatrol library is being used with --- and don't forget to include the
 version of the mpatrol library you are using!  Keep in mind that I only have
-access to a Pentium III Notebook PC running Red Hat Linux 6.2 and Windows 98, so
+access to a Pentium III Notebook PC running Red Hat Linux 7.1 and Windows ME, so
 I will be most likely unable to reproduce most of the system-specific bugs.  A
 bug report that comes with an associated fix will be most welcome.
 
