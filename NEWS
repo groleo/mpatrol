@@ -1,3 +1,28 @@
+Changes for 1.3.2 (18th December, 2000)
+
+  * Added the TRACE and TRACEFILE options to handle memory allocation tracing.
+
+  * Added the SHOWFREE option to display information about free memory blocks.
+
+  * Added the mptrace command to decode a tracing output file into tabular, and
+    possibly graphical, form.
+
+  * Added the %d, %t and %f filename characters to be replaced with the current
+    date, current time and full path of the executable.
+
+  * Added information about the peak number of memory allocations to the log
+    file summary.
+
+  * Improved the handling of internal blocks used by the mpatrol library to be
+    more efficient.
+
+  * Added a chapter on tracing to the mpatrol manual.
+
+  * Added new DVI, postscript and PDF formats for the UNIX manual pages and
+    added the mpatrol_man.tar.gz archive.  Also changed the mpatrol.3 manual
+    page to libmpatrol.3.
+
+
 Changes for 1.3.1 (22nd November, 2000)
 
   * The initialisation and termination of the mpatrol library has been improved
