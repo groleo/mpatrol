@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.52 2001-07-26 17:55:01 graeme Exp $
+ * $Id: inter.h,v 1.53 2001-08-01 21:15:14 graeme Exp $
  */
 
 
@@ -164,32 +164,32 @@ MP_API void __mp_summary(void);
 MP_API int __mp_stats(heapinfo *);
 MP_API void __mp_checkheap(char *, char *, unsigned long);
 MP_API void __mp_check(void);
-prologuehandler __mp_prologue(prologuehandler);
-epiloguehandler __mp_epilogue(epiloguehandler);
-nomemoryhandler __mp_nomemory(nomemoryhandler);
-void __mp_pushdelstack(char *, char *, unsigned long);
-void __mp_popdelstack(char **, char **, unsigned long *);
-int __mp_printf(char *, ...);
-int __mp_vprintf(char *, va_list);
-void __mp_printfwithloc(char *, char *, unsigned long, char *, ...);
-void __mp_vprintfwithloc(char *, char *, unsigned long, char *, va_list);
-void __mp_logmemory(void *, size_t);
-int __mp_logstack(size_t);
-int __mp_logaddr(void *);
-int __mp_edit(char *, unsigned long);
-int __mp_list(char *, unsigned long);
-int __mp_view(char *, unsigned long);
-int __mp_readcontents(char *, void *);
-int __mp_writecontents(char *, void *);
-long __mp_cmpcontents(char *, void *);
-int __mp_remcontents(char *, void *);
-void __cyg_profile_func_enter(void *, void *);
-void __cyg_profile_func_exit(void *, void *);
-void chkr_set_right(void *, size_t, unsigned char);
-void chkr_copy_bitmap(void *, void *, size_t);
-void chkr_check_addr(void *, size_t, unsigned char);
-void chkr_check_str(char *, unsigned char);
-void chkr_check_exec(void *);
+MP_API prologuehandler __mp_prologue(prologuehandler);
+MP_API epiloguehandler __mp_epilogue(epiloguehandler);
+MP_API nomemoryhandler __mp_nomemory(nomemoryhandler);
+MP_API void __mp_pushdelstack(char *, char *, unsigned long);
+MP_API void __mp_popdelstack(char **, char **, unsigned long *);
+MP_API int __mp_printf(char *, ...);
+MP_API int __mp_vprintf(char *, va_list);
+MP_API void __mp_printfwithloc(char *, char *, unsigned long, char *, ...);
+MP_API void __mp_vprintfwithloc(char *, char *, unsigned long, char *, va_list);
+MP_API void __mp_logmemory(void *, size_t);
+MP_API int __mp_logstack(size_t);
+MP_API int __mp_logaddr(void *);
+MP_API int __mp_edit(char *, unsigned long);
+MP_API int __mp_list(char *, unsigned long);
+MP_API int __mp_view(char *, unsigned long);
+MP_API int __mp_readcontents(char *, void *);
+MP_API int __mp_writecontents(char *, void *);
+MP_API long __mp_cmpcontents(char *, void *);
+MP_API int __mp_remcontents(char *, void *);
+MP_API void __cyg_profile_func_enter(void *, void *);
+MP_API void __cyg_profile_func_exit(void *, void *);
+MP_API void chkr_set_right(void *, size_t, unsigned char);
+MP_API void chkr_copy_bitmap(void *, void *, size_t);
+MP_API void chkr_check_addr(void *, size_t, unsigned char);
+MP_API void chkr_check_str(char *, unsigned char);
+MP_API void chkr_check_exec(void *);
 
 
 #ifdef __cplusplus

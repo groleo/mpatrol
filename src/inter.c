@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.137 2001-07-26 17:55:01 graeme Exp $"
+#ident "$Id: inter.c,v 1.138 2001-08-01 21:15:14 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.137 2001-07-26 17:55:01 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.138 2001-08-01 21:15:14 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2274,6 +2274,7 @@ __mp_check(void)
 /* Set the prologue function and return the previous setting.
  */
 
+MP_API
 prologuehandler
 __mp_prologue(prologuehandler h)
 {
@@ -2294,6 +2295,7 @@ __mp_prologue(prologuehandler h)
 /* Set the epilogue function and return the previous setting.
  */
 
+MP_API
 epiloguehandler
 __mp_epilogue(epiloguehandler h)
 {
@@ -2314,6 +2316,7 @@ __mp_epilogue(epiloguehandler h)
 /* Set the low-memory handler and return the previous setting.
  */
 
+MP_API
 nomemoryhandler
 __mp_nomemory(nomemoryhandler h)
 {
@@ -2334,6 +2337,7 @@ __mp_nomemory(nomemoryhandler h)
 /* Push source level information onto the top of the delete stack.
  */
 
+MP_API
 void
 __mp_pushdelstack(char *s, char *t, unsigned long u)
 {
@@ -2354,6 +2358,7 @@ __mp_pushdelstack(char *s, char *t, unsigned long u)
 /* Pop source level information off the top of the delete stack.
  */
 
+MP_API
 void
 __mp_popdelstack(char **s, char **t, unsigned long *u)
 {
@@ -2378,6 +2383,7 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
 /* Write user data to the mpatrol log file.
  */
 
+MP_API
 int
 __mp_printf(char *s, ...)
 {
@@ -2422,6 +2428,7 @@ __mp_printf(char *s, ...)
 /* Write user data to the mpatrol log file.
  */
 
+MP_API
 int
 __mp_vprintf(char *s, va_list v)
 {
@@ -2463,6 +2470,7 @@ __mp_vprintf(char *s, va_list v)
 /* Write user data to the mpatrol log file along with location information.
  */
 
+MP_API
 void
 __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
 {
@@ -2527,6 +2535,7 @@ __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
 /* Write user data to the mpatrol log file along with location information.
  */
 
+MP_API
 void
 __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
 {
@@ -2588,6 +2597,7 @@ __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
 /* Write a hex dump for a specified memory location to the mpatrol log file.
  */
 
+MP_API
 void
 __mp_logmemory(void *p, size_t l)
 {
@@ -2605,6 +2615,7 @@ __mp_logmemory(void *p, size_t l)
 /* Write the current call stack to the mpatrol log file.
  */
 
+MP_API
 int
 __mp_logstack(size_t k)
 {
@@ -2640,6 +2651,7 @@ __mp_logstack(size_t k)
  * the mpatrol log file.
  */
 
+MP_API
 int
 __mp_logaddr(void *p)
 {
@@ -2668,6 +2680,7 @@ __mp_logaddr(void *p)
 /* Invoke a text editor on a given source file at a specific line.
  */
 
+MP_API
 int
 __mp_edit(char *f, unsigned long l)
 {
@@ -2687,6 +2700,7 @@ __mp_edit(char *f, unsigned long l)
 /* List a given source file at a specific line.
  */
 
+MP_API
 int
 __mp_list(char *f, unsigned long l)
 {
@@ -2707,6 +2721,7 @@ __mp_list(char *f, unsigned long l)
  * or LIST options are in effect.
  */
 
+MP_API
 int
 __mp_view(char *f, unsigned long l)
 {
@@ -2731,6 +2746,7 @@ __mp_view(char *f, unsigned long l)
 /* Read in an allocation contents file.
  */
 
+MP_API
 int
 __mp_readcontents(char *s, void *p)
 {
@@ -2758,6 +2774,7 @@ __mp_readcontents(char *s, void *p)
 /* Write out an allocation contents file.
  */
 
+MP_API
 int
 __mp_writecontents(char *s, void *p)
 {
@@ -2785,6 +2802,7 @@ __mp_writecontents(char *s, void *p)
 /* Compare an allocation contents file with the contents currently in memory.
  */
 
+MP_API
 long
 __mp_cmpcontents(char *s, void *p)
 {
@@ -2812,6 +2830,7 @@ __mp_cmpcontents(char *s, void *p)
 /* Remove an allocation contents file.
  */
 
+MP_API
 int
 __mp_remcontents(char *s, void *p)
 {
@@ -2868,6 +2887,7 @@ void __mp_libiberty(void) {}
 /* The function that is called at every function prologue.
  */
 
+MP_API
 void
 __cyg_profile_func_enter(void *a, void *p)
 {
@@ -2890,6 +2910,7 @@ __cyg_profile_func_enter(void *a, void *p)
 /* The function that is called at every function epilogue.
  */
 
+MP_API
 void
 __cyg_profile_func_exit(void *a, void *p)
 {
@@ -2912,6 +2933,7 @@ __cyg_profile_func_exit(void *a, void *p)
 /* Set the access rights for a block of memory using the checker interface.
  */
 
+MP_API
 void
 chkr_set_right(void *p, size_t l, unsigned char a)
 {
@@ -2971,6 +2993,7 @@ chkr_set_right(void *p, size_t l, unsigned char a)
  * checker interface.
  */
 
+MP_API
 void
 chkr_copy_bitmap(void *p, void *q, size_t l)
 {
@@ -3030,6 +3053,7 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
 /* Check a block of memory using the checker interface.
  */
 
+MP_API
 void
 chkr_check_addr(void *p, size_t l, unsigned char a)
 {
@@ -3088,6 +3112,7 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
 /* Check a string using the checker interface.
  */
 
+MP_API
 void
 chkr_check_str(char *p, unsigned char a)
 {
@@ -3147,6 +3172,7 @@ chkr_check_str(char *p, unsigned char a)
 /* Check a function pointer using the checker interface.
  */
 
+MP_API
 void
 chkr_check_exec(void *p)
 {
