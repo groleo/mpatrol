@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.30 2000-06-01 20:56:30 graeme Exp $
+.\" $Id: mpatrol.3,v 1.31 2000-06-12 21:50:06 graeme Exp $
 .\"
-.TH MPATROL 3 "1 June 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "12 June 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -530,13 +530,15 @@ must be linked in before any other library that defines dynamic memory
 allocation functions with the same names:
 .RS 0
 
- \fBLibrary\fP        \fBReason\fP
+ \fBLibrary\fP    \fBReason\fP
 
- \fI\-lmpatrol\fP      To use this library.
- \fI\-lelf\fP          If built with \fBFORMAT=FORMAT_ELF32\fP.
- \fI\-lbfd \-liberty\fP If built with \fBFORMAT=FORMAT_BFD\fP.
- \fI\-lcl\fP           If built on HP/UX.
- \fI\-lpthread\fP      If built with \fBMP_THREADS_SUPPORT\fP.
+ \fI\-lmpatrol\fP  To use this library.
+ \fI\-lelf\fP      If built with \fBFORMAT=FORMAT_ELF32\fP.
+ \fI\-lbfd\fP &    If built with \fBFORMAT=FORMAT_BFD\fP.
+   \fI\-liberty\fP
+ \fI\-lcl\fP       If built on HP/UX.
+ \fI\-lexc\fP      If built on IRIX with \fBMP_LIBRARYSTACK_SUPPORT\fP.
+ \fI\-lpthread\fP  If built on UNIX with \fBMP_THREADS_SUPPORT\fP.
 .RE
 .PP
 On UNIX platforms, if there were no calls to memory allocation functions before
