@@ -45,6 +45,7 @@ MP_EXPORT char *__mp_alloctypenames[AT_MAX];
 
 
 MP_EXPORT char *__mp_logfile(char *);
+MP_EXPORT char *__mp_proffile(char *);
 MP_EXPORT int __mp_openlogfile(char *);
 MP_EXPORT int __mp_closelogfile(void);
 MP_EXPORT void __mp_diag(char *, ...);

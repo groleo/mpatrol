@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.17 2000-04-23 22:45:35 graeme Exp $"
+#ident "$Id: diag.c,v 1.18 2000-05-01 10:04:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -112,18 +112,14 @@ MP_GLOBAL char *__mp_alloctypenames[AT_MAX] =
 };
 
 
-/* Process the log file name, expanding any special characters.
- * Note that this function is not currently re-entrant.
+/* Process a file name, expanding any special characters.
  */
 
-MP_GLOBAL char *__mp_logfile(char *s)
+static void processfile(char *s, char *b, size_t l)
 {
-    static char b[256];
     size_t i;
 
-    if (s == NULL)
-        s = MP_LOGFILE;
-    for (i = 0; (i < sizeof(b) - 1) && (*s != '\0'); i++, s++)
+    for (i = 0; (i < l - 1) && (*s != '\0'); i++, s++)
         if (*s == '%')
             switch (s[1])
             {
@@ -141,6 +137,35 @@ MP_GLOBAL char *__mp_logfile(char *s)
         else
             b[i] = *s;
     b[i] = '\0';
+}
+
+
+/* Process the log file name, expanding any special characters.
+ * Note that this function is not currently re-entrant.
+ */
+
+MP_GLOBAL char *__mp_logfile(char *s)
+{
+    static char b[256];
+
+    if (s == NULL)
+        s = MP_LOGFILE;
+    processfile(s, b, sizeof(b));
+    return b;
+}
+
+
+/* Process the profiling output file name, expanding any special characters.
+ * Note that this function is not currently re-entrant.
+ */
+
+MP_GLOBAL char *__mp_proffile(char *s)
+{
+    static char b[256];
+
+    if (s == NULL)
+        s = MP_PROFFILE;
+    processfile(s, b, sizeof(b));
     return b;
 }
 
