@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.27 2000-07-11 23:48:54 graeme Exp $
+# $Id: build,v 1.28 2000-07-12 00:16:26 graeme Exp $
 
 
 version=1.2.5
@@ -72,6 +72,14 @@ cp ../../doc/images/mpatrol.txt doc/mpatrol/images
 cp ../../doc/images/mpatrol.jpg doc/mpatrol/images
 cp ../../doc/images/mpatrol.eps doc/mpatrol/images
 cp ../../doc/images/mpatrol.pdf doc/mpatrol/images
+mkdir -p doc/mpatrol/tests/pass
+cp ../../tests/pass/test*.c doc/mpatrol/tests/pass
+mkdir -p doc/mpatrol/tests/fail
+cp ../../tests/fail/test*.c doc/mpatrol/tests/fail
+mkdir -p doc/mpatrol/tests/profile
+cp ../../tests/profile/test*.c doc/mpatrol/tests/profile
+mkdir -p doc/mpatrol/tests/tutorial
+cp ../../tests/tutorial/test*.c doc/mpatrol/tests/tutorial
 mkdir -p include
 cp ../../src/mpatrol.h include
 mkdir -p info

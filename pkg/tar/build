@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.21 2000-07-11 23:48:58 graeme Exp $
+# $Id: build,v 1.22 2000-07-12 00:16:30 graeme Exp $
 
 
 version=1.2.5
@@ -74,6 +74,7 @@ cp ../../doc/images/mpatrol.eps mpatrol/doc/images
 cp ../../doc/images/mpatrol.pdf mpatrol/doc/images
 mkdir -p mpatrol/extra
 cp ../../extra/.gdbinit mpatrol/extra
+cp ../../extra/magic mpatrol/extra
 mkdir -p mpatrol/include
 cp ../../src/mpatrol.h mpatrol/include
 mkdir -p mpatrol/info
@@ -99,6 +100,14 @@ mkdir -p mpatrol/man/cat3
 cp ../../man/cat3/mpatrol.3 mpatrol/man/cat3
 mkdir -p mpatrol/man/man3
 cp ../../man/man3/mpatrol.3 mpatrol/man/man3
+mkdir -p mpatrol/tests/pass
+cp ../../tests/pass/test*.c mpatrol/tests/pass
+mkdir -p mpatrol/tests/fail
+cp ../../tests/fail/test*.c mpatrol/tests/fail
+mkdir -p mpatrol/tests/profile
+cp ../../tests/profile/test*.c mpatrol/tests/profile
+mkdir -p mpatrol/tests/tutorial
+cp ../../tests/tutorial/test*.c mpatrol/tests/tutorial
 
 
 # Create the compressed tar distribution archive.

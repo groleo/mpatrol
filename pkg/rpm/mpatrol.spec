@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.24 2000-07-11 23:48:57 graeme Exp $
+# $Id: mpatrol.spec,v 1.25 2000-07-12 00:16:28 graeme Exp $
 
 
 %define version 1.2.5
@@ -95,6 +95,14 @@ cp doc/images/mpatrol.txt $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
+cp tests/pass/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
+mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/fail
+cp tests/fail/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/fail
+mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
+cp tests/profile/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
+mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
+cp tests/tutorial/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
 mkdir -p $RPM_BUILD_ROOT/usr/include
 cp src/mpatrol.h $RPM_BUILD_ROOT/usr/include
 mkdir -p $RPM_BUILD_ROOT/usr/info

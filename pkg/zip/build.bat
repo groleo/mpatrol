@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.3 2000-07-11 23:49:00 graeme Exp $
+rem $Id: build.bat,v 1.4 2000-07-12 00:16:32 graeme Exp $
 
 
 set version=1.2.5
@@ -84,6 +84,15 @@ copy ..\..\build\windows\mpatrol.lib mpatrol\lib
 copy ..\..\build\windows\mpatrol.exp mpatrol\lib
 copy ..\..\build\windows\mpatrolmt.lib mpatrol\lib
 copy ..\..\build\windows\mpatrolmt.exp mpatrol\lib
+mkdir mpatrol\tests
+mkdir mpatrol\tests\pass
+copy ..\..\tests\pass\test*.c mpatrol\tests\pass
+mkdir mpatrol\tests\fail
+copy ..\..\tests\fail\test*.c mpatrol\tests\fail
+mkdir mpatrol\tests\profile
+copy ..\..\tests\profile\test*.c mpatrol\tests\profile
+mkdir mpatrol\tests\tutorial
+copy ..\..\tests\tutorial\test*.c mpatrol\tests\tutorial
 
 
 rem Create the ZIP distribution archive.

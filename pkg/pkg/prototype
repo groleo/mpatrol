@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.14 2000-06-15 19:29:47 graeme Exp $
+# $Id: prototype,v 1.15 2000-07-12 00:16:26 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -51,6 +51,38 @@ f none doc/mpatrol/images/mpatrol.txt 0664 bin bin
 f none doc/mpatrol/images/mpatrol.jpg 0664 bin bin
 f none doc/mpatrol/images/mpatrol.eps 0664 bin bin
 f none doc/mpatrol/images/mpatrol.pdf 0664 bin bin
+d none doc/mpatrol/tests 0775 bin bin
+d none doc/mpatrol/tests/pass 0775 bin bin
+f none doc/mpatrol/tests/pass/test1.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test2.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test3.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test4.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test5.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test6.c 0664 bin bin
+f none doc/mpatrol/tests/pass/test7.c 0664 bin bin
+d none doc/mpatrol/tests/fail 0775 bin bin
+f none doc/mpatrol/tests/fail/test1.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test2.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test3.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test4.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test5.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test6.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test7.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test8.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test9.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test10.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test11.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test12.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test13.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test14.c 0664 bin bin
+f none doc/mpatrol/tests/fail/test15.c 0664 bin bin
+d none doc/mpatrol/tests/profile 0775 bin bin
+f none doc/mpatrol/tests/profile/test1.c 0664 bin bin
+f none doc/mpatrol/tests/profile/test2.c 0664 bin bin
+d none doc/mpatrol/tests/tutorial 0775 bin bin
+f none doc/mpatrol/tests/tutorial/test1.c 0664 bin bin
+f none doc/mpatrol/tests/tutorial/test2.c 0664 bin bin
+f none doc/mpatrol/tests/tutorial/test3.c 0664 bin bin
 d none info 0775 bin bin
 f none info/mpatrol.info 0664 bin bin
 d none include 0775 bin bin
