@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.38 2000-03-08 01:18:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.39 2000-03-09 21:11:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.5
 @set VERSION 1.1.1
-@set UPDATED 7th March, 2000
+@set UPDATED 9th March, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -900,6 +900,7 @@ and in extreme cases the operating system itself.
 @menu
 * Virtual memory::                  Addition facilities.
 * Call stacks and symbol tables::   Tracing information.
+* Threads::                         Multiple threads of execution.
 @end menu
 
 @node Virtual memory, Call stacks and symbol tables, , Operating system support
@@ -1027,7 +1028,7 @@ mapped files will usually be more efficient than using normal file operations on
 a system without virtual memory.}, but the advantages of virtual memory far
 outweigh the disadvantages, especially when used for debugging purposes.
 
-@node Call stacks and symbol tables, , Virtual memory, Operating system support
+@node Call stacks and symbol tables, Threads, Virtual memory, Operating system support
 @section Call stacks and symbol tables
 @cindex function call stacks
 @cindex call stacks
@@ -1106,6 +1107,61 @@ so must be searched in the system in order to get the necessary information.  It
 is usually necessary to liaise with the @emph{dynamic linker}@footnote{Which is
 the part of the operating system that performs the run-time linking of shared
 libraries.} on many systems.
+
+@node Threads, , Call stacks and symbol tables, Operating system support
+@section Threads
+@cindex threads
+
+@cindex message passing
+@cindex shared memory
+On systems with virtual memory, such as UNIX and Windows, user programs are run
+as @emph{processes} which have their own address space and resources.  If a
+process needs to create sub-processes to perform other tasks it must call
+@code{fork()} or @code{spawn()} to create new processes, but these new processes
+do not share the same address space or resources as the parent process.  If
+processes need to share memory they must either use a message passing interface
+or explicitly mark a range of memory as shareable.
+
+@cindex parallel programming
+@cindex multi-processor systems
+Traditionally, this was not too much of a handicap as parallel processing was
+an expensive luxury and could only be made use of by the kernel of such systems.
+However, with the birth of fast processors and parallel programming, programs
+could be made to run more efficiently and faster on multi-processor systems by
+having more than one @emph{thread} of control.  This was achieved by allowing
+processes to have more than one program counter through which the processor
+could execute instructions, and if one thread of control stalled for a
+particular reason then another could continue without stalling the entire
+process.
+
+Such multithreaded programs allow parallel programming and implicit shared
+memory between threads since all threads in a process share the same address
+space and resources.  This is similar to operating systems that have no
+virtual memory, such as AmigaOS and Netware@footnote{Where the kernel is
+effectively a single process running all user programs as threads.}, except
+that once a process terminates, all threads terminate as well and all of its
+resources are still reclaimed.
+
+@cindex threads library
+@cindex POSIX threads
+Multithreaded programming generally needs no compiler support, but does require
+some primitive operations to be supported by the operating system for a threads
+library to call.  The functions that are available in the threads library
+provide the means for a process to create and destroy threads.  There are
+currently several popular threads libraries available, although the POSIX
+threads standard remains the definitive implementation.
+
+@cindex semaphores
+@cindex mutexes
+@cindex re-entrancy
+It is always important to remember when programming a multithreaded application
+that because all threads in a process share the same address space, measures
+must be taken to prevent threads reading and writing global data in a haphazard
+fashion.  This can either be done by locking with semaphores and mutexes, or can
+be performed by using stack variables instead of global variables since every
+thread has its own local stack.  Care must be taken to write re-entrant
+functions --- i.e. a function will give exactly the same result with one thread
+as it will with multiple threads running it at the same time.
 
 @node Using mpatrol, Improving performance, Operating system support, Top
 @chapter Using mpatrol
@@ -5285,7 +5341,15 @@ Perhaps add debugging/tracing versions of the string manipulation functions,
 such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
-with.
+with.  Also need to add replacement version of @code{memccpy()}.
+
+@item
+Add another library which can be linked in instead of mpatrol and replaces
+all calls to @code{__mp_alloc()}, etc., with the original calls to
+@code{malloc()} and related functions.  This would be very useful for quickly
+removing all mpatrol functionality for perhaps even a release build, and might
+be useful for implementing functions such as @code{memalign()} which don't
+exist on many systems.
 
 @item
 Script files similar to the @command{mpatrol} shell script provided for UNIX
