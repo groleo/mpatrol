@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mgauge.c,v 1.4 2001-02-23 21:49:55 graeme Exp $"
+#ident "$Id: mgauge.c,v 1.5 2001-03-07 20:43:49 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.4 2001-02-23 21:49:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.5 2001-03-07 20:43:49 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -101,11 +101,13 @@ updategauge(void)
 {
     static char b[COLUMN_WIDTH - 3];
     __mp_heapinfo h;
+    size_t t;
     unsigned long i, n;
 
     if (!gauge_pause && __mp_stats(&h))
     {
-        n = (unsigned long) (((double) (COLUMN_WIDTH - 4) * (double) h.atotal) /
+        t = h.atotal - h.mtotal;
+        n = (unsigned long) (((double) (COLUMN_WIDTH - 4) * (double) t) /
                              (double) gauge_size);
         if (n > COLUMN_WIDTH - 4)
             n = COLUMN_WIDTH - 4;
@@ -115,7 +117,7 @@ updategauge(void)
             b[i++] = ' ';
         b[i] = '\0';
         fprintf(gauge_file, "\r%c %s%c%c", DELIMIT_CHAR, b,
-                (h.atotal > gauge_size) ? OVERFLOW_CHAR : ' ', DELIMIT_CHAR);
+                (t > gauge_size) ? OVERFLOW_CHAR : ' ', DELIMIT_CHAR);
     }
 }
 
