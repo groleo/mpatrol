@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.54 2001-03-05 19:27:15 graeme Exp $"
+#ident "$Id: memory.c,v 1.55 2001-05-06 19:24:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.54 2001-03-05 19:27:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.55 2001-05-06 19:24:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -627,7 +627,16 @@ __mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
 #elif TARGET == TARGET_AMIGA
     p = AllocMem(*l, MEMF_ANY | MEMF_CLEAR);
 #elif TARGET == TARGET_WINDOWS
+    /* The VirtualProtect() function won't allow us to protect a range of pages
+     * that span the allocation boundaries made by VirtualAlloc().  As mpatrol
+     * tries to merge all bordering free memory areas, we must prevent the
+     * pages allocated by different calls to VirtualAlloc() from being merged.
+     * The easiest way to do this is to reserve a page of virtual memory after
+     * each call to VirtualAlloc() since this won't actually take up any
+     * physical memory.  It's a bit of a hack, though!
+     */
     p = VirtualAlloc(NULL, *l, MEM_COMMIT, PAGE_READWRITE);
+    VirtualAlloc(NULL, 0x10000, MEM_RESERVE, PAGE_NOACCESS);
 #elif TARGET == TARGET_NETWARE
     p = NXPageAlloc(*l / i->page, 0);
 #endif /* MP_ARRAY_SUPPORT && TARGET */
