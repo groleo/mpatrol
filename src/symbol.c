@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.10 2000-02-29 23:01:31 graeme Exp $"
+#ident "$Id: symbol.c,v 1.11 2000-03-07 00:36:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -132,7 +132,7 @@ typedef struct sourcepos
     size_t base;        /* virtual address of object file */
     char *func;         /* function name */
     char *file;         /* file name */
-    unsigned long line; /* line number */
+    unsigned int line;  /* line number */
     char found;         /* found flag */
 }
 sourcepos;
