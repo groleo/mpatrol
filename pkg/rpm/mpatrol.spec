@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.37 2000-11-20 20:49:33 graeme Exp $
+# $Id: mpatrol.spec,v 1.38 2000-11-20 22:29:18 graeme Exp $
 
 
 %define libversion 1.3
@@ -65,19 +65,16 @@ cd build/unix
 make libmpatrol.a libmpatrol.so.%{libversion}
 make libmpatrolmt.a libmpatrolmt.so.%{libversion}
 make mpatrol mprof mleak
-strip mpatrol
-strip mprof
-strip mleak
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/bin
-cp build/unix/mpatrol $RPM_BUILD_ROOT/usr/bin
-cp build/unix/mprof $RPM_BUILD_ROOT/usr/bin
-cp build/unix/mleak $RPM_BUILD_ROOT/usr/bin
-cp bin/mpsym $RPM_BUILD_ROOT/usr/bin
-cp bin/mpedit $RPM_BUILD_ROOT/usr/bin
+mkdir -p $RPM_BUILD_ROOT/%{_bindir}
+install -m755 -s build/unix/mpatrol $RPM_BUILD_ROOT/%{_bindir}
+install -m755 -s build/unix/mprof $RPM_BUILD_ROOT/%{_bindir}
+install -m755 -s build/unix/mleak $RPM_BUILD_ROOT/%{_bindir}
+install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
+install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
@@ -121,43 +118,43 @@ mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
 cp tests/profile/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
 cp tests/tutorial/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
-mkdir -p $RPM_BUILD_ROOT/usr/include
-cp src/mpatrol.h $RPM_BUILD_ROOT/usr/include
-mkdir -p $RPM_BUILD_ROOT/usr/info
-cp doc/mpatrol.info* $RPM_BUILD_ROOT/usr/info
-mkdir -p $RPM_BUILD_ROOT/usr/lib
-cp build/unix/libmpatrol.a $RPM_BUILD_ROOT/usr/lib
-cp build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/usr/lib
-cp build/unix/libmpatrolmt.a $RPM_BUILD_ROOT/usr/lib
-cp build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/usr/lib
-mkdir -p $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/mpatrol.1 $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/mprof.1 $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/mleak.1 $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/mpsym.1 $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/mpedit.1 $RPM_BUILD_ROOT/usr/man/man1
-mkdir -p $RPM_BUILD_ROOT/usr/man/man3
-cp man/man3/mpatrol.3 $RPM_BUILD_ROOT/usr/man/man3
+mkdir -p $RPM_BUILD_ROOT/%{_includedir}
+install -m644 src/mpatrol.h $RPM_BUILD_ROOT/%{_includedir}
+mkdir -p $RPM_BUILD_ROOT/%{_infodir}
+install -m644 doc/mpatrol.info* $RPM_BUILD_ROOT/%{_infodir}
+mkdir -p $RPM_BUILD_ROOT/%{_libdir}
+install -m644 build/unix/libmpatrol.a $RPM_BUILD_ROOT/%{_libdir}
+install -m755 build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+install -m644 build/unix/libmpatrolmt.a $RPM_BUILD_ROOT/%{_libdir}
+install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mpatrol.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mprof.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mleak.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mpsym.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mpedit.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
+install -m644 man/man3/mpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 
 %files
-/usr/bin
+%{_bindir}
 /usr/doc
-/usr/include
-/usr/info
-/usr/lib
-/usr/man
+%{_includedir}
+%{_infodir}
+%{_libdir}
+%{_mandir}
 
 
 %post
 /sbin/ldconfig
-/sbin/install-info /usr/info/mpatrol.info* /usr/info/dir
+/sbin/install-info %{_infodir}/mpatrol.info* %{_infodir}/dir
 
 
 %preun
 if [ $1 = 0 ]
 then
-    /sbin/install-info --delete /usr/info/mpatrol.info* /usr/info/dir
+    /sbin/install-info --delete %{_infodir}/mpatrol.info* %{_infodir}/dir
 fi
 
 
