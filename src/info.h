@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.56 2001-06-12 17:54:45 graeme Exp $
+ * $Id: info.h,v 1.57 2001-07-25 22:40:57 graeme Exp $
  */
 
 
@@ -69,6 +69,14 @@
 #define FLG_PROFILED      0x00000004 /* allocation has been profiled */
 #define FLG_TRACED        0x00000008 /* allocation has been traced */
 #define FLG_INTERNAL      0x00000010 /* allocation was made inside mpatrol */
+
+
+/* The types of the prologue, epilogue and low memory handlers.
+ */
+
+typedef void (*prologuehandler)(void *, size_t, void *);
+typedef void (*epiloguehandler)(void *, void *);
+typedef void (*nomemoryhandler)(void);
 
 
 /* The different types of memory allocation and operation functions.
@@ -246,10 +254,9 @@ typedef struct infohead
     size_t stotal;                    /* total bytes set */
     unsigned long ffreq;              /* failure frequency */
     unsigned long fseed;              /* failure seed */
-    void (*prologue)(void *, size_t,
-                     void *);         /* prologue function */
-    void (*epilogue)(void *, void *); /* epilogue function */
-    void (*nomemory)(void);           /* low-memory handler function */
+    prologuehandler prologue;         /* prologue function */
+    epiloguehandler epilogue;         /* epilogue function */
+    nomemoryhandler nomemory;         /* low-memory handler function */
     void (*inits[MP_MAXINITS])(void); /* initialisation functions */
     size_t initcount;                 /* initialisation function count */
     void (*finis[MP_MAXFINIS])(void); /* finalisation functions */
