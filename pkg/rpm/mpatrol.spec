@@ -21,23 +21,22 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.36 2000-11-18 15:11:23 graeme Exp $
+# $Id: mpatrol.spec,v 1.37 2000-11-20 20:49:33 graeme Exp $
 
 
-%define version 1.3.0
 %define libversion 1.3
 
 
-Summary: A library for controlling and tracing dynamic memory allocations
+Summary: A library for controlling and tracing dynamic memory allocations.
 Name: mpatrol
-Version: %{version}
+Version: 1.3.0
 Release: 1
-Copyright: LGPL
+License: LGPL
 Group: Development/Debuggers
-Source0: http://www.cbmamiga.demon.co.uk/mpatrol/files/mpatrol_%{version}.tar.gz
-Source1: http://www.cbmamiga.demon.co.uk/mpatrol/files/mpatrol_doc.tar.gz
-URL: http://www.cbmamiga.demon.co.uk/mpatrol/index.html
-Buildroot: /var/tmp/mpatrol-root
+Source0: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_%{version}.tar.gz
+Source1: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_doc.tar.gz
+URL: http://www.cbmamiga.demon.co.uk/mpatrol/
+Buildroot: %{_tmppath}/%{name}-root
 Prereq: /sbin/install-info /sbin/ldconfig
 Packager: Graeme S. Roy <graeme@epc.co.uk>
 
@@ -58,7 +57,7 @@ to recompile or relink in order to change the library's behaviour.
 
 
 %prep
-%setup -q -n mpatrol -b 1
+%setup -q -n %{name} -b 1
 
 
 %build
@@ -125,7 +124,7 @@ cp tests/tutorial/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutor
 mkdir -p $RPM_BUILD_ROOT/usr/include
 cp src/mpatrol.h $RPM_BUILD_ROOT/usr/include
 mkdir -p $RPM_BUILD_ROOT/usr/info
-cp doc/mpatrol.info $RPM_BUILD_ROOT/usr/info
+cp doc/mpatrol.info* $RPM_BUILD_ROOT/usr/info
 mkdir -p $RPM_BUILD_ROOT/usr/lib
 cp build/unix/libmpatrol.a $RPM_BUILD_ROOT/usr/lib
 cp build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/usr/lib
@@ -152,13 +151,13 @@ cp man/man3/mpatrol.3 $RPM_BUILD_ROOT/usr/man/man3
 
 %post
 /sbin/ldconfig
-/sbin/install-info /usr/info/mpatrol.info /usr/info/dir
+/sbin/install-info /usr/info/mpatrol.info* /usr/info/dir
 
 
 %preun
 if [ $1 = 0 ]
 then
-    /sbin/install-info --delete /usr/info/mpatrol.info /usr/info/dir
+    /sbin/install-info --delete /usr/info/mpatrol.info* /usr/info/dir
 fi
 
 
