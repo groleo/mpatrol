@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.42 2003-11-25 00:44:37 graeme Exp $
+# $Id: Makefile,v 1.43 2003-11-25 15:42:44 graeme Exp $
 
 
 # Definitions
@@ -105,8 +105,6 @@ ifeq ($(VERBOSE),true)
 else
 	@ makeinfo --html --no-split --number-sections $<
 endif
-	@ sed "s/<[ ]*<[ ]*[Pp][ ]*>[ ]*[Ii][Mm][Gg][ ]*/<img /g" $@ >$@.new
-	@ mv $@.new $@
 endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
