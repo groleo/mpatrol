@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.89 2001-02-16 23:02:56 graeme Exp $
+ * $Id: mpatrol.h,v 1.90 2001-02-22 18:45:08 graeme Exp $
  */
 
 
@@ -54,11 +54,11 @@
  */
 
 #ifndef MP_CONST
-#ifdef __STDC__
+#if defined(__STDC__) || defined(__cplusplus)
 #define MP_CONST const
-#else /* __STDC__ */
+#else /* __STDC__ && __cplusplus */
 #define MP_CONST
-#endif /* __STDC__ */
+#endif /* __STDC__ && __cplusplus */
 #endif /* MP_CONST */
 
 

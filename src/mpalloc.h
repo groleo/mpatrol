@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpalloc.h,v 1.4 2001-02-12 19:29:39 graeme Exp $
+ * $Id: mpalloc.h,v 1.5 2001-02-22 18:43:05 graeme Exp $
  */
 
 
@@ -36,11 +36,11 @@
  */
 
 #ifndef MP_CONST
-#ifdef __STDC__
+#if defined(__STDC__) || defined(__cplusplus)
 #define MP_CONST const
-#else /* __STDC__ */
+#else /* __STDC__ && __cplusplus */
 #define MP_CONST
-#endif /* __STDC__ */
+#endif /* __STDC__ && __cplusplus */
 #endif /* MP_CONST */
 
 
