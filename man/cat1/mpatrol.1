@@ -28,6 +28,21 @@ OOPPTTIIOONNSS
        to their listed mpatrol library  option.   See  mmppaattrrooll(3)
        for more details on these options.
 
+       --11 <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
+              [SSMMAALLLLBBOOUUNNDD]   Specifies  the  limit in bytes up to
+              which memory allocations should  be  classified  as
+              small allocations for profiling purposes.
+
+       --22 <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
+              [MMEEDDIIUUMMBBOOUUNNDD]   Specifies  the limit in bytes up to
+              which memory allocations should  be  classified  as
+              medium allocations for profiling purposes.
+
+       --33 <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
+              [LLAARRGGEEBBOOUUNNDD]   Specifies  the  limit in bytes up to
+              which memory allocations should  be  classified  as
+              large allocations for profiling purposes.
+
        --AA <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [AALLLLOOCCSSTTOOPP]  Specifies an allocation index at which
               to stop the program when it is being allocated.
@@ -43,6 +58,18 @@ OOPPTTIIOONNSS
 
        --cc     [CCHHEECCKKAALLLL]   Specifies  that all arguments to func-
               tions which  allocate,  reallocate  and  deallocate
+
+
+
+Release 1.2               30 April 2000                         1
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               memory have rigorous checks performed on them.
 
        --DD <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
@@ -56,19 +83,6 @@ OOPPTTIIOONNSS
               but only if they  were  dynamically  linked.   This
               option  will only work if the dynamic linker recog-
               nises the LLDD__PPRREELLOOAADD environment variable.
-
-
-
-
-
-Release 1.2               27 April 2000                         1
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
 
        --ee <_s_t_r_i_n_g>
               [PPRROOGGFFIILLEE]  Specifies an alternative filename  with
@@ -110,6 +124,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               deallocation.
 
        --nn     [NNOOFFRREEEE]  Specifies that the mpatrol library should
+
+
+
+Release 1.2               30 April 2000                         2
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               keep  all reallocated and freed memory allocations.
 
        --OO <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
@@ -121,21 +147,23 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               which  to  fill  the overflow buffers of all memory
               allocations.
 
+       --PP <_s_t_r_i_n_g>
+              [PPRROOFFFFIILLEE]  Specifies an alternative file in  which
+              to  place  all memory allocation profiling informa-
+              tion from the mpatrol library.
+
+       --pp     [PPRROOFF]  Specifies that all memory  allocations  are
+              to  be  profiled  and  sent to the profiling output
+              file.
+
+       --QQ <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
+              [AAUUTTOOSSAAVVEE]  Specifies the  frequency  at  which  to
+              periodically  write  the profiling data to the pro-
+              filing output file.
+
        --RR <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [RREEAALLLLOOCCSSTTOOPP]  Specifies  an  allocation  index  at
               which  to stop the program when a memory allocation
-
-
-
-Release 1.2               27 April 2000                         2
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
               is being reallocated.
 
        --SS     [SSHHOOWWMMAAPP & SSHHOOWWSSYYMMBBOOLLSS]  Specifies  that  a  memory
@@ -162,6 +190,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        --ww     [OOFFLLOOWWWWAATTCCHH]   Specifies  that  watch  point  areas
               should  be  used  for  overflow buffers rather than
+
+
+
+Release 1.2               30 April 2000                         3
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               filling with the overflow byte.
 
        --XX     [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
@@ -191,17 +231,6 @@ SSEEEE AALLSSOO
 AAUUTTHHOORR
        Graeme S. Roy <graeme@epc.co.uk>
 
-
-
-Release 1.2               27 April 2000                         3
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
@@ -230,35 +259,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.2               27 April 2000                         4
+Release 1.2               30 April 2000                         4
 
 
