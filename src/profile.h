@@ -45,6 +45,8 @@ typedef struct profhead
     size_t dcounts[MP_BIN_SIZE]; /* deallocation bins */
     size_t acountl;              /* total bytes of large allocations */
     size_t dcountl;              /* total bytes of large deallocations */
+    size_t acount;               /* total number of allocations */
+    size_t dcount;               /* total number of deallocations */
     size_t sbound;               /* small allocation boundary */
     size_t mbound;               /* medium allocation boundary */
     size_t lbound;               /* large allocation boundary */
