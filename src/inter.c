@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.53 2000-12-21 21:52:14 graeme Exp $"
+#ident "$Id: inter.c,v 1.54 2000-12-21 23:59:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -215,7 +215,7 @@ checkrange(unsigned long l, unsigned long n, unsigned long u)
 
 static
 void
-checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
+checkalloca(loginfo *i, int f)
 {
     allocanode *n, *p;
 #if MP_FULLSTACK
@@ -234,7 +234,7 @@ checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
      */
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectaddrs(&memhead.addr, MA_READWRITE);
-    a = __mp_getaddrs(&memhead.addr, v);
+    a = __mp_getaddrs(&memhead.addr, i->stack);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectaddrs(&memhead.addr, MA_READONLY);
 #endif /* MP_FULLSTACK */
@@ -276,7 +276,7 @@ checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
              * variable pointer occupies a higher address than that which
              * made the original allocation if we are to free the allocation.
              */
-            if ((char *) n->data.frame + 256 < (char *) &v->frame)
+            if ((char *) n->data.frame + 256 < (char *) &i->stack->frame)
                 c = 1;
         }
         else
@@ -285,7 +285,7 @@ checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
              * variable pointer occupies a lower address than that which
              * made the original allocation if we are to free the allocation.
              */
-            if ((char *) n->data.frame > (char *) &v->frame + 256)
+            if ((char *) n->data.frame > (char *) &i->stack->frame + 256)
                 c = 1;
         }
 #endif /* MP_FULLSTACK */
@@ -293,7 +293,7 @@ checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
         {
             if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue(n->block, (size_t) -1);
-            __mp_freememory(&memhead, n->block, AT_ALLOCA, s, t, u, v);
+            __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
             if (memhead.epilogue && (memhead.recur == 1))
                 memhead.epilogue((void *) -1);
         }
@@ -385,6 +385,7 @@ void
 __mp_fini(void)
 {
     stackinfo i;
+    loginfo v;
 
     savesignals();
     if (memhead.init)
@@ -400,7 +401,11 @@ __mp_fini(void)
             __mp_newframe(&i, NULL);
             if (__mp_getframe(&i))
                 __mp_getframe(&i);
-            checkalloca(NULL, NULL, 0, &i, 1);
+            v.func = NULL;
+            v.file = NULL;
+            v.line = 0;
+            v.stack = &i;
+            checkalloca(&v, 1);
             /* Then close any access library handles that might still be open.
              */
             __mp_closesymbols(&memhead.syms);
@@ -483,6 +488,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
 {
     void *p;
     stackinfo i;
+    loginfo v;
     int j;
 
 #if TARGET == TARGET_WINDOWS
@@ -536,9 +542,13 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
   retry:
-    p = __mp_getmemory(&memhead, l, a, f, s, t, u, &i);
+    p = __mp_getmemory(&memhead, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
@@ -582,6 +592,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
 {
     char *o;
     stackinfo i;
+    loginfo v;
     size_t n;
     int j;
 
@@ -645,7 +656,11 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
     if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
         j = 1;
     else
@@ -657,7 +672,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     if (__mp_checkstring(&memhead, p, &n, f, j))
     {
         o = p;
-        if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
+        if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, &v))
         {
             __mp_memcopy(p, o, n);
             p[n] = '\0';
@@ -687,6 +702,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     void *q;
 #endif /* TARGET */
     stackinfo i;
+    loginfo v;
     int j;
 
 #if TARGET == TARGET_WINDOWS
@@ -747,8 +763,12 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    p = __mp_resizememory(&memhead, p, l, a, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    p = __mp_resizememory(&memhead, p, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
@@ -767,6 +787,7 @@ void
 __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
 {
     stackinfo i;
+    loginfo v;
     int j;
 
 #if TARGET == TARGET_WINDOWS
@@ -812,8 +833,12 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    __mp_freememory(&memhead, p, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    __mp_freememory(&memhead, p, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1);
     restoresignals();
@@ -828,6 +853,7 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
             unsigned long u, size_t k)
 {
     stackinfo i;
+    loginfo v;
     int j;
 
     if (!memhead.init || memhead.fini)
@@ -863,8 +889,12 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    __mp_setmemory(&memhead, p, l, c, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    __mp_setmemory(&memhead, p, l, c, f, &v);
     restoresignals();
     return p;
 }
@@ -879,6 +909,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
 {
     void *r;
     stackinfo i;
+    loginfo v;
     int j;
 
     if (!memhead.init || memhead.fini)
@@ -925,8 +956,12 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    q = __mp_copymemory(&memhead, p, q, l, c, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    q = __mp_copymemory(&memhead, p, q, l, c, f, &v);
     restoresignals();
     return q;
 }
@@ -941,6 +976,7 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
 {
     void *r;
     stackinfo i;
+    loginfo v;
     int j;
     unsigned char b;
 
@@ -983,8 +1019,12 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    r = __mp_locatememory(&memhead, p, l, q, m, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    r = __mp_locatememory(&memhead, p, l, q, m, f, &v);
     restoresignals();
     return r;
 }
@@ -999,6 +1039,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 {
     void *m;
     stackinfo i;
+    loginfo v;
     int j, r;
 
     if (!memhead.init || memhead.fini)
@@ -1038,8 +1079,12 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    checkalloca(s, t, u, &i, 0);
-    r = __mp_comparememory(&memhead, p, q, l, f, s, t, u, &i);
+    v.func = s;
+    v.file = t;
+    v.line = u;
+    v.stack = &i;
+    checkalloca(&v, 0);
+    r = __mp_comparememory(&memhead, p, q, l, f, &v);
     restoresignals();
     return r;
 }
@@ -1218,6 +1263,7 @@ void
 __mp_check(void)
 {
     stackinfo i;
+    loginfo v;
 
     savesignals();
     if (!memhead.init)
@@ -1229,7 +1275,11 @@ __mp_check(void)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    checkalloca(NULL, NULL, 0, &i, 0);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
+    checkalloca(&v, 0);
     restoresignals();
 }
 
