@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.46 2000-12-18 22:14:37 graeme Exp $
+# $Id: mpatrol.spec,v 1.47 2000-12-18 23:54:03 graeme Exp $
 
 
 %define libversion 1.3
@@ -58,7 +58,7 @@ to recompile or relink in order to change the library's behaviour.
 
 
 %prep
-%setup -q -n %{name} -b 1
+%setup -q -n %{name} -b 1 -b 2
 
 
 %build
