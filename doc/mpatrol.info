@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
 February, 2001.
 
 * Menu:
@@ -9338,7 +9338,7 @@ Notes for all platforms
      before the mpatrol library has been initialised.
 
    * Add similar functions to the GNU `mcheck()' and `mprobe()'
-     functions, as well as `mtrace()' and `muntrace()'.
+     functions.
 
    * Perhaps add debugging/tracing versions of the string manipulation
      functions, such as `strlen()' and `strcmp()' in much the same way
@@ -13629,23 +13629,23 @@ Node: New processor support415227
 Node: New file format support415910
 Node: Notes416694
 Node: Generic notes418306
-Ref: Generic notes-Footnote-1435616
-Ref: Generic notes-Footnote-2435834
-Node: UNIX notes436056
-Node: Amiga notes440653
-Node: Windows notes444317
-Node: Netware notes445876
-Node: Frequently asked questions448436
-Node: Documentation449059
-Node: Building453889
-Node: Linking462600
-Node: Running467821
-Node: Files482929
-Node: Related software485925
-Ref: Related software-Footnote-1524935
-Node: References525176
-Node: Copying527769
-Node: Function index555658
-Node: Index558970
+Ref: Generic notes-Footnote-1435576
+Ref: Generic notes-Footnote-2435794
+Node: UNIX notes436016
+Node: Amiga notes440613
+Node: Windows notes444277
+Node: Netware notes445836
+Node: Frequently asked questions448396
+Node: Documentation449019
+Node: Building453849
+Node: Linking462560
+Node: Running467781
+Node: Files482889
+Node: Related software485885
+Ref: Related software-Footnote-1524895
+Node: References525136
+Node: Copying527729
+Node: Function index555618
+Node: Index558930
 
 End Tag Table

@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
 February, 2001.
 
 Foreword
@@ -9045,7 +9045,7 @@ H.1 Notes for all platforms
      before the mpatrol library has been initialised.
 
    * Add similar functions to the GNU `mcheck()' and `mprobe()'
-     functions, as well as `mtrace()' and `muntrace()'.
+     functions.
 
    * Perhaps add debugging/tracing versions of the string manipulation
      functions, such as `strlen()' and `strcmp()' in much the same way
