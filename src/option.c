@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.40 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: option.c,v 1.41 2001-09-27 23:08:57 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.40 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.41 2001-09-27 23:08:57 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -119,6 +119,8 @@ static char *options_help[] =
     "", "being freed.",
     "HELP", NULL,
     "", "Displays this quick-reference option summary.",
+    "HTML", NULL,
+    "", "Specifies that the log file should be formatted in HTML.",
     "LARGEBOUND", "unsigned integer",
     "", "Specifies the limit in bytes up to which memory allocations should be",
     "", "classified as large allocations for profiling purposes.",
@@ -679,6 +681,14 @@ __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     l = 1;
+                }
+                else if (matchoption(o, "HTML"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    __mp_diagflags |= FLG_HTML;
                 }
                 break;
               case 'L':
@@ -1440,6 +1450,8 @@ getflags(infohead *h)
         f |= OPT_EDIT;
     if (__mp_diagflags & FLG_LIST)
         f |= OPT_LIST;
+    if (__mp_diagflags & FLG_HTML)
+        f |= OPT_HTML;
     return f;
 }
 
