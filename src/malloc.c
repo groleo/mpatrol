@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.26 2001-02-05 21:06:01 graeme Exp $"
+#ident "$Id: malloc.c,v 1.27 2001-02-05 22:39:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -43,6 +43,10 @@ extern "C"
 
 /* Allocate an uninitialised memory block of a given size.
  */
+
+#ifdef malloc
+#undef malloc
+#endif /* malloc */
 
 void *
 malloc(size_t l)
@@ -64,6 +68,10 @@ MP_ALTFUNCNAME(malloc)(size_t l)
  * array of elements of a given size.
  */
 
+#ifdef calloc
+#undef calloc
+#endif /* calloc */
+
 void *
 calloc(size_t l, size_t n)
 {
@@ -82,6 +90,10 @@ MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 
 /* Allocate an uninitialised memory block of a given size and alignment.
  */
+
+#ifdef memalign
+#undef memalign
+#endif /* memalign */
 
 void *
 memalign(size_t a, size_t l)
@@ -103,6 +115,10 @@ MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
  * the system page size.
  */
 
+#ifdef valloc
+#undef valloc
+#endif /* valloc */
+
 void *
 valloc(size_t l)
 {
@@ -121,6 +137,10 @@ MP_ALTFUNCNAME(valloc)(size_t l)
 
 /* Allocate an uninitialised number of pages from the system.
  */
+
+#ifdef pvalloc
+#undef pvalloc
+#endif /* pvalloc */
 
 void *
 pvalloc(size_t l)
@@ -141,6 +161,10 @@ MP_ALTFUNCNAME(pvalloc)(size_t l)
 /* Allocate a temporary uninitialised memory block of a given size.
  */
 
+#ifdef alloca
+#undef alloca
+#endif /* alloca */
+
 void *
 alloca(size_t l)
 {
@@ -159,6 +183,10 @@ MP_ALTFUNCNAME(alloca)(size_t l)
 
 /* Duplicate an existing string using memory from the heap.
  */
+
+#ifdef strdup
+#undef strdup
+#endif /* strdup */
 
 char *
 strdup(MP_CONST char *p)
@@ -180,6 +208,10 @@ MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
  * on the size of the memory allocated for the new string.
  */
 
+#ifdef strndup
+#undef strndup
+#endif /* strndup */
+
 char *
 strndup(MP_CONST char *p, size_t l)
 {
@@ -198,6 +230,10 @@ MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
 
 /* Duplicate an existing string using memory from the heap.
  */
+
+#ifdef strsave
+#undef strsave
+#endif /* strsave */
 
 char *
 strsave(MP_CONST char *p)
@@ -218,6 +254,10 @@ MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
 /* Duplicate an existing string using memory from the heap, but set a limit
  * on the size of the memory allocated for the new string.
  */
+
+#ifdef strnsave
+#undef strnsave
+#endif /* strnsave */
 
 #if SYSTEM == SYSTEM_DGUX
 char *
@@ -248,6 +288,10 @@ MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
 /* Duplicate an existing string using temporary memory from the heap.
  */
 
+#ifdef strdupa
+#undef strdupa
+#endif /* strdupa */
+
 char *
 strdupa(MP_CONST char *p)
 {
@@ -268,6 +312,10 @@ MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
  * limit on the size of the memory allocated for the new string.
  */
 
+#ifdef strndupa
+#undef strndupa
+#endif /* strndupa */
+
 char *
 strndupa(MP_CONST char *p, size_t l)
 {
@@ -286,6 +334,10 @@ MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 
 /* Resize an existing block of memory.
  */
+
+#ifdef realloc
+#undef realloc
+#endif /* realloc */
 
 void *
 realloc(void *p, size_t l)
@@ -306,6 +358,10 @@ MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 /* Resize an existing block of memory, usually a block allocated by calloc().
  */
 
+#ifdef recalloc
+#undef recalloc
+#endif /* recalloc */
+
 void *
 recalloc(void *p, size_t l, size_t n)
 {
@@ -324,6 +380,10 @@ MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 
 /* Resize an existing block of memory, but never relocate it.
  */
+
+#ifdef expand
+#undef expand
+#endif /* expand */
 
 void *
 expand(void *p, size_t l)
@@ -344,6 +404,10 @@ MP_ALTFUNCNAME(expand)(void *p, size_t l)
 /* Free an existing block of memory.
  */
 
+#ifdef free
+#undef free
+#endif /* free */
+
 void
 free(void *p)
 {
@@ -362,6 +426,10 @@ MP_ALTFUNCNAME(free)(void *p)
 
 /* Free an existing block of memory, usually a block allocated by calloc().
  */
+
+#ifdef cfree
+#undef cfree
+#endif /* cfree */
 
 void
 cfree(void *p, size_t l, size_t n)
@@ -382,6 +450,10 @@ MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 /* Explicitly free an existing block of temporary memory.
  */
 
+#ifdef dealloca
+#undef dealloca
+#endif /* dealloca */
+
 void
 dealloca(void *p)
 {
@@ -400,6 +472,10 @@ MP_ALTFUNCNAME(dealloca)(void *p)
 
 /* Allocate an uninitialised memory block of a given size and abort on failure.
  */
+
+#ifdef xmalloc
+#undef xmalloc
+#endif /* xmalloc */
 
 void *
 xmalloc(size_t l)
@@ -421,6 +497,10 @@ MP_ALTFUNCNAME(xmalloc)(size_t l)
  * array of elements of a given size and abort on failure.
  */
 
+#ifdef xcalloc
+#undef xcalloc
+#endif /* xcalloc */
+
 void *
 xcalloc(size_t l, size_t n)
 {
@@ -439,6 +519,10 @@ MP_ALTFUNCNAME(xcalloc)(size_t l, size_t n)
 
 /* Duplicate an existing string using memory from the heap and abort on failure.
  */
+
+#ifdef xstrdup
+#undef xstrdup
+#endif /* xstrdup */
 
 char *
 xstrdup(MP_CONST char *p)
@@ -459,6 +543,10 @@ MP_ALTFUNCNAME(xstrdup)(MP_CONST char *p)
 /* Resize an existing block of memory and abort on failure.
  */
 
+#ifdef xrealloc
+#undef xrealloc
+#endif /* xrealloc */
+
 void *
 xrealloc(void *p, size_t l)
 {
@@ -477,6 +565,10 @@ MP_ALTFUNCNAME(xrealloc)(void *p, size_t l)
 
 /* Free an existing block of memory, usually a block allocated by xmalloc().
  */
+
+#ifdef xfree
+#undef xfree
+#endif /* xfree */
 
 void
 xfree(void *p)
@@ -497,6 +589,10 @@ MP_ALTFUNCNAME(xfree)(void *p)
 /* Set a block of memory to a specific byte.
  */
 
+#ifdef memset
+#undef memset
+#endif /* memset */
+
 void *
 memset(void *p, int c, size_t l)
 {
@@ -515,6 +611,10 @@ MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
 
 /* Set a block of memory to the zero byte.
  */
+
+#ifdef bzero
+#undef bzero
+#endif /* bzero */
 
 void
 bzero(void *p, size_t l)
@@ -536,6 +636,10 @@ MP_ALTFUNCNAME(bzero)(void *p, size_t l)
  * stopping when a specific character is found.
  */
 
+#ifdef memccpy
+#undef memccpy
+#endif /* memccpy */
+
 void *
 memccpy(void *q, MP_CONST void *p, int c, size_t l)
 {
@@ -545,10 +649,6 @@ memccpy(void *q, MP_CONST void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
-/* Copy a non-overlapping block of memory from one address to another,
- * stopping when a specific character is found.
- */
-
 void *
 MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 {
@@ -560,6 +660,10 @@ MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 
 /* Copy a non-overlapping block of memory from one address to another.
  */
+
+#ifdef memcpy
+#undef memcpy
+#endif /* memcpy */
 
 void *
 memcpy(void *q, MP_CONST void *p, size_t l)
@@ -580,6 +684,10 @@ MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
+#ifdef memmove
+#undef memmove
+#endif /* memmove */
+
 void *
 memmove(void *q, MP_CONST void *p, size_t l)
 {
@@ -599,6 +707,10 @@ MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
+#ifdef bcopy
+#undef bcopy
+#endif /* bcopy */
+
 void
 bcopy(MP_CONST void *p, void *q, size_t l)
 {
@@ -617,6 +729,10 @@ MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 
 /* Look for the first occurrence of a character in a block of memory.
  */
+
+#ifdef memchr
+#undef memchr
+#endif /* memchr */
 
 void *
 memchr(MP_CONST void *p, int c, size_t l)
@@ -639,6 +755,10 @@ MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
 /* Attempt to locate the position of one block of memory in another block.
  */
 
+#ifdef memmem
+#undef memmem
+#endif /* memmem */
+
 void *
 memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
@@ -660,6 +780,10 @@ MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 /* Compare two blocks of memory.
  */
 
+#ifdef memcmp
+#undef memcmp
+#endif /* memcmp */
+
 int
 memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
@@ -680,6 +804,10 @@ MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 /* Compare two blocks of memory.
  */
+
+#ifdef bcmp
+#undef bcmp
+#endif /* bcmp */
 
 int
 bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
