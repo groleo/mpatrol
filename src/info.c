@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.37 2000-11-06 00:02:36 graeme Exp $"
+#ident "$Id: info.c,v 1.38 2000-11-08 00:18:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1045,7 +1045,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
  * memory block.
  */
 
-int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
+MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
 {
     allocnode *n;
     infonode *m;
