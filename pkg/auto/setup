@@ -25,10 +25,10 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.5 2001-08-02 22:40:17 graeme Exp $
+# $Id: setup,v 1.6 2001-08-02 23:09:35 graeme Exp $
 
 
-uselinks=1
+uselinks=0
 generate=0
 
 
