@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: option.h,v 1.24 2001-08-23 22:46:42 graeme Exp $
+ * $Id: option.h,v 1.25 2001-09-27 22:38:03 graeme Exp $
  */
 
 
@@ -111,6 +111,7 @@
 #define OPT_USEDEBUG      0x02000000
 #define OPT_EDIT          0x04000000
 #define OPT_LIST          0x08000000
+#define OPT_HTML          0x10000000
 
 
 /* The different types of errors when parsing options.

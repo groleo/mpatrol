@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.138 2001-09-05 22:17:29 graeme Exp $
+ * $Id: mpatrol.h,v 1.139 2001-09-27 22:38:03 graeme Exp $
  */
 
 
@@ -252,6 +252,7 @@
 #define MP_FLG_USEDEBUG      0x02000000
 #define MP_FLG_EDIT          0x04000000
 #define MP_FLG_LIST          0x08000000
+#define MP_FLG_HTML          0x10000000
 
 
 /* The various options and flags that can be passed to __mp_leaktable().
