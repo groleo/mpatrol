@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.43 2000-12-26 10:30:00 graeme Exp $
+# $Id: Makefile,v 1.44 2001-01-22 20:02:52 graeme Exp $
 
 
 # Definitions
@@ -273,13 +273,13 @@ profile.o profile.s.o profile.n.ln profile.t.o profile.s.t.o profile.t.ln: \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
-trace.o trace.s.o trace.t.o trace.s.t.o: $(SOURCE)/trace.c $(SOURCE)/trace.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/memory.h \
-	$(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
-	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
-	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
-	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/utils.h \
-	$(SOURCE)/version.h
+trace.o trace.s.o trace.n.ln trace.t.o trace.s.t.o trace.t.ln: \
+	$(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/diag.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/version.h
 inter.o inter.s.o inter.n.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
