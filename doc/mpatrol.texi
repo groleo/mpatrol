@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.14 1999-11-26 13:15:18 graeme Exp $
+@c $Id: mpatrol.texi,v 1.15 1999-11-26 14:35:45 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.1
-@set VERSION 1.0.6
-@set UPDATED 25th November, 1999
+@set EDITION 1.2
+@set VERSION 1.1.0
+@set UPDATED 26th November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -1013,13 +1013,84 @@ mpatrol in the appendices, but you may wish to try out the examples
 (@pxref{Examples}) before reading further.
 
 @menu
+* Library behaviour::           Miscellaneous information.
 * Logging and tracing::         General information.
+* General errors::              Everyday problems.
 * Overwrites and underwrites::  Overflow buffers.
 * Using with a debugger::       Setting breakpoints.
 * Testing::                     Additional checks.
 @end menu
 
-@node Logging and tracing, Overwrites and underwrites, , Using mpatrol
+@node Library behaviour, Logging and tracing, , Using mpatrol
+@section Library behaviour
+@cindex library behaviour
+
+Most of the behaviour of the mpatrol library can be controlled at run-time via
+options which are read from the @env{MPATROL_OPTIONS} environment variable.
+This prevents you having to recompile or relink each time you want to change a
+library setting, and so makes it really easy to try out different settings to
+locate a particular bug.  You should know how to set the value of an environment
+variable on your system before you read on.
+
+@cindex alignment
+@cindex misaligned data
+@cindex bus errors
+By default, the mpatrol library will attempt to determine the minimum required
+alignment for any generic memory allocation when it first initialises itself.
+This may be affected by the compiler and its settings when the library was built
+but it should normally reflect the minimum alignment required by the processor
+on your system.  If you would prefer a larger (or perhaps even smaller) default
+alignment you may change it at run-time using the @option{DEFALIGN} option.  The
+value you supply must be in bytes, must be a power of two, and should not be
+larger that the system page size.  If you encounter bus errors due to misaligned
+memory accesses then you should increase this value.
+
+On systems that have virtual memory the library will attempt to write-protect
+all of its internal structures when user code is being run.  This ensures that
+it is nearly impossible for a program to corrupt any mpatrol library data.
+However, unprotecting and then protecting the structures at every library call
+has a slight overhead so you may prefer to disable this behaviour by using the
+@option{NOPROTECT} option.  This has no effect on systems that have no virtual
+memory.
+
+@cindex sbrk
+@cindex mmap
+On UNIX systems, the usual way for malloc libraries to allocate memory from the
+process heap is through the @code{sbrk()} system call.  This allocates memory
+from a contiguous heap, but has the disadvantage in that other library functions
+may also allocate memory using the same function, thus creating holes in the
+heap.  This is not a problem for mpatrol, but you may have a suspicion that your
+bug is due to a function from another library corrupting your data so you may
+wish to use the @option{USEMMAP} option.  This is only available on systems that
+have the @code{mmap()} system call and allows mpatrol to allocate all of its
+memory from a part of the process heap that is non-contiguous (i.e. each call to
+@code{mmap()} may return a block of memory that is completely unrelated to that
+returned by the previous call).
+
+By default, every time an mpatrol library function is called the library will
+automatically check the freed memory and overflow buffers of every memory
+allocation, which can slow program execution down, especially if you suspect the
+error you are looking for occurs at the 1000th memory allocation, for example.
+You can therefore use the @option{CHECK} option to specify a range of memory
+allocations at which the mpatrol library will automatically check the freed
+memory and overflow buffers.  All other allocations that fall outside this range
+will not be checked.
+
+@cindex stripped executable file
+If the mpatrol library that was built for your system supports reading symbolic
+information from a program's executable file, but it cannot locate the
+executable file, or you wish to specify an alternative, you can use the
+@option{PROGFILE} option to do this.  All this does is instruct the mpatrol
+library to read symbols from this file instead.  Note that on systems that
+support dynamic linking, the library can also read symbols from a dynamically
+linked executable file that has had its normal symbol table stripped.
+
+Finally, a list of all of the recognised options in the mpatrol library can be
+displayed to the standard error file stream by using the @option{HELP} option.
+This will not affect the settings of the library in any way, so you should be
+able to use other options at the same time.
+
+@node Logging and tracing, General errors, Library behaviour, Using mpatrol
 @section Logging and tracing
 @cindex logging
 @cindex tracing
@@ -1062,7 +1133,58 @@ will display any symbolic information that the mpatrol library managed to obtain
 from any executable files and libraries that were relevant to the program being
 tested.  All of these options can be selected with the @option{SHOWALL} option.
 
-@node Overwrites and underwrites, Using with a debugger, Logging and tracing, Using mpatrol
+@node General errors, Overwrites and underwrites, Logging and tracing, Using mpatrol
+@section General errors
+@cindex general errors
+
+By default, the mpatrol library follows the guidelines for ANSI C regarding the
+behaviour of the dynamic memory allocation functions it replaces@footnote{I
+attempted to do the same for ANSI C++ but there are still namespace and
+exception handling issues to be resolved.}.  This means that calling
+@code{malloc()} with a size of zero is allowed, for example.  However, warnings
+can be generated for all of these types of calls by using the @option{CHECKALL}
+option.  The @option{CHECKALLOCS} option warns only about calls to
+@code{malloc()} and similar functions with a size of zero, the
+@option{CHECKREALLOCS} option warns only about calls to @code{realloc()} and
+similar functions with either a null pointer or a size of zero, and the
+@option{CHECKFREES} option warns only about calls to @code{free()} and similar
+functions with a null pointer.
+
+@cindex allocation byte
+@cindex free byte
+All newly-allocated memory can be pre-filled with a specified byte by using the
+@option{ALLOCBYTE} option.  This can be used to catch out code that expects
+newly-allocated memory to be zeroed, although this option will have no effect on
+memory that was allocated with @code{calloc()}.  All free memory can also be
+pre-filled with a different specified byte by using the @option{FREEBYTE}
+option.  This will catch out code that expects to be able to use the contents of
+freed memory.
+
+@cindex prevent freeing memory
+@cindex free memory
+@cindex freed memory
+Alternatively, the mpatrol library can be instructed to keep all freed memory
+allocations so that its diagnostics can be clearer about which freed allocation
+a piece of code is erroneously trying to access.  This is controlled with the
+@option{NOFREE} option, but since it never reuses any freed allocations it can
+result in a lot more heap memory being used.  Note that this option
+distinguishes between @emph{free} memory and @emph{freed} memory.  @emph{Free}
+memory is unallocated memory that has been taken from the system heap.
+@emph{Freed} memory is a freed memory allocation, with all of the original
+details of the allocation preserved.
+
+@cindex preserve freed contents
+Normally, the @option{NOFREE} option will fill the freed allocation with the
+free byte so that any code that accesses it will hopefully fall over.  However,
+the original contents can be preserved using the @option{PRESERVE} option in
+case you need to see what the contents were just before it was freed.  The
+@option{NOFREE} option is also affected by the @option{PAGEALLOC} option, since
+then the freed allocation will have its contents both read and write protected
+so that nothing can access them.  If the @option{PRESERVE} option is used in
+this case then the freed allocation will only be made write-protected so that
+the original contents can be read from but not written to.
+
+@node Overwrites and underwrites, Using with a debugger, General errors, Using mpatrol
 @section Overwrites and underwrites
 @cindex overwrites
 @cindex underwrites
@@ -1964,9 +2086,6 @@ example have been numbered and their descriptions appear below.
 System page size.  This value is used on some platforms when allocating and
 protecting system memory.
 
-@cindex alignment
-@cindex misaligned data
-@cindex bus errors
 @item
 Default alignment.  This value is the minimum alignment required for general
 purpose memory allocations, and is usually the alignment required by the most
@@ -1986,10 +2105,8 @@ changed at run-time using the @option{OFLOWSIZE} option.
 
 @item
 Overflow byte.
-@cindex allocation byte
 @item
 Allocation byte.
-@cindex free byte
 @item
 Free byte.  These values are used by the library to pre-fill blocks of memory
 for checking purposes.  The overflow byte is used to fill overflow buffers, the
@@ -2233,7 +2350,6 @@ returns 0x00000000
 Note the extra information reported by @code{realloc()} since the library knows
 all of the details about the freed memory allocation and when it was freed.
 
-@cindex prevent freeing memory
 The @option{NOFREE} option tends to use up much more system memory than normal
 since it effectively instructs the mpatrol library to allocate new memory for
 every single memory allocation or reallocation.  It can also slow down program
@@ -2242,7 +2358,6 @@ the library needs to check more and more overflow buffers every time it is
 called.  However, it can be quite useful for problems such as this one.  The
 test in @file{tests/fail/test3.c} has a similar situation.
 
-@cindex preserve freed contents
 Normally, the @option{NOFREE} option will cause the library to fill all freed
 memory allocations with the free byte.  However, the original contents of such
 allocations can be preserved with the @option{PRESERVE} option.  This could
@@ -3378,8 +3493,6 @@ free up a minimum number of memory allocations.  Note that this setting will be
 ignored if its value is zero.  Default value: @option{UNFREEDABORT=0}.
 
 @cindex USEMMAP
-@cindex mmap
-@cindex sbrk
 @item @option{USEMMAP}
 Specifies that the library should use @code{mmap()} instead of @code{sbrk()} to
 allocate system memory on UNIX platforms.  This option should be used if there
@@ -4070,6 +4183,10 @@ Script files similar to the @command{mpatrol} shell script provided for UNIX
 platforms could be added for the other operating systems that the mpatrol
 library is available on.  Perhaps this could even be extended to a common
 executable command that is written in C.
+
+@item
+Add a section in the mpatrol manual describing how to use its special functions
+effectively, and also a guide on how to use the @command{mpatrol} shell script.
 
 @item
 Add a document containing frequently asked questions.
