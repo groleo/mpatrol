@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.256 2002-01-08 22:07:02 graeme Exp $
+@c $Id: mpatrol.texi,v 1.257 2002-02-04 23:34:48 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.13
+@set EDITION 2.14
 @set VERSION 1.4.8
-@set UPDATED 8th January, 2002
+@set UPDATED 4th February, 2002
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -921,6 +921,13 @@ by these tools and will also create a @file{configure} script.  Please see the
 that you can clean up the @file{pkg/auto} directory by typing @samp{make
 distclean} (if the @file{configure} script has already been run) followed by
 @samp{./cleanup}.
+
+If you have problems building with the @file{configure} script then you may
+need to regenerate the autoconf, automake and libtool configuration files to
+suit your particular system.  To do this, edit the @file{setup} file and change
+the setting of @samp{generate} from @samp{0} to @samp{1}.  Then re-execute
+the @file{setup} script, making sure that you have deleted the old files
+beforehand.
 
 For a manual installation, perform the following steps.
 
