@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 15th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 19th
 February, 2001.
 
 Foreword
@@ -218,6 +218,11 @@ out.
      lint library can also be built from the mpatrol library on UNIX
      platforms.
 
+   * A release version of the mpatrol library is provided, which has
+     the same functional interface, but does not contain any of
+     mpatrol's debugging, tracing or profiling features.  It is
+     intended to be used to quickly remove the mpatrol library.
+
    * Details of memory allocations and free memory are stored
      internally as a tree structure for speed and also to allow the
      best fit allocation algorithm to be used.  This also enables the
@@ -300,14 +305,17 @@ out.
 
    * A function is provided to display library settings and heap usage
      statistics, including peak memory usage.  This information is also
-     displayed at program termination.
+     displayed at program termination, and can also be placed into a
+     data structure at run-time via another function.
 
    * The library reads any user-controllable options at run-time from
      an environment variable, but this does not have to be set as
      defaults will then be used.  This prevents having to recompile
      anything in order to change any library settings.  An option
      exists to display a quick-reference summary of all of the
-     recognised options to the standard error file stream.
+     recognised options to the standard error file stream.  Library
+     settings can also be set and read from within user code after the
+     library has been initialised by calling two internal functions.
 
    * All diagnostics and logging are sent to a file in the current
      directory, but this can be overridden, including forcing the log
@@ -316,7 +324,9 @@ out.
      place log files can also be set.
 
    * Options exist to log details of every memory allocation,
-     reallocation or deallocation when they occur.
+     reallocation or deallocation when they occur.  A function exists
+     to log the details of any memory allocation to the mpatrol log
+     file.
 
    * Options exist to halt the program at a specific memory allocation,
      reallocation or deallocation when running the program within a
@@ -379,7 +389,8 @@ out.
      memory allocation call to ensure that nothing has overwritten the
      overflow buffers, but a function is also provided to perform
      additional checks under the programmer's control and an option
-     exists to specify a range in which checks will be performed.
+     exists to specify a range and frequency in which checks will be
+     performed.
 
    * On systems that support them, watch point areas can be used
      instead of overflow buffers so that every read and write to memory
@@ -444,7 +455,8 @@ out.
 
    * Certain signals can be saved and restored on entry to each library
      function and `errno' is set to `ENOMEM' if memory cannot be
-     allocated.
+     allocated, except for the ANSI C++ operators which throw the
+     `std::bad_alloc' exception instead.
 
    * On systems that support memory protection, the library attempts to
      detect any illegal memory accesses and display as much information
@@ -456,13 +468,15 @@ out.
      system it is being run on.  This information can then be displayed
      when information about a specific memory allocation is required.
      Many different call stack traceback implementations are provided
-     for different platforms.
+     for different platforms.  A function is also provided to write the
+     current call stack to the mpatrol log file.
 
    * Symbol table details from executable files and shared libraries are
      automatically read on systems that support this feature in order
      to make the call stack tracebacks more meaningful.  An option also
      exists to display a complete list of the symbols that were read by
-     the library at program termination.
+     the library at program termination.  A function is also provided
+     to return symbolic information about any code address.
 
    * Compiler-generated line number tables from any debugging sections
      that exist in executable files and shared libraries can also be
@@ -478,7 +492,8 @@ out.
    * Options are provided to edit and list a source file at a specific
      line number when a warning or error occurs due to that source
      line.  An external command which provides this functionality
-     outwith the mpatrol library is included.
+     outwith the mpatrol library is included, and functions are
+     provided to do this from within user code.
 
    * An option exists to change the default alignment used for
      general-purpose memory allocations.
@@ -494,6 +509,19 @@ out.
    * An option exists to display a complete memory map of the heap at
      program termination.  A function to do this is also available to
      call at any point during program execution.
+
+   * A function is provided to take a snapshot of the heap at the
+     current point in execution.  The value returned by this function
+     can then be used to pinpoint the differences in heap allocation
+     details between that point and a later point in the program.
+
+   * A function is provided to iterate across all of the current heap
+     allocations and call a user-defined callback function for each one
+     it finds.
+
+   * Functions are provided to write user-defined information directly
+     to the mpatrol log file, as well as hexadecimal memory dumps of
+     any memory location.
 
    * Options exist to display all freed and unfreed memory allocations
      at program termination in order to detect memory leaks, as well as
@@ -540,6 +568,9 @@ out.
      commercial graphical memory usage tool that can display the
      current memory map of a running process.  Inuse is supplied with
      Parasoft Insure++.
+
+   * An Automake macro is provided to ease the integration of mpatrol
+     into a new or existing project.
 
    * A small tool is provided to read a dictionary file and display all
      of the words that can be represented in hexadecimal form.  Such
@@ -612,7 +643,8 @@ if you perform the following steps.
      scripts.
 
   7. Go up two directory levels into the `src' directory and copy the
-     `mpatrol.h' header file into your local include directory.
+     `mpatrol.h', `mpalloc.h' and `mpdebug.h' header files into your
+     local include directory.
 
   8. On UNIX platforms, go up one directory level into the `man'
      directory and copy the `man1' and `man3' subdirectories to your
@@ -667,15 +699,22 @@ directory.
 4 Integration
 *************
 
+   This section describes how to go about adding or removing the
+mpatrol library from your code.  There are several levels for each
+category so it is worth reading about each before proceeding.
+
+4.1 Adding mpatrol
+==================
+
    The following steps should allow you to easily integrate the mpatrol
 library into an existing application, although some of them may not be
 available to do on many platforms.  They are listed in the order of
 number of changes required to modify existing code -- the last step
 will require a complete recompilation of all your code.
 
-  1. This step is currently only available on DYNIX/ptx, IRIX, Linux
-     and Solaris platforms and on DG/UX 4.20MU07(1) or later platforms
-     with the `LD_PRELOAD' feature.
+  1. This step is currently only available on DYNIX/ptx, FreeBSD, IRIX,
+     Linux, NetBSD, OpenBSD and Solaris platforms and on DG/UX
+     4.20MU07(1) or later platforms with the `LD_PRELOAD' feature.
 
      If your program or application has been dynamically linked with
      the system C library (`libc.so') or an alternative malloc shared
@@ -787,6 +826,33 @@ executable files.
 
    (1) Also available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59
 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.
+
+4.2 Removing mpatrol
+====================
+
+   Once you have ironed out all of the problems in your code with the
+help of the mpatrol library, there will come a time where you wish to
+build your program without any of its debugging features, either to
+improve the speed that it runs at, or perhaps even for a release.
+Choose one of the following steps to help you remove the mpatrol
+library from your program.
+
+  1. The quickest way to remove the mpatrol library from your
+     application is to link with libmpalloc instead of libmpatrol.
+     This contains replacements for all of the mpatrol library
+     functions, either implementing memory allocation or memory
+     operation functions with the system C library, or doing nothing in
+     the functions which perform debugging, profiling or tracing.  This
+     method is a very quick way to remove the mpatrol library but will
+     not result in very efficient code.
+
+  2. The other option is to recompile all of the source files which
+     include the `mpatrol.h' header file, but this time define the
+     `NDEBUG' preprocessor macro.  This automatically disables the
+     redefinition of `malloc()', etc. and prevents calls being made to
+     any mpatrol library functions.  Obviously, this option is the most
+     time-consuming of the two, but will result in the complete removal
+     of all references to the mpatrol library.
 
 5 Memory allocations
 ********************
@@ -12599,6 +12665,7 @@ adding a new operating system:
           See ``G.1 Adding a new operating system''.
 adding a new processor architecture:               
           See ``G.2 Adding a new processor architecture''.
+adding mpatrol:                                     See 4.1.
 address space:                                      See 9.
 address, physical:                                  See 6.1.
 address, virtual:                                   See 6.1.
@@ -13399,7 +13466,7 @@ re-entrancy:                                        See 6.3.
 read protection:                                    See 6.1.
 REALLOCSTOP:                                       
           See ``Appendix B Environment''.
-recompilation:                                      See 4.
+recompilation:                                      See 4.1.
 recoverable errors:                                 See 12.1.
 Red Hat:                                           
           See ``Appendix G Supported systems''.
@@ -13411,6 +13478,7 @@ related software:
           See ``Appendix J Related software''.
 release builds:                                    
           See ``Foreword''.
+removing mpatrol:                                   See 4.2.
 reporting bugs:                                    
           See ``Foreword''.
 resources:                                         

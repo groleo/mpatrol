@@ -15,6 +15,10 @@
 <li><a href="#Features">2 Features</a>
 <li><a href="#Installation">3 Installation</a>
 <li><a href="#Integration">4 Integration</a>
+<ul>
+<li><a href="#Adding%20mpatrol">4.1 Adding mpatrol</a>
+<li><a href="#Removing%20mpatrol">4.2 Removing mpatrol</a>
+</ul>
 <li><a href="#Memory%20allocations">5 Memory allocations</a>
 <ul>
 <li><a href="#Static%20memory%20allocations">5.1 Static memory allocations</a>
@@ -122,7 +126,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.5 of the mpatrol manual for version
-1.4.0, 15th February, 2001.
+1.4.0, 19th February, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -332,6 +336,11 @@ using heap memory from the system.
 support them, or even as one large object file.  A lint library can also be
 built from the mpatrol library on UNIX platforms.
 
+<li>A release version of the mpatrol library is provided, which has the same
+functional interface, but does not contain any of mpatrol's debugging, tracing
+or profiling features.  It is intended to be used to quickly remove the mpatrol
+library.
+
 <li>Details of memory allocations and free memory are stored internally as a tree
 structure for speed and also to allow the best fit allocation algorithm to be
 used.  This also enables the library to perform intelligent resizing of memory
@@ -483,13 +492,16 @@ example command file is provided for use with <code>gdb</code>.
 
 <li>A function is provided to display library settings and heap usage statistics,
 including peak memory usage.  This information is also displayed at program
-termination.
+termination, and can also be placed into a data structure at run-time via
+another function.
 
 <li>The library reads any user-controllable options at run-time from an environment
 variable, but this does not have to be set as defaults will then be used.  This
 prevents having to recompile anything in order to change any library settings. 
 An option exists to display a quick-reference summary of all of the recognised
-options to the standard error file stream.
+options to the standard error file stream.  Library settings can also be set and
+read from within user code after the library has been initialised by calling two
+internal functions.
 
 <li>All diagnostics and logging are sent to a file in the current directory, but
 this can be overridden, including forcing the log file to be the standard output
@@ -497,7 +509,8 @@ or standard error file streams.  An environment variable specifying a default
 directory in which to place log files can also be set.
 
 <li>Options exist to log details of every memory allocation, reallocation or
-deallocation when they occur.
+deallocation when they occur.  A function exists to log the details of any
+memory allocation to the mpatrol log file.
 
 <li>Options exist to halt the program at a specific memory allocation, reallocation
 or deallocation when running the program within a debugger.  These options have
@@ -552,8 +565,8 @@ overflow buffers.  The size of such overflow buffers and the value to pre-fill
 them with can be modified at run-time.  The checks will be performed before
 every memory allocation call to ensure that nothing has overwritten the
 overflow buffers, but a function is also provided to perform additional checks
-under the programmer's control and an option exists to specify a range in which
-checks will be performed.
+under the programmer's control and an option exists to specify a range and
+frequency in which checks will be performed.
 
 <li>On systems that support them, watch point areas can be used instead of overflow
 buffers so that every read and write to memory is checked to ensure that it is
@@ -609,7 +622,8 @@ corruption by the calling program.  This feature can be overridden at run-time
 as it can slow the program down.
 
 <li>Certain signals can be saved and restored on entry to each library function and
-<code>errno</code> is set to <code>ENOMEM</code> if memory cannot be allocated.
+<code>errno</code> is set to <code>ENOMEM</code> if memory cannot be allocated, except for
+the ANSI C++ operators which throw the <code>std::bad_alloc</code> exception instead.
 
 <li>On systems that support memory protection, the library attempts to detect any
 illegal memory accesses and display as much information as it can obtain about
@@ -619,13 +633,15 @@ the address in question and where the illegal memory access occurred.
 stored if the library supports this feature on the system it is being run on. 
 This information can then be displayed when information about a specific memory
 allocation is required.  Many different call stack traceback implementations are
-provided for different platforms.
+provided for different platforms.  A function is also provided to write the
+current call stack to the mpatrol log file.
 
 <li>Symbol table details from executable files and shared libraries are
 automatically read on systems that support this feature in order to make the
 call stack tracebacks more meaningful.  An option also exists to display a
 complete list of the symbols that were read by the library at program
-termination.
+termination.  A function is also provided to return symbolic information about
+any code address.
 
 <li>Compiler-generated line number tables from any debugging sections that exist
 in executable files and shared libraries can also be used by the mpatrol library
@@ -639,7 +655,8 @@ the program's executable file.
 
 <li>Options are provided to edit and list a source file at a specific line number
 when a warning or error occurs due to that source line.  An external command
-which provides this functionality outwith the mpatrol library is included.
+which provides this functionality outwith the mpatrol library is included, and
+functions are provided to do this from within user code.
 
 <li>An option exists to change the default alignment used for general-purpose memory
 allocations.
@@ -653,6 +670,17 @@ which can be useful for stress-testing error recovery code in a program.
 <li>An option exists to display a complete memory map of the heap at program
 termination.  A function to do this is also available to call at any point
 during program execution.
+
+<li>A function is provided to take a snapshot of the heap at the current point in
+execution.  The value returned by this function can then be used to pinpoint
+the differences in heap allocation details between that point and a later point
+in the program.
+
+<li>A function is provided to iterate across all of the current heap allocations
+and call a user-defined callback function for each one it finds.
+
+<li>Functions are provided to write user-defined information directly to the mpatrol
+log file, as well as hexadecimal memory dumps of any memory location.
 
 <li>Options exist to display all freed and unfreed memory allocations at program
 termination in order to detect memory leaks, as well as all free memory blocks. 
@@ -693,6 +721,9 @@ library.
 <li>The mpatrol library can be built to liaise with Parasoft Inuse, a commercial
 graphical memory usage tool that can display the current memory map of a running
 process.  Inuse is supplied with Parasoft Insure++.
+
+<li>An Automake macro is provided to ease the integration of mpatrol into a new or
+existing project.
 
 <li>A small tool is provided to read a dictionary file and display all of the words
 that can be represented in hexadecimal form.  Such hexadecimal constants can be
@@ -767,7 +798,8 @@ You may also wish to copy the <code>mpsym</code>, <code>mpedit</code> and
 supports Bourne shell scripts.
 
 <li>Go up two directory levels into the <code>src</code> directory and copy the
-<code>mpatrol.h</code> header file into your local include directory.
+<code>mpatrol.h</code>, <code>mpalloc.h</code> and <code>mpdebug.h</code> header files into your
+local include directory.
 
 <li>On UNIX platforms, go up one directory level into the <code>man</code> directory and
 copy the <code>man1</code> and <code>man3</code> subdirectories to your local man directory. 
@@ -824,6 +856,23 @@ Up:<a rel=up href="#Top">Top</a>
 
 <h1>4 Integration</h1>
 
+<p>This section describes how to go about adding or removing the mpatrol library
+from your code.  There are several levels for each category so it is worth
+reading about each before proceeding.
+
+<ul>
+<li><a href="#Adding%20mpatrol">Adding mpatrol</a>:               Adding mpatrol to your program. 
+<li><a href="#Removing%20mpatrol">Removing mpatrol</a>:             Removing mpatrol from your program. 
+</ul>
+
+<p><hr>
+Node:<a name="Adding%20mpatrol">Adding mpatrol</a>,
+Next:<a rel=next href="#Removing%20mpatrol">Removing mpatrol</a>,
+Up:<a rel=up href="#Integration">Integration</a>
+<br>
+
+<h2>4.1 Adding mpatrol</h2>
+
 <p>The following steps should allow you to easily integrate the mpatrol library
 into an existing application, although some of them may not be available to do
 on many platforms.  They are listed in the order of number of changes required
@@ -831,9 +880,9 @@ to modify existing code -- the last step will require a complete recompilation
 of all your code.
 
 <ol type=1 start=1>
-</p><li>This step is currently only available on DYNIX/ptx, IRIX, Linux and Solaris
-platforms and on DG/UX 4.20MU07<a rel=footnote href="#fn-1"><sup>1</sup></a> or
-later platforms with the <code>LD_PRELOAD</code> feature.
+</p><li>This step is currently only available on DYNIX/ptx, FreeBSD, IRIX, Linux,
+NetBSD, OpenBSD and Solaris platforms and on DG/UX 4.20MU07<a rel=footnote href="#fn-1"><sup>1</sup></a> or later platforms with the <code>LD_PRELOAD</code>
+feature.
 
 <p>If your program or application has been dynamically linked with the system C
 library (<code>libc.so</code>) or an alternative malloc shared library then you can
@@ -932,6 +981,37 @@ the <code>USEDEBUG</code> option or the <code>mpsym</code> command.  In addition
 symbolic information will be available if the executable files have not had
 their symbol tables stripped from them, although mpatrol can also fall back to
 using the dynamic symbol table from dynamically linked executable files.
+
+<p><hr>
+Node:<a name="Removing%20mpatrol">Removing mpatrol</a>,
+Previous:<a rel=previous href="#Adding%20mpatrol">Adding mpatrol</a>,
+Up:<a rel=up href="#Integration">Integration</a>
+<br>
+
+<h2>4.2 Removing mpatrol</h2>
+
+<p>Once you have ironed out all of the problems in your code with the help of the
+mpatrol library, there will come a time where you wish to build your program
+without any of its debugging features, either to improve the speed that it runs
+at, or perhaps even for a release.  Choose one of the following steps to help
+you remove the mpatrol library from your program.
+
+<ol type=1 start=1>
+</p><li>The quickest way to remove the mpatrol library from your application is to
+link with libmpalloc instead of libmpatrol.  This contains replacements for all
+of the mpatrol library functions, either implementing memory allocation or
+memory operation functions with the system C library, or doing nothing in the
+functions which perform debugging, profiling or tracing.  This method is a very
+quick way to remove the mpatrol library but will not result in very efficient
+code.
+
+<li>The other option is to recompile all of the source files which include the
+<code>mpatrol.h</code> header file, but this time define the <code>NDEBUG</code>
+preprocessor macro.  This automatically disables the redefinition of
+<code>malloc()</code>, etc. and prevents calls being made to any mpatrol library
+functions.  Obviously, this option is the most time-consuming of the two, but
+will result in the complete removal of all references to the mpatrol library.
+</ol>
 
 <p><hr>
 Node:<a name="Memory%20allocations">Memory allocations</a>,
@@ -12331,6 +12411,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>adding a new object file format: <a href="#New%20file%20format%20support">New file format support</a>
 <li>adding a new operating system: <a href="#New%20system%20support">New system support</a>
 <li>adding a new processor architecture: <a href="#New%20processor%20support">New processor support</a>
+<li>adding mpatrol: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>address space: <a href="#Tracing">Tracing</a>
 <li>address, physical: <a href="#Virtual%20memory">Virtual memory</a>
 <li>address, virtual: <a href="#Virtual%20memory">Virtual memory</a>
@@ -12867,7 +12948,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>re-entrancy: <a href="#Threads">Threads</a>
 <li>read protection: <a href="#Virtual%20memory">Virtual memory</a>
 <li>REALLOCSTOP: <a href="#Environment">Environment</a>
-<li>recompilation: <a href="#Integration">Integration</a>
+<li>recompilation: <a href="#Adding%20mpatrol">Adding mpatrol</a>
 <li>recoverable errors: <a href="#Example%201">Example 1</a>
 <li>Red Hat: <a href="#Supported%20systems">Supported systems</a>
 <li>reference card: <a href="#Installation">Installation</a>
@@ -12875,6 +12956,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>registers: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>related software: <a href="#Related%20software">Related software</a>
 <li>release builds: <a href="#Foreword">Foreword</a>
+<li>removing mpatrol: <a href="#Removing%20mpatrol">Removing mpatrol</a>
 <li>reporting bugs: <a href="#Foreword">Foreword</a>
 <li>resources: <a href="#References">References</a>
 <li>return address: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
@@ -13025,8 +13107,9 @@ Up:<a rel=up href="#Top">Top</a>
 <hr><h4>Footnotes</h4>
 <ol type="1">
 <li><a name="fn-1"></a>
-<p>Also available on DG/UX 4.20MU05 with
-patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.</p>
+<p>Also
+available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06
+with patch dgux_R4.20MU06.p08.</p>
 
 <li><a name="fn-2"></a>
 <p>Or more accurately, at link time.</p>
