@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.93 2001-02-26 00:01:58 graeme Exp $"
+#ident "$Id: inter.c,v 1.94 2001-02-27 20:10:55 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.93 2001-02-26 00:01:58 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.94 2001-02-27 20:10:55 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -347,6 +347,8 @@ checkalloca(loginfo *i, int f)
 void
 __mp_init(void)
 {
+    size_t i;
+
     savesignals();
     if (memhead.fini)
         /* We currently don't allow the library to be reinitialised.
@@ -407,6 +409,15 @@ __mp_init(void)
             __mp_protectsymbols(&memhead.syms, MA_READONLY);
             __mp_protectinfo(&memhead, MA_READONLY);
         }
+        /* Finally, call any initialisation functions in the order in which
+         * they were registered.
+         */
+        for (i = 0; i < memhead.initcount; i++)
+        {
+            memhead.inits[i]();
+            memhead.inits[i] = NULL;
+        }
+        memhead.initcount = 0;
     }
     restoresignals();
 }
