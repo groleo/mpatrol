@@ -33,7 +33,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.1.1.1 1999-10-03 11:25:23 graeme Exp $"
+#ident "$Id: strtab.c,v 1.2 1999-12-21 20:16:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -107,7 +107,7 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
     else
         __mp_treeremove(&t->tree, &n->node);
     r = n->next;
-    memcpy(r, s, l);
+    __mp_memcopy(r, s, l);
     n->next += l;
     n->avail -= l;
     /* We have already removed the strnode from the allocation tree since
