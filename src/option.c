@@ -35,13 +35,14 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <time.h>
 #if MP_MMAP_SUPPORT
 #include <fcntl.h>
 #endif /* MP_MMAP_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.3 1999-10-21 20:42:10 graeme Exp $"
+#ident "$Id: option.c,v 1.4 1999-11-25 16:15:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -57,7 +58,7 @@ extern "C"
  * from being re-entrant.
  */
 
-static char options[256];
+static char options[1024];
 
 
 /* The table describing a summary of all recognised options.
@@ -88,6 +89,12 @@ static char *options_help[] =
     "DEFALIGN", "unsigned integer",
     "", "Specifies the default alignment for general-purpose memory",
     "", "allocations, which must be a power of two.",
+    "FAILFREQ", "unsigned integer",
+    "", "Specifies the frequency at which all memory allocations will randomly",
+    "", "fail.",
+    "FAILSEED", "unsigned integer",
+    "", "Specifies the random number seed which will be used when determining",
+    "", "which memory allocations will randomly fail.",
     "FREEBYTE", "unsigned integer",
     "", "Specifies an 8-bit byte pattern with which to prefill newly-freed",
     "", "memory.",
@@ -485,7 +492,30 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     }
                 break;
               case 'F':
-                if (matchoption(o, "FREEBYTE"))
+                if (matchoption(o, "FAILFREQ"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        h->ffreq = n;
+                        i = OE_RECOGNISED;
+                    }
+                else if (matchoption(o, "FAILSEED"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        if (n == 0)
+                            h->fseed = (unsigned long) time(NULL);
+                        else
+                            h->fseed = n;
+                        i = OE_RECOGNISED;
+                    }
+                else if (matchoption(o, "FREEBYTE"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
