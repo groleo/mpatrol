@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.15 2000-04-27 18:55:38 graeme Exp $
+# $Id: build,v 1.16 2000-04-30 17:59:00 graeme Exp $
 
 
 version=1.2.0
@@ -74,6 +74,7 @@ cp ../../build/unix/libmpatrol.a lib
 cp ../../build/unix/libmpatrol.so.$libversion lib
 mkdir -p man/man1
 cp ../../man/man1/mpatrol.1 man/man1
+cp ../../man/man1/mprof.1 man/man1
 cp ../../man/man1/mleak.1 man/man1
 mkdir -p man/man3
 cp ../../man/man3/mpatrol.3 man/man3

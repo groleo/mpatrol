@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.11 2000-04-27 18:55:42 graeme Exp $
+# $Id: build,v 1.12 2000-04-30 17:59:07 graeme Exp $
 
 
 version=1.2.0
@@ -80,9 +80,11 @@ ln -s libmpatrol.so.$libversion libmpatrol.so
 cd ../..
 mkdir -p mpatrol/man/cat1
 cp ../../man/cat1/mpatrol.1 mpatrol/man/cat1
+cp ../../man/cat1/mprof.1 mpatrol/man/cat1
 cp ../../man/cat1/mleak.1 mpatrol/man/cat1
 mkdir -p mpatrol/man/man1
 cp ../../man/man1/mpatrol.1 mpatrol/man/man1
+cp ../../man/man1/mprof.1 mpatrol/man/man1
 cp ../../man/man1/mleak.1 mpatrol/man/man1
 mkdir -p mpatrol/man/cat3
 cp ../../man/cat3/mpatrol.3 mpatrol/man/cat3
