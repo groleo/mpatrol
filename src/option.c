@@ -35,12 +35,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.30 2001-02-08 00:02:44 graeme Exp $"
+#ident "$Id: option.c,v 1.31 2001-02-08 18:13:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.30 2001-02-08 00:02:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.31 2001-02-08 18:13:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1099,6 +1100,209 @@ __mp_parseoptions(infohead *h)
         h->prof.file = __mp_proffile(&h->alloc.heap.memory, p);
     if (t != NULL)
         h->trace.file = __mp_tracefile(&h->alloc.heap.memory, t);
+}
+
+
+/* Modify mpatrol flags after the library has been initialised.
+ */
+
+static
+unsigned long
+modifyflags(infohead *h, unsigned long f, int u)
+{
+    unsigned long i;
+
+    if (f == 0)
+        return 0;
+    for (i = 1; i != 0; i <<= 1)
+        if (f & i)
+        {
+            f &= ~i;
+            switch (i)
+            {
+              case OPT_CHECKALLOCS:
+                if (u == 0)
+                    h->flags |= FLG_CHECKALLOCS;
+                else
+                    h->flags &= ~FLG_CHECKALLOCS;
+                break;
+              case OPT_CHECKREALLOCS:
+                if (u == 0)
+                    h->flags |= FLG_CHECKREALLOCS;
+                else
+                    h->flags &= ~FLG_CHECKREALLOCS;
+                break;
+              case OPT_CHECKFREES:
+                if (u == 0)
+                    h->flags |= FLG_CHECKFREES;
+                else
+                    h->flags &= ~FLG_CHECKFREES;
+                break;
+              case OPT_CHECKMEMORY:
+                if (u == 0)
+                    h->flags |= FLG_CHECKMEMORY;
+                else
+                    h->flags &= ~FLG_CHECKMEMORY;
+                break;
+              case OPT_LOGALLOCS:
+                if (u == 0)
+                    h->flags |= FLG_LOGALLOCS;
+                else
+                    h->flags &= ~FLG_LOGALLOCS;
+                break;
+              case OPT_LOGREALLOCS:
+                if (u == 0)
+                    h->flags |= FLG_LOGREALLOCS;
+                else
+                    h->flags &= ~FLG_LOGREALLOCS;
+                break;
+              case OPT_LOGFREES:
+                if (u == 0)
+                    h->flags |= FLG_LOGFREES;
+                else
+                    h->flags &= ~FLG_LOGFREES;
+                break;
+              case OPT_LOGMEMORY:
+                if (u == 0)
+                    h->flags |= FLG_LOGMEMORY;
+                else
+                    h->flags &= ~FLG_LOGMEMORY;
+                break;
+              case OPT_SHOWMAP:
+                if (u == 0)
+                    h->flags |= FLG_SHOWMAP;
+                else
+                    h->flags &= ~FLG_SHOWMAP;
+                break;
+              case OPT_SHOWSYMBOLS:
+                if (u == 0)
+                    h->flags |= FLG_SHOWSYMBOLS;
+                else
+                    h->flags &= ~FLG_SHOWSYMBOLS;
+                break;
+              case OPT_SHOWFREE:
+                if (u == 0)
+                    h->flags |= FLG_SHOWFREE;
+                else
+                    h->flags &= ~FLG_SHOWFREE;
+                break;
+              case OPT_SHOWFREED:
+                if (u == 0)
+                    h->flags |= FLG_SHOWFREED;
+                else
+                    h->flags &= ~FLG_SHOWFREED;
+                break;
+              case OPT_SHOWUNFREED:
+                if (u == 0)
+                    h->flags |= FLG_SHOWUNFREED;
+                else
+                    h->flags &= ~FLG_SHOWUNFREED;
+                break;
+              case OPT_ALLOWOFLOW:
+                if (u == 0)
+                    h->flags |= FLG_ALLOWOFLOW;
+                else
+                    h->flags &= ~FLG_ALLOWOFLOW;
+                break;
+              case OPT_EDIT:
+                if (u == 0)
+                {
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_LIST;
+                    __mp_diagflags |= FLG_EDIT;
+#endif /* TARGET */
+                }
+                else
+                {
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_EDIT;
+#endif /* TARGET */
+                }
+                break;
+              case OPT_LIST:
+                if (u == 0)
+                {
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_EDIT;
+                    __mp_diagflags |= FLG_LIST;
+#endif /* TARGET */
+                }
+                else
+                {
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_LIST;
+#endif /* TARGET */
+                }
+                break;
+              default:
+                f |= i;
+                break;
+            }
+        }
+    return f;
+}
+
+
+/* Set an mpatrol option after the library has been initialised.
+ */
+
+MP_GLOBAL
+unsigned long
+__mp_setopt(infohead *h, unsigned long o, unsigned long v)
+{
+    unsigned long r;
+
+    r = 0;
+    switch (o)
+    {
+      case OPT_HELP:
+        showoptions();
+        break;
+      case OPT_SETFLAGS:
+        r = modifyflags(h, v, 0);
+        break;
+      case OPT_UNSETFLAGS:
+        r = modifyflags(h, v, 1);
+        break;
+      case OPT_ALLOCSTOP:
+        h->astop = v;
+        break;
+      case OPT_REALLOCSTOP:
+        h->rstop = v;
+        break;
+      case OPT_FREESTOP:
+        h->fstop = v;
+        break;
+      case OPT_ALLOCBYTE:
+        if (v > 0xFF)
+            v = 0xFF;
+        h->alloc.abyte = v;
+        break;
+      case OPT_LIMIT:
+        h->limit = v;
+        break;
+      case OPT_FAILFREQ:
+        h->ffreq = v;
+        break;
+      case OPT_FAILSEED:
+        if (v == 0)
+            v = (unsigned long) time(NULL);
+        srand((unsigned int) v);
+        h->fseed = v;
+        break;
+      case OPT_UNFREEDABORT:
+        h->uabort = v;
+        break;
+      case OPT_AUTOSAVE:
+        if (h->prof.autocount > 0)
+            __mp_writeprofile(&h->prof, !(h->flags & FLG_NOPROTECT));
+        h->prof.autosave = v;
+        break;
+      default:
+        r = o;
+        break;
+    }
+    return r;
 }
 
 

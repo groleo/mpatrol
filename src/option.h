@@ -38,30 +38,30 @@
  */
 
 #define OPT_HELP          0
-#define OPT_SETFLAGS      -1
-#define OPT_UNSETFLAGS    -2
-#define OPT_ALLOCSTOP     -3
-#define OPT_REALLOCSTOP   -4
-#define OPT_FREESTOP      -5
-#define OPT_ALLOCBYTE     -6
-#define OPT_FREEBYTE      -7
-#define OPT_OFLOWBYTE     -8
-#define OPT_OFLOWSIZE     -9
-#define OPT_DEFALIGN      -10
-#define OPT_LIMIT         -11
-#define OPT_FAILFREQ      -12
-#define OPT_FAILSEED      -13
-#define OPT_UNFREEDABORT  -14
-#define OPT_LOGFILE       -15
-#define OPT_PROFFILE      -16
-#define OPT_TRACEFILE     -17
-#define OPT_PROGFILE      -18
-#define OPT_AUTOSAVE      -19
-#define OPT_CHECK         -20
-#define OPT_NOFREE        -21
-#define OPT_SMALLBOUND    -22
-#define OPT_MEDIUMBOUND   -23
-#define OPT_LARGEBOUND    -24
+#define OPT_SETFLAGS      1
+#define OPT_UNSETFLAGS    2
+#define OPT_ALLOCSTOP     3
+#define OPT_REALLOCSTOP   4
+#define OPT_FREESTOP      5
+#define OPT_ALLOCBYTE     6
+#define OPT_FREEBYTE      7
+#define OPT_OFLOWBYTE     8
+#define OPT_OFLOWSIZE     9
+#define OPT_DEFALIGN      10
+#define OPT_LIMIT         11
+#define OPT_FAILFREQ      12
+#define OPT_FAILSEED      13
+#define OPT_UNFREEDABORT  14
+#define OPT_LOGFILE       15
+#define OPT_PROFFILE      16
+#define OPT_TRACEFILE     17
+#define OPT_PROGFILE      18
+#define OPT_AUTOSAVE      19
+#define OPT_CHECK         20
+#define OPT_NOFREE        21
+#define OPT_SMALLBOUND    22
+#define OPT_MEDIUMBOUND   23
+#define OPT_LARGEBOUND    24
 
 
 /* Flags that can be set at run-time.
@@ -125,6 +125,7 @@ extern "C"
 
 
 MP_EXPORT void __mp_parseoptions(infohead *);
+MP_EXPORT unsigned long __mp_setopt(infohead *, unsigned long, unsigned long);
 
 
 #ifdef __cplusplus
