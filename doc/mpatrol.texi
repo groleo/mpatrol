@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.67 2000-05-03 00:20:14 graeme Exp $
+@c $Id: mpatrol.texi,v 1.68 2000-05-04 20:21:49 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 2nd May, 2000
+@set UPDATED 4th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -675,14 +675,18 @@ the library names and library build commands on different systems.
 
 @cindex make
 @cindex all (make target)
+@cindex lint (make target)
 @cindex clean (make target)
 @cindex clobber (make target)
+@cindex lint
 @item
 Use the @command{make} command (or equivalent) to build the mpatrol library in
 archive form.  The @samp{all} target builds all possible combinations of the
 mpatrol library for your system.  The @samp{clean} target removes all relevant
 object files from the current directory, while the @samp{clobber} target also
-removes all libraries that have been built from the current directory.
+removes all libraries that have been built from the current directory.  On some
+UNIX platforms, the @samp{lint} target will build a @command{lint} library for
+the mpatrol library.
 
 @cindex Inuse
 @item
@@ -4607,12 +4611,13 @@ by another call to allocate memory.  If @var{ptr} is @samp{NULL} then no memory
 will be freed.  All of the previous contents will be destroyed.
 
 @findex cfree
-@item @code{void cfree(void *ptr)}
+@item @code{void cfree(void *ptr, size_t nelem, size_t size)}
 Frees the memory allocation beginning at @var{ptr} so the memory can be reused
 by another call to allocate memory.  If @var{ptr} is @samp{NULL} then no memory
-will be freed.  All of the previous contents will be destroyed.  This function
-is available for backwards compatibility with older C libraries and
-@code{calloc()} and should not be used in new code.
+will be freed.  All of the previous contents will be destroyed.  The @var{nelem}
+and @var{size} parameters are ignored in this implementation.  This function is
+available for backwards compatibility with older C libraries and @code{calloc()}
+and should not be used in new code.
 @end table
 
 @cindex MP_NOCPLUSPLUS
