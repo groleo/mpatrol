@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.15 2000-04-19 17:51:02 graeme Exp $"
+#ident "$Id: diag.c,v 1.16 2000-04-20 18:13:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -667,6 +667,9 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag("\nreallocation stop: %lu", h->rstop);
     __mp_diag("\nfree stop:         %lu", h->fstop);
     __mp_diag("\nunfreed abort:     %lu", h->uabort);
+    __mp_diag("\nsmall boundary:    %lu", h->prof.sbound);
+    __mp_diag("\nmedium boundary:   %lu", h->prof.mbound);
+    __mp_diag("\nlarge boundary:    %lu", h->prof.lbound);
     __mp_diag("\nlower check range: ");
     if (h->lrange == (size_t) -1)
         __mp_diag("-");
@@ -722,6 +725,7 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     else
         __mp_diag("%s", h->alloc.heap.memory.prog);
     __mp_diag("\nsymbols read:      %lu", h->syms.dtree.size);
+    __mp_diag("\nautosave count:    %lu", h->prof.autosave);
     __mp_diag("\nallocation count:  %lu", h->count);
     __mp_diag("\nallocation peak:   ");
     __mp_printsize(h->peak);
@@ -735,10 +739,10 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_printsize(h->alloc.fsize);
     n = h->alloc.heap.itree.size + h->alloc.itree.size + h->addr.list.size +
         h->syms.strings.list.size + h->syms.strings.tree.size +
-        h->syms.itree.size + h->list.size;
+        h->syms.itree.size + h->prof.list.size + h->list.size;
     __mp_diag(")\ninternal blocks:   %lu (", n);
     n = h->alloc.heap.isize + h->alloc.isize + h->addr.size +
-        h->syms.strings.size + h->syms.size + h->size;
+        h->syms.strings.size + h->syms.size + h->prof.size + h->size;
     __mp_printsize(n);
     __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
