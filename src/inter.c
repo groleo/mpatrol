@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.76 2001-02-06 22:01:06 graeme Exp $"
+#ident "$Id: inter.c,v 1.77 2001-02-08 00:02:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.76 2001-02-06 22:01:06 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.77 2001-02-08 00:02:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -211,24 +211,28 @@ restoresignals(void)
 }
 
 
-/* Check that a specified integer lies in a given range.
+/* Check the validity of all memory blocks, but only if the allocation count
+ * is within range and the event count is a multiple of the heap checking
+ * frequency.
  */
 
 static
-int
-checkrange(unsigned long l, unsigned long n, unsigned long u)
+void
+checkheap(unsigned long n)
 {
-    /* If the lower and upper bounds are zero then the integer never lies in
-     * the given range.
+    unsigned long l;
+
+    /* If the lower and upper bounds are zero then we never need to check
+     * the heap.
      */
-    if ((l != 0) || (u != 0))
+    if ((l = memhead.lrange) || (memhead.urange != 0))
     {
         if (l == (unsigned long) -1)
             l = 0;
-        if ((l <= n) && (n <= u))
-            return 1;
+        if ((l <= n) && (n <= memhead.urange) &&
+            ((memhead.check == 1) || (memhead.event % memhead.check == 0)))
+            __mp_checkinfo(&memhead);
     }
-    return 0;
 }
 
 
@@ -546,8 +550,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
-        __mp_checkinfo(&memhead);
+    checkheap(memhead.count + 1);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue((void *) -1, l);
     /* Determine the call stack details.
@@ -665,8 +668,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
-        __mp_checkinfo(&memhead);
+    checkheap(memhead.count + 1);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -2);
     /* Determine the call stack details.
@@ -802,8 +804,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (checkrange(memhead.lrange, memhead.count, memhead.urange))
-        __mp_checkinfo(&memhead);
+    checkheap(memhead.count);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, l);
     /* Determine the call stack details.
@@ -897,8 +898,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (checkrange(memhead.lrange, memhead.count, memhead.urange))
-        __mp_checkinfo(&memhead);
+    checkheap(memhead.count);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, (size_t) -1);
     /* Determine the call stack details.
@@ -1381,12 +1381,13 @@ __mp_iterate(int (*f)(void *), unsigned long s)
         if ((m = (infonode *) n->info) && !(m->data.flags & FLG_INTERNAL) &&
             (m->data.event > s))
         {
-            i++;
             if (f == NULL)
                 r = __mp_printinfo(n->block);
             else
                 r = f(n->block);
-            if (r == 0)
+            if (r > 0)
+                i++;
+            else if (r < 0)
                 break;
         }
     restoresignals();

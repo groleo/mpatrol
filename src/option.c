@@ -38,9 +38,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.29 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: option.c,v 1.30 2001-02-08 00:02:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.29 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.30 2001-02-08 00:02:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -307,15 +307,19 @@ readnumber(char *s, long *n, int u)
 
 static
 int
-readrange(char *s, unsigned long *l, unsigned long *u)
+readrange(char *s, unsigned long *l, unsigned long *u, unsigned long *d)
 {
-    char *t;
+    char *p, *t;
     unsigned long n;
     int w;
-    char c;
+    char b, c;
 
     w = 0;
     *l = *u = (unsigned long) -1;
+    *d = 1;
+    for (p = s; (*p != '/') && (*p != '\0'); p++);
+    b = *p;
+    *p = '\0';
     for (t = s; (*t != '-') && (*t != '\0'); t++);
     c = *t;
     *t = '\0';
@@ -339,6 +343,17 @@ readrange(char *s, unsigned long *l, unsigned long *u)
             w = 1;
         }
     }
+    if ((w == 0) && (b == '/'))
+    {
+        s = p + 1;
+        /* If there was a forward slash then read the number after it as well.
+         */
+        if ((*s != '\0') && (s[readnumber(s, (long *) d, 1)] != '\0'))
+        {
+            *d = 1;
+            w = 1;
+        }
+    }
     if (w != 0)
         return 0;
     /* If one or the other of the integers was zero (but not both) then convert
@@ -348,6 +363,10 @@ readrange(char *s, unsigned long *l, unsigned long *u)
         *l = (unsigned long) -1;
     else if ((*l != 0) && (*u == 0))
         *u = (unsigned long) -1;
+    /* If the frequency was zero then convert it to one.
+     */
+    if (*d == 0)
+        *d = 1;
     /* Swap the integers if the first number is greater than the second.
      */
     if ((*l != (unsigned long) -1) && (*u != (unsigned long) -1) && (*l > *u))
@@ -392,7 +411,7 @@ void
 __mp_parseoptions(infohead *h)
 {
     char *a, *f, *o, *p, *s, *t;
-    unsigned long m, n;
+    unsigned long d, m, n;
     int i, l, q;
 
     l = 0;
@@ -513,12 +532,13 @@ __mp_parseoptions(infohead *h)
                 if (matchoption(o, "CHECK"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
-                    else if (!readrange(a, &m, &n))
+                    else if (!readrange(a, &m, &n, &d))
                         i = OE_BADRANGE;
                     else
                     {
                         h->lrange = m;
                         h->urange = n;
+                        h->check = d;
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "CHECKALL"))

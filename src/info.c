@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.59 2001-02-06 22:23:38 graeme Exp $"
+#ident "$Id: info.c,v 1.60 2001-02-08 00:02:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.59 2001-02-06 22:23:38 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.60 2001-02-08 00:02:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -94,7 +94,8 @@ __mp_newinfo(infohead *h)
      */
     h->size = h->event = h->count = h->cpeak = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
-    h->lrange = h->urange = (size_t) -1;
+    h->lrange = h->urange = 0;
+    h->check = 1;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->ffreq = h->fseed = 0;
     h->prologue = NULL;

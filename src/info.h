@@ -224,6 +224,7 @@ typedef struct infohead
     size_t uabort;                    /* unfreed abort minimum */
     size_t lrange;                    /* lower check range */
     size_t urange;                    /* upper check range */
+    size_t check;                     /* check frequency */
     size_t dtotal;                    /* total bytes compared */
     size_t ltotal;                    /* total bytes located */
     size_t ctotal;                    /* total bytes copied */
