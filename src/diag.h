@@ -72,6 +72,20 @@ typedef enum errortype
 errortype;
 
 
+/* A loginfo structure is used to pass around information about a calling
+ * function.
+ */
+
+typedef struct loginfo
+{
+    char *func;         /* calling function name */
+    char *file;         /* file name in which call took place */
+    unsigned long line; /* line number at which call took place */
+    stackinfo *stack;   /* call stack details */
+}
+loginfo;
+
+
 #ifdef __cplusplus
 extern "C"
 {
