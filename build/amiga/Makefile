@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.2 2000-03-23 19:31:04 graeme Exp $
+# $Id: Makefile,v 1.3 2000-03-24 01:37:55 graeme Exp $
 
 
 # Definitions
@@ -167,7 +167,7 @@ malloc.o malloc.t.o: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h
 sbrk.o sbrk.t.o: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/memory.h
+	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.5 2000-03-23 19:48:20 graeme Exp $
+# $Id: Makefile,v 1.6 2000-03-24 01:37:57 graeme Exp $
 
 
 # Definitions
@@ -197,7 +197,7 @@ malloc.obj malloc.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h
 sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
-        $(SOURCE)/target.h $(SOURCE)/memory.h
+        $(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
