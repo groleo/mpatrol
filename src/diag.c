@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.18 2000-05-01 10:04:19 graeme Exp $"
+#ident "$Id: diag.c,v 1.19 2000-05-04 07:55:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,12 +66,12 @@ static FILE *logfile;
 static char buffer[256];
 
 
-/* The total warning and error counts.  These should really be reset after
+/* The total error and warning counts.  These should really be reset after
  * every initialisation of the library, but as we are not currently allowing
  * library to be reinitialised, this doesn't matter.
  */
 
-unsigned long warnings, errors;
+static unsigned long errors, warnings;
 
 
 /* This array should always be kept in step with the alloctype enumeration.
