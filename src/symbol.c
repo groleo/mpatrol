@@ -64,6 +64,7 @@
 #include <bfd.h>
 #endif /* FORMAT */
 #endif /* FORMAT */
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
 /* The shared libraries that an AIX executable has loaded can be obtained via
  * the loadquery() function.
@@ -91,13 +92,23 @@
 #include <obj.h>
 #include <obj_list.h>
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+/* We use the imagehlp library on Windows platforms to obtain information about
+ * the symbols loaded from third-party and system DLLs.  We can also use it to
+ * obtain information about any symbols contained in the executable file and
+ * program database if COFF or CodeView debugging information is being used.
+ */
+#include <windows.h>
+#include <imagehlp.h>
+#endif /* TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.27 2000-06-20 17:43:01 graeme Exp $"
+#ident "$Id: symbol.c,v 1.28 2000-06-22 23:04:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
     SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
@@ -123,8 +134,10 @@ typedef struct Elf32_Dyn
 Elf32_Dyn;
 #endif /* DT_NULL */
 #endif /* SYSTEM */
+#endif /* TARGET */
 
 
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
     SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
@@ -163,6 +176,31 @@ typedef struct objectinfo
 }
 objectinfo;
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+/* This structure is used to pass information to the callback function
+ * called by SymEnumerateSymbols().
+ */
+
+typedef struct syminfo
+{
+    symhead *syms; /* pointer to symbol table */
+    char *file;    /* filename of module */
+}
+syminfo;
+
+
+/* This structure is used to pass information to the callback function
+ * called by SymEnumerateModules().
+ */
+
+typedef struct modinfo
+{
+    symhead *syms; /* pointer to symbol table */
+    size_t index;  /* index of module */
+    char libs;     /* only read DLLs */
+}
+modinfo;
+#endif /* TARGET */
 
 
 #if FORMAT == FORMAT_BFD
@@ -205,6 +243,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
     SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
@@ -227,6 +266,7 @@ void _DYNAMIC(void);
  */
 extern struct obj_list *__rld_obj_head;
 #endif /* SYSTEM */
+#endif /* TARGET */
 
 
 /* Initialise the fields of a symhead so that the symbol table becomes empty.
@@ -271,6 +311,9 @@ MP_GLOBAL void __mp_closesymbols(symhead *y)
         free(n);
     }
 #endif /* FORMAT */
+#if TARGET == TARGET_WINDOWS
+    SymCleanup(GetCurrentProcess());
+#endif /* TARGET */
     y->hhead = y->htail = NULL;
 }
 
@@ -523,6 +566,51 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
     return 1;
 }
 #endif /* FORMAT */
+
+
+#if TARGET == TARGET_WINDOWS
+/* The callback function called to allocate a new symbol node for each
+ * symbol located in a module by the imagehlp library.
+ */
+
+static int __stdcall addsym(char *s, unsigned long a, unsigned long l, void *p)
+{
+    syminfo *i;
+    symhead *y;
+    symnode *n;
+    char *r;
+
+    i = (syminfo *) p;
+    y = i->syms;
+    /* We don't bother storing a symbol which has no name or which has a
+     * virtual address of zero.  Unfortunately, the imagehlp library does
+     * not provide information about the types of symbols so we will just
+     * have to add any symbols representing objects here as well.
+     */
+    if ((s != NULL) && (*s != '\0') && (a > 0))
+    {
+        if ((n = getsymnode(y)) == NULL)
+            return 0;
+        if ((r = __mp_addstring(&y->strings, s)) == NULL)
+        {
+            __mp_freeslot(&y->table, n);
+            return 0;
+        }
+        __mp_treeinsert(&y->dtree, &n->data.node, a);
+        n->data.file = i->file;
+        n->data.name = r;
+        n->data.addr = (void *) a;
+        n->data.size = l;
+        n->data.index = 0;
+        n->data.offset = 0;
+        /* Unfortunately, the imagehlp library does not provide information
+         * about the visibility of symbols.
+         */
+        n->data.flags = 0;
+    }
+    return 1;
+}
+#endif /* TARGET */
 
 
 #if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
@@ -836,6 +924,52 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
 #endif /* FORMAT */
 
 
+#if TARGET == TARGET_WINDOWS
+/* The callback function called to allocate a set of symbol nodes for each
+ * module located by the imagehlp library.
+ */
+
+static int __stdcall addsyms(char *f, unsigned long b, void *p)
+{
+    modinfo *i;
+    symhead *y;
+    char *t;
+    syminfo s;
+    IMAGEHLP_MODULE m;
+    int r;
+
+    r = 1;
+    i = (modinfo *) p;
+    y = i->syms;
+    /* The executable file is the first module, so we only want to examine it
+     * if we are not looking for external symbols.  The DLLs are the subsequent
+     * modules, so we only want to examine them if we are looking for external
+     * symbols.
+     */
+    if ((!i->libs && !i->index) || (i->libs && i->index))
+    {
+        /* Attempt to determine the full path of the current module.
+         */
+        m.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
+        if (SymGetModuleInfo(GetCurrentProcess(), b, &m))
+            f = m.LoadedImageName;
+        if ((t = __mp_addstring(&y->strings, f)) == NULL)
+            r = 0;
+        else
+        {
+            /* Cycle through every symbol contained in the module.
+             */
+            s.syms = y;
+            s.file = t;
+            r = SymEnumerateSymbols(GetCurrentProcess(), b, addsym, &s);
+        }
+    }
+    i->index++;
+    return r;
+}
+#endif /* TARGET */
+
+
 /* Read a file and add all relevant symbols contained within it to the
  * symbol table.
  */
@@ -856,6 +990,8 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 #endif /* FORMAT */
     char *t;
     int f;
+#elif FORMAT == FORMAT_PE
+    modinfo m;
 #endif /* FORMAT */
     int r;
 
@@ -1019,6 +1155,31 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
         }
     }
 #endif /* FORMAT */
+#if TARGET == TARGET_WINDOWS
+    /* We only want to obtain the symbols from the executable file using the
+     * imagehlp library if we are not using another object file access library,
+     * such as GNU BFD.  On the other hand, we always want to initialise the
+     * imagehlp library here since we will be using it to obtain the symbols
+     * from any loaded DLLs later on.  In any case we can set the demangling
+     * option in the imagehlp library and also instruct it to load line number
+     * information if the USEDEBUG option is given.
+     */
+    if (y->lineinfo)
+        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES);
+    else
+        SymSetOptions(SYMOPT_UNDNAME);
+    if (!SymInitialize(GetCurrentProcess(), NULL, 1))
+        r = 0;
+#if FORMAT == FORMAT_PE
+    else
+    {
+        m.syms = y;
+        m.index = 0;
+        m.libs = 0;
+        r = SymEnumerateModules(GetCurrentProcess(), addsyms, &m);
+    }
+#endif /* FORMAT */
+#endif /* TARGET */
     return r;
 }
 
@@ -1028,6 +1189,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 
 MP_GLOBAL int __mp_addextsymbols(symhead *y)
 {
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
     static char b[4096];
     struct ld_info *l;
@@ -1047,11 +1209,15 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
     char *s;
     size_t b;
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    modinfo m;
+#endif /* TARGET */
 
     /* This function liaises with the dynamic linker when a program is
      * dynamically linked in order to read symbols from any required shared
      * objects.
      */
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
     if (loadquery(L_GETINFO, b, sizeof(b)) != -1)
     {
@@ -1136,6 +1302,17 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
             }
         }
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    /* The imagehlp library allows us to locate the symbols contained in
+     * all of the loaded DLLs without having to actually read the files
+     * themselves.
+     */
+    m.syms = y;
+    m.index = 0;
+    m.libs = 1;
+    if (!SymEnumerateModules(GetCurrentProcess(), addsyms, &m))
+        return 0;
+#endif /* TARGET */
     return 1;
 }
 
@@ -1326,6 +1503,12 @@ MP_GLOBAL int __mp_findsource(symhead *y, void *p, char **s, char **t,
     objectfile *n;
     sourcepos m;
 #endif /* FORMAT */
+#if TARGET == TARGET_WINDOWS
+    static char b[1024];
+    IMAGEHLP_SYMBOL *i;
+    IMAGEHLP_LINE l;
+    unsigned long d;
+#endif /* TARGET */
 
 #if FORMAT == FORMAT_BFD
     m.addr = (bfd_vma) p;
@@ -1345,7 +1528,25 @@ MP_GLOBAL int __mp_findsource(symhead *y, void *p, char **s, char **t,
     }
 #endif /* FORMAT */
     *s = *t = NULL;
-    u = 0;
+    *u = 0;
+#if TARGET == TARGET_WINDOWS
+    if (y->lineinfo)
+    {
+        i = (IMAGEHLP_SYMBOL *) b;
+        i->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
+        i->MaxNameLength = sizeof(b) - sizeof(IMAGEHLP_SYMBOL);
+        if (SymGetSymFromAddr(GetCurrentProcess(), (unsigned long) p, &d, i))
+            *s = i->Name;
+        l.SizeOfStruct = sizeof(IMAGEHLP_LINE);
+        if (SymGetLineFromAddr(GetCurrentProcess(), (unsigned long) p, &d, &l))
+        {
+            *t = l.FileName;
+            *u = l.LineNumber;
+        }
+        if ((*s != NULL) || (*t != NULL))
+            return 1;
+    }
+#endif /* TARGET */
     return 0;
 }
 
