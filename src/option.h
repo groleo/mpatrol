@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: option.h,v 1.19 2001-02-12 19:27:35 graeme Exp $
+ * $Id: option.h,v 1.20 2001-02-13 22:07:14 graeme Exp $
  */
 
 
@@ -62,11 +62,13 @@
 #define OPT_TRACEFILE     17
 #define OPT_PROGFILE      18
 #define OPT_AUTOSAVE      19
-#define OPT_CHECK         20
-#define OPT_NOFREE        21
-#define OPT_SMALLBOUND    22
-#define OPT_MEDIUMBOUND   23
-#define OPT_LARGEBOUND    24
+#define OPT_CHECKLOWER    20
+#define OPT_CHECKUPPER    21
+#define OPT_CHECKFREQ     22
+#define OPT_NOFREE        23
+#define OPT_SMALLBOUND    24
+#define OPT_MEDIUMBOUND   25
+#define OPT_LARGEBOUND    26
 
 
 /* Flags that can be set at run-time.

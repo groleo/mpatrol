@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.83 2001-02-12 19:29:39 graeme Exp $
+ * $Id: mpatrol.h,v 1.84 2001-02-13 22:07:14 graeme Exp $
  */
 
 
@@ -170,11 +170,13 @@
 #define MP_OPT_TRACEFILE     -17
 #define MP_OPT_PROGFILE      -18
 #define MP_OPT_AUTOSAVE      -19
-#define MP_OPT_CHECK         -20
-#define MP_OPT_NOFREE        -21
-#define MP_OPT_SMALLBOUND    -22
-#define MP_OPT_MEDIUMBOUND   -23
-#define MP_OPT_LARGEBOUND    -24
+#define MP_OPT_CHECKLOWER    -20
+#define MP_OPT_CHECKUPPER    -21
+#define MP_OPT_CHECKFREQ     -22
+#define MP_OPT_NOFREE        -23
+#define MP_OPT_SMALLBOUND    -24
+#define MP_OPT_MEDIUMBOUND   -25
+#define MP_OPT_LARGEBOUND    -26
 
 
 /* Flags that can be set or unset using mallopt() and MP_OPT_SETFLAGS or
