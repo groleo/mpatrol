@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.115 2001-03-06 19:47:56 graeme Exp $
+ * $Id: mpatrol.h,v 1.116 2001-03-06 22:02:26 graeme Exp $
  */
 
 
@@ -814,6 +814,8 @@ __mp_locprintf(MP_CONST char *m, ...)
 #endif /* __cplusplus */
 
 #else /* NDEBUG */
+
+static int __mp_errno;
 
 #define dealloca(p)
 
