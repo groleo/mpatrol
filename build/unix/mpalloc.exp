@@ -78,6 +78,8 @@ __mp_readcontents
 __mp_writecontents
 __mp_cmpcontents
 __mp_remcontents
+__cyg_profile_func_enter
+__cyg_profile_func_exit
 chkr_set_right
 chkr_copy_bitmap
 chkr_check_addr

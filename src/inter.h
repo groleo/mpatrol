@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.46 2001-05-23 20:04:08 graeme Exp $
+ * $Id: inter.h,v 1.47 2001-07-25 21:45:28 graeme Exp $
  */
 
 
@@ -183,6 +183,8 @@ int __mp_readcontents(char *, void *);
 int __mp_writecontents(char *, void *);
 long __mp_cmpcontents(char *, void *);
 int __mp_remcontents(char *, void *);
+void __cyg_profile_func_enter(void *, void *);
+void __cyg_profile_func_exit(void *, void *);
 void chkr_set_right(void *, size_t, unsigned char);
 void chkr_copy_bitmap(void *, void *, size_t);
 void chkr_check_addr(void *, size_t, unsigned char);

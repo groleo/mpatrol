@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.33 2001-05-23 20:19:11 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.34 2001-07-25 21:45:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.33 2001-05-23 20:19:11 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.34 2001-07-25 21:45:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -990,6 +990,24 @@ int
 __mp_remcontents(char *s, void *p)
 {
     return 0;
+}
+
+
+/* The function that is called at every function prologue.
+ */
+
+void
+__cyg_profile_func_enter(void *a, void *p)
+{
+}
+
+
+/* The function that is called at every function epilogue.
+ */
+
+void
+__cyg_profile_func_exit(void *a, void *p)
+{
 }
 
 

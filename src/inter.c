@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.129 2001-06-12 18:56:09 graeme Exp $"
+#ident "$Id: inter.c,v 1.130 2001-07-25 21:45:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.129 2001-06-12 18:56:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.130 2001-07-25 21:45:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2823,6 +2823,50 @@ void __mp_libelf(void) {}
 void __mp_libbfd(void) {}
 void __mp_libiberty(void) {}
 #endif /* FORMAT */
+
+
+/* The function that is called at every function prologue.
+ */
+
+void
+__cyg_profile_func_enter(void *a, void *p)
+{
+#if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!crt_initialised())
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
+    restoresignals();
+}
+
+
+/* The function that is called at every function epilogue.
+ */
+
+void
+__cyg_profile_func_exit(void *a, void *p)
+{
+#if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!crt_initialised())
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
+    restoresignals();
+}
 
 
 /* Set the access rights for a block of memory using the checker interface.
