@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.78 2001-09-03 20:33:07 graeme Exp $
+# $Id: Makefile,v 1.79 2001-09-03 20:35:49 graeme Exp $
 
 
 # Definitions
@@ -41,7 +41,7 @@ GUISUP	= false
 ifeq ($(GUISUP),true)
 CFLAGS	= -I$(SOURCE) -I$(TOOLS) -I/usr/X11R6/include -I/usr/X11R5/include -I/usr/X11/include -I/usr/X/include -DMP_GUI_SUPPORT=1
 else
-CFLAGS	= -I$(SOURCE) -I$(TOOLS) -DMP_GUI_SUPPORT=0
+CFLAGS	= -I$(SOURCE) -I$(TOOLS)
 endif
 OFLAGS	= -O3 -fno-inline-functions
 SFLAGS	= -fPIC
