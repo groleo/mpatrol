@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.12 2000-11-16 21:41:50 graeme Exp $
+% $Id: refcard.tex,v 1.13 2000-11-16 22:13:54 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -45,6 +45,7 @@
 \newcommand{\heading}[1]{\textbf{\normalsize #1}}
 \newcommand{\command}[1]{\textbf{#1}}
 \newcommand{\function}[1]{\texttt{#1()}}
+\newcommand{\error}[1]{\texttt{#1}}
 \newcommand{\flag}[1]{\textbf{---#1}}
 \newcommand{\flagpar}[2]{\flag{#1} \texttt{<}\textit{#2}\texttt{>}}
 \newcommand{\option}[1]{\texttt{#1}}
@@ -385,6 +386,68 @@ can be defined to prevent the debugging versions of \texttt{operator new} and
 \hfill Sets up an allocation epilogue handler.
 \item[\function{\_\_mp\_nomemory}]
 \hfill Sets up an allocation failure handler.
+\end{description}
+
+\vskip 12pt
+
+The following table lists the warnings and errors that are likely to appear in
+the mpatrol log file when problems with dynamic memory allocations and memory
+operations occur.  Other types of warnings and errors may also appear in the log
+file, but they are likely to be associated with parsing options and reading
+symbols from executable files and so should be self-explanatory.
+
+\vskip 12pt
+\heading{Error abbreviation codes}
+\vskip 6pt
+
+\begin{description}
+\item[\error{ALLOVF}]
+\hfill Allocation has a corrupted overflow buffer.
+\item[\error{ALLZER}]
+\hfill Attempt to create an allocation of size 0.
+\item[\error{BADALN}]
+\hfill Alignment is not a power of two.
+\item[\error{FRDCOR}]
+\hfill Freed allocation has memory corruption.
+\item[\error{FRDOPN}]
+\hfill Attempt to perform operation on freed memory.
+\item[\error{FRDOVF}]
+\hfill Freed allocation has a corrupted overflow buffer.
+\item[\error{FRECOR}]
+\hfill Free memory corruption.
+\item[\error{FRENUL}]
+\hfill Attempt to free a \texttt{NULL} pointer.
+\item[\error{FREOPN}]
+\hfill Attempt to perform operation on free memory.
+\item[\error{ILLMEM}]
+\hfill Illegal memory access.
+\item[\error{INCOMP}]
+Attempt to resize or free memory allocated with an incompatible function.
+\item[\error{MAXALN}]
+\hfill Alignment is greater than the system page size.
+\item[\error{MISMAT}]
+Attempt to resize or free memory not pointing to the start of a memory
+allocation.
+\item[\error{NOTALL}]
+\hfill Pointer has not been allocated.
+\item[\error{NULOPN}]
+\hfill Attempt to perform operation on a \texttt{NULL} pointer.
+\item[\error{OUTMEM}]
+\hfill Out of memory.
+\item[\error{PRVFRD}]
+Attempt to resize of free memory that has previously been freed.
+\item[\error{RNGOVF}]
+Attempt to perform a memory operation that overflows a memory allocation.
+\item[\error{RNGOVL}]
+Attempt to perform a non-overlapping memory operation that overlaps.
+\item[\error{RSZNUL}]
+\hfill Attempt to resize a \texttt{NULL} pointer.
+\item[\error{RSZZER}]
+\hfill Attempt to resize an allocation to size 0.
+\item[\error{STROVF}]
+Attempt to perform a string operation that overflows a memory allocation.
+\item[\error{ZERALN}]
+\hfill Alignment 0 is invalid.
 \end{description}
 
 \vskip 12pt
