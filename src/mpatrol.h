@@ -48,6 +48,21 @@
 #endif /* MP_CONST */
 
 
+/* A macro for determining the alignment of a type at compile-time.
+ * This resolves to 0 if the compiler has no mechanism for doing this.
+ */
+
+#ifndef MP_ALIGN
+#ifdef __EDG__
+#define MP_ALIGN(t) __ALIGNOF__(t)
+#elif defined(__GNUC__)
+#define MP_ALIGN(t) __alignof__(t)
+#else /* __EDG__ && __GNUC__ */
+#define MP_ALIGN(t) 0
+#endif /* __EDG__ && __GNUC__ */
+#endif /* MP_ALIGN */
+
+
 /* A macro for determining the current function name.
  */
 
@@ -56,9 +71,9 @@
 #define MP_FUNCNAME __func__
 #elif defined(__GNUC__)
 #define MP_FUNCNAME __PRETTY_FUNCTION__
-#else /* __GNUC__ */
+#else /* __STDC_VERSION__ && __GNUC__ */
 #define MP_FUNCNAME NULL
-#endif /* __GNUC__ */
+#endif /* __STDC_VERSION__ && __GNUC__ */
 #endif /* MP_FUNCNAME */
 
 
@@ -369,6 +384,22 @@ struct mallinfo
 #undef bcmp
 #endif /* bcmp */
 
+#ifdef MP_MALLOC
+#undef MP_MALLOC
+#endif /* MP_MALLOC */
+#ifdef MP_CALLOC
+#undef MP_CALLOC
+#endif /* MP_CALLOC */
+#ifdef MP_STRDUP
+#undef MP_STRDUP
+#endif /* MP_STRDUP */
+#ifdef MP_REALLOC
+#undef MP_REALLOC
+#endif /* MP_REALLOC */
+#ifdef MP_FREE
+#undef MP_FREE
+#endif /* MP_FREE */
+
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
 #if MP_NONEWDELETE
@@ -450,6 +481,21 @@ struct mallinfo
 #define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, MP_FUNCNAME, \
                                       __FILE__, __LINE__, 0)
 
+#define MP_MALLOC(l, t) (t *) __mp_alloc((l) * sizeof(t), MP_ALIGN(t), \
+                                         MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
+                                         __LINE__, #t, sizeof(t), 0)
+#define MP_CALLOC(l, t) (t *) __mp_alloc((l) * sizeof(t), MP_ALIGN(t), \
+                                         MP_AT_CALLOC, MP_FUNCNAME, __FILE__, \
+                                         __LINE__, #t, sizeof(t), 0)
+#define MP_STRDUP(p) __mp_strdup((p), 0, MP_AT_STRDUP, MP_FUNCNAME, __FILE__, \
+                                 __LINE__, 0)
+#define MP_REALLOC(p, l, t) (t *) __mp_realloc((p), (l) * sizeof(t), \
+                                               MP_ALIGN(t), MP_AT_REALLOC, \
+                                               MP_FUNCNAME, __FILE__, \
+                                               __LINE__, #t, sizeof(t), 0)
+#define MP_FREE(p) do { __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, \
+                                  __LINE__, 0); p = NULL; } while (0)
+
 
 #ifdef __cplusplus
 extern "C"
@@ -499,6 +545,12 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #else /* NDEBUG */
 
 #define dealloca(p)
+
+#define MP_MALLOC(l, t) (t *) malloc((l) * sizeof(t))
+#define MP_CALLOC(l, t) (t *) calloc((l), sizeof(t))
+#define MP_STRDUP(p) strdup(p)
+#define MP_REALLOC(p, l, t) (t *) realloc((p), (l) * sizeof(t))
+#define MP_FREE(p) do { if (p) { free(p); } p = NULL; } while (0)
 
 #define MP_NEW new
 #define MP_DELETE delete
