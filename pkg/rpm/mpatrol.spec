@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.60 2001-02-21 09:58:36 graeme Exp $
+# $Id: mpatrol.spec,v 1.61 2001-02-21 11:03:23 graeme Exp $
 
 
 %define libversion 1.4
@@ -87,6 +87,8 @@ mkdir -p $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpatrol.h $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpalloc.h $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpdebug.h $RPM_BUILD_ROOT/%{_includedir}
+mkdir -p $RPM_BUILD_ROOT/%{_includedir}/mpatrol
+install -m644 tools/*.h $RPM_BUILD_ROOT/%{_includedir}/mpatrol
 mkdir -p $RPM_BUILD_ROOT/%{_infodir}
 install -m644 doc/mpatrol.info* $RPM_BUILD_ROOT/%{_infodir}
 mkdir -p $RPM_BUILD_ROOT/%{_libdir}

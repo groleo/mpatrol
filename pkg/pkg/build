@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.60 2001-02-14 22:14:43 graeme Exp $
+# $Id: build,v 1.61 2001-02-21 11:03:22 graeme Exp $
 
 
 version=1.4.0
@@ -103,6 +103,8 @@ mkdir -p include
 cp ../../src/mpatrol.h include
 cp ../../src/mpalloc.h include
 cp ../../src/mpdebug.h include
+mkdir -p include/mpatrol
+cp ../../tools/*.h include/mpatrol
 mkdir -p info
 cp ../../doc/mpatrol.info info
 mkdir -p lib

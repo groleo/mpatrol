@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.44 2001-02-14 22:14:43 graeme Exp $
+# $Id: prototype,v 1.45 2001-02-21 11:03:22 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -156,6 +156,10 @@ d none include 0775 bin bin
 f none include/mpatrol.h 0664 bin bin
 f none include/mpalloc.h 0664 bin bin
 f none include/mpdebug.h 0664 bin bin
+d none include/mpatrol 0775 bin bin
+f none include/mpatrol/heapdiff.h 0664 bin bin
+f none include/mpatrol/mgauge.h 0664 bin bin
+f none include/mpatrol/mtrace.h 0664 bin bin
 d none lib 0775 bin bin
 f none lib/libmpatrol.a 0664 bin bin
 f none lib/libmpatrol.so.1.4 0775 bin bin
