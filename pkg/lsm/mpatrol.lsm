@@ -1,7 +1,7 @@
 Begin4
 Title:          mpatrol
 Version:        1.4.4
-Entered-date:   2001-05-07
+Entered-date:   2001-05-30
 Description:    A link library that attempts to diagnose run-time errors that
                 are caused by the wrong use of dynamically allocated memory.
                 Along with providing a comprehensive and configurable log of
