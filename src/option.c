@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.22 2000-11-14 18:17:20 graeme Exp $"
+#ident "$Id: option.c,v 1.23 2000-11-30 21:40:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -204,6 +204,12 @@ static char *options_help[] =
     "SMALLBOUND", "unsigned integer",
     "", "Specifies the limit in bytes up to which memory allocations should be",
     "", "classified as small allocations for profiling purposes.",
+    "TRACE", NULL,
+    "", "Specifies that all memory allocations are to be traced and sent to",
+    "", "the tracing output file.",
+    "TRACEFILE", "string",
+    "", "Specifies an alternative file in which to place all memory allocation",
+    "", "tracing information from the mpatrol library.",
     "UNFREEDABORT", "unsigned integer",
     "", "Specifies the minimum number of unfreed allocations at which to abort",
     "", "the program just before program termination.",
@@ -373,12 +379,12 @@ static void showoptions(void)
 
 MP_GLOBAL void __mp_parseoptions(infohead *h)
 {
-    char *a, *f, *o, *p, *s;
+    char *a, *f, *o, *p, *s, *t;
     unsigned long m, n;
     int i, l, q;
 
     l = 0;
-    f = p = NULL;
+    f = p = t = NULL;
     if (((s = getenv(MP_OPTIONS)) == NULL) || (*s == '\0'))
         return;
     if (strlen(s) + 1 > sizeof(options))
@@ -923,6 +929,24 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     }
                 break;
+              case 'T':
+                if (matchoption(o, "TRACE"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->trace.tracing = 1;
+                }
+                else if (matchoption(o, "TRACEFILE"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else
+                    {
+                        t = a;
+                        i = OE_RECOGNISED;
+                    }
+                break;
               case 'U':
                 if (matchoption(o, "UNFREEDABORT"))
                     if (*a == '\0')
@@ -1026,12 +1050,19 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                    h->prof.lbound, h->prof.mbound);
         h->prof.lbound = h->prof.mbound + 1;
     }
+    /* Show the quick-reference option summary if it was requested.
+     */
     if (l != 0)
         showoptions();
+    /* Set up the filenames of the log, profiling and tracing files if they
+     * were overridden.
+     */
     if (f != NULL)
         h->log = __mp_logfile(&h->alloc.heap.memory, f);
     if (p != NULL)
         h->prof.file = __mp_proffile(&h->alloc.heap.memory, p);
+    if (t != NULL)
+        h->trace.file = __mp_tracefile(&h->alloc.heap.memory, t);
 }
 
 

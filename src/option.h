@@ -54,13 +54,14 @@
 #define OPT_UNFREEDABORT  -14
 #define OPT_LOGFILE       -15
 #define OPT_PROFFILE      -16
-#define OPT_PROGFILE      -17
-#define OPT_AUTOSAVE      -18
-#define OPT_CHECK         -19
-#define OPT_NOFREE        -20
-#define OPT_SMALLBOUND    -21
-#define OPT_MEDIUMBOUND   -22
-#define OPT_LARGEBOUND    -23
+#define OPT_TRACEFILE     -17
+#define OPT_PROGFILE      -18
+#define OPT_AUTOSAVE      -19
+#define OPT_CHECK         -20
+#define OPT_NOFREE        -21
+#define OPT_SMALLBOUND    -22
+#define OPT_MEDIUMBOUND   -23
+#define OPT_LARGEBOUND    -24
 
 
 /* Flags that can be set at run-time.
@@ -85,17 +86,18 @@
 #define OPT_CHECKFREES    0x00000400
 #define OPT_CHECKMEMORY   0x00000800
 #define OPT_PROF          0x00001000
-#define OPT_SAFESIGNALS   0x00002000
-#define OPT_NOPROTECT     0x00004000
-#define OPT_PRESERVE      0x00008000
-#define OPT_OFLOWWATCH    0x00010000
-#define OPT_PAGEALLOC     0x00020000
-#define OPT_ALLOCUPPER    0x00040000
-#define OPT_USEMMAP       0x00080000
-#define OPT_USEDEBUG      0x00100000
-#define OPT_ALLOWOFLOW    0x00200000
+#define OPT_TRACE         0x00002000
+#define OPT_SAFESIGNALS   0x00004000
+#define OPT_NOPROTECT     0x00008000
+#define OPT_PRESERVE      0x00010000
+#define OPT_OFLOWWATCH    0x00020000
+#define OPT_PAGEALLOC     0x00040000
+#define OPT_ALLOCUPPER    0x00080000
+#define OPT_USEMMAP       0x00100000
+#define OPT_USEDEBUG      0x00200000
 #define OPT_EDIT          0x00400000
 #define OPT_LIST          0x00800000
+#define OPT_ALLOWOFLOW    0x01000000
 
 
 /* The different types of errors when parsing options.
