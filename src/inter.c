@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.115 2001-03-07 21:16:31 graeme Exp $"
+#ident "$Id: inter.c,v 1.116 2001-03-07 22:13:32 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.115 2001-03-07 21:16:31 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.116 2001-03-07 22:13:32 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -389,6 +389,47 @@ checkalloca(loginfo *i, int f)
 }
 
 
+/* Deal with anything that needs to be done with marked memory allocations
+ * at program termination.
+ */
+
+static
+void
+finishmarked(void)
+{
+    allocnode *n;
+    infonode *m;
+    treenode *t;
+    int p;
+
+    if (memhead.flags & FLG_NOPROTECT)
+        p = -1;
+    else
+        p = 0;
+    for (t = __mp_minimum(memhead.alloc.atree.root); t != NULL;
+         t = __mp_successor(t))
+    {
+        n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
+        m = (infonode *) n->info;
+        if (m->data.flags & FLG_MARKED)
+        {
+            if ((p == 0) && (m->data.flags & (FLG_PROFILED | FLG_TRACED)))
+            {
+                __mp_protectinfo(&memhead, MA_READWRITE);
+                p = 1;
+            }
+            if (m->data.flags & FLG_PROFILED)
+                __mp_profilefree(&memhead.prof, n->size, m,
+                                 !(memhead.flags & FLG_NOPROTECT));
+            if (m->data.flags & FLG_TRACED)
+                __mp_tracefree(&memhead.trace, m->data.alloc);
+        }
+    }
+    if (p == 1)
+        __mp_protectinfo(&memhead, MA_READONLY);
+}
+
+
 /* The last error encountered by the mpatrol library.
  */
 
@@ -556,6 +597,9 @@ __mp_fini(void)
                     ((memhead.alloc.asize - memhead.mtotal) >= memhead.uabort))
                     __mp_printallocs(&memhead, 1);
             }
+            /* Deal with anything that needs to be done with marked allocations.
+             */
+            finishmarked();
             /* Next, close the tracing output file.  This will do nothing if
              * tracing has not been enabled.
              */
