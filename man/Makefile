@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.16 2002-01-08 20:28:40 graeme Exp $
+# $Id: Makefile,v 1.17 2003-11-25 00:40:43 graeme Exp $
 
 
 # Definitions
@@ -163,31 +163,31 @@ ps/libmpalloc.ps: man3/libmpalloc.3
 	$(ROFF) -Tps -man $< >$@
 
 pdf/mpatrol.pdf: ps/mpatrol.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/mprof.pdf: ps/mprof.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/mptrace.pdf: ps/mptrace.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/mleak.pdf: ps/mleak.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/mpsym.pdf: ps/mpsym.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/mpedit.pdf: ps/mpedit.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/hexwords.pdf: ps/hexwords.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 pdf/libmpalloc.pdf: ps/libmpalloc.ps
-	$(PSTILL) -c -o $@ $<
+	$(PSTILL) -c -c -p -o $@ $<
 
 all: $(CATPAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
