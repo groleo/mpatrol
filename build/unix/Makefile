@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.40 2000-12-06 01:09:12 graeme Exp $
+# $Id: Makefile,v 1.41 2000-12-06 22:48:29 graeme Exp $
 
 
 # Definitions
@@ -150,7 +150,7 @@ mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
 mptrace: mptrace.o getopt.o tree.o utils.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o utils.o version.o -lXm -lXt -lX11
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o utils.o version.o -L/usr/X11/lib -lXm -lXt -lX11
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
