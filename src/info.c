@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.26 2000-05-10 20:27:37 graeme Exp $"
+#ident "$Id: info.c,v 1.27 2000-05-11 20:10:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -290,7 +290,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 else
                     __mp_memset(p, h->alloc.abyte, l);
                 if (h->prof.profiling && (h->recur == 1) &&
-                    __mp_profilealloc(&h->prof, n->size, m))
+                    __mp_profilealloc(&h->prof, n->size, m,
+                                      !(h->flags & FLG_NOPROTECT)))
                     m->data.flags |= FLG_PROFILED;
 #if MP_INUSE_SUPPORT
                 _Inuse_malloc(p, l);
@@ -497,8 +498,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
 #endif /* MP_INUSE_SUPPORT */
             if ((p != NULL) && (m->data.flags & FLG_PROFILED))
             {
-                __mp_profilefree(&h->prof, d, m);
-                __mp_profilealloc(&h->prof, l, m);
+                __mp_profilefree(&h->prof, d, m, !(h->flags & FLG_NOPROTECT));
+                __mp_profilealloc(&h->prof, l, m, !(h->flags & FLG_NOPROTECT));
             }
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
@@ -615,7 +616,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         if (!(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READWRITE);
         if (m->data.flags & FLG_PROFILED)
-            __mp_profilefree(&h->prof, n->size, m);
+            __mp_profilefree(&h->prof, n->size, m, !(h->flags & FLG_NOPROTECT));
         __mp_freeaddrs(&h->addr, m->data.stack);
         if (h->alloc.flags & FLG_NOFREE)
         {
