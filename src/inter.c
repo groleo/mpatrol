@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.36 2000-05-23 21:52:58 graeme Exp $"
+#ident "$Id: inter.c,v 1.37 2000-05-23 23:10:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -254,10 +254,10 @@ void __mp_fini(void)
             __mp_protectsymbols(&memhead.syms, MA_READWRITE);
         }
         __mp_deleteinfo(&memhead);
-#endif /* MP_DELETE */
 #if MP_THREADS_SUPPORT
         __mp_finimutexes();
 #endif /* MP_THREADS_SUPPORT */
+#endif /* MP_DELETE */
         memhead.init = 0;
     }
     restoresignals();
