@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mptrace.1,v 1.5 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: mptrace.1,v 1.6 2001-03-08 23:57:38 graeme Exp $
 .\"
-.TH MPTRACE 1 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH MPTRACE 1 "8 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mptrace \- displays tracing information produced by the mpatrol library
 .SH SYNOPSIS
@@ -51,6 +51,14 @@ The \fIfile\fP argument must be a valid mpatrol tracing output filename but if
 \fIfile\fP is omitted then \fBmptrace\fP will use \fImpatrol.trace\fP as the
 name of the tracing output file to use.  If \fIfile\fP is given as \fI\-\fP then
 the standard input file stream will be used as the tracing output file.
+.PP
+A C source file containing a trace-driven memory allocation simulation program
+can be written with the \fB\-\-sim\-file\fP option.  This program will have the
+identical memory allocation behaviour to the program which produced the original
+trace file, although reallocations will have been converted into their
+corresponding deallocations and allocations.  This option can be useful to use
+if you wish to determine which malloc library is most suitable to use for a
+specific application.
 .PP
 The \fBmptrace\fP command will normally be built with GUI support on UNIX
 platforms that are running X Windows.  This means that a graphical memory map
@@ -87,6 +95,10 @@ more functionality.
 .TP
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
+.TP
+\fB\-\-sim\-file\fP \fIfile\fP [\fB\-s\fP]
+Specifies that a trace-driven memory allocation simulation program written in C
+should be written to a file.
 .TP
 \fB\-\-version\fP [\fB\-V\fP]
 Displays the version number of the \fBmptrace\fP command.
