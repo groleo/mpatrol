@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.21 2000-05-29 16:37:54 graeme Exp $"
+#ident "$Id: memory.c,v 1.22 2000-05-30 18:00:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -194,15 +194,17 @@ static int stackdirection(void *p)
 static char *progname(void)
 {
 #if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_IRIX
+#if SYSTEM == SYSTEM_AIX
+    extern char **p_xargv;
+#elif SYSTEM == SYSTEM_IRIX
     extern char **__Argv;
 #elif SYSTEM == SYSTEM_LINUX
     static char c[256];
     ssize_t l;
     int f;
 #endif /* SYSTEM */
-#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
-    !MP_BUILTINSTACK_SUPPORT
+#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
+     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC) && !MP_BUILTINSTACK_SUPPORT
     unsigned int *p;
     stackinfo s;
 #endif /* ARCH */
@@ -216,10 +218,12 @@ static char *progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_IRIX
-    /* IRIX has global variables containing argc and argv which we can use
-     * to determine the filename that the program was invoked with.
+    /* AIX and IRIX have global variables containing argc and argv which we
+     * can use to determine the filename that the program was invoked with.
      */
+#if SYSTEM == SYSTEM_AIX
+    return p_xargv[0];
+#elif SYSTEM == SYSTEM_IRIX
     return __Argv[0];
 #elif SYSTEM == SYSTEM_LINUX
     /* Linux has a file in the /proc filesystem which contains the argument
@@ -240,8 +244,8 @@ static char *progname(void)
         return c;
     }
 #endif /* SYSTEM */
-#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
-    !MP_BUILTINSTACK_SUPPORT
+#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
+     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC) && !MP_BUILTINSTACK_SUPPORT
     /* Because there is no function to return the executable filename
      * of a process on UNIX, we need to cheat and rely on the ABI by walking
      * up the process stack till we reach the startup code and then find
@@ -264,6 +268,9 @@ static char *progname(void)
 #endif /* SYSTEM */
 #elif ARCH == ARCH_M68K
         if (p = (unsigned int *) p[3])
+            return (char *) *p;
+#elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
+        if (p = (unsigned int *) p[23])
             return (char *) *p;
 #elif ARCH == ARCH_SPARC
         if (p = (unsigned int *) *(((unsigned int *) *p) + 1))
