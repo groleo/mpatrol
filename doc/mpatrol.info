@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 21st
 December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 21st
 December, 2000.
 
 * Menu:
@@ -10738,6 +10738,22 @@ Netware platforms.
           out of range block accesses as well as lots of tracing
           facilities.
 
+   * MTrace
+    Author
+          Morris R. Dovey (<mrdovey@iedu.com>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX, Windows
+
+    Location
+          `http://www.iedu.com/mrd/c/mtrace.c'
+
+    Overview
+          A very simple malloc tracing package.
+
    * MuForce
     Author
           Thomas Richter (<thor@einstein.math.tu-berlin.de>)
@@ -12305,6 +12321,7 @@ Index
 * mptrace command:                       Tracing.
 * MSS (Memory Supervision System):       Related software.
 * mtmalloc(3t):                          Related software.
+* MTrace:                                Related software.
 * MuForce:                               Related software.
 * MuGuardianAngel:                       Related software.
 * MuLib:                                 Related software.
@@ -12672,10 +12689,10 @@ Node: Linking427332
 Node: Running431604
 Node: Files445754
 Node: Related software448750
-Ref: Related software-Footnote-1484073
-Node: References484314
-Node: Copying486907
-Node: Function index514796
-Node: Index517054
+Ref: Related software-Footnote-1484351
+Node: References484592
+Node: Copying487185
+Node: Function index515074
+Node: Index517332
 
 End Tag Table

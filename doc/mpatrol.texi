@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.157 2000-12-18 22:19:45 graeme Exp $
+@c $Id: mpatrol.texi,v 1.158 2000-12-20 23:55:27 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -20,9 +20,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.2
-@set VERSION 1.3.2
-@set UPDATED 18th December, 2000
+@set EDITION 2.3
+@set VERSION 1.3.3
+@set UPDATED 21st December, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -11416,6 +11416,22 @@ Linux, Windows, MS-DOS
 Full-featured malloc library for C and C++ providing detection of memory leaks,
 use of uninitialised memory and out of range block accesses as well as lots of
 tracing facilities.
+@end table
+
+@cindex MTrace
+@item
+MTrace
+@table @asis
+@item Author
+Morris R. Dovey (@email{mrdovey@@iedu.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.iedu.com/mrd/c/mtrace.c}
+@item Overview
+A very simple malloc tracing package.
 @end table
 
 @cindex MuForce
