@@ -1,3 +1,18 @@
+Thu Oct 14 23:59:42 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/option.c:
+	Added the USEMMAP option for UNIX platforms that support mmap().
+
+	* src/memory.c:
+	Added support for allocating memory using mmap() on UNIX platforms that
+	support it.
+
+	* src/memory.h:
+	Changed the name of the watch point control file handle field and added
+	a memory mapped file handle field.
+
+	* src/config.h: Added MP_MMAP_SUPPORT and MP_MMAP_FILENAME.
+
 Wed Oct 13 21:22:30 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* EXAMPLES: New file for illustrating how to use the library.
