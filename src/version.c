@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.45 2001-05-30 23:18:42 graeme Exp $"
+#ident "$Id: version.c,v 1.46 2001-06-13 23:09:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.45 2001-05-30 23:18:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.46 2001-06-13 23:09:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -43,26 +43,26 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#define MP_VERSION "mpatrol 1.4.4" /* library name and version */
+#define MP_VERSION "mpatrol 1.4.5" /* library name and version */
 
 
 #if TARGET == TARGET_UNIX
 
 /* SCCS identification string and American date format.
  */
-MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (01/05/31)";
+MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (01/06/14)";
 
 #elif TARGET == TARGET_AMIGA
 
 /* Amiga identification string and European date format.
  */
-MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (31.05.01)";
+MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (14.06.01)";
 
 #else /* TARGET */
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (31 May 2001)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (14 June 2001)";
 
 #endif /* TARGET */
 
