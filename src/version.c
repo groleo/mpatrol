@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.13 2000-01-09 20:37:54 graeme Exp $"
+#ident "$Id: version.c,v 1.14 2000-01-24 20:31:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -41,7 +41,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#define MP_VERSION "mpatrol 1.0.8" /* library name and version */
+#define MP_VERSION "mpatrol 1.1.0" /* library name and version */
 
 
 #if TARGET == TARGET_UNIX
