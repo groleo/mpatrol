@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.260 2003-11-25 17:15:21 graeme Exp $
+@c $Id: mpatrol.texi,v 1.261 2003-11-25 17:27:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -40,9 +40,14 @@
 @set UPDATED 23rd July, 2002
 
 @c Flags to determine when images should be included
-@ifinfo
+@clear TITLEIMAGES
 @clear EXAMPLEIMAGES
+@ifinfo
+@set TITLEIMAGES
 @end ifinfo
+@ifhtml
+@set TITLEIMAGES
+@end ifhtml
 @ifnotinfo
 @set EXAMPLEIMAGES
 @end ifnotinfo
@@ -116,13 +121,9 @@ library are the trademarks of their respective owners.
 @node Top, Foreword, , (dir)
 @top mpatrol
 
-@ifinfo
+@ifset TITLEIMAGES
 @image{images/mpatrol}
-@end ifinfo
-
-@ifhtml
-@image{images/mpatrol}
-@end ifhtml
+@end ifset
 
 This document describes mpatrol, a library for controlling and tracing dynamic
 memory allocations.
