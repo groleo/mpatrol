@@ -221,6 +221,18 @@ their corresponding answers or solutions.
     hopefully then appear in the log file for all symbols that have associated
     debugging information.
 
+ Q. Why does the mpatrol library not read the symbols in my executable file on
+    Windows platforms?
+
+ A. If the mpatrol library was compiled with the FORMAT=FORMAT_PE preprocessor
+    macro defined then you must ensure that you compile your files with
+    debugging information enabled (using the -Z7 or -Zi options in Visual C++)
+    and that you tell the linker that you wish to preserve the debugging
+    information in the executable file (using the -debug and -pdb:none options
+    in the Microsoft linker).  Unfortunately, if you do not do this then the
+    final executable file will not have a symbol table and so the mpatrol
+    library cannot give symbolic stack tracebacks.
+
  Q. Why do some mpatrol log file entries only contain a partial call stack
     rather than following the function call stack back to the call to main()?
 
