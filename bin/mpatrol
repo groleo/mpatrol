@@ -24,7 +24,7 @@
 # UNIX shell script to run programs using the mpatrol library
 
 
-# $Id: mpatrol,v 1.1 1999-10-05 17:18:46 graeme Exp $
+# $Id: mpatrol,v 1.2 1999-10-14 23:48:04 graeme Exp $
 
 
 # Display a command usage message.
@@ -71,6 +71,9 @@ Options:
     -l <string>
         Specifies an alternative file in which to place all diagnostics from
         the mpatrol library.
+    -m
+        Specifies that the library should use mmap() instead of sbrk() to
+        allocate system memory.
     -N
         Specifies that the mpatrol library's internal data structures should
         not be made read-only after every memory allocation, reallocation or
@@ -118,8 +121,8 @@ ENDUSAGE
 # Set up command and option variables.
 
 command=`basename "$0"`
-version="1.0"
-options="A:a:cD:de:F:f:L:l:NnO:o:PpR:SsU:vw"
+version="1.1"
+options="A:a:cD:de:F:f:L:l:mNnO:o:PpR:SsU:vw"
 preload="false"
 format="elf"
 
@@ -147,6 +150,7 @@ reallocstop=""
 showfreed="false" # also includes showunfreed
 showmap="false"   # also includes showsymbols
 unfreedabort=""
+usemmap="false"
 
 
 # Attempt to parse any options given on the command line.
@@ -185,6 +189,9 @@ do
             ;;
         l)
             logfile="$OPTARG"
+            ;;
+        m)
+            usemmap="true"
             ;;
         N)
             noprotect="true"
@@ -330,6 +337,10 @@ fi
 if [ "$unfreedabort" != "" ]
 then
     MPATROL_OPTIONS="$MPATROL_OPTIONS UNFREEDABORT=\"$unfreedabort\""
+fi
+if [ "$usemmap" = "true" ]
+then
+    MPATROL_OPTIONS="$MPATROL_OPTIONS USEMMAP"
 fi
 export MPATROL_OPTIONS
 
