@@ -53,22 +53,26 @@ EXPORTS
 	memalign		@23
 	valloc			@24
 	pvalloc			@25
-	strdup			@26
-	strndup			@27
-	strsave			@28
-	strnsave		@29
-	realloc			@30
-	recalloc		@31
-	expand			@32
-	free			@33
-	cfree			@34
-	memset			@35
-	bzero			@36
-	memccpy			@37
-	memcpy			@38
-	memmove			@39
-	bcopy			@40
-	memchr			@41
-	memmem			@42
-	memcmp			@43
-	bcmp			@44
+	alloca			@26
+	strdup			@27
+	strndup			@28
+	strsave			@29
+	strnsave		@30
+	strdupa			@31
+	strndupa		@32
+	realloc			@33
+	recalloc		@34
+	expand			@35
+	free			@36
+	cfree			@37
+	dealloca		@38
+	memset			@39
+	bzero			@40
+	memccpy			@41
+	memcpy			@42
+	memmove			@43
+	bcopy			@44
+	memchr			@45
+	memmem			@46
+	memcmp			@47
+	bcmp			@48
