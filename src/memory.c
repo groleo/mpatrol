@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.52 2001-02-12 19:16:11 graeme Exp $"
+#ident "$Id: memory.c,v 1.53 2001-02-27 19:40:53 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.52 2001-02-12 19:16:11 graeme Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.53 2001-02-27 19:40:53 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1051,22 +1051,11 @@ MP_GLOBAL
 void
 __mp_memset(void *t, char c, size_t l)
 {
-#if TARGET != TARGET_WINDOWS
     long *w;
     char *p;
     size_t i, n;
     long b;
-#endif /* TARGET */
 
-#if TARGET == TARGET_WINDOWS
-    /* Hopefully these call optimised assembler routines.
-     */
-    if (l > 0)
-        if (c == 0)
-            ZeroMemory(t, l);
-        else
-            FillMemory(t, l, c);
-#else /* TARGET */
     /* This used to be a simple loop to set each byte individually, but
      * that is less efficient than attempting to set words at a time.
      * Therefore, if the number of bytes to set is larger than a certain
@@ -1102,7 +1091,6 @@ __mp_memset(void *t, char c, size_t l)
     /* Set all remaining bytes.
      */
     for (p = (char *) t, t = (char *) t + l; p < (char *) t; *p++ = c);
-#endif /* TARGET */
 }
 
 
@@ -1113,21 +1101,10 @@ MP_GLOBAL
 void
 __mp_memcopy(void *t, void *s, size_t l)
 {
-#if TARGET != TARGET_WINDOWS
     size_t n;
-#endif /* TARGET */
 
     if ((s == t) || (l == 0))
         return;
-#if TARGET == TARGET_WINDOWS
-    /* Hopefully these call optimised assembler routines.
-     */
-    if (((s < t) && ((char *) s + l > (char *) t)) ||
-        ((s > t) && ((char *) t + l > (char *) s)))
-        MoveMemory(t, s, l);
-    else
-        CopyMemory(t, s, l);
-#else /* TARGET */
     /* This used to be a simple loop to copy each byte individually, but
      * that is less efficient than attempting to copy words at a time.
      * Therefore, if the number of bytes to copy is larger than a certain
@@ -1227,7 +1204,6 @@ __mp_memcopy(void *t, void *s, size_t l)
             l--;
         }
     }
-#endif /* TARGET */
 }
 
 
