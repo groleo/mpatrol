@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.3 2001-02-27 00:44:54 graeme Exp $
+ * $Id: dbmalloc.h,v 1.4 2001-02-27 00:51:16 graeme Exp $
  */
 
 
@@ -112,6 +112,29 @@
 #define M_HANDLE_EXIT   2
 #define M_HANDLE_CORE   3
 #define M_HANDLE_DUMP   128
+
+
+/* The errors reported by the library.  None of these are actually used
+ * in this implementation and are here in case user code relies on them.
+ */
+
+#define M_CODE_CHAIN_BROKE  1
+#define M_CODE_NO_END       2
+#define M_CODE_BAD_PTR      3
+#define M_CODE_BAD_MAGIC    4
+#define M_CODE_BAD_CONNECT  5
+#define M_CODE_OVERRUN      6
+#define M_CODE_REUSE        7
+#define M_CODE_NOT_INUSE    8
+#define M_CODE_NOMORE_MEM   9
+#define M_CODE_OUTOF_BOUNDS 10
+#define M_CODE_FREELIST_BAD 11
+#define M_CODE_NOBOUND      12
+#define M_CODE_STK_NOCUR    13
+#define M_CODE_STK_BADFUNC  14
+#define M_CODE_UNDERRUN     15
+#define M_CODE_FREEMARK     16
+#define M_CODE_ZERO_ALLOC   17
 
 
 /* The union used to supply a command argument to dbmallopt().
