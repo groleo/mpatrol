@@ -35,10 +35,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#if MP_MMAP_SUPPORT
+#include <fcntl.h>
+#endif /* MP_MMAP_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.1.1.1 1999-10-03 11:25:22 graeme Exp $"
+#ident "$Id: option.c,v 1.2 1999-10-14 19:11:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -156,6 +159,9 @@ static char *options_help[] =
     "UNFREEDABORT", "unsigned integer",
     "", "Specifies the minimum number of unfreed allocations at which to abort",
     "", "the program just before program termination.",
+    "USEMMAP", NULL,
+    "", "Specifies that the library should use mmap() instead of sbrk() to",
+    "", "allocate system memory on UNIX platforms.",
     NULL
 };
 
@@ -659,6 +665,18 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         h->uabort = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "USEMMAP"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+#if MP_MMAP_SUPPORT
+                    if (h->alloc.list.size == 0)
+                        h->alloc.heap.memory.mfile = open(MP_MMAP_FILENAME,
+                                                          O_RDWR);
+#endif /* MP_MMAP_SUPPORT */
+                }
                 break;
               default:
                 break;
