@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.11 2000-04-30 15:47:18 graeme Exp $"
+#ident "$Id: mprof.c,v 1.12 2000-04-30 16:29:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -465,6 +465,8 @@ static void bintable(void)
     p = 0;
     printchar(' ', 32);
     fputs("ALLOCATION BINS\n\n", stdout);
+    printchar(' ', 29);
+    fprintf(stdout, "(number of bins: %lu)\n\n", binsize);
     printchar(' ', 21);
     fputs("allocated", stdout);
     printchar(' ', 26);
@@ -530,6 +532,9 @@ static void directtable(void)
     cleardata(&m);
     printchar(' ', 31);
     fputs("DIRECT ALLOCATIONS\n\n", stdout);
+    printchar(' ', 20);
+    fprintf(stdout, "(0 < s <= %lu < m <= %lu < l <= %lu < x)\n\n",
+            sbound, mbound, lbound);
     if (showcounts)
     {
         printchar(' ', 9);
@@ -671,6 +676,8 @@ static void leaktable(void)
 
     printchar(' ', 34);
     fputs("MEMORY LEAKS\n\n", stdout);
+    printchar(' ', 28);
+    fprintf(stdout, "(maximum stack depth: %lu)\n\n", maxstack);
     printchar(' ', 16);
     fputs("unfreed", stdout);
     printchar(' ', 22);
@@ -763,8 +770,14 @@ static void leaktable(void)
         }
         cleardata(d);
     }
-    e = ((double) (acount - dcount) / (double) acount) * 100.0;
-    f = ((double) (atotal - dtotal) / (double) atotal) * 100.0;
+    if (acount != 0)
+        e = ((double) (acount - dcount) / (double) acount) * 100.0;
+    else
+        e = 0.0;
+    if (atotal != 0)
+        f = ((double) (atotal - dtotal) / (double) atotal) * 100.0;
+    else
+        f = 0.0;
     if (temptree.size != 0)
         fputc('\n', stdout);
     if (showcounts)
