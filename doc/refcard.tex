@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.9 2000-10-29 23:16:40 graeme Exp $
+% $Id: refcard.tex,v 1.10 2000-11-08 01:15:06 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -36,19 +36,9 @@
 \setlength{\footskip}{0in}
 \setlength{\parindent}{0in}
 \setlength{\columnsep}{.5in}
-
-% Determine if a PDF file is being generated.
-
-\ifx\pdfoutput\undefined
-  \setlength{\oddsidemargin}{-.5in}
-  \setlength{\evensidemargin}{-.5in}
-  \setlength{\topmargin}{-.5in}
-\else
-  \pdfoutput=1
-  \setlength{\oddsidemargin}{0in}
-  \setlength{\evensidemargin}{0in}
-  \setlength{\topmargin}{0in}
-\fi
+\setlength{\oddsidemargin}{-.5in}
+\setlength{\evensidemargin}{-.5in}
+\setlength{\topmargin}{-.5in}
 
 % Define new commands for formatting the headings and options.
 
