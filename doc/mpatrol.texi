@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.164 2001-01-12 00:07:03 graeme Exp $
+@c $Id: mpatrol.texi,v 1.165 2001-01-15 19:07:59 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.4
 @set VERSION 1.3.4
-@set UPDATED 12th January, 2001
+@set UPDATED 15th January, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -217,7 +217,9 @@ his help on reading debugging information from object files via the GNU BFD
 library, and Alexander Barton (@email{abarton@@innotrac.com}) and Dave Gibson
 (@email{david@@epc.co.uk}) for their help on writing thread-safe code.  Roger
 Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
-command and also the idea for the @code{MP_USE_ATEXIT} feature macro.
+command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris
+Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
+initial testing for the FreeBSD port.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -8828,6 +8830,31 @@ The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libelf.so} is available.
 @end itemize
 
+@cindex FreeBSD, Intel 80x86
+@item
+FreeBSD 4.2, Intel Celeron, ELF32, @command{gcc}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{LIST} option does not work since the @option{--listing} option does
+not work in the @command{mpedit} command.
+@item
+The mpatrol library requires either the ELF access library or the GNU BFD
+library to be installed on the system, otherwise no symbols can be read from
+executable files or shared libraries and the library must be built with the
+@option{-DFORMAT=FORMAT_NONE} option.
+@item
+The @command{mpedit} command does not support the @option{--listing} option due
+to the lack of an @command{nl} command on the system.
+@item
+The @command{hexwords} command needs to be changed to use
+@file{/usr/share/dict/words} instead of @file{/usr/dict/words} as the default
+dictionary.
+@end itemize
+
 @cindex HP/UX, HP PA/RISC
 @item
 HP/UX 10.20, HP PA/RISC 9000, BFD, @command{gcc}
@@ -9307,7 +9334,12 @@ Add any machine-specific assembler code in @file{machine.c}.
 
 @itemize @bullet
 @item
-Add a new @code{FORMAT} definition in @file{target.h}.
+Add a new @code{FORMAT} and/or @code{DYNLINK} definition in @file{target.h}.
+The @code{FORMAT} macro specifies the object file format, or in some cases, the
+type of access library that is to be used to read the object file format.  The
+@code{DYNLINK} macro specifies the type of dynamic linker that is used on a
+specific platform, and is used when obtaining information about the shared
+libraries that a program needs or has loaded.
 
 @item
 Make any necessary modifications to @file{config.h}.
@@ -9779,8 +9811,7 @@ command.  Also add a way to specify editor options to the @command{mpedit}
 command.
 
 @item
-Add support for Digital UNIX, SunOS and other non-System V UNIX operating
-systems.
+Add support for Digital UNIX and other non-System V UNIX operating systems.
 
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not always
@@ -10096,6 +10127,7 @@ command on your system to find out more information.
 @cindex ARCH
 @cindex ENVIRON
 @cindex FORMAT
+@cindex DYNLINK
 @item
 Why does the @file{Makefile} assume that I am building mpatrol on platform X
 when I am really building on platform Y?
@@ -10104,12 +10136,13 @@ The @file{src/config.h} and @file{src/target.h} header files attempt to obtain
 as much information from the compiler as possible, mainly from any predefined
 preprocessor macros that it defines during compilation.  If this information
 is incorrect then you can override the @code{TARGET}, @code{SYSTEM},
-@code{ARCH}, @code{ENVIRON} and @code{FORMAT} preprocessor macros defined in
-@file{src/target.h} to suit your particular system by explicitly defining them
-in @code{CFLAGS} within the @file{Makefile} when you build mpatrol.  You could
-also choose to build different versions of mpatrol with different settings of
-@code{ENVIRON} or @code{FORMAT} on a single system if you wish to by changing
-@code{ENVIRON} or @code{FORMAT} for different builds.
+@code{ARCH}, @code{ENVIRON}, @code{FORMAT} and @code{DYNLINK} preprocessor
+macros defined in @file{src/target.h} to suit your particular system by
+explicitly defining them in @code{CFLAGS} within the @file{Makefile} when you
+build mpatrol.  You could also choose to build different versions of mpatrol
+with different settings of @code{ENVIRON}, @code{FORMAT} or @code{DYNLINK} on a
+single system if you wish to by changing @code{ENVIRON}, @code{FORMAT} or
+@code{DYNLINK} for different builds.
 
 @cindex 32-bit
 @cindex 64-bit
@@ -10785,6 +10818,22 @@ Detects and diagnoses errors in static, stack and heap memory and in memory and
 resource leaks.
 @end table
 
+@cindex C++ Debugging Support Library (libcwd)
+@item
+C++ Debugging Support Library (libcwd)
+@table @asis
+@item Author
+Carlo Wood @email{carlo@@alinoe.com}
+@item License
+Q Public License
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://sourceforge.net/projects/libcw/}
+@item Overview
+A C++ debugging library that can also detect memory corruption and memory leaks.
+@end table
+
 @cindex Ccmalloc
 @item
 Ccmalloc
@@ -11025,6 +11074,23 @@ AmigaOS
 @item Overview
 Provides a fortified shell for memory allocations, trapping memory leaks,
 writes beyond and before memory blocks and writes to freed memory.
+@end table
+
+@cindex Gabe's Debug Library
+@item
+Gabe's Debug Library
+@table @asis
+@item Author
+Gabriel Sechan @email{gsechan@@hotmail.com}
+@item License
+Free Software
+@item Platforms
+Windows
+@item Location
+@uref{http://sourceforge.net/projects/debuglib/}
+@item Overview
+A debugging library for C++ which performs dynamic memory management and looks
+for potential problems and memory leaks.
 @end table
 
 @cindex GC (Garbage Collector)
