@@ -21,16 +21,16 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.21 2003-11-26 23:26:54 graeme Exp $
+# $Id: Makefile,v 1.22 2003-11-26 23:30:36 graeme Exp $
 
 
 # Definitions
 
 SHELL     = /bin/sh
-MAN2ASCII = groff -man -Tascii
+MAN2ASCII = groff -man -t -Tascii
 MAN2HTML  = man2html -r
-MAN2DVI   = groff -ma4 -man -Tdvi
-MAN2PS    = groff -ma4 -man -Tps
+MAN2DVI   = groff -ma4 -man -t -Tdvi
+MAN2PS    = groff -ma4 -man -t -Tps
 MAN2PDF   = pstill -Fa4 -c -c -p
 
 CATPAGES  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
@@ -75,10 +75,10 @@ cat1/mpedit.1: man1/mpedit.1
 	$(MAN2ASCII) $< >$@
 
 cat1/hexwords.1: man1/hexwords.1
-	$(MAN2ASCII) -t $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat3/libmpatrol.3: man3/libmpatrol.3
-	$(MAN2ASCII) -t $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat3/libmpalloc.3: man3/libmpalloc.3
 	$(MAN2ASCII) $< >$@
@@ -129,10 +129,10 @@ dvi/mpedit.dvi: man1/mpedit.1
 	$(MAN2DVI) $< >$@
 
 dvi/hexwords.dvi: man1/hexwords.1
-	$(MAN2DVI) -t $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/libmpatrol.dvi: man3/libmpatrol.3
-	$(MAN2DVI) -t $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/libmpalloc.dvi: man3/libmpalloc.3
 	$(MAN2DVI) $< >$@
@@ -156,10 +156,10 @@ ps/mpedit.ps: man1/mpedit.1
 	$(MAN2PS) $< >$@
 
 ps/hexwords.ps: man1/hexwords.1
-	$(MAN2PS) -t $< >$@
+	$(MAN2PS) $< >$@
 
 ps/libmpatrol.ps: man3/libmpatrol.3
-	$(MAN2PS) -t $< >$@
+	$(MAN2PS) $< >$@
 
 ps/libmpalloc.ps: man3/libmpalloc.3
 	$(MAN2PS) $< >$@
