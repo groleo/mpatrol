@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.49 2001-02-05 23:34:05 graeme Exp $
+# $Id: Makefile,v 1.50 2001-02-21 11:32:54 graeme Exp $
 
 
 # Definitions
@@ -309,3 +309,6 @@ graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
+heapdiff.o: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h
+mgauge.o: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h
+mtrace.o: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h
