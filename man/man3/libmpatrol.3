@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.9 2001-02-08 23:16:54 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.10 2001-02-08 23:55:29 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "8 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -79,8 +79,12 @@ void *memchr(const void *ptr, int byte, size_t size);
 .if t \{void *memmem(const void *ptr1, size_t size1, const void *ptr2, size_t size2);
 \}
 
+char *__mp_function(__mp_alloctype func);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
+int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
+unsigned long __mp_snapshot(void);
+size_t __mp_iterate(int (*func)(void *), unsigned long event);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
@@ -95,6 +99,8 @@ void __mp_check(void);
 .if t \{void (*__mp_epilogue(void (*func)(const void *)))(const void *);
 \}
 void (*__mp_nomemory(void (*func)(void)))(void);
+int __mp_printf(const char *fmt, ...);
+int __mp_vprintf(const char *fmt, va_list args);
 void __mp_logmemory(const void *ptr, size_t size);
 int __mp_logstack(size_t frames);
 int __mp_logaddr(const void *ptr);
@@ -564,9 +570,13 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 14 functions are available as support routines for additional
+The following 20 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
+.TP
+\fB__mp_function\fP
+Returns the name of the function corresponding to the allocation type \fIfunc\fP
+or \fBNULL\fP if no such allocation type exists.
 .TP
 \fB__mp_info\fP
 Obtains information about a specific memory allocation by placing statistics
@@ -584,11 +594,32 @@ l l.
 \fBalloc\fP	Allocation index.
 \fBrealloc\fP	Number of times reallocated.
 \fBthread\fP	Thread identifier.
+\fBevent\fP	Event of last modification.
 \fBfunc\fP	Function in which alloc took place.
 \fBfile\fP	File in which alloc took place.
 \fBline\fP	Line number at which alloc took place.
 \fBstack\fP	Pointer to function call stack.
+\fBtypestr\fP	Type stored in allocation.
+\fBtypesize\fP	Size of type stored in allocation.
 \fBfreed\fP	Indicates if alloc has been freed.
+.TE
+.TP
+\fB__mp_syminfo\fP
+Obtains symbolic information about a specific code address by placing statistics
+about \fIptr\fP in \fIinfo\fP.  If \fIptr\fP does not belong to a function
+symbol then \fI0\fP will be returned, otherwise \fI1\fP will be returned and
+\fIinfo\fP will contain the following information:
+
+.TS
+l l.
+\fBField\fP	\fBDescription\fP
+
+\fBname\fP	Name of symbol.
+\fBobject\fP	File containing symbol.
+\fBaddr\fP	Start address of symbol.
+\fBsize\fP	Size of symbol.
+\fBfile\fP	Filename corresponding to address.
+\fBline\fP	Line number corresponding to address.
 .TE
 .TP
 \fB__mp_printinfo\fP
@@ -597,6 +628,21 @@ the standard error file stream.  If \fIptr\fP does not belong to a previously
 allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
 will be returned.  This function is intended to be called from within a
 debugger.
+.TP
+\fB__mp_snapshot\fP
+Returns the current event number, effectively taking a snapshot of the heap.
+This number can then be used in later calls to \fB__mp_iterate\fP.
+.TP
+\fB__mp_iterate\fP
+Iterates over all of the current allocated and freed memory allocations,
+calling \fIfunc\fP with the start address of every memory allocation that has
+been modified since event number \fIevent\fP.  If \fIfunc\fP is \fBNULL\fP then
+\fB__mp_printinfo\fP will be used as the callback function.  If \fBevent\fP is
+\fI0\fP then \fIfunc\fP will be called with the start address of every memory
+allocation.  If \fIfunc\fP returns a negative number then the iteration process
+will be stopped immediately.  If \fIfunc\fP returns a positive number above zero
+then \fB__mp_iterate\fP will return the number of times \fIfunc\fP returned a
+non-zero number after the iteration process has stopped.
 .TP
 \fB__mp_memorymap\fP
 If \fIstats\fP is non-zero then the current statistics of the mpatrol library
@@ -652,6 +698,18 @@ will be called once by C memory allocation functions, and repeatedly by C++
 memory allocation functions, when they would normally return \fBNULL\fP.  Note
 that this function is equivalent to \fBset_new_handler\fP and will replace the
 handler installed by that function.
+.TP
+\fB__mp_printf\fP
+Writes format string \fIfmt\fP with variable arguments to the log file, with
+each line prefixed by \fI>\fP.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  Returns the number of
+characters written, or a negative number upon error.
+.TP
+\fB__mp_vprintf\fP
+Writes format string \fIfmt\fP with variable argument list \fIargs\fP to the log
+file, with each line prefixed by \fI>\fP.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  Returns the number
+of characters written, or a negative number upon error.
 .TP
 \fB__mp_logmemory\fP
 Displays the contents of a block of memory beginning at \fIptr\fP, dumping
@@ -778,7 +836,7 @@ the right side of the dash are omitted then they will be assumed to be \fI0\fP
 and \fIinfinity\fP respectively.  A value of \fI0\fP on its own indicates that
 no such checking will ever be performed.  This option can be used to speed up
 the execution speed of the library at the expense of checking.  Default value:
-\fBCHECK\fP=\fI-\fP.
+\fBCHECK\fP=\fI0\fP.
 .TP
 \fBCHECKALL\fP
 Equivalent to the \fBCHECKALLOCS\fP, \fBCHECKREALLOCS\fP, \fBCHECKFREES\fP and

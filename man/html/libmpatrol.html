@@ -56,8 +56,12 @@ void *memchr(const void *ptr, int byte, size_t size);
 void *memmem(const void *ptr1, size_t size1,
              const void *ptr2, size_t size2);
 
+char *__mp_function(__mp_alloctype func);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
+int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
+unsigned long __mp_snapshot(void);
+size_t __mp_iterate(int (*func)(void *), unsigned long event);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
@@ -66,6 +70,8 @@ void (*__mp_prologue(void (*func)(const void *, size_t)))
 void (*__mp_epilogue(void (*func)(const void *)))
      (const void *);
 void (*__mp_nomemory(void (*func)(void)))(void);
+int __mp_printf(const char *fmt, ...);
+int __mp_vprintf(const char *fmt, va_list args);
 void __mp_logmemory(const void *ptr, size_t size);
 int __mp_logstack(size_t frames);
 int __mp_logaddr(const void *ptr);
@@ -521,10 +527,13 @@ and no bytes will be searched.
 </DL>
 <P>
 
-The following 14 functions are available as support routines for additional
+The following 20 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 <I>mpatrol.h</I> header file:
 <DL COMPACT>
+<DT><B>__mp_function</B><DD>
+Returns the name of the function corresponding to the allocation type <I>func</I>
+or <B>NULL</B> if no such allocation type exists.
 <DT><B>__mp_info</B><DD>
 Obtains information about a specific memory allocation by placing statistics
 about <I>ptr</I> in <I>info</I>.  If <I>ptr</I> does not belong to a previously
@@ -540,11 +549,31 @@ will be returned and <I>info</I> will contain the following information:
 <TR VALIGN=top><TD><B>alloc</B></TD><TD>Allocation index.<BR></TD></TR>
 <TR VALIGN=top><TD><B>realloc</B></TD><TD>Number of times reallocated.<BR></TD></TR>
 <TR VALIGN=top><TD><B>thread</B></TD><TD>Thread identifier.<BR></TD></TR>
+<TR VALIGN=top><TD><B>event</B></TD><TD>Event of last modification.<BR></TD></TR>
 <TR VALIGN=top><TD><B>func</B></TD><TD>Function in which alloc took place.<BR></TD></TR>
 <TR VALIGN=top><TD><B>file</B></TD><TD>File in which alloc took place.<BR></TD></TR>
 <TR VALIGN=top><TD><B>line</B></TD><TD>Line number at which alloc took place.<BR></TD></TR>
 <TR VALIGN=top><TD><B>stack</B></TD><TD>Pointer to function call stack.<BR></TD></TR>
+<TR VALIGN=top><TD><B>typestr</B></TD><TD>Type stored in allocation.<BR></TD></TR>
+<TR VALIGN=top><TD><B>typesize</B></TD><TD>Size of type stored in allocation.<BR></TD></TR>
 <TR VALIGN=top><TD><B>freed</B></TD><TD>Indicates if alloc has been freed.<BR></TD></TR>
+</TABLE>
+
+<DT><B>__mp_syminfo</B><DD>
+Obtains symbolic information about a specific code address by placing statistics
+about <I>ptr</I> in <I>info</I>.  If <I>ptr</I> does not belong to a function
+symbol then <I>0</I> will be returned, otherwise <I>1</I> will be returned and
+<I>info</I> will contain the following information:
+<P>
+<TABLE>
+<TR VALIGN=top><TD><B>Field</B></TD><TD><B>Description</B><BR></TD></TR>
+<TR VALIGN=top><TD></TD><TD><BR></TD></TR>
+<TR VALIGN=top><TD><B>name</B></TD><TD>Name of symbol.<BR></TD></TR>
+<TR VALIGN=top><TD><B>object</B></TD><TD>File containing symbol.<BR></TD></TR>
+<TR VALIGN=top><TD><B>addr</B></TD><TD>Start address of symbol.<BR></TD></TR>
+<TR VALIGN=top><TD><B>size</B></TD><TD>Size of symbol.<BR></TD></TR>
+<TR VALIGN=top><TD><B>file</B></TD><TD>Filename corresponding to address.<BR></TD></TR>
+<TR VALIGN=top><TD><B>line</B></TD><TD>Line number corresponding to address.<BR></TD></TR>
 </TABLE>
 
 <DT><B>__mp_printinfo</B><DD>
@@ -553,6 +582,19 @@ the standard error file stream.  If <I>ptr</I> does not belong to a previously
 allocated memory allocation then <I>0</I> will be returned, otherwise <I>1</I>
 will be returned.  This function is intended to be called from within a
 debugger.
+<DT><B>__mp_snapshot</B><DD>
+Returns the current event number, effectively taking a snapshot of the heap.
+This number can then be used in later calls to <B>__mp_iterate</B>.
+<DT><B>__mp_iterate</B><DD>
+Iterates over all of the current allocated and freed memory allocations,
+calling <I>func</I> with the start address of every memory allocation that has
+been modified since event number <I>event</I>.  If <I>func</I> is <B>NULL</B> then
+<B>__mp_printinfo</B> will be used as the callback function.  If <B>event</B> is
+<I>0</I> then <I>func</I> will be called with the start address of every memory
+allocation.  If <I>func</I> returns a negative number then the iteration process
+will be stopped immediately.  If <I>func</I> returns a positive number above zero
+then <B>__mp_iterate</B> will return the number of times <I>func</I> returned a
+non-zero number after the iteration process has stopped.
 <DT><B>__mp_memorymap</B><DD>
 If <I>stats</I> is non-zero then the current statistics of the mpatrol library
 will be displayed.  If the heap contains at least one allocated, freed or free
@@ -602,6 +644,16 @@ will be called once by C memory allocation functions, and repeatedly by C++
 memory allocation functions, when they would normally return <B>NULL</B>.  Note
 that this function is equivalent to <B>set_new_handler</B> and will replace the
 handler installed by that function.
+<DT><B>__mp_printf</B><DD>
+Writes format string <I>fmt</I> with variable arguments to the log file, with
+each line prefixed by <I>&gt;</I>.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  Returns the number of
+characters written, or a negative number upon error.
+<DT><B>__mp_vprintf</B><DD>
+Writes format string <I>fmt</I> with variable argument list <I>args</I> to the log
+file, with each line prefixed by <I>&gt;</I>.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  Returns the number
+of characters written, or a negative number upon error.
 <DT><B>__mp_logmemory</B><DD>
 Displays the contents of a block of memory beginning at <I>ptr</I>, dumping
 <I>size</I> consecutive bytes to the log file in hexadecimal format.
@@ -726,7 +778,7 @@ the right side of the dash are omitted then they will be assumed to be <I>0</I>
 and <I>infinity</I> respectively.  A value of <I>0</I> on its own indicates that
 no such checking will ever be performed.  This option can be used to speed up
 the execution speed of the library at the expense of checking.  Default value:
-<B>CHECK</B>=<I>-</I>.
+<B>CHECK</B>=<I>0</I>.
 <DT><B>CHECKALL</B><DD>
 Equivalent to the <B>CHECKALLOCS</B>, <B>CHECKREALLOCS</B>, <B>CHECKFREES</B> and
 <B>CHECKMEMORY</B> options specified together.
@@ -1049,6 +1101,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 23:16:10 GMT, February 08, 2001
+Time: 23:55:14 GMT, February 08, 2001
 </BODY>
 </HTML>
