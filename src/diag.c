@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.6 2000-01-21 00:36:19 graeme Exp $"
+#ident "$Id: diag.c,v 1.7 2000-01-24 20:31:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,6 +92,7 @@ MP_GLOBAL char *__mp_alloctypenames[AT_MAX] =
     "strnsave",
     "realloc",
     "recalloc",
+    "expand",
     "free",
     "cfree",
     "operator new",
@@ -705,6 +706,10 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
     __mp_printsize(n);
+    __mp_diag("\ntotal copied:      ");
+    __mp_printsize(h->ctotal);
+    __mp_diag("\ntotal set:         ");
+    __mp_printsize(h->stotal);
     __mp_diag("\ntotal warnings:    %lu", warnings);
     __mp_diag("\ntotal errors:      %lu\n", errors);
 }
