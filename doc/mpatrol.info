@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
 January, 2001.
 
 * Menu:
@@ -243,7 +243,20 @@ to see what the library does is to read the documentation and try it
 out.
 
    * Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware
-     platforms.
+     platforms.  Contains direct support for (and takes advantage of
+     most of the features of) AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD,
+     HP/UX, IRIX, Linux, LynxOS, NetBSD, OpenBSD, SINIX, Solaris, SunOS
+     and UnixWare.  Also contains target-specific code to take
+     advantage of Intel 80x86, Motorola 680x0 and 88xx0, MIPS, HP
+     PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
+
+   * Has the ability to read symbols from executable files and shared
+     libraries in the `a.out', COFF, XCOFF, ELF32, ELF64 and Windows
+     Portable Executable file formats, and if the GNU BFD library is
+     available then the mpatrol library can read symbols from all of
+     the file formats that it has support for as well.  Can also liase
+     with AIX, BSD-based, HP/UX, IRIX, SVR4-based and Windows dynamic
+     linkers in order to find out information about shared libraries.
 
    * Can be built to allocate memory from a fixed-sized static array
      rather than using heap memory from the system.
@@ -3901,8 +3914,8 @@ development tools.
 program using the following commands:
 
    * If the mpatrol library was built with no support for any object
-     file format or was built with support for the COFF or XCOFF object
-     file formats:
+     file format or was built with support for the `a.out', COFF or
+     XCOFF object file formats:
 
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
 
@@ -7801,7 +7814,10 @@ error occurred.
     Cause
           The `operator new' or `operator new[]' C++ operator was
           called to allocate memory, but no more memory was available
-          to allocate and no low-memory handler was installed.
+          to allocate and no low-memory handler was installed.  This
+          error can also be caused by a call to `xmalloc()' and related
+          functions, or `MP_MALLOC' and related functions when they
+          would otherwise return a `NULL' pointer.
 
     Additional
           The library summary.
@@ -8286,11 +8302,16 @@ supported on that system.
         * The `LIST' option does not work since the `--listing' option
           does not work in the `mpedit' command.
 
-        * The mpatrol library requires either the ELF access library or
-          the GNU BFD library to be installed on the system, otherwise
-          no symbols can be read from executable files or shared
-          libraries and the library must be built with the
-          `-DFORMAT=FORMAT_NONE' option.
+        * On ELF-based systems, the mpatrol library requires either the
+          ELF access library or the GNU BFD library to be installed on
+          the system, otherwise no symbols can be read from executable
+          files or shared libraries and the library must be built with
+          the `-DFORMAT=FORMAT_NONE' option.  No such extra libraries
+          are required on `a.out'-based systems.
+
+        * The `--dynamic' option to the `mpatrol' command does not
+          appear to work correctly, giving spurious errors in the log
+          file.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -9128,7 +9149,9 @@ Notes for UNIX platforms
      command.
 
    * Add support for Digital UNIX and other non-System V UNIX operating
-     systems.
+     systems.  Also test on NetBSD, OpenBSD and SunOS as support has
+     been written for these systems but is untested.  The SunOS port
+     requires an ANSI C compiler, though.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
@@ -9504,7 +9527,17 @@ Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
-  7. What does the `MP_INLINE' definition in `mpatrol.h' do?
+  7. What does the `MP_ALIGN' definition in `mpatrol.h' do?
+
+     It is a preprocessor macro function that is used to return the
+     minimum alignment in bytes required for a specified type at
+     compile-time.  It is used in the `MP_MALLOC' family of functions
+     to specify the required alignment of the memory allocation that is
+     to be used to store the specified type.  Some compilers provide a
+     feature that can be used to determine the minimum alignment of a
+     type at compile-time.  For all others, this macro evaluates to `0'.
+
+  8. What does the `MP_INLINE' definition in `mpatrol.h' do?
 
      It is used in the definition of the debugging versions of the C++
      operators in `mpatrol.h' so that they are inlined correctly.  We
@@ -9522,7 +9555,7 @@ Building
      platforms the `extern inline' function definition will have a weak
      visibility and so will not clash with library functions.
 
-  8. Why do I get different stack traces in the mpatrol log file from
+  9. Why do I get different stack traces in the mpatrol log file from
      the C++ operators in `mpatrol.h' when optimisation is turned on
      and off in the compiler?
 
@@ -9534,7 +9567,7 @@ Building
      top of its stack, even though it will be removed in the inlined
      case.
 
-  9. How do I build the `mptrace' command with GUI support?
+ 10. How do I build the `mptrace' command with GUI support?
 
      The GUI support for the `mptrace' command is currently written to
      use Motif and X Windows and so can only be built on systems with
@@ -11517,6 +11550,14 @@ allocations in the log files produced.  Useful information on the
 debugging features available within the GNU C library is located at
 `http://sdb.suse.de/sdb/en/html/aj_debug.html'.
 
+   If you suspect that the debugging problem you are looking at is
+likely to be related to UNIX system calls then some systems come with
+the `strace' or `truss' commands which allow you to trace all of the
+system calls that a program makes when running.  This can sometimes be
+invaluable in pinpointing the exact point at which a program fails, but
+as it only operates at the system call level, no information about
+individual memory allocations is available.
+
    ---------- Footnotes ----------
 
    (1) This list can be considered to be a slightly more up to date
@@ -12245,6 +12286,7 @@ Index
 * 32-bit:                                Building.
 * 64-bit:                                Building.
 * _RLD_LIST:                             The mpatrol command.
+* a.out:                                 Examples.
 * ABI:                                   Call stacks and symbol tables.
 * acknowledgements:                      Foreword.
 * adding a new object file format:       New file format support.
@@ -12648,6 +12690,7 @@ Index
 * MMU:                                   Virtual memory.
 * modules:                               How it works.
 * Motif:                                 Building.
+* MP_ALIGN:                              Building.
 * MP_BUILTINSTACK_SUPPORT:               Call stacks and symbol tables.
 * MP_DELETE:                             Functions.
 * MP_INLINE:                             Building.
@@ -12841,6 +12884,7 @@ Index
 * static inline:                         Building.
 * static memory allocations:             Static memory allocations.
 * statistics:                            Logging and tracing.
+* strace:                                Related software.
 * Stratosware Corporation:               Related software.
 * stress testing:                        Improving performance.
 * stripped executable file:              Library behaviour.
@@ -12884,6 +12928,7 @@ Index
 * tracing:                               Tracing.
 * tracing file format:                   Tracing file format.
 * tree structure:                        Example 2.
+* truss:                                 Related software.
 * TurboPower:                            Related software.
 * tutorial:                              Tutorial.
 * type of allocation:                    Example 1.
@@ -12938,123 +12983,123 @@ Node: Top1256
 Node: Foreword3527
 Node: Overview8263
 Node: Features11240
-Node: Installation28932
-Node: Integration35072
-Ref: Integration-Footnote-141472
-Node: Memory allocations41593
-Node: Static memory allocations42270
-Ref: Static memory allocations-Footnote-144731
-Node: Stack memory allocations44773
-Ref: Stack memory allocations-Footnote-146637
-Node: Dynamic memory allocations46676
-Ref: Dynamic memory allocations-Footnote-150098
-Ref: Dynamic memory allocations-Footnote-250217
-Node: Operating system support50321
-Node: Virtual memory52281
-Ref: Virtual memory-Footnote-158309
-Ref: Virtual memory-Footnote-258565
-Ref: Virtual memory-Footnote-358741
-Ref: Virtual memory-Footnote-458776
-Ref: Virtual memory-Footnote-558835
-Node: Call stacks and symbol tables59059
-Ref: Call stacks and symbol tables-Footnote-164737
-Ref: Call stacks and symbol tables-Footnote-264805
-Ref: Call stacks and symbol tables-Footnote-364856
-Ref: Call stacks and symbol tables-Footnote-464900
-Ref: Call stacks and symbol tables-Footnote-564942
-Ref: Call stacks and symbol tables-Footnote-664984
-Ref: Call stacks and symbol tables-Footnote-765032
-Node: Threads65138
-Ref: Threads-Footnote-171144
-Node: Using mpatrol71239
-Node: Library behaviour72105
-Ref: Library behaviour-Footnote-178002
-Node: Logging and tracing78060
-Node: General errors82926
-Ref: General errors-Footnote-187064
-Ref: General errors-Footnote-287220
-Node: Overwrites and underwrites87388
-Ref: Overwrites and underwrites-Footnote-195790
-Ref: Overwrites and underwrites-Footnote-295853
-Node: Using with a debugger95977
-Ref: Using with a debugger-Footnote-1105031
-Ref: Using with a debugger-Footnote-2105099
-Ref: Using with a debugger-Footnote-3105355
-Node: Testing105444
-Ref: Testing-Footnote-1108181
-Ref: Testing-Footnote-2108362
-Node: Library functions108421
-Node: Utilities115302
-Node: The mpatrol command116272
-Ref: The mpatrol command-Footnote-1122812
-Ref: The mpatrol command-Footnote-2122946
-Node: The mleak command123026
-Node: The mpsym command124990
-Node: The mpedit command127558
-Node: The hexwords command130954
-Node: Profiling134096
-Ref: Profiling-Footnote-1161988
-Ref: Profiling-Footnote-2162212
-Node: Tracing162316
-Ref: Tracing-Footnote-1179506
-Ref: Tracing-Footnote-2179540
-Ref: Tracing-Footnote-3179662
-Node: Improving performance179768
-Ref: Improving performance-Footnote-1188668
-Ref: Improving performance-Footnote-2188710
-Ref: Improving performance-Footnote-3188787
-Ref: Improving performance-Footnote-4188859
-Node: How it works188903
-Node: Examples196096
-Node: Example 1199814
-Ref: Example 1-Footnote-1223930
-Node: Example 2224120
-Node: Example 3229520
-Node: Example 4236377
-Node: Example 5239882
-Node: Example 6242350
-Ref: Example 6-Footnote-1246150
-Node: Example 7246279
-Node: Example 8248137
-Node: Example 9258373
-Node: Tutorial274244
-Ref: Tutorial-Footnote-1288775
-Ref: Tutorial-Footnote-2289066
-Ref: Tutorial-Footnote-3289215
-Ref: Tutorial-Footnote-4289352
-Ref: Tutorial-Footnote-5289451
-Node: Functions289732
-Node: Environment320168
-Node: Options340936
-Node: Diagnostic messages352323
-Node: Library performance368543
-Node: File formats371036
-Ref: File formats-Footnote-1371460
-Node: Profiling file format371672
-Node: Tracing file format374934
-Node: Supported systems376801
-Node: New system support392003
-Node: New processor support393199
-Node: New file format support393882
-Node: Notes394666
-Node: Generic notes396277
-Ref: Generic notes-Footnote-1413725
-Ref: Generic notes-Footnote-2413943
-Node: UNIX notes414165
-Node: Amiga notes418597
-Node: Windows notes422261
-Node: Netware notes423681
-Node: Frequently asked questions426241
-Node: Documentation426864
-Node: Building431694
-Node: Linking438757
-Node: Running443029
-Node: Files458137
-Node: Related software461133
-Ref: Related software-Footnote-1498549
-Node: References498790
-Node: Copying501383
-Node: Function index529272
-Node: Index531530
+Node: Installation29802
+Node: Integration35942
+Ref: Integration-Footnote-142342
+Node: Memory allocations42463
+Node: Static memory allocations43140
+Ref: Static memory allocations-Footnote-145601
+Node: Stack memory allocations45643
+Ref: Stack memory allocations-Footnote-147507
+Node: Dynamic memory allocations47546
+Ref: Dynamic memory allocations-Footnote-150968
+Ref: Dynamic memory allocations-Footnote-251087
+Node: Operating system support51191
+Node: Virtual memory53151
+Ref: Virtual memory-Footnote-159179
+Ref: Virtual memory-Footnote-259435
+Ref: Virtual memory-Footnote-359611
+Ref: Virtual memory-Footnote-459646
+Ref: Virtual memory-Footnote-559705
+Node: Call stacks and symbol tables59929
+Ref: Call stacks and symbol tables-Footnote-165607
+Ref: Call stacks and symbol tables-Footnote-265675
+Ref: Call stacks and symbol tables-Footnote-365726
+Ref: Call stacks and symbol tables-Footnote-465770
+Ref: Call stacks and symbol tables-Footnote-565812
+Ref: Call stacks and symbol tables-Footnote-665854
+Ref: Call stacks and symbol tables-Footnote-765902
+Node: Threads66008
+Ref: Threads-Footnote-172014
+Node: Using mpatrol72109
+Node: Library behaviour72975
+Ref: Library behaviour-Footnote-178872
+Node: Logging and tracing78930
+Node: General errors83796
+Ref: General errors-Footnote-187934
+Ref: General errors-Footnote-288090
+Node: Overwrites and underwrites88258
+Ref: Overwrites and underwrites-Footnote-196660
+Ref: Overwrites and underwrites-Footnote-296723
+Node: Using with a debugger96847
+Ref: Using with a debugger-Footnote-1105901
+Ref: Using with a debugger-Footnote-2105969
+Ref: Using with a debugger-Footnote-3106225
+Node: Testing106314
+Ref: Testing-Footnote-1109051
+Ref: Testing-Footnote-2109232
+Node: Library functions109291
+Node: Utilities116172
+Node: The mpatrol command117142
+Ref: The mpatrol command-Footnote-1123682
+Ref: The mpatrol command-Footnote-2123816
+Node: The mleak command123896
+Node: The mpsym command125860
+Node: The mpedit command128428
+Node: The hexwords command131824
+Node: Profiling134966
+Ref: Profiling-Footnote-1162858
+Ref: Profiling-Footnote-2163082
+Node: Tracing163186
+Ref: Tracing-Footnote-1180376
+Ref: Tracing-Footnote-2180410
+Ref: Tracing-Footnote-3180532
+Node: Improving performance180638
+Ref: Improving performance-Footnote-1189538
+Ref: Improving performance-Footnote-2189580
+Ref: Improving performance-Footnote-3189657
+Ref: Improving performance-Footnote-4189729
+Node: How it works189773
+Node: Examples196966
+Node: Example 1200693
+Ref: Example 1-Footnote-1224809
+Node: Example 2224999
+Node: Example 3230399
+Node: Example 4237256
+Node: Example 5240761
+Node: Example 6243229
+Ref: Example 6-Footnote-1247029
+Node: Example 7247158
+Node: Example 8249016
+Node: Example 9259252
+Node: Tutorial275123
+Ref: Tutorial-Footnote-1289654
+Ref: Tutorial-Footnote-2289945
+Ref: Tutorial-Footnote-3290094
+Ref: Tutorial-Footnote-4290231
+Ref: Tutorial-Footnote-5290330
+Node: Functions290611
+Node: Environment321047
+Node: Options341815
+Node: Diagnostic messages353202
+Node: Library performance369619
+Node: File formats372112
+Ref: File formats-Footnote-1372536
+Node: Profiling file format372748
+Node: Tracing file format376010
+Node: Supported systems377877
+Node: New system support393329
+Node: New processor support394525
+Node: New file format support395208
+Node: Notes395992
+Node: Generic notes397603
+Ref: Generic notes-Footnote-1415051
+Ref: Generic notes-Footnote-2415269
+Node: UNIX notes415491
+Node: Amiga notes420089
+Node: Windows notes423753
+Node: Netware notes425173
+Node: Frequently asked questions427733
+Node: Documentation428356
+Node: Building433186
+Node: Linking440800
+Node: Running445072
+Node: Files460180
+Node: Related software463176
+Ref: Related software-Footnote-1501053
+Node: References501294
+Node: Copying503887
+Node: Function index531776
+Node: Index534034
 
 End Tag Table

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.165 2001-01-15 19:07:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.166 2001-01-18 20:14:58 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.4
 @set VERSION 1.3.4
-@set UPDATED 15th January, 2001
+@set UPDATED 18th January, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -298,6 +298,19 @@ does is to read the documentation and try it out.
 @itemize @bullet
 @item
 Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms.
+Contains direct support for (and takes advantage of most of the features of)
+AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD, HP/UX, IRIX, Linux, LynxOS, NetBSD,
+OpenBSD, SINIX, Solaris, SunOS and UnixWare.  Also contains target-specific
+code to take advantage of Intel 80x86, Motorola 680x0 and 88xx0, MIPS,
+HP PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
+
+@item
+Has the ability to read symbols from executable files and shared libraries in
+the @file{a.out}, COFF, XCOFF, ELF32, ELF64 and Windows Portable Executable file
+formats, and if the GNU BFD library is available then the mpatrol library can
+read symbols from all of the file formats that it has support for as well.  Can
+also liase with AIX, BSD-based, HP/UX, IRIX, SVR4-based and Windows dynamic
+linkers in order to find out information about shared libraries.
 
 @item
 Can be built to allocate memory from a fixed-sized static array rather than
@@ -4223,11 +4236,12 @@ However, on a typical SVR4 UNIX system, with mpatrol installed in
 program using the following commands:
 
 @itemize @bullet
+@cindex a.out
 @cindex COFF
 @cindex XCOFF
 @item
 If the mpatrol library was built with no support for any object file format or
-was built with support for the COFF or XCOFF object file formats:
+was built with support for the @file{a.out}, COFF or XCOFF object file formats:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
@@ -8286,7 +8300,9 @@ Error
 @item Cause
 The @code{operator new} or @code{operator new[]} C++ operator was called to
 allocate memory, but no more memory was available to allocate and no low-memory
-handler was installed.
+handler was installed.  This error can also be caused by a call to
+@code{xmalloc()} and related functions, or @code{MP_MALLOC} and related
+functions when they would otherwise return a @samp{NULL} pointer.
 @item Additional
 The library summary.
 @item Result
@@ -8842,10 +8858,14 @@ The @option{USEDEBUG} option has no effect.
 The @option{LIST} option does not work since the @option{--listing} option does
 not work in the @command{mpedit} command.
 @item
-The mpatrol library requires either the ELF access library or the GNU BFD
-library to be installed on the system, otherwise no symbols can be read from
-executable files or shared libraries and the library must be built with the
-@option{-DFORMAT=FORMAT_NONE} option.
+On ELF-based systems, the mpatrol library requires either the ELF access library
+or the GNU BFD library to be installed on the system, otherwise no symbols can
+be read from executable files or shared libraries and the library must be built
+with the @option{-DFORMAT=FORMAT_NONE} option.  No such extra libraries are
+required on @file{a.out}-based systems.
+@item
+The @option{--dynamic} option to the @command{mpatrol} command does not appear
+to work correctly, giving spurious errors in the log file.
 @item
 The @command{mpedit} command does not support the @option{--listing} option due
 to the lack of an @command{nl} command on the system.
@@ -9812,6 +9832,8 @@ command.
 
 @item
 Add support for Digital UNIX and other non-System V UNIX operating systems.
+Also test on NetBSD, OpenBSD and SunOS as support has been written for these
+systems but is untested.  The SunOS port requires an ANSI C compiler, though.
 
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not always
@@ -10215,6 +10237,17 @@ inlining may significantly alter the layout of a program's stack.  Normally this
 option is only required when building the mpatrol library, but on some platforms
 function call stack traversal may not work properly unless this option (or
 equivalent) is used for all compiled code.
+
+@cindex MP_ALIGN
+@item
+What does the @code{MP_ALIGN} definition in @file{mpatrol.h} do?
+
+It is a preprocessor macro function that is used to return the minimum alignment
+in bytes required for a specified type at compile-time.  It is used in the
+@code{MP_MALLOC} family of functions to specify the required alignment of the
+memory allocation that is to be used to store the specified type.  Some
+compilers provide a feature that can be used to determine the minimum alignment
+of a type at compile-time.  For all others, this macro evaluates to @samp{0}.
 
 @cindex MP_INLINE
 @cindex extern inline
@@ -12217,6 +12250,16 @@ which can be used to aid in debugging, and some shell scripts which can
 translate return addresses or locate unfreed memory allocations in the log files
 produced.  Useful information on the debugging features available within the
 GNU C library is located at @uref{http://sdb.suse.de/sdb/en/html/aj_debug.html}.
+
+@cindex strace
+@cindex truss
+If you suspect that the debugging problem you are looking at is likely to be
+related to UNIX system calls then some systems come with the @command{strace}
+or @command{truss} commands which allow you to trace all of the system calls
+that a program makes when running.  This can sometimes be invaluable in
+pinpointing the exact point at which a program fails, but as it only operates
+at the system call level, no information about individual memory allocations is
+available.
 
 @node References, Copying, Related software, Top
 @appendix References

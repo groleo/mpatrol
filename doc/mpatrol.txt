@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
 January, 2001.
 
 Foreword
@@ -194,7 +194,20 @@ to see what the library does is to read the documentation and try it
 out.
 
    * Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware
-     platforms.
+     platforms.  Contains direct support for (and takes advantage of
+     most of the features of) AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD,
+     HP/UX, IRIX, Linux, LynxOS, NetBSD, OpenBSD, SINIX, Solaris, SunOS
+     and UnixWare.  Also contains target-specific code to take
+     advantage of Intel 80x86, Motorola 680x0 and 88xx0, MIPS, HP
+     PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
+
+   * Has the ability to read symbols from executable files and shared
+     libraries in the `a.out', COFF, XCOFF, ELF32, ELF64 and Windows
+     Portable Executable file formats, and if the GNU BFD library is
+     available then the mpatrol library can read symbols from all of
+     the file formats that it has support for as well.  Can also liase
+     with AIX, BSD-based, HP/UX, IRIX, SVR4-based and Windows dynamic
+     linkers in order to find out information about shared libraries.
 
    * Can be built to allocate memory from a fixed-sized static array
      rather than using heap memory from the system.
@@ -3734,8 +3747,8 @@ development tools.
 program using the following commands:
 
    * If the mpatrol library was built with no support for any object
-     file format or was built with support for the COFF or XCOFF object
-     file formats:
+     file format or was built with support for the `a.out', COFF or
+     XCOFF object file formats:
 
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
 
@@ -7580,7 +7593,10 @@ error occurred.
     Cause
           The `operator new' or `operator new[]' C++ operator was
           called to allocate memory, but no more memory was available
-          to allocate and no low-memory handler was installed.
+          to allocate and no low-memory handler was installed.  This
+          error can also be caused by a call to `xmalloc()' and related
+          functions, or `MP_MALLOC' and related functions when they
+          would otherwise return a `NULL' pointer.
 
     Additional
           The library summary.
@@ -8045,11 +8061,16 @@ supported on that system.
         * The `LIST' option does not work since the `--listing' option
           does not work in the `mpedit' command.
 
-        * The mpatrol library requires either the ELF access library or
-          the GNU BFD library to be installed on the system, otherwise
-          no symbols can be read from executable files or shared
-          libraries and the library must be built with the
-          `-DFORMAT=FORMAT_NONE' option.
+        * On ELF-based systems, the mpatrol library requires either the
+          ELF access library or the GNU BFD library to be installed on
+          the system, otherwise no symbols can be read from executable
+          files or shared libraries and the library must be built with
+          the `-DFORMAT=FORMAT_NONE' option.  No such extra libraries
+          are required on `a.out'-based systems.
+
+        * The `--dynamic' option to the `mpatrol' command does not
+          appear to work correctly, giving spurious errors in the log
+          file.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -8855,7 +8876,9 @@ H.2 Notes for UNIX platforms
      command.
 
    * Add support for Digital UNIX and other non-System V UNIX operating
-     systems.
+     systems.  Also test on NetBSD, OpenBSD and SunOS as support has
+     been written for these systems but is untested.  The SunOS port
+     requires an ANSI C compiler, though.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
@@ -9205,7 +9228,17 @@ I.2 Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
-  7. What does the `MP_INLINE' definition in `mpatrol.h' do?
+  7. What does the `MP_ALIGN' definition in `mpatrol.h' do?
+
+     It is a preprocessor macro function that is used to return the
+     minimum alignment in bytes required for a specified type at
+     compile-time.  It is used in the `MP_MALLOC' family of functions
+     to specify the required alignment of the memory allocation that is
+     to be used to store the specified type.  Some compilers provide a
+     feature that can be used to determine the minimum alignment of a
+     type at compile-time.  For all others, this macro evaluates to `0'.
+
+  8. What does the `MP_INLINE' definition in `mpatrol.h' do?
 
      It is used in the definition of the debugging versions of the C++
      operators in `mpatrol.h' so that they are inlined correctly.  We
@@ -9223,7 +9256,7 @@ I.2 Building
      platforms the `extern inline' function definition will have a weak
      visibility and so will not clash with library functions.
 
-  8. Why do I get different stack traces in the mpatrol log file from
+  9. Why do I get different stack traces in the mpatrol log file from
      the C++ operators in `mpatrol.h' when optimisation is turned on
      and off in the compiler?
 
@@ -9235,7 +9268,7 @@ I.2 Building
      top of its stack, even though it will be removed in the inlined
      case.
 
-  9. How do I build the `mptrace' command with GUI support?
+ 10. How do I build the `mptrace' command with GUI support?
 
      The GUI support for the `mptrace' command is currently written to
      use Motif and X Windows and so can only be built on systems with
@@ -11206,6 +11239,14 @@ allocations in the log files produced.  Useful information on the
 debugging features available within the GNU C library is located at
 `http://sdb.suse.de/sdb/en/html/aj_debug.html'.
 
+   If you suspect that the debugging problem you are looking at is
+likely to be related to UNIX system calls then some systems come with
+the `strace' or `truss' commands which allow you to trace all of the
+system calls that a program makes when running.  This can sometimes be
+invaluable in pinpointing the exact point at which a program fails, but
+as it only operates at the system call level, no information about
+individual memory allocations is available.
+
    ---------- Footnotes ----------
 
    (1) This list can be considered to be a slightly more up to date
@@ -12016,6 +12057,7 @@ Index
 64-bit:                                            
           See ``I.2 Building''.
 _RLD_LIST:                                          See 7.8.1.
+a.out:                                              See 12.
 ABI:                                                See 6.2.
 acknowledgements:                                  
           See ``Foreword''.
@@ -12609,6 +12651,8 @@ MMU:                                                See 6.1.
 modules:                                            See 11.
 Motif:                                             
           See ``I.2 Building''.
+MP_ALIGN:                                          
+          See ``I.2 Building''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
 MP_DELETE:                                         
           See ``Appendix A Functions''.
@@ -12907,6 +12951,8 @@ static inline:
           See ``I.2 Building''.
 static memory allocations:                          See 5.1.
 statistics:                                         See 7.2.
+strace:                                            
+          See ``Appendix J Related software''.
 Stratosware Corporation:                           
           See ``Appendix J Related software''.
 stress testing:                                     See 10.
@@ -12964,6 +13010,8 @@ tracing:                                            See 9.
 tracing file format:                               
           See ``F.2 Tracing file format''.
 tree structure:                                     See 12.2.
+truss:                                             
+          See ``Appendix J Related software''.
 TurboPower:                                        
           See ``Appendix J Related software''.
 tutorial:                                           See 13.

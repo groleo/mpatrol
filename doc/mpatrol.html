@@ -115,7 +115,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.4 of the mpatrol manual for version
-1.3.4, 15th January, 2001.
+1.3.4, 18th January, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -303,7 +303,19 @@ This is not intended to be exhaustive since the best way to see what the library
 does is to read the documentation and try it out.
 
 <ul>
-<li>Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms.
+<li>Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms. 
+Contains direct support for (and takes advantage of most of the features of)
+AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD, HP/UX, IRIX, Linux, LynxOS, NetBSD,
+OpenBSD, SINIX, Solaris, SunOS and UnixWare.  Also contains target-specific
+code to take advantage of Intel 80x86, Motorola 680x0 and 88xx0, MIPS,
+HP PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
+
+<li>Has the ability to read symbols from executable files and shared libraries in
+the <code>a.out</code>, COFF, XCOFF, ELF32, ELF64 and Windows Portable Executable file
+formats, and if the GNU BFD library is available then the mpatrol library can
+read symbols from all of the file formats that it has support for as well.  Can
+also liase with AIX, BSD-based, HP/UX, IRIX, SVR4-based and Windows dynamic
+linkers in order to find out information about shared libraries.
 
 <li>Can be built to allocate memory from a fixed-sized static array rather than
 using heap memory from the system.
@@ -3891,7 +3903,7 @@ program using the following commands:
 
 <ul>
 <li>If the mpatrol library was built with no support for any object file format or
-was built with support for the COFF or XCOFF object file formats:
+was built with support for the <code>a.out</code>, COFF or XCOFF object file formats:
 
 <pre>cc -I/usr/local/include &lt;file&gt; -L/usr/local/lib -lmpatrol
 </pre>
@@ -7639,7 +7651,9 @@ standards allow this behaviour, and it is really only a portability issue.
 <br><dt>Cause
 <dd>The <code>operator new</code> or <code>operator new[]</code> C++ operator was called to
 allocate memory, but no more memory was available to allocate and no low-memory
-handler was installed. 
+handler was installed.  This error can also be caused by a call to
+<code>xmalloc()</code> and related functions, or <code>MP_MALLOC</code> and related
+functions when they would otherwise return a <code>NULL</code> pointer. 
 <br><dt>Additional
 <dd>The library summary. 
 <br><dt>Result
@@ -8116,10 +8130,13 @@ unless <code>libelf.so</code> is available.
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The <code>LIST</code> option does not work since the <code>--listing</code> option does
 not work in the <code>mpedit</code> command. 
-<li>The mpatrol library requires either the ELF access library or the GNU BFD
-library to be installed on the system, otherwise no symbols can be read from
-executable files or shared libraries and the library must be built with the
-<code>-DFORMAT=FORMAT_NONE</code> option. 
+<li>On ELF-based systems, the mpatrol library requires either the ELF access library
+or the GNU BFD library to be installed on the system, otherwise no symbols can
+be read from executable files or shared libraries and the library must be built
+with the <code>-DFORMAT=FORMAT_NONE</code> option.  No such extra libraries are
+required on <code>a.out</code>-based systems. 
+<li>The <code>--dynamic</code> option to the <code>mpatrol</code> command does not appear
+to work correctly, giving spurious errors in the log file. 
 <li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
 to the lack of an <code>nl</code> command on the system. 
 <li>The <code>hexwords</code> command needs to be changed to use
@@ -8871,7 +8888,9 @@ object file format without needing to use the GNU BFD library.
 command.  Also add a way to specify editor options to the <code>mpedit</code>
 command.
 
-<li>Add support for Digital UNIX and other non-System V UNIX operating systems.
+<li>Add support for Digital UNIX and other non-System V UNIX operating systems. 
+Also test on NetBSD, OpenBSD and SunOS as support has been written for these
+systems but is untested.  The SunOS port requires an ANSI C compiler, though.
 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command does not always
 work on systems whose dynamic linkers support the <code>LD_PRELOAD</code> or
@@ -9241,6 +9260,15 @@ inlining may significantly alter the layout of a program's stack.  Normally this
 option is only required when building the mpatrol library, but on some platforms
 function call stack traversal may not work properly unless this option (or
 equivalent) is used for all compiled code.
+
+</p><li>What does the <code>MP_ALIGN</code> definition in <code>mpatrol.h</code> do?
+
+<p>It is a preprocessor macro function that is used to return the minimum alignment
+in bytes required for a specified type at compile-time.  It is used in the
+<code>MP_MALLOC</code> family of functions to specify the required alignment of the
+memory allocation that is to be used to store the specified type.  Some
+compilers provide a feature that can be used to determine the minimum alignment
+of a type at compile-time.  For all others, this macro evaluates to <code>0</code>.
 
 </p><li>What does the <code>MP_INLINE</code> definition in <code>mpatrol.h</code> do?
 
@@ -11008,6 +11036,14 @@ translate return addresses or locate unfreed memory allocations in the log files
 produced.  Useful information on the debugging features available within the
 GNU C library is located at <a href="http://sdb.suse.de/sdb/en/html/aj_debug.html">http://sdb.suse.de/sdb/en/html/aj_debug.html</a>.
 
+<p>If you suspect that the debugging problem you are looking at is likely to be
+related to UNIX system calls then some systems come with the <code>strace</code>
+or <code>truss</code> commands which allow you to trace all of the system calls
+that a program makes when running.  This can sometimes be invaluable in
+pinpointing the exact point at which a program fails, but as it only operates
+at the system call level, no information about individual memory allocations is
+available.
+
 <p><hr>
 Node:<a name="References">References</a>,
 Next:<a rel=next href="#Copying">Copying</a>,
@@ -11738,6 +11774,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>32-bit: <a href="#Building">Building</a>
 <li>64-bit: <a href="#Building">Building</a>
 <li>_RLD_LIST: <a href="#The%20mpatrol%20command">The mpatrol command</a>
+<li>a.out: <a href="#Examples">Examples</a>
 <li>ABI: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>acknowledgements: <a href="#Foreword">Foreword</a>
 <li>adding a new object file format: <a href="#New%20file%20format%20support">New file format support</a>
@@ -12141,6 +12178,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>MMU: <a href="#Virtual%20memory">Virtual memory</a>
 <li>modules: <a href="#How%20it%20works">How it works</a>
 <li>Motif: <a href="#Building">Building</a>
+<li>MP_ALIGN: <a href="#Building">Building</a>
 <li>MP_BUILTINSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>MP_DELETE: <a href="#Functions">Functions</a>
 <li>MP_INLINE: <a href="#Building">Building</a>
@@ -12334,6 +12372,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>static inline: <a href="#Building">Building</a>
 <li>static memory allocations: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>statistics: <a href="#Logging%20and%20tracing">Logging and tracing</a>
+<li>strace: <a href="#Related%20software">Related software</a>
 <li>Stratosware Corporation: <a href="#Related%20software">Related software</a>
 <li>stress testing: <a href="#Improving%20performance">Improving performance</a>
 <li>stripped executable file: <a href="#Library%20behaviour">Library behaviour</a>
@@ -12377,6 +12416,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>tracing: <a href="#Tracing">Tracing</a>
 <li>tracing file format: <a href="#Tracing%20file%20format">Tracing file format</a>
 <li>tree structure: <a href="#Example%202">Example 2</a>
+<li>truss: <a href="#Related%20software">Related software</a>
 <li>TurboPower: <a href="#Related%20software">Related software</a>
 <li>tutorial: <a href="#Tutorial">Tutorial</a>
 <li>type of allocation: <a href="#Example%201">Example 1</a>
