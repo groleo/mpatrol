@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.91 2001-02-25 23:32:39 graeme Exp $"
+#ident "$Id: inter.c,v 1.92 2001-02-25 23:46:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.91 2001-02-25 23:32:39 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.92 2001-02-25 23:46:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -631,7 +631,6 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    checkheap(memhead.count + 1);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -667,6 +666,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.stack = &i;
     v.typestr = g;
     v.typesize = h;
+    checkheap(&v, memhead.count + 1);
     checkalloca(&v, 0);
     memhead.event++;
     if (((f == AT_XMALLOC) || (f == AT_XCALLOC)) && (l == 0) && (h != 0))
@@ -751,7 +751,6 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    checkheap(memhead.count + 1);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -787,6 +786,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.stack = &i;
     v.typestr = "char";
     v.typesize = sizeof(char);
+    checkheap(&v, memhead.count + 1);
     checkalloca(&v, 0);
     memhead.event++;
     o = p;
@@ -885,7 +885,6 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    checkheap(memhead.count);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -921,6 +920,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.stack = &i;
     v.typestr = g;
     v.typesize = h;
+    checkheap(&v, memhead.count);
     checkalloca(&v, 0);
     memhead.event++;
     if ((f == AT_XREALLOC) && (l == 0) && (h != 0))
@@ -982,7 +982,6 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    checkheap(memhead.count);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -1018,6 +1017,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    checkheap(&v, memhead.count);
     checkalloca(&v, 0);
     memhead.event++;
     __mp_freememory(&memhead, p, f, &v);
@@ -1699,7 +1699,7 @@ __mp_stats(heapinfo *d)
  */
 
 void
-__mp_check(void)
+__mp_checkheap(char *s, char *t, unsigned long u)
 {
     stackinfo i;
     loginfo v;
@@ -1713,9 +1713,24 @@ __mp_check(void)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;

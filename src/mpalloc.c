@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.16 2001-02-23 22:41:18 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.17 2001-02-25 23:46:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.16 2001-02-23 22:41:18 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.17 2001-02-25 23:46:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -670,7 +670,7 @@ __mp_stats(heapinfo *d)
  */
 
 void
-__mp_check(void)
+__mp_checkheap(char *s, char *t, unsigned long u)
 {
 }
 
