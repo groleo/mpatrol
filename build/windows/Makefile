@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.14 2000-04-06 19:17:15 graeme Exp $
+# $Id: Makefile,v 1.15 2000-04-11 21:04:14 graeme Exp $
 
 
 # Definitions
@@ -82,7 +82,7 @@ $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
 
 $(SHARED_LIBRARY): $(SHARED_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -noentry -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS)
+	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS)
 
 $(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
@@ -91,7 +91,7 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
 $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -noentry -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS)
+	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS)
 
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
