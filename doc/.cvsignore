@@ -1,0 +1,9 @@
+.cvsignore
+*.txt
+*.info
+*.info-*
+*.guide
+*.html
+*.dvi
+*.ps
+*.pdf
