@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.76 2001-03-04 14:13:37 graeme Exp $"
+#ident "$Id: info.c,v 1.77 2001-03-05 18:59:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.76 2001-03-04 14:13:37 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.77 2001-03-05 18:59:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -79,6 +79,7 @@ __mp_newinfo(infohead *h)
                    MP_FREEBYTE, 0);
     __mp_newaddrs(&h->addr, &h->alloc.heap);
     __mp_newsymbols(&h->syms, &h->alloc.heap, h);
+    __mp_newleaktab(&h->ltable, &h->alloc.heap);
     __mp_newprofile(&h->prof, &h->alloc.heap, &h->syms);
     __mp_newtrace(&h->trace, &h->alloc.heap.memory);
     /* Determine the minimum alignment for an allocation information node
@@ -143,6 +144,7 @@ __mp_deleteinfo(infohead *h)
     __mp_closelogfile();
     h->log = NULL;
     __mp_deleteprofile(&h->prof);
+    __mp_deleteleaktab(&h->ltable);
     __mp_deletesymbols(&h->syms);
     __mp_deleteaddrs(&h->addr);
     __mp_deleteallocs(&h->alloc);
@@ -239,6 +241,44 @@ getallocanode(infohead *h)
         n = (allocanode *) __mp_getslot(&h->atable);
     }
     return n;
+}
+
+
+/* Add an entry to the leak table.
+ */
+
+static
+void
+leaktabentry(infohead *h, infonode *m, size_t l, int f)
+{
+    addrnode *a;
+    symnode *s;
+    char *t;
+    unsigned long u;
+
+    t = NULL;
+    u = 0;
+    if ((m->data.file != NULL) && (m->data.line != 0))
+    {
+        t = m->data.file;
+        u = m->data.line;
+    }
+    else if (m->data.func != NULL)
+        t = m->data.func;
+    else if (a = m->data.stack)
+    {
+        if ((a->data.name == NULL) &&
+            (s = __mp_findsymbol(&h->syms, a->data.addr)))
+            a->data.name = s->data.name;
+        if (a->data.name != NULL)
+            t = a->data.name;
+        else
+            u = (unsigned long) a->data.addr;
+    }
+    if (f == 0)
+        __mp_allocentry(&h->ltable, t, u, l);
+    else
+        __mp_freeentry(&h->ltable, t, u, l);
 }
 
 
@@ -377,6 +417,8 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                     __mp_memset(p, h->alloc.abyte, l);
                 if (h->recur == 1)
                 {
+                    if (h->ltable.tracing)
+                        leaktabentry(h, m, l, 0);
                     if (h->prof.profiling &&
                         __mp_profilealloc(&h->prof, n->size, m,
                                           !(h->flags & FLG_NOPROTECT)))
@@ -649,6 +691,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
             }
             if (p != NULL)
             {
+                if (h->ltable.tracing)
+                    leaktabentry(h, m, d, 1);
                 if (m->data.flags & FLG_PROFILED)
                     __mp_profilefree(&h->prof, d, m,
                                      !(h->flags & FLG_NOPROTECT));
@@ -664,6 +708,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                 m->data.stack = __mp_getaddrs(&h->addr, v->stack);
                 m->data.typestr = v->typestr;
                 m->data.typesize = v->typesize;
+                if (h->ltable.tracing)
+                    leaktabentry(h, m, l, 0);
                 if (m->data.flags & FLG_PROFILED)
                     __mp_profilealloc(&h->prof, l, m,
                                       !(h->flags & FLG_NOPROTECT));
@@ -808,6 +854,8 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
         }
         if (!(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READWRITE);
+        if (h->ltable.tracing)
+            leaktabentry(h, m, n->size, 1);
         if (m->data.flags & FLG_PROFILED)
             __mp_profilefree(&h->prof, n->size, m, !(h->flags & FLG_NOPROTECT));
         if (m->data.flags & FLG_TRACED)
@@ -1033,7 +1081,9 @@ __mp_protectinfo(infohead *h, memaccess a)
          m = (allocanode *) m->node.next)
         if (!__mp_memprotect(&h->alloc.heap.memory, m->block, m->data.size, a))
             return 0;
-    if (!__mp_protectaddrs(&h->addr, a) || !__mp_protectprofile(&h->prof, a))
+    if (!__mp_protectaddrs(&h->addr, a) ||
+        !__mp_protectleaktab(&h->ltable, a) ||
+        !__mp_protectprofile(&h->prof, a))
         return 0;
     return __mp_protectalloc(&h->alloc, a);
 }

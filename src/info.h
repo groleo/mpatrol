@@ -32,13 +32,14 @@
 
 
 /*
- * $Id: info.h,v 1.49 2001-02-27 20:17:28 graeme Exp $
+ * $Id: info.h,v 1.50 2001-03-05 18:59:08 graeme Exp $
  */
 
 
 #include "config.h"
 #include "alloc.h"
 #include "addr.h"
+#include "leaktab.h"
 #include "profile.h"
 #include "trace.h"
 #include "signals.h"
@@ -214,6 +215,7 @@ typedef struct infohead
     addrhead addr;                    /* stack address table */
     symhead syms;                     /* symbol table */
     sighead signals;                  /* signal handler table */
+    leaktab ltable;                   /* leak table */
     profhead prof;                    /* profiling information */
     tracehead trace;                  /* tracing information */
     slottable table;                  /* table of information nodes */
