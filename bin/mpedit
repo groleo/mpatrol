@@ -25,12 +25,12 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.7 2001-09-03 21:57:53 graeme Exp $
+# $Id: mpedit,v 1.8 2001-09-03 22:34:27 graeme Exp $
 
 
 # Program version.
 
-VERSION="1.0"
+VERSION="1.1"
 
 
 # Set the filename of the text editor to use.
@@ -300,7 +300,19 @@ then
     fi
 
     echo "    $sourcefile at line $linenumber:" >&2
-    nl -ba "$sourcefile" | sed -n "${lowerline},${upperline}p" >&2
+
+
+    # If the nl command is available then use it to number the lines in the
+    # source file, otherwise fall back to using awk.
+
+    which nl >/dev/null 2>&1
+    if [ $? = 0 ]
+    then
+        nl -ba "$sourcefile" | sed -n "${lowerline},${upperline}p" >&2
+    else
+        awk '{ printf("%6d\t%s\n", ++line, $0); }' "$sourcefile" |
+        sed -n "${lowerline},${upperline}p" >&2
+    fi
 else
     # If the --editor option was given on the command line then use the text
     # editor that was specified, otherwise look to the EDITOR environment
