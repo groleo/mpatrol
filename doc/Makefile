@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.43 2003-11-25 15:42:44 graeme Exp $
+# $Id: Makefile,v 1.44 2003-11-25 16:20:06 graeme Exp $
 
 
 # Definitions
@@ -109,7 +109,7 @@ endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).dvi: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).eps \
+$(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT).eps \
 	images/test.eps images/gcc.eps images/cpp.eps images/cc1.eps \
 	images/collect2.eps images/trace.eps
 	@ echo creating $@ from $<...
@@ -131,7 +131,7 @@ endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).pdf \
+$(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT).pdf \
 	images/test.pdf images/gcc.pdf images/cpp.pdf images/cc1.pdf \
 	images/collect2.pdf images/trace.pdf
 	@ echo creating $@ from $<...
