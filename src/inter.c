@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.15 2000-03-07 22:05:10 graeme Exp $"
+#ident "$Id: inter.c,v 1.16 2000-03-14 00:08:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -276,6 +276,21 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
             k--;
         }
     }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
   retry:
     p = __mp_getmemory(&memhead, l, a, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
@@ -333,6 +348,21 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
             j = __mp_getframe(&i);
             k--;
         }
+    }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     if (p != NULL)
     {
@@ -392,6 +422,21 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             k--;
         }
     }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     p = __mp_resizememory(&memhead, p, l, a, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
@@ -440,6 +485,21 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
             k--;
         }
     }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     __mp_freememory(&memhead, p, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1);
@@ -484,6 +544,21 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
             k--;
         }
     }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     __mp_setmemory(&memhead, p, l, c, f, s, t, u, &i);
     restoresignals();
     return p;
@@ -525,6 +600,21 @@ void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
             j = __mp_getframe(&i);
             k--;
         }
+    }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     __mp_copymemory(&memhead, p, q, l, f, s, t, u, &i);
     restoresignals();
@@ -577,6 +667,21 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
             k--;
         }
     }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     r = __mp_locatememory(&memhead, p, l, q, m, f, s, t, u, &i);
     restoresignals();
     return r;
@@ -622,6 +727,21 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
             j = __mp_getframe(&i);
             k--;
         }
+    }
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     r = __mp_comparememory(&memhead, p, q, l, f, s, t, u, &i);
     restoresignals();
