@@ -78,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.45 2001-01-24 13:18:07 graeme Exp $"
+#ident "$Id: memory.c,v 1.46 2001-01-24 20:34:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -677,6 +677,30 @@ __mp_memfree(meminfo *i, void *p, size_t l)
     NXPageFree(t);
 #endif /* TARGET */
 #endif /* MP_ARRAY_SUPPORT */
+}
+
+
+/* Return the access permission of an address.
+ */
+
+MP_GLOBAL
+memaccess
+__mp_memquery(meminfo *i, void *p)
+{
+#if SYSTEM == SYSTEM_SOLARIS
+    char c;
+#endif /* SYSTEM */
+
+#if SYSTEM == SYSTEM_SOLARIS
+    /* The mincore() system call allows us to determine if a page is in core,
+     * and if it is not and ENOMEM is set then it means that the page is not
+     * mapped.  Unfortunately, we can't tell if it's read-only.
+     */
+    p = (void *) __mp_rounddown((unsigned long) p, i->page);
+    if ((mincore((char *) p, 1, &c) == -1) && (errno == ENOMEM))
+        return MA_NOACCESS;
+#endif /* SYSTEM */
+    return MA_READWRITE;
 }
 
 
