@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.47 2001-07-25 21:45:28 graeme Exp $
+ * $Id: inter.h,v 1.48 2001-07-25 22:48:31 graeme Exp $
  */
 
 
@@ -164,9 +164,9 @@ void __mp_summary(void);
 int __mp_stats(heapinfo *);
 void __mp_checkheap(char *, char *, unsigned long);
 void __mp_check(void);
-void (*__mp_prologue(void (*)(void *, size_t, void *)))(void *, size_t, void *);
-void (*__mp_epilogue(void (*)(void *, void *)))(void *, void *);
-void (*__mp_nomemory(void (*)(void)))(void);
+prologuehandler __mp_prologue(prologuehandler);
+epiloguehandler __mp_epilogue(epiloguehandler);
+nomemoryhandler __mp_nomemory(nomemoryhandler);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(char *, ...);

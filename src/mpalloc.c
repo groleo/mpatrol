@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.34 2001-07-25 21:45:28 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.35 2001-07-25 22:48:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.34 2001-07-25 21:45:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.35 2001-07-25 22:48:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -807,8 +807,8 @@ __mp_check(void)
 /* Set the prologue function and return the previous setting.
  */
 
-void
-(*__mp_prologue(void (*h)(void *, size_t, void *)))(void *, size_t, void *)
+prologuehandler
+__mp_prologue(prologuehandler h)
 {
     return NULL;
 }
@@ -817,8 +817,8 @@ void
 /* Set the epilogue function and return the previous setting.
  */
 
-void
-(*__mp_epilogue(void (*h)(void *, void *)))(void *, void *)
+epiloguehandler
+__mp_epilogue(epiloguehandler h)
 {
     return NULL;
 }
@@ -827,8 +827,8 @@ void
 /* Set the low-memory handler and return the previous setting.
  */
 
-void
-(*__mp_nomemory(void (*h)(void)))(void)
+nomemoryhandler
+__mp_nomemory(nomemoryhandler h)
 {
     return NULL;
 }
