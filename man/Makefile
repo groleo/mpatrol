@@ -21,15 +21,17 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.19 2003-11-26 01:02:13 graeme Exp $
+# $Id: Makefile,v 1.20 2003-11-26 23:05:33 graeme Exp $
 
 
 # Definitions
 
-SHELL  = /bin/sh
-ROFF   = groff -man
-HTML   = man2html -r
-PSTILL = pstill -c -c -p
+SHELL     = /bin/sh
+MAN2ASCII = groff -man -Tascii
+MAN2HTML  = man2html -r
+MAN2DVI   = groff -man -Tdvi
+MAN2PS    = groff -man -Tps
+MAN2PDF   = pstill -c -c -p
 
 CATPAGES  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
 	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3 \
@@ -55,139 +57,139 @@ PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
 default: $(CATPAGES)
 
 cat1/mpatrol.1: man1/mpatrol.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/mprof.1: man1/mprof.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/mptrace.1: man1/mptrace.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/mleak.1: man1/mleak.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/mpsym.1: man1/mpsym.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/mpedit.1: man1/mpedit.1
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 cat1/hexwords.1: man1/hexwords.1
-	$(ROFF) -Tascii -t $< >$@
+	$(MAN2ASCII) -t $< >$@
 
 cat3/libmpatrol.3: man3/libmpatrol.3
-	$(ROFF) -Tascii -t $< >$@
+	$(MAN2ASCII) -t $< >$@
 
 cat3/libmpalloc.3: man3/libmpalloc.3
-	$(ROFF) -Tascii $< >$@
+	$(MAN2ASCII) $< >$@
 
 html/mpatrol.html: man1/mpatrol.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/mprof.html: man1/mprof.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/mptrace.html: man1/mptrace.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/mleak.html: man1/mleak.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/mpsym.html: man1/mpsym.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/mpedit.html: man1/mpedit.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/hexwords.html: man1/hexwords.1
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/libmpatrol.html: man3/libmpatrol.3
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 html/libmpalloc.html: man3/libmpalloc.3
-	$(HTML) $< >$@
+	$(MAN2HTML) $< >$@
 
 dvi/mpatrol.dvi: man1/mpatrol.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/mprof.dvi: man1/mprof.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/mptrace.dvi: man1/mptrace.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/mleak.dvi: man1/mleak.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/mpsym.dvi: man1/mpsym.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/mpedit.dvi: man1/mpedit.1
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 dvi/hexwords.dvi: man1/hexwords.1
-	$(ROFF) -Tdvi -t $< >$@
+	$(MAN2DVI) -t $< >$@
 
 dvi/libmpatrol.dvi: man3/libmpatrol.3
-	$(ROFF) -Tdvi -t $< >$@
+	$(MAN2DVI) -t $< >$@
 
 dvi/libmpalloc.dvi: man3/libmpalloc.3
-	$(ROFF) -Tdvi $< >$@
+	$(MAN2DVI) $< >$@
 
 ps/mpatrol.ps: man1/mpatrol.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/mprof.ps: man1/mprof.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/mptrace.ps: man1/mptrace.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/mleak.ps: man1/mleak.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/mpsym.ps: man1/mpsym.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/mpedit.ps: man1/mpedit.1
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 ps/hexwords.ps: man1/hexwords.1
-	$(ROFF) -Tps -t $< >$@
+	$(MAN2PS) -t $< >$@
 
 ps/libmpatrol.ps: man3/libmpatrol.3
-	$(ROFF) -Tps -t $< >$@
+	$(MAN2PS) -t $< >$@
 
 ps/libmpalloc.ps: man3/libmpalloc.3
-	$(ROFF) -Tps $< >$@
+	$(MAN2PS) $< >$@
 
 pdf/mpatrol.pdf: ps/mpatrol.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/mprof.pdf: ps/mprof.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/mptrace.pdf: ps/mptrace.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/mleak.pdf: ps/mleak.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/mpsym.pdf: ps/mpsym.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/mpedit.pdf: ps/mpedit.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/hexwords.pdf: ps/hexwords.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 pdf/libmpalloc.pdf: ps/libmpalloc.ps
-	$(PSTILL) -o $@ $<
+	$(MAN2PDF) -o $@ $<
 
 all: $(CATPAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
