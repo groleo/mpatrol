@@ -35,6 +35,7 @@
 #include "alloc.h"
 #include "addr.h"
 #include "profile.h"
+#include "trace.h"
 #include "signals.h"
 
 
@@ -56,7 +57,8 @@
 
 #define FLG_FREED         1     /* allocation has been freed */
 #define FLG_PROFILED      2     /* allocation has been profiled */
-#define FLG_INTERNAL      4     /* allocation was made from within the library */
+#define FLG_TRACED        4     /* allocation has been traced */
+#define FLG_INTERNAL      8     /* allocation was made inside the library */
 
 
 /* The different types of memory allocation and operation functions.
@@ -178,6 +180,7 @@ typedef struct infohead
     symhead syms;                     /* symbol table */
     sighead signals;                  /* signal handler table */
     profhead prof;                    /* profiling information */
+    tracehead trace;                  /* tracing information */
     slottable table;                  /* table of information nodes */
     slottable atable;                 /* table of allocanodes */
     listhead list;                    /* internal allocation list */
