@@ -68,7 +68,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.20 2000-05-29 16:49:16 graeme Exp $"
+#ident "$Id: symbol.c,v 1.21 2000-05-30 18:22:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -366,11 +366,21 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 
     a = b + (size_t) p->value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
-     * for symbols which have a virtual address of zero and we only remember
-     * symbols that are declared statically, externally or weakly visible.
+     * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
+     * likely to be the name of a CSECT beginning with a '.' and not the
+     * original name of the function, so we skip the first character.  We
+     * also don't allocate a symbol node for symbols which have a virtual
+     * address of zero and we only remember symbols that are declared
+     * statically, externally or weakly visible.
      */
-    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0) &&
+    if ((s != NULL) &&
+#if (SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LYNXOS) && \
+    (ARCH == ARCH_POWER || ARCH == ARCH_POWERPC)
+        (*s++ == '.') && (strcmp(s, "text") != 0) &&
+#else /* SYSTEM && ARCH */
+        (*s != '\0') &&
+#endif /* SYSTEM && ARCH */
+        !strpbrk(s, "$@.") && (a > 0) &&
         (p->flags & (BSF_LOCAL | BSF_GLOBAL | BSF_WEAK)))
     {
         if ((n = getsymnode(y)) == NULL)
