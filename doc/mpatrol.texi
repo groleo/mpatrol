@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.11 1999-11-25 15:56:34 graeme Exp $
+@c $Id: mpatrol.texi,v 1.12 1999-11-25 17:45:53 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -445,6 +445,10 @@ allocations.
 @item
 Contains support for a user-defined limit to available memory which can be
 useful for stress-testing a program in simulated low memory conditions.
+
+@item
+Contains a feature to randomly fail a specific frequency of memory allocations
+which can be useful for stress-testing error recovery code in a program.
 
 @item
 An option exists to display a complete memory map of the heap at program
@@ -1373,8 +1377,8 @@ allocated memory block will be zeroed unless you created it with
 @cindex stress testing
 Finally, try stress-testing your program in low memory conditions.  The mpatrol
 library contains the @option{LIMIT} option which can place an upper bound on the
-size of the heap, but there are likely to be more specialised utilities around
-that will be able to fail on specific memory allocations.  Doing this will test
+size of the heap, and also contains the @option{FAILFREQ} and @option{FAILSEED}
+options which can cause random memory allocation failures.  Doing this will test
 parts of your code that you would probably never expect to be called, but
 perhaps they will one day!  Who would you rather have debugging your program ---
 yourself or the user?
@@ -1523,6 +1527,8 @@ free stop:         0
 unfreed abort:     0
 lower check range: -
 upper check range: -
+failure frequency: 0
+failure seed:      533453
 prologue function: <unset>
 epilogue function: <unset>
 handler function:  <unset>
@@ -1756,22 +1762,24 @@ example have been numbered and their descriptions appear below.
 10  unfreed abort:     0
 11  lower check range: -
 12  upper check range: -
-13  prologue function: <unset>
-14  epilogue function: <unset>
-15  handler function:  <unset>
-16  log file:          mpatrol.log
-17  program filename:  /proc/729/object/a.out
-18  symbols read:      3240
-19  allocation count:  13
-20  allocation peak:   4720 bytes
-21  allocation limit:  0 bytes
-22  allocated blocks:  1 (16 bytes)
-23  freed blocks:      0 (0 bytes)
-24  free blocks:       1 (8176 bytes)
-25  internal blocks:   25 (204800 bytes)
-26  total heap usage:  212992 bytes
-27  total warnings:    0
-28  total errors:      1
+13  failure frequency: 0
+14  failure seed:      533453
+15  prologue function: <unset>
+16  epilogue function: <unset>
+17  handler function:  <unset>
+18  log file:          mpatrol.log
+19  program filename:  /proc/729/object/a.out
+20  symbols read:      3240
+21  allocation count:  13
+22  allocation peak:   4720 bytes
+23  allocation limit:  0 bytes
+24  allocated blocks:  1 (16 bytes)
+25  freed blocks:      0 (0 bytes)
+26  free blocks:       1 (8176 bytes)
+27  internal blocks:   25 (204800 bytes)
+28  total heap usage:  212992 bytes
+29  total warnings:    0
+30  total errors:      1
 @end smallexample
 
 @enumerate 1
@@ -1845,6 +1853,23 @@ range is infinite, but if they are both zero then no such checking will ever be
 performed, thus speeding up execution speed dramatically.  The library defaults
 to performing checks for every allocation index.  These can be changed at
 run-time using the @option{CHECK} option.
+
+@cindex random failures
+@cindex failure frequency
+@cindex failure seed
+@item
+Failure frequency.
+@item
+Failure seed.  These values are used to specify if random memory allocation
+failures should occur during program execution, for the purposes of stress
+testing a program.  If the failure frequency is zero then no random failures
+will occur, but if it is greater than zero then the higher the number, the less
+frequent the failures.  The failure seed is used internally by the mpatrol
+library when generating random numbers.  If it is zero then the seed will be set
+randomly, but if it is greater than zero then it will be used to generate a
+predictable sequence of random numbers; i.e. two runs of the same program with
+the same failure frequencies and the same failure seeds will generate exactly
+the same sequence of failures.
 
 @cindex callback functions
 @cindex functions, callback
@@ -2908,8 +2933,8 @@ the handler installed by that function.
 @cindex MPATROL_OPTIONS
 The library can read certain options at run-time from an environment variable
 called @env{MPATROL_OPTIONS}.  This variable must contain one or more valid
-option keywords from the list below and must be no longer than 256 characters in
-length.  If @env{MPATROL_OPTIONS} is unset or empty then the default settings
+option keywords from the list below and must be no longer than 1024 characters
+in length.  If @env{MPATROL_OPTIONS} is unset or empty then the default settings
 will be used.
 
 @cindex binary
@@ -2982,6 +3007,22 @@ Specifies the default alignment for general-purpose memory allocations, which
 must be a power of two (and will be rounded up to the nearest power of two if it
 is not).  The default alignment for a particular system is calculated at
 run-time.
+
+@cindex FAILFREQ
+@item @option{FAILFREQ}=<@var{unsigned-integer}>
+Specifies the frequency at which all memory allocations will randomly fail.  For
+example, a value of @samp{10} will mean that roughly 1 in 10 memory allocations
+will fail, but a value of @samp{0} will disable all random failures.  This
+option can be useful for stress-testing an application.  Default value:
+@option{FAILFREQ=0}.
+
+@cindex FAILSEED
+@item @option{FAILSEED}=<@var{unsigned-integer}>
+Specifies the random number seed which will be used when determining which
+memory allocations will randomly fail.  A value of @samp{0} will instruct the
+library to pick a random seed every time it is run.  Any other value will mean
+that the random failures will be the same every time the program is run, but
+only as long as the seed stays the same.  Default value: @option{FAILSEED=0}.
 
 @cindex FREEBYTE
 @item @option{FREEBYTE}=<@var{unsigned-integer}>
@@ -3339,6 +3380,16 @@ should preserve their original contents.
 [@option{OFLOWWATCH}]  Specifies that watch point areas should be used for
 overflow buffers rather than filling with the overflow byte.
 @end table
+
+@cindex -Z
+@item @option{-Z} <@var{unsigned-integer}>
+[@option{FAILSEED}]  Specifies the random number seed which will be used when
+determining which memory allocations will randomly fail.
+
+@cindex -z
+@item @option{-z} <@var{unsigned-integer}>
+[@option{FAILFREQ}]  Specifies the frequency at which all memory allocations
+will randomly fail.
 
 @node Library performance, Supported systems, Options, Top
 @appendix Library performance
@@ -3827,12 +3878,6 @@ program termination for debugging purposes to view memory fragmentation.  If
 that option is added then perhaps @option{SHOWALL} should only be equivalent to
 @option{SHOWFREE}, @option{SHOWFREED} and @option{SHOWUNFREED}, and
 @option{SHOWMAP} and @option{SHOWSYMBOLS} should be explicitly given.
-
-@item
-Add an option, similar in function to @option{LIMIT}, which would cause every
-@emph{nth} memory allocation to fail.  This would provide even better stress
-testing for badly-written programs that expect all memory allocations to
-succeed.
 
 @item
 Add an option, similar to @option{NOFREE}, that would prevent a freed memory
