@@ -761,14 +761,15 @@ for your system.
 
 <li>Edit the <code>Makefile</code> in that directory and check that it is using the
 appropriate compiler and build tools.  The <code>CC</code> macro specifies the
-compiler, the <code>AR</code> macro specifies the tool used to build the archive
-library and the <code>LD</code> macro specifies the tool to build the shared library. 
-The <code>CFLAGS</code> macro specifies compiler options that are always to be used,
-the <code>OFLAGS</code> macro specifies optimisation options for the compiler, the
-<code>SFLAGS</code> macro specifies options to be passed to the compiler when building
-a shared library and the <code>TFLAGS</code> macro specifies options to be passed to
-the compiler when building a thread-safe library.  You may also need to change
-the library names and library build commands on different systems.
+compiler<a rel=footnote href="#fn-1"><sup>1</sup></a>, the <code>AR</code>
+macro specifies the tool used to build the archive library and the <code>LD</code>
+macro specifies the tool to build the shared library.  The <code>CFLAGS</code> macro
+specifies compiler options that are always to be used, the <code>OFLAGS</code> macro
+specifies optimisation options for the compiler, the <code>SFLAGS</code> macro
+specifies options to be passed to the compiler when building a shared library
+and the <code>TFLAGS</code> macro specifies options to be passed to the compiler when
+building a thread-safe library.  You may also need to change the library names
+and library build commands on different systems.
 
 <li>Use the <code>make</code> command (or equivalent) to build the mpatrol library in
 archive form.  The <code>all</code> target builds all possible combinations of the
@@ -880,7 +881,7 @@ of all your code.
 
 <ol type=1 start=1>
 </p><li>This step is currently only available on DYNIX/ptx, FreeBSD, IRIX, Linux,
-NetBSD, OpenBSD and Solaris platforms and on DG/UX 4.20MU07<a rel=footnote href="#fn-1"><sup>1</sup></a> or later platforms with the <code>LD_PRELOAD</code>
+NetBSD, OpenBSD and Solaris platforms and on DG/UX 4.20MU07<a rel=footnote href="#fn-2"><sup>2</sup></a> or later platforms with the <code>LD_PRELOAD</code>
 feature.
 
 <p>If your program or application has been dynamically linked with the system C
@@ -1075,7 +1076,7 @@ Up:<a rel=up href="#Memory%20allocations">Memory allocations</a>
 <p>The first type of memory allocation is known as a <em>static memory
 allocation</em>, which corresponds to file scope variables and local static
 variables.  The addresses and sizes of these allocations are fixed at the time
-of compilation<a rel=footnote href="#fn-2"><sup>2</sup></a> and so they can be
+of compilation<a rel=footnote href="#fn-3"><sup>3</sup></a> and so they can be
 placed in a fixed-sized data area which then corresponds to a section within the
 final linked executable file.  Such memory allocations are called static because
 they do not vary in location or size during the lifetime of the program.
@@ -1128,7 +1129,7 @@ must be explicitly initialised by the programmer upon entry to the function or
 when they become visible in scope.
 
 <p>Such memory allocations are placed in a system memory area called the
-<em>stack</em>, which is allocated per process<a rel=footnote href="#fn-3"><sup>3</sup></a> and generally grows down in memory.  When a function is called, the
+<em>stack</em>, which is allocated per process<a rel=footnote href="#fn-4"><sup>4</sup></a> and generally grows down in memory.  When a function is called, the
 state of the calling function must be preserved so that when the called function
 returns, the calling function can resume execution.  That state is stored on the
 stack, including all local variables and parameters.  The compiler generates
@@ -1171,7 +1172,7 @@ allocated memory on request.  In some programming languages there is support for
 a <em>garbage collector</em>, which attempts to automatically free memory that has
 had all references to it removed, but this has traditionally not been very
 popular for programming languages such as C and C++, and has been more widely
-used in functional languages like ML<a rel=footnote href="#fn-4"><sup>4</sup></a>.
+used in functional languages like ML<a rel=footnote href="#fn-5"><sup>5</sup></a>.
 
 <p>Because dynamic memory allocations are performed at run-time rather than
 compile-time, they are outwith the domain of the compiler and must be
@@ -1189,7 +1190,7 @@ capability to diagnose errors if any occur.
 memory from the stack rather than the heap, and so the memory is automatically
 freed when the function that called it returns.  This is a non-standard feature
 that is not guaranteed to be present in a compiler, and indeed may not be
-possible to implement on some systems<a rel=footnote href="#fn-5"><sup>5</sup></a>.  However,
+possible to implement on some systems<a rel=footnote href="#fn-6"><sup>6</sup></a>.  However,
 the mpatrol library provides a debugging version of this function (and a few
 other related functions) on all systems, so that they make use of the heap
 instead of the stack.
@@ -1251,7 +1252,7 @@ Up:<a rel=up href="#Operating%20system%20support">Operating system support</a>
 <p><em>Virtual memory</em> is an operating system feature that was originally used to
 provide large usable address spaces for every process on machines that had very
 little physical memory.  It is used by an operating system to
-fool<a rel=footnote href="#fn-6"><sup>6</sup></a> a running process into believing that it can
+fool<a rel=footnote href="#fn-7"><sup>7</sup></a> a running process into believing that it can
 allocate a vast amount of memory for its own purposes, although whether it is
 allowed to or not depends on the operating system and the permissions of the
 individual user.
@@ -1262,7 +1263,7 @@ implemented via a piece of hardware called a <em>memory management unit</em>, or
 MMU.  The MMU's primary job is to translate any virtual addresses that are
 referred to by machine instructions into physical addresses by looking up a
 table which is built by the operating system.  This table contains mappings to
-and from <em>pages</em><a rel=footnote href="#fn-7"><sup>7</sup></a> rather than bytes since it
+and from <em>pages</em><a rel=footnote href="#fn-8"><sup>8</sup></a> rather than bytes since it
 would otherwise be very inefficient to handle mappings between individual bytes. 
 As a result, every virtual memory operation operates on pages, which are
 indivisible and are always aligned to the system page size.
@@ -1293,7 +1294,7 @@ mapping an existing file to memory means that the usual file I/O operations can
 be replaced with memory read and write operations.  The operating system will
 work out the optimum way to read and write any buffers and it means that only
 one copy of the file exists in both physical memory and the file system.  Note
-that this is how <em>shared libraries</em><a rel=footnote href="#fn-8"><sup>8</sup></a>
+that this is how <em>shared libraries</em><a rel=footnote href="#fn-9"><sup>9</sup></a>
 on UNIX platforms are generally implemented, with each individual process that
 uses the shared library having it mapped to somewhere in its address space.
 
@@ -1313,7 +1314,7 @@ which are implemented at operating system level.  These are normally used by
 debuggers to watch a specified area of memory that is expected to be read from
 or written to, but can just as easily be used to implement memory protection at
 byte level.  Unfortunately, as this feature is implemented in
-software<a rel=footnote href="#fn-9"><sup>9</sup></a> rather
+software<a rel=footnote href="#fn-10"><sup>10</sup></a> rather
 than in hardware, watch points tend to be incredibly slow, mainly as a result of
 the operating system having to check every instruction before it is executed. 
 In addition, some UNIX platforms only allow a certain number of software watch
@@ -1335,7 +1336,7 @@ mpatrol library replaces most of the memory operation functions provided by the
 system libraries with safer versions, although they may not be as efficient.
 
 <p>An operating system with virtual memory is usually going to run ever so slightly
-slower than an operating system without it<a rel=footnote href="#fn-10"><sup>10</sup></a>, but the advantages of virtual memory far
+slower than an operating system without it<a rel=footnote href="#fn-11"><sup>11</sup></a>, but the advantages of virtual memory far
 outweigh the disadvantages, especially when used for debugging purposes.
 
 <p><hr>
@@ -1350,7 +1351,7 @@ Up:<a rel=up href="#Operating%20system%20support">Operating system support</a>
 <p>As stated in the section on stack memory allocations (see <a href="#Stack%20memory%20allocations">Stack memory allocations</a>), when a function is called, a copy of the caller's state
 information (including local variables and registers) is saved on the stack so
 that it can be restored when the called function returns.  On many operating
-systems there is a <em>calling convention</em><a rel=footnote href="#fn-11"><sup>11</sup></a> which defines the layout of such
+systems there is a <em>calling convention</em><a rel=footnote href="#fn-12"><sup>12</sup></a> which defines the layout of such
 stack entries so that code compiled in different languages and with different
 compilers can be intermixed.  This usually specifies at which stack offsets the
 stack pointer, program counter and local variables for the calling function can
@@ -1365,7 +1366,7 @@ is extremely useful for debugging purposes and is done by examining the current
 stack frame to see if there is a pointer to the previous stack frame.  If there
 is, then it can be followed to find out all of the state information about the
 calling function.  This can be repeated until there are no more stack
-frames<a rel=footnote href="#fn-12"><sup>12</sup></a>. 
+frames<a rel=footnote href="#fn-13"><sup>13</sup></a>. 
 This is generally how this information is determined by debuggers when a call
 stack traceback is requested.
 
@@ -1373,7 +1374,7 @@ stack traceback is requested.
 information also always contains the saved program counter register, which
 contains either the address of the instruction that performed the function call,
 or the address of the instruction at which to continue execution when the
-called function returns<a rel=footnote href="#fn-13"><sup>13</sup></a>. 
+called function returns<a rel=footnote href="#fn-14"><sup>14</sup></a>. 
 This information can be used to identify which function performed the call,
 since the address of the instruction must lie between the start and end of one
 of the functions in the process.
@@ -1396,14 +1397,14 @@ the size of the stack frame being used and the address of the instruction at
 which execution will resume when the function returns.  This can also be quite
 a reliable method of obtaining call stack information but is only likely to be
 feasible on a processor architecture which has a very simple instruction set,
-such as a RISC<a rel=footnote href="#fn-14"><sup>14</sup></a> architecture.  MIPS
+such as a RISC<a rel=footnote href="#fn-15"><sup>15</sup></a> architecture.  MIPS
 processors are a good example of this.
 
 <p>The final method of stack unwinding requires that the frame pointer and return
 address are both stored on the stack whenever a new function is called.  The
 chain of frame pointers can then be followed down the stack, and the return
 addresses can be read at a given offset from the frame pointers.  This is
-usually possible with CISC<a rel=footnote href="#fn-15"><sup>15</sup></a> processor
+usually possible with CISC<a rel=footnote href="#fn-16"><sup>16</sup></a> processor
 architectures that have dedicated call instructions which automatically save
 such information on the stack, although some RISC processors also save these as
 well.  However, inline functions and compiler optimisations can sometimes result
@@ -1422,7 +1423,7 @@ if the symbol tables have been stripped from the final executable file.
 <p>If the object file was created by a compiler then it may also contain debugging
 information that was generated by the compiler for use with a debugger.  Such
 information may include a mapping of code addresses to source
-lines<a rel=footnote href="#fn-16"><sup>16</sup></a>, and this information
+lines<a rel=footnote href="#fn-17"><sup>17</sup></a>, and this information
 can be used by the mpatrol library to provide more meaningful information in
 call stack tracebacks.
 
@@ -1431,7 +1432,7 @@ determine the symbolic information for all of the functions which have been
 defined in them.  The symbols for functions that are defined in shared libraries
 normally appear as undefined symbols in the executable file for the program and
 so must be searched in the system in order to get the necessary information.  It
-is usually necessary to liaise with the <em>dynamic linker</em><a rel=footnote href="#fn-17"><sup>17</sup></a> on many systems.
+is usually necessary to liaise with the <em>dynamic linker</em><a rel=footnote href="#fn-18"><sup>18</sup></a> on many systems.
 
 <p><hr>
 Node:<a name="Threads">Threads</a>,
@@ -1462,7 +1463,7 @@ process.
 <p>Such multithreaded programs allow parallel programming and implicit shared
 memory between threads since all threads in a process share the same address
 space and resources.  This is similar to operating systems that have no
-virtual memory, such as AmigaOS and Netware<a rel=footnote href="#fn-18"><sup>18</sup></a>, except
+virtual memory, such as AmigaOS and Netware<a rel=footnote href="#fn-19"><sup>19</sup></a>, except
 that once a process terminates, all threads terminate as well and all of its
 resources are still reclaimed.
 
@@ -1599,7 +1600,7 @@ of these system library routines it is also possible to specify that they are
 protected from certain interrupt signals using the <code>SAFESIGNALS</code> option. 
 However, this can sometimes result in it being hard to interrupt the program
 from the keyboard if a lot of processor time is spent in mpatrol routines,
-which is why this behaviour is disabled by default<a rel=footnote href="#fn-19"><sup>19</sup></a>.
+which is why this behaviour is disabled by default<a rel=footnote href="#fn-20"><sup>20</sup></a>.
 
 <p>On UNIX systems, the usual way for malloc libraries to allocate memory from the
 process heap is through the <code>sbrk()</code> system call.  This allocates memory
@@ -1622,14 +1623,17 @@ this behaviour is reversed when the <code>USEMMAP</code> option is used.  This w
 done to segregate user memory from internal memory, and was especially required
 for the <code>mptrace</code> command's graphical display.
 
-<p>By default, every time an mpatrol library function is called the library will
-automatically check the freed memory and overflow buffers of every memory
-allocation, which can slow program execution down, especially if you suspect the
-error you are looking for occurs at the 1000th memory allocation, for example. 
-You can therefore use the <code>CHECK</code> option to specify a range of memory
-allocations at which the mpatrol library will automatically check the freed
-memory and overflow buffers.  All other allocations that fall outside this range
-will not be checked.
+<p>The <code>CHECK</code> option allows you to specify that every time an mpatrol
+library function is called the library will automatically check the freed memory
+and overflow buffers of every memory allocation, although this can slow program
+execution down, especially if you suspect the error you are looking for occurs
+at the 1000th memory allocation, for example.  You can therefore use the
+<code>CHECK</code> option to specify a range of memory allocations at which the
+mpatrol library will automatically check the freed memory and overflow buffers. 
+All other allocations that fall outside this range will not be checked.  You can
+also specify an optional frequency at which this checking should be performed. 
+No such checking is performed by default in mpatrol release 1.4.0 and onwards
+-- you must specify <code>CHECK=-</code> to get the original behaviour.
 
 <p>On UNIX systems, the mpatrol library can also invoke the <code>mpedit</code>
 command to edit source files that show up in any warnings or error messages that
@@ -1775,12 +1779,14 @@ number of recent) freed memory allocations so that its diagnostics can be
 clearer about which freed allocation a piece of code is erroneously trying to
 access.  This is controlled with the <code>NOFREE</code> option, which accepts an
 argument specifying the maximum number of recently-freed memory allocations to
-prevent being reused.  If the argument is zero then no freed memory allocations
-will ever be reused, thus resulting in a lot more heap memory being used.  Note
-that this option distinguishes between <em>free</em> memory and <em>freed</em>
-memory.  <em>Free</em> memory is unallocated memory that has been taken from the
-system heap.  <em>Freed</em> memory is a freed memory allocation, with all of the
-original details of the allocation preserved.
+prevent being reused.  If the argument is zero then all freed memory allocations
+will be immediately reused by the mpatrol library.  If the argument is non-zero
+then the mpatrol library will use up more memory than usual since it has to keep
+all of the freed memory allocations lying around until their lifetime has
+expired.  Note that this option distinguishes between <em>free</em> memory and
+<em>freed</em> memory.  <em>Free</em> memory is unallocated memory that has been
+taken from the system heap.  <em>Freed</em> memory is a freed memory allocation,
+with all of the original details of the allocation preserved.
 
 <p>Normally, the <code>NOFREE</code> option will fill the freed allocation with the
 free byte so that any code that accesses it will hopefully fall over.  However,
@@ -1794,15 +1800,14 @@ the original contents can be read from but not written to.
 
 <p>Note that if the argument specified with the <code>NOFREE</code> option is non-zero
 then the mpatrol library will store all recently-freed memory allocations in a
-queue<a rel=footnote href="#fn-20"><sup>20</sup></a>.  Once the queue has filled to the point specified with
-the <code>NOFREE</code> option then all subsequent calls to free memory will result
-in the most recently-freed memory allocation being placed at the end of the
-queue and the freed memory allocation at the beginning of the queue will be
-returned to the free memory pool for later reuse.  Obviously, the larger the
-freed queue size, the better chance of detecting attempts to access
-previously-freed memory, but unfortunately more memory will be used up and the
-mpatrol library will have to keep track of a larger number of memory
-allocations.
+queue.  Once the queue has filled to the point specified with the
+<code>NOFREE</code> option then all subsequent calls to free memory will result in
+the most recently-freed memory allocation being placed at the end of the queue
+and the freed memory allocation at the beginning of the queue will be returned
+to the free memory pool for later reuse.  Obviously, the larger the freed queue
+size, the better chance of detecting attempts to access previously-freed memory,
+but unfortunately more memory will be used up and the mpatrol library will have
+to keep track of a larger number of memory allocations.
 
 <p><hr>
 Node:<a name="Overwrites%20and%20underwrites">Overwrites and underwrites</a>,
@@ -1927,11 +1932,11 @@ problem lies in a function that was not recompiled with
 <code>-fcheck-memory-usage</code> then it won't do much good.
 
 <p>To conclude, if you suspect your program has a piece of code which is performing
-illegal memory underwrites or overwrites to a memory allocation you should use
-each of the following options in sequence, but only if your system supports
-them.  If all else fails and you are using the GNU compiler then you could try
-recompiling some or all of your code with the <code>-fcheck-memory-usage</code>
-option.
+illegal memory underwrites or overwrites to a memory allocation you turn on the
+<code>CHECK=-</code> option and you should use each of the following options in
+sequence, but only if your system supports them.  If all else fails and you are
+using the GNU compiler then you could try recompiling some or all of your code
+with the <code>-fcheck-memory-usage</code> option.
 
 <ol type=1 start=1>
 </p><li><code>OFLOWSIZE=8</code>
@@ -2118,7 +2123,9 @@ and in this case you can't since the mpatrol library was not compiled with
 debugging information enabled.  So, after returning from all of the library
 functions, the source line becomes line 16 because that was the location of the
 1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
-destination.
+destination.  Note that the file <code>extra/.gdbinit</code> included in the mpatrol
+distribution contains predefined commands which make setting the allocation
+index to stop at much easier.
 
 <p>Sometimes it is useful to be able to see information about a memory allocation
 whilst running a program from within a debugger.  The <code>__mp_printinfo()</code>
@@ -2130,9 +2137,13 @@ information about the pointer <code>p</code> at line 17 from within <code>gdb</c
 address 0x080620E8 located in allocated block:
     start of block:     0x080620E8
     size of block:      16 bytes
+    stored type:        &lt;unknown&gt;
+    stored type size:   &lt;unknown&gt;
+    user data:          0x00000000
     allocated by:       malloc
     allocation index:   1000
     reallocation index: 0
+    modification event: 1999
     calling function:   main
     called from file:   test.c
     called at line:     16
@@ -2225,104 +2236,102 @@ the <code>mpatrol.h</code> header file in order to use these functions, but you 
 check for a specific version of the mpatrol library by checking the
 <code>MPATROL_VERSION</code> preprocessor macro.
 
+<p>Certain mpatrol library options can be set after the library has been
+initialised with the <code>__mp_setoption()</code> function.  This allows you to
+override the default options or those specified in the <code>MPATROL_OPTIONS</code>
+environment variable from within your code.  Not all options can be overridden,
+however, since they would require a complete reinitialisation of the library --
+the <code>__mp_setoption()</code> function returns a failure indicator in these cases. 
+You can read the setting of any mpatrol library option with the corresponding
+function, <code>__mp_getoption()</code>.
+
 <p>It is possible to obtain a great deal of information about an existing memory
 allocation using the <code>__mp_info()</code> function.  This takes an address as an
 argument and fills in any details about its corresponding memory allocation in
 a supplied structure.  The following example illustrates this (it can be found
 in <code>tests/pass/test4.c</code>).
 
-<pre>    23	/*
-    24	 * Demonstrates and tests the facility for obtaining information about
-    25	 * the allocation a specific address belongs to.
-    26	 */
+<pre> 23  /*
+ 24   * Demonstrates and tests the facility for obtaining information
+ 25   * about the allocation a specific address belongs to.
+ 26   */
 
 
-    29	#include "mpatrol.h"
-    30	#include &lt;stdio.h&gt;
+ 29  #include "mpatrol.h"
+ 30  #include &lt;stdio.h&gt;
 
 
-    33	void display(void *p)
-    34	{
-    35	    __mp_allocstack *s;
-    36	    __mp_allocinfo d;
-    37	    __mp_symbolinfo i;
+ 33  void display(void *p)
+ 34  {
+ 35      __mp_allocstack *s;
+ 36      __mp_allocinfo d;
+ 37      __mp_symbolinfo i;
 
-    39	    if (!__mp_info(p, &amp;d))
-    40	    {
-    41	        if (sizeof(void *) == 8)
-    42	            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
-    43	        else
-    44	            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
-    45	        return;
-    46	    }
-    47	    if (sizeof(void *) == 8)
-    48	        fprintf(stderr, "block:    0x%016lX\n", d.block);
-    49	    else
-    50	        fprintf(stderr, "block:    0x%08lX\n", d.block);
-    51	    fprintf(stderr, "size:     %lu\n", d.size);
-    52	    fprintf(stderr, "type:     %s\n", __mp_function(d.type));
-    53	    fprintf(stderr, "alloc:    %lu\n", d.alloc);
-    54	    fprintf(stderr, "realloc:  %lu\n", d.realloc);
-    55	    fprintf(stderr, "thread:   %lu\n", d.thread);
-    56	    fprintf(stderr, "event:    %lu\n", d.event);
-    57	    fprintf(stderr, "func:     %s\n", d.func ? d.func : "&lt;unknown&gt;");
-    58	    fprintf(stderr, "file:     %s\n", d.file ? d.file : "&lt;unknown&gt;");
-    59	    fprintf(stderr, "line:     %lu\n", d.line);
-    60	    for (s = d.stack; s != NULL; s = s-&gt;next)
-    61	    {
-    62	        if (sizeof(void *) == 8)
-    63	            fprintf(stderr, "\t0x%016lX", s-&gt;addr);
-    64	        else
-    65	            fprintf(stderr, "\t0x%08lX", s-&gt;addr);
-    66	        if (__mp_syminfo(s-&gt;addr, &amp;i))
-    67	        {
-    68	            if (i.name != NULL)
-    69	                fprintf(stderr, " %s", i.name);
-    70	            if ((i.addr != NULL) &amp;&amp; (i.addr != s-&gt;addr))
-    71	                fprintf(stderr, "%+ld",
-    72	                        (char *) s-&gt;addr - (char *) i.addr);
-    73	            if (i.object != NULL)
-    74	                fprintf(stderr, " [%s]", i.object);
-    75	        }
-    76	        else if (s-&gt;name != NULL)
-    77	            fprintf(stderr, " %s", s-&gt;name);
-    78	        fputc('\n', stderr);
-    79	    }
-    80	    fprintf(stderr, "typestr:  %s\n",
-    81	            d.typestr ? d.typestr : "&lt;unknown&gt;");
-    82	    fprintf(stderr, "typesize: %lu\n", d.typesize);
-    83	    if (sizeof(void *) == 8)
-    84	        fprintf(stderr, "userdata: 0x%016lX\n", d.userdata);
-    85	    else
-    86	        fprintf(stderr, "userdata: 0x%08lX\n", d.userdata);
-    87	    fprintf(stderr, "freed:    %d\n", d.freed);
-    88	}
+ 39      if (!__mp_info(p, &amp;d))
+ 40      {
+ 41          fprintf(stderr, "nothing known about address 0x%0*lX\n",
+ 42                  sizeof(void *) * 2, p);
+ 43          return;
+ 44      }
+ 45      fprintf(stderr, "block:    0x%0*lX\n", sizeof(void *) * 2, d.block);
+ 46      fprintf(stderr, "size:     %lu\n", d.size);
+ 47      fprintf(stderr, "type:     %s\n", __mp_function(d.type));
+ 48      fprintf(stderr, "alloc:    %lu\n", d.alloc);
+ 49      fprintf(stderr, "realloc:  %lu\n", d.realloc);
+ 50      fprintf(stderr, "thread:   %lu\n", d.thread);
+ 51      fprintf(stderr, "event:    %lu\n", d.event);
+ 52      fprintf(stderr, "func:     %s\n", d.func ? d.func : "&lt;unknown&gt;");
+ 53      fprintf(stderr, "file:     %s\n", d.file ? d.file : "&lt;unknown&gt;");
+ 54      fprintf(stderr, "line:     %lu\n", d.line);
+ 55      for (s = d.stack; s != NULL; s = s-&gt;next)
+ 56      {
+ 57          fprintf(stderr, "\t0x%0*lX", sizeof(void *) * 2, s-&gt;addr);
+ 58          if (__mp_syminfo(s-&gt;addr, &amp;i))
+ 59          {
+ 60              if (i.name != NULL)
+ 61                  fprintf(stderr, " %s", i.name);
+ 62              if ((i.addr != NULL) &amp;&amp; (i.addr != s-&gt;addr))
+ 63                  fprintf(stderr, "%+ld",
+ 64                          (char *) s-&gt;addr - (char *) i.addr);
+ 65              if (i.object != NULL)
+ 66                  fprintf(stderr, " [%s]", i.object);
+ 67          }
+ 68          else if (s-&gt;name != NULL)
+ 69              fprintf(stderr, " %s", s-&gt;name);
+ 70          fputc('\n', stderr);
+ 71      }
+ 72      fprintf(stderr, "typestr:  %s\n",
+ 73              d.typestr ? d.typestr : "&lt;unknown&gt;");
+ 74      fprintf(stderr, "typesize: %lu\n", d.typesize);
+ 75      fprintf(stderr, "userdata: 0x%0*lX\n", sizeof(void *) * 2, d.userdata);
+ 76      fprintf(stderr, "freed:    %d\n", d.freed);
+ 77  }
 
 
-    91	void func2(void)
-    92	{
-    93	    void *p;
+ 80  void func2(void)
+ 81  {
+ 82      void *p;
 
-    95	    if (p = malloc(16))
-    96	    {
-    97	        display(p);
-    98	        free(p);
-    99	    }
-   100	    display(p);
-   101	}
-
-
-   104	void func1(void)
-   105	{
-   106	    func2();
-   107	}
+ 84      if (p = malloc(16))
+ 85      {
+ 86          display(p);
+ 87          free(p);
+ 88      }
+ 89      display(p);
+ 90  }
 
 
-   110	int main(void)
-   111	{
-   112	    func1();
-   113	    return EXIT_SUCCESS;
-   114	}
+ 93  void func1(void)
+ 94  {
+ 95      func2();
+ 96  }
+
+
+ 99  int main(void)
+100  {
+101      func1();
+102      return EXIT_SUCCESS;
+103  }
 </pre>
 
 <p>When this is compiled and run, it should give the following output, although
@@ -2337,10 +2346,10 @@ thread:   0
 event:    97
 func:     func2
 file:     test4.c
-line:     95
-          0x0804A7AB func2+35 [./a.out]
-          0x0804A7F8 func1+8 [./a.out]
-          0x0804A804 main+8 [./a.out]
+line:     84
+          0x0804A743 func2+35 [./a.out]
+          0x0804A790 func1+8 [./a.out]
+          0x0804A79C main+8 [./a.out]
           0x4007C9CB __libc_start_main+255 [/lib/libc.so.6]
           0x0804A3E1 _start+33 [./a.out]
 typestr:  &lt;unknown&gt;
@@ -2359,6 +2368,11 @@ function to display information about a heap address if your debugger supports
 calling functions from the command prompt.  Note that the textual representation
 of the <code>type</code> field returned by the <code>__mp_info()</code> function can be
 obtained by calling <code>__mp_function()</code>.
+
+<p>The <code>userdata</code> field shown above can be set for any memory allocation with
+the <code>__mp_setuser()</code> function.  This can have any value and is not
+interpreted by the mpatrol library.  It was added for user code to associate
+its own data with memory allocations.
 
 <p>You may also have noticed the use of <code>__mp_syminfo()</code> in the above example. 
 This function is very similar to the <code>__mp_info()</code> function except that
@@ -2384,55 +2398,78 @@ code is an example of this and can be found in <code>tests/pass/test2.c</code>.
 30  #include &lt;stdio.h&gt;
 
 
-33  void prologue(const void *p, size_t l)
-34  {
-35      if (p == (void *) -1)
-36          fprintf(stderr, "allocating %lu bytes\n", l);
-37      else if (l == (size_t) -1)
-38          fprintf(stderr, "freeing allocation 0x%08lX\n", p);
-39      else if (l == (size_t) -2)
-40          fprintf(stderr, "duplicating string `%s'\n", p);
-41      else
-42          fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
-43  }
+33  typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
+34  typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
 
 
-46  void epilogue(const void *p)
-47  {
-48      if (p != (void *) -1)
-49          fprintf(stderr, "allocation returns 0x%08lX\n", p);
-50  }
+37  prologue_handler old_prologue;
+38  epilogue_handler old_epilogue;
 
 
-53  int main(void)
-54  {
-55      void *p, *q;
+41  void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
+42  {
+43      if (old_prologue != NULL)
+44          old_prologue(p, l, a);
+45      if (p == (void *) -1)
+46          fprintf(stderr, "allocating %lu bytes\n", l);
+47      else if (l == (size_t) -1)
+48          fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
+49      else if (l == (size_t) -2)
+50          fprintf(stderr, "duplicating string `%s'\n", p);
+51      else
+52          fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
+53                  sizeof(void *) * 2, p, l);
+54  }
 
-57      __mp_prologue(prologue);
-58      __mp_epilogue(epilogue);
-59      if (p = malloc(16))
-60          if (q = realloc(p, 32))
-61              free(q);
-62          else
-63              free(p);
-64      if (p = (char *) strdup("test"))
-65          free(p);
-66      return EXIT_SUCCESS;
-67  }
+
+57  void epilogue(MP_CONST void *p, MP_CONST void *a)
+58  {
+59      if (p != (void *) -1)
+60          fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
+61      if (old_epilogue != NULL)
+62          old_epilogue(p, a);
+63  }
+
+
+66  int main(void)
+67  {
+68      void *p, *q;
+
+70      old_prologue = __mp_prologue(prologue);
+71      old_epilogue = __mp_epilogue(epilogue);
+72      if (p = malloc(16))
+73          if (q = realloc(p, 32))
+74              free(q);
+75          else
+76              free(p);
+77      if (p = (char *) strdup("test"))
+78          free(p);
+79      __mp_prologue(old_prologue);
+80      __mp_epilogue(old_epilogue);
+81      return EXIT_SUCCESS;
+82  }
 </pre>
 
 <p>Once again, if you compile and run the above code, you should see the following
 output.
 
 <pre>allocating 16 bytes
-allocation returns 0x080620E8
-reallocating allocation 0x080620E8 to 32 bytes
-allocation returns 0x080620E8
-freeing allocation 0x080620E8
+allocation returns 0x0806A0E8
+reallocating allocation 0x0806A0E8 to 32 bytes
+allocation returns 0x0806A0E8
+freeing allocation 0x0806A0E8
 duplicating string `test'
-allocation returns 0x080620E5
-freeing allocation 0x080620E5
+allocation returns 0x0806A0E5
+freeing allocation 0x0806A0E5
 </pre>
+
+<p>Note that in the above code, the previous prologue and epilogue functions were
+recorded and called.  If this is not done then your prologue and epilogue
+functions will completely override all others, which is not usually the expected
+behaviour.  In case you're wondering what the third argument of the prologue
+handler (and the second argument of the epilogue handler) is, it is the code
+address of the function that called <code>malloc()</code> or a related function.  This
+can be used in the handlers to see where they were called from.
 
 <p>Along with being able to install prologue and epilogue functions, you can also
 install a low-memory handler with the <code>__mp_nomemory()</code> function, which
@@ -2460,122 +2497,123 @@ used) since the snapshot point.  This makes it possible to detect localised
 memory leaks very easily, as the following example (found in
 <code>tests/pass/test10.c</code>) shows.
 
-<pre>    23	/*
-    24	 * Demonstrates and tests the facility for obtaining information on
-    25	 * local memory leaks.  Will also edit or list the location of each
-    26	 * leak if the EDIT or LIST option is in effect.
-    27	 */
+<pre> 23  /*
+ 24   * Demonstrates and tests the facility for obtaining information on
+ 25   * local memory leaks.  Will also edit or list the location of each
+ 26   * leak if the EDIT or LIST option is in effect.
+ 27   */
 
 
-    30	#include "mpatrol.h"
-    31	#include &lt;stdio.h&gt;
+ 30  #include "mpatrol.h"
+ 31  #include &lt;stdio.h&gt;
 
 
-    34	unsigned long leaktotal = 0;
+ 34  int callback(MP_CONST void *p, void *t)
+ 35  {
+ 36      __mp_allocstack *s;
+ 37      __mp_allocinfo d;
+
+ 39      if (!__mp_info(p, &amp;d))
+ 40      {
+ 41          fprintf(stderr, "nothing known about address 0x%0*lX\n",
+ 42                  sizeof(void *) * 2, p);
+ 43          return -1;
+ 44      }
+ 45      if (!d.freed)
+ 46      {
+ 47          fprintf(stderr, "0x%0*lX", sizeof(void *) * 2, d.block);
+ 48          fprintf(stderr, " %s", d.func ? d.func : "&lt;unknown&gt;");
+ 49          fprintf(stderr, " %s", d.file ? d.file : "&lt;unknown&gt;");
+ 50          fprintf(stderr, " %lu", d.line);
+ 51          for (s = d.stack; s != NULL; s = s-&gt;next)
+ 52          {
+ 53              if (s == d.stack)
+ 54                  fputs(" (", stderr);
+ 55              else
+ 56                  fputs("-&gt;", stderr);
+ 57              if (s-&gt;name != NULL)
+ 58                  fprintf(stderr, "%s", s-&gt;name);
+ 59              else
+ 60                  fprintf(stderr, "0x%0*lX", sizeof(void *) * 2, s-&gt;addr);
+ 61              if (s-&gt;next == NULL)
+ 62                  fputc(')', stderr);
+ 63          }
+ 64          fputc('\n', stderr);
+ 65          if ((d.file != NULL) &amp;&amp; (d.line != 0))
+ 66              __mp_view(d.file, d.line);
+ 67          *((unsigned long *) t) = *((unsigned long *) t) + d.size;
+ 68          return 1;
+ 69      }
+ 70      return 0;
+ 71  }
 
 
-    37	int callback(const void *p)
-    38	{
-    39	    __mp_allocstack *s;
-    40	    __mp_allocinfo d;
+ 74  void func2(unsigned long n)
+ 75  {
+ 76      void *p;
 
-    42	    if (!__mp_info(p, &amp;d))
-    43	    {
-    44	        if (sizeof(void *) == 8)
-    45	            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
-    46	        else
-    47	            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
-    48	        return -1;
-    49	    }
-    50	    if (!d.freed)
-    51	    {
-    52	        if (sizeof(void *) == 8)
-    53	            fprintf(stderr, "0x%016lX", d.block);
-    54	        else
-    55	            fprintf(stderr, "0x%08lX", d.block);
-    56	        fprintf(stderr, " %s", d.func ? d.func : "&lt;unknown&gt;");
-    57	        fprintf(stderr, " %s", d.file ? d.file : "&lt;unknown&gt;");
-    58	        fprintf(stderr, " %lu", d.line);
-    59	        for (s = d.stack; s != NULL; s = s-&gt;next)
-    60	        {
-    61	            if (s == d.stack)
-    62	                fputs(" (", stderr);
-    63	            else
-    64	                fputs("-&gt;", stderr);
-    65	            if (s-&gt;name != NULL)
-    66	                fprintf(stderr, "%s", s-&gt;name);
-    67	            else if (sizeof(void *) == 8)
-    68	                fprintf(stderr, "0x%016lX", s-&gt;addr);
-    69	            else
-    70	                fprintf(stderr, "0x%08lX", s-&gt;addr);
-    71	            if (s-&gt;next == NULL)
-    72	                fputc(')', stderr);
-    73	        }
-    74	        fputc('\n', stderr);
-    75	        if ((d.file != NULL) &amp;&amp; (d.line != 0))
-    76	            __mp_view(d.file, d.line);
-    77	        leaktotal += d.size;
-    78	        return 1;
-    79	    }
-    80	    return 0;
-    81	}
+ 78      p = malloc((n * 10) + 1);
+ 79      if (n % 13)
+ 80          free(p);
+ 81  }
 
 
-    84	void func2(unsigned long n)
-    85	{
-    86	    void *p;
+ 84  void func1(void)
+ 85  {
+ 86      void *p;
+ 87      size_t i, n;
+ 88      unsigned long s, t;
 
-    88	    p = malloc((n * 10) + 1);
-    89	    if (n % 13)
-    90	        free(p);
-    91	}
-
-
-    94	void func1(void)
-    95	{
-    96	    void *p;
-    97	    size_t i, n;
-    98	    unsigned long s;
-
-   100	    p = malloc(16);
-   101	    s = __mp_snapshot();
-   102	    for (i = 0; i &lt; 128; i++)
-   103	        func2(i);
-   104	    free(p);
-   105	    if (n = __mp_iterate(callback, s))
-   106	        fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\n", n,
-   107	                leaktotal);
-   108	    if ((n != 10) || (leaktotal != 5860))
-   109	        fputs("Expected 10 memory leaks (5860 bytes)\n", stderr);
-   110	}
+ 90      p = malloc(16);
+ 91      s = __mp_snapshot();
+ 92      for (i = 0; i &lt; 128; i++)
+ 93          func2(i);
+ 94      free(p);
+ 95      t = 0;
+ 96      if (n = __mp_iterate(callback, &amp;t, s))
+ 97          fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\n", n, t);
+ 98      if ((n != 10) || (t != 5860))
+ 99          fputs("Expected 10 memory leaks (5860 bytes)\n", stderr);
+100  }
 
 
-   113	int main(void)
-   114	{
-   115	    void *p;
+103  int main(void)
+104  {
+105      void *p;
 
-   117	    p = malloc(16);
-   118	    func1();
-   119	    free(p);
-   120	    return EXIT_SUCCESS;
-   121	}
+107      p = malloc(16);
+108      func1();
+109      free(p);
+110      return EXIT_SUCCESS;
+111  }
 </pre>
 
 <p>Compiling this example with mpatrol and then running it will produce the
 following list of memory leaks that were located between the points of calling
 <code>__mp_snapshot()</code> and <code>__mp_iterate()</code>.
 
-<pre>0x0806A108 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806A674 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806A6F8 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806A800 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806A988 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806AB94 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806AE20 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806B130 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806B4C0 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
-0x0806B8D4 func2 test10.c 88 (func2-&gt;func1-&gt;main-&gt;_start)
+<pre>0x0806A108 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806A674 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806A6F8 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806A800 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806A988 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806AB94 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806AE20 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806B130 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806B4C0 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+0x0806B8D4 func2 test10.c 78 (func2-&gt;func1-&gt;main-&gt;_start)
+Detected 10 memory leaks (5860 bytes)
 </pre>
+
+<p>The <code>tools</code> directory in the mpatrol distribution contains two files called
+<code>heapdiff.c</code> and <code>heapdiff.h</code> which demonstrate the use of
+<code>__mp_snapshot()</code> and <code>__mp_iterate()</code> to find localised memory leaks. 
+Have a look at these files to see a further example of using these functions,
+or perhaps even add these files to your application for debugging purposes. 
+Note that it is perfectly safe to allocate memory in the callback function used
+by <code>__mp_iterate()</code>, and such allocations can be freed as well.  The only
+restriction is that the callback function should never free a memory allocation
+that it has not allocated itself.
 
 <p>If you wish to write your own diagnostics to the mpatrol log file from within
 your source code then you can do so with the <code>__mp_printf()</code> and
@@ -2595,14 +2633,17 @@ file and line number, while the second displays a context listing of a file at a
 given line number.  The third function performs either or neither depending on
 the setting of the <code>EDIT</code> or <code>LIST</code> options.
 
-<p>Finally, there are three functions which affect the mpatrol library globally. 
+<p>Finally, there are four functions which affect the mpatrol library globally. 
 The first, <code>__mp_check()</code>, allows you to force an internal check of the
 mpatrol library's data structures at any point during program execution and also
 to free up any out of scope memory allocations made by the <code>alloca()</code>
-family of functions.  The other two functions, <code>__mp_memorymap()</code> and
-<code>__mp_summary()</code> allow you to force the generation of a memory map or
-library statistics at any point in your program, in much the same way as they
-would normally be displayed at the end of program execution.
+family of functions.  The <code>__mp_memorymap()</code> function allows you to force
+the generation of a memory map at any point in your program, in much the same
+way as it would normally be displayed at the end of program execution if the
+<code>SHOWMAP</code> option was used.  The <code>__mp_summary()</code> function writes
+library statistics to the mpatrol log file, while the <code>__mp_stats()</code>
+function fills in a data structure with selected statistics for examination in
+user code.
 
 <p><hr>
 Node:<a name="Utilities">Utilities</a>,
@@ -3495,15 +3536,13 @@ a minimal amount of changes.
 
 <p>We will use <code>tests/profile/test2.c</code> as the source file to compile with
 <code>gcc</code> and we'll turn on optimisation in order to cause <code>gcc</code> to
-allocate a bit more memory than it would normally.  When running it through the
-<code>mpatrol</code> command we also use <code>--check=0</code> so that we disable
-mpatrol's internal checks -- we don't need them if we are only profiling.  Note
-that use is also made of the format string feature of the <code>--log-file</code>
-and <code>--prof-file</code> options so that it is clear which mpatrol log and
-profiling output files belong to which processes.
+allocate a bit more memory than it would normally.  Note that use is also made
+of the format string feature of the <code>--log-file</code> and <code>--prof-file</code>
+options so that it is clear which mpatrol log and profiling output files belong
+to which processes.
 
 <pre>bash$ mpatrol --dynamic --log-file=%p.log --prof-file=%p.out
-              --prof --check=0 gcc -O -o test2 test2.c
+              --prof gcc -O -o test2 test2.c
 bash$ ls *.log *.out
 as.log         cc1.out        cpp.log        gcc.out
 as.out         collect2.log   cpp.out        ld.log
@@ -3767,15 +3806,13 @@ these will work in other shells with a minimal amount of changes.
 
 <p>We will use <code>tests/profile/test2.c</code> as the source file to compile with
 <code>gcc</code> and we'll turn on optimisation in order to cause <code>gcc</code> to
-allocate a bit more memory than it would normally.  When running it through the
-<code>mpatrol</code> command we also use <code>--check=0</code> so that we disable
-mpatrol's internal checks -- we don't need them if we are only tracing.  Note
-that use is also made of the format string feature of the <code>--log-file</code>
-and <code>--trace-file</code> options so that it is clear which mpatrol log and
-tracing output files belong to which processes.
+allocate a bit more memory than it would normally.  Note that use is also made
+of the format string feature of the <code>--log-file</code> and
+<code>--trace-file</code> options so that it is clear which mpatrol log and tracing
+output files belong to which processes.
 
 <pre>bash$ mpatrol --dynamic --log-file=%p.log --trace-file=%p.trace
-              --trace --check=0 gcc -O -o test2 test2.c
+              --trace gcc -O -o test2 test2.c
 bash$ ls *.log *.trace
 as.log         cc1.trace      cpp.log        gcc.trace
 as.trace       collect2.log   cpp.trace      ld.log
@@ -3962,6 +3999,15 @@ documentation for that tool remarks that it was written as a quick and dirty
 hack.  The <code>mptrace</code> command is hopefully more stable and contains a lot
 more functionality.
 
+<p>The mpatrol library can also generate trace files in a format that is compatible
+with the GNU <code>mtrace()</code> option.  The code to do this is built on top of the
+mpatrol library and is in <code>tools/mtrace.c</code> and <code>tools/mtrace.h</code>.  Such
+trace files can then be processed by the GNU <code>mtrace</code> command.  The
+<code>tools/mgauge.c</code> and <code>tools/mgauge.h</code> files in the same directory
+can be used to implement an allocated memory gauge which updates in real-time
+in a terminal window.  This can be used as an alternative to the window used by
+the <code>mptrace</code> command for a simpler display.
+
 <p><hr>
 Node:<a name="Improving%20performance">Improving performance</a>,
 Next:<a rel=next href="#How%20it%20works">How it works</a>,
@@ -4079,13 +4125,13 @@ allocations.
 first, most basic rule is to <em>always</em> check the return values from
 <code>malloc()</code> and related functions.  <em>Never</em> assume that a call to
 <code>malloc()</code> will succeed, because you're unlikely to be able to read the
-future<a rel=footnote href="#fn-39"><sup>39</sup></a>.  Alternatively, use (or write) an <code>xmalloc()</code> or similar function,
-which calls <code>malloc()</code> but never returns <code>NULL</code> since it will abort
-instead.  With the C++ operators it is slightly different because some versions
-use exceptions to indicate failure, so you should always provide a handler to
-deal with this eventuality.
+future<a rel=footnote href="#fn-39"><sup>39</sup></a>.  Alternatively, use (or write) an <code>xmalloc()</code> or similar
+function<a rel=footnote href="#fn-40"><sup>40</sup></a>, which calls <code>malloc()</code> but
+never returns <code>NULL</code> since it will abort instead.  With the C++ operators
+it is slightly different because some versions use exceptions to indicate
+failure, so you should always provide a handler to deal with this eventuality.
 
-<p>Never use <em>features</em><a rel=footnote href="#fn-40"><sup>40</sup></a> of
+<p>Never use <em>features</em><a rel=footnote href="#fn-41"><sup>41</sup></a> of
 specific malloc libraries if you want your code to be portable.  Always follow
 the ANSI C or C++ calling conventions and never make assumptions about the
 function or operator you are about to call -- the standards committees went to
@@ -4205,6 +4251,13 @@ functionality.  New modules have already been added, such as the <em>stack</em>,
 each memory allocation can be added to the <em>allocation information</em> module
 in <code>src/info.h</code> and <code>src/info.c</code> without having to change much code in
 any other files.
+
+<p>The <code>tools</code> directory in the mpatrol distribution comes with a collection
+of functions that are built on top of the mpatrol library using its interface
+functions.  This provides a way to extend the mpatrol library for specific
+applications without requiring that all applications use the extensions.  It
+also provides a way to add new interfaces to the library, perhaps for
+compatibility with other malloc debugging libraries.
 
 <p>Platform-dependent code has been isolated to specific modules, and feature
 macros are entirely defined and controlled from <code>config.h</code> and
@@ -4482,7 +4535,7 @@ on the type of function that is used to allocate the memory.
 <p>The following information contains source file details of where the call to
 <code>malloc()</code> came from, but is only available if the source file containing
 the call to <code>malloc()</code> included <code>mpatrol.h</code>; otherwise the fields will
-all be <code>-</code><a rel=footnote href="#fn-41"><sup>41</sup></a>. 
+all be <code>-</code><a rel=footnote href="#fn-42"><sup>42</sup></a>. 
 Because of the convoluted way this information is obtained for the C++
 operators, you may encounter some problems in existing C++ programs when making
 direct calls to <code>operator new</code> for example.  However, if you want to
@@ -5334,7 +5387,7 @@ allocations.  The following source can be found in <code>tests/fail/test9.c</cod
 <p>As you can see, the library detected that the <code>memset()</code> function would
 have written past the boundaries of the memory allocation and reported this to
 you.  It then proceeded to ignore the request to copy the memory and continued
-with the execution of the program<a rel=footnote href="#fn-42"><sup>42</sup></a>.  Note that this will only be done for known memory
+with the execution of the program<a rel=footnote href="#fn-43"><sup>43</sup></a>.  Note that this will only be done for known memory
 allocations.  Reading and writing past the boundaries of static and stack memory
 allocations cannot be detected in this way.
 
@@ -6191,11 +6244,11 @@ why bother trying to debug it?
 major error that is likely to prevent it from running portably on other systems. 
 However, for the purposes of this tutorial, we'll pretend that we've just been
 handed the source code for this program and have not worked on it before.  So
-let's now try to compile and link it with the mpatrol library<a rel=footnote href="#fn-43"><sup>43</sup></a>.
+let's now try to compile and link it with the mpatrol library<a rel=footnote href="#fn-44"><sup>44</sup></a>.
 
 <p>First, add the inclusion of <code>mpatrol.h</code> to line 34 so that we can replace
 calls to <code>malloc()</code> and <code>free()</code> with their mpatrol
-equivalents<a rel=footnote href="#fn-44"><sup>44</sup></a>.  Then, recompile the program and link it with the
+equivalents<a rel=footnote href="#fn-45"><sup>45</sup></a>.  Then, recompile the program and link it with the
 mpatrol library.  This time, running it with even the simplest of non-empty
 input lines should cause it to abort!
 
@@ -6233,7 +6286,7 @@ returns 0x08067FF4
 function call was <code>malloc()</code> called from <code>strtoupper()</code>.  If we add
 the option <code>OFLOWSIZE=8</code> to the <code>MPATROL_OPTIONS</code> environment
 variable then we get slightly more information about which memory allocation was
-affected<a rel=footnote href="#fn-45"><sup>45</sup></a>.
+affected<a rel=footnote href="#fn-46"><sup>46</sup></a>.
 
 <pre>ERROR: [ALLOVF]: allocation 0x08071E34 has a corrupted overflow buffer at
                  0x08071E36
@@ -6307,7 +6360,7 @@ The program is running.  Exit anyway? (y or n) y
 
 <p>After loading the program into <code>gdb</code>, we need to break at <code>main()</code>
 so that we can run to a point where all of the shared library symbols have been
-loaded into memory<a rel=footnote href="#fn-46"><sup>46</sup></a>.  We can then set another
+loaded into memory<a rel=footnote href="#fn-47"><sup>47</sup></a>.  We can then set another
 breakpoint at <code>__mp_trap()</code> and continue until allocation 68 has been
 reached.
 
@@ -6317,7 +6370,7 @@ this example we can quickly step back to the <code>strtoupper()</code> function 
 We then set a watch point on address <code>0x8071e36</code>, which is the address of
 the memory location that has been causing the problems.  After continuing, the
 debugger stops at line 46, but this is more likely to be line 45 since that is
-where a zero byte is being written to<a rel=footnote href="#fn-47"><sup>47</sup></a>.
+where a zero byte is being written to<a rel=footnote href="#fn-48"><sup>48</sup></a>.
 
 <p>So, we have located the problem, which is simply a case of not allocating
 enough memory to contain the copied string <em>and</em> the terminating zero byte. 
@@ -8477,7 +8530,7 @@ Up:<a rel=up href="#Top">Top</a>
 <h1>Appendix F File formats</h1>
 
 <p>The formats of the profiling and tracing output files that are produced by the
-mpatrol library are described here<a rel=footnote href="#fn-48"><sup>48</sup></a>.
+mpatrol library are described here<a rel=footnote href="#fn-49"><sup>49</sup></a>.
 
 <ul>
 <li><a href="#Profiling%20file%20format">Profiling file format</a>:        Profiling output file layout. 
@@ -9130,9 +9183,9 @@ work for unoptimised code.  A much better solution would be write the
 implementations at a lower level in assembly, but this is much less portable. 
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
-write one<a rel=footnote href="#fn-49"><sup>49</sup></a>?  I
+write one<a rel=footnote href="#fn-50"><sup>50</sup></a>?  I
 can think of many applications that would benefit from such a library besides
-this one<a rel=footnote href="#fn-50"><sup>50</sup></a>.
+this one<a rel=footnote href="#fn-51"><sup>51</sup></a>.
 
 <li>An alternative implementation for call stack traversal uses the functions
 <code>__builtin_frame_address()</code> and <code>__builtin_return_address()</code> that are
@@ -10365,7 +10418,7 @@ detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
 <p>A list of over eighty different items of software which help in debugging
-dynamic memory allocation problems is given below<a rel=footnote href="#fn-51"><sup>51</sup></a>.  They all provide some of the features that
+dynamic memory allocation problems is given below<a rel=footnote href="#fn-52"><sup>52</sup></a>.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
 you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
 Electric Fence and Mprof, so I can't vouch for any of the others, although if
@@ -12691,6 +12744,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>heap usage: <a href="#Example%201">Example 1</a>
 <li>HeapAgent: <a href="#Related%20software">Related software</a>
 <li>HeapCheck: <a href="#Related%20software">Related software</a>
+<li>heapdiff: <a href="#Library%20functions">Library functions</a>
 <li>HeapManager: <a href="#Related%20software">Related software</a>
 <li>HELP: <a href="#Environment">Environment</a>
 <li>hexadecimal: <a href="#Environment">Environment</a>
@@ -12831,6 +12885,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>MemTrace: <a href="#Related%20software">Related software</a>
 <li>MemWatch: <a href="#Related%20software">Related software</a>
 <li>message passing: <a href="#Threads">Threads</a>
+<li>mgauge: <a href="#Tracing">Tracing</a>
 <li>MicroQuill: <a href="#Related%20software">Related software</a>
 <li>Microsoft: <a href="#Supported%20systems">Supported systems</a>
 <li>misaligned data: <a href="#Library%20behaviour">Library behaviour</a>
@@ -12882,6 +12937,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>MSS (Memory Supervision System): <a href="#Related%20software">Related software</a>
 <li>mtmalloc(3t): <a href="#Related%20software">Related software</a>
 <li>MTrace: <a href="#Related%20software">Related software</a>
+<li>mtrace: <a href="#Tracing">Tracing</a>
 <li>MuForce: <a href="#Related%20software">Related software</a>
 <li>MuGuardianAngel: <a href="#Related%20software">Related software</a>
 <li>MuLib: <a href="#Related%20software">Related software</a>
@@ -13083,6 +13139,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>threads library: <a href="#Threads">Threads</a>
 <li>times: <a href="#Library%20performance">Library performance</a>
 <li>tips: <a href="#Improving%20performance">Improving performance</a>
+<li>tools: <a href="#How%20it%20works">How it works</a>
 <li>TRACE: <a href="#Environment">Environment</a>
 <li>tracebacks: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>TRACEDIR: <a href="#Environment">Environment</a>
@@ -13143,84 +13200,83 @@ Up:<a rel=up href="#Top">Top</a>
 <hr><h4>Footnotes</h4>
 <ol type="1">
 <li><a name="fn-1"></a>
+<p>On many systems this actually a C++ compiler by default, and
+should be a C++ compiler if you wish to use the C++ operators.</p>
+
+<li><a name="fn-2"></a>
 <p>Also
 available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06
 with patch dgux_R4.20MU06.p08.</p>
 
-<li><a name="fn-2"></a>
+<li><a name="fn-3"></a>
 <p>Or more accurately, at link time.</p>
 
-<li><a name="fn-3"></a>
+<li><a name="fn-4"></a>
 <p>Or per thread on some
 systems.</p>
 
-<li><a name="fn-4"></a>
+<li><a name="fn-5"></a>
 <p>There is currently at least one
 garbage collection package available for C and C++ (see <a href="#Related%20software">Related software</a>).</p>
 
-<li><a name="fn-5"></a>
+<li><a name="fn-6"></a>
 <p>Some compilers now support
 variable length arrays which provide roughly the same functionality.</p>
 
-<li><a name="fn-6"></a>
+<li><a name="fn-7"></a>
 <p>Well, perhaps that's too harsh a word, but it will certainly seem
 that way to a process running on a 32-bit UNIX system with only 4 megabytes of
 physical memory, and yet it will be able to read from and write to over 4
 gigabytes of virtual memory!</p>
 
-<li><a name="fn-7"></a>
+<li><a name="fn-8"></a>
 <p>The size of a page varies between operating
 systems and processor architectures, but they are generally around 4 or 8
 kilobytes in size, and are always a power of two.</p>
 
-<li><a name="fn-8"></a>
+<li><a name="fn-9"></a>
 <p>DLLs on Windows platforms.</p>
 
-<li><a name="fn-9"></a>
+<li><a name="fn-10"></a>
 <p>The operating system is still considered software.</p>
 
-<li><a name="fn-10"></a>
+<li><a name="fn-11"></a>
 <p>Due to the overhead of
 having to translate every address and swap in and out pages -- although memory
 mapped files will usually be more efficient than using normal file operations on
 a system without virtual memory.</p>
 
-<li><a name="fn-11"></a>
+<li><a name="fn-12"></a>
 <p>Usually part of the
 <em>Application Binary Interface</em>, or ABI.</p>
 
-<li><a name="fn-12"></a>
+<li><a name="fn-13"></a>
 <p>A process also known as <em>stack unwinding</em>.</p>
 
-<li><a name="fn-13"></a>
+<li><a name="fn-14"></a>
 <p>Also known as the <em>return address</em>.</p>
 
-<li><a name="fn-14"></a>
+<li><a name="fn-15"></a>
 <p>Reduced Instruction Set Computer.</p>
 
-<li><a name="fn-15"></a>
+<li><a name="fn-16"></a>
 <p>Complex Instruction Set Computer.</p>
 
-<li><a name="fn-16"></a>
+<li><a name="fn-17"></a>
 <p>Generally known as a line number table.</p>
 
-<li><a name="fn-17"></a>
+<li><a name="fn-18"></a>
 <p>Which is
 the part of the operating system that performs the run-time linking of shared
 libraries.</p>
 
-<li><a name="fn-18"></a>
+<li><a name="fn-19"></a>
 <p>Where the kernel is
 effectively a single process running all user programs as threads.</p>
 
-<li><a name="fn-19"></a>
+<li><a name="fn-20"></a>
 <p>In mpatrol release
 1.0 it was enabled by default.</p>
-
-<li><a name="fn-20"></a>
-<p>In the case of <code>NOFREE=0</code> a double negative does not make
-a positive.  The zero indicates that all memory allocations will not really be
-freed for later reuse.</p>
 
 <li><a name="fn-21"></a>
 <p>Commonly known as <em>overflow buffers</em> or <em>fence
@@ -13309,62 +13365,66 @@ called GC (see <a href="#Related%20software">Related software</a>).</p>
 it!</p>
 
 <li><a name="fn-40"></a>
-<p>Whether they are documented or not.</p>
+<p>The mpatrol library comes with the <code>xmalloc()</code> and
+<code>MP_MALLOC()</code> families of functions.</p>
 
 <li><a name="fn-41"></a>
+<p>Whether they are documented or not.</p>
+
+<li><a name="fn-42"></a>
 <p>This information may also be filled in if the
 <code>USEDEBUG</code> option or the <code>mpsym</code> command is used and supported,
 and if debugging information about the call to <code>malloc()</code> is available.</p>
 
-<li><a name="fn-42"></a>
+<li><a name="fn-43"></a>
 <p>The error can be turned into a
 warning with the <code>ALLOWOFLOW</code> option which will also force the operation
 to be performed.</p>
 
-<li><a name="fn-43"></a>
+<li><a name="fn-44"></a>
 <p>On UNIX
 systems with dynamic linking it might also be possible to run the program under
 the <code>mpatrol</code> command with its <code>--dynamic</code> option without having
 to recompile or relink, but compiling and linking with the mpatrol library is a
 more generic solution across different platforms.</p>
 
-<li><a name="fn-44"></a>
+<li><a name="fn-45"></a>
 <p>This is not strictly necessary on UNIX and Windows
 platforms (and AmigaOS when using <code>gcc</code>), but it does give us more
 debugging information.</p>
 
-<li><a name="fn-45"></a>
+<li><a name="fn-46"></a>
 <p>Note that the start address of the allocation has changed
 slightly since we added padding around it with the <code>OFLOWSIZE</code> option.</p>
 
-<li><a name="fn-46"></a>
+<li><a name="fn-47"></a>
 <p>This is really only necessary when the mpatrol
 library has been built as a shared library.</p>
 
-<li><a name="fn-47"></a>
+<li><a name="fn-48"></a>
 <p>This is not necessarily the fault
 of the debugger or the debugging information generated by the compiler since
 on most platforms such watch points can only be caught after they occur, hence
 most debuggers show the next statement to be executed rather than the current
 one.</p>
 
-<li><a name="fn-48"></a>
+<li><a name="fn-49"></a>
 <p>The file <code>extra/magic</code> contains
 a UNIX <em>magic</em> file excerpt for automatically identifying an mpatrol log
 file, an mpatrol profiling output file and an mpatrol tracing output file with
 the <code>file</code> command.</p>
 
-<li><a name="fn-49"></a>
+<li><a name="fn-50"></a>
 <p>There is currently a library called StackTrace written by
 Bjorn Reese which invokes a debugger to generate a stack traceback on certain
 UNIX platforms.  This method would be too slow for mpatrol to use though.</p>
 
-<li><a name="fn-50"></a>
+<li><a name="fn-51"></a>
 <p>Looking back at these statements about six months after they
 were written, it would appear that I have just written such a library judging by
 the number of architectures for which stack traversal is now supported.</p>
 
-<li><a name="fn-51"></a>
+<li><a name="fn-52"></a>
 <p>This list can be
 considered to be a slightly more up to date version of <cite>Debugging Tools
 for Dynamic Storage Allocation and Memory Management</cite>
