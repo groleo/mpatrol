@@ -31,10 +31,7 @@
 #include <stdio.h>
 
 
-unsigned long leaktotal = 0;
-
-
-int callback(const void *p)
+int callback(const void *p, void *t)
 {
     __mp_allocstack *s;
     __mp_allocinfo d;
@@ -74,7 +71,7 @@ int callback(const void *p)
         fputc('\n', stderr);
         if ((d.file != NULL) && (d.line != 0))
             __mp_view(d.file, d.line);
-        leaktotal += d.size;
+        *((unsigned long *) t) = *((unsigned long *) t) + d.size;
         return 1;
     }
     return 0;
@@ -95,17 +92,17 @@ void func1(void)
 {
     void *p;
     size_t i, n;
-    unsigned long s;
+    unsigned long s, t;
 
     p = malloc(16);
     s = __mp_snapshot();
     for (i = 0; i < 128; i++)
         func2(i);
     free(p);
-    if (n = __mp_iterate(callback, s))
-        fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\n", n,
-                leaktotal);
-    if ((n != 10) || (leaktotal != 5860))
+    t = 0;
+    if (n = __mp_iterate(callback, &t, s))
+        fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\n", n, t);
+    if ((n != 10) || (t != 5860))
         fputs("Expected 10 memory leaks (5860 bytes)\n", stderr);
 }
 
