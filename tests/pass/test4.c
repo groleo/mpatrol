@@ -44,16 +44,16 @@ void display(void *p)
         return;
     }
     if (sizeof(void *) == 8)
-        fprintf(stderr, "block:   0x%016lX\n", d.block);
+        fprintf(stderr, "block:    0x%016lX\n", d.block);
     else
-        fprintf(stderr, "block:   0x%08lX\n", d.block);
-    fprintf(stderr, "size:    %lu\n", d.size);
-    fprintf(stderr, "type:    %lu\n", d.type);
-    fprintf(stderr, "alloc:   %lu\n", d.alloc);
-    fprintf(stderr, "realloc: %lu\n", d.realloc);
-    fprintf(stderr, "func:    %s\n", d.func ? d.func : "NULL");
-    fprintf(stderr, "file:    %s\n", d.file ? d.file : "NULL");
-    fprintf(stderr, "line:    %lu\n", d.line);
+        fprintf(stderr, "block:    0x%08lX\n", d.block);
+    fprintf(stderr, "size:     %lu\n", d.size);
+    fprintf(stderr, "type:     %lu\n", d.type);
+    fprintf(stderr, "alloc:    %lu\n", d.alloc);
+    fprintf(stderr, "realloc:  %lu\n", d.realloc);
+    fprintf(stderr, "func:     %s\n", d.func ? d.func : "NULL");
+    fprintf(stderr, "file:     %s\n", d.file ? d.file : "NULL");
+    fprintf(stderr, "line:     %lu\n", d.line);
     for (s = d.stack; s != NULL; s = s->next)
     {
         if (sizeof(void *) == 8)
@@ -62,7 +62,9 @@ void display(void *p)
             fprintf(stderr, "\t0x%08lX: ", s->addr);
         fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
     }
-    fprintf(stderr, "freed:   %d\n", d.freed);
+    fprintf(stderr, "typename: %s\n", d.typestr ? d.typestr : "NULL");
+    fprintf(stderr, "typesize: %lu\n", d.typesize);
+    fprintf(stderr, "freed:    %d\n", d.freed);
 }
 
 
