@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.10 2001-03-04 17:50:55 graeme Exp $
+ * $Id: dbmalloc.h,v 1.11 2001-03-07 20:41:10 graeme Exp $
  */
 
 
@@ -71,11 +71,9 @@
  * or malloc_list() results in the output being sent to the mpatrol log
  * file.
  *
- * The malloc_inuse() function does not deduct any memory used by marked
- * allocations, contrary to the behaviour of the Dbmalloc library.  In
- * addition, the malloc_size() and malloc_mark() functions do not give an
- * error message if the pointer passed in does not correspond to a heap
- * allocation.  Neither of these three functions automatically perform an
+ * The malloc_size() and malloc_mark() functions do not give an error
+ * message if the pointer passed in does not correspond to a heap
+ * allocation.  Neither of these these functions automatically perform an
  * integrity check of the heap.  Note that the malloc_chain_check()
  * function will never return a non-zero value - it always terminates with
  * an error message in the mpatrol log file whenever it detects heap
