@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.42 2000-11-03 18:27:33 graeme Exp $"
+#ident "$Id: inter.c,v 1.43 2000-11-06 01:07:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -143,14 +143,45 @@ static int checkrange(unsigned long l, unsigned long n, unsigned long u)
 static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
 {
     allocanode *n, *p;
+#if MP_FULLSTACK
+    addrnode *a, *b;
+    stackcompare r;
+#endif /* MP_FULLSTACK */
     int c;
 
+    if (memhead.fini || (memhead.astack.size == 0))
+        return;
+#if MP_FULLSTACK
+    /* Create the address nodes for the current call.  This is not necessarily
+     * an efficient way of doing call stack comparisons if the alloca allocation
+     * stack does not contain many outstanding entries, but on some platforms
+     * call stack traversal is an expensive business.
+     */
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectaddrs(&memhead.addr, MA_READWRITE);
+    a = __mp_getaddrs(&memhead.addr, v);
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectaddrs(&memhead.addr, MA_READONLY);
+#endif /* MP_FULLSTACK */
     for (n = (allocanode *) memhead.astack.head;
          p = (allocanode *) n->node.next; n = p)
     {
         c = 0;
         if (f == 1)
             c = 1;
+#if MP_FULLSTACK
+        else
+        {
+            /* We need to compare the call stacks of the two calling functions
+             * in order to see if we can free the allocation.
+             */
+            b = (addrnode *) n->data.frame;
+            if ((b->data.next != NULL) && (a->data.next != NULL) &&
+                (((r = __mp_compareaddrs(b->data.next, a->data.next)) ==
+                  SC_DIFFERENT) || (r == SC_SHALLOWER)))
+                c = 1;
+        }
+#else /* MP_FULLSTACK */
         else if (memhead.alloc.heap.memory.stackdir < 0)
         {
             /* The stack grows down so we must ensure that the current local
@@ -169,6 +200,7 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
             if ((char *) n->data.frame > (char *) &v->frame)
                 c = 1;
         }
+#endif /* MP_FULLSTACK */
         if (c == 1)
         {
             if (memhead.prologue && (memhead.recur == 1))
@@ -178,6 +210,19 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
                 memhead.epilogue((void *) -1);
         }
     }
+#if MP_FULLSTACK
+    /* Free the address nodes for the current call.  They may well have to be
+     * generated again but that can't be guaranteed.
+     */
+    if (a != NULL)
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectaddrs(&memhead.addr, MA_READWRITE);
+        __mp_freeaddrs(&memhead.addr, a);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectaddrs(&memhead.addr, MA_READONLY);
+    }
+#endif /* MP_FULLSTACK */
 }
 
 
