@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.101 2001-02-27 23:14:40 graeme Exp $
+ * $Id: mpatrol.h,v 1.102 2001-03-02 01:31:23 graeme Exp $
  */
 
 
@@ -712,6 +712,10 @@ void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(MP_CONST char *, ...);
 int __mp_vprintf(MP_CONST char *, va_list);
+void __mp_printfwithloc(MP_CONST char *, MP_CONST char *, unsigned long,
+                        MP_CONST char *, ...);
+void __mp_vprintfwithloc(MP_CONST char *, MP_CONST char *, unsigned long,
+                         MP_CONST char *, va_list);
 void __mp_logmemory(MP_CONST void *, size_t);
 int __mp_logstack(size_t);
 int __mp_logaddr(MP_CONST void *);
@@ -764,6 +768,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_pushdelstack(s, t, u) ((void) 0)
 #define __mp_popdelstack(s, t, u) ((void) 0)
 #define __mp_vprintf(s, v) ((int) 0)
+#define __mp_vprintfwithloc(s, t, u, m, v) ((void) 0)
 #define __mp_logmemory(p, l) ((void) 0)
 #define __mp_logstack(k) ((int) 0)
 #define __mp_logaddr(p) ((int) 0)
@@ -773,14 +778,23 @@ int __mp_view(MP_CONST char *, unsigned long);
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
 #define __mp_printf(s, ...) ((int) 0)
+#define __mp_printfwithloc(s, t, u, m, ...) ((void) 0)
 #elif defined(__GNUC__)
 #define __mp_printf(s, a...) ((int) 0)
+#define __mp_printfwithloc(s, t, u, m, a...) ((void) 0)
 #else /* __STDC_VERSION__ && __GNUC__ */
 static
 int
 __mp_printf(MP_CONST char *s, ...)
 {
     return 0;
+}
+
+static
+void
+__mp_printfwithloc(MP_CONST char *s, MP_CONST char *t, unsigned long u,
+                   MP_CONST char *m, ...)
+{
 }
 #endif /* __STDC_VERSION__ && __GNUC__ */
 

@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.31 2001-02-26 00:01:58 graeme Exp $
+ * $Id: inter.h,v 1.32 2001-03-02 01:31:23 graeme Exp $
  */
 
 
@@ -153,6 +153,8 @@ void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(char *, ...);
 int __mp_vprintf(char *, va_list);
+void __mp_printfwithloc(char *, char *, unsigned long, char *, ...);
+void __mp_vprintfwithloc(char *, char *, unsigned long, char *, va_list);
 void __mp_logmemory(void *, size_t);
 int __mp_logstack(size_t);
 int __mp_logaddr(void *);
