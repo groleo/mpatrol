@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.6 2000-03-15 00:44:27 graeme Exp $"
+#ident "$Id: alloc.c,v 1.7 2000-07-11 23:41:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -443,7 +443,8 @@ MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
             /* Remove any memory protection and the watch point area if it
              * exists.
              */
-            __mp_memprotect(&h->heap.memory, p->block, s, MA_READWRITE);
+            __mp_memprotect(&h->heap.memory, (char *) p->block - h->oflow, s,
+                            MA_READWRITE);
             if (h->flags & FLG_OFLOWWATCH)
                 __mp_memwatch(&h->heap.memory, (char *) n->block + n->size,
                               m - n->size, MA_READWRITE);
