@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.50 2001-01-22 21:42:47 graeme Exp $
+# $Id: Makefile,v 1.51 2001-01-25 13:35:25 graeme Exp $
 
 
 # Definitions
@@ -178,7 +178,7 @@ mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
 all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
-	mpatrol mprof mptrace mleak
+	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) mpatrol mprof mptrace mleak
 
 lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
 
@@ -186,6 +186,8 @@ clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPTOBJS) $(SHARTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPAOBJS) $(SHARED_MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPAOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
@@ -195,6 +197,9 @@ clobber: clean
 	-@ rm -f $(SHARED_MPATROL) $(SHARTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPALLOC).$(VERSION).$(REVISION) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPALLOC) $(LINT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
@@ -328,6 +333,18 @@ version.o version.s.o version.n.ln version.t.o version.s.t.o version.t.ln: \
 	$(SOURCE)/target.h
 machine.o machine.s.o machine.t.o machine.s.t.o: $(SOURCE)/machine.c \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpfailure.o mpfailure.s.o mpfailure.n.ln: $(SOURCE)/mpfailure.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
+mpsetfail.o mpsetfail.s.o mpsetfail.n.ln: $(SOURCE)/mpsetfail.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
+mpmalloc.o mpmalloc.s.o mpmalloc.n.ln: $(SOURCE)/mpmalloc.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
+mpcalloc.o mpcalloc.s.o mpcalloc.n.ln: $(SOURCE)/mpcalloc.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
+mpstrdup.o mpstrdup.s.o mpstrdup.n.ln: $(SOURCE)/mpstrdup.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
+mprealloc.o mprealloc.s.o mprealloc.n.ln: $(SOURCE)/mprealloc.c \
+	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
