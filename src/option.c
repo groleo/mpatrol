@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.8 2000-01-09 20:35:18 graeme Exp $"
+#ident "$Id: option.c,v 1.9 2000-01-21 00:36:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -106,8 +106,8 @@ static char *options_help[] =
     "", "Specifies the limit in bytes at which all memory allocations should",
     "", "fail if the total allocated memory should increase beyond this.",
     "LOGALL", NULL,
-    "", "Equivalent to the LOGALLOCS, LOGREALLOCS and LOGFREES options",
-    "", "specified together.",
+    "", "Equivalent to the LOGALLOCS, LOGREALLOCS, LOGFREES and LOGMEMORY",
+    "", "options specified together.",
     "LOGALLOCS", NULL,
     "", "Specifies that all memory allocations are to be logged and sent to",
     "", "the log file.",
@@ -117,6 +117,9 @@ static char *options_help[] =
     "LOGFREES", NULL,
     "", "Specifies that all memory deallocations are to be logged and sent to",
     "", "the log file.",
+    "LOGMEMORY", NULL,
+    "", "Specifies that all memory operations are to be logged and sent to the",
+    "", "log file.",
     "LOGREALLOCS", NULL,
     "", "Specifies that all memory reallocations are to be logged and sent to",
     "", "the log file.",
@@ -564,7 +567,8 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_IGNARGUMENT;
                     else
                         i = OE_RECOGNISED;
-                    h->flags |= FLG_LOGALLOCS | FLG_LOGREALLOCS | FLG_LOGFREES;
+                    h->flags |= FLG_LOGALLOCS | FLG_LOGREALLOCS | FLG_LOGFREES |
+                                FLG_LOGMEMORY;
                 }
                 else if (matchoption(o, "LOGALLOCS"))
                 {
@@ -589,6 +593,14 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     h->flags |= FLG_LOGFREES;
+                }
+                else if (matchoption(o, "LOGMEMORY"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_LOGMEMORY;
                 }
                 else if (matchoption(o, "LOGREALLOCS"))
                 {
