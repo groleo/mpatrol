@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.11 2000-04-19 00:27:21 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.12 2000-04-20 22:24:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -78,7 +78,8 @@ static char *oflowbyte, *oflowsize;
 static char *defalign, *limit;
 static char *failfreq, *failseed, *unfreedabort;
 static char *logfile, *proffile, *progfile;
-static char *check, *pagealloc;
+static char *autosave, *check, *pagealloc;
+static char *smallbound, *mediumbound, *largebound;
 
 
 /* The following boolean options correspond to their uppercase equivalents when
@@ -98,6 +99,15 @@ static int usemmap, usedebug;
 
 static char *options_help[] =
 {
+    "1", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as small allocations for profiling purposes.",
+    "2", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as medium allocations for profiling purposes.",
+    "3", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as large allocations for profiling purposes.",
     "A", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when it is",
     "", "being allocated.",
@@ -160,6 +170,9 @@ static char *options_help[] =
     "p", NULL,
     "", "Specifies that all memory allocations are to be profiled and sent to",
     "", "the profiling output file.",
+    "Q", "unsigned integer",
+    "", "Specifies the frequency at which to periodically write the profiling",
+    "", "data to the profiling output file.",
     "R", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when a",
     "", "memory allocation is being reallocated.",
@@ -266,6 +279,8 @@ static void setoptions(void)
         addoption("ALLOCBYTE", allocbyte, 0);
     if (allocstop)
         addoption("ALLOCSTOP", allocstop, 0);
+    if (autosave)
+        addoption("AUTOSAVE", autosave, 0);
     if (check)
         addoption("CHECK", check, 0);
     if (checkall)
@@ -280,9 +295,13 @@ static void setoptions(void)
         addoption("FREEBYTE", freebyte, 0);
     if (freestop)
         addoption("FREESTOP", freestop, 0);
+    if (largebound)
+        addoption("LARGEBOUND", largebound, 0);
     if (limit)
         addoption("LIMIT", limit, 0);
     addoption("LOGALL", NULL, 0);
+    if (mediumbound)
+        addoption("MEDIUMBOUND", mediumbound, 0);
     if (nofree)
         addoption("NOFREE", NULL, 0);
     if (noprotect)
@@ -316,6 +335,8 @@ static void setoptions(void)
     }
     if (showfreed)
         addoption("SHOWUNFREED", NULL, 0);
+    if (smallbound)
+        addoption("SMALLBOUND", smallbound, 0);
     if (unfreedabort)
         addoption("UNFREEDABORT", unfreedabort, 0);
     if (usedebug)
@@ -356,9 +377,18 @@ int main(int argc, char **argv)
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     while ((c = __mp_getopt(argc, argv,
-             "A:a:C:cD:de:F:f:GgL:l:mNnO:o:P:pR:SsU:VvwXxZ:z:")) != EOF)
+             "1:2:3:A:a:C:cD:de:F:f:GgL:l:mNnO:o:P:pQ:R:SsU:VvwXxZ:z:")) != EOF)
         switch (c)
         {
+          case '1':
+            smallbound = __mp_optarg;
+            break;
+          case '2':
+            mediumbound = __mp_optarg;
+            break;
+          case '3':
+            largebound = __mp_optarg;
+            break;
           case 'A':
             allocstop = __mp_optarg;
             break;
@@ -418,6 +448,9 @@ int main(int argc, char **argv)
             break;
           case 'p':
             prof = 1;
+            break;
+          case 'Q':
+            autosave = __mp_optarg;
             break;
           case 'R':
             reallocstop = __mp_optarg;
