@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mtrace.c,v 1.6 2001-07-26 16:01:32 graeme Exp $"
+#ident "$Id: mtrace.c,v 1.7 2001-07-26 16:11:07 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.6 2001-07-26 16:01:32 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.7 2001-07-26 16:11:07 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -77,8 +77,9 @@ static size_t alloc_size;
 
 /* Log where an allocation or reallocation was made, or where a deallocation
  * was performed.  We can also interface with the mpatrol symbol manager to
- * obtain the name of the function that made the call, and perhaps even the
- * filename and line number if USEDEBUG is used and supported.
+ * obtain the name of the function that made the call if that is not already
+ * available, and perhaps even the filename and line number if USEDEBUG is used
+ * and supported.
  */
 
 static
@@ -88,6 +89,11 @@ location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
     __mp_symbolinfo i;
     long o;
 
+    if ((t != NULL) && (u != 0))
+    {
+        fprintf(trace_file, "@ %s:%lu ", t, u);
+        return;
+    }
     if (a == NULL)
         return;
     fputs("@ ", trace_file);
@@ -97,11 +103,11 @@ location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
             fprintf(trace_file, "%s:%lu ", i.file, i.line);
             return;
         }
-        else if (i.name != NULL)
+        else if ((s != NULL) || (i.name != NULL))
         {
             if (i.object != NULL)
                 fprintf(trace_file, "%s:", i.object);
-            fprintf(trace_file, "(%s", i.name);
+            fprintf(trace_file, "(%s", (s != NULL) ? s : i.name);
             o = (char *) a - (char *) i.addr;
             if (o > 0)
                 fprintf(trace_file, "+%#lx", o);
