@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.34 2000-11-02 21:17:24 graeme Exp $"
+#ident "$Id: info.c,v 1.35 2000-11-02 22:04:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -342,9 +342,15 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
         if ((f == AT_ALLOCA) && (g != NULL))
             if (p != NULL)
             {
+                /* We take the address of a local variable in the calling
+                 * function in order to determine if subsequent calls are
+                 * closer to or further away from the program's entry point.
+                 * This information can later be used to free up any
+                 * allocations made by alloca() that are now out of scope.
+                 */
                 __mp_addhead(&h->astack, &g->node);
                 g->block = p;
-                g->data.frame = NULL;
+                g->data.frame = (void *) &v->frame;
             }
             else
                 __mp_freeslot(&h->atable, g);
