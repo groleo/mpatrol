@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: getopt.h,v 1.8 2001-02-10 16:45:39 graeme Exp $
+ * $Id: getopt.h,v 1.9 2001-07-19 22:50:01 graeme Exp $
  */
 
 
@@ -65,6 +65,7 @@ MP_EXPORT unsigned long __mp_optindex;
 MP_EXPORT char *__mp_optarg;
 
 
+MP_EXPORT char *__mp_basename(char *);
 MP_EXPORT int __mp_getnum(char *, char *, long *, int);
 MP_EXPORT int __mp_getopt(unsigned long, char **, char *, option *);
 MP_EXPORT char *__mp_shortopts(char *, option *);

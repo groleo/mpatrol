@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.12 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: getopt.c,v 1.13 2001-07-19 22:50:01 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.12 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.13 2001-07-19 22:50:01 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,6 +59,27 @@ MP_GLOBAL unsigned long __mp_optindex;
  */
 
 MP_GLOBAL char *__mp_optarg;
+
+
+/* Strip the path component from a fully-qualified filename.
+ */
+
+MP_GLOBAL
+char *
+__mp_basename(char *s)
+{
+    char *t;
+
+#if TARGET == TARGET_UNIX
+    while (t = strchr(s, '/'))
+#elif TARGET == TARGET_AMIGA
+    while (t = strpbrk(s, ":/"))
+#else /* TARGET */
+    while (t = strpbrk(s, ":/\\"))
+#endif /* TARGET */
+        s = t + 1;
+    return s;
+}
 
 
 /* Convert a string representation of a number to an integer,
