@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.57 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: info.c,v 1.58 2001-02-06 19:53:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.57 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.58 2001-02-06 19:53:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,7 +92,7 @@ __mp_newinfo(infohead *h)
     __mp_newlist(&h->astack);
     /* Initialise the settings to their default values.
      */
-    h->size = h->count = h->cpeak = h->peak = h->limit = 0;
+    h->size = h->event = h->count = h->cpeak = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
@@ -148,7 +148,7 @@ __mp_deleteinfo(infohead *h)
     __mp_newlist(&h->list);
     __mp_newlist(&h->alist);
     __mp_newlist(&h->astack);
-    h->size = h->count = h->cpeak = h->peak = 0;
+    h->size = h->event = h->count = h->cpeak = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->delpos = 0;
 }
@@ -335,6 +335,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
 #if MP_THREADS_SUPPORT
                 m->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
+                m->data.event = h->event;
                 m->data.func = v->func;
                 m->data.file = v->file;
                 m->data.line = v->line;
@@ -556,6 +557,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
 #if MP_THREADS_SUPPORT
                     i->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
+                    i->data.event = h->event;
                     i->data.func = v->func;
                     i->data.file = v->file;
                     i->data.line = v->line;
@@ -630,6 +632,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
 #if MP_THREADS_SUPPORT
                 m->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
+                m->data.event = h->event;
                 m->data.func = v->func;
                 m->data.file = v->file;
                 m->data.line = v->line;
@@ -787,6 +790,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
 #if MP_THREADS_SUPPORT
             m->data.thread = __mp_threadid();
 #endif /* MP_THREADS_SUPPORT */
+            m->data.event = h->event;
             m->data.func = v->func;
             m->data.file = v->file;
             m->data.line = v->line;

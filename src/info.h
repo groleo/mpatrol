@@ -180,6 +180,7 @@ typedef union infonode
 #if MP_THREADS_SUPPORT
         unsigned long thread;  /* thread identifier */
 #endif /* MP_THREADS_SUPPORT */
+        unsigned long event;   /* event of last modification */
         char *func;            /* calling function name */
         char *file;            /* file name in which call took place */
         unsigned long line;    /* line number at which call took place */
@@ -211,6 +212,7 @@ typedef struct infohead
     listhead alist;                   /* internal allocanode list */
     listhead astack;                  /* alloca allocation stack */
     size_t size;                      /* internal allocation total */
+    size_t event;                     /* allocation event count */
     size_t count;                     /* allocation count */
     size_t cpeak;                     /* allocation count peak */
     size_t peak;                      /* allocation peak */
