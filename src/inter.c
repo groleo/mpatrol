@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.33 2000-05-14 11:56:50 graeme Exp $"
+#ident "$Id: inter.c,v 1.34 2000-05-14 12:39:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -655,14 +655,26 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
 void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
                    char *s, char *t, unsigned long u, size_t k)
 {
+    void *r;
     stackinfo i;
     int j;
 
     if (!memhead.init || memhead.fini)
-    {
-        __mp_memcopy(q, p, l);
-        return q;
-    }
+        if (f == AT_MEMCCPY)
+        {
+            if (r = __mp_memfind(p, l, &c, 1))
+                l = (size_t) ((char *) r - (char *) p) + 1;
+            __mp_memcopy(q, p, l);
+            if (r != NULL)
+                return (char *) q + l;
+            else
+                return NULL;
+        }
+        else
+        {
+            __mp_memcopy(q, p, l);
+            return q;
+        }
     savesignals();
     /* Determine the call stack details.
      */
