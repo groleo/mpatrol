@@ -130,11 +130,15 @@ their corresponding answers or solutions.
     instead.  If you are using the thread-safe version of mpatrol then you may
     also need to link with the system threads library.
 
- Q. Why do I still get undefined symbols on HP/UX platforms, despite following
-    the above instructions?
+ Q. Why do I still get undefined symbols on HP/UX or IRIX platforms, despite
+    following the above instructions?
 
- A. If the symbols are called U_get_current_frame and U_get_previous_frame then
-    you still need to link with the system stack traceback library, libcl.a.
+ A. If the symbols are called U_get_current_frame and U_get_previous_frame on
+    HP/UX then you still need to link with the system stack traceback library,
+    libcl.a.  If the symbols are called exc_setjmp and unwind on IRIX and you
+    defined the MP_LIBRARYSTACK_SUPPORT preprocessor macro when building the
+    mpatrol library then you still need to link with the system exception
+    library libexc.so.
 
  Q. Why do I get duplicate definitions of symbols when linking with the mpatrol
     library?
