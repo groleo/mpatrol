@@ -538,7 +538,8 @@
 
 
 /* The number of bytes that distinguish where medium-sized allocations
- * begin and small-sized allocations end for profiling purposes.
+ * begin and small-sized allocations end for profiling purposes.  This
+ * may be overridden at run-time using the SMALLBOUND option.
  */
 
 #ifndef MP_SMALLBOUND
@@ -547,7 +548,8 @@
 
 
 /* The number of bytes that distinguish where large-sized allocations
- * begin and medium-sized allocations end for profiling purposes.
+ * begin and medium-sized allocations end for profiling purposes.  This
+ * may be overridden at run-time using the MEDIUMBOUND option.
  */
 
 #ifndef MP_MEDIUMBOUND
@@ -556,7 +558,8 @@
 
 
 /* The number of bytes that distinguish where extra large-sized allocations
- * begin and large-sized allocations end for profiling purposes.
+ * begin and large-sized allocations end for profiling purposes.  This
+ * may be overridden at run-time using the LARGEBOUND option.
  */
 
 #ifndef MP_LARGEBOUND
