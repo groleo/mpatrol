@@ -26,7 +26,7 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.2 2000-10-31 22:59:01 graeme Exp $
+# $Id: mpsym,v 1.3 2000-11-01 19:23:41 graeme Exp $
 
 
 # Program version.
@@ -45,6 +45,7 @@ POINTER="0x%08X"
 error=0
 help=0
 version=0
+progname=`basename "$0"`
 
 for option in "$@"
 do
@@ -65,7 +66,7 @@ do
       -)
         break;;
       -*)
-        echo "$0: Illegal option \`$option'" >&2
+        echo "$progname: Illegal option \`$option'" >&2
         error=1
         shift;;
       *)
@@ -102,7 +103,7 @@ fi
 
 if [ $version = 1 ]
 then
-    echo "$0 $VERSION" >&2
+    echo "$progname $VERSION" >&2
     echo "Copyright (C) 1997-2000 Graeme S. Roy" >&2
     echo >&2
     echo "This is free software, and you are welcome to redistribute it under certain" >&2
@@ -118,11 +119,11 @@ fi
 
 if [ $error = 1 -o $help = 1 ]
 then
-    echo "Usage: $0 [options] [progfile [logfile]]" >&2
+    echo "Usage: $progname [options] [progfile [logfile]]" >&2
     echo >&2
     if [ $help = 0 ]
     then
-        echo "Type \`$0 --help' for a complete list of options." >&2
+        echo "Type \`$progname --help' for a complete list of options." >&2
     else
 cat <<EOF >&2
 Options:
@@ -144,13 +145,13 @@ fi
 
 if [ ! -f "$progfile" ]
 then
-    echo "$0: Cannot open file \`$progfile'" >&2
+    echo "$progname: Cannot open file \`$progfile'" >&2
     exit 1
 fi
 
 if [ ! -f "$logfile" ]
 then
-    echo "$0: Cannot open file \`$logfile'" >&2
+    echo "$progname: Cannot open file \`$logfile'" >&2
     exit 1
 fi
 
@@ -162,8 +163,8 @@ then
     TMPDIR="/tmp"
 fi
 
-dbtemp="$TMPDIR/mpsym_$$.db"
-edtemp="$TMPDIR/mpsym_$$.ed"
+dbtemp="$TMPDIR/$progname_$$.db"
+edtemp="$TMPDIR/$progname_$$.ed"
 
 trap "rm -f \"$dbtemp\" \"$edtemp\"" 0 1 2 3 15
 
@@ -215,6 +216,7 @@ gdb --batch --nx --command "$dbtemp" "$progfile" 2>/dev/null |
 # existing symbols that appear after any code addresses with the new symbol
 # that has been obtained from the debugger.
 
-awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("\t%s\n", $1); getline; }
-     { print; }' "$logfile" |
+awk 'BEGIN { output = 1; }
+     /^\t0x[0-9A-F]+ [^ ]/ { printf("\t%s\n", $1); output = 0; }
+     { if (output == 1) print; else output = 1; }' "$logfile" |
     sed -f "$edtemp"
