@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.84 2000-05-31 18:55:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.85 2000-06-01 21:03:56 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.10
 @set VERSION 1.2.1
-@set UPDATED 31st May, 2000
+@set UPDATED 1st June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2872,6 +2872,15 @@ access library:
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
    -liberty
+@end smallexample
+
+@item
+If the mpatrol library was built on HP/UX with support for the GNU BFD object
+file format access library:
+
+@smallexample
+cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
+   -liberty -lcl
 @end smallexample
 @end itemize
 
@@ -5909,9 +5918,10 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-Cannot automatically determine the program filename.
+The archive version of the traceback library (@file{libcl.a}) must currently
+be used instead of the shared version (@file{libcl.sl}) when linking.
 @item
-No support for call stack traversal.
+Symbols read from shared libraries may have slightly incorrect offsets.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
@@ -6509,22 +6519,30 @@ this problem when it is compiled by a C++ compiler, but it may only work if the
 final program is linked with that specific compiler.
 
 @item
-Need to add support for call stack traversal for at least the Alpha, MIPS and
-PA/RISC processor architectures.  The current implementation of call stack
-traversal for the Motorola 88xx0 family is also a bit flaky and so should only
-be used when the library and program are built unoptimised.
+Need to add support for call stack traversal for at least the Alpha and MIPS
+processor architectures.  The current implementation of call stack traversal
+for the Motorola 88xx0 family is also a bit flaky and so should only be used
+when the library and program are built unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for at least
-the Alpha, Motorola 88xx0, non-IRIX MIPS and PA/RISC processor architectures.
-Also need to add support for reading the program symbols from a suitable file
-in @file{/proc} for other operating systems that support it.  If there is no
+the Alpha, Motorola 88xx0 and non-IRIX MIPS processor architectures.  Also
+need to add support for reading the program symbols from a suitable file in
+@file{/proc} for other operating systems that support it.  If there is no
 support for either of these methods then the @option{PROGFILE} option can
 currently be used to specify the program name at run-time.
 
 @item
+The HP/UX traceback library (@file{libcl.a}) must currently be linked as the
+archive version instead of the shared version otherwise a @samp{SIGABORT} will
+be raised.  This is probably due to the call to @code{U_get_current_frame()}
+using the traceback information from the shared library rather than the
+executable file, and the documentation warns against this.
+
+@item
 The library cannot currently read any symbols from shared objects that have been
-read via @code{dlopen()}.
+read via @code{dlopen()}.  There is also currently a problem with the code
+offsets of any symbols that have been read from shared libraries on HP/UX.
 
 @item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
