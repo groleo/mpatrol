@@ -21,7 +21,7 @@ Changes for 1.4.0
     program's execution.  In addition, a function has been added to obtain
     symbolic information about a code address from the mpatrol symbol manager
     and another function added to associate user-specific data with a particular
-    memory allocaton.
+    memory allocation.
 
   * Added functions to snapshot the heap and iterate across all memory
     allocations in the heap.  Also added functions to write strings, hex dumps,
