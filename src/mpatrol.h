@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.90 2001-02-22 18:45:08 graeme Exp $
+ * $Id: mpatrol.h,v 1.91 2001-02-22 19:40:46 graeme Exp $
  */
 
 
@@ -294,6 +294,25 @@ typedef enum __mp_alloctype
     MP_AT_MAX
 }
 __mp_alloctype;
+
+
+/* The different types of initialiser functions.
+ */
+
+typedef enum __mp_initfunc
+{
+    MP_IF_USER1,  /* user-defined initialiser function 1 */
+    MP_IF_USER2,  /* user-defined initialiser function 2 */
+    MP_IF_USER3,  /* user-defined initialiser function 3 */
+    MP_IF_USER4,  /* user-defined initialiser function 4 */
+    MP_IF_USER5,  /* user-defined initialiser function 5 */
+    MP_IF_USER6,  /* user-defined initialiser function 6 */
+    MP_IF_USER7,  /* user-defined initialiser function 7 */
+    MP_IF_USER8,  /* user-defined initialiser function 8 */
+    MP_IF_MTRACE, /* mtrace tool initialiser function */
+    MP_IF_MAX
+}
+__mp_initfunc;
 
 
 /* The details of a single function in a call stack.
