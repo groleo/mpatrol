@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.37 2000-11-03 18:48:52 graeme Exp $
+.\" $Id: mpatrol.3,v 1.38 2000-11-06 19:39:02 graeme Exp $
 .\"
-.TH MPATROL 3 "3 November 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 3 "6 November 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -33,15 +33,19 @@ void *calloc(size_t nelem, size_t size);
 void *memalign(size_t align, size_t size);
 void *valloc(size_t size);
 void *pvalloc(size_t size);
+void *alloca(size_t size);
 char *strdup(const char *str);
 char *strndup(const char *str, size_t size);
 char *strsave(const char *str);
 char *strnsave(const char *str, size_t size);
+char *strdupa(const char *str);
+char *strndupa(const char *str, size_t size);
 void *realloc(void *ptr, size_t size);
 void *recalloc(void *ptr, size_t nelem, size_t size);
 void *expand(void *ptr, size_t size);
 void free(void *ptr);
 void cfree(void *ptr, size_t nelem, size_t size);
+void dealloca(void *ptr);
 
 void *operator new(size_t size);
 void *operator new[](size_t size);
@@ -122,11 +126,13 @@ used.  The information stored in this file can then be used by the \fBmprof\fP
 command to display various tables summarising the memory allocation behaviour
 of the program that produced it.
 .SH FUNCTIONS
-The following 14 functions are available as replacements for existing C library
+The following 18 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
 \fBgcc\fP) they will be used anyway, albeit with slightly less tracing
-information:
+information.  If \fBalloca\fP is being used and \fIalloca.h\fP is included then
+\fImpatrol.h\fP must appear after \fIalloca.h\fP otherwise the debugging version
+of \fBalloca\fP will not be used:
 .TP
 \fBmalloc\fP
 Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
@@ -185,6 +191,22 @@ then the null pointer will be returned and \fBerrno\fP will be set to
 reallocated with \fBrealloc\fP, although the latter will not guarantee the
 preservation of alignment.
 .TP
+\fBalloca\fP
+Allocates \fIsize\fP temporary uninitialised bytes from the heap and returns a
+pointer to the first byte of the allocation.  The pointer returned will be
+suitably aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The \fBalloca\fP function normally allocates its memory from the
+stack, with the result that all such allocations will be freed when the function
+returns.  This version of \fBalloca\fP allocates its memory from the heap in
+order to provide better debugging, but the allocations may not necessarily be
+freed immediately when the function returns.  The allocated memory can be
+deallocated explicitly with \fBdealloca\fP, but may not be reallocated or
+deallocated in any other way.  This function is available for backwards
+compatibility with older C source code and should not be used in new code.
+.TP
 \fBstrdup\fP
 Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
 the terminating nul character) and returns a pointer to the first byte of the
@@ -235,6 +257,43 @@ then the null pointer will be returned and \fBerrno\fP will be set to
 \fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
 reallocated with \fBrealloc\fP.  This function is available for backwards
 compatibility with older C libraries and should not be used in new code.
+.TP
+\fBstrdupa\fP
+Allocates exactly enough temporary memory from the heap to duplicate \fIstr\fP
+(including the terminating nul character) and returns a pointer to the first
+byte of the allocation after copying \fIstr\fP to the newly-allocated memory.
+The pointer returned will have no alignment constraints and can be used to store
+character data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then
+the null pointer will be returned.  If there is not enough space in the heap
+then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The \fBstrdupa\fP function normally allocates its memory from the
+stack, with the result that all such allocations will be freed when the function
+returns.  This version of \fBstrdupa\fP allocates its memory from the heap in
+order to provide better debugging, but the allocations may not necessarily be
+freed immediately when the function returns.  The allocated memory can be
+deallocated explicitly with \fBdealloca\fP, but may not be reallocated or
+deallocated in any other way.  This function is available for backwards
+compatibility with older C source code and should not be used in new code.
+.TP
+\fBstrndupa\fP
+Allocates exactly enough temporary memory from the heap to duplicate \fIstr\fP
+(including the terminating nul character) and returns a pointer to the first
+byte of the allocation after copying \fIstr\fP to the newly-allocated memory.
+The pointer returned will have no alignment constraints and can be used to store
+character data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then
+the null pointer will be returned.  If the length of \fIstr\fP is greater than
+\fIsize\fP then only \fIsize\fP characters will be allocated and copied, with
+one additional byte for the nul character.  If there is not enough space in the
+heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The \fBstrndupa\fP function normally allocates its memory from
+the stack, with the result that all such allocations will be freed when the
+function returns.  This version of \fBstrndupa\fP allocates its memory from the
+heap in order to provide better debugging, but the allocations may not
+necessarily be freed immediately when the function returns.  The allocated
+memory can be deallocated explicitly with \fBdealloca\fP, but may not be
+reallocated or deallocated in any other way.  This function is available for
+backwards compatibility with older C source code and should not be used in new
+code.
 .TP
 \fBrealloc\fP
 Resizes the memory allocation beginning at \fIptr\fP to \fIsize\fP bytes and
@@ -296,6 +355,16 @@ will be freed.  All of the previous contents will be destroyed.  The \fInelem\fP
 and \fIsize\fP parameters are ignored in this implementation.  This function is
 available for backwards compatibility with older C libraries and \fBcalloc\fP
 and should not be used in new code.
+.TP
+\fBdealloca\fP
+Explicitly frees the temporary memory allocation beginning at \fIptr\fP so the
+memory can be reused by another call to allocate memory.  If \fIptr\fP is
+\fBNULL\fP then no memory will be explicitly freed.  All of the previous
+contents will be destroyed.  This function can only be used to free memory that
+was allocated with the \fBalloca\fP, \fBstrdupa\fP and \fBstrndupa\fP functions,
+but is only really required if the mpatrol library does not automatically free
+such memory allocations when the allocating function returns.  This function is
+mpatrol-specific and should not be used in release code.
 .PP
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in \fImpatrol.h\fP will only be used if the
@@ -871,8 +940,8 @@ library which uses \fBsbrk\fP to allocate its memory.  It is ignored on
 systems that do not support the \fBmmap\fP system call.
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBmpsym\fP(1), \fBmmap\fP(2),
-\fBsbrk\fP(2), \fBmalloc\fP(3), \fBmemory\fP(3), \fBstring\fP(3),
-\fBassert\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBsbrk\fP(2), \fBmalloc\fP(3), \fBalloca\fP(3), \fBmemory\fP(3),
+\fBstring\fP(3), \fBassert\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP

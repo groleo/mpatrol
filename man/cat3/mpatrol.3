@@ -15,15 +15,19 @@ SSYYNNOOPPSSIISS
        void *memalign(size_t align, size_t size);
        void *valloc(size_t size);
        void *pvalloc(size_t size);
+       void *alloca(size_t size);
        char *strdup(const char *str);
        char *strndup(const char *str, size_t size);
        char *strsave(const char *str);
        char *strnsave(const char *str, size_t size);
+       char *strdupa(const char *str);
+       char *strndupa(const char *str, size_t size);
        void *realloc(void *ptr, size_t size);
        void *recalloc(void *ptr, size_t nelem, size_t size);
        void *expand(void *ptr, size_t size);
        void free(void *ptr);
        void cfree(void *ptr, size_t nelem, size_t size);
+       void dealloca(void *ptr);
 
        void *operator new(size_t size);
        void *operator new[](size_t size);
@@ -54,14 +58,10 @@ SSYYNNOOPPSSIISS
             (const void *, size_t);
        void (*__mp_epilogue(void (*func)(const void *)))
             (const void *);
-       void (*__mp_nomemory(void (*func)(void)))(void);
-
-DDEESSCCRRIIPPTTIIOONN
-       The  _m_p_a_t_r_o_l  _l_i_b_r_a_r_y  contains implementations of dynamic
 
 
 
-Release 1.3              3 November 2000                        1
+Release 1.3              6 November 2000                        1
 
 
 
@@ -70,6 +70,10 @@ Release 1.3              3 November 2000                        1
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       void (*__mp_nomemory(void (*func)(void)))(void);
+
+DDEESSCCRRIIPPTTIIOONN
+       The  _m_p_a_t_r_o_l  _l_i_b_r_a_r_y  contains implementations of dynamic
        memory allocation functions for C  and  C++  suitable  for
        tracing  and debugging, and is available on UNIX, AmigaOS,
        Windows and Netware platforms.  The library is intended to
@@ -120,14 +124,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        Memory allocation profiling is supported, with  statistics
        about  every  memory  allocation and deallocation that was
-       made during the execution of a program being written to  a
-       file  at  program  termination if the PPRROOFF option is used.
-       The information stored in this file can then  be  used  by
-       the  mmpprrooff  command  to display various tables summarising
 
 
 
-Release 1.3              3 November 2000                        2
+Release 1.3              6 November 2000                        2
 
 
 
@@ -136,16 +136,22 @@ Release 1.3              3 November 2000                        2
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       made during the execution of a program being written to  a
+       file  at  program  termination if the PPRROOFF option is used.
+       The information stored in this file can then  be  used  by
+       the  mmpprrooff  command  to display various tables summarising
        the memory allocation behaviour of the program  that  pro-
        duced it.
 
 FFUUNNCCTTIIOONNSS
-       The  following  14 functions are available as replacements
+       The  following  18 functions are available as replacements
        for existing C library functions.  To use these  you  must
        include  _m_p_a_t_r_o_l_._h before all other header files, although
        on UNIX and Windows platforms (and AmigaOS when using ggcccc)
        they  will be used anyway, albeit with slightly less trac-
-       ing information:
+       ing information.  If aallllooccaa is being used and _a_l_l_o_c_a_._h  is
+       included  then _m_p_a_t_r_o_l_._h must appear after _a_l_l_o_c_a_._h other-
+       wise the debugging version of aallllooccaa will not be used:
 
        mmaalllloocc Allocates _s_i_z_e uninitialised bytes  from  the  heap
               and  returns  a  pointer  to  the first byte of the
@@ -184,16 +190,10 @@ FFUUNNCCTTIIOONNSS
               the  system  page size then it will be truncated to
               that value.  If _s_i_z_e is _0 then the memory allocated
               will  be implicitly rounded up to _1 byte.  If there
-              is not enough space  in  the  heap  then  the  null
-              pointer  will  be returned and eerrrrnnoo will be set to
-              EENNOOMMEEMM.  The allocated memory must  be  deallocated
-              with ffrreeee or reallocated with rreeaalllloocc, although the
-              latter  will  not  guarantee  the  preservation  of
-              alignment.
 
 
 
-Release 1.3              3 November 2000                        3
+Release 1.3              6 November 2000                        3
 
 
 
@@ -201,6 +201,13 @@ Release 1.3              3 November 2000                        3
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              is not enough space  in  the  heap  then  the  null
+              pointer  will  be returned and eerrrrnnoo will be set to
+              EENNOOMMEEMM.  The allocated memory must  be  deallocated
+              with ffrreeee or reallocated with rreeaalllloocc, although the
+              latter  will  not  guarantee  the  preservation  of
+              alignment.
 
        vvaalllloocc Allocates  _s_i_z_e  uninitialised  bytes from the heap
               and returns a pointer to  the  first  byte  of  the
@@ -231,6 +238,40 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               rreeaalllloocc, although the latter will not guarantee the
               preservation of alignment.
 
+       aallllooccaa Allocates  _s_i_z_e  temporary uninitialised bytes from
+              the heap and returns a pointer to the first byte of
+              the allocation.  The pointer returned will be suit-
+              ably aligned for casting to any  type  and  can  be
+              used  to  store data of up to _s_i_z_e bytes in length.
+              If _s_i_z_e is _0 then  the  memory  allocated  will  be
+              implicitly  rounded  up to _1 byte.  If there is not
+              enough space in the heap then the null pointer will
+              be  returned  and eerrrrnnoo will be set to EENNOOMMEEMM.  The
+              aallllooccaa function normally allocates its memory  from
+              the  stack,  with  the result that all such alloca-
+              tions will be  freed  when  the  function  returns.
+              This  version  of  aallllooccaa allocates its memory from
+              the heap in order to provide better debugging,  but
+              the  allocations may not necessarily be freed imme-
+              diately when the function returns.   The  allocated
+              memory can be deallocated explicitly with ddeeaallllooccaa,
+              but may not be reallocated or  deallocated  in  any
+
+
+
+Release 1.3              6 November 2000                        4
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
+              other  way.   This  function is available for back-
+              wards compatibility with older C  source  code  and
+              should not be used in new code.
+
        ssttrrdduupp Allocates  exactly  enough  memory from the heap to
               duplicate _s_t_r (including the terminating nul  char-
               acter)  and  returns a pointer to the first byte of
@@ -256,18 +297,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               the length of _s_t_r is greater than  _s_i_z_e  then  only
               _s_i_z_e  characters will be allocated and copied, with
               one additional byte  for  the  nul  character.   If
-
-
-
-Release 1.3              3 November 2000                        4
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               there is not enough space in the heap then the null
               pointer will be returned and eerrrrnnoo will be  set  to
               EENNOOMMEEMM.   The  allocated memory must be deallocated
@@ -293,6 +322,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               older C libraries and should not  be  used  in  new
               code.
 
+
+
+
+Release 1.3              6 November 2000                        5
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
        ssttrrnnssaavvee
               Allocates  exactly  enough  memory from the heap to
               duplicate _s_t_r (including the terminating nul  char-
@@ -313,19 +354,44 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               older  C  libraries  and  should not be used in new
               code.
 
-       rreeaalllloocc
-              Resizes the memory allocation beginning at  _p_t_r  to
-              _s_i_z_e  bytes and returns a pointer to the first byte
-              of the new allocation  after  copying  _p_t_r  to  the
-              newly-allocated  memory, which will be truncated if
-              _s_i_z_e is smaller than the original allocation.   The
-              pointer returned will be suitably aligned for cast-
-              ing to any type and can be used to store data of up
-              to  _s_i_z_e  bytes in length.  If _p_t_r is NNUULLLL then the
+       ssttrrdduuppaa
+              Allocates exactly enough temporary memory from  the
+              heap  to  duplicate  _s_t_r (including the terminating
+              nul character) and returns a pointer to  the  first
+              byte  of  the  allocation  after copying _s_t_r to the
+              newly-allocated memory.  The pointer returned  will
+              have  no  alignment  constraints and can be used to
+              store character data up to the length of  _s_t_r.   If
+              _s_t_r is NNUULLLL then the null pointer will be returned.
+              If there is not enough space in the heap  then  the
+              null pointer will be returned and eerrrrnnoo will be set
+              to EENNOOMMEEMM.  The ssttrrdduuppaa function normally allocates
+              its memory from the stack, with the result that all
+              such allocations will be freed  when  the  function
+              returns.   This  version  of  ssttrrdduuppaa allocates its
+              memory from the heap in  order  to  provide  better
+              debugging,  but the allocations may not necessarily
+              be freed immediately  when  the  function  returns.
+              The  allocated memory can be deallocated explicitly
+              with ddeeaallllooccaa, but may not be reallocated or  deal-
+              located  in any other way.  This function is avail-
+              able  for  backwards  compatibility  with  older  C
+              source code and should not be used in new code.
+
+       ssttrrnndduuppaa
+              Allocates  exactly enough temporary memory from the
+              heap to duplicate _s_t_r  (including  the  terminating
+              nul  character)  and returns a pointer to the first
+              byte of the allocation after  copying  _s_t_r  to  the
+              newly-allocated  memory.  The pointer returned will
+              have no alignment constraints and can  be  used  to
+              store  character  data up to the length of _s_t_r.  If
+              _s_t_r is NNUULLLL then the null pointer will be returned.
+              If the length of _s_t_r is greater than _s_i_z_e then only
 
 
 
-Release 1.3              3 November 2000                        5
+Release 1.3              6 November 2000                        6
 
 
 
@@ -334,64 +400,130 @@ Release 1.3              3 November 2000                        5
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              call will be equivalent to mmaalllloocc.  If  _s_i_z_e  is  _0
-              then  the  existing memory allocation will be freed
-              and the null pointer will be returned.  If _s_i_z_e  is
-              greater than the original allocation then the extra
-              space will be filled with uninitialised bytes.   If
+              _s_i_z_e characters will be allocated and copied,  with
+              one  additional  byte  for  the  nul character.  If
               there is not enough space in the heap then the null
-              pointer will be returned and eerrrrnnoo will be  set  to
-              EENNOOMMEEMM.   The  allocated memory must be deallocated
-              with ffrreeee and can be reallocated again  with  rreeaall--
+              pointer  will  be returned and eerrrrnnoo will be set to
+              EENNOOMMEEMM.  The ssttrrnndduuppaa function  normally  allocates
+              its memory from the stack, with the result that all
+              such allocations will be freed  when  the  function
+              returns.   This  version  of ssttrrnndduuppaa allocates its
+              memory from the heap in  order  to  provide  better
+              debugging,  but the allocations may not necessarily
+              be freed immediately  when  the  function  returns.
+              The  allocated memory can be deallocated explicitly
+              with ddeeaallllooccaa, but may not be reallocated or  deal-
+              located  in any other way.  This function is avail-
+              able  for  backwards  compatibility  with  older  C
+              source code and should not be used in new code.
+
+       rreeaalllloocc
+              Resizes  the  memory allocation beginning at _p_t_r to
+              _s_i_z_e bytes and returns a pointer to the first  byte
+              of  the  new  allocation  after  copying _p_t_r to the
+              newly-allocated memory, which will be truncated  if
+              _s_i_z_e  is smaller than the original allocation.  The
+              pointer returned will be suitably aligned for cast-
+              ing to any type and can be used to store data of up
+              to _s_i_z_e bytes in length.  If _p_t_r is NNUULLLL  then  the
+              call  will  be  equivalent to mmaalllloocc.  If _s_i_z_e is _0
+              then the existing memory allocation will  be  freed
+              and  the null pointer will be returned.  If _s_i_z_e is
+              greater than the original allocation then the extra
+              space  will be filled with uninitialised bytes.  If
+              there is not enough space in the heap then the null
+              pointer  will  be returned and eerrrrnnoo will be set to
+              EENNOOMMEEMM.  The allocated memory must  be  deallocated
+              with  ffrreeee  and can be reallocated again with rreeaall--
               lloocc.
 
        rreeccaalllloocc
-              Resizes  the  memory allocation beginning at _p_t_r to
-              _n_e_l_e_m elements of _s_i_z_e bytes and returns a  pointer
+              Resizes the memory allocation beginning at  _p_t_r  to
+              _n_e_l_e_m  elements of _s_i_z_e bytes and returns a pointer
               to the first byte of the new allocation after copy-
-              ing _p_t_r to the newly-allocated memory,  which  will
-              be  truncated  if  _n_e_l_e_m * _s_i_z_e is smaller than the
-              original allocation.  The pointer returned will  be
+              ing  _p_t_r  to the newly-allocated memory, which will
+              be truncated if _n_e_l_e_m * _s_i_z_e is  smaller  than  the
+              original  allocation.  The pointer returned will be
               suitably aligned for casting to any type and can be
-              used to store data of up to _n_e_l_e_m * _s_i_z_e  bytes  in
-              length.   If  _p_t_r  is  NNUULLLL  then  the call will be
-              equivalent to ccaalllloocc.  If _n_e_l_e_m * _s_i_z_e  is  _0  then
-              the  existing  memory  allocation will be freed and
+              used  to  store data of up to _n_e_l_e_m * _s_i_z_e bytes in
+              length.  If _p_t_r is  NNUULLLL  then  the  call  will  be
+              equivalent  to  ccaalllloocc.   If _n_e_l_e_m * _s_i_z_e is _0 then
+              the existing memory allocation will  be  freed  and
               the null pointer will be returned.  If _n_e_l_e_m * _s_i_z_e
-              is  greater  than  the original allocation then the
-              extra space will be  filled  with  zero-initialised
-              bytes.   If  there  is not enough space in the heap
-              then the null pointer will be  returned  and  eerrrrnnoo
-              will  be  set to EENNOOMMEEMM.  The allocated memory must
-              be deallocated with ffrreeee  and  can  be  reallocated
+              is greater than the original  allocation  then  the
+              extra  space  will  be filled with zero-initialised
+              bytes.  If there is not enough space  in  the  heap
+              then  the  null  pointer will be returned and eerrrrnnoo
+
+
+
+Release 1.3              6 November 2000                        7
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
+              will be set to EENNOOMMEEMM.  The allocated  memory  must
+              be  deallocated  with  ffrreeee  and can be reallocated
               again with rreeaalllloocc.  This function is available for
-              backwards compatibility with older C libraries  and
+              backwards  compatibility with older C libraries and
               ccaalllloocc and should not be used in new code.
 
-       eexxppaanndd Attempts  to resize the memory allocation beginning
-              at _p_t_r to _s_i_z_e bytes  and  either  returns  _p_t_r  if
+       eexxppaanndd Attempts to resize the memory allocation  beginning
+              at  _p_t_r  to  _s_i_z_e  bytes  and either returns _p_t_r if
               there was enough space to resize it, or NNUULLLL if the
               block could not be resized for a particular reason.
-              If  _p_t_r is NNUULLLL then the call will be equivalent to
-              mmaalllloocc.  If _s_i_z_e is  00  then  the  existing  memory
-              allocation  will be freed and the NNUULLLL pointer will
-              be returned.  If _s_i_z_e is greater than the  original
+              If _p_t_r is NNUULLLL then the call will be equivalent  to
+              mmaalllloocc.   If  _s_i_z_e  is  00  then the existing memory
+              allocation will be freed and the NNUULLLL pointer  will
+              be  returned.  If _s_i_z_e is greater than the original
               allocation then the extra space will be filled with
-              uninitialised bytes and if _s_i_z_e is  less  than  the
-              original  allocation  then the memory block will be
-              truncated.  If there is not  enough  space  in  the
-              heap  then  the  NNUULLLL  pointer will be returned and
-              eerrrrnnoo will be set to EENNOOMMEEMM.  The allocated  memory
-              must  be  deallocated  with ffrreeee and can be reallo-
-              cated again with rreeaalllloocc.  This function is  avail-
+              uninitialised  bytes  and  if _s_i_z_e is less than the
+              original allocation then the memory block  will  be
+              truncated.   If  there  is  not enough space in the
+              heap then the NNUULLLL pointer  will  be  returned  and
+              eerrrrnnoo  will be set to EENNOOMMEEMM.  The allocated memory
+              must be deallocated with ffrreeee and  can  be  reallo-
+              cated  again with rreeaalllloocc.  This function is avail-
               able  for  backwards  compatibility  with  older  C
               libraries and should not be used in new code.
 
        ffrreeee   Frees the memory allocation beginning at _p_t_r so the
+              memory can be reused by another  call  to  allocate
+              memory.   If  _p_t_r  is  NNUULLLL  then no memory will be
+              freed.   All  of  the  previous  contents  will  be
+              destroyed.
+
+       ccffrreeee  Frees the memory allocation beginning at _p_t_r so the
+              memory can be reused by another  call  to  allocate
+              memory.   If  _p_t_r  is  NNUULLLL  then no memory will be
+              freed.   All  of  the  previous  contents  will  be
+              destroyed.   The  _n_e_l_e_m  and  _s_i_z_e  parameters  are
+              ignored in this implementation.  This  function  is
+              available  for backwards compatibility with older C
+              libraries and ccaalllloocc and should not be used in  new
+              code.
+
+       ddeeaallllooccaa
+              Explicitly  frees  the  temporary memory allocation
+              beginning at _p_t_r so the memory  can  be  reused  by
+              another  call  to  allocate memory.  If _p_t_r is NNUULLLL
+              then no memory will be explicitly  freed.   All  of
+              the  previous  contents  will  be  destroyed.  This
+              function can only be used to free memory  that  was
+              allocated  with  the  aallllooccaa,  ssttrrdduuppaa and ssttrrnndduuppaa
+              functions, but is only really required if the  mpa-
+              trol  library does not automatically free such mem-
+              ory  allocations  when  the   allocating   function
+              returns.   This  function  is  mpatrol-specific and
+              should not be used in release code.
 
 
 
-Release 1.3              3 November 2000                        6
+Release 1.3              6 November 2000                        8
 
 
 
@@ -399,21 +531,6 @@ Release 1.3              3 November 2000                        6
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
-
-              memory  can  be  reused by another call to allocate
-              memory.  If _p_t_r is NNUULLLL  then  no  memory  will  be
-              freed.   All  of  the  previous  contents  will  be
-              destroyed.
-
-       ccffrreeee  Frees the memory allocation beginning at _p_t_r so the
-              memory  can  be  reused by another call to allocate
-              memory.  If _p_t_r is NNUULLLL  then  no  memory  will  be
-              freed.   All  of  the  previous  contents  will  be
-              destroyed.   The  _n_e_l_e_m  and  _s_i_z_e  parameters  are
-              ignored  in  this implementation.  This function is
-              available for backwards compatibility with older  C
-              libraries  and ccaalllloocc and should not be used in new
-              code.
 
        The following 5 functions are  available  as  replacements
        for  existing  C++ library functions, but the replacements
@@ -454,18 +571,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Frees the memory allocation beginning at _p_t_r so the
               memory can be reused by another  call  to  allocate
               memory.   If  _p_t_r  is  NNUULLLL  then no memory will be
-
-
-
-Release 1.3              3 November 2000                        7
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               freed.   All  of  the  previous  contents  will  be
               destroyed.   This  function  must only be used with
               memory allocated by ooppeerraattoorr nneeww.
@@ -481,6 +586,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        sseett__nneeww__hhaannddlleerr
               Installs  a low-memory handler specifically for use
               with ooppeerraattoorr nneeww and ooppeerraattoorr nneeww[[]] and returns  a
+
+
+
+Release 1.3              6 November 2000                        9
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               pointer to the previously installed handler, or the
               null pointer if  no  handler  had  been  previously
               installed.   This will be called repeatedly by both
@@ -520,18 +637,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        mmeemmccccppyy
               Copies _s_i_z_e bytes from  _s_r_c  to  _d_e_s_t  and  returns
-
-
-
-Release 1.3              3 November 2000                        8
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               NNUULLLL,  or  copies  the  number  of  bytes up to and
               including the first  occurrence  of  _b_y_t_e  if  _b_y_t_e
               exists  within  the  specified  range and returns a
@@ -547,6 +652,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        mmeemmccppyy Copies _s_i_z_e bytes from  _s_r_c  to  _d_e_s_t  and  returns
               _d_e_s_t.  If _s_i_z_e is 00 or _s_r_c is the same as _d_e_s_t then
+
+
+
+Release 1.3              6 November 2000                       10
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               no bytes will be copied.  The source  and  destina-
               tion ranges should not overlap, otherwise a warning
               will be written to the log file.  If the  operation
@@ -586,18 +703,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        bbccmmpp   Compares _s_i_z_e bytes from _p_t_r_1 and _p_t_r_2 and  returns
               00 if all of the bytes are identical, or returns the
-
-
-
-Release 1.3              3 November 2000                        9
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               byte difference of the first differing  bytes.   If
               _s_i_z_e is 00 or _p_t_r_1 is the same as _p_t_r_2 then no bytes
               will be compared.  If the operation would read from
@@ -613,6 +718,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               NNUULLLL if no such byte occurs.  If _s_i_z_e is 00 then  no
               bytes  will  be  searched.   If the operation would
               affect an existing memory allocation  in  the  heap
+
+
+
+Release 1.3              6 November 2000                       11
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               but  would  straddle  that  allocation's boundaries
               then an error message will be generated in the  log
               file and no bytes will be searched.
@@ -652,18 +769,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               ffiillee    File in which alloc took place.
               lliinnee    Line number at which alloc took place.
               ssttaacckk   Pointer to function call stack.
-
-
-
-Release 1.3              3 November 2000                       10
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               ffrreeeedd   Indicates if alloc has been freed.
 
        ____mmpp__pprriinnttiinnffoo
@@ -679,6 +784,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               If _s_t_a_t_s is non-zero then the current statistics of
               the mpatrol library will be displayed.  If the heap
               contains  at  least  one  allocated,  freed or free
+
+
+
+Release 1.3              6 November 2000                       12
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               block then a map of the current heap will  also  be
               displayed.
 
@@ -718,18 +835,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               the  previously installed epilogue function, or the
               null pointer if no epilogue function had been  pre-
               viously installed.  The following arguments will be
-
-
-
-Release 1.3              3 November 2000                       11
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               used to call the epilogue function:
 
               AArrgguummeenntt CCaalllleedd bbyy
@@ -745,6 +850,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               allocation functions, and repeatedly by C++  memory
               allocation  functions,  when  they  would  normally
               return NNUULLLL.  Note that this function is equivalent
+
+
+
+Release 1.3              6 November 2000                       13
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               to  sseett__nneeww__hhaannddlleerr  and  will  replace the handler
               installed by that function.
 
@@ -784,18 +901,6 @@ EENNVVIIRROONNMMEENNTT
        environment  variable  called MMPPAATTRROOLL__OOPPTTIIOONNSS.  This vari-
        able must contain one or more valid option  keywords  from
        the  list below and must be no longer than 1024 characters
-
-
-
-Release 1.3              3 November 2000                       12
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
        in length.  If MMPPAATTRROOLL__OOPPTTIIOONNSS is unset or empty then  the
        default settings will be used.
 
@@ -811,6 +916,17 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        but whitespace  must  appear  between  different  options.
        Note  that  option  keywords  can be given in lowercase as
        well as uppercase, or a mixture of both.
+
+
+
+Release 1.3              6 November 2000                       14
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
 
        AALLLLOOCCBBYYTTEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies an 8-bit byte pattern with which to  pre-
@@ -850,18 +966,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               be  written  to  the  profiling  output file.  This
               option can be used to instruct the mpatrol  library
               to dump out any profiling information just before a
-
-
-
-Release 1.3              3 November 2000                       13
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               fatal error occurs in a program, for example.  Note
               that  this  setting will be ignored if its value is
               zero.  Default value: AAUUTTOOSSAAVVEE=_0.
@@ -878,6 +982,17 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               be performed.  This option can be used to speed  up
               the  execution  speed of the library at the expense
               of checking.  Default value: CCHHEECCKK=_-.
+
+
+
+Release 1.3              6 November 2000                       15
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
 
        CCHHEECCKKAALLLL
               Equivalent  to  the   CCHHEECCKKAALLLLOOCCSS,   CCHHEECCKKRREEAALLLLOOCCSS,
@@ -916,18 +1031,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               tions  will randomly fail.  For example, a value of
               _1_0 will mean that roughly 1 in  10  memory  alloca-
               tions  will fail, but a value of _0 will disable all
-
-
-
-Release 1.3              3 November 2000                       14
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               random failures.  This option  can  be  useful  for
               stress-testing   an  application.   Default  value:
               FFAAIILLFFRREEQQ=_0.
@@ -945,6 +1048,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        FFRREEEEBBYYTTEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies  an 8-bit byte pattern with which to pre-
               fill newly-freed  memory.   This  can  be  used  to
+
+
+
+Release 1.3              6 November 2000                       16
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               detect the use of memory which has just been freed.
               It is also used internally  to  ensure  that  freed
               memory  has  not  been  overwritten.  Note that the
@@ -982,18 +1097,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               low memory conditions.  The internal memory used by
               the  library  itself will not be counted as part of
               the total heap size, but on some systems there  may
-
-
-
-Release 1.3              3 November 2000                       15
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               be  a small amount of memory required to initialise
               the library itself.  Note that this setting will be
               ignored  if  its  value  is  zero.   Default value:
@@ -1011,6 +1114,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        LLOOGGFFIILLEE=_s_t_r_i_n_g
               Specifies an alternative file in which to place all
               diagnostics  from  the mpatrol library.  A filename
+
+
+
+Release 1.3              6 November 2000                       17
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               of _s_t_d_e_r_r will send all diagnostics to  the  ssttddeerrrr
               file  stream  and  a filename of _s_t_d_o_u_t will do the
               equivalent with the ssttddoouutt file stream.  Note  that
@@ -1048,18 +1163,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        NNOOFFRREEEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies  that  a  number of recently-freed memory
-
-
-
-Release 1.3              3 November 2000                       16
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               allocations should be prevented from being returned
               to the free memory pool.  Such freed memory alloca-
               tions will then be flagged as freed and can be used
@@ -1077,6 +1180,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Specifies  that the mpatrol library's internal data
               structures should not be made read-only after every
               memory  allocation  reallocation  or  deallocation.
+
+
+
+Release 1.3              6 November 2000                       18
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               This may significantly speed up execution but  this
               will  be  at the expense of less safety if the pro-
               gram accidentally overwrites some of the  library's
@@ -1114,18 +1229,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               effect  on  systems that do not support watch point
               areas.
 
-
-
-
-Release 1.3              3 November 2000                       17
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
        PPAAGGEEAALLLLOOCC=_L_O_W_E_R|_U_P_P_E_R
               Specifies that each  individual  memory  allocation
               should  occupy  at least one page of virtual memory
@@ -1143,6 +1246,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Specifies that  any  reallocated  or  freed  memory
               allocations  should  preserve  their  original con-
               tents.  This option must be used  with  the  NNOOFFRREEEE
+
+
+
+Release 1.3              6 November 2000                       19
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               option and has no effect otherwise.
 
        PPRROOFF   Specifies that all memory allocations and dealloca-
@@ -1180,18 +1295,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               will  be  halted  the  first time any allocation is
               reallocated the specified number  of  times.   Note
               that  this  setting will be ignored if its value is
-
-
-
-Release 1.3              3 November 2000                       18
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               zero.  Default value: RREEAALLLLOOCCSSTTOOPP=_0.
 
        SSAAFFEESSIIGGNNAALLSS
@@ -1207,6 +1310,19 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        SSHHOOWWAALLLL
               Equivalent  to  the SSHHOOWWFFRREEEEDD, SSHHOOWWUUNNFFRREEEEDD, SSHHOOWWMMAAPP
               and SSHHOOWWSSYYMMBBOOLLSS options specified together.
+
+
+
+
+
+Release 1.3              6 November 2000                       20
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
 
        SSHHOOWWFFRREEEEDD
               Specifies that a summary of all of the freed memory
@@ -1246,18 +1362,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies the minimum number of unfreed allocations
-
-
-
-Release 1.3              3 November 2000                       19
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               at which to abort the program just  before  program
               termination.  A summary of all the allocations will
               be displayed on  the  standard  error  file  stream
@@ -1274,6 +1378,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               source-level information.  This  option  will  only
               have  an  effect  if the executable file contains a
               compiler-generated line number table  and  will  be
+
+
+
+Release 1.3              6 November 2000                       21
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               ignored if the mpatrol library was built to support
               an object file access library that cannot read line
               tables from object files.
@@ -1289,8 +1405,8 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 SSEEEE AALLSSOO
        mmppaattrrooll(1),   mmpprrooff(1),   mmlleeaakk(1),   mmppssyymm(1),   mmmmaapp(2),
-       ssbbrrkk(2),  mmaalllloocc(3),  mmeemmoorryy(3),   ssttrriinngg(3),   aasssseerrtt(3),
-       eellff(3e), bbffdd(3).
+       ssbbrrkk(2),  mmaalllloocc(3),  aallllooccaa(3),   mmeemmoorryy(3),   ssttrriinngg(3),
+       aasssseerrtt(3), eellff(3e), bbffdd(3).
 
        The mpatrol manual and reference card.
 
@@ -1312,18 +1428,6 @@ CCOOPPYYRRIIGGHHTT
        useful, but WITHOUT ANY WARRANTY; without even the implied
        warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
        PURPOSE.  See the GNU Library General Public  License  for
-
-
-
-Release 1.3              3 November 2000                       20
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
        more details.
 
        You should have received a copy of the GNU Library General
@@ -1343,44 +1447,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.3              3 November 2000                       21
+Release 1.3              6 November 2000                       22
 
 
