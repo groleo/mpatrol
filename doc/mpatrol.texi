@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.189 2001-02-22 19:04:19 graeme Exp $
+@c $Id: mpatrol.texi,v 1.190 2001-02-22 22:39:53 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -12775,6 +12775,22 @@ Windows
 @item Overview
 A simple enhancement for C source code which makes it easier to find memory
 leaks.
+@end table
+
+@item
+MemTrace
+@table @asis
+@item Author
+Frank Pilhofer (@email{fp@@informatik.uni-frankfurt.de})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.informatik.uni-frankfurt.de/~fp/Tools/MemTrace/}
+@item Overview
+Searches for memory leaks in a program and uses various platform-specific
+features to record a stack trace each time a memory chunk is allocated.
 @end table
 
 @cindex MemWatch
