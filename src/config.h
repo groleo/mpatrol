@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.64 2001-02-22 18:41:39 graeme Exp $
+ * $Id: config.h,v 1.65 2001-02-22 20:04:59 graeme Exp $
  */
 
 
@@ -189,6 +189,16 @@
 #ifndef MP_MAXDELSTACK
 #define MP_MAXDELSTACK 32
 #endif /* MP_MAXDELSTACK */
+
+
+/* The maximum number of finalisation functions that can be registered with
+ * the mpatrol library through __mp_atexit() and then called in reverse order
+ * when __mp_fini() is called.
+ */
+
+#ifndef MP_MAXFINIS
+#define MP_MAXFINIS 32
+#endif /* MP_MAXFINIS */
 
 
 /* Indicates if all of the heap memory used by the library should be
