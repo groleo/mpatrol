@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.8 2001-03-14 21:10:24 graeme Exp $
+ * $Id: dmalloc.h,v 1.9 2001-03-21 22:13:55 graeme Exp $
  */
 
 
@@ -48,7 +48,7 @@
  *
  * This module is intended to work with the existing dmalloc command,
  * which sets the contents of the DMALLOC_OPTIONS environment variable
- * according to any specified command-line options.  The four documented
+ * according to any specified command line options.  The four documented
  * Dmalloc global variables are also defined, although the two address
  * variables are not acted upon and changing the dmalloc_logpath variable
  * has no effect yet.  The dmalloc_errno variable is mapped onto the
