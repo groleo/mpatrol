@@ -26,7 +26,7 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.1 2000-10-31 22:27:08 graeme Exp $
+# $Id: mpsym,v 1.2 2000-10-31 22:59:01 graeme Exp $
 
 
 # Program version.
@@ -215,7 +215,6 @@ gdb --batch --nx --command "$dbtemp" "$progfile" 2>/dev/null |
 # existing symbols that appear after any code addresses with the new symbol
 # that has been obtained from the debugger.
 
-awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("\t%s\n", $1); }
-     /^[^\t]/ { print; }
-     /^$/ { print; }' "$logfile" |
+awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("\t%s\n", $1); getline; }
+     { print; }' "$logfile" |
     sed -f "$edtemp"
