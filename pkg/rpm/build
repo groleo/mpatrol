@@ -1,0 +1,41 @@
+#!/bin/sh
+
+
+# mpatrol
+# A library for controlling and tracing dynamic memory allocations.
+# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+
+
+# UNIX shell script to build an RPM package file
+
+
+# $Id: build,v 1.1 1999-11-29 20:14:01 graeme Exp $
+
+
+arch=m68k
+version=1.0.7
+
+
+# Build the binary and source package files.  This assumes that the
+# source and documentation archives exist in /usr/src/redhat/SOURCES.
+
+rpm -ba --clean mpatrol.spec
+cp /usr/src/redhat/RPMS/$arch/mpatrol-$version-1.$arch.rpm .
+rm -f /usr/src/redhat/RPMS/$arch/mpatrol-$version-1.$arch.rpm
+cp /usr/src/redhat/SRPMS/mpatrol-$version-1.src.rpm .
+rm -f /usr/src/redhat/SRPMS/mpatrol-$version-1.src.rpm
