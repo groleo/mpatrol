@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.228 2001-07-25 22:35:22 graeme Exp $
+@c $Id: mpatrol.texi,v 1.229 2001-07-26 16:31:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 25th July, 2001
+@set UPDATED 26th July, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2809,48 +2809,50 @@ code is an example of this and can be found in @file{tests/pass/test2.c}.
 34  __mp_epiloguehandler old_epilogue;
 
 
-37  void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
-38  @{
-39      if (old_prologue != NULL)
-40          old_prologue(p, l, a);
-41      if (p == (void *) -1)
-42          fprintf(stderr, "allocating %lu bytes\n", l);
-43      else if (l == (size_t) -1)
-44          fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
-45      else if (l == (size_t) -2)
-46          fprintf(stderr, "duplicating string `%s'\n", p);
-47      else
-48          fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
-49                  sizeof(void *) * 2, p, l);
-50  @}
+37  void prologue(MP_CONST void *p, size_t l, MP_CONST char *s,
+38                MP_CONST char *t, unsigned long u, MP_CONST void *a)
+39  @{
+40      if (old_prologue != NULL)
+41          old_prologue(p, l, s, t, u, a);
+42      if (p == (void *) -1)
+43          fprintf(stderr, "allocating %lu bytes\n", l);
+44      else if (l == (size_t) -1)
+45          fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
+46      else if (l == (size_t) -2)
+47          fprintf(stderr, "duplicating string `%s'\n", p);
+48      else
+49          fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
+50                  sizeof(void *) * 2, p, l);
+51  @}
 
 
-53  void epilogue(MP_CONST void *p, MP_CONST void *a)
-54  @{
-55      if (p != (void *) -1)
-56          fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
-57      if (old_epilogue != NULL)
-58          old_epilogue(p, a);
-59  @}
+54  void epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t,
+55                unsigned long u, MP_CONST void *a)
+56  @{
+57      if (p != (void *) -1)
+58          fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
+59      if (old_epilogue != NULL)
+60          old_epilogue(p, s, t, u, a);
+61  @}
 
 
-62  int main(void)
-63  @{
-64      void *p, *q;
+64  int main(void)
+65  @{
+66      void *p, *q;
 
-66      old_prologue = __mp_prologue(prologue);
-67      old_epilogue = __mp_epilogue(epilogue);
-68      if (p = malloc(16))
-69          if (q = realloc(p, 32))
-70              free(q);
-71          else
-72              free(p);
-73      if (p = (char *) strdup("test"))
-74          free(p);
-75      __mp_prologue(old_prologue);
-76      __mp_epilogue(old_epilogue);
-77      return EXIT_SUCCESS;
-78  @}
+68      old_prologue = __mp_prologue(prologue);
+69      old_epilogue = __mp_epilogue(epilogue);
+70      if (p = malloc(16))
+71          if (q = realloc(p, 32))
+72              free(q);
+73          else
+74              free(p);
+75      if (p = (char *) strdup("test"))
+76          free(p);
+77      __mp_prologue(old_prologue);
+78      __mp_epilogue(old_epilogue);
+79      return EXIT_SUCCESS;
+80  @}
 @end smallexample
 
 Once again, if you compile and run the above code, you should see the following
@@ -2870,10 +2872,11 @@ freeing allocation 0x0806A0E5
 Note that in the above code, the previous prologue and epilogue functions were
 recorded and called.  If this is not done then your prologue and epilogue
 functions will completely override all others, which is not usually the expected
-behaviour.  In case you're wondering what the third argument of the prologue
-handler (and the second argument of the epilogue handler) is, it is the code
-address of the function that called @code{malloc()} or a related function.  This
-can be used in the handlers to see where they were called from.
+behaviour.  In case you're wondering what the last four arguments of the
+prologue and epilogue handlers are, they are the function name, file name,
+line number and call address of the function that called @code{malloc()} or a
+related function.  These can be used in the handlers to see where they were
+called from.
 
 Along with being able to install prologue and epilogue functions, you can also
 install a low-memory handler with the @code{__mp_nomemory()} function, which
@@ -3357,8 +3360,7 @@ this implementation since it is functionally identical to
 only ever return @code{DMALLOC_VERIFY_ERROR} if the pointer to be checked is not
 null and is invalid --- it always terminates with an error message in the
 mpatrol log file whenever the pointer to be checked is null and it has detected
-heap corruption.  The information currently passed to any tracker functions does
-not include source file and line number information.
+heap corruption.
 
 The @code{dmalloc_log_heap_map()} and @code{dmalloc_log_stats()} functions map
 on to the @code{__mp_memorymap()} and @code{__mp_summary()} functions and so
@@ -9275,9 +9277,9 @@ Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
 function had been previously installed.  The following arguments will be used to
-call the prologue function (including a third argument containing the return
-address of the calling function, or the null pointer if it cannot be
-determined):
+call the prologue function (the last four arguments contain the function name,
+file name, line number and the return address of the calling function, or null
+pointers and zero if they cannot be determined):
 
 @multitable @columnfractions .2 .2 .6
 @item @emph{Argument 1}
@@ -9303,9 +9305,9 @@ Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
 function had been previously installed.  The following arguments will be used to
-call the epilogue function (including a second argument containing the return
-address of the calling function, or the null pointer if it cannot be
-determined):
+call the epilogue function (the last four arguments contain the function name,
+file name, line number and the return address of the calling function, or null
+pointers and zero if they cannot be determined):
 
 @multitable @columnfractions .2 .8
 @item @emph{Argument}
