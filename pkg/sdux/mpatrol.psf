@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.18 2001-01-25 23:15:11 graeme Exp $
+# $Id: mpatrol.psf,v 1.19 2001-02-08 00:06:34 graeme Exp $
 
 
 product
@@ -131,6 +131,7 @@ product
 	file			test6.c
 	file			test7.c
 	file			test8.c
+	file			test9.c
 	directory		mpatrol/doc/mpatrol/tests/fail=/usr/local/doc/mpatrol/tests/fail
 	file			test1.c
 	file			test2.c
