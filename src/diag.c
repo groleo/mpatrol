@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.93 2001-10-05 23:08:41 graeme Exp $"
+#ident "$Id: diag.c,v 1.94 2001-10-08 22:35:06 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.93 2001-10-05 23:08:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.94 2001-10-08 22:35:06 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1099,23 +1099,55 @@ __mp_printsymbols(symhead *y)
 {
     symnode *n;
 
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<HR>");
     __mp_diag("\nsymbols read: %lu\n", y->dtree.size);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<BLOCKQUOTE>\n");
+        __mp_diagtag("<TABLE CELLSPACING=0 CELLPADDING=1 BORDER=0>\n");
+    }
     for (n = (symnode *) __mp_minimum(y->dtree.root); n != NULL;
          n = (symnode *) __mp_successor(&n->data.node))
     {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TR>\n");
         if (n->data.size == 0)
-        {
+            if (__mp_diagflags & FLG_HTML)
+            {
+                __mp_diagtag("<TD>");
+                __mp_diagtag("</TD>\n");
+                __mp_diagtag("<TD>");
+                __mp_diag(MP_POINTER, n->data.addr);
+                __mp_diagtag("</TD>\n");
+            }
+            else
+            {
 #if ENVIRON == ENVIRON_64
-            __mp_diag("\t");
+                __mp_diag("\t");
 #endif /* ENVIRON */
-            __mp_diag("\t       " MP_POINTER, n->data.addr);
+                __mp_diag("\t       " MP_POINTER, n->data.addr);
+            }
+        else
+            if (__mp_diagflags & FLG_HTML)
+            {
+                __mp_diagtag("<TD ALIGN=RIGHT>");
+                __mp_diag(MP_POINTER "-", n->data.addr);
+                __mp_diagtag("</TD>\n");
+                __mp_diagtag("<TD>");
+                __mp_diag(MP_POINTER, (char *) n->data.addr + n->data.size - 1);
+                __mp_diagtag("</TD>\n");
+            }
+            else
+                __mp_diag("    " MP_POINTER "-" MP_POINTER, n->data.addr,
+                          (char *) n->data.addr + n->data.size - 1);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("<TD>");
+            __mp_diagtag("<TT>");
         }
         else
-            __mp_diag("    " MP_POINTER "-" MP_POINTER, n->data.addr,
-                      (char *) n->data.addr + n->data.size - 1);
-        __mp_diag(" ");
-        if (__mp_diagflags & FLG_HTML)
-            __mp_diagtag("<TT>");
+            __mp_diag(" ");
         __mp_diag("%s", n->data.name);
         if (__mp_diagflags & FLG_HTML)
             __mp_diagtag("</TT>");
@@ -1127,7 +1159,19 @@ __mp_printsymbols(symhead *y)
             __mp_diagtag("</TT>");
         __mp_diag("] (");
         __mp_printsize(n->data.size);
-        __mp_diag(")\n");
+        __mp_diag(")");
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("</TT>");
+            __mp_diagtag("</TD>\n");
+            __mp_diagtag("</TR>");
+        }
+        __mp_diag("\n");
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TABLE>\n");
+        __mp_diagtag("</BLOCKQUOTE>\n");
     }
 }
 
@@ -1139,12 +1183,36 @@ MP_GLOBAL
 void
 __mp_printaddrs(symhead *y, addrnode *n)
 {
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<BLOCKQUOTE>\n");
+        __mp_diagtag("<TABLE CELLSPACING=0 CELLPADDING=1 BORDER=0>\n");
+    }
     while (n != NULL)
     {
-        __mp_diag("\t" MP_POINTER " ", n->data.addr);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("<TR>\n");
+            __mp_diagtag("<TD>");
+            __mp_diag(MP_POINTER, n->data.addr);
+            __mp_diagtag("</TD>\n");
+            __mp_diagtag("<TD>");
+        }
+        else
+            __mp_diag("\t" MP_POINTER " ", n->data.addr);
         __mp_printsymbol(y, n->data.addr);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("</TD>\n");
+            __mp_diagtag("</TR>");
+        }
         __mp_diag("\n");
         n = n->data.next;
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TABLE>\n");
+        __mp_diagtag("</BLOCKQUOTE>\n");
     }
 }
 
@@ -1159,17 +1227,55 @@ __mp_printstack(symhead *y, stackinfo *p)
     stackinfo s;
 
     s = *p;
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<BLOCKQUOTE>\n");
+        __mp_diagtag("<TABLE CELLSPACING=0 CELLPADDING=1 BORDER=0>\n");
+    }
     if ((p->frame != NULL) && (p->addr != NULL))
     {
-        __mp_diag("\t" MP_POINTER " ", p->addr);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("<TR>\n");
+            __mp_diagtag("<TD>");
+            __mp_diag(MP_POINTER, p->addr);
+            __mp_diagtag("</TD>\n");
+            __mp_diagtag("<TD>");
+        }
+        else
+            __mp_diag("\t" MP_POINTER " ", p->addr);
         __mp_printsymbol(y, p->addr);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("</TD>\n");
+            __mp_diagtag("</TR>");
+        }
         __mp_diag("\n");
         while (__mp_getframe(p) && (p->addr != NULL))
         {
-            __mp_diag("\t" MP_POINTER " ", p->addr);
+            if (__mp_diagflags & FLG_HTML)
+            {
+                __mp_diagtag("<TR>\n");
+                __mp_diagtag("<TD>");
+                __mp_diag(MP_POINTER, p->addr);
+                __mp_diagtag("</TD>\n");
+                __mp_diagtag("<TD>");
+            }
+            else
+                __mp_diag("\t" MP_POINTER " ", p->addr);
             __mp_printsymbol(y, p->addr);
+            if (__mp_diagflags & FLG_HTML)
+            {
+                __mp_diagtag("</TD>\n");
+                __mp_diagtag("</TR>");
+            }
             __mp_diag("\n");
         }
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TABLE>\n");
+        __mp_diagtag("</BLOCKQUOTE>\n");
     }
     *p = s;
 }
