@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.41 2003-11-24 15:29:00 graeme Exp $
+# $Id: Makefile,v 1.42 2003-11-25 00:44:37 graeme Exp $
 
 
 # Definitions
@@ -181,9 +181,9 @@ endif
 $(REFCARD).pdf: $(REFCARD).ps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ pstill -Fa4 -R270 -c -ctv -o $@ $<
+	@ pstill -Fa4 -R270 -c -c -p -t -v -o $@ $<
 else
-	@ pstill -Fa4 -R270 -c -ct -o $@ $<
+	@ pstill -Fa4 -R270 -c -c -p -t -o $@ $<
 endif
 
 # Build the DVI source code from the LaTeX file using texi2dvi
