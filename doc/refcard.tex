@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.28 2001-05-30 22:48:47 graeme Exp $
+% $Id: refcard.tex,v 1.29 2001-06-13 22:37:52 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -103,6 +103,9 @@ read-only after every memory allocation, reallocation or deallocation.
 \item[\option{SAFESIGNALS}]
 Instructs the library to save and replace certain signal handlers during the
 execution of library code and to restore them afterwards.
+\item[\option{CHECKFORK}]
+Checks at every call to see if the process has been forked in case new log,
+profiling and tracing output files need to be started.
 \item[\option{USEMMAP}]
 Specifies that the library should use \function{mmap} instead of \function{sbrk}
 to allocate user memory on UNIX platforms.
@@ -626,6 +629,8 @@ decimal or hexadecimal notation.
 \hfill See \option{CHECKALL}.
 \item[\flag{check-allocs}]
 \hfill See \option{CHECKALLOCS}.
+\item[\flag{check-fork}]
+\hfill See \option{CHECKFORK}.
 \item[\flag{check-frees}]
 \hfill See \option{CHECKFREES}.
 \item[\flag{check-memory}]
@@ -797,6 +802,9 @@ Specifies the colour to use for displaying internal heap memory (GUI only).
 \item[\flagpar{sim-file}{file}]
 Specifies that a trace-driven memory allocation simulation program written in C
 should be written to a file.
+\item[\flag{source}]
+Displays source-level information for each event in the tracing table, if
+available.
 \item[\flagpar{space}{size}]
 Specifies the size (in megabytes) of the visible address space displayed in the
 memory map (GUI only).
