@@ -36,17 +36,32 @@
 #include "list.h"
 
 
-/* A profdata structure contains statistics about the counts and totals
- * of all of the small, medium, large and extra large allocations and
- * deallocations for a particular call site.
+/* A profdata structure belongs to a list of profdata structures and contains
+ * statistics about the counts and totals of all of the small, medium, large
+ * and extra large allocations and deallocations for a particular call site.
+ * An internal profdata structure stores details of a single memory block
+ * allocated for profdata structure slots.
  */
 
-typedef struct profdata
+typedef union profdata
 {
-    size_t acount[4]; /* total numbers of allocations */
-    size_t dcount[4]; /* total numbers of deallocations */
-    size_t atotal[4]; /* total numbers of allocated bytes */
-    size_t dtotal[4]; /* total numbers of deallocated bytes */
+    struct
+    {
+        listnode node;       /* internal list node */
+        void *block;         /* pointer to block of memory */
+        size_t size;         /* size of block of memory */
+    }
+    index;
+    struct
+    {
+        listnode node;       /* list node */
+        unsigned long index; /* data index */
+        size_t acount[4];    /* total numbers of allocations */
+        size_t dcount[4];    /* total numbers of deallocations */
+        size_t atotal[4];    /* total numbers of allocated bytes */
+        size_t dtotal[4];    /* total numbers of deallocated bytes */
+    }
+    data;
 }
 profdata;
 
@@ -71,7 +86,7 @@ typedef union profnode
         union profnode *parent; /* parent node */
         unsigned long index;    /* node index */
         void *addr;             /* return address */
-        profdata data;          /* profiling data */
+        profdata *data;         /* profiling data */
     }
     data;
 }
@@ -85,8 +100,10 @@ profnode;
 typedef struct profhead
 {
     heaphead *heap;              /* pointer to heap */
-    slottable table;             /* table of profnodes */
+    slottable dtable;            /* table of profdata structures */
+    slottable ntable;            /* table of profnodes */
     listhead ilist;              /* internal list of memory blocks */
+    listhead list;               /* list of profdata structures */
     treeroot tree;               /* tree of profnodes */
     size_t size;                 /* memory used by internal blocks */
     size_t acounts[MP_BIN_SIZE]; /* allocation bins */
