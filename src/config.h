@@ -195,20 +195,36 @@
 
 /* Indicates if a UNIX system supports the mmap() function call to allocate
  * memory as well as sbrk().  This must only be set if the system also supports
- * the allocation of zero-initialised pages from a special device file.  Note
- * that sbrk() will still be used by default, but the USEMMAP option will
- * instruct the library to use mmap() instead.
+ * the allocation of zero-initialised pages from either a special device file
+ * or via a special flag.  Note that sbrk() will still be used by default, but
+ * the USEMMAP option will instruct the library to use mmap() instead.
  */
 
 #ifndef MP_MMAP_SUPPORT
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 #define MP_MMAP_SUPPORT 1
 #else /* SYSTEM */
 #define MP_MMAP_SUPPORT 0
 #endif /* SYSTEM */
+#endif /* MP_MMAP_SUPPORT */
+
+
+/* Indicates if the mmap() function call supports the MAP_ANON or MAP_ANONYMOUS
+ * flag for allocating zero-filled pages.  If it doesn't then the filename
+ * specified by MP_MMAP_FILENAME will be used instead.
+ */
+
+#if MP_MMAP_SUPPORT
+#ifndef MP_MMAP_ANONYMOUS
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX
+#define MP_MMAP_ANONYMOUS 1
+#else /* SYSTEM */
+#define MP_MMAP_ANONYMOUS 0
+#endif /* SYSTEM */
+#endif /* MP_MMAP_ANONYMOUS */
 #endif /* MP_MMAP_SUPPORT */
 
 

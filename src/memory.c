@@ -62,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.28 2000-06-23 19:29:13 graeme Exp $"
+#ident "$Id: memory.c,v 1.29 2000-06-29 18:03:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -364,7 +364,10 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
     /* On UNIX, we initially set the memory mapped file handle to be -1 as we
      * default to using sbrk(), even on systems that support the mmap() function
      * call.  We only set this to point to the memory mapped file if the USEMMAP
-     * option has been found when parsing the library options.
+     * option has been found when parsing the library options.  However, if the
+     * MP_MMAP_ANONYMOUS macro is set then we don't need to open a file for
+     * mapping so we just use the mfile field as an indicator as to whether the
+     * USEMMAP option has been given.
      */
     i->mfile = -1;
 #if MP_WATCH_SUPPORT
@@ -385,7 +388,9 @@ MP_GLOBAL void __mp_endmemory(meminfo *i)
 #if MP_MMAP_SUPPORT
     if (i->mfile != -1)
     {
+#if !MP_MMAP_ANONYMOUS
         close(i->mfile);
+#endif /* MP_MMAP_ANONYMOUS */
         i->mfile = -1;
     }
 #endif /* MP_MMAP_SUPPORT */
@@ -490,8 +495,13 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
      */
     if (i->mfile != -1)
     {
+#if MP_MMAP_ANONYMOUS
+        if ((p = mmap(NULL, *l, PROT_READ | PROT_WRITE,
+              MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)) == (void *) -1)
+#else /* MP_MMAP_ANONYMOUS */
         if ((p = mmap(NULL, *l, PROT_READ | PROT_WRITE, MAP_PRIVATE, i->mfile,
               0)) == (void *) -1)
+#endif /* MP_MMAP_ANONYMOUS */
             p = NULL;
     }
     else

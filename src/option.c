@@ -35,13 +35,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#if MP_MMAP_SUPPORT
+#if MP_MMAP_SUPPORT && !MP_MMAP_ANONYMOUS
 #include <fcntl.h>
-#endif /* MP_MMAP_SUPPORT */
+#endif /* MP_MMAP_SUPPORT && MP_MMAP_ANONYMOUS */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.16 2000-05-16 00:33:11 graeme Exp $"
+#ident "$Id: option.c,v 1.17 2000-06-29 18:03:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -902,8 +902,12 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
 #if MP_MMAP_SUPPORT
                     if (h->alloc.list.size == 0)
+#if MP_MMAP_ANONYMOUS
+                        h->alloc.heap.memory.mfile = 0;
+#else /* MP_MMAP_ANONYMOUS */
                         h->alloc.heap.memory.mfile = open(MP_MMAP_FILENAME,
                                                           O_RDWR);
+#endif /* MP_MMAP_ANONYMOUS */
 #endif /* MP_MMAP_SUPPORT */
                 }
                 break;
