@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.46 2000-11-30 21:09:24 graeme Exp $"
+#ident "$Id: diag.c,v 1.47 2000-12-05 19:06:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -73,6 +73,14 @@ static FILE *logfile;
  */
 
 static char buffer[256];
+
+
+/* The current date and time at which the log file is being created.  This
+ * must be fixed once it has been determined since it may be used in several
+ * places.
+ */
+
+static time_t currenttime;
 
 
 /* The total error and warning counts.  These should really be reset after
@@ -175,12 +183,51 @@ static void processfile(meminfo *m, char *s, char *b, size_t l)
         if (*s == '%')
             switch (s[1])
             {
+              case 'd':
+                /* Replace %d with the current date in the form YYYYMMDD.
+                 */
+                if (!currenttime)
+                    currenttime = time(NULL);
+                if (currenttime != (time_t) -1)
+                    strftime(b + i, l - i, "%Y%m%d", localtime(&currenttime));
+                else
+                    strcpy(b + i, "today");
+                i += strlen(b + i) - 1;
+                s++;
+                break;
+              case 'f':
+                /* Replace %f with the program filename, with all path
+                 * separation characters replaced by underscores.
+                 */
+                if (((p = m->prog) == NULL) || (*p == '\0'))
+                    p = "mpatrol";
+                while (*p != '\0')
+                {
+#if TARGET == TARGET_UNIX
+                    if (*p == '/')
+#elif TARGET == TARGET_AMIGA
+                    if ((*p == ':') || (*p == '/'))
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+                    if ((*p == ':') || (*p == '/') || (*p == '\\'))
+#endif /* TARGET */
+                        b[i++] = '_';
+                    else
+                        b[i++] = *p;
+                    p++;
+                }
+                i--;
+                s++;
+                break;
               case 'n':
+                /* Replace %n with the current process identifier.
+                 */
                 sprintf(b + i, "%lu", __mp_processid());
                 i += strlen(b + i) - 1;
                 s++;
                 break;
               case 'p':
+                /* Replace %p with the program name.
+                 */
                 if (p = m->prog)
 #if TARGET == TARGET_UNIX
                     while (t = strchr(p, '/'))
@@ -194,6 +241,18 @@ static void processfile(meminfo *m, char *s, char *b, size_t l)
                     p = "mpatrol";
                 strcpy(b + i, p);
                 i += strlen(p) - 1;
+                s++;
+                break;
+              case 't':
+                /* Replace %t with the current time in the form HHMMSS.
+                 */
+                if (!currenttime)
+                    currenttime = time(NULL);
+                if (currenttime != (time_t) -1)
+                    strftime(b + i, l - i, "%H%M%S", localtime(&currenttime));
+                else
+                    strcpy(b + i, "now");
+                i += strlen(b + i) - 1;
                 s++;
                 break;
               default:
@@ -991,6 +1050,37 @@ MP_GLOBAL void __mp_printfreed(infohead *h)
 }
 
 
+/* Display the details of all free blocks.
+ */
+
+MP_GLOBAL void __mp_printfree(infohead *h)
+{
+    allocnode *n, *p;
+    treenode *s, *t;
+    size_t c;
+
+    __mp_diag("\nfree blocks: %lu (", h->alloc.ftree.size);
+    __mp_printsize(h->alloc.fsize);
+    __mp_diag(")\n");
+    for (t = __mp_maximum(h->alloc.ftree.root); t != NULL; t = s)
+    {
+        n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
+        s = t;
+        c = 0;
+        do
+        {
+            if (s = __mp_predecessor(s))
+                p = (allocnode *) ((char *) s - offsetof(allocnode, tnode));
+            else
+                p = NULL;
+            c++;
+        }
+        while ((p != NULL) && (p->size == n->size));
+        __mp_diag("   %8lu: %lu\n", n->size, c);
+    }
+}
+
+
 /* Display a complete memory map of the heap.
  */
 
@@ -1083,8 +1173,6 @@ MP_GLOBAL void __mp_printmap(infohead *h)
 
 MP_GLOBAL void __mp_printversion(void)
 {
-    time_t t;
-
     __mp_diag("%s\n%s\n\n", __mp_version, __mp_copyright);
     __mp_diag("This is free software, and you are welcome to redistribute it "
               "under certain\n");
@@ -1092,8 +1180,10 @@ MP_GLOBAL void __mp_printversion(void)
               "details.\n\n");
     __mp_diag("For the latest mpatrol release and documentation,\n");
     __mp_diag("visit %s.\n\n", __mp_homepage);
-    if ((t = time(NULL)) != (time_t) -1)
-        __mp_diag("Log file generated on %s\n", ctime(&t));
+    if (!currenttime)
+        currenttime = time(NULL);
+    if (currenttime != (time_t) -1)
+        __mp_diag("Log file generated on %s\n", ctime(&currenttime));
 }
 
 

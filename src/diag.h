@@ -120,6 +120,7 @@ MP_EXPORT void __mp_logmemcompare(infohead *, void *, void *, size_t, alloctype,
                                   char *, char *, unsigned long, stackinfo *);
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
+MP_EXPORT void __mp_printfree(infohead *);
 MP_EXPORT void __mp_printmap(infohead *);
 MP_EXPORT void __mp_printversion(void);
 MP_EXPORT void __mp_printsummary(infohead *);
