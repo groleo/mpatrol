@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.2 2001-03-01 18:49:09 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.3 2001-03-01 19:13:12 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.2 2001-03-01 18:49:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.3 2001-03-01 19:13:12 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -326,25 +326,37 @@ epilogue(MP_CONST void *p, MP_CONST void *a)
 {
     size_t l;
 
-    if (malloc_pointer == (void *) -1)
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
-    else if (malloc_size == (size_t) -1)
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
-    else if (malloc_size == (size_t) -2)
+    if (dmalloc_logpath != NULL)
     {
-        if (malloc_pointer == NULL)
-            l = 0;
-        else
-            l = strlen((char *) malloc_pointer) + 1;
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_STRDUP, l, 0, NULL, p);
+        __mp_setoption(MP_OPT_LOGFILE, (unsigned long) dmalloc_logpath);
+        dmalloc_logpath = NULL;
     }
-    else if (malloc_pointer == NULL)
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
-    else if (malloc_size == 0)
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
-    else
-        malloc_tracker(NULL, 0, DMALLOC_FUNC_REALLOC, malloc_size, 0,
-                       malloc_pointer, p);
+    if (malloc_tracker != NULL)
+    {
+        if (malloc_pointer == (void *) -1)
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL,
+                           p);
+        else if (malloc_size == (size_t) -1)
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer,
+                           NULL);
+        else if (malloc_size == (size_t) -2)
+        {
+            if (malloc_pointer == NULL)
+                l = 0;
+            else
+                l = strlen((char *) malloc_pointer) + 1;
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_STRDUP, l, 0, NULL, p);
+        }
+        else if (malloc_pointer == NULL)
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL,
+                           p);
+        else if (malloc_size == 0)
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer,
+                           NULL);
+        else
+            malloc_tracker(NULL, 0, DMALLOC_FUNC_REALLOC, malloc_size, 0,
+                           malloc_pointer, p);
+    }
     if (old_epilogue != NULL)
         old_epilogue(p, a);
 }
@@ -359,25 +371,25 @@ __mpt_dmallocshutdown(void)
     time_t t;
     unsigned long h, m, s;
 
-    if (malloc_initialised)
+    if (!malloc_initialised)
+        return;
+    __mp_prologue(old_prologue);
+    __mp_epilogue(old_epilogue);
+    if ((t = time(NULL)) != (time_t) -1)
     {
-        __mpt_dmalloctrack(NULL);
-        if ((t = time(NULL)) != (time_t) -1)
-        {
-            s = (unsigned long) t - (unsigned long) malloc_time;
-            h = s / 3600;
-            m = (s / 60) % 60;
-            s %= 60;
-        }
-        else
-        {
-            t = (time_t) 0;
-            h = m = s = 0;
-        }
-        __mpt_dmallocmessage("ending time = %lu, elapsed since start = "
-                             "%lu:%02lu:%02lu\n\n", (unsigned long) t, h, m, s);
-        malloc_initialised = 0;
+        s = (unsigned long) t - (unsigned long) malloc_time;
+        h = s / 3600;
+        m = (s / 60) % 60;
+        s %= 60;
     }
+    else
+    {
+        t = (time_t) 0;
+        h = m = s = 0;
+    }
+    __mpt_dmallocmessage("ending time = %lu, elapsed since start = "
+                         "%lu:%02lu:%02lu\n\n", (unsigned long) t, h, m, s);
+    malloc_initialised = 0;
 }
 
 
@@ -559,18 +571,6 @@ __mpt_dmalloctrack(dmalloc_track_t h)
 {
     if (!malloc_initialised)
         __mp_init_dmalloc();
-    if (malloc_tracker != NULL)
-    {
-        __mp_prologue(old_prologue);
-        __mp_epilogue(old_epilogue);
-        old_prologue = NULL;
-        old_epilogue = NULL;
-    }
-    if (h != NULL)
-    {
-        old_prologue = __mp_prologue(prologue);
-        old_epilogue = __mp_epilogue(epilogue);
-    }
     malloc_tracker = h;
 }
 
@@ -594,35 +594,35 @@ __mp_init_dmalloc(void)
 {
     char *t;
 
-    if (!malloc_initialised)
-    {
-        malloc_initialised = 1;
-        if ((malloc_time = time(NULL)) == (time_t) -1)
-            malloc_time = (time_t) 0;
-        malloc_flags = 0;
-        malloc_start = 0;
-        malloc_interval = 1;
-        malloc_tracker = NULL;
-        dmalloc_logpath = NULL;
-        dmalloc_errno = 0;
-        dmalloc_address = NULL;
-        dmalloc_address_count = 0;
-        readoptions();
-        setoptions();
-        __mp_atexit(__mpt_dmallocshutdown);
-        if (!__mp_getoption(MP_OPT_LOGFILE, (unsigned long *) &t) ||
-            (t == NULL))
-            t = "stderr";
-        __mpt_dmallocmessage("Dmalloc version '%lu.%lu.%lu' (mpatrol)\n",
-                             DMALLOC_VERSION_MAJOR, DMALLOC_VERSION_MINOR,
-                             DMALLOC_VERSION_PATCH);
-        __mpt_dmallocmessage("flags = %#lx, logfile '%s'\n", malloc_flags, t);
-        __mpt_dmallocmessage("interval = %lu, addr = %#lx, seen # = %lu\n",
-                             malloc_interval, dmalloc_address,
-                             dmalloc_address_count);
-        __mpt_dmallocmessage("starting time = %lu\n\n",
-                             (unsigned long) malloc_time);
-    }
+    if (malloc_initialised)
+        return;
+    malloc_initialised = 1;
+    if ((malloc_time = time(NULL)) == (time_t) -1)
+        malloc_time = (time_t) 0;
+    malloc_flags = 0;
+    malloc_start = 0;
+    malloc_interval = 1;
+    malloc_tracker = NULL;
+    dmalloc_logpath = NULL;
+    dmalloc_errno = 0;
+    dmalloc_address = NULL;
+    dmalloc_address_count = 0;
+    readoptions();
+    setoptions();
+    __mp_atexit(__mpt_dmallocshutdown);
+    if (!__mp_getoption(MP_OPT_LOGFILE, (unsigned long *) &t) || (t == NULL))
+        t = "stderr";
+    __mpt_dmallocmessage("Dmalloc version '%lu.%lu.%lu' (mpatrol)\n",
+                         DMALLOC_VERSION_MAJOR, DMALLOC_VERSION_MINOR,
+                         DMALLOC_VERSION_PATCH);
+    __mpt_dmallocmessage("flags = %#lx, logfile '%s'\n", malloc_flags, t);
+    __mpt_dmallocmessage("interval = %lu, addr = %#lx, seen # = %lu\n",
+                         malloc_interval, dmalloc_address,
+                         dmalloc_address_count);
+    __mpt_dmallocmessage("starting time = %lu\n\n",
+                         (unsigned long) malloc_time);
+    old_prologue = __mp_prologue(prologue);
+    old_epilogue = __mp_epilogue(epilogue);
 }
 
 
