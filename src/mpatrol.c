@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.45 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.46 2005-03-10 00:18:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.45 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.46 2005-03-10 00:18:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -209,7 +209,7 @@ static option options_table[] =
      "\tChecks that no attempt is made to deallocate a NULL pointer.\n"},
     {"check-memory", OF_CHECKMEMORY, NULL,
      "\tChecks that no attempt is made to perform a zero-length memory\n"
-     "\toperation on a NULL pointer.\n"},
+     "\toperation or a memory operation on a NULL pointer.\n"},
     {"check-reallocs", OF_CHECKREALLOCS, NULL,
      "\tChecks that no attempt is made to reallocate a NULL pointer or resize\n"
      "\tan existing block of memory to size zero.\n"},
