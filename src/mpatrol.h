@@ -36,6 +36,18 @@
 #define MPATROL_VERSION 10100
 
 
+/* A macro for determining the current function name.
+ */
+
+#ifndef MP_FUNCNAME
+#ifdef __GNUC__
+#define MP_FUNCNAME __PRETTY_FUNCTION__
+#else /* __GNUC__ */
+#define MP_FUNCNAME NULL
+#endif /* __GNUC__ */
+#endif /* MP_FUNCNAME */
+
+
 /* Options for backwards compatibility with other versions of mallopt().  They
  * are all currently ignored as they have no meaning when used with mpatrol.
  */
@@ -256,109 +268,50 @@ __mp_allocinfo;
 #endif /* bcmp */
 
 
-#ifdef __GNUC__
-
-#define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, __PRETTY_FUNCTION__, \
-                             __FILE__, __LINE__, 0)
-#define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, \
-                                __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define memalign(a, l) __mp_alloc((l), (a), MP_AT_MEMALIGN, \
-                                  __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define valloc(l) __mp_alloc((l), 0, MP_AT_VALLOC, __PRETTY_FUNCTION__, \
-                             __FILE__, __LINE__, 0)
-#define pvalloc(l) __mp_alloc((l), 0, MP_AT_PVALLOC, __PRETTY_FUNCTION__, \
-                              __FILE__, __LINE__, 0)
-#define strdup(p) __mp_strdup((p), 0, MP_AT_STRDUP, __PRETTY_FUNCTION__, \
-                              __FILE__, __LINE__, 0)
-#define strndup(p, l) __mp_strdup((p), (l), MP_AT_STRNDUP, \
-                                  __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define strsave(p) __mp_strdup((p), 0, MP_AT_STRSAVE, __PRETTY_FUNCTION__, \
-                               __FILE__, __LINE__, 0)
-#define strnsave(p, l) __mp_strdup((p), (l), MP_AT_STRNSAVE, \
-                                   __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, \
-                                   __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, \
-                                    __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, \
-                                  __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define free(p) __mp_free((p), MP_AT_FREE, __PRETTY_FUNCTION__, __FILE__, \
-                          __LINE__, 0)
-#define cfree(p) __mp_free((p), MP_AT_CFREE, __PRETTY_FUNCTION__, __FILE__, \
-                           __LINE__, 0)
-#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, \
-                                    __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, \
-                                       __PRETTY_FUNCTION__, __FILE__, \
-                                       __LINE__, 0)
-#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, \
-                                     __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
-#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, \
-                                      __PRETTY_FUNCTION__, __FILE__, __LINE__, \
-                                      0)
-#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
-                                           __PRETTY_FUNCTION__, __FILE__, \
-                                           __LINE__, 0)
-#define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (c), MP_AT_MEMCHR, \
-                                       __PRETTY_FUNCTION__, __FILE__, \
-                                       __LINE__, 0)
-#define memmem(p, l, q, m) __mp_locatemem((p), (l), (q), (m), MP_AT_MEMMEM, \
-                                          __PRETTY_FUNCTION__, __FILE__, \
-                                          __LINE__, 0)
-#define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, \
-                                        __PRETTY_FUNCTION__, __FILE__, \
-                                        __LINE__, 0)
-#define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, \
-                                      __PRETTY_FUNCTION__, __FILE__, __LINE__, \
-                                      0)
-
-#else /* __GNUC__ */
-
-#define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, NULL, __FILE__, __LINE__, \
-                             0)
-#define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, NULL, __FILE__, \
-                                __LINE__, 0)
-#define memalign(a, l) __mp_alloc((l), (a), MP_AT_MEMALIGN, NULL, __FILE__, \
-                                  __LINE__, 0)
-#define valloc(l) __mp_alloc((l), 0, MP_AT_VALLOC, NULL, __FILE__, __LINE__, \
-                             0)
-#define pvalloc(l) __mp_alloc((l), 0, MP_AT_PVALLOC, NULL, __FILE__, __LINE__, \
-                              0)
-#define strdup(p) __mp_strdup((p), 0, MP_AT_STRDUP, NULL, __FILE__, __LINE__, 0)
-#define strndup(p, l) __mp_strdup((p), (l), MP_AT_STRNDUP, NULL, __FILE__, \
-                                  __LINE__, 0)
-#define strsave(p) __mp_strdup((p), 0, MP_AT_STRSAVE, NULL, __FILE__, \
+#define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
+                             __LINE__, 0)
+#define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, MP_FUNCNAME, \
+                                __FILE__, __LINE__, 0)
+#define memalign(a, l) __mp_alloc((l), (a), MP_AT_MEMALIGN, MP_FUNCNAME, \
+                                  __FILE__, __LINE__, 0)
+#define valloc(l) __mp_alloc((l), 0, MP_AT_VALLOC, MP_FUNCNAME, __FILE__, \
+                             __LINE__, 0)
+#define pvalloc(l) __mp_alloc((l), 0, MP_AT_PVALLOC, MP_FUNCNAME, __FILE__, \
+                              __LINE__, 0)
+#define strdup(p) __mp_strdup((p), 0, MP_AT_STRDUP, MP_FUNCNAME, __FILE__, \
+                              __LINE__, 0)
+#define strndup(p, l) __mp_strdup((p), (l), MP_AT_STRNDUP, MP_FUNCNAME, \
+                                  __FILE__, __LINE__, 0)
+#define strsave(p) __mp_strdup((p), 0, MP_AT_STRSAVE, MP_FUNCNAME, __FILE__, \
                                __LINE__, 0)
-#define strnsave(p, l) __mp_strdup((p), (l), MP_AT_STRNSAVE, NULL, __FILE__, \
-                                   __LINE__, 0)
-#define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, NULL, __FILE__, \
-                                   __LINE__, 0)
-#define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, NULL, \
+#define strnsave(p, l) __mp_strdup((p), (l), MP_AT_STRNSAVE, MP_FUNCNAME, \
+                                   __FILE__, __LINE__, 0)
+#define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, MP_FUNCNAME, \
+                                   __FILE__, __LINE__, 0)
+#define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, MP_FUNCNAME, \
                                     __FILE__, __LINE__, 0)
-#define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, NULL, __FILE__, \
-                                  __LINE__, 0)
-#define free(p) __mp_free((p), MP_AT_FREE, NULL, __FILE__, __LINE__, 0)
-#define cfree(p) __mp_free((p), MP_AT_CFREE, NULL, __FILE__, __LINE__, 0)
-#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, NULL, \
+#define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, MP_FUNCNAME, \
+                                  __FILE__, __LINE__, 0)
+#define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define cfree(p) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, MP_FUNCNAME, \
                                     __FILE__, __LINE__, 0)
-#define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, NULL, \
+#define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, MP_FUNCNAME, \
                                        __FILE__, __LINE__, 0)
-#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, NULL, \
+#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, MP_FUNCNAME, \
                                      __FILE__, __LINE__, 0)
-#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, NULL, \
-                                      __FILE__, __LINE__, 0)
-#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, NULL, \
-                                           __FILE__, __LINE__, 0)
+#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, \
+                                      MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
+                                           MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (c), MP_AT_MEMCHR, \
-                                       NULL, __FILE__, __LINE__, 0)
+                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memmem(p, l, q, m) __mp_locatemem((p), (l), (q), (m), MP_AT_MEMMEM, \
-                                          NULL, __FILE__, __LINE__, 0)
-#define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, NULL, \
-                                        __FILE__, __LINE__, 0)
-#define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, NULL, \
+                                          MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, \
+                                        MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, MP_FUNCNAME, \
                                       __FILE__, __LINE__, 0)
-
-#endif /* __GNUC__ */
 
 
 #ifdef __cplusplus
