@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.26 2001-05-30 22:46:46 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.27 2001-06-13 22:19:40 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "30 May 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "13 June 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -257,8 +257,11 @@ subsequent memory allocations there will be multiple entries with the same
 allocation indices written to the log, profile or trace files.  This can be
 most confusing when processing these files afterwards!  As a workaround, the
 mpatrol library will always check the current process identifier every time one
-of its functions is called and will open new log, profile or trace files if it
-has determined that the process has been forked.
+of its functions is called if the \fBCHECKFORK\fP option is used and will open
+new log, profile or trace files if it has determined that the process has been
+forked.  If the \fBCHECKFORK\fP option is not used then a call to
+\fB__mp_reinit\fP should be added as the first function call in the child
+process in order to duplicate the behaviour of the \fBCHECKFORK\fP option.
 .PP
 Memory allocation profiling is supported, with statistics about every memory
 allocation and deallocation that was made during the execution of a program
@@ -1232,6 +1235,12 @@ Equivalent to the \fBCHECKALLOCS\fP, \fBCHECKREALLOCS\fP, \fBCHECKFREES\fP and
 \fBCHECKALLOCS\fP
 Checks that no attempt is made to allocate a block of memory of size zero.  A
 warning will be issued for every such case.
+.TP
+\fBCHECKFORK\fP
+Checks at every call to see if the process has been forked in case new log,
+profiling and tracing output files need to be started.  This option only has an
+effect on UNIX platforms, but should not be used in multithreaded programs if
+each thread has a different process identifier.
 .TP
 \fBCHECKFREES\fP
 Checks that no attempt is made to deallocate a \fBNULL\fP pointer.  A warning
