@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.129 2000-11-06 19:37:47 graeme Exp $
+@c $Id: mpatrol.texi,v 1.130 2000-11-08 01:31:26 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 6th November, 2000
+@set UPDATED 8th November, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -838,7 +838,9 @@ If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
 use the @option{--dynamic} option to the @file{mpatrol} command to override the
 default definitions of @code{malloc()}, etc.@: at run-time without having to
-relink your program.
+relink your program.  If your program is multithreaded then you must also add
+the @option{--threads} option to pick up the multithreaded shared libraries
+instead.
 
 For example, if your program's executable file is called @file{testprog} and it
 accepts an option specifying an input file, you can force the system's dynamic
@@ -2370,7 +2372,8 @@ running it with any of the mpatrol library's debugging options.  This is mainly
 a @emph{toy} feature which allows you to view and manipulate the dynamic memory
 allocations of programs that you don't have the source for, but in theory it
 could be quite useful if you need to debug a previously released executable and
-are unable to recompile or relink it.
+are unable to recompile or relink it.  Note that if the program being run is
+multithreaded then you must add the @option{--threads} option as well.
 
 Note that the @command{mpatrol} command must be set up to use the correct
 object file format access libraries that are required for your system if you
@@ -2394,10 +2397,10 @@ is invoked to build the shared library, you must explicitly add any object file
 format access libraries that you want to use at the end of the linker command
 line.  This ensures that all references to such libraries will be resolved at
 link time rather than run time.  You must then edit the file @file{src/config.h}
-and remove all of the libraries that you embedded from the definition of the
-@code{MP_PRELOAD_LIBS} preprocessor macro.  Finally, rebuild the shared version
-of the mpatrol library and the @command{mpatrol} command and see if your efforts
-were worth it.
+and remove all of the libraries that you embedded from the definitions of the
+@code{MP_PRELOAD_LIBS} and @option{MP_PRELOADMT_LIBS} preprocessor macros.
+Finally, rebuild the shared version of the mpatrol library and the
+@command{mpatrol} command and see if your efforts were worth it.
 
 Because the @command{mpatrol} command sets the @env{MPATROL_OPTIONS} environment
 variable for each of the programs it runs, it does not affect the value of the
@@ -6574,12 +6577,13 @@ without the directory components.  If the executable filename could not be
 determined or was not set then it will be replaced with @samp{mpatrol}.
 
 All of the following options (except @option{--dynamic}, @option{--help},
-@option{--show-env} and @option{--version}) correspond to their listed mpatrol
-library option (@pxref{Environment}).  Note that some of these options have a
-one character equivalent option that can be used for brevity.  The list of one
-character options can be viewed with the @option{--help} option or viewed in the
-UNIX manual pages.  Such options are parsed on the command line in a similar way
-to the UNIX function @code{getopt()}.
+@option{--show-env}, @option{--threads} and @option{--version}) correspond to
+their listed mpatrol library option (@pxref{Environment}).  Note that some of
+these options have a one character equivalent option that can be used for
+brevity.  The list of one character options can be viewed with the
+@option{--help} option or viewed in the UNIX manual pages.  Such options are
+parsed on the command line in a similar way to the UNIX function
+@code{getopt()}.
 
 @table @asis
 @cindex --alloc-byte
@@ -6821,6 +6825,12 @@ allocations should be displayed at the end of program execution.
 @item @option{--small-bound} <@var{unsigned-integer}>
 [@option{SMALLBOUND}]  Specifies the limit in bytes up to which memory
 allocations should be classified as small allocations for profiling purposes.
+
+@cindex --threads
+@item @option{--threads}
+Specifies that the program to be run is multithreaded if the @option{--dynamic}
+option is used.  This option is required if the multithreaded version of the
+mpatrol library should be preloaded instead of the normal version.
 
 @cindex --unfreed-abort
 @item @option{--unfreed-abort} <@var{unsigned-integer}>
@@ -8312,11 +8322,9 @@ script to automatically update the version numbers contained in the files in the
 
 @item
 The postscript version of the quick reference card seems to print at an unusual
-offset on some printers.  Also, the PDF version gets created with 1 inch margins
-rather than half inch margins which means that it is one inch too large in both
-dimensions.  Need to figure out what is happening in both cases.  In addition,
-the mpatrol manual should also be formatted in DocBook format once a suitable
-@TeX{}info to DocBook translator is available.
+offset on some printers.  In addition, the mpatrol manual should also be
+formatted in DocBook format once a suitable @TeX{}info to DocBook translator is
+available.
 
 @item
 Perhaps add benchmark tests for dynamic memory allocation functions and memory
@@ -8418,8 +8426,7 @@ compiling @file{symbol.c}.
 The @option{--dynamic} option to the @command{mpatrol} command does not always
 work on systems whose dynamic linkers support the @env{LD_PRELOAD} or
 @env{_RLD_LIST} environment variables.  This is because the object file format
-access libraries do not exist in shared form on such systems.  There is also
-likely to be an issue when running with thread-safe libraries.
+access libraries do not exist in shared form on such systems.
 
 @item
 Perhaps add files to build the mpatrol library and tools as a Debian package
@@ -8925,12 +8932,13 @@ that was not originally compiled with the mpatrol library.  However, even though
 it runs successfully, no mpatrol log file is produced.  Why is this?
 
 First, check that you are passing the @option{--dynamic} option to the
-@command{mpatrol} command.  If that doesn't work then check that the executable
-file has been dynamically linked; statically linked executables cannot be forced
-to use the mpatrol library.  If it still doesn't work then it may be that the
-dynamic linker on your system doesn't have the ability to preload any shared
-libraries that have been specified in a special environment variable, in which
-case you can't use this feature.
+@command{mpatrol} command and, if necessary, the @option{--threads} option as
+well.  If that doesn't work then check that the executable file has been
+dynamically linked; statically linked executables cannot be forced to use the
+mpatrol library.  If it still doesn't work then it may be that the dynamic
+linker on your system doesn't have the ability to preload any shared libraries
+that have been specified in a special environment variable, in which case you
+can't use this feature.
 
 @item
 I know that there's a definite heap corruption problem in my program as it keeps

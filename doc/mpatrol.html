@@ -101,7 +101,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.0 of the mpatrol manual for version
-1.3.0, 6th November, 2000.
+1.3.0, 8th November, 2000.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -730,7 +730,9 @@ later platforms with the <code>LD_PRELOAD</code> feature.
 library (<code>libc.so</code>) or an alternative malloc shared library then you can
 use the <code>--dynamic</code> option to the <code>mpatrol</code> command to override the
 default definitions of <code>malloc()</code>, etc. at run-time without having to
-relink your program.
+relink your program.  If your program is multithreaded then you must also add
+the <code>--threads</code> option to pick up the multithreaded shared libraries
+instead.
 
 <p>For example, if your program's executable file is called <code>testprog</code> and it
 accepts an option specifying an input file, you can force the system's dynamic
@@ -2154,7 +2156,8 @@ running it with any of the mpatrol library's debugging options.  This is mainly
 a <em>toy</em> feature which allows you to view and manipulate the dynamic memory
 allocations of programs that you don't have the source for, but in theory it
 could be quite useful if you need to debug a previously released executable and
-are unable to recompile or relink it.
+are unable to recompile or relink it.  Note that if the program being run is
+multithreaded then you must add the <code>--threads</code> option as well.
 
 <p>Note that the <code>mpatrol</code> command must be set up to use the correct
 object file format access libraries that are required for your system if you
@@ -2177,10 +2180,10 @@ is invoked to build the shared library, you must explicitly add any object file
 format access libraries that you want to use at the end of the linker command
 line.  This ensures that all references to such libraries will be resolved at
 link time rather than run time.  You must then edit the file <code>src/config.h</code>
-and remove all of the libraries that you embedded from the definition of the
-<code>MP_PRELOAD_LIBS</code> preprocessor macro.  Finally, rebuild the shared version
-of the mpatrol library and the <code>mpatrol</code> command and see if your efforts
-were worth it.
+and remove all of the libraries that you embedded from the definitions of the
+<code>MP_PRELOAD_LIBS</code> and <code>MP_PRELOADMT_LIBS</code> preprocessor macros. 
+Finally, rebuild the shared version of the mpatrol library and the
+<code>mpatrol</code> command and see if your efforts were worth it.
 
 <p>Because the <code>mpatrol</code> command sets the <code>MPATROL_OPTIONS</code> environment
 variable for each of the programs it runs, it does not affect the value of the
@@ -6070,12 +6073,13 @@ without the directory components.  If the executable filename could not be
 determined or was not set then it will be replaced with <code>mpatrol</code>.
 
 <p>All of the following options (except <code>--dynamic</code>, <code>--help</code>,
-<code>--show-env</code> and <code>--version</code>) correspond to their listed mpatrol
-library option (see <a href="#Environment">Environment</a>).  Note that some of these options have a
-one character equivalent option that can be used for brevity.  The list of one
-character options can be viewed with the <code>--help</code> option or viewed in the
-UNIX manual pages.  Such options are parsed on the command line in a similar way
-to the UNIX function <code>getopt()</code>.
+<code>--show-env</code>, <code>--threads</code> and <code>--version</code>) correspond to
+their listed mpatrol library option (see <a href="#Environment">Environment</a>).  Note that some of
+these options have a one character equivalent option that can be used for
+brevity.  The list of one character options can be viewed with the
+<code>--help</code> option or viewed in the UNIX manual pages.  Such options are
+parsed on the command line in a similar way to the UNIX function
+<code>getopt()</code>.
 
 <dl>
 <dt><code>--alloc-byte</code> &lt;<var>unsigned-integer</var>&gt;
@@ -6271,6 +6275,11 @@ allocations should be displayed at the end of program execution.
 <br><dt><code>--small-bound</code> &lt;<var>unsigned-integer</var>&gt;
 <dd>[<code>SMALLBOUND</code>]  Specifies the limit in bytes up to which memory
 allocations should be classified as small allocations for profiling purposes.
+
+<br><dt><code>--threads</code>
+<dd>Specifies that the program to be run is multithreaded if the <code>--dynamic</code>
+option is used.  This option is required if the multithreaded version of the
+mpatrol library should be preloaded instead of the normal version.
 
 <br><dt><code>--unfreed-abort</code> &lt;<var>unsigned-integer</var>&gt;
 <dd>[<code>UNFREEDABORT</code>]  Specifies the minimum number of unfreed allocations at
@@ -7510,11 +7519,9 @@ script to automatically update the version numbers contained in the files in the
 <code>pkg</code> directory.
 
 <li>The postscript version of the quick reference card seems to print at an unusual
-offset on some printers.  Also, the PDF version gets created with 1 inch margins
-rather than half inch margins which means that it is one inch too large in both
-dimensions.  Need to figure out what is happening in both cases.  In addition,
-the mpatrol manual should also be formatted in DocBook format once a suitable
-TeXinfo to DocBook translator is available.
+offset on some printers.  In addition, the mpatrol manual should also be
+formatted in DocBook format once a suitable TeXinfo to DocBook translator is
+available.
 
 <li>Perhaps add benchmark tests for dynamic memory allocation functions and memory
 operation functions.  Obviously the mpatrol library would perform much worse
@@ -7604,8 +7611,7 @@ compiling <code>symbol.c</code>.
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command does not always
 work on systems whose dynamic linkers support the <code>LD_PRELOAD</code> or
 <code>_RLD_LIST</code> environment variables.  This is because the object file format
-access libraries do not exist in shared form on such systems.  There is also
-likely to be an issue when running with thread-safe libraries.
+access libraries do not exist in shared form on such systems.
 
 <li>Perhaps add files to build the mpatrol library and tools as a Debian package
 and possibly also a package in the HP/UX package format. 
@@ -8077,12 +8083,13 @@ that was not originally compiled with the mpatrol library.  However, even though
 it runs successfully, no mpatrol log file is produced.  Why is this?
 
 <p>First, check that you are passing the <code>--dynamic</code> option to the
-<code>mpatrol</code> command.  If that doesn't work then check that the executable
-file has been dynamically linked; statically linked executables cannot be forced
-to use the mpatrol library.  If it still doesn't work then it may be that the
-dynamic linker on your system doesn't have the ability to preload any shared
-libraries that have been specified in a special environment variable, in which
-case you can't use this feature.
+<code>mpatrol</code> command and, if necessary, the <code>--threads</code> option as
+well.  If that doesn't work then check that the executable file has been
+dynamically linked; statically linked executables cannot be forced to use the
+mpatrol library.  If it still doesn't work then it may be that the dynamic
+linker on your system doesn't have the ability to preload any shared libraries
+that have been specified in a special environment variable, in which case you
+can't use this feature.
 
 </p><li>I know that there's a definite heap corruption problem in my program as it keeps
 crashing in unrelated code due to pointer corruption, and when I link with the
@@ -9659,6 +9666,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>-show-unfreed: <a href="#Options">Options</a>
 <li>-small-bound: <a href="#Options">Options</a>
 <li>-stack-depth: <a href="#Profiling">Profiling</a>
+<li>-threads: <a href="#Options">Options</a>
 <li>-unfreed-abort: <a href="#Options">Options</a>
 <li>-use-debug: <a href="#Options">Options</a>
 <li>-use-mmap: <a href="#Options">Options</a>

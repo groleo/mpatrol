@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 6th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 6th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
 November, 2000.
 
 Foreword
@@ -595,7 +595,9 @@ will require a complete recompilation of all your code.
      the system C library (`libc.so') or an alternative malloc shared
      library then you can use the `--dynamic' option to the `mpatrol'
      command to override the default definitions of `malloc()', etc. at
-     run-time without having to relink your program.
+     run-time without having to relink your program.  If your program
+     is multithreaded then you must also add the `--threads' option to
+     pick up the multithreaded shared libraries instead.
 
      For example, if your program's executable file is called
      `testprog' and it accepts an option specifying an input file, you
@@ -2073,7 +2075,8 @@ This is mainly a _toy_ feature which allows you to view and manipulate
 the dynamic memory allocations of programs that you don't have the
 source for, but in theory it could be quite useful if you need to debug
 a previously released executable and are unable to recompile or relink
-it.
+it.  Note that if the program being run is multithreaded then you must
+add the `--threads' option as well.
 
    Note that the `mpatrol' command must be set up to use the correct
 object file format access libraries that are required for your system
@@ -2098,10 +2101,10 @@ explicitly add any object file format access libraries that you want to
 use at the end of the linker command line.  This ensures that all
 references to such libraries will be resolved at link time rather than
 run time.  You must then edit the file `src/config.h' and remove all of
-the libraries that you embedded from the definition of the
-`MP_PRELOAD_LIBS' preprocessor macro.  Finally, rebuild the shared
-version of the mpatrol library and the `mpatrol' command and see if
-your efforts were worth it.
+the libraries that you embedded from the definitions of the
+`MP_PRELOAD_LIBS' and `MP_PRELOADMT_LIBS' preprocessor macros.
+Finally, rebuild the shared version of the mpatrol library and the
+`mpatrol' command and see if your efforts were worth it.
 
    Because the `mpatrol' command sets the `MPATROL_OPTIONS' environment
 variable for each of the programs it runs, it does not affect the value
@@ -5982,12 +5985,13 @@ could not be determined or was not set then it will be replaced with
 `mpatrol'.
 
    All of the following options (except `--dynamic', `--help',
-`--show-env' and `--version') correspond to their listed mpatrol
-library option (*note Environment::).  Note that some of these options
-have a one character equivalent option that can be used for brevity.
-The list of one character options can be viewed with the `--help'
-option or viewed in the UNIX manual pages.  Such options are parsed on
-the command line in a similar way to the UNIX function `getopt()'.
+`--show-env', `--threads' and `--version') correspond to their listed
+mpatrol library option (*note Environment::).  Note that some of these
+options have a one character equivalent option that can be used for
+brevity.  The list of one character options can be viewed with the
+`--help' option or viewed in the UNIX manual pages.  Such options are
+parsed on the command line in a similar way to the UNIX function
+`getopt()'.
 
 `--alloc-byte' <UNSIGNED-INTEGER>
      [`ALLOCBYTE']  Specifies an 8-bit byte pattern with which to
@@ -6190,6 +6194,12 @@ the command line in a similar way to the UNIX function `getopt()'.
      [`SMALLBOUND']  Specifies the limit in bytes up to which memory
      allocations should be classified as small allocations for
      profiling purposes.
+
+`--threads'
+     Specifies that the program to be run is multithreaded if the
+     `--dynamic' option is used.  This option is required if the
+     multithreaded version of the mpatrol library should be preloaded
+     instead of the normal version.
 
 `--unfreed-abort' <UNSIGNED-INTEGER>
      [`UNFREEDABORT']  Specifies the minimum number of unfreed
@@ -7489,12 +7499,9 @@ H.1 Notes for all platforms
      version numbers contained in the files in the `pkg' directory.
 
    * The postscript version of the quick reference card seems to print
-     at an unusual offset on some printers.  Also, the PDF version gets
-     created with 1 inch margins rather than half inch margins which
-     means that it is one inch too large in both dimensions.  Need to
-     figure out what is happening in both cases.  In addition, the
-     mpatrol manual should also be formatted in DocBook format once a
-     suitable TeXinfo to DocBook translator is available.
+     at an unusual offset on some printers.  In addition, the mpatrol
+     manual should also be formatted in DocBook format once a suitable
+     TeXinfo to DocBook translator is available.
 
    * Perhaps add benchmark tests for dynamic memory allocation
      functions and memory operation functions.  Obviously the mpatrol
@@ -7596,8 +7603,7 @@ H.2 Notes for UNIX platforms
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
      `_RLD_LIST' environment variables.  This is because the object
      file format access libraries do not exist in shared form on such
-     systems.  There is also likely to be an issue when running with
-     thread-safe libraries.
+     systems.
 
    * Perhaps add files to build the mpatrol library and tools as a
      Debian package and possibly also a package in the HP/UX package
@@ -8045,13 +8051,14 @@ I.4 Running
      produced.  Why is this?
 
      First, check that you are passing the `--dynamic' option to the
-     `mpatrol' command.  If that doesn't work then check that the
-     executable file has been dynamically linked; statically linked
-     executables cannot be forced to use the mpatrol library.  If it
-     still doesn't work then it may be that the dynamic linker on your
-     system doesn't have the ability to preload any shared libraries
-     that have been specified in a special environment variable, in
-     which case you can't use this feature.
+     `mpatrol' command and, if necessary, the `--threads' option as
+     well.  If that doesn't work then check that the executable file
+     has been dynamically linked; statically linked executables cannot
+     be forced to use the mpatrol library.  If it still doesn't work
+     then it may be that the dynamic linker on your system doesn't have
+     the ability to preload any shared libraries that have been
+     specified in a special environment variable, in which case you
+     can't use this feature.
 
   7. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
@@ -9900,6 +9907,8 @@ Index
 -small-bound:                                      
           See ``Appendix C Options''.
 -stack-depth:                                       See 8.
+-threads:                                          
+          See ``Appendix C Options''.
 -unfreed-abort:                                    
           See ``Appendix C Options''.
 -use-debug:                                        
