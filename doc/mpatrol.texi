@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.149 2000-11-20 23:05:08 graeme Exp $
+@c $Id: mpatrol.texi,v 1.150 2000-11-22 22:59:33 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -20,9 +20,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.0
-@set VERSION 1.3.0
-@set UPDATED 20th November, 2000
+@set EDITION 2.1
+@set VERSION 1.3.1
+@set UPDATED 22nd November, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -806,25 +806,26 @@ then install or print these documents.
 @end enumerate
 
 @cindex PKG package
+@cindex SD/UX package
 @cindex RPM package
 @cindex TAR archive
 @cindex LhA archive
 @cindex ZIP archive
 Alternatively, the @file{pkg} directory contains files that can be used to
 automatically generate a @emph{package} in a specific format suitable for
-installation on a system.  Two package formats (PKG and RPM) and three archive
-formats are currently supported (generic tape archive, LhA and ZIP).  The first
-package format is generally used on UNIX SVR4 systems, while the second was
-introduced by Red Hat for use in their Linux distributions.  The generic tape
-archive can be used as a distribution for UNIX systems where no package format
-is supported, but it does not contain information on how to install the files on
-the system once they have been extracted from the distribution.  The LhA and ZIP
-formats are also roughly the same, but the LhA format is intended for Amiga
-systems and is used for Aminet distributions, while the ZIP format is intended
-for Windows systems and is used for WinSite distributions.  You should really
-know what you are doing before you attempt to build a package, and you should
-also be aware that some of the package files may need to be modified before you
-begin.
+installation on a system.  Three package formats (PKG, SD/UX and RPM) and three
+archive formats are currently supported (generic tape archive, LhA and ZIP).
+The first package format is generally used on UNIX SVR4 systems, while the
+second is used on HP/UX systems and the third was introduced by Red Hat for use
+in their Linux distributions.  The generic tape archive can be used as a
+distribution for UNIX systems where no package format is supported, but it does
+not contain information on how to install the files on the system once they
+have been extracted from the distribution.  The LhA and ZIP formats are also
+roughly the same, but the LhA format is intended for Amiga systems and is used
+for Aminet distributions, while the ZIP format is intended for Windows systems
+and is used for WinSite distributions.  You should really know what you are
+doing before you attempt to build a package, and you should also be aware that
+some of the package files may need to be modified before you begin.
 
 @cindex Linux Software Map
 @cindex LSM
@@ -2434,6 +2435,15 @@ run-time.  However, there may well be problems if the resulting shared library
 contains position-dependent code from the archive libraries you incorporated.
 The only way to find out is for you to try it and see.
 
+If you have access to the GNU linker on your system then there may be a way to
+convert archive libraries into shared libraries if position-independent code is
+not necessarily required for building shared libraries on your system.  If you
+use the @option{--whole-archive} and @option{--shared} linker options then the
+GNU linker will read the entire contents of one or more archive libraries before
+writing out a shared library.  All going well, you should be able to use the new
+shared library in conjunction with the @option{--dynamic} @coommand{mpatrol}
+option.
+
 @cindex embedded libraries
 In order to build a shared version of the mpatrol library with embedded object
 file format access libraries, you must first modify the @file{Makefile} you
@@ -3727,7 +3737,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.3.0 (00/11/19)
+@@(#) mpatrol 1.3.1 (00/11/22)
 Copyright (C) 1997-2000 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -3737,7 +3747,7 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
-Log file generated on Tue Oct 31 00:18:17 2000
+Log file generated on Wed Nov 22 22:26:31 2000
 
 ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
         0x0804942F main+31
@@ -8948,19 +8958,13 @@ Add support for Digital UNIX and also the BSD systems (specifically FreeBSD,
 NetBSD, OpenBSD and SunOS) and other non-System V UNIX operating systems.
 
 @item
-There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
-is defined in @file{elf.h}, thus resulting in a conflicting definition when
-compiling @file{symbol.c}.
-
-@item
 The @option{--dynamic} option to the @command{mpatrol} command does not always
 work on systems whose dynamic linkers support the @env{LD_PRELOAD} or
 @env{_RLD_LIST} environment variables.  This is because the object file format
 access libraries do not exist in shared form on such systems.
 
 @item
-Perhaps add files to build the mpatrol library and tools as a Debian package
-and possibly also a package in the HP/UX package format.
+Perhaps add files to build the mpatrol library and tools as a Debian package.
 @end itemize
 
 @node Amiga notes, Windows notes, UNIX notes, Notes
@@ -9472,11 +9476,13 @@ I linked my program with the mpatrol library to trace all of its memory
 operations, such as @code{memcpy()} and @code{memcmp()}, but I get nothing in
 the log file.  Why is this?
 
-The memory operation functions do not automatically initialise the mpatrol
-library since on many systems the startup routines call them very early on.  If
-your program does not call any memory allocation functions to initialise the
-mpatrol library then you must explicitly call the @code{__mp_init()} function.
-All memory operation functions following that call with then be traced.
+On systems that do not support @samp{.init} and @samp{.fini} sections or are
+not @command{gcc} or C++ based then the memory operation functions will not
+automatically initialise the mpatrol library since on many systems the startup
+routines call them very early on.  On such systems, if your program does not
+call any memory allocation functions to initialise the mpatrol library then you
+must explicitly call the @code{__mp_init()} function.  All memory operation
+functions following that call with then be traced.
 
 @item
 Why does the @option{USEDEBUG} option not work for me?
