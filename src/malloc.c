@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.28 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: malloc.c,v 1.29 2001-02-06 21:58:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.28 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.29 2001-02-06 21:58:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -353,6 +353,30 @@ void *
 MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Resize an existing block of memory but free the block if no memory is
+ * available to resize it.
+ */
+
+#ifdef reallocf
+#undef reallocf
+#endif /* reallocf */
+
+void *
+reallocf(void *p, size_t l)
+{
+    return __mp_realloc(p, l, 0, AT_REALLOCF, NULL, NULL, 0, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *
+MP_ALTFUNCNAME(reallocf)(void *p, size_t l)
+{
+    return __mp_realloc(p, l, 0, AT_REALLOCF, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

@@ -353,6 +353,9 @@ struct mallinfo
 #ifdef realloc
 #undef realloc
 #endif /* realloc */
+#ifdef reallocf
+#undef reallocf
+#endif /* reallocf */
 #ifdef recalloc
 #undef recalloc
 #endif /* recalloc */
@@ -480,6 +483,8 @@ struct mallinfo
                                    __FILE__, __LINE__, 0)
 #define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, MP_FUNCNAME, \
                                    __FILE__, __LINE__, NULL, 0, 0)
+#define reallocf(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOCF, MP_FUNCNAME, \
+                                    __FILE__, __LINE__, NULL, 0, 0)
 #define recalloc(p, l, n) __mp_realloc((p), (l) * (n), 0, MP_AT_RECALLOC, \
                                        MP_FUNCNAME, __FILE__, __LINE__, NULL, \
                                        0, 0)

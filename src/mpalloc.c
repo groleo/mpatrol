@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.8 2001-02-06 20:25:50 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.9 2001-02-06 21:58:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.8 2001-02-06 20:25:50 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.9 2001-02-06 21:58:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -375,10 +375,13 @@ void *
 __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              unsigned long u, char *g, size_t h, size_t k)
 {
+    void *q;
+
     checkalloca(&p);
     if (f == AT_XREALLOC)
         return __mp_xrealloc(p, l, s, t, u, g, h);
-    else if ((f != AT_REALLOC) && (f != AT_RECALLOC) && (f != AT_EXPAND))
+    else if ((f != AT_REALLOC) && (f != AT_REALLOCF) && (f != AT_RECALLOC) &&
+             (f != AT_EXPAND))
         illegalfunction("__mp_realloc", s, t, u);
     /* There is a major limitation here in that we don't know the size of
      * the existing memory allocation.  This means that we can't implement
@@ -398,6 +401,12 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     {
         free(p);
         p = NULL;
+    }
+    else if (f == AT_REALLOCF)
+    {
+        if ((q = realloc(p, l)) == NULL)
+            free(p);
+        p = q;
     }
     else if (f != AT_EXPAND)
         p = realloc(p, l);

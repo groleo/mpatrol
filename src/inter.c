@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.75 2001-02-06 20:25:50 graeme Exp $"
+#ident "$Id: inter.c,v 1.76 2001-02-06 22:01:06 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.75 2001-02-06 20:25:50 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.76 2001-02-06 22:01:06 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -791,8 +791,11 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             q = NULL;
         else
             __mp_memcopy(q, p, l);
-        if ((q == NULL) && (f == AT_XREALLOC))
-            abort();
+        if (q == NULL)
+            if (f == AT_REALLOCF)
+                free(p);
+            else if (f == AT_XREALLOC)
+                abort();
         return q;
     }
 #endif /* TARGET && __GNUC__ */
