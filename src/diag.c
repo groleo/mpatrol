@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.102 2001-12-11 21:50:45 graeme Exp $"
+#ident "$Id: diag.c,v 1.103 2001-12-18 21:44:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.102 2001-12-11 21:50:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.103 2001-12-18 21:44:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -166,7 +166,7 @@ MP_GLOBAL errorinfo __mp_errordetails[ET_MAX + 1] =
  * allocation function.
  */
 
-MP_GLOBAL char *__mp_functionnames[AT_MAX] =
+MP_GLOBAL char *__mp_functionnames[AT_MAX + 1] =
 {
     "malloc",
     "calloc",
@@ -205,7 +205,8 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "memchr",
     "memmem",
     "memcmp",
-    "bcmp"
+    "bcmp",
+    "check"
 };
 
 
@@ -214,7 +215,7 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
  * structure is not used.
  */
 
-MP_GLOBAL char *__mp_lognames[LT_MAX] =
+MP_GLOBAL char *__mp_lognames[LT_MAX + 1] =
 {
     "ALLOC",
     "REALLOC",
@@ -222,7 +223,8 @@ MP_GLOBAL char *__mp_lognames[LT_MAX] =
     "MEMSET",
     "MEMCOPY",
     "MEMFIND",
-    "MEMCMP"
+    "MEMCMP",
+    "LOG"
 };
 
 
@@ -1361,7 +1363,7 @@ MP_GLOBAL
 void
 __mp_log(infohead *h, loginfo *i)
 {
-    if ((h->recur == 1) && (i->ltype != LT_MAX) && !i->logged)
+    if ((h->recur == 1) && !i->logged)
     {
         i->logged = 1;
         if (__mp_diagflags & FLG_HTML)
@@ -1434,6 +1436,10 @@ __mp_log(infohead *h, loginfo *i)
                       i->variant.logmemcompare.block2);
             __mp_printsize(i->variant.logmemcompare.size);
             __mp_diag(") ");
+            logcall(h, i, 0);
+            break;
+          case LT_MAX:
+            __mp_diag(" () ");
             logcall(h, i, 0);
             break;
         }
