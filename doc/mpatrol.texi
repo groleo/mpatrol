@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.191 2001-02-25 21:56:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.192 2001-02-25 22:13:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2547,34 +2547,50 @@ in @file{tests/pass/test4.c}).
  73              d.typestr ? d.typestr : "<unknown>");
  74      fprintf(stderr, "typesize: %lu\n", d.typesize);
  75      fprintf(stderr, "userdata: 0x%0*lX\n", sizeof(void *) * 2, d.userdata);
- 76      fprintf(stderr, "freed:    %d\n", d.freed);
- 77  @}
+ 76      fputs("flags:   ", stderr);
+ 77      if (!d.freed && !d.marked && !d.profiled && !d.traced && !d.internal)
+ 78          fputs(" none\n", stderr);
+ 79      else
+ 80      @{
+ 81          if (d.freed)
+ 82              fputs(" freed", stderr);
+ 83          if (d.marked)
+ 84              fputs(" marked", stderr);
+ 85          if (d.profiled)
+ 86              fputs(" profiled", stderr);
+ 87          if (d.traced)
+ 88              fputs(" traced", stderr);
+ 89          if (d.internal)
+ 90              fputs(" internal", stderr);
+ 91          fputc('\n', stderr);
+ 92      @}
+ 93  @}
 
 
- 80  void func2(void)
- 81  @{
- 82      void *p;
+ 96  void func2(void)
+ 97  @{
+ 98      void *p;
 
- 84      if (p = malloc(16))
- 85      @{
- 86          display(p);
- 87          free(p);
- 88      @}
- 89      display(p);
- 90  @}
-
-
- 93  void func1(void)
- 94  @{
- 95      func2();
- 96  @}
+100      if (p = malloc(16))
+101      @{
+102          display(p);
+103          free(p);
+104      @}
+105      display(p);
+106  @}
 
 
- 99  int main(void)
-100  @{
-101      func1();
-102      return EXIT_SUCCESS;
-103  @}
+109  void func1(void)
+110  @{
+111      func2();
+112  @}
+
+
+115  int main(void)
+116  @{
+117      func1();
+118      return EXIT_SUCCESS;
+119  @}
 @end smallexample
 
 When this is compiled and run, it should give the following output, although
@@ -2590,7 +2606,7 @@ thread:   0
 event:    97
 func:     func2
 file:     test4.c
-line:     84
+line:     100
           0x0804A743 func2+35 [./a.out]
           0x0804A790 func1+8 [./a.out]
           0x0804A79C main+8 [./a.out]
@@ -2599,7 +2615,7 @@ line:     84
 typestr:  <unknown>
 typesize: 0
 userdata: 0x00000000
-freed:    0
+flags:    none
 nothing known about address 0x0806A0E8
 @end smallexample
 
