@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: library.c,v 1.3 2000-05-15 23:37:48 graeme Exp $"
+#ident "$Id: library.c,v 1.4 2000-11-30 22:12:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -57,6 +57,7 @@
 #include "diag.c"
 #include "option.c"
 #include "profile.c"
+#include "trace.c"
 #include "inter.c"
 #if TARGET == TARGET_UNIX || (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
     TARGET == TARGET_WINDOWS
