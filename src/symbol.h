@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: symbol.h,v 1.15 2001-02-10 16:45:39 graeme Exp $
+ * $Id: symbol.h,v 1.16 2001-02-27 20:32:22 graeme Exp $
  */
 
 
@@ -87,6 +87,7 @@ typedef struct symhead
     size_t size;      /* number of symbol nodes in table */
     void *hhead;      /* access library handle list head */
     void *htail;      /* access library handle list tail */
+    void *inits;      /* initialisation functions handle */
     memaccess prot;   /* protection status */
     size_t protrecur; /* protection recursion count */
     char lineinfo;    /* line number information flag */
@@ -100,7 +101,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newsymbols(symhead *, heaphead *);
+MP_EXPORT void __mp_newsymbols(symhead *, heaphead *, void *);
 MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
 MP_EXPORT int __mp_addsymbols(symhead *, char *, char *, size_t);

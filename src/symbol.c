@@ -121,9 +121,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.51 2001-02-05 22:58:34 graeme Exp $"
+#ident "$Id: symbol.c,v 1.52 2001-02-27 20:32:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.51 2001-02-05 22:58:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.52 2001-02-27 20:32:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -309,7 +309,7 @@ void _DYNAMIC(void);
 
 MP_GLOBAL
 void
-__mp_newsymbols(symhead *y, heaphead *h)
+__mp_newsymbols(symhead *y, heaphead *h, void *i)
 {
     struct { char x; symnode y; } z;
     long n;
@@ -326,6 +326,7 @@ __mp_newsymbols(symhead *y, heaphead *h)
     __mp_newtree(&y->dtree);
     y->size = 0;
     y->hhead = y->htail = NULL;
+    y->inits = i;
     y->prot = MA_NOACCESS;
     y->protrecur = 0;
     y->lineinfo = 0;
@@ -373,6 +374,7 @@ __mp_deletesymbols(symhead *y)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
+    y->inits = NULL;
     y->prot = MA_NOACCESS;
     y->protrecur = 0;
 }
