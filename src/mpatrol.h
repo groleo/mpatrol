@@ -84,6 +84,15 @@
 #endif /* MP_NOCPLUSPLUS */
 
 
+/* A macro for requiring the use of MP_NEW and MP_DELETE instead of new
+ * and delete in order to use the mpatrol versions of the C++ operators.
+ */
+
+#ifndef MP_NONEWDELETE
+#define MP_NONEWDELETE 0
+#endif /* MP_NONEWDELETE */
+
+
 /* Options for backwards compatibility with other versions of mallopt().  They
  * are all currently ignored as they have no meaning when used with mpatrol.
  */
@@ -336,12 +345,21 @@ __mp_allocinfo;
 
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
+#if MP_NONEWDELETE
+#ifdef MP_NEW
+#undef MP_NEW
+#endif /* MP_NEW */
+#ifdef MP_DELETE
+#undef MP_DELETE
+#endif /* MP_DELETE */
+#else /* MP_NONEWDELETE */
 #ifdef new
 #undef new
 #endif /* new */
 #ifdef delete
 #undef delete
 #endif /* delete */
+#endif /* MP_NONEWDELETE */
 #endif /* __cplusplus */
 #endif /* MP_NOCPLUSPLUS */
 
@@ -453,6 +471,9 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 
 #define dealloca(p)
 
+#define MP_NEW new
+#define MP_DELETE delete
+
 #define __mp_init() ((void) 0)
 #define __mp_fini() ((void) 0)
 #define __mp_alloc(l, a, f, s, t, u, k) ((void *) NULL)
@@ -550,8 +571,13 @@ MP_INLINE void operator delete[](void *p)
 }
 
 
+#if MP_NONEWDELETE
+#define MP_NEW ::new(MP_FUNCNAME, __FILE__, __LINE__)
+#define MP_DELETE __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
+#else /* MP_NONEWDELETE */
 #define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
 #define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
+#endif /* MP_NONEWDELETE */
 
 #endif /* NDEBUG */
 #endif /* __cplusplus */
