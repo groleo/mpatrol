@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.138 2001-08-01 21:15:14 graeme Exp $"
+#ident "$Id: inter.c,v 1.139 2001-08-01 21:19:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.138 2001-08-01 21:15:14 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.139 2001-08-01 21:19:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2863,24 +2863,24 @@ __mp_remcontents(char *s, void *p)
 
 #if TARGET == TARGET_WINDOWS || SYSTEM == SYSTEM_CYGWIN
 #if FORMAT == FORMAT_PE || DYNLINK == DYNLINK_WINDOWS || MP_LIBRARYSTACK_SUPPORT
-void __mp_libimagehlp(void) {}
+MP_API void __mp_libimagehlp(void) {}
 #endif /* FORMAT && DYNLINK && MP_LIBRARYSTACK_SUPPORT */
 #elif SYSTEM == SYSTEM_HPUX
 #if MP_LIBRARYSTACK_SUPPORT
-void __mp_libcl(void) {}
+MP_API void __mp_libcl(void) {}
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
 #if MP_LIBRARYSTACK_SUPPORT
-void __mp_libexc(void) {}
+MP_API void __mp_libexc(void) {}
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* TARGET && SYSTEM */
 #if (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF) && SYSTEM != SYSTEM_LYNXOS
-void __mp_libld(void) {}
+MP_API void __mp_libld(void) {}
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
-void __mp_libelf(void) {}
+MP_API void __mp_libelf(void) {}
 #elif FORMAT == FORMAT_BFD
-void __mp_libbfd(void) {}
-void __mp_libiberty(void) {}
+MP_API void __mp_libbfd(void) {}
+MP_API void __mp_libiberty(void) {}
 #endif /* FORMAT */
 
 
