@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.55 2000-12-22 00:25:34 graeme Exp $"
+#ident "$Id: inter.c,v 1.56 2000-12-24 22:33:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1384,8 +1384,10 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
 void
 chkr_set_right(void *p, size_t l, unsigned char a)
 {
+    char *s, *t;
     stackinfo i;
     loginfo v;
+    unsigned long u;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
@@ -1402,9 +1404,24 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* No filename was passed through so attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
@@ -1422,8 +1439,10 @@ chkr_set_right(void *p, size_t l, unsigned char a)
 void
 chkr_copy_bitmap(void *p, void *q, size_t l)
 {
+    char *s, *t;
     stackinfo i;
     loginfo v;
+    unsigned long u;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
@@ -1440,9 +1459,24 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* No filename was passed through so attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v) ||
         !__mp_checkrange(&memhead, q, l, AT_MAX, &v))
@@ -1460,8 +1494,10 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
 void
 chkr_check_addr(void *p, size_t l, unsigned char a)
 {
+    char *s, *t;
     stackinfo i;
     loginfo v;
+    unsigned long u;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
@@ -1478,9 +1514,24 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* No filename was passed through so attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
@@ -1497,9 +1548,11 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
 void
 chkr_check_str(char *p, unsigned char a)
 {
+    char *s, *t;
     stackinfo i;
     loginfo v;
     size_t l;
+    unsigned long u;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
@@ -1516,9 +1569,24 @@ chkr_check_str(char *p, unsigned char a)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* No filename was passed through so attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     if (!__mp_checkstring(&memhead, p, &l, AT_MAX, &v, 0))
     {
@@ -1535,8 +1603,10 @@ chkr_check_str(char *p, unsigned char a)
 void
 chkr_check_exec(void *p)
 {
+    char *s, *t;
     stackinfo i;
     loginfo v;
+    unsigned long u;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
@@ -1553,9 +1623,24 @@ chkr_check_exec(void *p)
     __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
         __mp_getframe(&i);
-    v.func = NULL;
-    v.file = NULL;
-    v.line = 0;
+    /* No filename was passed through so attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    v.func = s;
+    v.file = t;
+    v.line = u;
     v.stack = &i;
     restoresignals();
 }
