@@ -280,9 +280,9 @@
 #ifndef _MULTITHREADED
 #define _MULTITHREADED 1
 #endif /* _MULTITHREADED */
-#ifndef _POSIX_THREADS_CALLS
-#define _POSIX_THREADS_CALLS 1
-#endif /* _POSIX_THREADS_CALLS */
+#ifndef __POSIX4_D9__
+#define __POSIX4_D9__ 1
+#endif /* __POSIX4_D9__ */
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #ifndef _MT
