@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.249 2001-09-13 19:32:51 graeme Exp $
+@c $Id: mpatrol.texi,v 1.250 2001-09-17 22:25:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.13
 @set VERSION 1.4.8
-@set UPDATED 13th September, 2001
+@set UPDATED 17th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -855,7 +855,7 @@ Comes with a library of tools that are built on top of the mpatrol library and
 can be used to extend it for specific applications.
 
 @item
-An Automake macro is provided to ease the integration of mpatrol into a new or
+An automake macro is provided to ease the integration of mpatrol into a new or
 existing project.
 
 @item
@@ -864,8 +864,9 @@ that can be represented in hexadecimal form.  Such hexadecimal constants can be
 used to initialise variables in user programs in order to aid debugging.
 
 @item
-Build scripts are supplied to build both installation packages and binary
-distributions.  A Linux Software Map file is also provided.
+The library and tools can be built using the GNU autoconf, automake and libtool
+utilities.  Build scripts are also supplied to build both installation packages
+and binary distributions.  A Linux Software Map file is also provided.
 
 @cindex test suite
 @item
@@ -900,6 +901,24 @@ Note that if you want to check the integrity of the files that came with the
 mpatrol distribution you can use the @file{CHECKSUMS} file in the @file{mpatrol}
 base directory.  You must have the @command{md5sum} command installed on your
 system in order to make use of this file.
+
+@cindex autoconf
+@cindex automake
+@cindex libtool
+@cindex configure
+@cindex setup
+@cindex cleanup
+@cindex distclean (make target)
+If you wish to use GNU autoconf, automake and libtool to build and install
+mpatrol you may do so by entering the @file{pkg/auto} directory and typing
+@samp{./setup}.  This will construct the directory structure that is required
+by these tools and will also create a @file{configure} script.  Please see the
+@file{INSTALL} file in that directory for information on how to proceed.  Note
+that you can clean up the @file{pkg/auto} directory by typing @samp{make
+distclean} (if the @file{configure} script has already been run) followed by
+@samp{./cleanup}.
+
+For a manual installation, perform the following steps.
 
 @enumerate 1
 @item
@@ -1217,14 +1236,12 @@ symbolic information will be available if the executable files have not had
 their symbol tables stripped from them, although mpatrol can also fall back to
 using the dynamic symbol table from dynamically linked executable files.
 
-@cindex autoconf
-@cindex automake
 @cindex AM_WITH_MPATROL
-Note that an Automake macro is now provided to allow you to integrate mpatrol
-into a new or existing project that uses the GNU Autoconf and Automake tools.
+Note that an automake macro is now provided to allow you to integrate mpatrol
+into a new or existing project that uses the GNU autoconf and automake tools.
 It is located in @file{extra/mpatrol.m4}, which should be copied to the
-directory containing all of the local Autoconf and Automake macros on your
-system, usually @file{/usr/local/share/aclocal}.  The Automake macro it defines
+directory containing all of the local autoconf and automake macros on your
+system, usually @file{/usr/local/share/aclocal}.  The automake macro it defines
 is called @code{AM_WITH_MPATROL}, which should be added to the libraries section
 in the @file{configure.in} file for your project.  It takes one optional
 parameter specifying whether mpatrol should be included in the project
@@ -1236,12 +1253,12 @@ option to the resulting @file{configure} shell script.
 @cindex HAVE_MPATROL
 @cindex HAVE_MPALLOC
 @cindex mpdebug.h
-If you are using the @code{AM_WITH_MPATROL} Automake macro then you may wish to
+If you are using the @code{AM_WITH_MPATROL} automake macro then you may wish to
 use the @file{mpdebug.h} header file instead of @file{mpatrol.h}.  This ensures
 that the @code{MP_MALLOC()} family of functions are always defined, even if
 libmpatrol or libmpalloc are unavailable.  It makes use of the
 @code{HAVE_MPATROL} and @code{HAVE_MPALLOC} preprocessor macros that are
-controlled by the Automake macro, but in other respects behaves in exactly the
+controlled by the automake macro, but in other respects behaves in exactly the
 same way as @file{mpatrol.h}.
 
 @node Removing mpatrol, , Adding mpatrol, Integration
@@ -1281,7 +1298,7 @@ option but relies on you having originally made these changes when you first
 started integrating the mpatrol library into your program.
 @end enumerate
 
-Note that if you used the @code{AM_WITH_MPATROL} Automake macro as detailed in
+Note that if you used the @code{AM_WITH_MPATROL} automake macro as detailed in
 the previous section to build your application then you should perform a clean
 recompilation using the @option{--without-mpatrol} option to the
 @file{configure} shell script in order to completely remove the mpatrol library.
@@ -12358,6 +12375,14 @@ options to @command{mprof} to write out files that can be used by chart drawing
 software for a better visualisation of the first few profiling tables.
 
 @item
+Perhaps the allocation call graph table should have the capability to be sorted
+in @command{mprof} and the @option{--leaks} option should work with it as well.
+There should be better handling of cycles in the call graph and there is
+currently a problem in that @command{mprof} cannot distinguish between call
+sites with very low code addresses that have no symbols and that conflict with
+existing symbol indices.
+
+@item
 Extend the @command{mptrace} command to graphically display the size of the heap
 plotted against time and the allocation size frequency.  Also rewrite the GUI
 support to use GNOME instead of Motif, possibly also using GLADE.
@@ -12414,7 +12439,8 @@ that have long periods of time where no dynamic memory allocation functions are
 called, but heap allocations are still manipulated.  In addition, checks could
 automatically be made upon receipt of special signals sent to the program by
 the user and information about the last successful verification of the heap
-could be used to narrow down problems.
+could be used to narrow down problems.  Perhaps even some statistics could be
+printed on receipt of a special signal as well.
 
 @item
 Add a diagnostic number count to each warning and error reported in the log
@@ -12546,6 +12572,14 @@ in the mpatrol log file.
 Perhaps add memory protection to the simulated @code{sbrk} heap.
 
 @item
+Add an option to force the mpatrol library to return @samp{NULL} if it is
+asked to allocate a zero-sized block of memory.  This might be useful for SVID
+compliant programs.  Perhaps also extend the mpatrol library to allow
+zero-sized blocks.  I suspect the easiest way to do this is to have a special
+address that is always returned for such blocks and that will have the
+appropriate size of overflow buffers depending on the options used.
+
+@item
 Add an option to report if one thread resizes or frees another thread's
 allocations.  This may not be useful in most cases, but it might be possible
 to track down some obscure bugs in some situations.
@@ -12564,8 +12598,9 @@ memory access when it is displaying the summary.  This should be prevented by
 disabling the signal handler at its first entry.
 
 @item
-Need to make the mpalloc library threadsafe.  This is only likely to be an
-issue when calling @code{MP_FAILURE()}.  Should also add something similar to
+Need to make the mpalloc library threadsafe@footnote{And perhaps also make the
+mptools library threadsafe as well}.  This is only likely to be an issue when
+calling @code{MP_FAILURE()}.  Should also add something similar to
 @code{xmalloc_set_program_name()} in order to show the program name when a
 memory allocation fails.  If the C++ operators fail to allocate memory in
 libmpalloc then there should probably also be an exception thrown to mimic the
@@ -12589,7 +12624,10 @@ standard input file stream.
 @item
 Perhaps add an option to the @command{mpatrol} command to read in the current
 value of the @env{MPATROL_OPTIONS} environment variable before adding options
-to it.
+to it.  Another good idea might be to have the @command{mpatrol} command read
+options from a configuration file instead of an environment variable, but that
+will only work if it doesn't involve allocating any memory before the mpatrol
+library has been initialised.
 
 @item
 Perhaps incorporate a C++ encoded name demangler into the mpatrol library.  The
@@ -12612,7 +12650,7 @@ hard to verify the tests since the heap addresses are likely to be different on
 every new build and will certainly be different across different platforms.
 
 @item
-Improve the Autoconf, Automake and Libtool support.  Also update the
+Improve the autoconf, automake and libtool support.  Also update the
 @command{mupdate} shell script to automatically update the version numbers
 contained in the files in the @file{pkg} directory.
 
@@ -12835,6 +12873,13 @@ to be looked into, but for the moment, don't mix them.
 @item
 The library cannot currently read any symbols from DLLs that have been read via
 @code{LoadLibrary()}.
+
+@item
+There seems to be a disparity between different versions of the imagehlp
+library.  It would appear that the latest incarnation of the imagehlp library
+has had some functions removed and placed in a new library called debughlp.
+Perhaps this simply means that @file{debughlp.lib} needs to be linked in as
+well, but maybe there's more to it than that.
 
 @item
 Perhaps add support for the @command{mpatrol} command's @option{--dynamic}
@@ -13658,6 +13703,7 @@ the mpatrol library as one large object file from @file{library.c}.  Note that
 the Windows and Netware @file{Makefile}s use @file{libmpatrol.obj}.
 
 @cindex CVS
+@cindex .cvsignore
 @item
 What are the @file{CVS} subdirectories that come with the mpatrol distribution?
 
@@ -13665,9 +13711,11 @@ CVS stands for Concurrent Versions System and is a project version control
 system.  All of the source files that comprise an mpatrol release are stored in
 a central CVS repository so that previous releases can be easily retrieved, but
 the CVS system needs to have a way of determining the versions of currently
-checked-out files, hence the @file{CVS} subdirectories.  You shouldn't need to
-worry about them, so just ignore them, and in later releases they should have
-been removed before a distribution was made.
+checked-out files, hence the @file{CVS} subdirectories.  The @file{.cvsignore}
+files within these directories simply inform CVS about which files to ignore
+when looking for changes.  You shouldn't need to worry about them, so just
+ignore them, and in later releases they should have been removed before a
+distribution was made.
 
 @item
 Why does the @command{mpsym} command not work for me?
