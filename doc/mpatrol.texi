@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.56 2000-04-13 18:39:35 graeme Exp $
+@c $Id: mpatrol.texi,v 1.57 2000-04-13 19:15:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1816,7 +1816,8 @@ address 0x80033000 located in allocated block:
 Some debuggers, such as @command{gdb}, also allow you to define your own
 commands for use in a debugging session.  The following example defines a
 new @command{gdb} command called @samp{printalloc} which calls
-@code{__mp_printinfo()}:
+@code{__mp_printinfo()}@footnote{A sample GDB command file for use with
+mpatrol can be found in @file{extra/.gdbinit}.}:
 
 @smallexample
 (gdb) define printalloc
@@ -5538,6 +5539,13 @@ reading, in case of problems where the library crashes during reading a call
 stack.
 
 @item
+Add a function to display a stack trace of the current call stack to a file
+stream and another function to walk all current memory allocations invoking a
+call-back function for each one encountered.  Note that there is still an issue
+with call-back functions if they call mpatrol library functions, since this
+will lead to recursion.
+
+@item
 In object file formats that support nested symbols (such as ELF), the current
 implementation will tend to show some shortcomings.  This is because there is
 currently no nesting count in the function that deals with symbol name lookup,
@@ -5576,7 +5584,8 @@ allocations have not been corrupted when the @option{NOFREE} and
 @option{PRESERVE} options are in use on platforms which have no memory
 protection.  This could also be extended to marking allocated memory blocks
 and then displaying what blocks have changed after a certain period from within
-a debugger.
+a debugger.  Another idea could be to display all memory allocations, etc.
+made since a certain function was called from within a program.
 
 @item
 Improve use of watch points by allowing an option which will only install write
@@ -5640,7 +5649,19 @@ Write a set of functions that are compatible with those implemented by Checker,
 the @command{gcc} run-time memory access checker.  This would allow every memory
 access to be checked in object files compiled with @command{gcc}, not just
 pointers into the heap, and would provide error checking as effective as source
-code instrumentation.
+code instrumentation.  Could also make use of the @code{etext}, @code{edata} and
+@code{end} pointers that are set at run-time on most UNIX systems.
+
+@item
+Perhaps remove the automatic logging of memory operations from programs run
+through the @command{mpatrol} command, and instead add an option to do it
+explicitly.
+
+@item
+Add an option to specify that all failed memory allocations should abort (or at
+least give a warning) instead of returning a @samp{NULL} pointer.  Also, perhaps
+add an option to display the partial contents of freed and unfreed allocations
+in the mpatrol log file.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
