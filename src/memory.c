@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.23 2000-05-31 18:32:09 graeme Exp $"
+#ident "$Id: memory.c,v 1.24 2000-06-01 20:41:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -199,6 +199,8 @@ static char *progname(void)
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
     extern char **p_xargv;
+#elif SYSTEM == SYSTEM_HPUX
+    extern char **__argv_value;
 #elif SYSTEM == SYSTEM_IRIX
     extern char **__Argv;
 #elif SYSTEM == SYSTEM_LINUX
@@ -221,11 +223,14 @@ static char *progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-    /* AIX and IRIX have global variables containing argc and argv which we
-     * can use to determine the filename that the program was invoked with.
+    /* AIX, HP/UX and IRIX have global variables containing argc and argv
+     * which we can use to determine the filename that the program was
+     * invoked with.
      */
 #if SYSTEM == SYSTEM_AIX
     return p_xargv[0];
+#elif SYSTEM == SYSTEM_HPUX
+    return __argv_value[0];
 #elif SYSTEM == SYSTEM_IRIX
     return __Argv[0];
 #elif SYSTEM == SYSTEM_LINUX
