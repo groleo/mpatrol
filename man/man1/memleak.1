@@ -1,0 +1,70 @@
+.\" mpatrol
+.\" A library for controlling and tracing dynamic memory allocations.
+.\" Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+.\" MA 02111-1307, USA.
+.\"
+.\" UNIX Manual Page
+.\"
+.\" $Id: memleak.1,v 1.1 2000-03-30 17:55:40 graeme Exp $
+.\"
+.TH MEMLEAK 1 "30 March 2000" "Release 1.1" "mpatrol library"
+.SH NAME
+memleak \- locates memory leaks in an mpatrol log file
+.SH SYNOPSIS
+\fBmemleak\fP [\fIfile\fP]
+.SH DESCRIPTION
+The \fBmemleak\fP command is used to display all unfreed memory allocations
+from a log file produced by the mpatrol library.  This should be used if the
+mpatrol library could not finish writing the log file due to abnormal program
+termination (which would prevent the \fBSHOWUNFREED\fP option from working),
+but note that some of the unfreed allocations might have been freed if the
+program had terminated successfully.
+.PP
+The \fBmemleak\fP command scans through an mpatrol log file looking for lines
+beginning with \fIALLOC:\fP and \fIFREE:\fP but ignores lines beginning with
+\fIREALLOC:\fP, so only the \fBLOGALLOCS\fP and \fBLOGFREES\fP options are
+necessary when running a program linked with the mpatrol library.  Note that
+as a result of this, no attempt is made to account for resizing of memory
+allocations and so the total amount of memory used by the resulting unfreed
+allocations may not be entirely accurate.
+.PP
+The \fIfile\fP argument must be a valid mpatrol log filename but if \fIfile\fP
+is omitted then \fBmemleak\fP will use \fImpatrol.log\fP as the name of the log
+file to use.  The \fBmemleak\fP command makes two passes over the log file so
+the file must be randomly-accessable.
+.SH SEE ALSO
+\fBmpatrol\fP(1), \fBmpatrol\fP(3).
+.PP
+The mpatrol manual and FAQ.
+.SH AUTHOR
+Graeme S. Roy <graeme@epc.co.uk>
+.SH COPYRIGHT
+Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+.PP
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Library General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option) any
+later version.
+.PP
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for more
+details.
+.PP
+You should have received a copy of the GNU Library General Public License
+along with this library; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
