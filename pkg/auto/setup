@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.4 2001-08-02 22:34:37 graeme Exp $
+# $Id: setup,v 1.5 2001-08-02 22:40:17 graeme Exp $
 
 
 uselinks=1
@@ -75,7 +75,8 @@ if [ $generate = 0 ]
 then
     files="../../config/INSTALL ../../config/install-sh ../../config/missing
            ../../config/mkinstalldirs ../../config/config.guess
-           ../../config/config.sub ../../config/ltconfig ../../config/ltmain.sh"
+           ../../config/config.sub ../../config/ltconfig ../../config/ltmain.sh
+           ../../config/aclocal.m4 ../../config/configure"
     for file in $files
     do
         copyfile "$file" `basename "$file"`
