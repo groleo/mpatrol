@@ -26,7 +26,7 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.7 2001-03-06 19:34:13 graeme Exp $
+# $Id: mpsym,v 1.8 2001-03-08 18:20:13 graeme Exp $
 
 
 # Program version.
@@ -152,8 +152,13 @@ fi
 
 if [ ! -f "$logfile" ]
 then
-    echo "$progname: Cannot open file \`$logfile'" >&2
-    exit 1
+    logfile2="$progfile.log"
+    if [ ! -f "$logfile2" ]
+    then
+        echo "$progname: Cannot open file \`$logfile'" >&2
+        exit 1
+    fi
+    logfile="$logfile2"
 fi
 
 
