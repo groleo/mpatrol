@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.104 2000-07-16 23:51:13 graeme Exp $
+@c $Id: mpatrol.texi,v 1.105 2000-07-17 21:32:18 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.15
 @set VERSION 1.2.6
-@set UPDATED 16th July, 2000
+@set UPDATED 17th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -3752,6 +3752,16 @@ the library needs to check more and more overflow buffers every time it is
 called.  However, it can be quite useful for problems such as this one.  The
 test in @file{tests/fail/test3.c} has a similar situation.
 
+The numerical argument specified with the @option{NOFREE} option indicates the
+number of recently-freed memory allocations that are to be delayed from being
+returned to the free memory pool, with a value of zero meaning that no freed
+memory allocations will ever be reused.  Obviously, in an ideal world it would
+be nice to be able to specify @option{NOFREE=0} all the time, but this will
+gradually use up more and more memory since no system heap memory will ever be
+reused.  Supplying a different number to the @option{NOFREE} option allows you
+to make a compromise by storing the details of only the most recently-freed
+memory allocations.  How many details you wish to store is up to you.
+
 Normally, the @option{NOFREE} option will cause the library to fill all freed
 memory allocations with the free byte.  However, the original contents of such
 allocations can be preserved with the @option{PRESERVE} option.  This could
@@ -6558,6 +6568,14 @@ support for building on targets and architectures where no operating system
 features are required or even available.
 
 @item
+Need to improve the concurrency in the thread-safe version of the mpatrol
+library.  Currently, only one thread at a time is allowed to enter the mpatrol
+library, but it should be possible to extend this to protect individual data
+structures.  Note that this will not only help to improve efficiency, but might
+also allow the mpatrol library to uncover bugs in thread-safe code that are
+timing-dependent.
+
+@item
 Need to make the library re-entrant.  This could be achieved by moving the
 static variables in @file{memory.c}, @file{stack.c}, @file{mutex.c},
 @file{diag.c}, @file{option.c} and @file{sbrk.c} into the @code{infohead}
@@ -6738,6 +6756,13 @@ contents of a memory allocation to the log file.
 Perhaps add memory protection to the simulated @code{sbrk} heap.
 
 @item
+Perhaps add internationalisation support through the use of locales and message
+catalogs.  Unfortunately, there does not appear to be a unified method for doing
+this across all platforms and there may also be issues with third-party
+libraries calling @code{malloc()} and other related routines when the mpatrol
+library is attempting to initialise itself.
+
+@item
 There is currently a problem when the mpatrol library encounters an illegal
 memory access on UNIX and Windows platforms, and there is a further illegal
 memory access when it is displaying the summary.  This should be prevented by
@@ -6784,6 +6809,10 @@ Perhaps add benchmark tests for dynamic memory allocation functions and memory
 operation functions.  Obviously the mpatrol library would perform much worse
 than normal malloc libraries, but it would help to see just how much worse so
 that speed improvements could be made.
+
+@item
+Add support for the BeOS operating system, as well as MacOS and OS/2.  Perhaps
+MS-DOS might be possible as well.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
