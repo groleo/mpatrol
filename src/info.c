@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.77 2001-03-05 18:59:08 graeme Exp $"
+#ident "$Id: info.c,v 1.78 2001-03-06 22:12:59 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.77 2001-03-05 18:59:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.78 2001-03-06 22:12:59 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -177,6 +177,27 @@ __mp_atinit(infohead *h, void (*f)(void))
     else
     {
         h->inits[h->initcount++] = f;
+        r = 1;
+    }
+    return r;
+}
+
+
+/* Register a finalisation function to be called when the library is
+ * terminated.
+ */
+
+MP_GLOBAL
+int
+__mp_atfini(infohead *h, void (*f)(void))
+{
+    int r;
+
+    if (h->finicount == MP_MAXFINIS)
+        r = 0;
+    else
+    {
+        h->finis[h->finicount++] = f;
         r = 1;
     }
     return r;

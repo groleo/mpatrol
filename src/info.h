@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.51 2001-03-05 21:59:51 graeme Exp $
+ * $Id: info.h,v 1.52 2001-03-06 22:12:59 graeme Exp $
  */
 
 
@@ -272,6 +272,7 @@ extern "C"
 MP_EXPORT void __mp_newinfo(infohead *);
 MP_EXPORT void __mp_deleteinfo(infohead *);
 MP_EXPORT int __mp_atinit(infohead *, void (*)(void));
+MP_EXPORT int __mp_atfini(infohead *, void (*)(void));
 MP_EXPORT void *__mp_getmemory(infohead *, size_t, size_t, alloctype,
                                loginfo *);
 MP_EXPORT void *__mp_resizememory(infohead *, void *, size_t, size_t, alloctype,
