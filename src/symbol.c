@@ -121,7 +121,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.49 2001-02-01 18:50:40 graeme Exp $"
+#ident "$Id: symbol.c,v 1.50 2001-02-04 22:40:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -421,10 +421,12 @@ addsymbol(symhead *y, struct nlist *p, char *f, char *s, size_t b)
 
     a = b + p->n_value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
-     * for symbols which have a virtual address of zero.
+     * contains a '$', '@' or a '.', although GNU C++ destructors begin with
+     * `_._'.  We also don't allocate a symbol node for symbols which have a
+     * virtual address of zero.
      */
-    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0))
+    if ((s != NULL) && (*s != '\0') && ((strncmp(s, "_._", 3) == 0) ||
+         !strpbrk(s, "$@.")) && (a > 0))
     {
         if ((n = getsymnode(y)) == NULL)
             return 0;
@@ -466,12 +468,12 @@ addsymbol(symhead *y, SYMENT *p, char *f, char *s, size_t b)
 
     a = b + p->n_value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
-     * likely to be the name of a CSECT beginning with a '.' and not the
-     * original name of the function, so we skip the first character.  We
-     * also don't allocate a symbol node for symbols which have a virtual
-     * address of zero and we only remember symbols that are declared
-     * statically or externally visible.
+     * contains a '$', '@' or a '.', although GNU C++ destructors begin with
+     * `_._'.  However, in XCOFF the symbol name is likely to be the name of
+     * a CSECT beginning with a '.' and not the original name of the function,
+     * so we skip the first character.  We also don't allocate a symbol node
+     * for symbols which have a virtual address of zero and we only remember
+     * symbols that are declared statically or externally visible.
      */
     if ((s != NULL) &&
 #if FORMAT == FORMAT_XCOFF
@@ -479,7 +481,7 @@ addsymbol(symhead *y, SYMENT *p, char *f, char *s, size_t b)
 #else /* FORMAT */
         (*s != '\0') &&
 #endif /* FORMAT */
-        !strpbrk(s, "$@.") && (a > 0) &&
+        ((strncmp(s, "_._", 3) == 0) || !strpbrk(s, "$@.")) && (a > 0) &&
 #if FORMAT == FORMAT_XCOFF
         (ISFCN(p->n_type) || (p->n_sclass == C_EXT)))
 #else /* FORMAT */
@@ -532,10 +534,12 @@ addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
 
     a = b + p->st_value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
-     * for symbols which have a virtual address of zero or are of object type.
+     * contains a '$', '@' or a '.', although GNU C++ destructors begin with
+     * `_._'.  We also don't allocate a symbol node for symbols which have a
+     * virtual address of zero or are of object type.
      */
-    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0) &&
+    if ((s != NULL) && (*s != '\0') && ((strncmp(s, "_._", 3) == 0) ||
+         !strpbrk(s, "$@.")) && (a > 0) &&
         (((t = ELF32_ST_TYPE(p->st_info)) == STT_NOTYPE) || (t == STT_FUNC)))
     {
         if ((n = getsymnode(y)) == NULL)
@@ -573,10 +577,12 @@ addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
 
     a = b + p->st_value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
-     * for symbols which have a virtual address of zero or are of object type.
+     * contains a '$', '@' or a '.', although GNU C++ destructors begin with
+     * `_._'.  We also don't allocate a symbol node for symbols which have a
+     * virtual address of zero or are of object type.
      */
-    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0) &&
+    if ((s != NULL) && (*s != '\0') && ((strncmp(s, "_._", 3) == 0) ||
+         !strpbrk(s, "$@.")) && (a > 0) &&
         (((t = ELF64_ST_TYPE(p->st_info)) == STT_NOTYPE) || (t == STT_FUNC)))
     {
         if ((n = getsymnode(y)) == NULL)
@@ -613,14 +619,14 @@ addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 
     a = b + (size_t) p->value;
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
-     * likely to be the name of a CSECT beginning with a '.' and not the
-     * original name of the function, so we skip the first character.  In
-     * addition, the HP/UX $START$ symbol contains dollar characters but we
-     * don't want to bother allowing any other symbols containing dollars.
-     * We also don't allocate a symbol node for symbols which have a virtual
-     * address of zero and we only remember symbols that are declared
-     * statically, externally or weakly visible.
+     * contains a '$', '@' or a '.', although GNU C++ destructors begin with
+     * `_._'.  However, in XCOFF the symbol name is likely to be the name of
+     * a CSECT beginning with a '.' and not the original name of the function,
+     * so we skip the first character.  In addition, the HP/UX $START$ symbol
+     * contains dollar characters but we don't want to bother allowing any
+     * other symbols containing dollars.  We also don't allocate a symbol node
+     * for symbols which have a virtual address of zero and we only remember
+     * symbols that are declared statically, externally or weakly visible.
      */
     if ((s != NULL) &&
 #if (SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LYNXOS) && \
@@ -630,11 +636,12 @@ addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
         (*s != '\0') &&
 #endif /* SYSTEM && ARCH */
 #if SYSTEM == SYSTEM_HPUX
-        ((strcmp(s, "$START$") == 0) || !strpbrk(s, "$@.")) &&
+        ((strcmp(s, "$START$") == 0) || (strncmp(s, "_._", 3) == 0) ||
 #else /* SYSTEM */
-        !strpbrk(s, "$@.") &&
+        ((strncmp(s, "_._", 3) == 0) ||
 #endif /* SYSTEM */
-        (a > 0) && (p->flags & (BSF_LOCAL | BSF_GLOBAL | BSF_WEAK)))
+         !strpbrk(s, "$@.")) && (a > 0) &&
+        (p->flags & (BSF_LOCAL | BSF_GLOBAL | BSF_WEAK)))
     {
         if ((n = getsymnode(y)) == NULL)
             return 0;
