@@ -6760,9 +6760,10 @@ message to be given instead).
 
  @{" Functions 1                " link "Functions 1"}  C dynamic memory allocation functions.
  @{" Functions 2                " link "Functions 2"}  C dynamic memory extension functions.
- @{" Functions 3                " link "Functions 3"}  C++ dynamic memory allocation functions.
- @{" Functions 4                " link "Functions 4"}  C memory operation functions.
- @{" Functions 5                " link "Functions 5"}  mpatrol library functions.
+ @{" Functions 3                " link "Functions 3"}  C dynamic memory alternative functions.
+ @{" Functions 4                " link "Functions 4"}  C++ dynamic memory allocation functions.
+ @{" Functions 5                " link "Functions 5"}  C memory operation functions.
+ @{" Functions 6                " link "Functions 6"}  mpatrol library functions.
 
 
 @endnode
@@ -7141,6 +7142,100 @@ anyway, albeit with slightly less tracing information.
 @prev "Functions 2"
 @toc "Functions"
 
+C dynamic memory alternative functions
+======================================
+
+   The following 6 functions are provided as convenient alternatives to
+the ANSI C dynamic memory allocation functions (although @{b}strdup()@{ub} is
+not strictly an ANSI C function).  They are implemented as preprocessor
+macro functions which may evaluate their arguments more than once, so
+extra care should be taken to avoid passing arguments with
+side-effects.  None of the functions return @{b}NULL@{ub} if no memory is
+available and instead abort the program with a useful error message
+indicating where the call to allocate memory came from and what was
+being allocated.  To use these you should include the @{b}mpatrol.h@{ub} or
+@{b}mpalloc.h@{ub} header files.
+
+@{b}void *MP_MALLOC(void *ptr, size_t count, typename type)@{ub}
+     Allocates COUNT uninitialised items of type TYPE from the heap,
+     sets PTR to the result and returns a suitably-cast pointer to the
+     first item of the allocation.  The pointer returned will be
+     suitably aligned for holding items of type TYPE.  If COUNT is @{b}0@{ub}
+     then it will be implicitly rounded up to @{b}1@{ub}.  If there is not
+     enough space in the heap then the program will be aborted after
+     calling the allocation failure handler, which by default writes an
+     appropriate error message to the standard error file stream.  The
+     allocated memory in PTR must be deallocated with @{b}MP_FREE()@{ub} or
+     reallocated with @{b}MP_REALLOC()@{ub}.
+
+@{b}void *MP_CALLOC(void *ptr, size_t count, typename type)@{ub}
+     Allocates COUNT zero-initialised items of type TYPE from the heap,
+     sets PTR to the result and returns a suitably-cast pointer to the
+     first item of the allocation.  The pointer returned will be
+     suitably aligned for holding items of type TYPE.  If COUNT is @{b}0@{ub}
+     then it will be implicitly rounded up to @{b}1@{ub}.  If there is not
+     enough space in the heap then the program will be aborted after
+     calling the allocation failure handler, which by default writes an
+     appropriate error message to the standard error file stream.  The
+     allocated memory in PTR must be deallocated with @{b}MP_FREE()@{ub} or
+     reallocated with @{b}MP_REALLOC()@{ub}.
+
+@{b}char *MP_STRDUP(char *ptr, const char *str)@{ub}
+     Allocates exactly enough memory from the heap to duplicate STR
+     (including the terminating nul character), sets PTR to the result
+     and returns a suitably-cast pointer to the first byte of the
+     allocation after copying STR to the newly-allocated memory.  The
+     pointer returned will have no alignment constraints and can be
+     used to store character data up to the length of STR.  If there is
+     not enough space in the heap then the program will be aborted
+     after calling the allocation failure handler, which by default
+     writes an appropriate error message to the standard error file
+     stream.  The allocated memory in PTR must be deallocated with
+     @{b}MP_FREE()@{ub} or reallocated with @{b}MP_REALLOC()@{ub}.
+
+@{b}void *MP_REALLOC(void *ptr, size_t count, typename type)@{ub}
+     Resizes the memory allocation beginning at PTR to COUNT items of
+     type TYPE and returns a suitably-cast pointer to the first item of
+     the new allocation after copying PTR to the newly-allocated
+     memory, which will be truncated if COUNT is smaller than the
+     original number of items.  The pointer returned will be suitably
+     aligned for holding items of type TYPE.  If PTR is @{b}NULL@{ub} then the
+     call will be equivalent to @{b}MP_MALLOC()@{ub}.  If COUNT is @{b}0@{ub} then it
+     will be implicitly rounded up to @{b}1@{ub}.  If COUNT is greater than the
+     original number of items then the extra space will be filled with
+     uninitialised bytes.  If there is not enough space in the heap
+     then the program will be aborted after calling the allocation
+     failure handler, which by default writes an appropriate error
+     message to the standard error file stream.  The allocated memory
+     must be deallocated with @{b}MP_FREE()@{ub} and can be reallocated again
+     with @{b}MP_REALLOC()@{ub}.
+
+@{b}void MP_FREE(void *ptr)@{ub}
+     Frees the memory allocation beginning at PTR so the memory can be
+     reused by another call to allocate memory, and sets PTR to @{b}NULL@{ub}
+     after freeing the memory.  If PTR is @{b}NULL@{ub} then no memory will be
+     freed.
+
+@{b}__mp_failhandler MP_FAILURE(__mp_failhandler func)@{ub}
+     Installs an allocation failure handler specifically for use with
+     @{b}MP_MALLOC()@{ub}, @{b}MP_CALLOC()@{ub}, @{b}MP_STRDUP()@{ub} and @{b}MP_REALLOC()@{ub} and returns
+     a pointer to the previously installed handler, normally the
+     default handler if no handler had been previously installed.  This
+     will be called by the above functions when there is not enough
+     space in the heap for them to satisfy their allocation request.
+     The default allocation failure handler will terminate the program
+     after writing an error message to the standard error file stream
+     indicating where the original allocation request took place and
+     what was being allocated.
+
+
+@endnode
+
+@node "Functions 4" "mpatrol.guide/Functions 4"
+@next "Functions 5"
+@prev "Functions 3"
+@toc "Functions"
+
 C++ dynamic memory allocation functions
 =======================================
 
@@ -7207,9 +7302,9 @@ information.
 
 @endnode
 
-@node "Functions 4" "mpatrol.guide/Functions 4"
-@next "Functions 5"
-@prev "Functions 3"
+@node "Functions 5" "mpatrol.guide/Functions 5"
+@next "Functions 6"
+@prev "Functions 4"
 @toc "Functions"
 
 C memory operation functions
@@ -7316,20 +7411,55 @@ anyway, albeit with slightly less tracing information.
 
 @endnode
 
-@node "Functions 5" "mpatrol.guide/Functions 5"
-@prev "Functions 4"
+@node "Functions 6" "mpatrol.guide/Functions 6"
+@prev "Functions 5"
 @toc "Functions"
 
 mpatrol library functions
 =========================
 
-   The following 20 functions are available as support routines for
+   The following 24 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the @{b}mpatrol.h@{ub} header file.
+
+@{b}unsigned long __mp_setoption(long opt, unsigned long val)@{ub}
+     Sets the value of an mpatrol option after the library has been
+     initialised.  Options that require values are listed in @{b}mpatrol.h@{ub}
+     prefixed with @{b}MP_OPT_*@{ub}.  The OPT argument should be set to one of
+     these macros, and the VAL argument should be set to the option
+     value, cast to an unsigned integer.  The return value will be @{b}0@{ub} on
+     success and @{b}1@{ub} on failure.  Options that are flags are listed in
+     @{b}mpatrol.h@{ub} prefixed with @{b}MP_FLG_*@{ub}.  Multiple flags can be set or
+     unset at once using the @{b}MP_OPT_SETFLAGS@{ub} and @{b}MP_OPT_UNSETFLAGS@{ub}
+     options respectively, with the necessary flags specified in VAL.
+     The return value will be @{b}0@{ub} on success and a combination of all of
+     the flags that could not be set or unset on failure.
+
+@{b}int __mp_getoption(long opt, unsigned long *val)@{ub}
+     Gets the value of an mpatrol option after the library has been
+     initialised.  If OPT is a valid option listed in @{b}mpatrol.h@{ub} then @{b}1@{ub}
+     will be returned and the associated value will be returned in VAL
+     and cast to an unsigned integer, otherwise @{b}0@{ub} will be returned.  If
+     OPT is @{b}MP_OPT_SETFLAGS@{ub} then all of the mpatrol library flags that
+     are set will be returned in VAL.  If OPT is @{b}MP_OPT_UNSETFLAGS@{ub} then
+     all of the mpatrol library flags that are not set will be returned
+     in VAL.
 
 @{b}char *__mp_function(__mp_alloctype func)@{ub}
      Returns the name of the function corresponding to the allocation
      type FUNC or @{b}NULL@{ub} if no such allocation type exists.
+
+@{b}int __mp_setuser(const void *ptr, const void *data)@{ub}
+     Sets the user data for the memory allocation containing PTR.  The
+     contents of DATA are entirely application-specific as user data
+     will never be examined by the mpatrol library.  Such data is
+     associated with a memory allocation for its entire lifetime unless
+     overridden by a subsequent call to @{b}__mp_setuser()@{ub}.  As such, the
+     user data must be valid for the entire lifetime of the memory
+     allocation, perhaps even after the allocation has been freed if
+     the @{b}NOFREE@{ub} option is being used.  This function returns @{b}1@{ub} if there
+     is an allocated (or freed) memory block containing PTR, and @{b}0@{ub}
+     otherwise.
 
 @{b}int __mp_info(const void *ptr, __mp_allocinfo *info)@{ub}
      Obtains information about a specific memory allocation by placing
@@ -7345,10 +7475,14 @@ you should include the @{b}mpatrol.h@{ub} header file.
      @{b}alloc@{ub}         Allocation index.
      @{b}realloc@{ub}       Number of times reallocated.
      @{b}thread@{ub}        Thread identifier.
+     @{b}event@{ub}         Event of last modification.
      @{b}func@{ub}          Function in which allocation took place.
      @{b}file@{ub}          File in which allocation took place.
      @{b}line@{ub}          Line number at which allocation took place.
      @{b}stack@{ub}         Pointer to function call stack.
+     @{b}typestr@{ub}       Type stored in allocation.
+     @{b}typesize@{ub}      Size of type stored in allocation.
+     @{b}userdata@{ub}      User data associated with allocation.
      @{b}freed@{ub}         Indicates if allocation has been freed.
 
 @{b}int __mp_syminfo(const void *ptr, __mp_symbolinfo *info)@{ub}
@@ -7377,7 +7511,7 @@ you should include the @{b}mpatrol.h@{ub} header file.
      the heap.  This number can then be used in later calls to
      @{b}__mp_iterate()@{ub}.
 
-@{b}size_t __mp_iterate(int (*func)(const void *), unsigned long event)@{ub}
+@{b}size_t __mp_iterate(int (*func)(const void *, void *), void *data, unsigned long event)@{ub}
      Iterates over all of the current allocated and freed memory
      allocations, calling FUNC with the start address of every memory
      allocation that has been modified since event number EVENT.  If
@@ -7387,7 +7521,9 @@ you should include the @{b}mpatrol.h@{ub} header file.
      number then the iteration process will be stopped immediately.  If
      FUNC returns a positive number above zero then @{b}__mp_iterate()@{ub} will
      return the number of times FUNC returned a non-zero number after
-     the iteration process has stopped.
+     the iteration process has stopped.  The DATA argument is passed
+     directly to FUNC as its second argument and is not read by the
+     mpatrol library.
 
 @{b}void __mp_memorymap(int stats)@{ub}
      If STATS is non-zero then the current statistics of the mpatrol
@@ -7399,6 +7535,22 @@ you should include the @{b}mpatrol.h@{ub} header file.
      Displays information about the current state of the mpatrol
      library, including its settings and any relevant statistics.
 
+@{b}int __mp_stats(__mp_heapinfo *info)@{ub}
+     Obtains statistics about the current state of the heap and places
+     them in INFO.  If this information could not be determined then @{b}0@{ub}
+     will be returned, otherwise @{b}1@{ub} will be returned and INFO will
+     contain the following information:
+
+     @{i}Field@{ui}         @{i}Description@{ui}
+     @{b}acount@{ub}        Total number of allocated blocks.
+     @{b}atotal@{ub}        Total size of allocated blocks.
+     @{b}fcount@{ub}        Total number of free blocks.
+     @{b}ftotal@{ub}        Total size of free blocks.
+     @{b}gcount@{ub}        Total number of freed blocks.
+     @{b}gtotal@{ub}        Total size of freed blocks.
+     @{b}icount@{ub}        Total number of internal blocks.
+     @{b}itotal@{ub}        Total size of internal blocks.
+
 @{b}void __mp_check(void)@{ub}
      Forces the library to perform an immediate check of the overflow
      buffers of every memory allocation and to ensure that nothing has
@@ -7406,13 +7558,15 @@ you should include the @{b}mpatrol.h@{ub} header file.
      the @{b}alloca()@{ub} family of functions are out of scope then this
      function will also cause them to be freed.
 
-@{b}void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t)@{ub}
+@{b}void (*__mp_prologue(void (*func)(const void *, size_t, const void *)))(const void *, size_t, const void *)@{ub}
      Installs a prologue function to be called before any memory
      allocation, reallocation or deallocation function.  This function
      will return a pointer to the previously installed prologue
-     function, or the @{b}NULL@{ub} pointer if no prologue function had been
+     function, or the null pointer if no prologue function had been
      previously installed.  The following arguments will be used to
-     call the prologue function:
+     call the prologue function (including a third argument containing
+     the return address of the calling function, or the null pointer if
+     it cannot be determined):
 
      @{i}Argument 1@{ui}    @{i}Argument 2@{ui}    @{i}Called by@{ui}
      @{b}-1@{ub}            SIZE          @{b}malloc()@{ub}, etc.
@@ -7420,13 +7574,15 @@ you should include the @{b}mpatrol.h@{ub} header file.
      PTR           @{b}-1@{ub}            @{b}free()@{ub}, etc.
      PTR           @{b}-2@{ub}            @{b}strdup()@{ub}, etc.
 
-@{b}void (*__mp_epilogue(void (*func)(const void *)))(const void *)@{ub}
+@{b}void (*__mp_epilogue(void (*func)(const void *, const void *)))(const void *, const void *)@{ub}
      Installs an epilogue function to be called after any memory
      allocation, reallocation or deallocation function.  This function
      will return a pointer to the previously installed epilogue
-     function, or the @{b}NULL@{ub} pointer if no epilogue function had been
+     function, or the null pointer if no epilogue function had been
      previously installed.  The following arguments will be used to
-     call the epilogue function:
+     call the epilogue function (including a second argument containing
+     the return address of the calling function, or the null pointer if
+     it cannot be determined):
 
      @{i}Argument@{ui}      @{i}Called by@{ui}
      PTR           @{b}malloc()@{ub}, @{b}realloc()@{ub}, @{b}strdup()@{ub}, etc.
@@ -7564,12 +7720,14 @@ a mixture of both.
      Specifies a range of allocation indices at which to check the
      integrity of free memory and overflow buffers.  The range must be
      specified as no more than two unsigned integers separated by a
-     dash.  If numbers on either the left side or the right side of the
-     dash are omitted then they will be assumed to be @{b}0@{ub} and INFINITY
-     respectively.  A value of @{b}0@{ub} on its own indicates that no such
-     checking will ever be performed.  This option can be used to speed
-     up the execution speed of the library at the expense of checking.
-     Default value: @{b}CHECK=-@{ub}.
+     dash, followed by an optional forward slash and an unsigned
+     integer specifying an event checking frequency.  If numbers on
+     either the left side or the right side of the dash are omitted
+     then they will be assumed to be @{b}0@{ub} and INFINITY respectively.  A
+     value of @{b}0@{ub} on its own indicates that no such checking will ever be
+     performed.  This option can be used to speed up the execution
+     speed of the library at the expense of checking.  Default value:
+     @{b}CHECK=0@{ub}.
 
 @{b}CHECKALL@{ub}
      Equivalent to the @{b}CHECKALLOCS@{ub}, @{b}CHECKREALLOCS@{ub}, @{b}CHECKFREES@{ub} and
@@ -7605,7 +7763,8 @@ a mixture of both.
      lines in the program will be affected and only then if they
      contain source-level information.  This option is currently only
      available on UNIX platforms as it makes use of the @{b}mpedit@{ub} command.
-     It also overrides the behaviour of the @{b}LIST@{ub} option.
+     It also overrides the behaviour of the @{b}LIST@{ub} option and affects the
+     behaviour of the @{b}__mp_view()@{ub} function.
 
 @{b}FAILFREQ@{ub}=<UNSIGNED-INTEGER>
      Specifies the frequency at which all memory allocations will
@@ -7667,7 +7826,8 @@ a mixture of both.
      program will be affected and only then if they contain
      source-level information.  This option is currently only available
      on UNIX platforms as it makes use of the @{b}mpedit@{ub} command.  It also
-     overrides the behaviour of the @{b}EDIT@{ub} option.
+     overrides the behaviour of the @{b}EDIT@{ub} option and affects the
+     behaviour of the @{b}__mp_view()@{ub} function.
 
 @{b}LOGALL@{ub}
      Equivalent to the @{b}LOGALLOCS@{ub}, @{b}LOGREALLOCS@{ub}, @{b}LOGFREES@{ub} and @{b}LOGMEMORY@{ub}
@@ -7718,13 +7878,13 @@ a mixture of both.
      Specifies that a number of recently-freed memory allocations
      should be prevented from being returned to the free memory pool.
      Such freed memory allocations will then be flagged as freed and
-     can be used by the library to provide better diagnostics.
-     However, if the size of the freed queue is specified as zero then
-     no system memory will ever be reused by the mpatrol library, which
-     can quickly lead to a shortage of available system memory for a
-     process.  Note that this option will always force a memory
-     reallocation to return a pointer to newly-allocated memory, but
-     the @{b}expand()@{ub} function will never be affected by this option.
+     can be used by the library to provide better diagnostics.  If the
+     size of the freed queue is specified as zero then all freed memory
+     will be immediately reused by the mpatrol library.  Note that if
+     this option is given a non-zero value then the mpatrol library
+     will always force a memory reallocation to return a pointer to
+     newly-allocated memory, but the @{b}expand()@{ub} function will never be
+     affected by this option.  Default value: @{b}NOFREE=0@{ub}.
 
 @{b}NOPROTECT@{ub}
      Specifies that the mpatrol library's internal data structures
@@ -8805,8 +8965,8 @@ occurred.
           The log file entry.
 
     Result
-          The alignment is set to the system page size and execution
-          continues.
+          The alignment is set to the default system alignment and
+          execution continues.
 
 
 @endnode
@@ -8827,8 +8987,9 @@ average result.  Obviously, these times can only be an approximation,
 but should serve to illustrate the effects on performance that each
 option can have.  All times are given in seconds, and the second time
 on each line was obtained with the same options plus the @{b}NOPROTECT@{ub}
-option.  Running with the @{b}CHECK=0@{ub} option would speed things up
-dramatically, albeit at the expense of less error checking.
+option.  The tests were all run with the @{b}CHECK=-@{ub} option, so running
+with the @{b}CHECK=0@{ub} option would speed things up dramatically, albeit at
+the expense of less error checking.
 
    Running with basic options:
 
@@ -8840,20 +9001,20 @@ dramatically, albeit at the expense of less error checking.
 
    Running when all freed memory allocations are kept:
 
-@{b}NOFREE=0@{ub}                                    0.943       0.506
-@{b}NOFREE=0 OFLOWSIZE=2@{ub}                        1.026       0.579
-@{b}NOFREE=0 OFLOWSIZE=8@{ub}                        1.091       0.645
-@{b}NOFREE=0 PAGEALLOC=LOWER@{ub}                    8.013       7.598
-@{b}NOFREE=0 PAGEALLOC=UPPER@{ub}                    8.026       7.616
+@{b}NOFREE=0xFFFF@{ub}                               0.943       0.506
+@{b}NOFREE=0xFFFF OFLOWSIZE=2@{ub}                   1.026       0.579
+@{b}NOFREE=0xFFFF OFLOWSIZE=8@{ub}                   1.091       0.645
+@{b}NOFREE=0xFFFF PAGEALLOC=LOWER@{ub}               8.013       7.598
+@{b}NOFREE=0xFFFF PAGEALLOC=UPPER@{ub}               8.026       7.616
 
    Running when all freed memory allocations are kept and their
 contents are preserved:
 
-@{b}NOFREE=0 PRESERVE@{ub}                           0.719       0.292
-@{b}NOFREE=0 PRESERVE OFLOWSIZE=2@{ub}               0.792       0.367
-@{b}NOFREE=0 PRESERVE OFLOWSIZE=8@{ub}               0.850       0.419
-@{b}NOFREE=0 PRESERVE PAGEALLOC=LOWER@{ub}           8.043       7.616
-@{b}NOFREE=0 PRESERVE PAGEALLOC=UPPER@{ub}           8.052       7.631
+@{b}NOFREE=0xFFFF PRESERVE@{ub}                      0.719       0.292
+@{b}NOFREE=0xFFFF PRESERVE OFLOWSIZE=2@{ub}          0.792       0.367
+@{b}NOFREE=0xFFFF PRESERVE OFLOWSIZE=8@{ub}          0.850       0.419
+@{b}NOFREE=0xFFFF PRESERVE PAGEALLOC=LOWER@{ub}      8.043       7.616
+@{b}NOFREE=0xFFFF PRESERVE PAGEALLOC=UPPER@{ub}      8.052       7.631
 
    Running using watch points to check the overflow buffers:
 
@@ -13155,30 +13316,34 @@ Function index
 **************
 
 
- @{" __mp_check                               " link "Functions 5"}   Functions 5
- @{" __mp_edit                                " link "Functions 5"}   Functions 5
- @{" __mp_epilogue                            " link "Functions 5"}   Functions 5
- @{" __mp_function                            " link "Functions 5"}   Functions 5
- @{" __mp_info                                " link "Functions 5"}   Functions 5
- @{" __mp_iterate                             " link "Functions 5"}   Functions 5
- @{" __mp_list                                " link "Functions 5"}   Functions 5
- @{" __mp_logaddr                             " link "Functions 5"}   Functions 5
- @{" __mp_logmemory                           " link "Functions 5"}   Functions 5
- @{" __mp_logstack                            " link "Functions 5"}   Functions 5
- @{" __mp_memorymap                           " link "Functions 5"}   Functions 5
- @{" __mp_nomemory                            " link "Functions 5"}   Functions 5
- @{" __mp_printf                              " link "Functions 5"}   Functions 5
- @{" __mp_printinfo                           " link "Functions 5"}   Functions 5
- @{" __mp_prologue                            " link "Functions 5"}   Functions 5
- @{" __mp_snapshot                            " link "Functions 5"}   Functions 5
- @{" __mp_summary                             " link "Functions 5"}   Functions 5
- @{" __mp_syminfo                             " link "Functions 5"}   Functions 5
- @{" __mp_view                                " link "Functions 5"}   Functions 5
- @{" __mp_vprintf                             " link "Functions 5"}   Functions 5
+ @{" __mp_check                               " link "Functions 6"}   Functions 6
+ @{" __mp_edit                                " link "Functions 6"}   Functions 6
+ @{" __mp_epilogue                            " link "Functions 6"}   Functions 6
+ @{" __mp_function                            " link "Functions 6"}   Functions 6
+ @{" __mp_getoption                           " link "Functions 6"}   Functions 6
+ @{" __mp_info                                " link "Functions 6"}   Functions 6
+ @{" __mp_iterate                             " link "Functions 6"}   Functions 6
+ @{" __mp_list                                " link "Functions 6"}   Functions 6
+ @{" __mp_logaddr                             " link "Functions 6"}   Functions 6
+ @{" __mp_logmemory                           " link "Functions 6"}   Functions 6
+ @{" __mp_logstack                            " link "Functions 6"}   Functions 6
+ @{" __mp_memorymap                           " link "Functions 6"}   Functions 6
+ @{" __mp_nomemory                            " link "Functions 6"}   Functions 6
+ @{" __mp_printf                              " link "Functions 6"}   Functions 6
+ @{" __mp_printinfo                           " link "Functions 6"}   Functions 6
+ @{" __mp_prologue                            " link "Functions 6"}   Functions 6
+ @{" __mp_setoption                           " link "Functions 6"}   Functions 6
+ @{" __mp_setuser                             " link "Functions 6"}   Functions 6
+ @{" __mp_snapshot                            " link "Functions 6"}   Functions 6
+ @{" __mp_stats                               " link "Functions 6"}   Functions 6
+ @{" __mp_summary                             " link "Functions 6"}   Functions 6
+ @{" __mp_syminfo                             " link "Functions 6"}   Functions 6
+ @{" __mp_view                                " link "Functions 6"}   Functions 6
+ @{" __mp_vprintf                             " link "Functions 6"}   Functions 6
  @{" alloca                                   " link "Functions 1"}   Functions 1
- @{" bcmp                                     " link "Functions 4"}   Functions 4
- @{" bcopy                                    " link "Functions 4"}   Functions 4
- @{" bzero                                    " link "Functions 4"}   Functions 4
+ @{" bcmp                                     " link "Functions 5"}   Functions 5
+ @{" bcopy                                    " link "Functions 5"}   Functions 5
+ @{" bzero                                    " link "Functions 5"}   Functions 5
  @{" calloc                                   " link "Functions 1"}   Functions 1
  @{" cfree                                    " link "Functions 1"}   Functions 1
  @{" dealloca                                 " link "Functions 1"}   Functions 1
@@ -13186,22 +13351,28 @@ Function index
  @{" free                                     " link "Functions 1"}   Functions 1
  @{" malloc                                   " link "Functions 1"}   Functions 1
  @{" memalign                                 " link "Functions 1"}   Functions 1
- @{" memccpy                                  " link "Functions 4"}   Functions 4
- @{" memchr                                   " link "Functions 4"}   Functions 4
- @{" memcmp                                   " link "Functions 4"}   Functions 4
- @{" memcpy                                   " link "Functions 4"}   Functions 4
- @{" memmem                                   " link "Functions 4"}   Functions 4
- @{" memmove                                  " link "Functions 4"}   Functions 4
- @{" memset                                   " link "Functions 4"}   Functions 4
- @{" operator delete                          " link "Functions 3"}   Functions 3
- @{" operator delete[]                        " link "Functions 3"}   Functions 3
- @{" operator new                             " link "Functions 3"}   Functions 3
- @{" operator new[]                           " link "Functions 3"}   Functions 3
+ @{" memccpy                                  " link "Functions 5"}   Functions 5
+ @{" memchr                                   " link "Functions 5"}   Functions 5
+ @{" memcmp                                   " link "Functions 5"}   Functions 5
+ @{" memcpy                                   " link "Functions 5"}   Functions 5
+ @{" memmem                                   " link "Functions 5"}   Functions 5
+ @{" memmove                                  " link "Functions 5"}   Functions 5
+ @{" memset                                   " link "Functions 5"}   Functions 5
+ @{" MP_CALLOC                                " link "Functions 3"}   Functions 3
+ @{" MP_FAILURE                               " link "Functions 3"}   Functions 3
+ @{" MP_FREE                                  " link "Functions 3"}   Functions 3
+ @{" MP_MALLOC                                " link "Functions 3"}   Functions 3
+ @{" MP_REALLOC                               " link "Functions 3"}   Functions 3
+ @{" MP_STRDUP                                " link "Functions 3"}   Functions 3
+ @{" operator delete                          " link "Functions 4"}   Functions 4
+ @{" operator delete[]                        " link "Functions 4"}   Functions 4
+ @{" operator new                             " link "Functions 4"}   Functions 4
+ @{" operator new[]                           " link "Functions 4"}   Functions 4
  @{" pvalloc                                  " link "Functions 1"}   Functions 1
  @{" realloc                                  " link "Functions 1"}   Functions 1
  @{" reallocf                                 " link "Functions 1"}   Functions 1
  @{" recalloc                                 " link "Functions 1"}   Functions 1
- @{" set_new_handler                          " link "Functions 3"}   Functions 3
+ @{" set_new_handler                          " link "Functions 4"}   Functions 4
  @{" strdup                                   " link "Functions 1"}   Functions 1
  @{" strdupa                                  " link "Functions 1"}   Functions 1
  @{" strndup                                  " link "Functions 1"}   Functions 1
@@ -13334,7 +13505,7 @@ Index
  @{" allocation boundaries                    " link "Profiling"}   Profiling
  @{" allocation byte                          " link "General errors"}   General errors
  @{" allocation index                         " link "Example 1"}   Example 1
- @{" allocation information                   " link "Functions 5"}   Functions 5
+ @{" allocation information                   " link "Functions 6"}   Functions 6
  @{" allocation type                          " link "Example 1"}   Example 1
  @{" ALLOCBYTE                                " link "Environment"}   Environment
  @{" ALLOCSTOP                                " link "Environment"}   Environment
@@ -13586,7 +13757,7 @@ Index
  @{" improving performance                    " link "Improving performance"}   Improving performance
  @{" INCOMP                                   " link "Diagnostic messages"}   Diagnostic messages
  @{" INFOPATH                                 " link "Documentation"}   Documentation
- @{" information about an allocation          " link "Functions 5"}   Functions 5
+ @{" information about an allocation          " link "Functions 6"}   Functions 6
  @{" inline functions                         " link "Building"}   Building
  @{" installation                             " link "Installation"}   Installation
  @{" instrumentation                          " link "Related software"}   Related software
@@ -13729,13 +13900,13 @@ Index
  @{" Motif                                    " link "Building"}   Building
  @{" MP_ALIGN                                 " link "Building"}   Building
  @{" MP_BUILTINSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
- @{" MP_DELETE                                " link "Functions 3"}   Functions 3
+ @{" MP_DELETE                                " link "Functions 4"}   Functions 4
  @{" MP_INLINE                                " link "Building"}   Building
  @{" MP_LIBRARYSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
- @{" MP_NEW                                   " link "Functions 3"}   Functions 3
- @{" MP_NEW_NOTHROW                           " link "Functions 3"}   Functions 3
- @{" MP_NOCPLUSPLUS                           " link "Functions 3"}   Functions 3
- @{" MP_NONEWDELETE                           " link "Functions 3"}   Functions 3
+ @{" MP_NEW                                   " link "Functions 4"}   Functions 4
+ @{" MP_NEW_NOTHROW                           " link "Functions 4"}   Functions 4
+ @{" MP_NOCPLUSPLUS                           " link "Functions 4"}   Functions 4
+ @{" MP_NONEWDELETE                           " link "Functions 4"}   Functions 4
  @{" MP_USE_ATEXIT                            " link "Running"}   Running
  @{" mpatrol                                  " link "Overview"}   Overview
  @{" mpatrol command                          " link "The mpatrol command"}   The mpatrol command

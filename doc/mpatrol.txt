@@ -6721,7 +6721,93 @@ used anyway, albeit with slightly less tracing information.
      no memory will be freed.  All of the previous contents will be
      destroyed.
 
-A.3 C++ dynamic memory allocation functions
+A.3 C dynamic memory alternative functions
+==========================================
+
+   The following 6 functions are provided as convenient alternatives to
+the ANSI C dynamic memory allocation functions (although `strdup()' is
+not strictly an ANSI C function).  They are implemented as preprocessor
+macro functions which may evaluate their arguments more than once, so
+extra care should be taken to avoid passing arguments with
+side-effects.  None of the functions return `NULL' if no memory is
+available and instead abort the program with a useful error message
+indicating where the call to allocate memory came from and what was
+being allocated.  To use these you should include the `mpatrol.h' or
+`mpalloc.h' header files.
+
+`void *MP_MALLOC(void *ptr, size_t count, typename type)'
+     Allocates COUNT uninitialised items of type TYPE from the heap,
+     sets PTR to the result and returns a suitably-cast pointer to the
+     first item of the allocation.  The pointer returned will be
+     suitably aligned for holding items of type TYPE.  If COUNT is `0'
+     then it will be implicitly rounded up to `1'.  If there is not
+     enough space in the heap then the program will be aborted after
+     calling the allocation failure handler, which by default writes an
+     appropriate error message to the standard error file stream.  The
+     allocated memory in PTR must be deallocated with `MP_FREE()' or
+     reallocated with `MP_REALLOC()'.
+
+`void *MP_CALLOC(void *ptr, size_t count, typename type)'
+     Allocates COUNT zero-initialised items of type TYPE from the heap,
+     sets PTR to the result and returns a suitably-cast pointer to the
+     first item of the allocation.  The pointer returned will be
+     suitably aligned for holding items of type TYPE.  If COUNT is `0'
+     then it will be implicitly rounded up to `1'.  If there is not
+     enough space in the heap then the program will be aborted after
+     calling the allocation failure handler, which by default writes an
+     appropriate error message to the standard error file stream.  The
+     allocated memory in PTR must be deallocated with `MP_FREE()' or
+     reallocated with `MP_REALLOC()'.
+
+`char *MP_STRDUP(char *ptr, const char *str)'
+     Allocates exactly enough memory from the heap to duplicate STR
+     (including the terminating nul character), sets PTR to the result
+     and returns a suitably-cast pointer to the first byte of the
+     allocation after copying STR to the newly-allocated memory.  The
+     pointer returned will have no alignment constraints and can be
+     used to store character data up to the length of STR.  If there is
+     not enough space in the heap then the program will be aborted
+     after calling the allocation failure handler, which by default
+     writes an appropriate error message to the standard error file
+     stream.  The allocated memory in PTR must be deallocated with
+     `MP_FREE()' or reallocated with `MP_REALLOC()'.
+
+`void *MP_REALLOC(void *ptr, size_t count, typename type)'
+     Resizes the memory allocation beginning at PTR to COUNT items of
+     type TYPE and returns a suitably-cast pointer to the first item of
+     the new allocation after copying PTR to the newly-allocated
+     memory, which will be truncated if COUNT is smaller than the
+     original number of items.  The pointer returned will be suitably
+     aligned for holding items of type TYPE.  If PTR is `NULL' then the
+     call will be equivalent to `MP_MALLOC()'.  If COUNT is `0' then it
+     will be implicitly rounded up to `1'.  If COUNT is greater than
+     the original number of items then the extra space will be filled
+     with uninitialised bytes.  If there is not enough space in the
+     heap then the program will be aborted after calling the allocation
+     failure handler, which by default writes an appropriate error
+     message to the standard error file stream.  The allocated memory
+     must be deallocated with `MP_FREE()' and can be reallocated again
+     with `MP_REALLOC()'.
+
+`void MP_FREE(void *ptr)'
+     Frees the memory allocation beginning at PTR so the memory can be
+     reused by another call to allocate memory, and sets PTR to `NULL'
+     after freeing the memory.  If PTR is `NULL' then no memory will be
+     freed.
+
+`__mp_failhandler MP_FAILURE(__mp_failhandler func)'
+     Installs an allocation failure handler specifically for use with
+     `MP_MALLOC()', `MP_CALLOC()', `MP_STRDUP()' and `MP_REALLOC()' and
+     returns a pointer to the previously installed handler, normally
+     the default handler if no handler had been previously installed.
+     This will be called by the above functions when there is not
+     enough space in the heap for them to satisfy their allocation
+     request.  The default allocation failure handler will terminate
+     the program after writing an error message to the standard error
+     file stream indicating where the original allocation request took
+     place and what was being allocated.
+
+A.4 C++ dynamic memory allocation functions
 ===========================================
 
    The following 5 functions are available as replacements for existing
@@ -6784,7 +6870,7 @@ slightly less tracing information.
      Note that this function is equivalent to `__mp_nomemory()' and
      will replace the handler installed by that function.
 
-A.4 C memory operation functions
+A.5 C memory operation functions
 ================================
 
    The following 10 functions are available as replacements for
@@ -6885,16 +6971,52 @@ anyway, albeit with slightly less tracing information.
      straddle that allocation's boundaries then an error message will
      be generated in the log file and no bytes will be searched.
 
-A.5 mpatrol library functions
+A.6 mpatrol library functions
 =============================
 
-   The following 20 functions are available as support routines for
+   The following 24 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the `mpatrol.h' header file.
+
+`unsigned long __mp_setoption(long opt, unsigned long val)'
+     Sets the value of an mpatrol option after the library has been
+     initialised.  Options that require values are listed in
+     `mpatrol.h' prefixed with `MP_OPT_*'.  The OPT argument should be
+     set to one of these macros, and the VAL argument should be set to
+     the option value, cast to an unsigned integer.  The return value
+     will be `0' on success and `1' on failure.  Options that are flags
+     are listed in `mpatrol.h' prefixed with `MP_FLG_*'.  Multiple
+     flags can be set or unset at once using the `MP_OPT_SETFLAGS' and
+     `MP_OPT_UNSETFLAGS' options respectively, with the necessary flags
+     specified in VAL.  The return value will be `0' on success and a
+     combination of all of the flags that could not be set or unset on
+     failure.
+
+`int __mp_getoption(long opt, unsigned long *val)'
+     Gets the value of an mpatrol option after the library has been
+     initialised.  If OPT is a valid option listed in `mpatrol.h' then
+     `1' will be returned and the associated value will be returned in
+     VAL and cast to an unsigned integer, otherwise `0' will be
+     returned.  If OPT is `MP_OPT_SETFLAGS' then all of the mpatrol
+     library flags that are set will be returned in VAL.  If OPT is
+     `MP_OPT_UNSETFLAGS' then all of the mpatrol library flags that are
+     not set will be returned in VAL.
 
 `char *__mp_function(__mp_alloctype func)'
      Returns the name of the function corresponding to the allocation
      type FUNC or `NULL' if no such allocation type exists.
+
+`int __mp_setuser(const void *ptr, const void *data)'
+     Sets the user data for the memory allocation containing PTR.  The
+     contents of DATA are entirely application-specific as user data
+     will never be examined by the mpatrol library.  Such data is
+     associated with a memory allocation for its entire lifetime unless
+     overridden by a subsequent call to `__mp_setuser()'.  As such, the
+     user data must be valid for the entire lifetime of the memory
+     allocation, perhaps even after the allocation has been freed if
+     the `NOFREE' option is being used.  This function returns `1' if
+     there is an allocated (or freed) memory block containing PTR, and
+     `0' otherwise.
 
 `int __mp_info(const void *ptr, __mp_allocinfo *info)'
      Obtains information about a specific memory allocation by placing
@@ -6910,10 +7032,14 @@ you should include the `mpatrol.h' header file.
      `alloc'       Allocation index.
      `realloc'     Number of times reallocated.
      `thread'      Thread identifier.
+     `event'       Event of last modification.
      `func'        Function in which allocation took place.
      `file'        File in which allocation took place.
      `line'        Line number at which allocation took place.
      `stack'       Pointer to function call stack.
+     `typestr'     Type stored in allocation.
+     `typesize'    Size of type stored in allocation.
+     `userdata'    User data associated with allocation.
      `freed'       Indicates if allocation has been freed.
 
 `int __mp_syminfo(const void *ptr, __mp_symbolinfo *info)'
@@ -6942,7 +7068,7 @@ you should include the `mpatrol.h' header file.
      the heap.  This number can then be used in later calls to
      `__mp_iterate()'.
 
-`size_t __mp_iterate(int (*func)(const void *), unsigned long event)'
+`size_t __mp_iterate(int (*func)(const void *, void *), void *data, unsigned long event)'
      Iterates over all of the current allocated and freed memory
      allocations, calling FUNC with the start address of every memory
      allocation that has been modified since event number EVENT.  If
@@ -6952,7 +7078,9 @@ you should include the `mpatrol.h' header file.
      negative number then the iteration process will be stopped
      immediately.  If FUNC returns a positive number above zero then
      `__mp_iterate()' will return the number of times FUNC returned a
-     non-zero number after the iteration process has stopped.
+     non-zero number after the iteration process has stopped.  The DATA
+     argument is passed directly to FUNC as its second argument and is
+     not read by the mpatrol library.
 
 `void __mp_memorymap(int stats)'
      If STATS is non-zero then the current statistics of the mpatrol
@@ -6964,6 +7092,22 @@ you should include the `mpatrol.h' header file.
      Displays information about the current state of the mpatrol
      library, including its settings and any relevant statistics.
 
+`int __mp_stats(__mp_heapinfo *info)'
+     Obtains statistics about the current state of the heap and places
+     them in INFO.  If this information could not be determined then
+     `0' will be returned, otherwise `1' will be returned and INFO will
+     contain the following information:
+
+     _Field_       _Description_
+     `acount'      Total number of allocated blocks.
+     `atotal'      Total size of allocated blocks.
+     `fcount'      Total number of free blocks.
+     `ftotal'      Total size of free blocks.
+     `gcount'      Total number of freed blocks.
+     `gtotal'      Total size of freed blocks.
+     `icount'      Total number of internal blocks.
+     `itotal'      Total size of internal blocks.
+
 `void __mp_check(void)'
      Forces the library to perform an immediate check of the overflow
      buffers of every memory allocation and to ensure that nothing has
@@ -6971,13 +7115,15 @@ you should include the `mpatrol.h' header file.
      the `alloca()' family of functions are out of scope then this
      function will also cause them to be freed.
 
-`void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t)'
+`void (*__mp_prologue(void (*func)(const void *, size_t, const void *)))(const void *, size_t, const void *)'
      Installs a prologue function to be called before any memory
      allocation, reallocation or deallocation function.  This function
      will return a pointer to the previously installed prologue
-     function, or the `NULL' pointer if no prologue function had been
+     function, or the null pointer if no prologue function had been
      previously installed.  The following arguments will be used to
-     call the prologue function:
+     call the prologue function (including a third argument containing
+     the return address of the calling function, or the null pointer if
+     it cannot be determined):
 
      _Argument 1_  _Argument 2_  _Called by_
      `-1'          SIZE          `malloc()', etc.
@@ -6985,13 +7131,15 @@ you should include the `mpatrol.h' header file.
      PTR           `-1'          `free()', etc.
      PTR           `-2'          `strdup()', etc.
 
-`void (*__mp_epilogue(void (*func)(const void *)))(const void *)'
+`void (*__mp_epilogue(void (*func)(const void *, const void *)))(const void *, const void *)'
      Installs an epilogue function to be called after any memory
      allocation, reallocation or deallocation function.  This function
      will return a pointer to the previously installed epilogue
-     function, or the `NULL' pointer if no epilogue function had been
+     function, or the null pointer if no epilogue function had been
      previously installed.  The following arguments will be used to
-     call the epilogue function:
+     call the epilogue function (including a second argument containing
+     the return address of the calling function, or the null pointer if
+     it cannot be determined):
 
      _Argument_    _Called by_
      PTR           `malloc()', `realloc()', `strdup()', etc.
@@ -7123,12 +7271,14 @@ as well as uppercase, or a mixture of both.
      Specifies a range of allocation indices at which to check the
      integrity of free memory and overflow buffers.  The range must be
      specified as no more than two unsigned integers separated by a
-     dash.  If numbers on either the left side or the right side of the
-     dash are omitted then they will be assumed to be `0' and INFINITY
-     respectively.  A value of `0' on its own indicates that no such
-     checking will ever be performed.  This option can be used to speed
-     up the execution speed of the library at the expense of checking.
-     Default value: `CHECK=-'.
+     dash, followed by an optional forward slash and an unsigned
+     integer specifying an event checking frequency.  If numbers on
+     either the left side or the right side of the dash are omitted
+     then they will be assumed to be `0' and INFINITY respectively.  A
+     value of `0' on its own indicates that no such checking will ever
+     be performed.  This option can be used to speed up the execution
+     speed of the library at the expense of checking.  Default value:
+     `CHECK=0'.
 
 `CHECKALL'
      Equivalent to the `CHECKALLOCS', `CHECKREALLOCS', `CHECKFREES' and
@@ -7164,7 +7314,8 @@ as well as uppercase, or a mixture of both.
      lines in the program will be affected and only then if they
      contain source-level information.  This option is currently only
      available on UNIX platforms as it makes use of the `mpedit'
-     command.  It also overrides the behaviour of the `LIST' option.
+     command.  It also overrides the behaviour of the `LIST' option and
+     affects the behaviour of the `__mp_view()' function.
 
 `FAILFREQ'=<UNSIGNED-INTEGER>
      Specifies the frequency at which all memory allocations will
@@ -7226,7 +7377,8 @@ as well as uppercase, or a mixture of both.
      program will be affected and only then if they contain
      source-level information.  This option is currently only available
      on UNIX platforms as it makes use of the `mpedit' command.  It
-     also overrides the behaviour of the `EDIT' option.
+     also overrides the behaviour of the `EDIT' option and affects the
+     behaviour of the `__mp_view()' function.
 
 `LOGALL'
      Equivalent to the `LOGALLOCS', `LOGREALLOCS', `LOGFREES' and
@@ -7277,13 +7429,13 @@ as well as uppercase, or a mixture of both.
      Specifies that a number of recently-freed memory allocations
      should be prevented from being returned to the free memory pool.
      Such freed memory allocations will then be flagged as freed and
-     can be used by the library to provide better diagnostics.
-     However, if the size of the freed queue is specified as zero then
-     no system memory will ever be reused by the mpatrol library, which
-     can quickly lead to a shortage of available system memory for a
-     process.  Note that this option will always force a memory
-     reallocation to return a pointer to newly-allocated memory, but
-     the `expand()' function will never be affected by this option.
+     can be used by the library to provide better diagnostics.  If the
+     size of the freed queue is specified as zero then all freed memory
+     will be immediately reused by the mpatrol library.  Note that if
+     this option is given a non-zero value then the mpatrol library
+     will always force a memory reallocation to return a pointer to
+     newly-allocated memory, but the `expand()' function will never be
+     affected by this option.  Default value: `NOFREE=0'.
 
 `NOPROTECT'
      Specifies that the mpatrol library's internal data structures
@@ -8356,8 +8508,8 @@ error occurred.
           The log file entry.
 
     Result
-          The alignment is set to the system page size and execution
-          continues.
+          The alignment is set to the default system alignment and
+          execution continues.
 
 Appendix E Library performance
 ******************************
@@ -8370,8 +8522,9 @@ average result.  Obviously, these times can only be an approximation,
 but should serve to illustrate the effects on performance that each
 option can have.  All times are given in seconds, and the second time
 on each line was obtained with the same options plus the `NOPROTECT'
-option.  Running with the `CHECK=0' option would speed things up
-dramatically, albeit at the expense of less error checking.
+option.  The tests were all run with the `CHECK=-' option, so running
+with the `CHECK=0' option would speed things up dramatically, albeit at
+the expense of less error checking.
 
    Running with basic options:
 
@@ -8383,20 +8536,20 @@ _no options_                                0.618       0.258
 
    Running when all freed memory allocations are kept:
 
-`NOFREE=0'                                  0.943       0.506
-`NOFREE=0 OFLOWSIZE=2'                      1.026       0.579
-`NOFREE=0 OFLOWSIZE=8'                      1.091       0.645
-`NOFREE=0 PAGEALLOC=LOWER'                  8.013       7.598
-`NOFREE=0 PAGEALLOC=UPPER'                  8.026       7.616
+`NOFREE=0xFFFF'                             0.943       0.506
+`NOFREE=0xFFFF OFLOWSIZE=2'                 1.026       0.579
+`NOFREE=0xFFFF OFLOWSIZE=8'                 1.091       0.645
+`NOFREE=0xFFFF PAGEALLOC=LOWER'             8.013       7.598
+`NOFREE=0xFFFF PAGEALLOC=UPPER'             8.026       7.616
 
    Running when all freed memory allocations are kept and their
 contents are preserved:
 
-`NOFREE=0 PRESERVE'                         0.719       0.292
-`NOFREE=0 PRESERVE OFLOWSIZE=2'             0.792       0.367
-`NOFREE=0 PRESERVE OFLOWSIZE=8'             0.850       0.419
-`NOFREE=0 PRESERVE PAGEALLOC=LOWER'         8.043       7.616
-`NOFREE=0 PRESERVE PAGEALLOC=UPPER'         8.052       7.631
+`NOFREE=0xFFFF PRESERVE'                    0.719       0.292
+`NOFREE=0xFFFF PRESERVE OFLOWSIZE=2'        0.792       0.367
+`NOFREE=0xFFFF PRESERVE OFLOWSIZE=8'        0.850       0.419
+`NOFREE=0xFFFF PRESERVE PAGEALLOC=LOWER'    8.043       7.616
+`NOFREE=0xFFFF PRESERVE PAGEALLOC=UPPER'    8.052       7.631
 
    Running using watch points to check the overflow buffers:
 
@@ -12494,53 +12647,61 @@ Function index
 **************
 
 __mp_check:                                        
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_edit:                                         
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_epilogue:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_function:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
+__mp_getoption:                                    
+          See ``A.6 mpatrol library functions''.
 __mp_info:                                         
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_iterate:                                      
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_list:                                         
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_logaddr:                                      
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_logmemory:                                    
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_logstack:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_memorymap:                                    
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_nomemory:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_printf:                                       
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_printinfo:                                    
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_prologue:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
+__mp_setoption:                                    
+          See ``A.6 mpatrol library functions''.
+__mp_setuser:                                      
+          See ``A.6 mpatrol library functions''.
 __mp_snapshot:                                     
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
+__mp_stats:                                        
+          See ``A.6 mpatrol library functions''.
 __mp_summary:                                      
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_syminfo:                                      
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_view:                                         
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 __mp_vprintf:                                      
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 alloca:                                            
           See ``A.1 C dynamic memory allocation functions''.
 bcmp:                                              
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 bcopy:                                             
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 bzero:                                             
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 calloc:                                            
           See ``A.1 C dynamic memory allocation functions''.
 cfree:                                             
@@ -12556,27 +12717,39 @@ malloc:
 memalign:                                          
           See ``A.1 C dynamic memory allocation functions''.
 memccpy:                                           
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memchr:                                            
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memcmp:                                            
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memcpy:                                            
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memmem:                                            
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memmove:                                           
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
 memset:                                            
-          See ``A.4 C memory operation functions''.
+          See ``A.5 C memory operation functions''.
+MP_CALLOC:                                         
+          See ``A.3 C dynamic memory alternative functions''.
+MP_FAILURE:                                        
+          See ``A.3 C dynamic memory alternative functions''.
+MP_FREE:                                           
+          See ``A.3 C dynamic memory alternative functions''.
+MP_MALLOC:                                         
+          See ``A.3 C dynamic memory alternative functions''.
+MP_REALLOC:                                        
+          See ``A.3 C dynamic memory alternative functions''.
+MP_STRDUP:                                         
+          See ``A.3 C dynamic memory alternative functions''.
 operator delete:                                   
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 operator delete[]:                                 
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 operator new:                                      
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 operator new[]:                                    
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 pvalloc:                                           
           See ``A.1 C dynamic memory allocation functions''.
 realloc:                                           
@@ -12586,7 +12759,7 @@ reallocf:
 recalloc:                                          
           See ``A.1 C dynamic memory allocation functions''.
 set_new_handler:                                   
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 strdup:                                            
           See ``A.1 C dynamic memory allocation functions''.
 strdupa:                                           
@@ -12784,7 +12957,7 @@ allocation boundaries:                              See 8.
 allocation byte:                                    See 7.3.
 allocation index:                                   See 12.1.
 allocation information:                            
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 allocation type:                                    See 12.1.
 ALLOCBYTE:                                         
           See ``Appendix B Environment''.
@@ -13152,7 +13325,7 @@ INCOMP:
 INFOPATH:                                          
           See ``I.1 Documentation''.
 information about an allocation:                   
-          See ``A.5 mpatrol library functions''.
+          See ``A.6 mpatrol library functions''.
 inline functions:                                  
           See ``I.2 Building''.
 installation:                                       See 3.
@@ -13367,18 +13540,18 @@ MP_ALIGN:
           See ``I.2 Building''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
 MP_DELETE:                                         
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 MP_INLINE:                                         
           See ``I.2 Building''.
 MP_LIBRARYSTACK_SUPPORT:                            See 6.2.
 MP_NEW:                                            
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 MP_NEW_NOTHROW:                                    
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 MP_NOCPLUSPLUS:                                    
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 MP_NONEWDELETE:                                    
-          See ``A.3 C++ dynamic memory allocation functions''.
+          See ``A.4 C++ dynamic memory allocation functions''.
 MP_USE_ATEXIT:                                     
           See ``I.4 Running''.
 mpatrol:                                            See 1.

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.182 2001-02-20 15:25:04 graeme Exp $
+@c $Id: mpatrol.texi,v 1.183 2001-02-20 21:02:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -7037,9 +7037,10 @@ instead).
 @menu
 * Functions 1::                 C dynamic memory allocation functions.
 * Functions 2::                 C dynamic memory extension functions.
-* Functions 3::                 C++ dynamic memory allocation functions.
-* Functions 4::                 C memory operation functions.
-* Functions 5::                 mpatrol library functions.
+* Functions 3::                 C dynamic memory alternative functions.
+* Functions 4::                 C++ dynamic memory allocation functions.
+* Functions 5::                 C memory operation functions.
+* Functions 6::                 mpatrol library functions.
 @end menu
 
 @node Functions 1, Functions 2, , Functions
@@ -7397,6 +7398,92 @@ will be freed.  All of the previous contents will be destroyed.
 @end table
 
 @node Functions 3, Functions 4, Functions 2, Functions
+@section C dynamic memory alternative functions
+
+The following 6 functions are provided as convenient alternatives to the ANSI C
+dynamic memory allocation functions (although @code{strdup()} is not strictly an
+ANSI C function).  They are implemented as preprocessor macro functions which
+may evaluate their arguments more than once, so extra care should be taken to
+avoid passing arguments with side-effects.  None of the functions return
+@samp{NULL} if no memory is available and instead abort the program with a
+useful error message indicating where the call to allocate memory came from and
+what was being allocated.  To use these you should include the @file{mpatrol.h}
+or @file{mpalloc.h} header files.
+
+@table @asis
+@findex MP_MALLOC
+@item @code{void *MP_MALLOC(void *ptr, size_t count, typename type)}
+Allocates @var{count} uninitialised items of type @var{type} from the heap, sets
+@var{ptr} to the result and returns a suitably-cast pointer to the first item of
+the allocation.  The pointer returned will be suitably aligned for holding items
+of type @var{type}.  If @var{count} is @samp{0} then it will be implicitly
+rounded up to @samp{1}.  If there is not enough space in the heap then the
+program will be aborted after calling the allocation failure handler, which by
+default writes an appropriate error message to the standard error file stream.
+The allocated memory in @var{ptr} must be deallocated with @code{MP_FREE()} or
+reallocated with @code{MP_REALLOC()}.
+
+@findex MP_CALLOC
+@item @code{void *MP_CALLOC(void *ptr, size_t count, typename type)}
+Allocates @var{count} zero-initialised items of type @var{type} from the heap,
+sets @var{ptr} to the result and returns a suitably-cast pointer to the first
+item of the allocation.  The pointer returned will be suitably aligned for
+holding items of type @var{type}.  If @var{count} is @samp{0} then it will be
+implicitly rounded up to @samp{1}.  If there is not enough space in the heap
+then the program will be aborted after calling the allocation failure handler,
+which by default writes an appropriate error message to the standard error file
+stream.  The allocated memory in @var{ptr} must be deallocated with
+@code{MP_FREE()} or reallocated with @code{MP_REALLOC()}.
+
+@findex MP_STRDUP
+@item @code{char *MP_STRDUP(char *ptr, const char *str)}
+Allocates exactly enough memory from the heap to duplicate @var{str} (including
+the terminating nul character), sets @var{ptr} to the result and returns a
+suitably-cast pointer to the first byte of the allocation after copying
+@var{str} to the newly-allocated memory.  The pointer returned will have no
+alignment constraints and can be used to store character data up to the length
+of @var{str}.  If there is not enough space in the heap then the program will be
+aborted after calling the allocation failure handler, which by default writes an
+appropriate error message to the standard error file stream.  The allocated
+memory in @var{ptr} must be deallocated with @code{MP_FREE()} or reallocated
+with @code{MP_REALLOC()}.
+
+@findex MP_REALLOC
+@item @code{void *MP_REALLOC(void *ptr, size_t count, typename type)}
+Resizes the memory allocation beginning at @var{ptr} to @var{count} items of
+type @var{type} and returns a suitably-cast pointer to the first item of the new
+allocation after copying @var{ptr} to the newly-allocated memory, which will be
+truncated if @var{count} is smaller than the original number of items.  The
+pointer returned will be suitably aligned for holding items of type @var{type}.
+If @var{ptr} is @samp{NULL} then the call will be equivalent to
+@code{MP_MALLOC()}.  If @var{count} is @samp{0} then it will be implicitly
+rounded up to @samp{1}.  If @var{count} is greater than the original number of
+items then the extra space will be filled with uninitialised bytes.  If there is
+not enough space in the heap then the program will be aborted after calling the
+allocation failure handler, which by default writes an appropriate error message
+to the standard error file stream.  The allocated memory must be deallocated
+with @code{MP_FREE()} and can be reallocated again with @code{MP_REALLOC()}.
+
+@findex MP_FREE
+@item @code{void MP_FREE(void *ptr)}
+Frees the memory allocation beginning at @var{ptr} so the memory can be reused
+by another call to allocate memory, and sets @var{ptr} to @samp{NULL} after
+freeing the memory.  If @var{ptr} is @samp{NULL} then no memory will be freed.
+
+@findex MP_FAILURE
+@item @code{__mp_failhandler MP_FAILURE(__mp_failhandler func)}
+Installs an allocation failure handler specifically for use with
+@code{MP_MALLOC()}, @code{MP_CALLOC()}, @code{MP_STRDUP()} and
+@code{MP_REALLOC()} and returns a pointer to the previously installed handler,
+normally the default handler if no handler had been previously installed.  This
+will be called by the above functions when there is not enough space in the heap
+for them to satisfy their allocation request.  The default allocation failure
+handler will terminate the program after writing an error message to the
+standard error file stream indicating where the original allocation request took
+place and what was being allocated.
+@end table
+
+@node Functions 4, Functions 5, Functions 3, Functions
 @section C++ dynamic memory allocation functions
 
 @cindex MP_NOCPLUSPLUS
@@ -7466,7 +7553,7 @@ Note that this function is equivalent to @code{__mp_nomemory()} and will replace
 the handler installed by that function.
 @end table
 
-@node Functions 4, Functions 5, Functions 3, Functions
+@node Functions 5, Functions 6, Functions 4, Functions
 @section C memory operation functions
 
 The following 10 functions are available as replacements for existing C library
@@ -7574,18 +7661,54 @@ allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 @end table
 
-@node Functions 5, , Functions 4, Functions
+@node Functions 6, , Functions 5, Functions
 @section mpatrol library functions
 
-The following 20 functions are available as support routines for additional
+The following 24 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
-@findex __mp_function
 @table @asis
+@findex __mp_setoption
+@item @code{unsigned long __mp_setoption(long opt, unsigned long val)}
+Sets the value of an mpatrol option after the library has been initialised.
+Options that require values are listed in @file{mpatrol.h} prefixed with
+@samp{MP_OPT_*}.  The @var{opt} argument should be set to one of these macros,
+and the @var{val} argument should be set to the option value, cast to an
+unsigned integer.  The return value will be @samp{0} on success and @samp{1} on
+failure.  Options that are flags are listed in @file{mpatrol.h} prefixed with
+@samp{MP_FLG_*}.  Multiple flags can be set or unset at once using the
+@code{MP_OPT_SETFLAGS} and @code{MP_OPT_UNSETFLAGS} options respectively, with
+the necessary flags specified in @var{val}.  The return value will be @samp{0}
+on success and a combination of all of the flags that could not be set or unset
+on failure.
+
+@findex __mp_getoption
+@item @code{int __mp_getoption(long opt, unsigned long *val)}
+Gets the value of an mpatrol option after the library has been initialised.
+If @var{opt} is a valid option listed in @file{mpatrol.h} then @samp{1} will be
+returned and the associated value will be returned in @var{val} and cast to an
+unsigned integer, otherwise @samp{0} will be returned.  If @var{opt} is
+@code{MP_OPT_SETFLAGS} then all of the mpatrol library flags that are set will
+be returned in @var{val}.  If @var{opt} is @code{MP_OPT_UNSETFLAGS} then all of
+the mpatrol library flags that are not set will be returned in @var{val}.
+
+@findex __mp_function
 @item @code{char *__mp_function(__mp_alloctype func)}
 Returns the name of the function corresponding to the allocation type @var{func}
 or @samp{NULL} if no such allocation type exists.
+
+@findex __mp_setuser
+@item @code{int __mp_setuser(const void *ptr, const void *data)}
+Sets the user data for the memory allocation containing @var{ptr}.  The contents
+of @var{data} are entirely application-specific as user data will never be
+examined by the mpatrol library.  Such data is associated with a memory
+allocation for its entire lifetime unless overridden by a subsequent call to
+@code{__mp_setuser()}.  As such, the user data must be valid for the entire
+lifetime of the memory allocation, perhaps even after the allocation has been
+freed if the @option{NOFREE} option is being used.  This function returns
+@samp{1} if there is an allocated (or freed) memory block containing @var{ptr},
+and @samp{0} otherwise.
 
 @findex __mp_info
 @cindex allocation information
@@ -7611,6 +7734,8 @@ will be returned and @var{info} will contain the following information:
 @tab Number of times reallocated.
 @item @code{thread}
 @tab Thread identifier.
+@item @code{event}
+@tab Event of last modification.
 @item @code{func}
 @tab Function in which allocation took place.
 @item @code{file}
@@ -7619,6 +7744,12 @@ will be returned and @var{info} will contain the following information:
 @tab Line number at which allocation took place.
 @item @code{stack}
 @tab Pointer to function call stack.
+@item @code{typestr}
+@tab Type stored in allocation.
+@item @code{typesize}
+@tab Size of type stored in allocation.
+@item @code{userdata}
+@tab User data associated with allocation.
 @item @code{freed}
 @tab Indicates if allocation has been freed.
 @end multitable
@@ -7661,7 +7792,7 @@ Returns the current event number, effectively taking a snapshot of the heap.
 This number can then be used in later calls to @code{__mp_iterate()}.
 
 @findex __mp_iterate
-@item @code{size_t __mp_iterate(int (*func)(const void *), unsigned long event)}
+@item @code{size_t __mp_iterate(int (*func)(const void *, void *), void *data, unsigned long event)}
 Iterates over all of the current allocated and freed memory allocations,
 calling @var{func} with the start address of every memory allocation that has
 been modified since event number @var{event}.  If @var{func} is @samp{NULL} then
@@ -7670,7 +7801,9 @@ is @samp{0} then @var{func} will be called with the start address of every
 memory allocation.  If @var{func} returns a negative number then the iteration
 process will be stopped immediately.  If @var{func} returns a positive number
 above zero then @code{__mp_iterate()} will return the number of times @var{func}
-returned a non-zero number after the iteration process has stopped.
+returned a non-zero number after the iteration process has stopped.  The
+@var{data} argument is passed directly to @var{func} as its second argument and
+is not read by the mpatrol library.
 
 @findex __mp_memorymap
 @item @code{void __mp_memorymap(int stats)}
@@ -7683,6 +7816,34 @@ block then a map of the current heap will also be displayed.
 Displays information about the current state of the mpatrol library, including
 its settings and any relevant statistics.
 
+@findex __mp_stats
+@item @code{int __mp_stats(__mp_heapinfo *info)}
+Obtains statistics about the current state of the heap and places them in
+@var{info}.  If this information could not be determined then @samp{0} will be
+returned, otherwise @samp{1} will be returned and @var{info} will contain the
+following information:
+
+@multitable @columnfractions .2 .8
+@item @emph{Field}
+@tab @emph{Description}
+@item @code{acount}
+@tab Total number of allocated blocks.
+@item @code{atotal}
+@tab Total size of allocated blocks.
+@item @code{fcount}
+@tab Total number of free blocks.
+@item @code{ftotal}
+@tab Total size of free blocks.
+@item @code{gcount}
+@tab Total number of freed blocks.
+@item @code{gtotal}
+@tab Total size of freed blocks.
+@item @code{icount}
+@tab Total number of internal blocks.
+@item @code{itotal}
+@tab Total size of internal blocks.
+@end multitable
+
 @findex __mp_check
 @item @code{void __mp_check(void)}
 Forces the library to perform an immediate check of the overflow buffers of
@@ -7691,12 +7852,14 @@ blocks.  If any memory allocations made by the @code{alloca()} family of
 functions are out of scope then this function will also cause them to be freed.
 
 @findex __mp_prologue
-@item @code{void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t)}
+@item @code{void (*__mp_prologue(void (*func)(const void *, size_t, const void *)))(const void *, size_t, const void *)}
 Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
-the previously installed prologue function, or the @samp{NULL} pointer if no
-prologue function had been previously installed.  The following arguments will
-be used to call the prologue function:
+the previously installed prologue function, or the null pointer if no prologue
+function had been previously installed.  The following arguments will be used to
+call the prologue function (including a third argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 
 @multitable @columnfractions .2 .2 .6
 @item @emph{Argument 1}
@@ -7717,12 +7880,14 @@ be used to call the prologue function:
 @end multitable
 
 @findex __mp_epilogue
-@item @code{void (*__mp_epilogue(void (*func)(const void *)))(const void *)}
+@item @code{void (*__mp_epilogue(void (*func)(const void *, const void *)))(const void *, const void *)}
 Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
-the previously installed epilogue function, or the @samp{NULL} pointer if no
-epilogue function had been previously installed.  The following arguments will
-be used to call the epilogue function:
+the previously installed epilogue function, or the null pointer if no epilogue
+function had been previously installed.  The following arguments will be used to
+call the epilogue function (including a second argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 
 @multitable @columnfractions .2 .8
 @item @emph{Argument}
@@ -7867,12 +8032,13 @@ will be ignored if its value is zero.  Default value: @option{AUTOSAVE=0}.
 @item @option{CHECK}=<@var{unsigned-range}>
 Specifies a range of allocation indices at which to check the integrity of free
 memory and overflow buffers.  The range must be specified as no more than two
-unsigned integers separated by a dash.  If numbers on either the left side or
-the right side of the dash are omitted then they will be assumed to be @samp{0}
-and @var{infinity} respectively.  A value of @samp{0} on its own indicates that
-no such checking will ever be performed.  This option can be used to speed up
-the execution speed of the library at the expense of checking.  Default value:
-@option{CHECK=-}.
+unsigned integers separated by a dash, followed by an optional forward slash and
+an unsigned integer specifying an event checking frequency.  If numbers on
+either the left side or the right side of the dash are omitted then they will be
+assumed to be @samp{0} and @var{infinity} respectively.  A value of @samp{0} on
+its own indicates that no such checking will ever be performed.  This option can
+be used to speed up the execution speed of the library at the expense of
+checking.  Default value: @option{CHECK=0}.
 
 @cindex CHECKALL
 @item @option{CHECKALL}
@@ -7914,7 +8080,8 @@ that are associated with any warnings or errors when they occur.  Only
 diagnostics which occur at source lines in the program will be affected and only
 then if they contain source-level information.  This option is currently only
 available on UNIX platforms as it makes use of the @command{mpedit} command.  It
-also overrides the behaviour of the @option{LIST} option.
+also overrides the behaviour of the @option{LIST} option and affects the
+behaviour of the @code{__mp_view()} function.
 
 @cindex FAILFREQ
 @item @option{FAILFREQ}=<@var{unsigned-integer}>
@@ -7978,7 +8145,8 @@ that are associated with any warnings or errors when they occur.  Only
 diagnostics which occur at source lines in the program will be affected and only
 then if they contain source-level information.  This option is currently only
 available on UNIX platforms as it makes use of the @command{mpedit} command.  It
-also overrides the behaviour of the @option{EDIT} option.
+also overrides the behaviour of the @option{EDIT} option and affects the
+behaviour of the @code{__mp_view()} function.
 
 @cindex LOGALL
 @item @option{LOGALL}
@@ -8037,12 +8205,12 @@ the small bound but less than the large bound.  Default value:
 Specifies that a number of recently-freed memory allocations should be prevented
 from being returned to the free memory pool.  Such freed memory allocations will
 then be flagged as freed and can be used by the library to provide better
-diagnostics.  However, if the size of the freed queue is specified as zero then
-no system memory will ever be reused by the mpatrol library, which can quickly
-lead to a shortage of available system memory for a process.  Note that this
-option will always force a memory reallocation to return a pointer to
-newly-allocated memory, but the @code{expand()} function will never be affected
-by this option.
+diagnostics.  If the size of the freed queue is specified as zero then all
+freed memory will be immediately reused by the mpatrol library.  Note that if
+this option is given a non-zero value then the mpatrol library will always force
+a memory reallocation to return a pointer to newly-allocated memory, but the
+@code{expand()} function will never be affected by this option.  Default value:
+@option{NOFREE=0}.
 
 @cindex NOPROTECT
 @item @option{NOPROTECT}
@@ -9101,7 +9269,7 @@ were used.
 @item Additional
 The log file entry.
 @item Result
-The alignment is set to the system page size and execution continues.
+The alignment is set to the default system alignment and execution continues.
 @end table
 @end itemize
 
@@ -9117,9 +9285,9 @@ system, but were run several times to obtain an average result.  Obviously,
 these times can only be an approximation, but should serve to illustrate the
 effects on performance that each option can have.  All times are given in
 seconds, and the second time on each line was obtained with the same options
-plus the @option{NOPROTECT} option.  Running with the @option{CHECK=0} option
-would speed things up dramatically, albeit at the expense of less error
-checking.
+plus the @option{NOPROTECT} option.  The tests were all run with the
+@option{CHECK=-} option, so running with the @option{CHECK=0} option would speed
+things up dramatically, albeit at the expense of less error checking.
 
 Running with basic options:
 
@@ -9144,19 +9312,19 @@ Running with basic options:
 Running when all freed memory allocations are kept:
 
 @multitable @columnfractions .6 .15 .15
-@item @option{NOFREE=0}
+@item @option{NOFREE=0xFFFF}
 @tab 0.943
 @tab 0.506
-@item @option{NOFREE=0 OFLOWSIZE=2}
+@item @option{NOFREE=0xFFFF OFLOWSIZE=2}
 @tab 1.026
 @tab 0.579
-@item @option{NOFREE=0 OFLOWSIZE=8}
+@item @option{NOFREE=0xFFFF OFLOWSIZE=8}
 @tab 1.091
 @tab 0.645
-@item @option{NOFREE=0 PAGEALLOC=LOWER}
+@item @option{NOFREE=0xFFFF PAGEALLOC=LOWER}
 @tab 8.013
 @tab 7.598
-@item @option{NOFREE=0 PAGEALLOC=UPPER}
+@item @option{NOFREE=0xFFFF PAGEALLOC=UPPER}
 @tab 8.026
 @tab 7.616
 @end multitable
@@ -9165,19 +9333,19 @@ Running when all freed memory allocations are kept and their contents are
 preserved:
 
 @multitable @columnfractions .6 .15 .15
-@item @option{NOFREE=0 PRESERVE}
+@item @option{NOFREE=0xFFFF PRESERVE}
 @tab 0.719
 @tab 0.292
-@item @option{NOFREE=0 PRESERVE OFLOWSIZE=2}
+@item @option{NOFREE=0xFFFF PRESERVE OFLOWSIZE=2}
 @tab 0.792
 @tab 0.367
-@item @option{NOFREE=0 PRESERVE OFLOWSIZE=8}
+@item @option{NOFREE=0xFFFF PRESERVE OFLOWSIZE=8}
 @tab 0.850
 @tab 0.419
-@item @option{NOFREE=0 PRESERVE PAGEALLOC=LOWER}
+@item @option{NOFREE=0xFFFF PRESERVE PAGEALLOC=LOWER}
 @tab 8.043
 @tab 7.616
-@item @option{NOFREE=0 PRESERVE PAGEALLOC=UPPER}
+@item @option{NOFREE=0xFFFF PRESERVE PAGEALLOC=UPPER}
 @tab 8.052
 @tab 7.631
 @end multitable
