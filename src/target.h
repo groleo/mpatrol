@@ -160,7 +160,13 @@
 
 
 #ifndef ENVIRON
-#if SYSTEM == SYSTEM_SOLARIS
+#if SYSTEM == SYSTEM_IRIX
+#if defined(ABI64) || defined(_ABI64)
+#define ENVIRON ENVIRON_64
+#else /* ABI64 */
+#define ENVIRON ENVIRON_32
+#endif /* ABI64 */
+#elif SYSTEM == SYSTEM_SOLARIS
 #if defined(sparcv9) || defined(_sparcv9) || defined(__sparcv9) || \
     defined(__sparcv9__)
 #define ENVIRON ENVIRON_64
