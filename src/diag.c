@@ -36,10 +36,11 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.13 2000-04-03 18:36:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.14 2000-04-03 18:49:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -632,6 +633,8 @@ MP_GLOBAL void __mp_printmap(infohead *h)
 
 MP_GLOBAL void __mp_printversion(void)
 {
+    time_t t;
+
     __mp_diag("%s\n%s\n\n", __mp_version, __mp_copyright);
     __mp_diag("This is free software, and you are welcome to redistribute it "
               "under certain\n");
@@ -639,6 +642,8 @@ MP_GLOBAL void __mp_printversion(void)
               "details.\n\n");
     __mp_diag("For the latest mpatrol release and documentation,\n");
     __mp_diag("visit %s.\n\n", __mp_homepage);
+    if ((t = time(NULL)) != (time_t) -1)
+        __mp_diag("Log file generated on %s\n", ctime(&t));
 }
 
 
