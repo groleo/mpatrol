@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpsym.1,v 1.8 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: mpsym.1,v 1.9 2001-03-08 23:57:29 graeme Exp $
 .\"
-.TH MPSYM 1 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH MPSYM 1 "8 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpsym \- locates missing symbolic information in an mpatrol log file
 .SH SYNOPSIS
@@ -48,8 +48,9 @@ that created the mpatrol log file then the final output will be wrong.
 .PP
 The \fIlogfile\fP argument must be a valid mpatrol log filename but if
 \fIlogfile\fP is omitted then \fBmpsym\fP will use \fImpatrol.log\fP as the
-name of the log file to use.  The \fBmpsym\fP command makes two passes over the
-log file so the file must be randomly-accessable.
+name of the log file to use, or \fIprogfile.log\fP if it can't find that.  The
+\fBmpsym\fP command makes two passes over the log file so the file must be
+randomly-accessable.
 .PP
 The \fBmpsym\fP command currently uses \fBgdb\fP as the debugger with which to
 obtain the additional information about the code addresses in the mpatrol log
