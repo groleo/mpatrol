@@ -21,7 +21,7 @@
 ; Amiga shell script to build an LhA distribution file
 
 
-; $Id: build,v 1.29 2000-12-13 23:41:46 graeme Exp $
+; $Id: build,v 1.30 2000-12-14 17:59:20 graeme Exp $
 
 
 ; Build both the GCC and SAS/C versions of the mpatrol library.
@@ -82,6 +82,24 @@ Copy //doc/images/cc1.pdf mpatrol/doc/images
 Copy //doc/images/collect2.jpg mpatrol/doc/images
 Copy //doc/images/collect2.eps mpatrol/doc/images
 Copy //doc/images/collect2.pdf mpatrol/doc/images
+MakeDir mpatrol/doc/man
+Copy //man/README mpatrol/doc/man
+MakeDir mpatrol/doc/man/dvi
+Copy //man/dvi/mpatrol.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/mprof.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/mptrace.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/mleak.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/mpsym.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/mpedit.dvi mpatrol/doc/man/dvi
+Copy //man/dvi/libmpatrol.dvi mpatrol/doc/man/dvi
+MakeDir mpatrol/doc/man/ps
+Copy //man/ps/mpatrol.ps mpatrol/doc/man/ps
+Copy //man/ps/mprof.ps mpatrol/doc/man/ps
+Copy //man/ps/mptrace.ps mpatrol/doc/man/ps
+Copy //man/ps/mleak.ps mpatrol/doc/man/ps
+Copy //man/ps/mpsym.ps mpatrol/doc/man/ps
+Copy //man/ps/mpedit.ps mpatrol/doc/man/ps
+Copy //man/ps/libmpatrol.ps mpatrol/doc/man/ps
 MakeDir mpatrol/extra
 Copy //extra/.profile mpatrol/extra
 Copy //extra/.cshrc mpatrol/extra
