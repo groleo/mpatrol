@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.103 2001-03-04 23:39:41 graeme Exp $"
+#ident "$Id: inter.c,v 1.104 2001-03-04 23:54:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.103 2001-03-04 23:39:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.104 2001-03-04 23:54:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1560,7 +1560,13 @@ __mp_printinfo(void *p)
         if (n == NULL)
             fputs(" not in heap\n", stderr);
         else
-            fputs(" is in free memory\n", stderr);
+        {
+            fputs(" located in free memory:\n", stderr);
+            fprintf(stderr, "    start of block:     " MP_POINTER "\n",
+                    n->block);
+            fprintf(stderr, "    size of block:      %lu byte%s\n", n->size,
+                    (n->size == 1) ? "" : "s");
+        }
         restoresignals();
         return 0;
     }
