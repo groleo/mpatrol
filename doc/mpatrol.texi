@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.68 2000-05-04 20:21:49 graeme Exp $
+@c $Id: mpatrol.texi,v 1.69 2000-05-10 20:06:59 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 4th May, 2000
+@set UPDATED 10th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -4570,18 +4570,19 @@ then the @samp{NULL} pointer will be returned and @code{errno} will be set to
 can be reallocated again with @code{realloc()}.
 
 @findex recalloc
-@item @code{void *recalloc(void *ptr, size_t size)}
-Resizes the memory allocation beginning at @var{ptr} to @var{size} bytes and
-returns a pointer to the first byte of the new allocation after copying
-@var{ptr} to the newly-allocated memory, which will be truncated if @var{size}
-is smaller than the original allocation.  The pointer returned will be suitably
-aligned for casting to any type and can be used to store data of up to
-@var{size} bytes in length.  If @var{ptr} is @samp{NULL} then the call will be
-equivalent to @code{calloc()}.  If @var{size} is @samp{0} then the existing
-memory allocation will be freed and the @samp{NULL} pointer will be returned.
-If @var{size} is greater than the original allocation then the extra space will
-be filled with zero-initialised bytes.  If there is not enough space in the heap
-then the @samp{NULL} pointer will be returned and @code{errno} will be set to
+@item @code{void *recalloc(void *ptr, size_t nelem, size_t size)}
+Resizes the memory allocation beginning at @var{ptr} to @var{nelem} elements of
+@var{size} bytes and returns a pointer to the first byte of the new allocation
+after copying @var{ptr} to the newly-allocated memory, which will be truncated
+if @code{nelem * size} is smaller than the original allocation.  The pointer
+returned will be suitably aligned for casting to any type and can be used to
+store data of up to @code{nelem * size} bytes in length.  If @var{ptr} is
+@samp{NULL} then the call will be equivalent to @code{calloc()}.  If
+@code{nelem * size} is @samp{0} then the existing memory allocation will be
+freed and the @samp{NULL} pointer will be returned.  If @code{nelem * size} is
+greater than the original allocation then the extra space will be filled with
+zero-initialised bytes.  If there is not enough space in the heap then the
+@samp{NULL} pointer will be returned and @code{errno} will be set to
 @code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} and
 can be reallocated again with @code{realloc()}.  This function is available for
 backwards compatibility with older C libraries and @code{calloc()} and should
