@@ -1,3 +1,26 @@
+Changes for 1.2.0
+
+  * Added memory allocation profiling, which behaves in a similar way to mprof.
+
+  * Added the PROF, PROFFILE, AUTOSAVE, SMALLBOUND, MEDIUMBOUND and LARGEBOUND
+    options for memory allocation profiling purposes.
+
+  * Added a new command for displaying tables from memory allocation profiling
+    output files.
+
+  * The -P and -p options to the mpatrol command are now called -X and -x.
+
+  * The memleak tool is now called mleak.
+
+  * AIX and IRIX are now supported.
+
+  * Added a GDB command file for use with mpatrol.
+
+  * Added instructions on how to build the mpatrol library as a shared library
+    while also resolving references to any object file access libraries.  Also
+    added references to more related software.
+
+
 Changes for 1.1.4 (10th April, 2000)
 
   * The mpatrol shell script is now rewritten in C and is now also available on
