@@ -35,14 +35,17 @@
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
 #ifdef __cplusplus
+#ifdef __GNUC__
+#pragma implementation "new"
+#endif /* __GNUC__ */
 #include <new>
 #endif /* __cplusplus */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.6 2001-03-04 13:57:20 graeme Exp $"
+#ident "$Id: cplus.c,v 1.7 2001-03-07 18:51:30 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.6 2001-03-04 13:57:20 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.7 2001-03-07 18:51:30 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
