@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.10 2000-01-30 20:29:30 graeme Exp $"
+#ident "$Id: memory.c,v 1.11 2000-03-15 01:42:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -391,8 +391,11 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
                 n = (unsigned long) p - __mp_rounddown((unsigned long) p,
                                                        i->page);
             else
+            {
+                t = p;
                 n = __mp_roundup((unsigned long) p, i->page) -
                     (unsigned long) p;
+            }
             if (n > 0)
                 /* We need to allocate a little more memory in order to make the
                  * allocation page-aligned.
@@ -406,7 +409,7 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
                     p = NULL;
                 }
                 else if (p >= t)
-                    p = (char *) p + n - i->page;
+                    p = (char *) t + n;
         }
     }
 #elif TARGET == TARGET_AMIGA
