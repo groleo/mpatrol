@@ -6698,6 +6698,25 @@ specify that <code>memmove()</code> should be used instead.
 <dd>The copy operation will still be performed but it will deal correctly with
 overlapping memory regions. 
 </dl>
+
+<li><code>string %1 overflows [%2,%3]</code>
+<dl>
+<dt>Type
+<dd>Error
+<br><dt><code>%1</code>
+<dd>The start address of the string. 
+<br><dt><code>%2</code>
+<dd>The start address of the memory allocation. 
+<br><dt><code>%3</code>
+<dd>The end address of the memory allocation. 
+<br><dt>Cause
+<dd>A string function was called to operate on a string which overflowed the
+boundaries of a memory allocation. 
+<br><dt>Additional
+<dd>Information about the original memory allocation. 
+<br><dt>Result
+<dd>The operation will not be performed and execution continues. 
+</dl>
 </ul>
 
 <p><hr>
@@ -7386,7 +7405,8 @@ the information can be used at program termination.  May also need to display
 this information in the <code>__mp_printinfo()</code> function and add this
 information to the profiling output file so that <code>mprof</code> can make use of
 it.  Stack traces also need to be displayed when the <code>__mp_checkrange()</code>
-internal function fails.
+and <code>__mp_checkstring()</code> internal functions fail.  Likewise for the
+<code>strdup()</code> family of functions if the source string is invalid.
 
 <li>In object file formats that support nested symbols (such as ELF), the current
 implementation will tend to show some shortcomings.  This is because there is
@@ -7940,6 +7960,32 @@ inlining may significantly alter the layout of a program's stack.  Normally this
 option is only required when building the mpatrol library, but on some platforms
 function call stack traversal may not work properly unless this option (or
 equivalent) is used for all compiled code.
+
+</p><li>What does the MP_INLINE definition in <code>mpatrol.h</code> do?
+
+<p>It is used in the definition of the debugging versions of the C++ operators in
+<code>mpatrol.h</code> so that they are inlined correctly.  We want to define the C++
+operators so that they will be inlined in every source file that uses them and
+also not clash with the versions defined in the mpatrol library or the standard
+C++ library.  Traditionally, this is done by defining them to be
+<code>static inline</code>, which means that any non-inlined definition will be local
+to each object file.  An even better technique is available with the new C++
+standard which allows <code>extern inline</code> definitions, meaning that no
+definition will be available if the function is not inlined.  Unfortunately, if
+optimisation is turned off in the compiler then no inlining will usually be
+performed and so the definitions will be real functions.  Luckily, on ELF
+platforms the <code>extern inline</code> function definition will have a weak
+visibility and so will not clash with library functions.
+
+</p><li>Why do I get different stack traces in the mpatrol log file from the C++
+operators in <code>mpatrol.h</code> when optimisation is turned on and off in the
+compiler?
+
+<p>When the compiler is optimising it will invariably be performing inlining, in
+which case each inlined function will share the stack frame of its caller when
+it is called -- the mpatrol library cannot detect this.  In order to cope in
+both situations, the non-inlined case will contain the name of the C++ operator
+at the top of its stack, even though it will be removed in the inlined case.
 </ol>
 
 <p><hr>
@@ -8106,6 +8152,21 @@ mpatrol library.  If it still doesn't work then it may be that the dynamic
 linker on your system doesn't have the ability to preload any shared libraries
 that have been specified in a special environment variable, in which case you
 can't use this feature.
+
+</p><li>I am attempting to run a multithreaded C++ program with the mpatrol library on
+Linux.  However, my program crashes before <code>main()</code> and the debugger shows
+that the failure is in <code>__sigaction()</code> which is called from
+<code>__mp_initsignals()</code>.  Is the fault with the mpatrol library?
+
+<p>There have been many reports of this problem and it turns out to be an issue
+with shared library dependencies.  ELF shared libraries may contain
+initialisation functions that are executed before <code>main()</code>.  However,
+sometimes the order in which these functions are executed is critical.  In this
+case it is likely that the mpatrol and pthreads libraries are being initialised
+in the wrong order.  You must ensure that <code>-lpthread</code> appears near the
+very end of the link line after all user libraries, and you must also ensure
+that none of the user libraries have a dependency on <code>libpthread.so</code>.  You
+can verify this by running the <code>ldd</code> command on them.
 
 </p><li>I know that there's a definite heap corruption problem in my program as it keeps
 crashing in unrelated code due to pointer corruption, and when I link with the
@@ -9853,6 +9914,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>errors, run-time: <a href="#Overview">Overview</a>
 <li>examples: <a href="#Examples">Examples</a>
 <li>executable files: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>extern inline: <a href="#Building">Building</a>
 <li>FAILFREQ: <a href="#Environment">Environment</a>
 <li>FAILSEED: <a href="#Environment">Environment</a>
 <li>failure frequency: <a href="#Testing">Testing</a>
@@ -10048,6 +10110,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>modules: <a href="#How%20it%20works">How it works</a>
 <li>Motif: <a href="#References">References</a>
 <li>MP_BUILTINSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>MP_INLINE: <a href="#Building">Building</a>
 <li>MP_LIBRARYSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>MP_NOCPLUSPLUS: <a href="#Functions">Functions</a>
 <li>mpatrol: <a href="#Overview">Overview</a>
@@ -10208,6 +10271,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>stack memory allocations: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>stack tracebacks: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>stack unwinding: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>static inline: <a href="#Building">Building</a>
 <li>static memory allocations: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>statistics: <a href="#Logging%20and%20tracing">Logging and tracing</a>
 <li>Stratosware Corporation: <a href="#Related%20software">Related software</a>

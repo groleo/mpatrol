@@ -7038,6 +7038,29 @@ files and so should be self-explanatory.
           The copy operation will still be performed but it will deal
           correctly with overlapping memory regions.
 
+   * @{b}string %1 overflows [%2,%3]@{ub}
+    Type
+          Error
+
+    @{b}%1@{ub}
+          The start address of the string.
+
+    @{b}%2@{ub}
+          The start address of the memory allocation.
+
+    @{b}%3@{ub}
+          The end address of the memory allocation.
+
+    Cause
+          A string function was called to operate on a string which
+          overflowed the boundaries of a memory allocation.
+
+    Additional
+          Information about the original memory allocation.
+
+    Result
+          The operation will not be performed and execution continues.
+
 
 @endnode
 
@@ -7753,7 +7776,9 @@ Notes for all platforms
      May also need to display this information in the @{b}__mp_printinfo()@{ub}
      function and add this information to the profiling output file so
      that @{b}mprof@{ub} can make use of it.  Stack traces also need to be
-     displayed when the @{b}__mp_checkrange()@{ub} internal function fails.
+     displayed when the @{b}__mp_checkrange()@{ub} and @{b}__mp_checkstring()@{ub}
+     internal functions fail.  Likewise for the @{b}strdup()@{ub} family of
+     functions if the source string is invalid.
 
    * In object file formats that support nested symbols (such as ELF),
      the current implementation will tend to show some shortcomings.
@@ -8365,6 +8390,36 @@ Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
+  7. What does the MP_INLINE definition in @{b}mpatrol.h@{ub} do?
+
+     It is used in the definition of the debugging versions of the C++
+     operators in @{b}mpatrol.h@{ub} so that they are inlined correctly.  We
+     want to define the C++ operators so that they will be inlined in
+     every source file that uses them and also not clash with the
+     versions defined in the mpatrol library or the standard C++
+     library.  Traditionally, this is done by defining them to be
+     @{b}static inline@{ub}, which means that any non-inlined definition will be
+     local to each object file.  An even better technique is available
+     with the new C++ standard which allows @{b}extern inline@{ub} definitions,
+     meaning that no definition will be available if the function is
+     not inlined.  Unfortunately, if optimisation is turned off in the
+     compiler then no inlining will usually be performed and so the
+     definitions will be real functions.  Luckily, on ELF platforms the
+     @{b}extern inline@{ub} function definition will have a weak visibility and
+     so will not clash with library functions.
+
+  8. Why do I get different stack traces in the mpatrol log file from
+     the C++ operators in @{b}mpatrol.h@{ub} when optimisation is turned on and
+     off in the compiler?
+
+     When the compiler is optimising it will invariably be performing
+     inlining, in which case each inlined function will share the stack
+     frame of its caller when it is called -- the mpatrol library
+     cannot detect this.  In order to cope in both situations, the
+     non-inlined case will contain the name of the C++ operator at the
+     top of its stack, even though it will be removed in the inlined
+     case.
+
 
 @endnode
 
@@ -8550,7 +8605,25 @@ Running
      special environment variable, in which case you can't use this
      feature.
 
-  7. I know that there's a definite heap corruption problem in my
+  7. I am attempting to run a multithreaded C++ program with the
+     mpatrol library on Linux.  However, my program crashes before
+     @{b}main()@{ub} and the debugger shows that the failure is in @{b}__sigaction()@{ub}
+     which is called from @{b}__mp_initsignals()@{ub}.  Is the fault with the
+     mpatrol library?
+
+     There have been many reports of this problem and it turns out to
+     be an issue with shared library dependencies.  ELF shared
+     libraries may contain initialisation functions that are executed
+     before @{b}main()@{ub}.  However, sometimes the order in which these
+     functions are executed is critical.  In this case it is likely
+     that the mpatrol and pthreads libraries are being initialised in
+     the wrong order.  You must ensure that @{b}-lpthread@{ub} appears near the
+     very end of the link line after all user libraries, and you must
+     also ensure that none of the user libraries have a dependency on
+     @{b}libpthread.so@{ub}.  You can verify this by running the @{b}ldd@{ub} command on
+     them.
+
+  8. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
      corruption, and when I link with the mpatrol library it stops
      crashing.  What can I do?
@@ -8567,7 +8640,7 @@ Running
      through your program in a debugger until something unusual or
      unexpected happens.
 
-  8. If I link my program to version 1.0 of the mpatrol library then I
+  9. If I link my program to version 1.0 of the mpatrol library then I
      cannot interrupt it using the keyboard, which I would normally be
      able to do without using mpatrol.  Is this a bug?
 
@@ -8582,7 +8655,7 @@ Running
      which is why the behaviour was moved to an option for those that
      needed it.
 
-  9. Why does mpatrol not report an illegal memory access when it can
+ 10. Why does mpatrol not report an illegal memory access when it can
      be detected by a debugger?
 
      First of all, illegal memory accesses can only be detected on
@@ -8596,7 +8669,7 @@ Running
      try to live with that, or you could try disabling the overriding
      handlers.
 
- 10. I've linked and run my program with mpatrol under UNIX and it uses
+ 11. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -8616,7 +8689,7 @@ Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 11. Why does my program run so slowly after I link it with the mpatrol
+ 12. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -8630,7 +8703,7 @@ Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 12. My program is written in C++ and is linked to the mpatrol library,
+ 13. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -8647,7 +8720,7 @@ Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 13. Why does my program not stop when the mpatrol library notices an
+ 14. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -8659,7 +8732,7 @@ Running
      of program execution, and then search backwards in the log file for
      @{b}WARNING@{ub} or @{b}ERROR@{ub}.
 
- 14. I have linked my program with the mpatrol library on an Amiga or
+ 15. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -8673,7 +8746,7 @@ Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 15. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
+ 16. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the @{b}MPATROL_OPTIONS@{ub} environment variable recognised
      when I run it?
@@ -8686,7 +8759,7 @@ Running
      allows you to set an environment variable that the GNU @{b}getenv()@{ub}
      function can read when you are running in AmigaDOS.
 
- 16. How do I suppress all diagnostic output from the mpatrol library?
+ 17. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's @{i}bit bucket@{ui}, which is @{b}/dev/null@{ub} on UNIX platforms and @{b}NIL:@{ub}
@@ -10546,6 +10619,7 @@ Index
  @{" errors, run-time                         " link "Overview"}   Overview
  @{" examples                                 " link "Examples"}   Examples
  @{" executable files                         " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" extern inline                            " link "Building"}   Building
  @{" FAILFREQ                                 " link "Environment"}   Environment
  @{" FAILSEED                                 " link "Environment"}   Environment
  @{" failure frequency                        " link "Testing"}   Testing
@@ -10741,6 +10815,7 @@ Index
  @{" modules                                  " link "How it works"}   How it works
  @{" Motif                                    " link "References"}   References
  @{" MP_BUILTINSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" MP_INLINE                                " link "Building"}   Building
  @{" MP_LIBRARYSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" MP_NOCPLUSPLUS                           " link "Functions"}   Functions
  @{" mpatrol                                  " link "Overview"}   Overview
@@ -10901,6 +10976,7 @@ Index
  @{" stack memory allocations                 " link "Stack memory allocations"}   Stack memory allocations
  @{" stack tracebacks                         " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" stack unwinding                          " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" static inline                            " link "Building"}   Building
  @{" static memory allocations                " link "Static memory allocations"}   Static memory allocations
  @{" statistics                               " link "Logging and tracing"}   Logging and tracing
  @{" Stratosware Corporation                  " link "Related software"}   Related software

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.131 2000-11-09 19:30:05 graeme Exp $
+@c $Id: mpatrol.texi,v 1.132 2000-11-09 20:18:39 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -7272,6 +7272,26 @@ The log file entry.
 The copy operation will still be performed but it will deal correctly with
 overlapping memory regions.
 @end table
+
+@item
+@samp{string %1 overflows [%2,%3]}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The start address of the string.
+@item @samp{%2}
+The start address of the memory allocation.
+@item @samp{%3}
+The end address of the memory allocation.
+@item Cause
+A string function was called to operate on a string which overflowed the
+boundaries of a memory allocation.
+@item Additional
+Information about the original memory allocation.
+@item Result
+The operation will not be performed and execution continues.
+@end table
 @end itemize
 
 @node Library performance, Profiling file format, Diagnostic messages, Top
@@ -8164,7 +8184,8 @@ the information can be used at program termination.  May also need to display
 this information in the @code{__mp_printinfo()} function and add this
 information to the profiling output file so that @command{mprof} can make use of
 it.  Stack traces also need to be displayed when the @code{__mp_checkrange()}
-internal function fails.
+and @code{__mp_checkstring()} internal functions fail.  Likewise for the
+@code{strdup()} family of functions if the source string is invalid.
 
 @item
 In object file formats that support nested symbols (such as ELF), the current
@@ -8779,6 +8800,37 @@ inlining may significantly alter the layout of a program's stack.  Normally this
 option is only required when building the mpatrol library, but on some platforms
 function call stack traversal may not work properly unless this option (or
 equivalent) is used for all compiled code.
+
+@cindex MP_INLINE
+@cindex extern inline
+@cindex static inline
+@item
+What does the MP_INLINE definition in @file{mpatrol.h} do?
+
+It is used in the definition of the debugging versions of the C++ operators in
+@file{mpatrol.h} so that they are inlined correctly.  We want to define the C++
+operators so that they will be inlined in every source file that uses them and
+also not clash with the versions defined in the mpatrol library or the standard
+C++ library.  Traditionally, this is done by defining them to be
+@code{static inline}, which means that any non-inlined definition will be local
+to each object file.  An even better technique is available with the new C++
+standard which allows @code{extern inline} definitions, meaning that no
+definition will be available if the function is not inlined.  Unfortunately, if
+optimisation is turned off in the compiler then no inlining will usually be
+performed and so the definitions will be real functions.  Luckily, on ELF
+platforms the @code{extern inline} function definition will have a weak
+visibility and so will not clash with library functions.
+
+@item
+Why do I get different stack traces in the mpatrol log file from the C++
+operators in @file{mpatrol.h} when optimisation is turned on and off in the
+compiler?
+
+When the compiler is optimising it will invariably be performing inlining, in
+which case each inlined function will share the stack frame of its caller when
+it is called --- the mpatrol library cannot detect this.  In order to cope in
+both situations, the non-inlined case will contain the name of the C++ operator
+at the top of its stack, even though it will be removed in the inlined case.
 @end enumerate
 
 @node Linking, Running, Building, Frequently asked questions
@@ -8955,6 +9007,22 @@ mpatrol library.  If it still doesn't work then it may be that the dynamic
 linker on your system doesn't have the ability to preload any shared libraries
 that have been specified in a special environment variable, in which case you
 can't use this feature.
+
+@item
+I am attempting to run a multithreaded C++ program with the mpatrol library on
+Linux.  However, my program crashes before @code{main()} and the debugger shows
+that the failure is in @code{__sigaction()} which is called from
+@code{__mp_initsignals()}.  Is the fault with the mpatrol library?
+
+There have been many reports of this problem and it turns out to be an issue
+with shared library dependencies.  ELF shared libraries may contain
+initialisation functions that are executed before @code{main()}.  However,
+sometimes the order in which these functions are executed is critical.  In this
+case it is likely that the mpatrol and pthreads libraries are being initialised
+in the wrong order.  You must ensure that @option{-lpthread} appears near the
+very end of the link line after all user libraries, and you must also ensure
+that none of the user libraries have a dependency on @file{libpthread.so}.  You
+can verify this by running the @command{ldd} command on them.
 
 @item
 I know that there's a definite heap corruption problem in my program as it keeps

@@ -6891,6 +6891,29 @@ files and so should be self-explanatory.
           The copy operation will still be performed but it will deal
           correctly with overlapping memory regions.
 
+   * `string %1 overflows [%2,%3]'
+    Type
+          Error
+
+    `%1'
+          The start address of the string.
+
+    `%2'
+          The start address of the memory allocation.
+
+    `%3'
+          The end address of the memory allocation.
+
+    Cause
+          A string function was called to operate on a string which
+          overflowed the boundaries of a memory allocation.
+
+    Additional
+          Information about the original memory allocation.
+
+    Result
+          The operation will not be performed and execution continues.
+
 
 File: mpatrol.info,  Node: Library performance,  Next: Profiling file format,  Prev: Diagnostic messages,  Up: Top
 
@@ -7574,8 +7597,9 @@ Notes for all platforms
      May also need to display this information in the
      `__mp_printinfo()' function and add this information to the
      profiling output file so that `mprof' can make use of it.  Stack
-     traces also need to be displayed when the `__mp_checkrange()'
-     internal function fails.
+     traces also need to be displayed when the `__mp_checkrange()' and
+     `__mp_checkstring()' internal functions fail.  Likewise for the
+     `strdup()' family of functions if the source string is invalid.
 
    * In object file formats that support nested symbols (such as ELF),
      the current implementation will tend to show some shortcomings.
@@ -8164,6 +8188,36 @@ Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
+  7. What does the MP_INLINE definition in `mpatrol.h' do?
+
+     It is used in the definition of the debugging versions of the C++
+     operators in `mpatrol.h' so that they are inlined correctly.  We
+     want to define the C++ operators so that they will be inlined in
+     every source file that uses them and also not clash with the
+     versions defined in the mpatrol library or the standard C++
+     library.  Traditionally, this is done by defining them to be
+     `static inline', which means that any non-inlined definition will
+     be local to each object file.  An even better technique is
+     available with the new C++ standard which allows `extern inline'
+     definitions, meaning that no definition will be available if the
+     function is not inlined.  Unfortunately, if optimisation is turned
+     off in the compiler then no inlining will usually be performed and
+     so the definitions will be real functions.  Luckily, on ELF
+     platforms the `extern inline' function definition will have a weak
+     visibility and so will not clash with library functions.
+
+  8. Why do I get different stack traces in the mpatrol log file from
+     the C++ operators in `mpatrol.h' when optimisation is turned on
+     and off in the compiler?
+
+     When the compiler is optimising it will invariably be performing
+     inlining, in which case each inlined function will share the stack
+     frame of its caller when it is called -- the mpatrol library
+     cannot detect this.  In order to cope in both situations, the
+     non-inlined case will contain the name of the C++ operator at the
+     top of its stack, even though it will be removed in the inlined
+     case.
+
 
 File: mpatrol.info,  Node: Linking,  Next: Running,  Prev: Building,  Up: Frequently asked questions
 
@@ -8339,7 +8393,25 @@ Running
      specified in a special environment variable, in which case you
      can't use this feature.
 
-  7. I know that there's a definite heap corruption problem in my
+  7. I am attempting to run a multithreaded C++ program with the
+     mpatrol library on Linux.  However, my program crashes before
+     `main()' and the debugger shows that the failure is in
+     `__sigaction()' which is called from `__mp_initsignals()'.  Is the
+     fault with the mpatrol library?
+
+     There have been many reports of this problem and it turns out to
+     be an issue with shared library dependencies.  ELF shared
+     libraries may contain initialisation functions that are executed
+     before `main()'.  However, sometimes the order in which these
+     functions are executed is critical.  In this case it is likely
+     that the mpatrol and pthreads libraries are being initialised in
+     the wrong order.  You must ensure that `-lpthread' appears near the
+     very end of the link line after all user libraries, and you must
+     also ensure that none of the user libraries have a dependency on
+     `libpthread.so'.  You can verify this by running the `ldd' command
+     on them.
+
+  8. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
      corruption, and when I link with the mpatrol library it stops
      crashing.  What can I do?
@@ -8356,7 +8428,7 @@ Running
      through your program in a debugger until something unusual or
      unexpected happens.
 
-  8. If I link my program to version 1.0 of the mpatrol library then I
+  9. If I link my program to version 1.0 of the mpatrol library then I
      cannot interrupt it using the keyboard, which I would normally be
      able to do without using mpatrol.  Is this a bug?
 
@@ -8371,7 +8443,7 @@ Running
      which is why the behaviour was moved to an option for those that
      needed it.
 
-  9. Why does mpatrol not report an illegal memory access when it can
+ 10. Why does mpatrol not report an illegal memory access when it can
      be detected by a debugger?
 
      First of all, illegal memory accesses can only be detected on
@@ -8385,7 +8457,7 @@ Running
      either try to live with that, or you could try disabling the
      overriding handlers.
 
- 10. I've linked and run my program with mpatrol under UNIX and it uses
+ 11. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -8405,7 +8477,7 @@ Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 11. Why does my program run so slowly after I link it with the mpatrol
+ 12. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -8419,7 +8491,7 @@ Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 12. My program is written in C++ and is linked to the mpatrol library,
+ 13. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -8436,7 +8508,7 @@ Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 13. Why does my program not stop when the mpatrol library notices an
+ 14. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -8448,7 +8520,7 @@ Running
      of program execution, and then search backwards in the log file for
      `WARNING' or `ERROR'.
 
- 14. I have linked my program with the mpatrol library on an Amiga or
+ 15. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -8462,7 +8534,7 @@ Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 15. I have built the mpatrol library with `gcc' on AmigaOS and have
+ 16. I have built the mpatrol library with `gcc' on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the `MPATROL_OPTIONS' environment variable
      recognised when I run it?
@@ -8475,7 +8547,7 @@ Running
      allows you to set an environment variable that the GNU `getenv()'
      function can read when you are running in AmigaDOS.
 
- 16. How do I suppress all diagnostic output from the mpatrol library?
+ 17. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's _bit bucket_, which is `/dev/null' on UNIX platforms and
@@ -10290,6 +10362,7 @@ Index
 * errors, run-time:                      Overview.
 * examples:                              Examples.
 * executable files:                      Call stacks and symbol tables.
+* extern inline:                         Building.
 * FAILFREQ:                              Environment.
 * FAILSEED:                              Environment.
 * failure frequency:                     Testing.
@@ -10485,6 +10558,7 @@ Index
 * modules:                               How it works.
 * Motif:                                 References.
 * MP_BUILTINSTACK_SUPPORT:               Call stacks and symbol tables.
+* MP_INLINE:                             Building.
 * MP_LIBRARYSTACK_SUPPORT:               Call stacks and symbol tables.
 * MP_NOCPLUSPLUS:                        Functions.
 * mpatrol:                               Overview.
@@ -10645,6 +10719,7 @@ Index
 * stack memory allocations:              Stack memory allocations.
 * stack tracebacks:                      Call stacks and symbol tables.
 * stack unwinding:                       Call stacks and symbol tables.
+* static inline:                         Building.
 * static memory allocations:             Static memory allocations.
 * statistics:                            Logging and tracing.
 * Stratosware Corporation:               Related software.
@@ -10809,30 +10884,30 @@ Node: Functions244712
 Node: Environment274862
 Node: Options292605
 Node: Diagnostic messages302538
-Node: Library performance316975
-Node: Profiling file format319477
-Ref: Profiling file format-Footnote-1322764
-Node: Supported systems322944
-Node: New system support335753
-Node: New processor support336949
-Node: New file format support337632
-Node: Notes338022
-Node: Generic notes339633
-Ref: Generic notes-Footnote-1353145
-Node: UNIX notes353367
-Node: Amiga notes357961
-Node: Windows notes361352
-Node: Netware notes362502
-Node: Frequently asked questions364792
-Node: Documentation365415
-Node: Building369208
-Node: Linking373966
-Node: Running378238
-Node: Files390864
-Node: Related software393452
-Ref: Related software-Footnote-1427203
-Node: References427444
-Node: Function index430044
-Node: Index432305
+Node: Library performance317513
+Node: Profiling file format320015
+Ref: Profiling file format-Footnote-1323302
+Node: Supported systems323482
+Node: New system support336291
+Node: New processor support337487
+Node: New file format support338170
+Node: Notes338560
+Node: Generic notes340171
+Ref: Generic notes-Footnote-1353795
+Node: UNIX notes354017
+Node: Amiga notes358611
+Node: Windows notes362002
+Node: Netware notes363152
+Node: Frequently asked questions365442
+Node: Documentation366065
+Node: Building369858
+Node: Linking376300
+Node: Running380572
+Node: Files394208
+Node: Related software396796
+Ref: Related software-Footnote-1430547
+Node: References430788
+Node: Function index433388
+Node: Index435649
 
 End Tag Table
