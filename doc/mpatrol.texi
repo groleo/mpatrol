@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.217 2001-05-22 21:02:18 graeme Exp $
+@c $Id: mpatrol.texi,v 1.218 2001-05-30 22:29:28 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.9
 @set VERSION 1.4.4
-@set UPDATED 22nd May, 2001
+@set UPDATED 30th May, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -618,8 +618,8 @@ be set.
 A tracing command is provided which reads a tracing output file produced by the
 mpatrol library and displays the memory allocation events in tabular or
 graphical form.  It also displays any relevant statistics that could be
-calculated, and has an option to write out a trace-driven memory allocation
-simulation program as C source code.
+calculated, and has options to write out the trace in HATF format or write out
+a trace-driven memory allocation simulation program as C source code.
 
 @item
 On UNIX platforms, the @code{mmap()} function can optionally be used to allocate
@@ -2560,7 +2560,9 @@ used to provide additional information to your program, and which can be called
 at various points in your code for debugging purposes.  You must always include
 the @file{mpatrol.h} header file in order to use these functions, but you can
 check for a specific version of the mpatrol library by checking the
-@code{MPATROL_VERSION} preprocessor macro.
+@code{MPATROL_VERSION} preprocessor macro.  You can check the version of the
+mpatrol library that a program was linked with by calling the
+@code{__mp_libversion()} function.
 
 Certain mpatrol library options can be set after the library has been
 initialised with the @code{__mp_setoption()} function.  This allows you to
@@ -2586,6 +2588,19 @@ the executable file or shared library before the program is run, and the order
 in which such functions will be called if there are more than one is
 unspecified.  The @code{__mp_atexit()} function can also be used to register
 functions that should be called when the mpatrol library terminates.
+
+@cindex forked processes
+On UNIX platforms, the @code{fork()} function can cause problems if it is used
+to make a copy of the parent process without immediately calling one of the
+@code{exec()} family of functions.  This is because the child process inherits
+all of the memory allocations of the parent process, but also inherits the log,
+profile and trace files as well.  If both the parent and child processes make
+subsequent memory allocations there will be multiple entries with the same
+allocation indices written to the log, profile or trace files.  This can be
+most confusing when processing these files afterwards!  As a workaround, the
+mpatrol library will always check the current process identifier every time one
+of its functions is called and will open new log, profile or trace files if it
+has determined that the process has been forked.
 
 It is possible to obtain a great deal of information about an existing memory
 allocation or free block using the @code{__mp_info()} function.  This takes an
@@ -4595,6 +4610,18 @@ identical memory allocation behaviour to the program which produced the original
 trace file.  This option can be useful to use if you wish to determine which
 malloc library is most suitable to use for a specific application.
 
+@cindex HATF
+@cindex Heap Allocation Trace Format
+@cindex --hatf-file
+A trace file in Heap Allocation Trace Format (HATF) can also be written out by
+the @command{mptrace} command by using the @option{--hatf-file} option.  It
+takes the name of the HATF trace file to be written as an argument and writes
+out the HATF version of the mpatrol tracing output file given as input when it
+is being processed.  The HATF file format is an attempt to standardise trace
+file formats for memory allocation tracing, and is being developed by Benjamin
+Zorn and Richard Jones.  There is a HATF DTD located in the @file{extra}
+directory in the mpatrol distribution.
+
 @cindex GUI
 @cindex graphical user interface
 @cindex X Windows
@@ -4747,8 +4774,8 @@ If you examine this file you will see something similar to the following.  Note
 that the @samp{@dots{}} marks text that has been removed.
 
 @smallexample
- event  type     index  allocation      size    life
-------  ------  ------  ----------  --------  ------
+ event  type     index  allocation      size    life   count     bytes
+------  ------  ------  ----------  --------  ------  ------  --------
         internal        0x0024E000     32768
         internal        0x00256000     32768
         internal        0x0025E000     32768
@@ -4761,26 +4788,26 @@ that the @samp{@dots{}} marks text that has been removed.
         internal        0x00290000     32768
 @dots{}
         reserve         0x00308000     16384
-     1  alloc       19  0x00266568      4072
-     2  alloc       21  0x0030A008      4072
-     3  alloc       22  0x0030AFF0      4072
+     1  alloc       19  0x00266568      4072               1      4072
+     2  alloc       21  0x0030A008      4072               2      8144
+     3  alloc       22  0x0030AFF0      4072               3     12216
         reserve         0x0030C000      8192
-     4  alloc       23  0x0030BFD8      4072
-     5  alloc       24  0x0030CFC0      4072
+     4  alloc       23  0x0030BFD8      4072               4     16288
+     5  alloc       24  0x0030CFC0      4072               5     20360
         reserve         0x0030E000      8192
-     6  alloc       25  0x0030DFA8      4072
-     7  alloc       26  0x00267550        42
+     6  alloc       25  0x0030DFA8      4072               6     24432
+     7  alloc       26  0x00267550        42               7     24474
 @dots{}
-  1712  free       650  0x00373FF0      4072     827
-  1713  free       649  0x00376FA8      4072     829
-  1714  alloc     1074  0x00376FA8      4072
-  1715  free       233  0x0031ED18      8200    1498
-  1716  free       234  0x00320D20      8200    1498
-  1717  free       299  0x00355CC8       620    1426
-  1718  free       655  0x00353A28      1016     823
-  1719  free       303  0x0035E000      5096    1424
-  1720  free       653  0x00354E60       152     827
-  1721  free       654  0x00354EF8       152     827
+  1712  free       650  0x00373FF0      4072     827     398    321191
+  1713  free       649  0x00376FA8      4072     829     397    317119
+  1714  alloc     1074  0x00376FA8      4072             398    321191
+  1715  free       233  0x0031ED18      8200    1498     397    312991
+  1716  free       234  0x00320D20      8200    1498     396    304791
+  1717  free       299  0x00355CC8       620    1426     395    304171
+  1718  free       655  0x00353A28      1016     823     394    303155
+  1719  free       303  0x0035E000      5096    1424     393    298059
+  1720  free       653  0x00354E60       152     827     392    297907
+  1721  free       654  0x00354EF8       152     827     391    297755
 
 memory allocation tracing statistics
 ------------------------------------
@@ -4797,7 +4824,7 @@ largest size:  8200 bytes
 average size:  512 bytes
 @end smallexample
 
-There are six different columns of data displayed by the @command{mptrace}
+There are eight different columns of data displayed by the @command{mptrace}
 command when it decodes the tracing output file and displays it in tabular
 format with the @option{--verbose} option.  Here is an explanation for each of
 them.
@@ -4841,6 +4868,14 @@ working out how long a memory allocation is valid throughout a program's
 execution.  If a memory allocation is reallocated, its lifetime will be
 calculated from the original time of allocation, @emph{not} the point at which
 it was reallocated.
+
+@item count
+This contains a running total of the number of memory allocations currently in
+use.  The total is calculated after processing the current event.
+
+@item bytes
+This contains a running total of the memory used by the current memory
+allocations.  The total is calculated after processing the current event.
 @end table
 
 The first few entries in the table show that the mpatrol library started by
@@ -5818,7 +5853,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.4.4 (01/05/22)
+@@(#) mpatrol 1.4.4 (01/05/30)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -5835,7 +5870,7 @@ processor word size:    32-bit
 object file format:     BFD
 dynamic linker type:    SVR4
 
-Log file generated on Tue May 22 23:57:23 2001
+Log file generated on Wed May 30 23:57:23 2001
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.4
 read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so
@@ -8887,7 +8922,7 @@ and no bytes will be searched.
 @node Functions 6, , Functions 5, Functions
 @section mpatrol library functions
 
-The following 36 functions are available as support routines for additional
+The following 37 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
@@ -8922,6 +8957,12 @@ unsigned integer, otherwise @samp{0} will be returned.  If @var{opt} is
 @code{MP_OPT_SETFLAGS} then all of the mpatrol library flags that are set will
 be returned in @var{val}.  If @var{opt} is @code{MP_OPT_UNSETFLAGS} then all of
 the mpatrol library flags that are not set will be returned in @var{val}.
+
+@findex __mp_libversion
+@item @code{unsigned long __mp_libversion(void)}
+Returns the version number of the mpatrol library.  This can be useful for
+verifying that the version of the mpatrol library that a program is linked with
+is the one expected at compile-time.
 
 @findex __mp_strerror
 @item @code{const char *__mp_strerror(__mp_errortype err)}
@@ -12377,8 +12418,8 @@ it would be more user-friendly to make them begin with @samp{mpatrol_}?
 
 @item
 Add an option to write the mpatrol log file in HTML format, or even better XML
-format.  Could also write the tracing output file in HATF format (Heap
-Allocation Trace Format).
+format.  Need to also extend what is written out by the @option{--hatf-file}
+option.
 
 @item
 The @command{mpsym} command could optionally preserve any stack traceback lines
@@ -14877,6 +14918,23 @@ Various UNIX, Windows
 @uref{http://www.cit.uws.edu.au/~blilburn/sbase/}
 @item Overview
 A set of classes for debugging dynamic memory problems in Objective C.
+@end table
+
+@cindex SCID
+@item
+SCID
+@table @asis
+@item Author
+Richard Mills (@email{rich@@xerp.freeserve.co.uk})
+@item License
+GNU General Public License
+@item Platforms
+Various UNIX
+@item Location
+@uref{http:///www.xerp.demon.co.uk/}
+@item Overview
+A program that tries to help locate bugs caused by the reading and writing of
+invalid pointers in C code by source code insertion.
 @end table
 
 @cindex SmartAlloc
