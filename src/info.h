@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.66 2001-12-06 00:25:56 graeme Exp $
+ * $Id: info.h,v 1.67 2001-12-06 00:36:25 graeme Exp $
  */
 
 
@@ -130,6 +130,24 @@ typedef enum alloctype
 alloctype;
 
 
+/* The overall types of memory allocation and operation functions for logging
+ * purposes.
+ */
+
+typedef enum logtype
+{
+    LT_ALLOC,   /* memory allocation */
+    LT_REALLOC, /* memory reallocation */
+    LT_FREE,    /* memory deallocation */
+    LT_SET,     /* memory set */
+    LT_COPY,    /* memory copy */
+    LT_LOCATE,  /* memory search */
+    LT_COMPARE, /* memory comparison */
+    LT_MAX
+}
+logtype;
+
+
 /* An allocanode belongs to a stack of memory allocations that were made
  * by the alloca() and related functions.  Some memory allocations at the
  * top of the stack may be automatically freed when the next call to an
@@ -156,7 +174,7 @@ allocanode;
 
 typedef struct loginfo
 {
-    alloctype type;       /* type of memory allocation */
+    logtype ltype;        /* overall type of memory allocation */
     union
     {
         struct
@@ -179,6 +197,7 @@ typedef struct loginfo
         logfree;
     }
     variant;
+    alloctype type;       /* type of memory allocation */
     char *func;           /* calling function name */
     char *file;           /* file name in which call took place */
     unsigned long line;   /* line number at which call took place */
