@@ -1,0 +1,86 @@
+* mpatrol
+* A library for controlling and tracing dynamic memory allocations.
+* Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Library General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Library General Public License for more details.
+*
+* You should have received a copy of the GNU Library General Public
+* License along with this library; if not, write to the Free
+* Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+* MA 02111-1307, USA.
+
+
+* AIX Shared Library Exports
+
+
+__mp_init
+__mp_fini
+__mp_alloc
+__mp_strdup
+__mp_realloc
+__mp_free
+__mp_setmem
+__mp_copymem
+__mp_comparemem
+__mp_locatemem
+__mp_info
+__mp_printinfo
+__mp_memorymap
+__mp_summary
+__mp_check
+__mp_prologue
+__mp_epilogue
+__mp_nomemory
+__mp_pushdelstack
+__mp_popdelstack
+chkr_set_right
+chkr_copy_bitmap
+chkr_check_addr
+chkr_check_str
+chkr_check_exec
+malloc
+calloc
+memalign
+valloc
+pvalloc
+alloca
+strdup
+strndup
+strsave
+strnsave
+strdupa
+strndupa
+realloc
+recalloc
+expand
+free
+cfree
+dealloca
+xmalloc
+xcalloc
+xstrdup
+xrealloc
+xfree
+memset
+bzero
+memccpy
+memcpy
+memmove
+bcopy
+memchr
+memmem
+memcmp
+bcmp
+__nw__FUi
+__arr_nw__FUi
+__dl__FPv
+__arr_dl__FPv
+set_new_handler__FPFv_v
