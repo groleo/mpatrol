@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.35 2001-05-14 12:15:13 graeme Exp $
+ * $Id: diag.h,v 1.36 2001-05-16 07:48:47 graeme Exp $
  */
 
 
@@ -121,6 +121,7 @@ MP_EXPORT void __mp_error(errortype, alloctype, char *, unsigned long, char *,
 MP_EXPORT int __mp_editfile(char *, unsigned long, int);
 MP_EXPORT int __mp_readalloc(char *, unsigned long, void *, size_t);
 MP_EXPORT int __mp_writealloc(char *, unsigned long, void *, size_t);
+MP_EXPORT long __mp_cmpalloc(char *, unsigned long, void *, size_t);
 MP_EXPORT int __mp_remalloc(char *, unsigned long);
 MP_EXPORT void __mp_printmemory(void *, size_t);
 MP_EXPORT void __mp_printsize(size_t);

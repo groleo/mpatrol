@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.76 2001-05-14 12:15:13 graeme Exp $"
+#ident "$Id: diag.c,v 1.77 2001-05-16 07:48:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.76 2001-05-14 12:15:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.77 2001-05-16 07:48:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -773,6 +773,58 @@ __mp_writealloc(char *s, unsigned long n, void *a, size_t l)
         fclose(f);
         if (r == 0)
             remove(t);
+    }
+    return r;
+}
+
+
+/* Compare an allocation contents file with the contents currently in memory.
+ */
+
+MP_GLOBAL
+long
+__mp_cmpalloc(char *s, unsigned long n, void *a, size_t l)
+{
+    FILE *f;
+    char *p;
+    long r;
+    int c;
+
+    r = -1;
+    if (f = fopen(allocfile(s, n), "rb"))
+    {
+        r = 0;
+        p = (char *) a;
+        while (((c = fgetc(f)) != EOF) && (l != 0))
+        {
+            if ((unsigned char) *p != (unsigned char) c)
+            {
+                if (r == 0)
+                    __mp_diag("allocation %lu (" MP_POINTER ") differences:\n",
+                              n, a);
+                __mp_diag("\t" MP_POINTER "  %02X -> %02X (offset %lu)\n", p,
+                          (unsigned char) c, (unsigned char) *p,
+                          (unsigned long) (p - (char *) a));
+                r++;
+            }
+            p++;
+            l--;
+        }
+        if (c != EOF)
+        {
+            __mp_diag("allocation %lu (" MP_POINTER ") has decreased in size\n",
+                      n, a);
+            r++;
+        }
+        else if (l != 0)
+        {
+            __mp_diag("allocation %lu (" MP_POINTER ") has increased in size\n",
+                      n, a);
+            r++;
+        }
+        if (r != 0)
+            __mp_diag("\n");
+        fclose(f);
     }
     return r;
 }

@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.28 2001-05-14 12:15:14 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.29 2001-05-16 07:48:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.28 2001-05-14 12:15:14 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.29 2001-05-16 07:48:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -945,6 +945,16 @@ int
 __mp_writecontents(char *s, void *p)
 {
     return 0;
+}
+
+
+/* Compare an allocation contents file with the contents currently in memory.
+ */
+
+long
+__mp_cmpcontents(char *s, void *p)
+{
+    return -1;
 }
 
 

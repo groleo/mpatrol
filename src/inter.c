@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.120 2001-05-14 12:15:13 graeme Exp $"
+#ident "$Id: inter.c,v 1.121 2001-05-16 07:48:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.120 2001-05-14 12:15:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.121 2001-05-16 07:48:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2564,6 +2564,31 @@ __mp_writecontents(char *s, void *p)
         r = 0;
     else
         r = __mp_writealloc(s, m->data.alloc, n->block, n->size);
+    restoresignals();
+    return r;
+}
+
+
+/* Compare an allocation contents file with the contents currently in memory.
+ */
+
+long
+__mp_cmpcontents(char *s, void *p)
+{
+    allocnode *n;
+    infonode *m;
+    long r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = -1;
+    else
+        r = __mp_cmpalloc(s, m->data.alloc, n->block, n->size);
     restoresignals();
     return r;
 }
