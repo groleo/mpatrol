@@ -323,7 +323,7 @@ Further information
     available as freeware or as commercial products.  Try to keep in mind that
     mpatrol comes with absolutely no warranty and so if it doesn't work for you
     and you need a fast solution, try some of the other libraries or products
-    available.  I have listed some of the most popular in NOTES.
+    available.
 
     Due to their very nature, problems with dynamic memory allocations are
     notoriously difficult to reproduce and debug, and this is likely to be the
