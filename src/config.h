@@ -314,6 +314,19 @@
 #endif /* MP_PROCFS_SUPPORT && MP_WATCH_SUPPORT */
 
 
+/* Indicates if the system dynamic linker supports preloading a set of shared
+ * libraries specified in an environment variable.
+ */
+
+#ifndef MP_PRELOAD_SUPPORT
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
+#define MP_PRELOAD_SUPPORT 1
+#else /* SYSTEM */
+#define MP_PRELOAD_SUPPORT 0
+#endif /* SYSTEM */
+#endif /* MP_PRELOAD_SUPPORT */
+
+
 /* Indicates if the compiler supports the __builtin_frame_address() and
  * __builtin_return_address() macros, and if they should be used instead of
  * traversing the call stack directly.  Note that this method only allows a
