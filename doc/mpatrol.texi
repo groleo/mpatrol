@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.209 2001-03-19 19:29:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.210 2001-03-21 21:36:57 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.8
 @set VERSION 1.4.3
-@set UPDATED 19th March, 2001
+@set UPDATED 21st March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -148,6 +148,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Library performance::         Comparitive timings.
 * File formats::                Output file layouts.
 * Supported systems::           Known platforms that mpatrol runs on.
+* Porting::                     How to port mpatrol to a new system.
 * Notes::                       Known bugs and future enhancements.
 * Frequently asked questions::  For answering specific problems.
 * Related software::            Similar programs.
@@ -3300,7 +3301,7 @@ are defined by this file or by the mpatrol library.
 
 This module is intended to work with the existing @command{dmalloc} command,
 which sets the contents of the @env{DMALLOC_OPTIONS} environment variable
-according to any specified command-line options.  The four documented Dmalloc
+according to any specified command line options.  The four documented Dmalloc
 global variables are also defined, although the two address variables are not
 acted upon and changing the @code{dmalloc_logpath} variable has no effect yet.
 The @code{dmalloc_errno} variable is mapped onto the @code{__mp_errno} variable
@@ -10855,7 +10856,7 @@ encoded as an unsigned LEB128 number.
 4 bytes containing the characters @samp{M}, @samp{T}, @samp{R} and @samp{C}.
 @end itemize
 
-@node Supported systems, Notes, File formats, Top
+@node Supported systems, Porting, File formats, Top
 @appendix Supported systems
 @cindex supported systems
 @cindex systems
@@ -11433,110 +11434,393 @@ work.
 @end itemize
 @end itemize
 
-@menu
-* New system support::          Adding a new operating system.
-* New processor support::       Adding a new processor architecture.
-* New file format support::     Adding a new object file format.
-@end menu
+@node Porting, Notes, Supported systems, Top
+@appendix Porting
+@cindex porting
 
-@node New system support, New processor support, , Supported systems
-@appendixsec Adding a new operating system
-@cindex adding a new operating system
-@cindex operating systems, adding support
+This section describes how to port the mpatrol library to new systems.  It is
+not a complete set of guidelines as nothing can cover every eventuality, but it
+should list most of the important issues and where to make the necessary
+changes.  Once you've made the changes (and are happy with them) then send them
+to me and I can incorporate them into the next mpatrol release.  I'd also like
+to hear from anybody who has got mpatrol working on a different version of an
+operating system listed in the supported systems section (@pxref{Supported
+systems}) even if no changes were required, since that information can be useful
+for new users wondering if mpatrol can be used on their system.
 
-@itemize @bullet
+@enumerate 1
 @item
-Add a new @code{TARGET} and/or @code{SYSTEM} definition in @file{target.h}.  The
-@code{TARGET} macro is for fundamentally different operating systems, whereas
-the @code{SYSTEM} macro is for differentiating variations of a particular
-operating system.
+Make any required changes in @file{src/target.h} in order to identify the new
+system.
 
-@item
-Make any necessary modifications to @file{config.h}.
+The @code{TARGET} macro is used to identify distinct families of operating
+systems whereas the @code{SYSTEM} macro is used to identify the operating system
+variant if @code{TARGET=TARGET_UNIX}.  You should try to identify the predefined
+preprocessor macros that the system C compiler defines for the operating system
+type and the operating system variant, otherwise you will have to specify the
+@code{TARGET} and @code{SYSTEM} macros explicitly in the Makefile when building
+the mpatrol library.  Note that for non-UNIX operating systems,
+@code{SYSTEM=SYSTEM_ANY} is implied.
 
-@item
-Add any support for memory allocation in @file{memory.c}.
+The @code{ARCH} macro is used to identify the processor architecture and the
+@code{ENVIRON} macro is used to identify the processor word size.  Again, you
+should try to identify the predefined preprocessor macros that the system C
+compiler defines for the processor architecture and processor word size,
+otherwise you may also have to specify the @code{ARCH} and @code{ENVIRON}
+macros explicitly in the Makefile when building the mpatrol library.  The
+default setting for the processor word size is @code{ENVIRON=ENVIRON_32}.
 
-@item
-Add any support for stack traversal in @file{stack.c}.
+You can normally figure out the preprocessor macros that are predefined by the
+system C compiler by using the @option{-#}, @option{-v} or @option{-verbose}
+options when compiling a source file.  The command line used to invoke the
+preprocessor should then be shown, which should show a list of all of the macros
+that are being defined in addition to those specified on the compiler command
+line.  It should then be easy for you to spot the ones you need.
 
-@item
-Add any platform-specific assembler code in @file{machine.c}.
+The @code{FORMAT} macro is used to identify the object file format and the
+@code{DYNLINK} macro is used to identify the dynamic linker type.  You may be
+able to use the existing values for these without having to define new ones,
+but in any case you should attempt to set defaults for these macros depending
+on the values of the four preceding macros.  A setting of
+@code{FORMAT=FORMAT_NONE} indicates that reading symbols from any object files
+is not supported and a setting of @code{DYNLINK=DYNLINK_NONE} indicates that
+reading symbols from shared libraries is not supported.
 
-@item
-Add any support for signals in @file{signals.c}.
+If the object file format of the new system is not currently supported, perhaps
+it is supported by the GNU BFD library.  This can be used as a catch-all
+solution to provide symbol reading support for the mpatrol library with object
+file formats that are obscure or are just hard to implement readers for.  You'd
+be surprised at how many object file formats are supported by that library and
+if the new format is supported then try defining @code{FORMAT=FORMAT_BFD} for
+the new system.
 
-@item
-Add any support for threads in @file{mutex.c}.
+In all six of the above target macros, care should be taken not to define a new
+macro that is effectively the same as an existing one, unless there are
+significant differences.  For example, the dynamic linker used on BSD systems is
+slightly different from the dynamic linker used on SunOS, but they both use
+@code{DYNLINK=DYNLINK_BSD} because the underlying dynamic linker uses the same
+data structures --- they are just named differently on the two systems.
 
-@item
-Add any support for filenames in @file{diag.c}.
-
-@item
-Add a new version and date format (or use an existing one) in @file{version.c}.
-
-@item
-Decide if the @code{malloc()} replacements should be used from @file{malloc.c}.
-
-@item
-Add any support for invoking commands in @file{mpatrol.c}.
-
-@item
-Add a new subdirectory in the @file{build} directory that contains a
-@file{Makefile} and any other files that are required to build the library on
-the new operating system.
-@end itemize
-
-@node New processor support, New file format support, New system support, Supported systems
-@appendixsec Adding a new processor architecture
-@cindex adding a new processor architecture
-@cindex processor architectures, adding support
-
-@itemize @bullet
-@item
-Add a new @code{ARCH} and/or @code{ENVIRON} definition in @file{target.h}.  The
-@code{ARCH} macro specifies a processor family, whereas the @code{ENVIRON} macro
-specifies the size of a word if the processor family can support different word
-sizes.
-
-@item
-Make any necessary modifications to @file{config.h}.
-
-@item
-Add any support for memory allocation in @file{memory.c}.
-
-@item
-Add any support for stack traversal in @file{stack.c}.
-
-@item
-Add any machine-specific assembler code in @file{machine.c}.
-@end itemize
-
-@node New file format support, , New processor support, Supported systems
-@appendixsec Adding a new object file format
-@cindex adding a new object file format
-@cindex object file formats, adding support
-
-@itemize @bullet
-@item
-Add a new @code{FORMAT} and/or @code{DYNLINK} definition in @file{target.h}.
-The @code{FORMAT} macro specifies the object file format, or in some cases, the
-type of access library that is to be used to read the object file format.  The
-@code{DYNLINK} macro specifies the type of dynamic linker that is used on a
-specific platform, and is used when obtaining information about the shared
-libraries that a program needs or has loaded.
+Finally, you should determine if it is necessary to define any special macros
+in order to obtain all of the required definitions from the system header files.
+Many compilers default to providing an ANSI C or C++ environment without any
+extensions, but as the mpatrol library uses additional features that are not
+provided by these standards, it may be necessary to define additional macros
+that allow the compiler to see the definitions of these features.  For example,
+the @code{_POSIX_SOURCE} macro is defined here for all UNIX platforms so that
+mpatrol can make use of the POSIX extensions.  Note that @file{src/target.h} is
+the only mpatrol library source file that refers to the predefined preprocessor
+macros defined by the system C compiler on a particular system (apart from a
+few necessary exceptions) and the rest of the source code refers to the six
+aforementioned macros for conditional compilation.
 
 @item
-Make any necessary modifications to @file{config.h}.
+Make any required changes in @file{src/memory.c} in order to support the new
+system.
+
+The mpatrol library, like the system malloc library it is replacing, must have
+some way of allocating memory from the system heap for a process.  For UNIX
+systems, this is done by calling @code{sbrk()} and/or @code{mmap()} but this is
+likely to be completely different for other operating systems.  The mpatrol
+library must also have some way of returning the allocated heap memory back to
+the operating system, although on systems with virtual memory this is not really
+an issue (see @code{MP_DELETEHEAP} in @file{src/config.h}).  If there is
+currently no support in the mpatrol library for allocating and returning system
+heap memory for the new system then you must modify @code{__mp_memalloc()} and
+@code{__mp_memfree()} to add the support.  You should define
+@code{MP_MMAP_SUPPORT} in @file{src/config.h} if the operating system is UNIX
+and the system variant supports the @code{mmap()} system call.
+
+Note that some (mainly embedded) systems may have no system heap available for a
+program to use.  If that is the case then the mpatrol library can be built to
+allocate memory from a static array whose size is fixed at compile-time.  The
+@code{MP_ARRAY_SUPPORT} macro should be defined in @file{src/config.h} and the
+@code{MP_ARRAY_SIZE} macro should be set to the maximum number of bytes that the
+simulated heap should be able to hold.  Keep in mind that all of the internal
+mpatrol library data structures will also be allocated from this array so it is
+important to make it large enough.
+
+Operating systems with virtual memory allow mpatrol to protect certain regions
+of heap memory to ensure that they are not overwritten.  The
+@code{MP_PROTECT_SUPPORT} macro in @file{src/config.h} controls whether the
+operating system supports this, and the @code{__mp_memprotect()} and
+@code{__mp_memquery()} functions should be updated to support the new system.
+You should also define @code{MP_MINCORE_SUPPORT} in @file{src/config.h} if the
+operating system is UNIX and the system variant supports the @code{mincore()}
+system call.  The @code{MP_WATCH_SUPPORT} macro controls the support of software
+watchpoints in a similar way and the @code{__mp_memwatch()} function should be
+updated if they are supported.
+
+If the new system is a UNIX system and it supports the @file{/proc} filesystem
+then you may wish to define @code{MP_PROCFS_SUPPORT} in @file{src/config.h}.
+However, this is only necessary if there is a way to detect the filename the
+current process was invoked with (@code{MP_PROCFS_CMDNAME}) or a way to obtain
+the filehandle of the executable file for the current process
+(@code{MP_PROCFS_EXENAME}).  It may also be necessary if @code{MP_WATCH_SUPPORT}
+is defined and the only way to set the watchpoints is via a file in the
+@file{/proc} filesystem (@code{MP_PROCFS_CTLNAME}).
+
+Finally, you should add support for determining the system page size in
+@code{pagesize()} and the process identifier for the current process in
+@code{__mp_processid()} if the system is not already supported.  You will also
+have to add a way to determine the filename that the current process was invoked
+with in @code{progname()}, otherwise the @option{PROGFILE} option will always
+have to be used in order to read symbols from the executable file.  This can be
+done in a multitude of ways, including examining global variables, making
+function calls to query the system or traversing the call stack.
 
 @item
-Add any support for stack traversal in @file{stack.c}.
+Make any required changes in @file{src/stack.c} in order to support stack
+traversal in the new processor architecture.
+
+If the new processor architecture is CISC (complex instruction set computer)
+then the chances are that you can easily find the frame pointer and return
+address of the current stack frame by simply looking at a constant offset from
+the parameter to the @code{__mp_getframe()} function.  The call chain can then
+be obtained by following the frame pointer at each stage.  This can sometimes
+be disrupted by optimisations that do not preserve the frame pointer but this
+is usually confined to leaf routines and is not normally an issue.  The Intel
+x86 and Motorola 680x0 processor families are good examples to look at when
+implementing stack traversal for a CISC processor.
+
+On the other hand, things might not be so easy if the new processor architecture
+is RISC (reduced instruction set computer).  Such processors do not always have
+fixed format stack frames@footnote{Although some do, and you can follow the
+instructions for CISC processors above in order to provide stack traversal
+support for them.} and so other means might have to be used.  The Alpha and MIPS
+processor families are examples of these and code reading normally has to be
+used in order to find the call instruction from the calling routine.  This then
+has to be done for every function in the call stack.  An example of such code
+can be found for the generic MIPS implementation.  Any assembler code that needs
+to be written to support the stack traversal implementation should be written
+in @file{src/machine.c}.
+
+If the GNU compiler is being used then it might be possible to use its
+@code{__builtin_frame_address()} and @code{__builtin_return_address()} builtin
+functions in order to provide stack traversal.  These can only be used if they
+return @samp{NULL} when the bottom of the call stack is reached, but on many
+architectures the GNU compiler does not implement this correctly and so this
+method of stack traversal cannot be used.  Even if it can, it still imposes an
+upper limit on the size of the stack that can be traversed.  If this is not an
+issue then it can be enabled with the @code{MP_BUILTINSTACK_SUPPORT} macro in
+@file{src/config.h} and the maximum size of the call stack that can be traversed
+can be set by changing the @code{MP_MAXSTACK} macro in the same file.  The
+@code{MP_FULLSTACK} macro in @file{src/config.h} should be set for stack
+traversal implementations that have no limit to the maximum size of the call
+stack that can be traversed.  Obviously that is not the case for
+@code{MP_BUILTINSTACK_SUPPORT}.
+
+Some operating systems have library functions that provide stack traversal
+facilities and so you may wish to make use of them by defining
+@code{MP_LIBRARYSTACK_SUPPORT} in @file{src/config.h} and implementing the code
+to call them in @file{src/stack.c}.  Examples of systems that can make use of
+this capability are IRIX and Tru64, although they have a drawback in that they
+recursively call @code{malloc()} and so work slower than they normally would.
+
+If any functions from an external system library were used to help implement
+stack traversal for the new processor architecture then you may also have to
+modify the @code{MP_SYSTEM_LIBS} definitions in @file{src/config.h}, the
+@code{__mp_lib*} definitions in @file{src/inter.c} and the @code{AC_CHECK_LIB()}
+calls in @file{extra/mpatrol.m4}.
 
 @item
-Add any support for symbol reading in @file{symbol.c}.
-@end itemize
+Make any required changes in @file{src/symbol.c} in order to support any new
+object file formats and dynamic linkers.
 
-@node Notes, Frequently asked questions, Supported systems, Top
+The best place to find information on the object file format and dynamic linker
+interface supported by a new system is the on-line manual pages and header files
+on that system.  If that fails then try the hardcopy technical reference manuals
+that came with the system or the internet in order to find the information you
+need.  There may also be standards that define the object file format and
+dynamic linker interface across several systems.
+
+If you defined a new @code{FORMAT} macro in @file{src/target.h} then you must
+add the code to support it in @file{src/symbol.c}.  You will typically have to
+add new @code{addsymbol()} and @code{addsymbols()} functions that are specific
+to the new object file format and then add support for that format in
+@code{__mp_addsymbols()} and @code{__mp_findsymbol()}.  If it is possible to
+easily read a line number table from the object file format then you may also
+want to extend the @code{__mp_findsource()} function to handle the new format as
+well in order to support the @option{USEDEBUG} option.
+
+If you defined a new @code{DYNLINK} macro in @file{src/target.h} then you must
+also add the code to support it in @file{src/symbol.c}.  You will normally only
+have to extend the @code{__mp_addextsymbols()} function to support the new
+dynamic linker but there may be some extra work required to translate the base
+addresses of any symbols read from shared libraries into real addresses.
+
+In both cases, try to base the new code on the structure of the existing code
+since it has been proven to work well and there is no point in reinventing the
+wheel@footnote{You might also be interested to note that you can safely call
+@code{malloc()} in this code to allocate memory --- just remember to clean up
+after yourself!}.  You might decide to make changes to an existing
+implementation instead; this was done with the COFF and XCOFF formats, for
+example.
+
+If any functions from an external object file access library were used to help
+read symbols from the new object file format then you may also have to modify
+the @code{MP_SYMBOL_LIBS} definitions in @file{src/config.h}, the
+@code{__mp_lib*} definitions in @file{src/inter.c} and the @code{AC_CHECK_LIB()}
+calls in @file{extra/mpatrol.m4}.
+
+@item
+Make any required changes in @file{src/signals.c} in order to obtain the address
+of an illegal memory access in the new system.
+
+If the system supports the @code{SA_SIGINFO} flag when setting up a signal
+handler with @code{sigaction()} then it supports architecture-independent
+determination of the address of an illegal memory access and the
+@code{MP_SIGINFO_SUPPORT} macro should be set in @file{src/config.h}.
+
+If this is not the case then an architecture-dependent method must be employed
+in order to obtain this information.  On UNIX systems, signal handlers can have
+additional arguments that may be used to probe for the address of a segmentation
+violation or bus error.  On Windows systems, an exception record can be obtained
+whenever an access violation occurs.  In either case, the saved register
+containing the relevant address must be determined.  If this is not done then
+the mpatrol library will compile correctly, but the addresses of illegal memory
+accesses can never be determined.
+
+@item
+Make any required changes in @file{src/mutex.c} in order to support threads in
+the new system.
+
+The mpatrol library must be able to lock its data structures in a multithreaded
+environment otherwise two threads may allocate memory at the same time and the
+heap would become corrupted, for example.  On operating systems that have
+virtual memory, processes have their own address space and can have more than
+one thread of execution running at one time.  On other operating systems, there
+is only one process (the operating system) and the threads are the user
+processes that all share the same address space.  For that reason, you may wish
+to use semaphores on such systems since they have no support for threads in a
+conventional sense.
+
+For systems that do support threads, mutexes should be used to lock the mpatrol
+library data structures.  On UNIX platforms, POSIX threads are used but this
+could easily be extended to other threads implementations.  On Windows
+platforms, Win32 API threads are used.  For other systems, POSIX threads are
+preferred but it should not be too hard to add support for others.  There should
+also be a way to return the current thread identifier.
+
+You should also determine if it is necessary to define any special macros
+in order to obtain all of the required threadsafe definitions from the system
+header files.  Many compilers require an option to be specified on the command
+line in order to compile threadsafe code, but some still only require a
+preprocessor macro to be defined during compilation.  For example, the
+@code{_REENTRANT} macro is defined for Solaris systems so that mpatrol can make
+use of the threadsafe definitions.  Any such macros should be defined in
+@file{src/config.h} when @code{MP_THREADS_SUPPORT} is defined.
+
+The multithreaded version of the mpatrol library must be initialised before a
+process becomes multithreaded and so there must be a way to do this on a new
+system.
+
+The @code{MP_INIT_SUPPORT} macro should be defined in @file{src/config.h} if
+the new system supports @samp{.init} and @samp{.fini} sections that get executed
+before and after @code{main()} respectively.  Both the contents of the
+@samp{.init} section (which should call @code{__mp_initmutexes()} and
+@code{__mp_init()}) and the @samp{.fini} section (which should call
+@code{__mp_fini()}) should be written in @file{src/machine.c} in assembler code.
+
+There are also other methods to initialise and terminate the mpatrol library in
+@file{src/inter.c} so you may need to use one of them (or add a new method of
+your own) for the new system.  Note that if @code{MP_USE_ATEXIT} is defined in
+@file{src/config.h} then these methods of terminating the mpatrol library when a
+process ends are replaced by registering the @code{__mp_fini()} function with
+@code{atexit()}.
+
+There may be problems if the mpatrol library is built to override
+@code{malloc()} and related functions if the system C library calls them before
+the mpatrol library can be initialised.  There is a function in
+@file{src/inter.c} on UNIX and Windows platforms called @code{crt_initialised()}
+which checks to see if it is safe to initialise the mpatrol library, and if not
+the relevant functions will use @code{sbrk()} to allocate the memory.  You may
+have to modify @code{crt_initialised()} to support the new system if there are
+initialisation problems.
+
+If there are no special methods to initialise the multithreaded version of the
+mpatrol library on a new system then it will simply be initialised at the first
+call to one of its functions, hopefully before the process has become
+multithreaded.
+
+If there is support for reading symbols from object files on the new system
+then you should compile and run the following test with the mpatrol library to
+check to see if there is support for calling functions by their start address.
+This is not always true on certain systems and will most likely result in the
+test crashing if that is the case.  If the test works then the
+@code{MP_INITFUNC_SUPPORT} macro should be set in @file{src/config.h}.
+
+@smallexample
+#include <stdio.h>
+#include "mpatrol.h"
+
+
+void __mp_init_test(void)
+@{
+    puts("__mp_init_* functions work");
+@}
+
+
+void __mp_fini_test(void)
+@{
+    puts("__mp_fini_* functions work");
+@}
+
+
+int main(void)
+@{
+    malloc(1);
+    puts("there should be a line of output above and below");
+    return EXIT_SUCCESS;
+@}
+@end smallexample
+
+If any functions from an external threads library were used to lock the data
+structures of the multithreaded version of the mpatrol library then you may also
+have to modify the @code{MP_THREADS_LIBS} definitions in @file{src/config.h},
+the @code{__mp_lib*} definitions in @file{src/inter.c} and the
+@code{AC_CHECK_LIB()} calls in @file{extra/mpatrol.m4}.
+
+@item
+Make any required changes in @file{src/mpatrol.c} in order to support executing
+external commands.
+
+The @command{mpatrol} command should be modified to support the execution of
+external commands on a new operating system.  The @code{exec()} family of
+functions are used on UNIX platforms, while the @code{spawn()} family of
+functions are used on Windows platforms.  The ANSI C @code{system()} function is
+currently used on all other platforms, but that runs the command indirectly
+via the system command line interpreter (shell) which is not usually very
+efficient.  You may also have to add the ability to find any commands using a
+search path.
+
+If the new operating system can support the @option{--dynamic} option of the
+@command{mpatrol} command then the @code{MP_PRELOAD_SUPPORT} macro should be
+defined in @file{src/config.h}.  The name of the environment variable that must
+be used to specify the list of shared libraries to preload should be given in
+@code{MP_PRELOAD_NAME} and the library separator string for the list should be
+given in @code{MP_PRELOAD_SEP}.  The @code{MP_LIBNAME} macro may also need to
+be modified if the naming convention of shared libraries is different on the
+new system.  Note that the @code{__mp_editfile()} function in @file{src/diag.c}
+may also need to be modified to prevent editor processes from being affected by
+the @option{--dynamic} option.
+
+@item
+Make any required changes in @file{src/mptrace.c} in order to support any new
+window systems.
+
+The @command{mptrace} command may be built as a text-only command line tool, or
+it may be built with GUI support if the @code{MP_GUI_SUPPORT} macro is defined
+in @file{src/config.h}.  If it is built with GUI support then it becomes an
+event-driven tool and the code in @file{src/mptrace.c} has been written to
+reflect that.  The @command{mptrace} command currently only has Motif GUI
+support but if you wish to add support for a new window system then it shouldn't
+be too hard to do.  Note that you will probably have to add additional libraries
+to the @file{Makefile} when building @command{mptrace} with
+@code{MP_GUI_SUPPORT} defined.
+@end enumerate
+
+@node Notes, Frequently asked questions, Porting, Top
 @appendix Notes
 @cindex notes
 @cindex known bugs
@@ -11590,10 +11874,10 @@ memory allocators can be derived.
 
 @item
 Need to add support for other 64-bit processors in addition to the existing
-SPARC V9 support.  This shouldn't be too hard, but I haven't got access to such
-processors to test them, so I haven't been able to yet.  Also need to add
-support for building on targets and architectures where no operating system
-features are required or even available.
+Alpha and SPARC V9 support.  This shouldn't be too hard, but I haven't got
+access to such processors to test them, so I haven't been able to yet.  Also
+need to add support for building on targets and architectures where no operating
+system features are required or even available.
 
 @item
 Need to improve the concurrency in the thread-safe version of the mpatrol
@@ -11640,6 +11924,13 @@ However, perhaps there might even be a use for an option to limit the number of
 stack frames in stack tracebacks for systems that have no such limitation.
 
 @item
+Is it worth adding functions to manually push and pop entries on the call stack
+for platforms which have no support for call stack traversal?  This is currently
+not a high-priority issue since almost all of the platforms that mpatrol is
+available on have support for full call stack traversal.  However, it might be
+handy anyway as an additional debugging tool for entering and leaving scopes.
+
+@item
 Need to change @code{__mp_compareaddrs()} so that it will improve the detection
 of when to free memory allocations made by @code{alloca()} and its related
 functions.  This will involve checking the common return addresses in the call
@@ -11649,10 +11940,16 @@ bytes that stack frames should differ by should be platform-dependent since the
 current value is way too high.
 
 @item
+Perhaps hash the call stacks when they are stored internally by the routines in
+@file{addr.c}.  This would make for quick checks to see if two call stacks are
+identical and it might save some memory in the process.
+
+@item
 There is an issue with callback functions if they call mpatrol library
-functions, since this will lead to recursion.  Callback functions could also be
-defined for @code{__malloc_hook()}, @code{__realloc_hook()} and
-@code{__free_hook()} in much the same way as for the GNU C library.
+functions, since this may lead to recursion in some obscure cases.  Callback
+functions could also be defined for @code{__malloc_hook()},
+@code{__realloc_hook()} and @code{__free_hook()} in much the same way as for the
+GNU C library.
 
 @item
 Need to store filename and line number information in all call stacks so that
@@ -11704,7 +12001,8 @@ of Motif, possibly also using GLADE.
 @item
 Add an option to @command{mptrace} to prevent the window being opened on systems
 where GUI support is enabled.  Also add widgets to the @command{mptrace} window
-to pause and quit.
+to pause and quit.  Might also be handy to add the ability to write out charts
+summarising tracing information.
 
 @item
 Handle marked memory allocations in the leak table, and also perhaps write out
@@ -11738,6 +12036,13 @@ left and mpatrol would normally have to allocate more from the system.  It could
 then convert as many freed allocations to free memory as it needs to fulfil the
 allocation request, although it would probably still have to abide by the
 minimum number of freed allocations set by the @option{NOFREE} option.
+
+@item
+Perhaps change the behaviour of the @option{NOFREE} option so that it doesn't
+prevent in-place reallocations if there is enough memory to perform them.  Then
+an option could be added to force reallocations to always allocate new memory
+so that the behaviour could also be used when the @option{NOFREE} option is not
+used.
 
 @item
 Add an option to set up a timer that will automatically check the heap after a
@@ -11807,14 +12112,17 @@ displaying memory range errors.
 @item
 Add wide-character equivalents of @code{memset()}, etc.  These are defined as
 @code{wmemset()}, etc.@: and are now part of ANSI C.  Also add @code{wcsdup()},
-@code{memdup()} and @code{xmemdup()}.
+@code{memdup()} and @code{xmemdup()} as well as @code{mempcpy()} and
+@code{memrchr()}.
 
 @item
 Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to @code{malloc()} each time a write to the log file
 occurs on some systems.  Example code to do this was submitted by Alexander
 Barton (@email{abarton@@innotrac.com}) and this may well be incorporated into
-the library at some point in the future.
+the library at some point in the future@footnote{This code can be applied as an
+mpatrol library patch which can be downloaded from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch1.tar.gz}.}.
 
 @item
 The @option{LOG*} options could be extended to take a list of specific functions
@@ -11828,8 +12136,9 @@ an uninitialised variable.
 
 @item
 Add assertion macros to @file{mpatrol.h} that can be used in program code.
-These could be used to assert that pointers have not been freed or are valid
-heap addresses, etc.  They would be disabled if @code{NDEBUG} is defined.
+These could be used to assert that pointers have not been freed, are valid
+heap addresses or are strings, or perhaps even that the address is readable,
+writable and/or executable.  They would be disabled if @code{NDEBUG} is defined.
 
 @item
 Add support functions that could be added to user code to enter and leave
@@ -11857,6 +12166,12 @@ segments.  For example, a memory operation may erroneously cross the data
 and BSS segments.  The symbol table for data symbols could also be used to
 provide much finer-grained error-checking.  Need to make use of the
 @code{__mp_memquery()} function.
+
+@item
+Add garbage detection support to mpatrol.  This would be implemented as a
+function that would traverse all of the roots of the memory in a process and
+look for pointers into free memory or the lack of any pointers into allocated
+memory (to detect memory leaks).
 
 @item
 Add an option to specify that all failed memory allocations should abort (or at
@@ -12026,10 +12341,13 @@ was called rather than unwinding to the top of the stack.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
-read via @code{dlopen()}, @code{shl_load()} or similar functions.  In addition,
-symbols cannot currently be read from any COFF or XCOFF shared libraries on
-LynxOS and some work needs to be done to build the mpatrol library as a shared
-library on LynxOS.
+read via @code{dlopen()}, @code{shl_load()} or similar functions@footnote{There
+is an mpatrol library patch that supports reading symbols from shared libraries
+opened by @code{dlopen()} which can be downloaded from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch2.tar.gz}.}.
+In addition, symbols cannot currently be read from any COFF or XCOFF shared
+libraries on LynxOS and some work needs to be done to build the mpatrol library
+as a shared library on LynxOS.
 
 @item
 Perhaps add support for reading HP/UX executable files and libraries in the SOM
