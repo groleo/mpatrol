@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.7 2000-12-08 00:12:05 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.8 2000-12-14 17:46:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -67,6 +67,7 @@ typedef struct allocation
     unsigned long event; /* event number */
     void *addr;          /* allocation address */
     size_t size;         /* allocation size */
+    unsigned long time;  /* allocation lifetime */
 }
 allocation;
 
@@ -160,16 +161,17 @@ static Dimension vwidth, vheight, width, height;
 static unsigned long delay;
 
 
-/* The size (in megabytes) of the address space covered by the drawing area.
- */
-
-static unsigned long addrspace;
-
-
-/* The base address and the scaling factor of the drawing area.
+/* The base address and the size (in megabytes) of the address space covered by
+ * the drawing area.
  */
 
 static void *addrbase;
+static unsigned long addrspace;
+
+
+/* The scaling factor of the drawing area.
+ */
+
 static unsigned long addrscale;
 
 
@@ -180,6 +182,8 @@ static XtResource resources[] =
 {
     {"alloc", XmCColor, XmRPixel, sizeof(Pixel),
      (Cardinal) &alcol, XmRString, (XtPointer) "black"},
+    {"base", "Base", XmRInt, sizeof(void *),
+     (Cardinal) &addrbase, XmRImmediate, (XtPointer) NULL},
     {"delay", "Delay", XmRInt, sizeof(unsigned long),
      (Cardinal) &delay, XmRImmediate, (XtPointer) 0},
     {"free", XmCColor, XmRPixel, sizeof(Pixel),
@@ -206,16 +210,17 @@ static XtResource resources[] =
 
 static XrmOptionDescRec options[] =
 {
-    {"-alloc", "alloc", XrmoptionSepArg, NULL},
-    {"-delay", "delay", XrmoptionSepArg, NULL},
-    {"-free", "free", XrmoptionSepArg, NULL},
-    {"-height", "height", XrmoptionSepArg, NULL},
-    {"-internal", "internal", XrmoptionSepArg, NULL},
-    {"-space", "space", XrmoptionSepArg, NULL},
-    {"-unalloc", "unalloc", XrmoptionSepArg, NULL},
-    {"-viewheight", "view-height", XrmoptionSepArg, NULL},
-    {"-viewwidth", "view-width", XrmoptionSepArg, NULL},
-    {"-width", "width", XrmoptionSepArg, NULL}
+    {"--alloc", "alloc", XrmoptionSepArg, NULL},
+    {"--base", "base", XrmoptionSepArg, NULL},
+    {"--delay", "delay", XrmoptionSepArg, NULL},
+    {"--free", "free", XrmoptionSepArg, NULL},
+    {"--height", "height", XrmoptionSepArg, NULL},
+    {"--internal", "internal", XrmoptionSepArg, NULL},
+    {"--space", "space", XrmoptionSepArg, NULL},
+    {"--unalloc", "unalloc", XrmoptionSepArg, NULL},
+    {"--view-height", "view-height", XrmoptionSepArg, NULL},
+    {"--view-width", "view-width", XrmoptionSepArg, NULL},
+    {"--width", "width", XrmoptionSepArg, NULL}
 };
 #endif /* MP_GUI_SUPPORT */
 
@@ -240,15 +245,25 @@ static void newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
-    if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
+    if (n = (allocation *) __mp_search(alloctree.root, i))
     {
-        fprintf(stderr, "%s: Out of memory\n", progname);
-        exit(EXIT_FAILURE);
+        if (n->time == 0)
+            fprintf(stderr, "%s: Allocation index `%lu' has been allocated "
+                    "twice without being freed\n", progname, i);
     }
-    __mp_treeinsert(&alloctree, &n->node, i);
-    n->event = e;
+    else
+    {
+        if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        __mp_treeinsert(&alloctree, &n->node, i);
+        n->event = e;
+    }
     n->addr = a;
     n->size = l;
+    n->time = 0;
 }
 
 
@@ -500,7 +515,7 @@ static int readevent(void)
             a = (void *) getuleb128();
             l = getuleb128();
             newalloc(n, currentevent, a, l);
-            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %lu\n",
+            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu\n",
                     currentevent, n, a, l);
 #if MP_GUI_SUPPORT
             if (addrbase == NULL)
@@ -517,8 +532,12 @@ static int readevent(void)
             n = getuleb128();
             if (f = (allocation *) __mp_search(alloctree.root, n))
             {
-                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %lu\n",
-                        currentevent, n, f->addr, f->size);
+                if (f->time != 0)
+                    fprintf(stderr, "%s: Allocation index `%lu' has already "
+                            "been freed\n", progname, n);
+                f->time = currentevent - f->event;
+                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
+                        "%6lu\n", currentevent, n, f->addr, f->size, f->time);
 #if MP_GUI_SUPPORT
                 drawmemory(f->addr, f->size, frgc);
 #endif /* MP_GUI_SUPPORT */
@@ -536,7 +555,7 @@ static int readevent(void)
             bufferlen--;
             a = (void *) getuleb128();
             l = getuleb128();
-            fprintf(stdout, "        reserve         " MP_POINTER "  %lu\n", a,
+            fprintf(stdout, "        reserve         " MP_POINTER "  %8lu\n", a,
                     l);
 #if MP_GUI_SUPPORT
             if (addrbase == NULL)
@@ -551,7 +570,7 @@ static int readevent(void)
             bufferlen--;
             a = (void *) getuleb128();
             l = getuleb128();
-            fprintf(stdout, "        internal        " MP_POINTER "  %lu\n", a,
+            fprintf(stdout, "        internal        " MP_POINTER "  %8lu\n", a,
                     l);
 #if MP_GUI_SUPPORT
             if (addrbase == NULL)
@@ -629,14 +648,14 @@ static void readfile(void)
 #else /* ENVIRON */
     fputs("allocation", stdout);
 #endif /* ENVIRON */
-    fputs("  size\n", stdout);
+    fputs("      size    life\n", stdout);
     fputs("------  ------  ------  ", stdout);
 #if ENVIRON == ENVIRON_64
     fputs("------------------", stdout);
 #else /* ENVIRON */
     fputs("----------", stdout);
 #endif /* ENVIRON */
-    fputs("  ----\n", stdout);
+    fputs("  --------  ------\n", stdout);
 #if !MP_GUI_SUPPORT
     /* Read each allocation or deallocation entry.
      */
@@ -724,7 +743,6 @@ int main(int argc, char **argv)
     bufferlen = 0;
     readfile();
 #if MP_GUI_SUPPORT
-    addrbase = NULL;
     addrscale = (((addrspace * 1048576) - 1) / (width * height)) + 1;
     /* Set up the main application window and scrollable drawing area.  Also
      * set up a pixmap to backup the drawing area.
