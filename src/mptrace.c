@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.6 2000-12-07 00:12:38 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.7 2000-12-08 00:12:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -418,7 +418,8 @@ static unsigned long getuleb128(void)
 
 static void redrawmemory(Widget w, XtPointer d, XmDrawingAreaCallbackStruct *s)
 {
-    XCopyArea(appdisplay, pixmap, s->window, ungc, 0, 0, width, height, 0, 0);
+    XCopyArea(appdisplay, pixmap, s->window, ungc, 0, 0, width - 1, height - 1,
+              0, 0);
 }
 #endif /* MP_GUI_SUPPORT */
 
@@ -761,8 +762,9 @@ int main(int argc, char **argv)
                   NULL);
     XtAppAddWorkProc(appcontext, (XtWorkProc) readevent, NULL);
     XtRealizeWidget(appwidget);
-    XFillRectangle(appdisplay, XtWindow(drawwidget), ungc, 0, 0, width, height);
-    XFillRectangle(appdisplay, pixmap, ungc, 0, 0, width, height);
+    XFillRectangle(appdisplay, XtWindow(drawwidget), ungc, 0, 0, width - 1,
+                   height - 1);
+    XFillRectangle(appdisplay, pixmap, ungc, 0, 0, width - 1, height - 1);
     XtAppMainLoop(appcontext);
 #endif /* MP_GUI_SUPPORT */
     return EXIT_SUCCESS;
