@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.95 2001-03-01 00:54:16 graeme Exp $"
+#ident "$Id: inter.c,v 1.96 2001-03-02 00:48:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.95 2001-03-01 00:54:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.96 2001-03-02 00:48:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1351,7 +1351,8 @@ __mp_setmark(void *p)
     /* Check that we know something about the address that was supplied.
      */
     if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
-        ((m = (infonode *) n->info) == NULL))
+        ((m = (infonode *) n->info) == NULL) ||(m->data.type == AT_ALLOCA) ||
+        (m->data.type == AT_STRDUPA) || (m->data.type == AT_STRNDUPA))
         r = 0;
     else
     {
