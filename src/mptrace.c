@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.10 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.11 2001-01-02 23:06:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -595,8 +595,6 @@ readevent(void)
             fprintf(stdout, "        internal        " MP_POINTER "  %8lu\n", a,
                     l);
 #if MP_GUI_SUPPORT
-            if (addrbase == NULL)
-                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
             drawmemory(a, l, ingc);
             return 0;
 #else /* MP_GUI_SUPPORT */
