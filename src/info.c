@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.48 2000-12-21 23:14:55 graeme Exp $"
+#ident "$Id: info.c,v 1.49 2000-12-22 00:12:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -821,7 +821,7 @@ __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
-    if (__mp_checkrange(h, p, l, f))
+    if (__mp_checkrange(h, p, l, f, v))
     {
         __mp_memset(p, c, l);
         h->stotal += l;
@@ -869,7 +869,7 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to copy the memory.
      */
-    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
+    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, l, f, v))
     {
         if (f == AT_MEMCCPY)
         {
@@ -907,7 +907,7 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
-    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, m, f))
+    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, m, f, v))
     {
         r = __mp_memfind(p, l, q, m);
         h->ltotal += m;
@@ -935,7 +935,7 @@ __mp_comparememory(infohead *h, void *p, void *q, size_t l, alloctype f,
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */
-    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
+    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, l, f, v))
     {
         h->dtotal += l;
         if (r = __mp_memcompare(p, q, l))
@@ -1121,7 +1121,7 @@ __mp_checkinfo(infohead *h)
 
 MP_GLOBAL
 int
-__mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
+__mp_checkrange(infohead *h, void *p, size_t s, alloctype f, loginfo *v)
 {
     allocnode *n;
     infonode *m;
@@ -1132,8 +1132,8 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
     if (p == NULL)
     {
         if ((s > 0) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(ET_NULOPN, f, NULL, 0, "attempt to perform operation on "
-                       "a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, v->file, v->line, "attempt to perform "
+                       "operation on a NULL pointer\n");
         return 0;
     }
     e = 1;
@@ -1142,14 +1142,14 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
     if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
-            __mp_error(ET_FREOPN, f, NULL, 0, "attempt to perform operation on "
-                       "free memory\n");
+            __mp_error(ET_FREOPN, f, v->file, v->line, "attempt to perform "
+                       "operation on free memory\n");
             e = 0;
         }
         else if (m->data.flags & FLG_FREED)
         {
-            __mp_error(ET_FRDOPN, f, NULL, 0, "attempt to perform operation on "
-                       "freed memory");
+            __mp_error(ET_FRDOPN, f, v->file, v->line, "attempt to perform "
+                       "operation on freed memory");
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = 0;
@@ -1172,13 +1172,15 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
             b = (char *) b - h->alloc.oflow;
             l += h->alloc.oflow << 1;
             if (h->flags & FLG_ALLOWOFLOW)
-                __mp_warn(ET_RNGOVF, f, NULL, 0, "range [" MP_POINTER ","
-                          MP_POINTER "] overflows [" MP_POINTER "," MP_POINTER
-                          "]", p, (char *) p + s - 1, b, (char *) b + l - 1);
+                __mp_warn(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER
+                          "," MP_POINTER "] overflows [" MP_POINTER ","
+                          MP_POINTER "]", p, (char *) p + s - 1, b,
+                          (char *) b + l - 1);
             else
-                __mp_error(ET_RNGOVF, f, NULL, 0, "range [" MP_POINTER ","
-                           MP_POINTER "] overflows [" MP_POINTER "," MP_POINTER
-                           "]", p, (char *) p + s - 1, b, (char *) b + l - 1);
+                __mp_error(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER
+                           "," MP_POINTER "] overflows [" MP_POINTER ","
+                           MP_POINTER "]", p, (char *) p + s - 1, b,
+                           (char *) b + l - 1);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = ((h->flags & FLG_ALLOWOFLOW) != 0);
@@ -1193,7 +1195,8 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
 
 MP_GLOBAL
 int
-__mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, int g)
+__mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
+                 int g)
 {
     allocnode *n;
     infonode *m;
@@ -1211,8 +1214,8 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, int g)
     if (p == NULL)
     {
         if ((g == 0) || (u > p) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(ET_NULOPN, f, NULL, 0, "attempt to perform operation on "
-                       "a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, v->file, v->line, "attempt to perform "
+                       "operation on a NULL pointer\n");
         return 0;
     }
     e = 0;
@@ -1252,14 +1255,14 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, int g)
     }
     else if ((m = (infonode *) n->info) == NULL)
     {
-        __mp_error(ET_FREOPN, f, NULL, 0, "attempt to perform operation on "
-                   "free memory\n");
+        __mp_error(ET_FREOPN, f, v->file, v->line, "attempt to perform "
+                   "operation on free memory\n");
         return 0;
     }
     else if (m->data.flags & FLG_FREED)
     {
-        __mp_error(ET_FRDOPN, f, NULL, 0, "attempt to perform operation on "
-                   "freed memory");
+        __mp_error(ET_FRDOPN, f, v->file, v->line, "attempt to perform "
+                   "operation on freed memory");
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         return 0;
@@ -1303,11 +1306,11 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, int g)
         b = (char *) b - h->alloc.oflow;
         l += h->alloc.oflow << 1;
         if (e == 1)
-            __mp_error(ET_STROVF, f, NULL, 0, "string " MP_POINTER
+            __mp_error(ET_STROVF, f, v->file, v->line, "string " MP_POINTER
                        " overflows [" MP_POINTER "," MP_POINTER "]", p, b,
                        (char *) b + l - 1);
         else
-            __mp_warn(ET_RNGOVF, f, NULL, 0, "range [" MP_POINTER ","
+            __mp_warn(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER ","
                       MP_POINTER "] overflows [" MP_POINTER "," MP_POINTER "]",
                       p, u - 1, b, (char *) b + l - 1);
         __mp_printalloc(&h->syms, n);
