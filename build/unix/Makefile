@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.69 2001-03-07 22:39:48 graeme Exp $
+# $Id: Makefile,v 1.70 2001-03-07 22:50:34 graeme Exp $
 
 
 # Definitions
@@ -362,7 +362,7 @@ malloc.o malloc.s.o malloc.n.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/diag.h
 cplus.o cplus.s.o cplus.n.ln: $(SOURCE)/cplus.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
@@ -388,7 +388,7 @@ mpalloc.o mpalloc.s.o mpalloc.n.ln: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
 	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
-	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h
+	$(SOURCE)/signals.h $(SOURCE)/diag.h $(SOURCE)/mpalloc.h
 mpfailure.o mpfailure.s.o mpfailure.n.ln: $(SOURCE)/mpfailure.c \
 	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
 mpsetfail.o mpsetfail.s.o mpsetfail.n.ln: $(SOURCE)/mpsetfail.c \
@@ -436,9 +436,9 @@ $(OBJECT_MPALLOC): $(SOURCE)/library2.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
 	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
-	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h $(SOURCE)/mpfailure.c \
-	$(SOURCE)/mpsetfail.c $(SOURCE)/mpmalloc.c $(SOURCE)/mpcalloc.c \
-	$(SOURCE)/mpstrdup.c $(SOURCE)/mprealloc.c
+	$(SOURCE)/signals.h $(SOURCE)/diag.h $(SOURCE)/mpalloc.h \
+	$(SOURCE)/mpfailure.c $(SOURCE)/mpsetfail.c $(SOURCE)/mpmalloc.c \
+	$(SOURCE)/mpcalloc.c $(SOURCE)/mpstrdup.c $(SOURCE)/mprealloc.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \

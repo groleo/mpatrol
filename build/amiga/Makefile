@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.58 2001-03-07 22:39:46 graeme Exp $
+# $Id: Makefile,v 1.59 2001-03-07 22:50:32 graeme Exp $
 
 
 # Definitions
@@ -245,7 +245,7 @@ malloc.o malloc.t.o: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/diag.h
 cplus.o: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
@@ -267,7 +267,8 @@ mpalloc.o: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
-	$(SOURCE)/leaktab.h $(SOURCE)/signals.h $(SOURCE)/mpalloc.h
+	$(SOURCE)/leaktab.h $(SOURCE)/signals.h $(SOURCE)/diag.h \
+	$(SOURCE)/mpalloc.h
 mpfailure.o: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.o: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
@@ -317,9 +318,9 @@ $(OBJECT_MPALLOC): $(SOURCE)/library2.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
 	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/signals.h \
-	$(SOURCE)/leaktab.h $(SOURCE)/mpalloc.h $(SOURCE)/mpfailure.c \
-	$(SOURCE)/mpsetfail.c $(SOURCE)/mpmalloc.c $(SOURCE)/mpcalloc.c \
-	$(SOURCE)/mpstrdup.c $(SOURCE)/mprealloc.c
+	$(SOURCE)/diag.h $(SOURCE)/leaktab.h $(SOURCE)/mpalloc.h \
+	$(SOURCE)/mpfailure.c $(SOURCE)/mpsetfail.c $(SOURCE)/mpmalloc.c \
+	$(SOURCE)/mpcalloc.c $(SOURCE)/mpstrdup.c $(SOURCE)/mprealloc.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
