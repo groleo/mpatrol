@@ -1,3 +1,78 @@
+Mon Jul 17 00:01:11 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/cat1/mpatrol.1, man/man1/mpatrol.1:
+	Added an argument to the -n option.
+
+Sun Jul 16 23:58:17 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented the changes to the NOFREE option.
+
+	* doc/refcard.tex: Added arguments to the NOFREE and -n options.
+
+	* man/cat3/mpatrol.3, man/man3/mpatrol.3:
+	Added an argument to the NOFREE option.
+
+	* src/alloc.c, src/alloc.h:
+	Added ability to recycle previously-freed memory allocations from a
+	queue.
+
+	* src/info.c: Added an extra argument to the call to __mp_newallocs().
+
+	* src/stack.c: Fixed problem with stack traversal for SPARC platforms.
+
+	* src/diag.c: Added freed queue size to the summary.
+
+	* src/option.c: Changed the NOFREE option to accept an argument.
+
+	* src/option.h, src/mpatrol.h:
+	The NOFREE option now accepts an argument.
+
+	* src/mpatrol.c: The -n option now takes an argument.
+
+Fri Jul 14 00:16:40 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.c:
+	Added a way to obtain the program name from the stack on 64-bit SPARC
+	platforms.  Changed all ints to longs in memory operation functions.
+
+Thu Jul 13 23:57:26 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added information about compiling on a 64-bit environment.
+
+	* doc/mpatrol.texi: Mentioned 64-bit support.
+
+	* src/config.h:
+	Added MAP_ANONYMOUS support for DYNIX/ptx and UnixWare, LD_PRELOAD
+	support for DYNIX/ptx and support for displaying pointers in 64-bit
+	environments.
+
+	* src/target.h:
+	Added the ENVIRON preprocessor macro for specifying whether mpatrol is
+	to be run in a 32-bit or a 64-bit environment.
+
+	* src/memory.c:
+	Added a way to determine the program name on DYNIX/ptx without
+	traversing the stack.
+
+	* src/stack.c:
+	Added support for traversing the stack on the SPARC V9 64-bit
+	architecture.
+
+	* src/strtab.c:
+	Adapted the hash() function to work in 64-bit environments as well.
+
+	* src/symbol.c:
+	Added support for reading symbols from shared libraries in a 64-bit ELF
+	environment.
+
+	* src/diag.c:
+	Added support for displaying diagnostics in a 64-bit environment.
+
+	* src/inter.c: Added explicit cast to the parameter of srand().
+
+	* src/sbrk.c, src/sbrk.h:
+	Changed the parameter of sbrk() from an int to a long.
+
 Wed Jul 12 00:16:32 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,

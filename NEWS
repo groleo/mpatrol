@@ -1,3 +1,16 @@
+Changes for 1.2.6
+
+  * The NOFREE option now takes an argument which specifies the maximum number
+    of freed memory allocations to preserve before returning the oldest to the
+    free memory pool.
+
+  * Added 64-bit support for SPARC Solaris platforms.
+
+  * Added support for the -d option on DYNIX/ptx.
+
+  * Added support for threads on DYNIX/ptx.
+
+
 Changes for 1.2.5 (12th July, 2000)
 
   * Can now determine the address of an illegal memory access on LynxOS
