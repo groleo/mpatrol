@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.24 2001-07-19 22:52:10 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.25 2001-08-01 22:05:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.24 2001-07-19 22:52:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.25 2001-08-01 22:05:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.4" /* the current version of this program */
+#define PROGVERSION "1.4" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -1248,7 +1248,7 @@ main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, PROGVERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
               "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
@@ -1301,7 +1301,7 @@ main(int argc, char **argv)
             exit(EXIT_FAILURE);
         }
         fprintf(simfile, "/* produced by %s %s from %s */\n\n\n", progname,
-                VERSION, f);
+                PROGVERSION, f);
         fputs("#include <stdio.h>\n", simfile);
         fputs("#include <stdlib.h>\n\n\n", simfile);
         fputs("typedef struct event\n{\n", simfile);
@@ -1327,7 +1327,7 @@ main(int argc, char **argv)
         fputs("## Date: Unknown\n", hatffile);
         fputs("## DTDURL: hatf.dtd\n", hatffile);
         fprintf(hatffile, "## Description: Converted to HATF by %s %s.\n\n",
-                progname, VERSION);
+                progname, PROGVERSION);
     }
     readfile();
 #if MP_GUI_SUPPORT

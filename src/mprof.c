@@ -36,13 +36,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.30 2001-07-19 22:52:10 graeme Exp $"
+#ident "$Id: mprof.c,v 1.31 2001-08-01 22:05:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.30 2001-07-19 22:52:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.31 2001-08-01 22:05:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.3" /* the current version of this program */
+#define PROGVERSION "1.3" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -1474,7 +1474,7 @@ main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, PROGVERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
               "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
@@ -1556,7 +1556,7 @@ main(int argc, char **argv)
         if (r == EXIT_SUCCESS)
         {
             fprintf(graphfile, "/* produced by %s %s from %s */\n\n", progname,
-                    VERSION, f);
+                    PROGVERSION, f);
             if (showleaks)
                 fputs("digraph \"memory leak call graph\"\n{\n", graphfile);
             else

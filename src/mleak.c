@@ -41,13 +41,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.12 2001-07-19 22:52:10 graeme Exp $"
+#ident "$Id: mleak.c,v 1.13 2001-08-01 22:05:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.12 2001-07-19 22:52:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.13 2001-08-01 22:05:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.3" /* the current version of this program */
+#define PROGVERSION "1.3" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -423,7 +423,7 @@ main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, PROGVERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
               "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
