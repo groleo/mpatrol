@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.13 2000-05-04 20:07:01 graeme Exp $"
+#ident "$Id: malloc.c,v 1.14 2000-05-10 19:54:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -226,16 +226,16 @@ void *MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 /* Resize an existing block of memory, usually a block allocated by calloc().
  */
 
-void *recalloc(void *p, size_t l)
+void *recalloc(void *p, size_t l, size_t n)
 {
-    return __mp_realloc(p, l, 0, AT_RECALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(recalloc)(void *p, size_t l)
+void *MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 {
-    return __mp_realloc(p, l, 0, AT_RECALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

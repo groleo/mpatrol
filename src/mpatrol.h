@@ -326,8 +326,8 @@ __mp_allocinfo;
                                    __FILE__, __LINE__, 0)
 #define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, MP_FUNCNAME, \
                                    __FILE__, __LINE__, 0)
-#define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, MP_FUNCNAME, \
-                                    __FILE__, __LINE__, 0)
+#define recalloc(p, l, n) __mp_realloc((p), (l) * (n), 0, MP_AT_RECALLOC, \
+                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, MP_FUNCNAME, \
                                   __FILE__, __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
