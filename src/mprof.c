@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.23 2000-11-14 23:58:44 graeme Exp $"
+#ident "$Id: mprof.c,v 1.24 2000-11-17 18:06:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -554,6 +554,18 @@ static void readfile(void)
         fprintf(stderr, "%s: Invalid file format\n", progname);
         exit(EXIT_FAILURE);
     }
+}
+
+
+/* Count the number of decimal digits in a number.
+ */
+
+static unsigned char countdigits(unsigned long n)
+{
+    unsigned char d;
+
+    for (d = 1; n /= 10; d++);
+    return d;
 }
 
 
@@ -1130,17 +1142,44 @@ static void leaktable(void)
 
 static void callgraph(void)
 {
+    size_t d[4];
     listnode *l;
     vertex *u, *v;
     edge *e;
     graphedge *g;
-    size_t i;
+    size_t i, s, t;
 
     i = 1;
     printchar(' ', 29);
     fputs("ALLOCATION CALL GRAPH\n\n", stdout);
     printchar(' ', 28);
     fprintf(stdout, "(number of vertices: %lu)\n\n", temptree.size);
+    if (showcounts)
+    {
+        printchar(' ', 10);
+        fputs("allocated", stdout);
+        printchar(' ', 13);
+        fputs("unfreed\n", stdout);
+        printchar(' ', 5);
+        printchar('-', 19);
+        fputs("  ", stdout);
+        printchar('-', 19);
+        fputs("\nindex count   s  m  l  x   count   s  m  l  x  function\n",
+              stdout);
+    }
+    else
+    {
+        printchar(' ', 11);
+        fputs("allocated", stdout);
+        printchar(' ', 15);
+        fputs("unfreed\n", stdout);
+        printchar(' ', 5);
+        printchar('-', 21);
+        fputs("  ", stdout);
+        printchar('-', 21);
+        fputs("\nindex   bytes   s  m  l  x     bytes   s  m  l  x  function\n",
+              stdout);
+    }
     /* Compute the index for each vertex in the graph.  This is currently
      * done after the graph has been completely constructed so that the
      * ordering can be done by code address.  It has to be done before we
@@ -1153,6 +1192,11 @@ static void callgraph(void)
     for (v = (vertex *) __mp_minimum(temptree.root); v != NULL;
          v = (vertex *) __mp_successor(&v->node))
     {
+        if (showcounts)
+            printchar('-', 45);
+        else
+            printchar('-', 49);
+        fputc('\n', stdout);
         /* Calculate the details of the parents.
          */
         for (l = v->gnode.parents.head; l->next != NULL; l = l->next)
@@ -1167,12 +1211,47 @@ static void callgraph(void)
             u = (vertex *) ((char *) e->gnode.parent - offsetof(vertex, gnode));
             if (&u->gnode != &graph.start)
             {
-                printchar(' ', 4);
+                for (i = s = t = 0; i < 4; i++)
+                {
+                    if (showcounts)
+                    {
+                        t += e->data.acount[i];
+                        d[i] = e->data.acount[i] - e->data.dcount[i];
+                    }
+                    else
+                    {
+                        t += e->data.atotal[i];
+                        d[i] = e->data.atotal[i] - e->data.dtotal[i];
+                    }
+                    s += d[i];
+                }
+                if (e->flags & 2)
+                    fputs(" (*) ", stdout);
+                else
+                    printchar(' ', 5);
+                if (showcounts)
+                {
+                    fprintf(stdout, "%6lu ", t);
+                    printdata(e->data.acount, t);
+                    fprintf(stdout, "  %6lu ", s);
+                }
+                else
+                {
+                    fprintf(stdout, "%8lu ", t);
+                    printdata(e->data.atotal, t);
+                    fprintf(stdout, "  %8lu ", s);
+                }
+                printdata(d, s);
+                printchar(' ', 6);
                 printsymbol(stdout, u->pnode);
                 fprintf(stdout, " [%lu]\n", u->index);
             }
         }
-        printchar(' ', 8);
+        fprintf(stdout, "[%lu] ", v->index);
+        if (showcounts)
+            printchar(' ', 44 - countdigits(v->index));
+        else
+            printchar(' ', 48 - countdigits(v->index));
         printsymbol(stdout, v->pnode);
         fprintf(stdout, " [%lu]\n", v->index);
         /* Calculate the details of the children.
@@ -1189,13 +1268,42 @@ static void callgraph(void)
             u = (vertex *) ((char *) e->gnode.child - offsetof(vertex, gnode));
             if (&u->gnode != &graph.end)
             {
-                printchar(' ', 4);
+                for (i = s = t = 0; i < 4; i++)
+                {
+                    if (showcounts)
+                    {
+                        t += e->data.acount[i];
+                        d[i] = e->data.acount[i] - e->data.dcount[i];
+                    }
+                    else
+                    {
+                        t += e->data.atotal[i];
+                        d[i] = e->data.atotal[i] - e->data.dtotal[i];
+                    }
+                    s += d[i];
+                }
+                if (e->flags & 2)
+                    fputs(" (*) ", stdout);
+                else
+                    printchar(' ', 5);
+                if (showcounts)
+                {
+                    fprintf(stdout, "%6lu ", t);
+                    printdata(e->data.acount, t);
+                    fprintf(stdout, "  %6lu ", s);
+                }
+                else
+                {
+                    fprintf(stdout, "%8lu ", t);
+                    printdata(e->data.atotal, t);
+                    fprintf(stdout, "  %8lu ", s);
+                }
+                printdata(d, s);
+                printchar(' ', 6);
                 printsymbol(stdout, u->pnode);
                 fprintf(stdout, " [%lu]\n", u->index);
             }
         }
-        if (v->index != temptree.size)
-            fputc('\n', stdout);
     }
 }
 
@@ -1312,21 +1420,21 @@ int main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stderr, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
-              "under certain\n", stderr);
+              "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
-              "details.\n\n", stderr);
-        fputs("For the latest mpatrol release and documentation,\n", stderr);
-        fprintf(stderr, "visit %s.\n\n", __mp_homepage);
+              "details.\n\n", stdout);
+        fputs("For the latest mpatrol release and documentation,\n", stdout);
+        fprintf(stdout, "visit %s.\n\n", __mp_homepage);
     }
     if (argc > 1)
         e = 1;
     if ((e == 1) || (h == 1))
     {
-        fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
+        fprintf(stdout, "Usage: %s [options] [file]\n\n", progname);
         if (h == 0)
-            fprintf(stderr, "Type `%s --help' for a complete list of "
+            fprintf(stdout, "Type `%s --help' for a complete list of "
                     "options.\n", progname);
         else
             __mp_showopts(options_table);
