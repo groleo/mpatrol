@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.16 1999-11-27 16:23:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.17 1999-12-06 20:27:32 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.2
-@set VERSION 1.0.7
-@set UPDATED 27th November, 1999
+@set EDITION 1.3
+@set VERSION 1.0.8
+@set UPDATED 6th December, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -597,6 +597,15 @@ could download an archive containing the latest mpatrol manual in a variety of
 documentation formats from the mpatrol home page.  You can then install or print
 these documents.
 @end enumerate
+
+Alternatively, the @file{pkg} directory contains files that can be used to
+automatically generate a @emph{package} in a specific format suitable for
+installation on a system.  Two package formats are currently supported; PKG and
+RPM.  The first is generally used on UNIX SVR4 systems, while the second was
+introduced by Red Hat for use in their Linux distributions.  You should really
+know what you are doing before you attempt to build a package, and you should
+also be aware that some of the package files may need to be modified before you
+begin.
 
 @node Memory allocations, Operating system support, Installation, Top
 @chapter Memory allocations
@@ -1722,10 +1731,10 @@ interfering with the operation of the library.
 
 @cindex modules
 The library is written in a modular fashion so as to make it easy to add new
-functionality.  New @emph{modules} have already been added, such as the
-@emph{stack} and @emph{symbol} modules, and perhaps there might even be a
-@emph{debug} module in the future for reading debugging information from object
-files.  Extra information about each memory allocation can be added to the
+functionality.  New modules have already been added, such as the @emph{stack}
+and @emph{symbol} modules, and perhaps there might even be a @emph{debug}
+module in the future for reading debugging information from object files.
+Extra information about each memory allocation can be added to the
 @emph{allocation information} module in @file{src/info.h} and @file{src/info.c}
 without having to change much code in any other files.
 
@@ -1776,6 +1785,10 @@ cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
    -liberty
 @end smallexample
 @end itemize
+
+If you need to link with other libraries, make sure that they don't contain
+definitions of @code{malloc()}, etc., or if they do then you must ensure that
+the mpatrol library appears before them on the link line.
 
 You should also know how to set an environment variable on your specific system.
 Again, this varies from system to system and also depends on the command line
@@ -1839,7 +1852,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.0.4 (99/10/21)
+@@(#) mpatrol 1.0.7 (99/11/29)
 Copyright (C) 1997-1999 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
