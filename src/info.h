@@ -47,13 +47,14 @@
 #define FLG_LOGREALLOCS   32    /* log all memory reallocations */
 #define FLG_LOGFREES      64    /* log all memory deallocations */
 #define FLG_LOGMEMORY     128   /* log all memory operations */
-#define FLG_SHOWFREED     256   /* show all freed allocations */
-#define FLG_SHOWUNFREED   512   /* show all unfreed allocations */
-#define FLG_SHOWMAP       1024  /* show memory map of heap */
-#define FLG_SHOWSYMBOLS   2048  /* show all symbols read */
-#define FLG_SAFESIGNALS   4096  /* save and restore signal handlers */
-#define FLG_NOPROTECT     8192  /* do not protect internal structures */
-#define FLG_ALLOWOFLOW    16384 /* allow memory operations to overflow */
+#define FLG_SHOWFREE      256   /* show all free blocks */
+#define FLG_SHOWFREED     512   /* show all freed allocations */
+#define FLG_SHOWUNFREED   1024  /* show all unfreed allocations */
+#define FLG_SHOWMAP       2048  /* show memory map of heap */
+#define FLG_SHOWSYMBOLS   4096  /* show all symbols read */
+#define FLG_ALLOWOFLOW    8192  /* allow memory operations to overflow */
+#define FLG_SAFESIGNALS   16384 /* save and restore signal handlers */
+#define FLG_NOPROTECT     32768 /* do not protect internal structures */
 
 #define FLG_FREED         1     /* allocation has been freed */
 #define FLG_PROFILED      2     /* allocation has been profiled */
@@ -188,6 +189,7 @@ typedef struct infohead
     listhead astack;                  /* alloca allocation stack */
     size_t size;                      /* internal allocation total */
     size_t count;                     /* allocation count */
+    size_t cpeak;                     /* allocation count peak */
     size_t peak;                      /* allocation peak */
     size_t limit;                     /* allocation limit */
     size_t astop;                     /* allocation stop index */

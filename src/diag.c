@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.47 2000-12-05 19:06:08 graeme Exp $"
+#ident "$Id: diag.c,v 1.48 2000-12-10 22:37:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1276,9 +1276,9 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag("\nautosave count:    %lu", h->prof.autosave);
     __mp_diag("\nfreed queue size:  %lu", h->alloc.fmax);
     __mp_diag("\nallocation count:  %lu", h->count);
-    __mp_diag("\nallocation peak:   ");
+    __mp_diag("\nallocation peak:   %lu (", h->cpeak);
     __mp_printsize(h->peak);
-    __mp_diag("\nallocation limit:  ");
+    __mp_diag(")\nallocation limit:  ");
     __mp_printsize(h->limit);
     __mp_diag("\nallocated blocks:  %lu (", h->alloc.atree.size);
     __mp_printsize(h->alloc.asize);

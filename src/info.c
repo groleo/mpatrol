@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.45 2000-12-06 22:54:45 graeme Exp $"
+#ident "$Id: info.c,v 1.46 2000-12-10 22:37:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -88,7 +88,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     __mp_newlist(&h->astack);
     /* Initialise the settings to their default values.
      */
-    h->size = h->count = h->peak = h->limit = 0;
+    h->size = h->count = h->cpeak = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
@@ -142,7 +142,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     __mp_newlist(&h->list);
     __mp_newlist(&h->alist);
     __mp_newlist(&h->astack);
-    h->size = h->count = h->peak = 0;
+    h->size = h->count = h->cpeak = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->delpos = 0;
 }
@@ -382,6 +382,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 __mp_freeslot(&h->atable, g);
         if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READONLY);
+        if (h->cpeak < h->alloc.atree.size)
+            h->cpeak = h->alloc.atree.size;
         if (h->peak < h->alloc.asize)
             h->peak = h->alloc.asize;
     }
@@ -615,6 +617,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     __mp_memset((char *) p + d, 0, l - d);
                 else
                     __mp_memset((char *) p + d, h->alloc.abyte, l - d);
+            if (h->cpeak < h->alloc.atree.size)
+                h->cpeak = h->alloc.atree.size;
             if (h->peak < h->alloc.asize)
                 h->peak = h->alloc.asize;
         }
