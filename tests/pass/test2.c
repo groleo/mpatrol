@@ -34,10 +34,11 @@ __mp_prologuehandler old_prologue;
 __mp_epiloguehandler old_epilogue;
 
 
-void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
+void prologue(MP_CONST void *p, size_t l, MP_CONST char *s, MP_CONST char *t,
+              unsigned long u, MP_CONST void *a)
 {
     if (old_prologue != NULL)
-        old_prologue(p, l, a);
+        old_prologue(p, l, s, t, u, a);
     if (p == (void *) -1)
         fprintf(stderr, "allocating %lu bytes\n", l);
     else if (l == (size_t) -1)
@@ -50,12 +51,13 @@ void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
 }
 
 
-void epilogue(MP_CONST void *p, MP_CONST void *a)
+void epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t,
+              unsigned long u, MP_CONST void *a)
 {
     if (p != (void *) -1)
         fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
     if (old_epilogue != NULL)
-        old_epilogue(p, a);
+        old_epilogue(p, s, t, u, a);
 }
 
 
