@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.41 2001-02-15 21:02:36 graeme Exp $
+ * $Id: info.h,v 1.42 2001-02-22 19:38:34 graeme Exp $
  */
 
 
@@ -68,6 +68,8 @@
 
 
 /* The different types of memory allocation and operation functions.
+ * This must be kept up to date with the definition of __mp_alloctype
+ * in mpatrol.h.
  */
 
 typedef enum alloctype

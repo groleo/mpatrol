@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: option.h,v 1.20 2001-02-13 22:07:14 graeme Exp $
+ * $Id: option.h,v 1.21 2001-02-22 19:38:34 graeme Exp $
  */
 
 
@@ -39,7 +39,9 @@
 #include "info.h"
 
 
-/* Options that can be set at run-time.
+/* Options that can be set at run-time.  These must have the negative value
+ * of those defined in mpatrol.h and must be kept up to date with respect to
+ * those definitions.
  */
 
 #define OPT_HELP          0
@@ -71,7 +73,8 @@
 #define OPT_LARGEBOUND    26
 
 
-/* Flags that can be set at run-time.
+/* Flags that can be set at run-time.  These must be kept up to date with
+ * the definitions in mpatrol.h
  */
 
 #define OPT_CHECKALL      (OPT_CHECKALLOCS | OPT_CHECKREALLOCS | \
