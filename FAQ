@@ -196,6 +196,16 @@ their corresponding answers or solutions.
     demangle them on its standard output file stream, and so can be used to
     process the mpatrol log file.
 
+ Q. Why does my program not stop when the mpatrol library notices an error?
+
+ A. The library was written to give as much information as possible and so
+    sometimes, when a non-fatal error is discovered, the library will write
+    the error message to the log file and continue in the hope of being able
+    to uncover more errors during the execution of the program.  This means
+    that you should always check the number of warnings and errors given in
+    the summary at the end of program execution, and then search backwards in
+    the log file for WARNING or ERROR.
+
 
  4. FILES
 
