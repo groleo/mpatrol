@@ -34,6 +34,11 @@
 #include <stdlib.h>
 
 
+#if MP_IDENT_SUPPORT
+#ident "$Id: sbrk.c,v 1.2 2000-03-23 19:11:24 graeme Exp $"
+#endif /* MP_IDENT_SUPPORT */
+
+
 /* The brkinfo structure contains information about the simulated heap.
  */
 
@@ -45,11 +50,6 @@ typedef struct brkinfo
     size_t len;     /* current break length */
 }
 brkinfo;
-
-
-#if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.1 2000-03-23 19:10:26 graeme Exp $"
-#endif /* MP_IDENT_SUPPORT */
 
 
 #ifdef __cplusplus
