@@ -58,6 +58,7 @@ MP_EXPORT char *__mp_optarg;
 
 MP_EXPORT int __mp_getnum(char *, char *, long *, int);
 MP_EXPORT int __mp_getopt(unsigned long, char **, char *, option *);
+MP_EXPORT void __mp_showopts(option *);
 
 
 #ifdef __cplusplus
