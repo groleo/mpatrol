@@ -61,7 +61,7 @@ OOPPTTIIOONNSS
 
 
 
-Release 1.1                6 April 2000                         1
+Release 1.1               19 April 2000                         1
 
 
 
@@ -121,13 +121,13 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               which  to  fill  the overflow buffers of all memory
               allocations.
 
-       --PP     [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
-              memory  allocation  should occupy at least one page
-              of virtual memory  and  should  be  placed  at  the
+       --RR <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
+              [RREEAALLLLOOCCSSTTOOPP]  Specifies  an  allocation  index  at
+              which  to stop the program when a memory allocation
 
 
 
-Release 1.1                6 April 2000                         2
+Release 1.1               19 April 2000                         2
 
 
 
@@ -136,16 +136,6 @@ Release 1.1                6 April 2000                         2
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
-              highest point within these pages.
-
-       --pp     [PPAAGGEEAALLLLOOCC=_L_O_W_E_R]   Specifies  that each individual
-              memory allocation should occupy at least  one  page
-              of  virtual memory and should be placed at the low-
-              est point within these pages.
-
-       --RR <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
-              [RREEAALLLLOOCCSSTTOOPP]  Specifies  an  allocation  index  at
-              which  to stop the program when a memory allocation
               is being reallocated.
 
        --SS     [SSHHOOWWMMAAPP & SSHHOOWWSSYYMMBBOOLLSS]  Specifies  that  a  memory
@@ -174,6 +164,16 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               should  be  used  for  overflow buffers rather than
               filling with the overflow byte.
 
+       --XX     [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
+              memory  allocation  should occupy at least one page
+              of virtual memory and should be placed at the high-
+              est point within these pages.
+
+       --xx     [PPAAGGEEAALLLLOOCC=_L_O_W_E_R]   Specifies  that each individual
+              memory allocation should occupy at least  one  page
+              of  virtual memory and should be placed at the low-
+              est point within these pages.
+
        --ZZ <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [FFAAIILLSSEEEEDD]  Specifies the random number seed  which
               will  be used when determining which memory alloca-
@@ -193,7 +193,7 @@ AAUUTTHHOORR
 
 
 
-Release 1.1                6 April 2000                         3
+Release 1.1               19 April 2000                         3
 
 
 
@@ -259,6 +259,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.1                6 April 2000                         4
+Release 1.1               19 April 2000                         4
 
 

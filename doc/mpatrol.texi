@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.58 2000-04-18 21:56:20 graeme Exp $
+@c $Id: mpatrol.texi,v 1.59 2000-04-19 00:36:03 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.1.5
-@set UPDATED 18th April, 2000
+@set UPDATED 19th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -4935,18 +4935,6 @@ buffers, which must be a power of two.
 [@option{OFLOWBYTE}]  Specifies an 8-bit byte pattern with which to fill the
 overflow buffers of all memory allocations.
 
-@cindex -P
-@item @option{-P}
-[@option{PAGEALLOC=UPPER}]  Specifies that each individual memory allocation
-should occupy at least one page of virtual memory and should be placed at the
-highest point within these pages.
-
-@cindex -p
-@item @option{-p}
-[@option{PAGEALLOC=LOWER}]  Specifies that each individual memory allocation
-should occupy at least one page of virtual memory and should be placed at the
-lowest point within these pages.
-
 @cindex -R
 @item @option{-R} <@var{unsigned-integer}>
 [@option{REALLOCSTOP}]  Specifies an allocation index at which to stop the
@@ -4982,6 +4970,18 @@ should preserve their original contents.
 @item @option{-w}
 [@option{OFLOWWATCH}]  Specifies that watch point areas should be used for
 overflow buffers rather than filling with the overflow byte.
+
+@cindex -X
+@item @option{-X}
+[@option{PAGEALLOC=UPPER}]  Specifies that each individual memory allocation
+should occupy at least one page of virtual memory and should be placed at the
+highest point within these pages.
+
+@cindex -x
+@item @option{-x}
+[@option{PAGEALLOC=LOWER}]  Specifies that each individual memory allocation
+should occupy at least one page of virtual memory and should be placed at the
+lowest point within these pages.
 
 @cindex -Z
 @item @option{-Z} <@var{unsigned-integer}>

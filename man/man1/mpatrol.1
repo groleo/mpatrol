@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.10 2000-04-05 23:56:25 graeme Exp $
+.\" $Id: mpatrol.1,v 1.11 2000-04-19 00:32:58 graeme Exp $
 .\"
-.TH MPATROL 1 "6 April 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 1 "19 April 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -117,16 +117,6 @@ which must be a power of two.
 [\fBOFLOWBYTE\fP]  Specifies an 8-bit byte pattern with which to fill the
 overflow buffers of all memory allocations.
 .TP
-\fB\-P\fP
-[\fBPAGEALLOC\fP=\fIUPPER\fP]  Specifies that each individual memory allocation
-should occupy at least one page of virtual memory and should be placed at the
-highest point within these pages.
-.TP
-\fB\-p\fP
-[\fBPAGEALLOC\fP=\fILOWER\fP]  Specifies that each individual memory allocation
-should occupy at least one page of virtual memory and should be placed at the
-lowest point within these pages.
-.TP
 \fB\-R\fP <\fIunsigned integer\fP>
 [\fBREALLOCSTOP\fP]  Specifies an allocation index at which to stop the program
 when a memory allocation is being reallocated.
@@ -155,6 +145,16 @@ should preserve their original contents.
 \fB\-w\fP
 [\fBOFLOWWATCH\fP]  Specifies that watch point areas should be used for overflow
 buffers rather than filling with the overflow byte.
+.TP
+\fB\-X\fP
+[\fBPAGEALLOC\fP=\fIUPPER\fP]  Specifies that each individual memory allocation
+should occupy at least one page of virtual memory and should be placed at the
+highest point within these pages.
+.TP
+\fB\-x\fP
+[\fBPAGEALLOC\fP=\fILOWER\fP]  Specifies that each individual memory allocation
+should occupy at least one page of virtual memory and should be placed at the
+lowest point within these pages.
 .TP
 \fB\-Z\fP <\fIunsigned integer\fP>
 [\fBFAILSEED\fP]  Specifies the random number seed which will be used when
