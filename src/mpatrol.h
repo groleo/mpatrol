@@ -475,7 +475,7 @@ static inline void operator delete[](void *p)
 
 
 #define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
-#define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__); ::delete
+#define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
 
 #endif /* __cplusplus */
 
