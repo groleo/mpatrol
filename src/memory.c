@@ -54,7 +54,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.2 1999-10-14 18:58:39 graeme Exp $"
+#ident "$Id: memory.c,v 1.3 1999-10-19 18:37:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -496,8 +496,61 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
 
 MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
 {
+    int *w;
     char *p;
+    size_t i, n;
+    int b;
 
+    /* This used to be a simple loop to compare each byte individually, but
+     * that is less efficient than attempting to compare words at a time.
+     * Therefore, if the number of bytes to compare is larger than a certain
+     * number then this routine will attempt to compare as many words as
+     * possible.
+     */
+    if (l > sizeof(int) * sizeof(int))
+    {
+        /* Check all bytes that occur before the first word.
+         */
+        if ((n = (unsigned long) t & (sizeof(int) - 1)) > 0)
+        {
+            if ((n = sizeof(int) - n) > l)
+                n = l;
+            for (p = (char *) t, t = (char *) t + n; p < (char *) t; p++)
+                if (*p != c)
+                    return p;
+            l -= n;
+        }
+        if (l == 0)
+            return NULL;
+        /* Check all words that occur in the memory block.
+         */
+        if ((n = l / sizeof(int)) > 0)
+        {
+            /* Build up the word that we will be checking against.
+             */
+            for (p = (char *) &b, i = 0; i < sizeof(int); p++, i++)
+                *p = c;
+            for (w = (int *) t, t = (int *) t + n; w < (int *) t; w++)
+                if (*w != b)
+                {
+                    /* Locate the exact byte that caused the test to fail.
+                     */
+                    for (p = (char *) w, i = 0; i < sizeof(int); p++, i++)
+                        if (*p != c)
+                            return p;
+                    /* The above loop should never exit, but just in case it
+                     * does, return the address of the word that caused the test
+                     * to fail.
+                     */
+                    return w;
+                }
+            l -= n * sizeof(int);
+        }
+    }
+    if (l == 0)
+        return NULL;
+    /* Check all remaining bytes.
+     */
     for (p = (char *) t, t = (char *) t + l; p < (char *) t; p++)
         if (*p != c)
             return p;
