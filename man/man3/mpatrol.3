@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.19 2000-04-27 18:52:36 graeme Exp $
+.\" $Id: mpatrol.3,v 1.20 2000-04-30 23:46:40 graeme Exp $
 .\"
-.TH MPATROL 3 "27 April 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "30 April 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -102,10 +102,17 @@ Stack traceback information for every memory allocation is available on some
 supported platforms, which is useful for determining exactly where a memory
 allocation was performed or for adding meaning to tracing.  Symbol names are
 read from the executable file and also possibly from any required shared
-libraries, and if the \fBUSEDEBUG\fP is used and is available then the debugging
-section in the executable file will be read to determine additional source-level
-information.
+libraries, and if the \fBUSEDEBUG\fP option is used and is available then the
+debugging section in the executable file will be read to determine additional
+source-level information.
 .PP
+Memory allocation profiling is supported, with statistics about every memory
+allocation and deallocation that was made during the execution of a program
+being written to a file at program termination if the \fBPROF\fP option is
+used.  The information stored in this file can then be used by the \fBmprof\fP
+command to display various tables summarising the memory allocation behaviour
+of the program that produced it.
+.SH FUNCTIONS
 The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
@@ -550,6 +557,15 @@ program will be halted, and its state may be examined at that point by using
 a suitable debugger.  Note that this setting will be ignored if its value is
 zero.  Default value: \fBALLOCSTOP\fP=\fI0\fP.
 .TP
+\fBAUTOSAVE\fP=\fIunsigned integer\fP
+Specifies the frequency at which to periodically write the profiling data to
+the profiling output file.  When the total number of profiled memory allocations
+and deallocations is a multiple of this number then the current profiling
+information will be written to the profiling output file.  This option can be
+used to instruct the mpatrol library to dump out any profiling information just
+before a fatal error occurs in a program, for example.  Note that this setting
+will be ignored if its value is zero.  Default value: \fBAUTOSAVE\fP=\fI0\fP.
+.TP
 \fBCHECK\fP=\fIunsigned range\fP
 Specifies a range of allocation indices at which to check the integrity of free
 memory and overflow buffers.  The range must be specified as no more than two
@@ -615,6 +631,11 @@ is zero.  Default value: \fBFREESTOP\fP=\fI0\fP.
 \fBHELP\fP
 Displays a quick-reference option summary to the \fBstderr\fP file stream.
 .TP
+\fBLARGEBOUND\fP=\fIunsigned integer\fP
+Specifies the limit in bytes up to which memory allocations should be classified
+as large allocations for profiling purposes.  This limit must be greater than
+the small and medium bounds.  Default value: \fBLARGEBOUND\fP=\fI1024\fP.
+.TP
 \fBLIMIT\fP=\fIunsigned integer\fP
 Specifies the limit in bytes at which all memory allocations should fail if the
 total allocated memory should increase beyond this.  This can be used to
@@ -657,6 +678,12 @@ will not be logged.
 Specifies that all memory reallocations are to be logged and sent to the log
 file.  Note that any memory reallocations made internally by the library will
 not be logged.
+.TP
+\fBMEDIUMBOUND\fP=\fIunsigned integer\fP
+Specifies the limit in bytes up to which memory allocations should be classified
+as medium allocations for profiling purposes.  This limit must be greater than
+the small bound but less than the large bound.  Default value:
+\fBMEDIUMBOUND\fP=\fI256\fP.
 .TP
 \fBNOFREE\fP
 Specifies that the mpatrol library should keep all reallocated and freed memory
@@ -712,6 +739,20 @@ Specifies that any reallocated or freed memory allocations should preserve their
 original contents.  This option must be used with the \fBNOFREE\fP option and
 has no effect otherwise.
 .TP
+\fBPROF\fP
+Specifies that all memory allocations and deallocations are to be profiled and
+sent to the profiling output file.  Memory reallocations are treated as a
+memory deallocation immediately followed by a memory allocation.
+.TP
+\fBPROFFILE\fP=\fIstring\fP
+Specifies an alternative file in which to place all memory allocation profiling
+information from the mpatrol library.  A filename of \fIstderr\fP will send this
+information to the \fBstderr\fP file stream and a filename of \fIstdout\fP will
+do the equivalent with the \fBstdout\fP file stream.  Note that if a problem
+occurs while opening the profiling output file then the profiling information
+will be sent to the \fBstderr\fP file stream.  Default value:
+\fBPROFFILE\fP=\fImpatrol.out\fP
+.TP
 \fBPROGFILE\fP=\fIstring\fP
 Specifies an alternative filename with which to locate the executable file
 containing the program's symbols.  On most systems, the library will
@@ -760,6 +801,12 @@ Specifies that a summary of all of the unfreed memory allocations should be
 displayed at the end of program execution.  This step will not be performed if
 an abnormal termination occurs or if there are no unfreed allocations.
 .TP
+\fBSMALLBOUND\fP=\fIunsigned integer\fP
+Specifies the limit in bytes up to which memory allocations should be classified
+as small allocations for profiling purposes.  This limit must be greater than
+zero but less than the medium and large bounds.  Default value:
+\fBSMALLBOUND\fP=\fI32\fP.
+.TP
 \fBUNFREEDABORT\fP=\fIunsigned integer\fP
 Specifies the minimum number of unfreed allocations at which to abort the
 program just before program termination.  A summary of all the allocations will
@@ -782,7 +829,7 @@ are problems when using the mpatrol library in combination with another malloc
 library which uses \fBsbrk()\fP to allocate its memory.  It is ignored on
 systems that do not support the \fBmmap()\fP system call.
 .SH SEE ALSO
-\fBmpatrol\fP(1), \fBmleak\fP(1), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and FAQ.
 .SH AUTHOR
