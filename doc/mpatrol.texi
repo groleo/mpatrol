@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.107 2000-07-18 23:24:39 graeme Exp $
+@c $Id: mpatrol.texi,v 1.108 2000-07-20 18:15:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 18th July, 2000
+@set UPDATED 20th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -123,6 +123,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
 * Options::                     Command line options.
+* Diagnostic messages::         Warnings and errors.
 * Library performance::         Comparitive timings.
 * Profiling file format::       Profiling output file layout.
 * Supported systems::           Known platforms that mpatrol runs on.
@@ -5582,7 +5583,7 @@ systems require this option in order for the mpatrol library to be able to
 perform memory protection with the @code{mprotect()} system call.
 @end table
 
-@node Options, Library performance, Environment, Top
+@node Options, Diagnostic messages, Environment, Top
 @appendix Options
 @cindex options
 @cindex command line options
@@ -5806,7 +5807,424 @@ determining which memory allocations will randomly fail.
 will randomly fail.
 @end table
 
-@node Library performance, Profiling file format, Options, Top
+@node Diagnostic messages, Library performance, Options, Top
+@appendix Diagnostic messages
+@cindex diagnostic messages
+@cindex warnings
+@cindex errors
+
+The following table lists the warnings and errors that are likely to appear in
+the mpatrol log file when problems with dynamic memory allocations and memory
+operations occur.  Other types of warnings and errors may also appear in the log
+file, but they are likely to be associated with parsing options and reading
+symbols from executable files and so should be self-explanatory.
+
+@itemize @bullet
+@item
+@samp{%1 does not match allocation of %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that is to be resized or freed.
+@item @samp{%2}
+The pointer to the memory allocation that the mpatrol library knows about.
+@item Cause
+A function was called to resize or free a memory allocation that begins at a
+different address from that supplied.
+@item Additional
+The log file entry and information about the original memory allocation.
+@item Result
+The reallocation or deallocation fails and execution continues.
+@end table
+
+@item
+@samp{%1 has not been allocated}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that is to be resized or freed.
+@item Cause
+A function was called to resize or free a memory allocation that has not been
+allocated.  It may be that the memory allocation has just been freed, in which
+case the @option{NOFREE} option should be used to provide a better diagnostic
+message.
+@item Additional
+The log file entry.
+@item Result
+The reallocation or deallocation fails and execution continues.
+@end table
+
+@item
+@samp{%1 was allocated with %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that is to be resized or freed.
+@item @samp{%2}
+The name of the function which originally allocated the memory allocation.
+@item Cause
+A function was called to resize or free a memory allocation that was allocated
+with a function that is incompatible with the current request.  For example,
+a memory allocation which was allocated with @code{operator new} being resized
+with @code{realloc()}.
+@item Additional
+The log file entry and information about the original memory allocation.
+@item Result
+The reallocation or deallocation fails and execution continues.
+@end table
+
+@item
+@samp{%1 was freed with %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that is to be resized or freed.
+@item @samp{%2}
+The name of the function which originally freed the memory allocation.
+@item Cause
+A function was called to resize or free a memory allocation that had previously
+been freed when the @option{NOFREE} option was used.
+@item Additional
+The log file entry and information about the original memory allocation.
+@item Result
+The reallocation or deallocation fails and execution continues.
+@end table
+
+@item
+@samp{alignment 0 is invalid}
+@table @asis
+@item Type
+Warning
+@item Cause
+The @code{memalign()} function was called to allocate memory with an alignment
+of @samp{0} when either of the @option{CHECKALL} or @option{CHECKALLOCS} options
+were used.
+@item Additional
+The log file entry.
+@item Result
+The alignment is set to the system page size and execution continues.
+@end table
+
+@item
+@samp{alignment %1 is greater than the system page size}
+@table @asis
+@item Type
+Warning
+@item @samp{%1}
+The alignment in bytes.
+@item Cause
+The @code{memalign()} function was called to allocate memory with an alignment
+which was greater than the system page size when either of the @option{CHECKALL}
+or @option{CHECKALLOCS} options were used.  The mpatrol library cannot currently
+align memory allocations to a byte alignment over this limit, but then neither
+can most other implementations.
+@item Additional
+The log file entry.
+@item Result
+The alignment is set to the system page size and execution continues.
+@end table
+
+@item
+@samp{alignment %1 is not a power of two}
+@table @asis
+@item Type
+Warning
+@item @samp{%1}
+The alignment in bytes.
+@item Cause
+The @code{memalign()} function was called to allocate memory with an alignment
+which was not a power of two when either of the @option{CHECKALL} or
+@option{CHECKALLOCS} options were used.
+@item Additional
+The log file entry.
+@item Result
+The alignment is rounded up to the nearest power of two and execution continues.
+@end table
+
+@item
+@samp{allocation %1 has a corrupted overflow buffer at %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that has a corrupted overflow buffer.
+@item @samp{%2}
+The pointer to the first byte of corruption in the memory allocation's overflow
+buffer.
+@item Cause
+Something has corrupted the overflow buffer of a memory allocation and this has
+been caught at the next invocation of an mpatrol function when the
+@option{OFLOWSIZE} or @option{PAGEALLOC} options were used.  This particular
+error message will not occur if the @option{OFLOWWATCH} option was used since
+all overflow buffers will be write protected.
+@item Additional
+The library summary, the contents of the overflow buffer and information about
+the original memory allocation.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{attempt to create an allocation of size 0}
+@table @asis
+@item Type
+Warning
+@item Cause
+A function was called to allocate memory with a size of @samp{0} when either of
+the @option{CHECKALL} or @option{CHECKALLOCS} options were used.  This warning
+will not occur by default as the ANSI C/C++ standards allow this behaviour, and
+it is really only a portability issue.
+@item Additional
+The log file entry.
+@item Result
+The size is increased to 1 byte and execution continues.
+@end table
+
+@item
+@samp{attempt to free a NULL pointer}
+@table @asis
+@item Type
+Warning
+@item Cause
+A function was called to free an existing memory allocation with a pointer of
+@samp{NULL} when either of the @option{CHECKALL} or @option{CHECKFREES} options
+were used.  This warning will not occur by default as the ANSI C/C++ standards
+allow this behaviour, and it is really only a portability issue.
+@item Additional
+The log file entry.
+@item Result
+No memory allocation will be freed and execution continues.
+@end table
+
+@item
+@samp{attempt to perform operation on a NULL pointer}
+@table @asis
+@item Type
+Error
+@item Cause
+A memory operation function was called to operate on a @samp{NULL} pointer.
+@item Additional
+No additional information.
+@item Result
+The memory operation fails and execution continues.
+@end table
+
+@item
+@samp{attempt to perform operation on free memory}
+@table @asis
+@item Type
+Error
+@item Cause
+A memory operation function was called to operate on free memory.
+@item Additional
+No additional information.
+@item Result
+The memory operation fails and execution continues.
+@end table
+
+@item
+@samp{attempt to perform operation on freed memory}
+@table @asis
+@item Type
+Error
+@item Cause
+A memory operation function was called to operate on a previously freed memory
+allocation when the @option{NOFREE} option was used.
+@item Additional
+Information about the original memory allocation.
+@item Result
+The memory operation fails and execution continues.
+@end table
+
+@item
+@samp{attempt to resize a NULL pointer}
+@table @asis
+@item Type
+Warning
+@item Cause
+A function was called to resize an existing memory allocation with a pointer of
+@samp{NULL} when either of the @option{CHECKALL} or @option{CHECKREALLOCS}
+options were used.  This warning will not occur by default as the ANSI C/C++
+standards allow this behaviour, and it is really only a portability issue.
+@item Additional
+The log file entry.
+@item Result
+A new memory allocation is returned and execution continues.
+@end table
+
+@item
+@samp{attempt to resize an allocation to size 0}
+@table @asis
+@item Type
+Warning
+@item Cause
+A function was called to resize an existing memory allocation to a size of
+@samp{0} when either of the @option{CHECKALL} or @option{CHECKREALLOCS} options
+were used.  This warning will not occur by default as the ANSI C/C++ standards
+allow this behaviour, and it is really only a portability issue.
+@item Additional
+The log file entry.
+@item Result
+The existing memory allocation will be freed and execution continues.
+@end table
+
+@item
+@samp{free memory corruption at %1}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the first byte of corruption in free memory.
+@item Cause
+Something has corrupted the contents of the free memory pool and this has been
+caught at the next invocation of an mpatrol function.  This particular error
+message will not occur if the @option{PAGEALLOC} option was used since all free
+memory will be write protected.
+@item Additional
+The library summary and the contents of the free memory block.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{freed allocation %1 has a corrupted overflow buffer at %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the freed memory allocation that has a corrupted overflow buffer.
+@item @samp{%2}
+The pointer to the first byte of corruption in the freed memory allocation's
+overflow buffer.
+@item Cause
+Something has corrupted the overflow buffer of a previously freed memory
+allocation and this has been caught at the next invocation of an mpatrol
+function when the @option{NOFREE} option was used in conjunction with the
+@option{OFLOWSIZE} or @option{PAGEALLOC} options.  This particular error message
+will not occur if the @option{OFLOWWATCH} option was used since all overflow
+buffers will be write protected.
+@item Additional
+The library summary, the contents of the overflow buffer and information about
+the original memory allocation.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{freed allocation %1 has memory corruption at %2}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The pointer to the freed memory allocation that has been corrupted.
+@item @samp{%2}
+The pointer to the first byte of corruption in the freed memory allocation.
+@item Cause
+Something has corrupted the contents of a previously freed memory allocation and
+this has been caught at the next invocation of an mpatrol function when the
+@option{NOFREE} option was used.  This particular error message will not occur
+if the @option{PAGEALLOC} option was used since all freed memory allocations
+will be write protected and will also not occur if the @option{PRESERVE} option
+was used since the free byte cannot be used to verify the freed allocation's
+contents.
+@item Additional
+The library summary, the contents of the freed memory block and information
+about the original memory allocation.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{illegal memory access at address %1}
+@table @asis
+@item Type
+Error
+@item @samp{%1}
+The address at which the illegal memory access occurred.
+@item Cause
+An attempt was made to read from or write to an illegal address on systems which
+have virtual memory.  This address may or may not exist in the heap, or it may
+be a perfectly valid address that was misaligned and caused a bus error.  In
+either case, the mpatrol library will attempt to associate the address with an
+existing memory allocation.  This error may also appear instead of memory
+corruption errors if the @option{PAGEALLOC} or @option{OFLOWWATCH} options were
+used.
+@item Additional
+The library summary, information about the original memory allocation (if
+possible) and the call stack of where the error occurred.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{out of memory}
+@table @asis
+@item Type
+Error
+@item Cause
+The @code{operator new} or @code{operator new[]} C++ operator was called to
+allocate memory, but no more memory was available to allocate and no low-memory
+handler was installed.
+@item Additional
+The library summary.
+@item Result
+Execution terminates.
+@end table
+
+@item
+@samp{range [%1,%2] overflows [%3,%4]}
+@table @asis
+@item Type
+Warning/Error
+@item @samp{%1}
+The start address of the memory region.
+@item @samp{%2}
+The end address of the memory region.
+@item @samp{%3}
+The start address of the memory allocation.
+@item @samp{%4}
+The end address of the memory allocation.
+@item Cause
+A memory operation function was called to operate on a range of memory which
+overflowed the boundaries of a memory allocation.
+@item Additional
+Information about the original memory allocation.
+@item Result
+The operation will be only be performed (and will be changed from an error to a
+warning) if the @option{ALLOWOFLOW} option was used, but execution will
+continue regardless.
+@end table
+
+@item
+@samp{range [%1,%2] overlaps [%3,%4]}
+@table @asis
+@item Type
+Warning
+@item @samp{%1}
+The start address of the source memory region.
+@item @samp{%2}
+The end address of the source memory region.
+@item @samp{%3}
+The start address of the destination memory region.
+@item @samp{%4}
+The end address of the destination memory region.
+@item Cause
+The @code{memcpy()} or @code{memccpy()} function was called to copy overlapping
+memory regions.  This is an error on many systems and the ANSI C/C++ standards
+specify that @code{memmove()} should be used instead.
+@item Additional
+The log file entry.
+@item Result
+The copy operation will still be performed but it will deal correctly with
+overlapping memory regions.
+@end table
+@end itemize
+
+@node Library performance, Profiling file format, Diagnostic messages, Top
 @appendix Library performance
 @cindex performance times
 @cindex times
