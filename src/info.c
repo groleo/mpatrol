@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.11 2000-02-10 21:16:15 graeme Exp $"
+#ident "$Id: info.c,v 1.12 2000-02-22 20:35:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -82,6 +82,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->epilogue = NULL;
     h->nomemory = NULL;
     h->log = __mp_logfile(NULL);
+    h->delpos = 0;
 #if MP_PROTECT_SUPPORT
     h->flags = 0;
 #else /* MP_PROTECT_SUPPORT */
@@ -123,6 +124,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     __mp_newlist(&h->list);
     h->size = h->count = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
+    h->delpos = 0;
 }
 
 
