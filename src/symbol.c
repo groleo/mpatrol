@@ -46,17 +46,7 @@
 #include <a.out.h>
 #elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 #include <a.out.h>
-#if SYSTEM == SYSTEM_AIX
-#ifdef FREAD
-#undef FREAD
-#endif /* FREAD */
-#ifdef FWRITE
-#undef FWRITE
-#endif /* FWRITE */
-#ifndef ISCOFF
-#define ISCOFF(m) (((m) == U800TOCMAGIC) || ((m) == U802TOCMAGIC))
-#endif /* ISCOFF */
-#elif SYSTEM == SYSTEM_LYNXOS
+#if SYSTEM == SYSTEM_LYNXOS
 #include <coff.h>
 #ifndef ISCOFF
 #define ISCOFF(m) ((m) == COFFMAGICNUM)
@@ -67,8 +57,20 @@
 #ifndef n_name
 #define n_name _n._n_name
 #endif /* n_name */
+#else /* SYSTEM */
+#if SYSTEM == SYSTEM_AIX
+#ifdef FREAD
+#undef FREAD
+#endif /* FREAD */
+#ifdef FWRITE
+#undef FWRITE
+#endif /* FWRITE */
+#ifndef ISCOFF
+#define ISCOFF(m) (((m) == U800TOCMAGIC) || ((m) == U802TOCMAGIC))
+#endif /* ISCOFF */
 #endif /* SYSTEM */
 #include <ldfcn.h>
+#endif /* SYSTEM */
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
 #include <libelf.h>
 #elif FORMAT == FORMAT_BFD
@@ -81,9 +83,9 @@
  */
 #include <sys/ldr.h>
 #elif DYNLINK == DYNLINK_BSD
-/* The BSD COFF dynamic linker is based on the original SunOS implementation
+/* The BSD a.out dynamic linker is based on the original SunOS implementation
  * and is the precursor to the SVR4 ELF dynamic linker.  Most BSD systems now
- * use ELF so this is for SunOS and the BSD systems that still use COFF.
+ * use ELF so this is for SunOS and the BSD systems that still use a.out.
  */
 #include <sys/types.h>
 #include <link.h>
@@ -118,7 +120,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.44 2001-01-24 13:18:49 graeme Exp $"
+#ident "$Id: symbol.c,v 1.45 2001-01-24 20:12:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -796,6 +798,7 @@ addsymbols(symhead *y, char *e, char *l, char *f, size_t b, size_t a)
 {
     char n[SYMNMLEN + 1];
     FILHDR *o;
+    AOUTHDR *v;
     SCNHDR *h;
     SYMENT *p;
     char *c, *m, *s;
@@ -822,6 +825,16 @@ addsymbols(symhead *y, char *e, char *l, char *f, size_t b, size_t a)
         else
             __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, c);
         return 1;
+    }
+    /* COFF and XCOFF dynamic linkers don't record the original start
+     * address of the text section so we must adjust the base address here
+     * if necessary.
+     */
+    if ((a != 0) && (o->f_opthdr >= sizeof(AOUTHDR)))
+    {
+        v = (AOUTHDR *) (e + FILHSZ);
+        if (a > v->text_start)
+            a -= (v->text_start & ~0xFFFF);
     }
     b -= o->f_opthdr;
     if ((o->f_nscns == 0) || (b < o->f_nscns * SCNHSZ))
@@ -1227,7 +1240,8 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 #if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || \
     FORMAT == FORMAT_XCOFF || FORMAT == FORMAT_ELF32 || \
     FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
-#if FORMAT == FORMAT_AOUT
+#if FORMAT == FORMAT_AOUT || (SYSTEM == SYSTEM_LYNXOS && \
+     (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF))
     char *m;
     off_t o;
     int f;
@@ -1265,9 +1279,11 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
         SymSetOptions(SYMOPT_UNDNAME);
     SymInitialize(GetCurrentProcess(), NULL, 1);
 #endif /* DYNLINK */
-#if FORMAT == FORMAT_AOUT
+#if FORMAT == FORMAT_AOUT || (SYSTEM == SYSTEM_LYNXOS && \
+     (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF))
     /* This is a very simple, yet portable, way to read symbols from a.out
-     * executable files.
+     * executable files, or from COFF or XCOFF executable files when libld
+     * is not available.
      */
     if ((f = open(s, O_RDONLY)) == -1)
     {
