@@ -36,6 +36,18 @@
 #define MPATROL_VERSION 10100
 
 
+/* A macro for representing constant function parameters.
+ */
+
+#ifndef MP_CONST
+#ifdef __STDC__
+#define MP_CONST const
+#else /* __STDC__ */
+#define MP_CONST
+#endif /* __STDC__ */
+#endif /* MP_CONST */
+
+
 /* A macro for determining the current function name.
  */
 
@@ -304,8 +316,8 @@ __mp_allocinfo;
                                   __FILE__, __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define cfree(p) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, MP_FUNCNAME, \
-                                    __FILE__, __LINE__, 0)
+#define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), MP_AT_MEMSET, \
+                                    MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, MP_FUNCNAME, \
                                        __FILE__, __LINE__, 0)
 #define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, MP_FUNCNAME, \
@@ -314,8 +326,9 @@ __mp_allocinfo;
                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
                                            MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (c), MP_AT_MEMCHR, \
-                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (size_t) (c), \
+                                       MP_AT_MEMCHR, MP_FUNCNAME, __FILE__, \
+                                       __LINE__, 0)
 #define memmem(p, l, q, m) __mp_locatemem((p), (l), (q), (m), MP_AT_MEMMEM, \
                                           MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, \
@@ -335,47 +348,59 @@ extern "C"
 __asm void __mp_init(void);
 __asm void __mp_fini(void);
 __asm void *__mp_alloc(register __d0 size_t, register __d1 size_t,
-                       register __d2 __mp_alloctype, register __a0 char *,
-                       register __a1 char *, register __d3 unsigned long,
-                       register __d4 size_t);
-__asm char *__mp_strdup(register __a0 char *, register __d0 size_t,
-                        register __d1 __mp_alloctype, register __a1 char *,
-                        register __a2 char *, register __d2 unsigned long,
-                        register __d3 size_t);
+                       register __d2 __mp_alloctype,
+                       register __a0 MP_CONST char *,
+                       register __a1 MP_CONST char *,
+                       register __d3 unsigned long, register __d4 size_t);
+__asm char *__mp_strdup(register __a0 MP_CONST char *, register __d0 size_t,
+                        register __d1 __mp_alloctype,
+                        register __a1 MP_CONST char *,
+                        register __a2 MP_CONST char *,
+                        register __d2 unsigned long, register __d3 size_t);
 __asm void *__mp_realloc(register __a0 void *, register __d0 size_t,
                          register __d1 size_t, register __d2 __mp_alloctype,
-                         register __a1 char *, register __a2 char *,
+                         register __a1 MP_CONST char *,
+                         register __a2 MP_CONST char *,
                          register __d3 unsigned long, register __d4 size_t);
 __asm void __mp_free(register __a0 void *, register __d0 __mp_alloctype,
-                     register __a1 char *, register __a2 char *,
-                     register __d1 unsigned long, register __d2 size_t);
+                     register __a1 MP_CONST char *,
+                     register __a2 MP_CONST char *, register __d1 unsigned long,
+                     register __d2 size_t);
 __asm void *__mp_setmem(register __a0 void *, register __d0 size_t,
                         register __d1 unsigned char,
-                        register __d2 __mp_alloctype, register __a1 char *,
-                        register __a2 char *, register __d3 unsigned long,
-                        register __d4 size_t);
-__asm void *__mp_copymem(register __a0 void *, register __a1 void *,
+                        register __d2 __mp_alloctype,
+                        register __a1 MP_CONST char *,
+                        register __a2 MP_CONST char *,
+                        register __d3 unsigned long, register __d4 size_t);
+__asm void *__mp_copymem(register __a0 MP_CONST void *, register __a1 void *,
                          register __d0 size_t, register __d1 __mp_alloctype,
-                         register __a2 char *, register __a3 char *,
+                         register __a2 MP_CONST char *,
+                         register __a3 MP_CONST char *,
                          register __d2 unsigned long, register __d3 size_t);
-__asm void *__mp_locatemem(register __a0 void *, register __d0 size_t,
-                           register __a1 void *, register __d1 size_t,
-                           register __d2 __mp_alloctype, register __a2 char *,
-                           register __a3 char *, register __d3 unsigned long,
-                           register __d4 size_t);
-__asm int __mp_comparemem(register __a0 void *, register __a1 void *,
-                          register __d0 size_t, register __d1 __mp_alloctype,
-                          register __a2 char *, register __a3 char *,
+__asm void *__mp_locatemem(register __a0 MP_CONST void *, register __d0 size_t,
+                           register __a1 MP_CONST void *, register __d1 size_t,
+                           register __d2 __mp_alloctype,
+                           register __a2 MP_CONST char *,
+                           register __a3 MP_CONST char *,
+                           register __d3 unsigned long, register __d4 size_t);
+__asm int __mp_comparemem(register __a0 MP_CONST void *,
+                          register __a1 MP_CONST void *, register __d0 size_t,
+                          register __d1 __mp_alloctype,
+                          register __a2 MP_CONST char *,
+                          register __a3 MP_CONST char *,
                           register __d2 unsigned long, register __d3 size_t);
-__asm int __mp_info(register __a0 void *, register __a1 __mp_allocinfo *);
+__asm int __mp_info(register __a0 MP_CONST void *,
+                    register __a1 __mp_allocinfo *);
 __asm void __mp_memorymap(register __d0 int);
 __asm void __mp_summary(void);
 __asm void __mp_check(void);
-__asm void (*__mp_prologue(register __a0 void (*)(void *, size_t)))
-           (void *, size_t);
-__asm void (*__mp_epilogue(register __a0 void (*)(void *)))(void *);
+__asm void (*__mp_prologue(register __a0 void (*)(MP_CONST void *, size_t)))
+           (MP_CONST void *, size_t);
+__asm void (*__mp_epilogue(register __a0 void (*)(MP_CONST void *)))
+           (MP_CONST void *);
 __asm void (*__mp_nomemory(register __a0 void (*)(void)))(void);
-__asm void __mp_pushdelstack(register __a0 char *, register __a1 char *,
+__asm void __mp_pushdelstack(register __a0 MP_CONST char *,
+                             register __a1 MP_CONST char *,
                              register __d0 unsigned long);
 __asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
                             register __a2 unsigned long *);
@@ -384,29 +409,32 @@ __asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
 
 void __mp_init(void);
 void __mp_fini(void);
-void *__mp_alloc(size_t, size_t, __mp_alloctype, char *, char *, unsigned long,
-                 size_t);
-char *__mp_strdup(char *, size_t, __mp_alloctype, char *, char *, unsigned long,
-                  size_t);
-void *__mp_realloc(void *, size_t, size_t, __mp_alloctype, char *, char *,
-                   unsigned long, size_t);
-void __mp_free(void *, __mp_alloctype, char *, char *, unsigned long, size_t);
-void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype, char *, char *,
-                  unsigned long, size_t);
-void *__mp_copymem(void *, void *, size_t, __mp_alloctype, char *, char *,
-                   unsigned long, size_t);
-void *__mp_locatemem(void *, size_t, void *, size_t, __mp_alloctype, char *,
-                     char *, unsigned long, size_t);
-int __mp_comparemem(void *, void *, size_t, __mp_alloctype, char *, char *,
-                    unsigned long, size_t);
-int __mp_info(void *, __mp_allocinfo *);
+void *__mp_alloc(size_t, size_t, __mp_alloctype, MP_CONST char *,
+                 MP_CONST char *, unsigned long, size_t);
+char *__mp_strdup(MP_CONST char *, size_t, __mp_alloctype, MP_CONST char *,
+                  MP_CONST char *, unsigned long, size_t);
+void *__mp_realloc(void *, size_t, size_t, __mp_alloctype, MP_CONST char *,
+                   MP_CONST char *, unsigned long, size_t);
+void __mp_free(void *, __mp_alloctype, MP_CONST char *, MP_CONST char *,
+               unsigned long, size_t);
+void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype,
+                  MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+void *__mp_copymem(MP_CONST void *, void *, size_t, __mp_alloctype,
+                   MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
+                     __mp_alloctype, MP_CONST char *, MP_CONST char *,
+                     unsigned long, size_t);
+int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
+                    MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+int __mp_info(MP_CONST void *, __mp_allocinfo *);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*)(void *, size_t)))(void *, size_t);
-void (*__mp_epilogue(void (*)(void *)))(void *);
+void (*__mp_prologue(void (*)(MP_CONST void *, size_t)))
+     (MP_CONST void *, size_t);
+void (*__mp_epilogue(void (*)(MP_CONST void *)))(MP_CONST void *);
 void (*__mp_nomemory(void (*)(void)))(void);
-void __mp_pushdelstack(char *, char *, unsigned long);
+void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 
 #endif /* AMIGA */
@@ -434,7 +462,8 @@ static inline new_handler set_new_handler(new_handler h)
 /* Override operator new.
  */
 
-static inline void *operator new(size_t l, char *s, char *t, unsigned long u)
+static inline void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
+                                 unsigned long u)
 {
     return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
 }
@@ -443,7 +472,8 @@ static inline void *operator new(size_t l, char *s, char *t, unsigned long u)
 /* Override operator new[].
  */
 
-static inline void *operator new[](size_t l, char *s, char *t, unsigned long u)
+static inline void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
+                                   unsigned long u)
 {
     return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
 }
