@@ -56,7 +56,34 @@ their corresponding answers or solutions.
     page.
 
 
- 2. LINKING
+ 2. BUILDING
+
+ Q. Why does the makefile assume that I am building mpatrol on platform X when
+    I am really building on platform Y?
+
+ A. The src/config.h and src/target.h header files attempt to obtain as much
+    information from the compiler as possible, mainly from any predefined
+    preprocessor macros that it defines during compilation.  If this information
+    is incorrect then you can override the TARGET, SYSTEM, ARCH and FORMAT
+    preprocessor macros defined in src/target.h to suit your particular system
+    by explicitly defining them in CFLAGS within the makefile when you build
+    mpatrol.  You could also choose to build different versions of mpatrol with
+    different settings of FORMAT on a single system if you wish to by changing
+    FORMAT for different builds.
+
+ Q. I cannot include mpatrol.h from my C++ source code as I get lots of
+    compilation errors.  Why is this and what can I do to prevent them?
+
+ A. The most likely reason that you are getting errors is because you are
+    calling placement new, and the way that mpatrol derives source information
+    from calls to operator new is by defining a macro called new, thus causing
+    lots of problems when calling placement new or explicitly calling operator
+    new.  You can either try not to use placement new or you can define the
+    preprocessor macro MP_NOCPLUSPLUS when compiling your source file, which
+    will disable the overriding of any C++ operators in mpatrol.h.
+
+
+ 3. LINKING
 
  Q. Why do I get undefined symbols when linking with the mpatrol library?
 
@@ -97,7 +124,7 @@ their corresponding answers or solutions.
     relink.
 
 
- 3. RUNNING
+ 4. RUNNING
 
  Q. I've just linked and run my program with the mpatrol library, but the
     resulting log file doesn't contain any useful information.  Why does it not
@@ -229,7 +256,7 @@ their corresponding answers or solutions.
     this is required for code linked with the static library as well.
 
 
- 4. FILES
+ 5. FILES
 
  Q. Why is there a libmpatrol.o target in the UNIX Makefile?
 
