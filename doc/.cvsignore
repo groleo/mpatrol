@@ -3,6 +3,7 @@
 *.info
 *.info-*
 *.guide
+*.xml
 *.html
 *.dvi
 *.ps
