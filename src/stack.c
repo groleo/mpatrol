@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.7 2000-05-31 20:39:23 graeme Exp $"
+#ident "$Id: stack.c,v 1.8 2000-06-01 20:40:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -89,8 +89,7 @@
 #error not enough frameaddress() and returnaddress() macros
 #endif /* MP_MAXSTACK */
 #elif SYSTEM == SYSTEM_HPUX
-/* The following functions are defined in the HP/UX traceback library (libcl)
- * but are not documented anywhere and have no associated header file.
+/* The following functions are defined in the HP/UX traceback library (libcl).
  */
 
 frameinfo U_get_current_frame(void);
@@ -238,12 +237,26 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     if (p->frame == NULL)
     {
         p->next = U_get_current_frame();
-        p->frame = (void *) &p->next;
+        if (U_get_previous_frame(&p->next, &f) == 0)
+        {
+            p->next.size = f.size;
+            p->next.sp = f.sp;
+            p->next.ps = f.ps;
+            p->next.pc = f.pc;
+            p->next.dp = f.dp;
+        }
+        else
+            __mp_memset(&p->next, 0, sizeof(frameinfo));
     }
-    if (U_get_previous_frame(&p->next, &f) == 0)
+    if (p->next.pc && (U_get_previous_frame(&p->next, &f) == 0))
     {
-        p->addr = (void *) (p->next.addr - 3);
-        __mp_memcopy(&p->next, &f, sizeof(frameinfo));
+        p->frame = (void *) p->next.sp;
+        p->addr = (void *) (p->next.pc & ~3);
+        p->next.size = f.size;
+        p->next.sp = f.sp;
+        p->next.ps = f.ps;
+        p->next.pc = f.pc;
+        p->next.dp = f.dp;
         r = 1;
     }
     else

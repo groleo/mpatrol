@@ -35,16 +35,19 @@
 
 
 #if SYSTEM == SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
-/* HP/UX provides undocumented functions to traverse the PA/RISC stack frames.
- * This structure only makes visible the stack frame entries that we need to
+/* HP/UX provides functions to traverse the PA/RISC stack frames.  This
+ * structure only makes visible the stack frame entries that we need to
  * use - all the rest are simply reserved.
  */
 
 typedef struct frameinfo
 {
-    unsigned long res1[3];  /* reserved entries */
-    unsigned long addr;     /* return address */
-    unsigned long res2[12]; /* reserved entries */
+    unsigned int size;   /* frame size */
+    unsigned int sp;     /* stack pointer */
+    unsigned int ps;     /* program counter space */
+    unsigned int pc;     /* program counter */
+    unsigned int dp;     /* data pointer */
+    unsigned int res[6]; /* reserved entries */
 }
 frameinfo;
 #endif /* SYSTEM && MP_BUILTINSTACK_SUPPORT */
