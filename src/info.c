@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.86 2001-07-26 17:33:10 graeme Exp $"
+#ident "$Id: info.c,v 1.87 2001-08-01 23:10:17 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.86 2001-07-26 17:33:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.87 2001-08-01 23:10:17 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1446,6 +1446,34 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
         return (e == 2);
     }
     return 1;
+}
+
+
+/* Fix the alignment required by a specified allocation function.
+ */
+
+MP_GLOBAL
+size_t
+__mp_fixalign(infohead *h, alloctype f, size_t a)
+{
+    size_t r;
+
+    if ((f == AT_VALLOC) || (f == AT_PVALLOC))
+        r = h->alloc.heap.memory.page;
+    else
+    {
+        r = a;
+        if (f == AT_MEMALIGN)
+        {
+            if (r > h->alloc.heap.memory.page)
+                r = h->alloc.heap.memory.page;
+            else if (!__mp_ispoweroftwo(r))
+                r = __mp_poweroftwo(r);
+        }
+        if (r == 0)
+            r = h->alloc.heap.memory.align;
+    }
+    return r;
 }
 
 

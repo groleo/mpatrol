@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.60 2001-08-01 22:27:44 graeme Exp $
+ * $Id: info.h,v 1.61 2001-08-01 23:10:18 graeme Exp $
  */
 
 
@@ -303,6 +303,7 @@ MP_EXPORT void __mp_checkinfo(infohead *, loginfo *);
 MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype, loginfo *);
 MP_EXPORT int __mp_checkstring(infohead *, char *, size_t *, alloctype,
                                loginfo *, int);
+MP_EXPORT size_t __mp_fixalign(infohead *, alloctype, size_t);
 
 
 #ifdef __cplusplus
