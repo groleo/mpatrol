@@ -1,3 +1,144 @@
+Mon Jan 24 21:20:53 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ:
+	New information about non-fatal errors and added information on C++
+	name demangling.
+
+	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
+	Added __mp_setmem() and __mp_copymem().
+
+	* doc/mpatrol.texi:
+	Mentioned all about the new memory operation replacement functions.
+	Added information about expand() and information about the bytes copied
+	and bytes set values in the summary.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1:
+	Added information about implicit LOGALL.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Added details of memory operations and added the expand() function.
+
+	* pkg/rpm/build:
+	Added more information about building in a directory other than /usr.
+
+	* src/info.c, src/info.h:
+	Added the expand() function, added the total bytes copied and set counts
+	and fixed __mp_checkrange() for free and freed blocks.
+
+	* src/diag.c:
+	Added the expand() function and the total bytes copied and set to the
+	summary.
+
+	* src/malloc.c: Added the expand() function.
+
+	* src/mpatrol.h:
+	Added the expand function and increased to version 1.1.0.
+
+	* src/version.c: Updated to version 1.1.0.
+
+Fri Jan 21 01:11:45 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/alloc.c, src/alloc.h:
+	Added an extra argument to __mp_findnode() for detecting if a node lies
+	in a range of addresses.
+
+	* src/info.c, src/info.h:
+	Added the __mp_setmemory(), __mp_copymemory() and __mp_checkrange()
+	functions.
+
+	* src/diag.c: Added new memory operation function names.
+
+	* src/option.c, src/option.h: Added the LOGMEMORY option.
+
+	* src/signals.c: Added an extra parameter to __mp_findnode().
+
+	* src/inter.c, src/inter.h: Added __mp_setmem() and __mp_copymem().
+
+	* src/mpatrol.h, src/malloc.c: Added new memory operation functions.
+
+	* tests/fail/test9.c:
+	New test which performs an illegal memset() operation.
+
+	* tests/fail/test10.c: New test showing the erroneous use of memcpy().
+
+Tue Jan 18 00:41:34 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Listed more of the potential run-time problems.
+
+Thu Jan 13 00:40:24 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, README:
+	Added information about the new discussion group at eGroups.com.
+
+Wed Jan 12 01:08:50 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more information about SAFESIGNALS and more items of related
+	software.
+
+Tue Jan 11 00:56:11 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added the FILES section.
+
+	* doc/Makefile: Changed suffix of ASCII document from .doc to .txt.
+
+	* doc/mpatrol.texi, README:
+	Added point about reading the FAQ before reporting a bug.
+
+	* pkg/rpm/mpatrol.spec, pkg/pkg/prototype, pkg/pkg/build:
+	Changed the suffix of the ASCII documentation from .doc to .txt.
+
+Sun Jan  9 22:08:18 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/SMakefile, build/netware/Makefile, build/unix/Makefile,
+	  build/windows/Makefile, build/windows/mpatrol.def:
+	Updated the library revision and prevented the object libraries from being
+	built when the all target is used.
+
+	* FAQ: Added information about signals being ignored.
+
+	* bin/mpatrol: Added the -g option.
+
+	* doc/mpatrol.texi: Added the SAFESIGNALS option.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1: Added the -g option.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Added the SAFESIGNALS option.
+
+	* src/info.h, src/option.c, src/inter.c:
+	Added support for the new SAFESIGNALS option.
+
+	* src/signals.c, src/signals.h:
+	Added extra flag to indicate if signals have been saved or not.
+
+Thu Dec 23 18:50:55 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more related software and removed authors from the concept index.
+	Also added FreshMeat details and fixed line numbers in some examples.
+
+	* FAQ: New file containing the answers to frequently asked questions.
+
+	* pkg/pkg/pkginfo, pkg/pkg/prototype, pkg/pkg/build,
+	  pkg/rpm/mpatrol.spec, pkg/rpm/build:
+	Increased the version to 1.1.0 and added the FAQ.
+
+	* src/option.h: Added OPT_* definitions for use with mallopt().
+
+Tue Dec 21 21:43:21 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added reference to the memory management reference.
+
+	* src/memory.c, src/alloc.c, src/info.c, src/strtab.c, src/option.c,
+	  src/inter.c:
+	Changed calls from memset() to __mp_memset() and calls from memcpy() to
+	__mp_memcopy().
+
+	* src/symbol.c:
+	Now automatically check for dynamic symbols when using GNU BFD as well.
+
+	* src/mpatrol.h: Added options and flags for use with mallopt().
+
 Mon Dec 20 22:06:49 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added a section on using the library functions.
