@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.72 2000-05-11 21:08:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.73 2000-05-12 18:46:26 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 11th May, 2000
+@set UPDATED 12th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -164,8 +164,9 @@ library can be found in the appendices, while introductory and background
 material can be found in the preceding chapters and sections.  For readers who
 wish to delve right in and use the library, the Installation
 (@pxref{Installation}) and Examples (@pxref{Examples}) chapters should be enough
-to get started.  Otherwise, this manual should be read from beginning to end in
-order to get the most out of the software it describes.
+to get started in combination with the quick reference card.  Otherwise, this
+manual should be read from beginning to end in order to get the most out of the
+software it describes.
 
 @cindex bug reports
 @cindex reporting bugs
@@ -637,7 +638,7 @@ A small test suite is provided in order to test basic features.
 
 @item
 User documentation is currently available in @TeX{}info format as well as UNIX
-manual pages.
+manual pages and a quick reference card.
 @end itemize
 
 @node Installation, Integration, Features, Top
@@ -735,17 +736,22 @@ manual pages while the @file{cat*} subdirectories contain the formatted manual
 pages.
 
 @cindex @TeX{}info
+@cindex La@TeX{}
 @cindex documentation
+@cindex reference card
+@cindex quick reference card
 @cindex printing
 @item
 Go up one directory level into the @file{doc} directory and examine the files
 located there.  The @file{mpatrol.texi} file contains the @TeX{}info source for
 this manual and can be translated into a wide variety of documentation formats.
-There may already be translated files in the @file{doc} directory, but if not
-you will either have to generate them yourself using an appropriate tool or you
-could download an archive containing the latest mpatrol manual in a variety of
-documentation formats from the mpatrol home page.  You can then install or print
-these documents.
+The @file{refcard.tex} file contains the La@TeX{} source for the quick reference
+card and can be translated into formats suitable for printing onto a single
+page.  There may already be translated files in the @file{doc} directory, but if
+not you will either have to generate them yourself using an appropriate tool or
+you could download an archive containing the latest mpatrol manual and reference
+card in a variety of documentation formats from the mpatrol home page.  You can
+then install or print these documents.
 @end enumerate
 
 Alternatively, the @file{pkg} directory contains files that can be used to
@@ -6287,7 +6293,8 @@ the platform it is being built on, and also use automake, libtool and install
 when building and installing files.
 
 @item
-Add a quick reference card for using mpatrol and its related tools.
+Perhaps add an extra page to the quick reference card containing details of the
+related tools and functions.  Also add the ability to build a PDF version.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
