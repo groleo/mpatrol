@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.24 2001-03-04 12:17:37 graeme Exp $
+ * $Id: diag.h,v 1.25 2001-03-04 12:25:57 graeme Exp $
  */
 
 
@@ -86,6 +86,7 @@ extern "C"
 
 
 MP_EXPORT char *__mp_functionnames[AT_MAX];
+MP_EXPORT unsigned long __mp_errno;
 MP_EXPORT unsigned long __mp_diagflags;
 
 
