@@ -229,21 +229,33 @@ __mp_returnaddress:
 	j	$31
 	.end	__mp_returnaddress
 #elif ARCH == ARCH_SPARC
-#if SYSTEM == SYSTEM_SUNOS
-/* SunOS platforms do not have the getcontext() function so unfortunately we
- * have to provide an assembler routine to obtain the stack pointer.
+#if SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SUNOS
+/* Linux and SunOS platforms do not have the getcontext() function so
+ * unfortunately we have to provide an assembler routine to obtain the stack
+ * pointer.
  */
 
 
 /* Obtain the stack pointer for the current function.
  */
 
+#if SYSTEM == SYSTEM_LINUX
+	.text
+__mp_stackpointer:
+	ta	0x03
+	retl
+	mov	%sp,%o0
+	.global	__mp_stackpointer
+	.type	__mp_stackpointer,#function
+	.size	__mp_stackpointer,.-__mp_stackpointer
+#elif SYSTEM == SYSTEM_SUNOS
 	.text
 	.global	___mp_stackpointer
 ___mp_stackpointer:
 	ta	0x03
 	retl
 	mov	%sp,%o0
+#endif /* SYSTEM */
 #endif /* SYSTEM */
 #endif /* ARCH */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
