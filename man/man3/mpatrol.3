@@ -1,0 +1,621 @@
+.\" mpatrol
+.\" A library for controlling and tracing dynamic memory allocations.
+.\" Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+.\"
+.\" This library is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU Library General Public
+.\" License as published by the Free Software Foundation; either
+.\" version 2 of the License, or (at your option) any later version.
+.\"
+.\" This library is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" Library General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU Library General Public
+.\" License along with this library; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+.\" MA 02111-1307, USA.
+.\"
+.\" UNIX Manual Page
+.\"
+.\" $Id: mpatrol.3,v 1.1 1999-10-10 21:38:18 graeme Exp $
+.\"
+.TH MPATROL 3 "11 October 1999" "Release 1.0" "mpatrol library"
+.SH NAME
+mpatrol \- dynamic memory allocation and tracing library
+.SH SYNOPSIS
+.nf
+#include <mpatrol.h>
+
+void *malloc(size_t size);
+void *calloc(size_t nelem, size_t size);
+void *memalign(size_t align, size_t size);
+void *valloc(size_t size);
+void *pvalloc(size_t size);
+char *strdup(char *str);
+char *strndup(char *str, size_t size);
+char *strsave(char *str);
+char *strnsave(char *str, size_t size);
+void *realloc(void *ptr, size_t size);
+void *recalloc(void *ptr, size_t size);
+void free(void *ptr);
+void cfree(void *ptr);
+
+void *operator new(size_t size);
+void *operator new[](size_t size);
+void operator delete(void *ptr);
+void operator delete[](void *ptr);
+void (*set_new_handler(void (*func)(void)))(void);
+
+int __mp_info(void *ptr, __mp_allocinfo *info);
+void __mp_memorymap(int stats);
+void __mp_summary(void);
+void __mp_check(void);
+void (*__mp_prologue(void (*func)(void *, size_t)))
+     (void *, size_t);
+void (*__mp_epilogue(void (*func)(void *)))(void *);
+void (*__mp_nomemory(void (*func)(void)))(void);
+.fi
+.SH DESCRIPTION
+The \fImpatrol library\fP contains implementations of dynamic memory
+allocation functions for C and C++ suitable for tracing and debugging, and is
+available on UNIX, AmigaOS, Windows and Netware platforms.  The library is
+intended to be used without requiring any changes to existing user source code
+except the inclusion of the \fImpatrol.h\fP header file, although additional
+functions are supplied for extra tracing and control.  Note that the current
+version of the mpatrol library is contained in the \fBMPATROL_VERSION\fP
+preprocessor macro.
+.PP
+All diagnostics are sent to the file \fImpatrol.log\fP in the current directory
+by default but this can be changed at run-time.  Additional configuration
+options can also be changed at run-time by setting and altering the
+\fBMPATROL_OPTIONS\fP environment variable.  See \fBENVIRONMENT\fP below for
+more details.
+.PP
+Details of memory allocations and free memory are stored internally as a tree
+structure for speed and also to allow the best fit allocation algorithm to be
+used.  This also enables the library to perform intelligent resizing of memory
+allocations and can be used to quickly determine if an address has been
+allocated on the heap.
+.PP
+On systems that support memory protection, the library attempts to detect any
+illegal memory accesses and display as much information as it can obtain about
+the address in question and where the illegal memory access occurred.
+.PP
+Stack traceback information for every memory allocation is available on some
+supported platforms, which is useful for determining exactly where a memory
+allocation was performed or for adding meaning to tracing.  Symbol names are
+read from the executable file and also possibly from any required shared
+libraries.
+.PP
+The following 13 functions are available as replacements for existing C library
+functions.  To use these you must include \fImpatrol.h\fP before all other
+header files, although on UNIX platforms they will be used anyway, albeit with
+slightly less tracing information:
+.TP
+\fBmalloc\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
+reallocated with \fBrealloc\fP.
+.TP
+\fBcalloc\fP
+Allocates \fInelem\fP elements of \fIsize\fP zero-initialized bytes from the
+heap and returns a pointer to the first byte of the allocation.  The pointer
+returned will be suitably aligned for casting to any type and can be used to
+store data of up to \fInelem * size\fP bytes in length.  If \fInelem * size\fP
+is \fI0\fP then the amount of memory allocated will be implicitly rounded up to
+\fI1\fP byte.  If there is not enough space in the heap then the null pointer
+will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The allocated
+memory must be deallocated with \fBfree\fP or reallocated with \fBrealloc\fP.
+.TP
+\fBmemalign\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be aligned to
+\fIalign\fP bytes and can be used to store data of up to \fIsize\fP bytes in
+length.  If \fIalign\fP is zero then the default system alignment will be used.
+If \fIalign\fP is not a power of two then it will be rounded up to the nearest
+power of two.  If \fIalign\fP is greater than the system page size then it will
+be truncated to that value.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
+reallocated with \fBrealloc\fP, although the latter will not guarantee the
+preservation of alignment.
+.TP
+\fBvalloc\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be aligned to the
+system page size and can be used to store data of up to \fIsize\fP bytes in
+length.  If \fIsize\fP is \fI0\fP then the memory allocated will be implicitly
+rounded up to \fI1\fP byte.  If there is not enough space in the heap then the
+null pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
+allocated memory must be deallocated with \fBfree\fP or reallocated with
+\fBrealloc\fP, although the latter will not guarantee the preservation of
+alignment.
+.TP
+\fBpvalloc\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be aligned to the
+system page size and can be used to store data of up to \fIsize\fP bytes in
+length.  If \fIsize\fP is \fI0\fP then the memory allocated will be implicitly
+rounded up to \fI1\fP page, otherwise \fIsize\fP will be implicitly rounded up
+to a multiple of the system page size.  If there is not enough space in the heap
+then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
+reallocated with \fBrealloc\fP, although the latter will not guarantee the
+preservation of alignment.
+.TP
+\fBstrdup\fP
+Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying \fIstr\fP to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then the null
+pointer will be returned.  If there is not enough space in the heap then the
+null pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
+allocated memory must be deallocated with \fBfree\fP or reallocated with
+\fBrealloc\fP.
+.TP
+\fBstrndup\fP
+Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying \fIstr\fP to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then the null
+pointer will be returned.  If the length of \fIstr\fP is greater than \fIsize\fP
+then only \fIsize\fP characters will be allocated and copied, with one
+additional byte for the nul character.  If there is not enough space in the heap
+then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
+reallocated with \fBrealloc\fP.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
+.TP
+\fBstrsave\fP
+Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying \fIstr\fP to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then the null
+pointer will be returned.  If there is not enough space in the heap then the
+null pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
+allocated memory must be deallocated with \fBfree\fP or reallocated with
+\fBrealloc\fP.  This function is available for backwards compatibility with
+older C libraries and should not be used in new code.
+.TP
+\fBstrnsave\fP
+Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
+the terminating nul character) and returns a pointer to the first byte of the
+allocation after copying \fIstr\fP to the newly-allocated memory.  The pointer
+returned will have no alignment constraints and can be used to store character
+data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then the null
+pointer will be returned.  If the length of \fIstr\fP is greater than \fIsize\fP
+then only \fIsize\fP characters will be allocated and copied, with one
+additional byte for the nul character.  If there is not enough space in the heap
+then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP.  The allocated memory must be deallocated with \fBfree\fP or
+reallocated with \fBrealloc\fP.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
+.TP
+\fBrealloc\fP
+Resizes the memory allocation beginning at \fIptr\fP to \fIsize\fP bytes and
+returns a pointer to the first byte of the new allocation after copying
+\fIptr\fP to the newly-allocated memory, which will be truncated if \fIsize\fP
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIptr\fP is \fBNULL\fP then the call will be
+equivalent to \fBmalloc\fP.  If \fIsize\fP is \fI0\fP then the existing memory
+allocation will be freed and the null pointer will be returned.  If \fIsize\fP
+is greater than the original allocation then the extra space will be filled with
+uninitialized bytes.  If there is not enough space in the heap then the null
+pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
+allocated memory must be deallocated with \fBfree\fP and can be reallocated
+again with \fBrealloc\fP.
+.TP
+\fBrecalloc\fP
+Resizes the memory allocation beginning at \fIptr\fP to \fIsize\fP bytes and
+returns a pointer to the first byte of the new allocation after copying
+\fIptr\fP to the newly-allocated memory, which will be truncated if \fIsize\fP
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIptr\fP is \fBNULL\fP then the call will be
+equivalent to \fBcalloc\fP.  If \fIsize\fP is \fI0\fP then the existing memory
+allocation will be freed and the null pointer will be returned.  If \fIsize\fP
+is greater than the original allocation then the extra space will be filled with
+zero-initialized bytes.  If there is not enough space in the heap then the null
+pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
+allocated memory must be deallocated with \fBfree\fP and can be reallocated
+again with \fBrealloc\fP.  This function is available for backwards
+compatibility with older C libraries and \fBcalloc\fP and should not be used in
+new code.
+.TP
+\fBfree\fP
+Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
+by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
+will be freed.  All of the previous contents will be destroyed.
+.TP
+\fBcfree\fP
+Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
+by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
+will be freed.  All of the previous contents will be destroyed.  This function
+is available for backwards compatibilty with older C libraries and \fBcalloc\fP
+and should not be used in new code.
+.PP
+The following 5 functions are available as replacements for existing C++ library
+functions.  To use these you must include \fImpatrol.h\fP before all other
+header files, although on UNIX platforms they will be used anyway, albeit with
+slightly less tracing information:
+.TP
+\fBoperator new\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP - no exceptions will be thrown.  The allocated memory must be
+deallocated with \fBoperator delete\fP.
+.TP
+\fBoperator new[]\fP
+Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
+the first byte of the allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+\fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
+will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
+the heap then the null pointer will be returned and \fBerrno\fP will be set to
+\fBENOMEM\fP - no exceptions will be thrown.  The allocated memory must be
+deallocated with \fBoperator delete[]\fP.
+.TP
+\fBoperator delete\fP
+Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
+by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
+will be freed.  All of the previous contents will be destroyed.  This function
+must only be used with memory allocated by \fBoperator new\fP.
+.TP
+\fBoperator delete[]\fP
+Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
+by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
+will be freed.  All of the previous contents will be destroyed.  This function
+must only be used with memory allocated by \fBoperator new[]\fP.
+.TP
+\fBset_new_handler\fP
+Installs a low-memory handler specifically for use with \fBoperator new\fP and
+\fBoperator new[]\fP and returns a pointer to the previously installed handler,
+or the null pointer if no handler had been previously installed.  This will be
+called repeatedly by both functions when they would normally return \fBNULL\fP,
+and this loop will continue until they manage to allocate the requested space.
+Note that this function is equivalent to \fB__mp_nomemory\fP and will replace
+the handler installed by that function.
+.PP
+The following 7 functions are available as support routines for additional
+control and tracing in the mpatrol library.  To use these you should include the
+\fImpatrol.h\fP header file:
+.TP
+\fB__mp_info\fP
+Obtains information about a specific memory allocation by placing statistics
+about \fIptr\fP in \fIinfo\fP.  If \fIptr\fP does not belong to a previously
+allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
+will be returned and \fIinfo\fP will contain the following information:
+.RS 0.6i
+
+ \fBField\fP   \fBDescription\fP
+
+ \fBblock\fP   Pointer to first byte of allocation.
+ \fBsize\fP    Size of allocation in bytes.
+ \fBtype\fP    Type of function which allocated memory.
+ \fBalloc\fP   Allocation index.
+ \fBrealloc\fP Number of times reallocated.
+ \fBthread\fP  Thread identifier.
+ \fBfunc\fP    Function in which memory was allocated.
+ \fBfile\fP    File in which memory was allocated.
+ \fBline\fP    Line number at which memory was allocated.
+ \fBstack\fP   Pointer to function call stack.
+ \fBfreed\fP   Indicates if allocation has been freed.
+.RE
+.TP
+\fB__mp_memorymap\fP
+If \fIstats\fP is non-zero then the current statistics of the mpatrol library
+will be displayed.  If the heap contains at least one allocated, freed or free
+block then a map of the current heap will also be displayed.
+.TP
+\fB__mp_summary\fP
+Displays information about the current state of the mpatrol library, including
+its settings and any relevant statistics.
+.TP
+\fB__mp_check\fP
+Forces the library to perform an immediate check of the overflow buffers of
+every memory allocation and to ensure that nothing has overwritten any free
+blocks.
+.TP
+\fB__mp_prologue\fP
+Installs a prologue function to be called before any memory allocation,
+reallocation or deallocation function.  This function will return a pointer to
+the previously installed prologue function, or the null pointer if no prologue
+function had been previously installed.  The following arguments will be used
+to call the prologue function:
+.RS 0.6i
+
+ \fBArgument 1\fP \fBArgument 2\fP \fBCalled by\fP
+
+ \fI-1\fP         \fIsize\fP       \fBmalloc\fP, etc.
+ \fIptr\fP        \fIsize\fP       \fBrealloc\fP, etc.
+ \fIptr\fP        \fI-1\fP         \fBfree\fP, etc.
+ \fIptr\fP        \fI-2\fP         \fBstrdup\fP, etc.
+.RE
+.TP
+\fB__mp_epilogue\fP
+Installs an epilogue function to be called after any memory allocation,
+reallocation or deallocation function.  This function will return a pointer to
+the previously installed epilogue function, or the null pointer if no epilogue
+function had been previously installed.  The following arguments will be used
+to call the epilogue function:
+.RS 0.6i
+
+ \fBArgument\fP \fBCalled by\fP
+
+ \fIptr\fP      \fBmalloc\fP, \fBrealloc\fP, \fBstrdup\fP, etc.
+ \fI-1\fP       \fBfree\fP, etc.
+.RE
+.TP
+\fB__mp_nomemory\fP
+Installs a low-memory handler and returns a pointer to the previously installed
+handler, or the null pointer if no handler had been previously installed.  This
+will be called once by C memory allocation functions, and repeatedly by C++
+memory allocation functions, when they would normally return \fBNULL\fP.  Note
+that this function is equivalent to \fBset_new_handler\fP and will replace the
+handler installed by that function.
+.SH LINKING
+In order to use the mpatrol library on UNIX platforms, the following libraries
+must be linked in before any other library that defines dynamic memory
+allocation functions with the same names:
+.RS 0
+
+ \fBLibrary\fP        \fBReason\fP
+
+ \fI\-lmpatrol\fP      To use this library.
+ \fI\-lelf\fP          If built with \fBFORMAT=FORMAT_ELF32\fP.
+ \fI\-lbfd \-liberty\fP If built with \fBFORMAT=FORMAT_BFD\fP.
+ \fI\-lpthread\fP      If built with \fBMP_THREADS_SUPPORT\fP.
+.RE
+.PP
+On UNIX platforms, if there were no calls to memory allocation functions before
+\fI\-lmpatrol\fP appears on the link line then the mpatrol library will not be
+linked in.  However, this can be overridden by placing \fI\-umalloc\fP just
+before that point.
+.SH ENVIRONMENT
+The library can read certain options at run-time from an environment variable
+called \fBMPATROL_OPTIONS\fP.  This variable must contain one or more valid
+option keywords from the list below and must be no longer than 256 characters in
+length.  If \fBMPATROL_OPTIONS\fP is unset or empty then the default settings
+will be used.
+.PP
+The syntax for options specified within the \fBMPATROL_OPTIONS\fP environment
+variable is \fBOPTION\fP or \fBOPTION\fP=\fIVALUE\fP, where \fBOPTION\fP is a
+keyword from the list below and \fIVALUE\fP is the setting for that option.  If
+\fIVALUE\fP is numeric then it may be specified using binary, octal, decimal or
+hexadecimal notation, with binary notation beginning with either \fI0b\fP or
+\fI0B\fP.  If \fIVALUE\fP is a character string containing spaces then it may be
+quoted using double quotes.  No whitespace may appear between the \fI=\fP sign,
+but whitespace must appear between different options.  Note that option keywords
+can be given in lowercase as well as uppercase, or a mixture of both.
+.TP
+\fBALLOCBYTE\fP=\fIunsigned integer\fP
+Specifies an 8-bit byte pattern with which to prefill newly-allocated memory.
+This can be used to detect the use of memory which has not been initialised
+after allocation.  Note that this setting will not affect memory allocated with
+\fBcalloc()\fP or \fBrecalloc()\fP as these functions always prefill allocated
+memory with an 8-bit byte pattern of zero.  Default value:
+\fBALLOCBYTE\fP=\fI0xFF\fP.
+.TP
+\fBALLOCSTOP\fP=\fIunsigned integer\fP
+Specifies an allocation index at which to stop the program when it is being
+allocated.  When the number of memory allocations reaches this number the
+program will be halted, and its state may be examined at that point by using
+a suitable debugger.  Note that this setting will be ignored if its value is
+zero.  Default value: \fBALLOCSTOP\fP=\fI0\fP.
+.TP
+\fBCHECKALL\fP
+Equivalent to the \fBCHECKALLOCS\fP, \fBCHECKREALLOCS\fP and \fBCHECKFREES\fP
+options specified together.
+.TP
+\fBCHECKALLOCS\fP
+Checks that no attempt is made to allocate a block of memory of size zero.  A
+warning will be issued for every such case.
+.TP
+\fBCHECKFREES\fP
+Checks that no attempt is made to deallocate a \fBNULL\fP pointer.  A warning
+will be issued for every such case.
+.TP
+\fBCHECKREALLOCS\fP
+Checks that no attempt is made to reallocate a \fBNULL\fP pointer or resize an
+existing block of memory to size zero.  Warnings will be issued for every such
+case.
+.TP
+\fBDEFALIGN\fP=\fIunsigned integer\fP
+Specifies the default alignment for general-purpose memory allocations, which
+must be a power of two (and will be rounded up to the nearest power of two if it
+is not).  The default alignment for a particular system is calculated at
+run-time.
+.TP
+\fBFREEBYTE\fP=\fIunsigned integer\fP
+Specifies an 8-bit byte pattern with which to prefill newly-freed memory.  This
+can be used to detect the use of memory which has just been freed.  It is also
+used internally to ensure that freed memory has not been overwritten.  Note that
+the freed memory may be reused the next time a block of memory is allocated and
+so once memory has been freed its contents are not guaranteed to remain the same
+as the specified byte pattern.  Default value: \fBFREEBYTE\fP=\fI0x55\fP.
+.TP
+\fBFREESTOP\fP=\fIunsigned integer\fP
+Specifies an allocation index at which to stop the program when it is being
+freed.  When the memory allocation with the specified allocation index is to be
+freed the program will be halted, and its state may be examined at that point
+using a suitable debugger.  Note that this setting will be ignored if its value
+is zero.  Default value: \fBFREESTOP\fP=\fI0\fP.
+.TP
+\fBHELP\fP
+Displays a quick-reference option summary to the \fBstderr\fP file stream.
+.TP
+\fBLIMIT\fP=\fIunsigned integer\fP
+Specifies the limit in bytes at which all memory allocations should fail if the
+total allocated memory should increase beyond this.  This can be used to
+stress-test software to see how it behaves in low memory conditions.  The
+internal memory used by the library itself will not be counted as part of the
+total heap size, but on some systems there may be a small amount of memory
+required to initialise the library itself.  Note that this setting will be
+ignored if its value is zero.  Default value: \fBLIMIT\fP=\fI0\fP.
+.TP
+\fBLOGALL\fP
+Equivalent to the \fBLOGALLOCS\fP, \fBLOGREALLOCS\fP and \fBLOGFREES\fP options
+specified together.
+.TP
+\fBLOGALLOCS\fP
+Specifies that all memory allocations are to be logged and sent to the log file.
+Note that any memory allocations made internally by the library will not be
+logged.
+.TP
+\fBLOGFILE\fP=\fIstring\fP
+Specifies an alternative file in which to place all diagnostics from the mpatrol
+library.  A filename of \fIstderr\fP will send all diagnostics to the
+\fBstderr\fP file stream and a filename of \fIstdout\fP will do the equivalent
+with the \fBstdout\fP file stream.  Note that if a problem occurs while opening
+the log file or if any diagnostics require to be displayed before the log file
+has had a chance to be opened then they will be sent to the \fBstderr\fP file
+stream.  Default value: \fBLOGFILE\fP=\fImpatrol.log\fP
+.TP
+\fBLOGFREES\fP
+Specifies that all memory deallocations are to be logged and sent to the log
+file.  Note that any memory deallocations made internally by the library will
+not be logged.
+.TP
+\fBLOGREALLOCS\fP
+Specifies that all memory reallocations are to be logged and sent to the log
+file.  Note that any memory reallocations made internally by the library will
+not be logged.
+.TP
+\fBNOFREE\fP
+Specifies that the mpatrol library should keep all reallocated and freed memory
+allocations.  Such freed memory allocations will then be flagged as freed and
+can be used by the library to provide better diagnostics.  However, as no system
+memory will ever be reused by the mpatrol library, this option can quickly lead
+to a shortage of available system memory for a process.  Note that this option
+will always force a memory reallocation to return a pointer to newly-allocated
+memory.
+.TP
+\fBNOPROTECT\fP
+Specifies that the mpatrol library's internal data structures should not be made
+read-only after every memory allocation reallocation or deallocation.  This may
+significantly speed up execution but this will be at the expense of less safety
+if the program accidentally overwrites some of the library's internal data
+structures.  Note that this option has no effect on systems that do not support
+memory protection.
+.TP
+\fBOFLOWBYTE\fP=\fIunsigned integer\fP
+Specifies an 8-bit byte pattern with which to fill the overflow buffers of all
+memory allocations.  This is used internally to ensure that nothing has been
+written beyond the beginning or the end of a block of allocated memory.  Note
+that this setting will only have an effect if the \fBOFLOWSIZE\fP option is in
+use.  Default value: \fBOFLOWBYTE\fP=\fI0xAA\fP.
+.TP
+\fBOFLOWSIZE\fP=\fIunsigned integer\fP
+Specifies the size in bytes to use for all overflow buffers, which must be a
+power of two (and will be rounded up to the nearest power of two if it is not).
+This is used internally to ensure that nothing has been written beyond the
+beginning or the end of a block of allocated memory.  Note that this setting
+specifies the size for only one of the overflow buffers given to each memory
+allocation; the other overflow buffer will have an identical size.  No overflow
+buffers will be used if this setting is zero.  Default value:
+\fBOFLOWSIZE\fP=\fI0\fP.
+.TP
+\fBOFLOWWATCH\fP
+Specifies that watch point areas should be used for overflow buffers rather than
+filling with the overflow byte.  This can significantly reduce the speed of
+program execution.  Note that this option has no effect on systems that do not
+support watch point areas.
+.TP
+\fBPAGEALLOC\fP=\fILOWER\fP|\fIUPPER\fP
+Specifies that each individual memory allocation should occupy at least one
+page of virtual memory and should be placed at the lowest or highest point
+within these pages.  This allows the library to place an overflow buffer of one
+page on either side of every memory allocation and write-protect these pages as
+well as all free and freed memory.  Note that this option has no effect on
+systems that do not support memory protection, and is disabled by default on
+other systems as it can slow down the speed of program execution.
+.TP
+\fBPRESERVE\fP
+Specifies that any reallocated or freed memory allocations should preserve their
+original contents.  This option must be used with the \fBNOFREE\fP option and
+has no effect otherwise.
+.TP
+\fBPROGFILE\fP=\fIstring\fP
+Specifies an alternative filename with which to locate the executable file
+containing the program's symbols.  On most systems, the library will
+automatically be able to determine this filename, but on a few systems this
+option may have to be used before any or all symbols can be read.
+.TP
+\fBREALLOCSTOP\fP=\fIunsigned integer\fP
+Specifies a reallocation index at which to stop the program when a memory
+allocation is being reallocated.  If the \fBALLOCSTOP\fP option is non-zero
+then the program will be halted when the allocation matching that allocation
+index is reallocated the specified number of times.  Otherwise the program will
+be halted the first time any allocation is reallocated the specified number of
+times.  Note that this setting will be ignored if its value is zero.  Default
+value: \fBREALLOCSTOP\fP=\fI0\fP.
+.TP
+\fBSHOWALL\fP
+Equivalent to the \fBSHOWFREED\fP, \fBSHOWUNFREED\fP, \fBSHOWMAP\fP and
+\fBSHOWSYMBOLS\fP options specified together.
+.TP
+\fBSHOWFREED\fP
+Specifies that a summary of all of the freed memory allocations should be
+displayed at the end of program execution.  This option must be used in
+conjunction with the \fBNOFREE\fP option and this step will not be performed if
+an abnormal termination occurs or if there were no freed allocations.
+.TP
+\fBSHOWMAP\fP
+Specifies that a memory map of the entire heap should be displayed at the end of
+program execution.  This step will not be performed if an abnormal termination
+occurs or if the heap is empty.
+.TP
+\fBSHOWSYMBOLS\fP
+Specifies that a summary of all of the function symbols read from the program's
+executable file should be displayed at the end of program execution.  This step
+will not be performed if an abnormal termination occurs or if no symbols could
+be read from the executable file.
+.TP
+\fBSHOWUNFREED\fP
+Specifies that a summary of all of the unfreed memory allocations should be
+displayed at the end of program execution.  This step will not be performed if
+an abnormal termination occurs or if there are no unfreed allocations.
+.TP
+\fBUNFREEDABORT\fP=\fIunsigned integer\fP
+Specifies the minimum number of unfreed allocations at which to abort the
+program just before program termination.  A summary of all the allocations will
+be displayed on the standard error file stream before aborting.  This option may
+be handy for use in batch tests as it can force tests to fail if they do not
+free up a minimum number of memory allocations.  Note that this setting will be
+ignored if its value is zero.  Default value: \fBUNFREEDABORT\fP=\fI0\fP.
+.SH SEE ALSO
+\fBmpatrol\fP(1), \fBelf\fP(3e), \fBbfd\fP(3).
+.SH AUTHOR
+Graeme S. Roy <graeme@epc.co.uk>
+.SH COPYRIGHT
+Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+.PP
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Library General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option) any
+later version.
+.PP
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for more
+details.
+.PP
+You should have received a copy of the GNU Library General Public License
+along with this library; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
