@@ -44,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.28 2000-11-07 18:55:35 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.29 2000-11-14 18:27:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -65,12 +65,13 @@ typedef enum options_flags
     OF_DEFALIGN       = 'D',
     OF_DYNAMIC        = 'd',
     OF_SHOWENV        = 'E',
-    OF_PROGFILE       = 'e',
+    OF_EDIT           = 'e',
     OF_FREESTOP       = 'F',
     OF_FREEBYTE       = 'f',
     OF_SAFESIGNALS    = 'G',
     OF_USEDEBUG       = 'g',
     OF_HELP           = 'h',
+    OF_LIST           = 'i',
     OF_LOGALL         = 'L',
     OF_LOGFILE        = 'l',
     OF_ALLOWOFLOW     = 'M',
@@ -84,6 +85,7 @@ typedef enum options_flags
     OF_FAILSEED       = 'Q',
     OF_FAILFREQ       = 'q',
     OF_REALLOCSTOP    = 'R',
+    OF_PROGFILE       = 'r',
     OF_SHOWALL        = 'S',
     OF_AUTOSAVE       = 's',
     OF_THREADS        = 't',
@@ -159,6 +161,7 @@ static int prof, safesignals;
 static int noprotect, preserve;
 static int oflowwatch, usemmap;
 static int usedebug, allowoflow;
+static int editlist;
 
 
 /* The table describing all recognised options.
@@ -203,6 +206,10 @@ static option options_table[] =
      "\tSpecifies that programs which were not linked with the mpatrol\n"
      "\tlibrary should also be traced, but only if they were dynamically\n"
      "\tlinked.\n"},
+    {"edit", OF_EDIT, NULL,
+     "\tSpecifies that a text editor should be invoked to edit any relevant\n"
+     "\tsource files that are associated with any warnings or errors when\n"
+     "\tthey occur.\n"},
     {"fail-freq", OF_FAILFREQ, "unsigned integer",
      "\tSpecifies the frequency at which all memory allocations will randomly\n"
      "\tfail.\n"},
@@ -223,6 +230,10 @@ static option options_table[] =
     {"limit", OF_LIMIT, "unsigned integer",
      "\tSpecifies the limit in bytes at which all memory allocations should\n"
      "\tfail if the total allocated memory should increase beyond this.\n"},
+    {"list", OF_LIST, NULL,
+     "\tSpecifies that a context listing should be shown for any relevant\n"
+     "\tsource files that are associated with any warnings or errors when\n"
+     "\tthey occur.\n"},
     {"log-all", OF_LOGALL, NULL,
      "\tEquivalent to the --log-allocs, --log-reallocs, --log-frees and\n"
      "\t--log-memory options specified together.\n"},
@@ -393,6 +404,8 @@ static void setoptions(int s)
     }
     if (defalign)
         addoption("DEFALIGN", defalign, 0);
+    if (editlist == 1)
+        addoption("EDIT", NULL, 0);
     if (failfreq)
         addoption("FAILFREQ", failfreq, 0);
     if (failseed)
@@ -405,6 +418,8 @@ static void setoptions(int s)
         addoption("LARGEBOUND", largebound, 0);
     if (limit)
         addoption("LIMIT", limit, 0);
+    if (editlist == 2)
+        addoption("LIST", NULL, 0);
     if (logallocs && logfrees && logmemory && logreallocs)
         addoption("LOGALL", NULL, 0);
     else
@@ -607,6 +622,9 @@ int main(int argc, char **argv)
           case OF_DYNAMIC:
             d = 1;
             break;
+          case OF_EDIT:
+            editlist = 1;
+            break;
           case OF_FAILFREQ:
             failfreq = __mp_optarg;
             break;
@@ -624,6 +642,9 @@ int main(int argc, char **argv)
             break;
           case OF_LARGEBOUND:
             largebound = __mp_optarg;
+            break;
+          case OF_LIST:
+            editlist = 2;
             break;
           case OF_LIMIT:
             limit = __mp_optarg;
