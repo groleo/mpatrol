@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.19 2000-05-16 23:25:04 graeme Exp $"
+#ident "$Id: memory.c,v 1.20 2000-05-18 23:25:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -196,10 +196,16 @@ static char *progname(void)
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_IRIX
     extern char **__Argv;
-#elif ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC
+#elif SYSTEM == SYSTEM_LINUX
+    static char c[256];
+    ssize_t l;
+    int f;
+#endif /* SYSTEM */
+#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
+    !MP_BUILTINSTACK_SUPPORT
     unsigned int *p;
     stackinfo s;
-#endif /* SYSTEM && ARCH */
+#endif /* ARCH */
 #if MP_PROCFS_SUPPORT
     static char b[64];
 #endif /* MP_PROCFS_SUPPORT */
@@ -215,8 +221,27 @@ static char *progname(void)
      * to determine the filename that the program was invoked with.
      */
     return __Argv[0];
-#elif (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
-      !MP_BUILTINSTACK_SUPPORT
+#elif SYSTEM == SYSTEM_LINUX
+    /* Linux has a file in the /proc filesystem which contains the argument
+     * vector that a process was invoked with.
+     */
+    l = 0;
+    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
+            MP_PROCFS_CMDNAME);
+    if ((f = open(b, O_RDONLY)) != -1)
+    {
+        if ((l = read(f, c, sizeof(c) - 1)) == -1)
+            l = 0;
+        close(f);
+    }
+    if (l > 0)
+    {
+        c[l] = '\0';
+        return c;
+    }
+#endif /* SYSTEM */
+#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
+    !MP_BUILTINSTACK_SUPPORT
     /* Because there is no function to return the executable filename
      * of a process on UNIX, we need to cheat and rely on the ABI by walking
      * up the process stack till we reach the startup code and then find
@@ -241,7 +266,7 @@ static char *progname(void)
         if (p = (unsigned int *) *(((unsigned int *) *p) + 1))
             return (char *) *p;
 #endif /* ARCH */
-#endif /* SYSTEM && ARCH && MP_BUILTINSTACK_SUPPORT */
+#endif /* ARCH && MP_BUILTINSTACK_SUPPORT */
 #if MP_PROCFS_SUPPORT
     /* If the /proc filesystem is supported then we can usually access the
      * actual executable file that contains the current program through a
