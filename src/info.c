@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.23 2000-05-08 20:58:26 graeme Exp $"
+#ident "$Id: info.c,v 1.24 2000-05-08 21:22:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -176,12 +176,18 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
     infonode *m;
     void *p;
     unsigned long c;
+    int o;
 
     p = NULL;
     h->count++;
     c = h->count;
     if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
+    {
         __mp_logalloc(h, l, a, f, s, t, u, v);
+        o = 1;
+    }
+    else
+        o = 0;
     if ((c == h->astop) && (h->rstop == 0))
     {
         /* Abort at the specified allocation index.
@@ -192,7 +198,14 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
         __mp_trap();
     }
     if ((h->flags & FLG_CHECKALLOCS) && (l == 0))
+    {
+        if ((o == 0) && (h->recur == 1))
+        {
+            __mp_logalloc(h, l, a, f, s, t, u, v);
+            o = 1;
+        }
         __mp_warn(f, "attempt to create an allocation of size 0\n");
+    }
     if (f == AT_MEMALIGN)
     {
         /* Check that the specified alignment is valid.  This is only
@@ -202,20 +215,41 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
         if (a == 0)
         {
             if (h->flags & FLG_CHECKALLOCS)
+            {
+                if ((o == 0) && (h->recur == 1))
+                {
+                    __mp_logalloc(h, l, a, f, s, t, u, v);
+                    o = 1;
+                }
                 __mp_warn(f, "alignment 0 is invalid\n");
+            }
             a = h->alloc.heap.memory.page;
         }
         else if (!__mp_ispoweroftwo(a))
         {
             if (h->flags & FLG_CHECKALLOCS)
+            {
+                if ((o == 0) && (h->recur == 1))
+                {
+                    __mp_logalloc(h, l, a, f, s, t, u, v);
+                    o = 1;
+                }
                 __mp_warn(f, "alignment %lu is not a power of two\n", a);
+            }
             a = __mp_poweroftwo(a);
         }
         else if (a > h->alloc.heap.memory.page)
         {
             if (h->flags & FLG_CHECKALLOCS)
+            {
+                if ((o == 0) && (h->recur == 1))
+                {
+                    __mp_logalloc(h, l, a, f, s, t, u, v);
+                    o = 1;
+                }
                 __mp_warn(f, "alignment %lu is greater than the system page "
                           "size\n", a);
+            }
             a = h->alloc.heap.memory.page;
         }
     }
@@ -294,13 +328,26 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
     allocnode *n, *r;
     infonode *i, *m;
     size_t d;
+    int o;
 
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
+    {
         __mp_logrealloc(h, p, l, a, f, s, t, u, v);
+        o = 1;
+    }
+    else
+        o = 0;
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKREALLOCS)
+        {
+            if ((o == 0) && (h->recur == 1))
+            {
+                __mp_logrealloc(h, p, l, a, f, s, t, u, v);
+                o = 1;
+            }
             __mp_warn(f, "attempt to resize a NULL pointer\n");
+        }
         p = __mp_getmemory(h, l, a, f, s, t, u, v);
     }
     else if (n = __mp_findfreed(&h->alloc, p))
@@ -348,7 +395,14 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
     else if (l == 0)
     {
         if (h->flags & FLG_CHECKREALLOCS)
+        {
+            if ((o == 0) && (h->recur == 1))
+            {
+                __mp_logrealloc(h, p, l, a, f, s, t, u, v);
+                o = 1;
+            }
             __mp_warn(f, "attempt to resize an allocation to size 0\n");
+        }
         __mp_freememory(h, p, f, s, t, u, v);
         p = NULL;
     }
@@ -478,13 +532,26 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
 {
     allocnode *n;
     infonode *m;
+    int o;
 
     if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
+    {
         __mp_logfree(h, p, f, s, t, u, v);
+        o = 1;
+    }
+    else
+        o = 0;
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKFREES)
+        {
+            if ((o == 0) && (h->recur == 1))
+            {
+                __mp_logfree(h, p, f, s, t, u, v);
+                o = 1;
+            }
             __mp_warn(f, "attempt to free a NULL pointer\n");
+        }
         return;
     }
     if (n = __mp_findfreed(&h->alloc, p))
