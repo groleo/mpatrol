@@ -31,6 +31,7 @@
 
 #include "stack.h"
 #include "memory.h"
+#include "machine.h"
 #if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
 #if MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_IRIX
@@ -39,22 +40,18 @@
 #endif /* SYSTEM */
 #else /* MP_LIBRARYSTACK_SUPPORT */
 #include <setjmp.h>
-#if ARCH == ARCH_MIPS || ARCH == ARCH_SPARC
+#if ARCH == ARCH_SPARC
 #include <ucontext.h>
-#if SYSTEM == SYSTEM_SINIX
-#define gregs gpregs
-#elif ARCH == ARCH_SPARC
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
-#endif /* SYSTEM && ARCH */
 #endif /* ARCH */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.12 2000-06-08 18:21:15 graeme Exp $"
+#ident "$Id: stack.c,v 1.13 2000-06-12 21:39:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,10 +119,9 @@ extern "C"
 #if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
 #if MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_HPUX
-/* The following functions are defined in the HP/UX traceback library (libcl).
+/* The following function is defined in the HP/UX traceback library (libcl).
  */
 
-frameinfo U_get_current_frame(void);
 int U_get_previous_frame(frameinfo *, frameinfo *);
 #elif SYSTEM == SYSTEM_IRIX
 /* The unwind() function in the IRIX exception-handling library (libexc) calls
@@ -230,6 +226,14 @@ static int unwind(frameinfo *f)
     q = 0xFFFFFFFF;
     l = u = 0;
     a = 0;
+    /* Determine the current stack pointer and return address if we are
+     * initiating call stack traversal.
+     */
+    if (f->ra == 0)
+    {
+        f->sp = __mp_stackpointer();
+        f->ra = __mp_returnaddress();
+    }
     /* Search for the return address offset in the stack frame.
      */
     while (!((a & RA_OFFSET) && (a & SP_OFFSET)) && (f->ra < q))
@@ -282,9 +286,10 @@ static int unwind(frameinfo *f)
     if ((s == 0) && ((a & SP_LOWER) || (a & SP_UPPER)))
         s = (u << 16) | l;
     if ((s > 0) && (i = ((unsigned long *) f->sp)[p >> 2]) &&
-        (*((unsigned long *) (i - 8)) == 0x0320F809))
+        ((*((unsigned long *) (i - 8)) == 0x0320F809) ||
+         (*((unsigned long *) (i - 8)) >> 16 == 0x0C10)))
     {
-        /* jalr ra,t9 */
+        /* jalr ra,t9 or jal ## */
         f->sp += s;
         f->ra = i;
         return 1;
@@ -298,21 +303,7 @@ static int unwind(frameinfo *f)
 
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     TARGET == TARGET_UNIX
-#if ARCH == ARCH_MIPS
-/* Determine the stack pointer and return address of the current stack frame.
- */
-
-static int getframe(frameinfo *f)
-{
-    ucontext_t c;
-
-    if (getcontext(&c) == -1)
-        return 0;
-    f->sp = c.uc_mcontext.gregs[CXT_SP];
-    f->ra = c.uc_mcontext.gregs[CXT_RA];
-    return 1;
-}
-#elif ARCH == ARCH_SPARC
+#if ARCH == ARCH_SPARC
 /* Return a handle for the frame pointer at the current point in execution.
  */
 
@@ -383,7 +374,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #if SYSTEM == SYSTEM_HPUX
     if (p->frame == NULL)
     {
-        p->next = U_get_current_frame();
+        __mp_frameinfo(&p->next);
         if (U_get_previous_frame(&p->next, &f) == 0)
         {
             p->next.size = f.size;
@@ -513,7 +504,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         __mp_newframe(p);
     else
     {
-        if ((p->frame == NULL) && getframe(&p->next))
+        if (p->frame == NULL)
             unwind(&p->next);
         if ((p->next.ra) && unwind(&p->next))
         {
