@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.50 2001-02-21 11:51:45 graeme Exp $
+# $Id: SMakefile,v 1.51 2001-02-21 12:06:27 graeme Exp $
 
 
 # Definitions
@@ -90,6 +90,9 @@ $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/library2.c
 
+$(ARCHIVE_MPTOOLS): $(ARCHIVE_MPLOBJS)
+	$(AR) -n $@ REPLACE $(ARCHIVE_MPLOBJS)
+
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mpatrol.o getopt.o version.o
 
@@ -102,17 +105,19 @@ mptrace: mptrace.o getopt.o tree.o utils.o version.o
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) mpatrol mprof mptrace mleak
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) \
+	$(ARCHIVE_MPTOOLS) mpatrol mprof mptrace mleak
 
 clean:
 	-@ Delete $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) FORCE >NIL:
-	-@ Delete $(ARCHIVE_MPAOBJS) FORCE >NIL:
+	-@ Delete $(ARCHIVE_MPAOBJS) $(ARCHIVE_MPLOBJS) FORCE >NIL:
 	-@ Delete mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) FORCE >NIL:
 	-@ Delete $(OBJECT_MPATROL) $(OBJTS_MPATROL) FORCE >NIL:
 	-@ Delete $(ARCHIVE_MPALLOC) $(OBJECT_MPALLOC) FORCE >NIL:
+	-@ Delete $(ARCHIVE_MPTOOLS) FORCE >NIL:
 	-@ Delete mpatrol mpatrol.lnk mprof mprof.lnk mptrace mptrace.lnk mleak mleak.lnk FORCE >NIL:
 
 

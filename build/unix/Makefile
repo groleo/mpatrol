@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.61 2001-02-21 11:51:47 graeme Exp $
+# $Id: Makefile,v 1.62 2001-02-21 12:06:29 graeme Exp $
 
 
 # Definitions
@@ -157,6 +157,9 @@ $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 $(LINT_MPALLOC): $(LINT_MPAOBJS)
 	$(LINT) -o $(MPALLOC) $(LINT_MPAOBJS)
 
+$(ARCHIVE_MPTOOLS): $(ARCHIVE_MPLOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPLOBJS)
+
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s
 	$(CC) $(CFLAGS) $(OFLAGS) -c machine.s
@@ -190,7 +193,8 @@ mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
 all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
-	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) mpatrol mprof mptrace mleak
+	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) $(ARCHIVE_MPTOOLS) \
+	mpatrol mprof mptrace mleak
 
 lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
 
@@ -200,6 +204,7 @@ clean:
 	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPAOBJS) $(SHARED_MPAOBJS) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPLOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
@@ -213,6 +218,7 @@ clobber: clean
 	-@ rm -f $(SHARED_MPALLOC).$(VERSION).$(REVISION) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 

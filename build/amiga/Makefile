@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.51 2001-02-21 11:51:45 graeme Exp $
+# $Id: Makefile,v 1.52 2001-02-21 12:06:27 graeme Exp $
 
 
 # Definitions
@@ -91,6 +91,9 @@ $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
+$(ARCHIVE_MPTOOLS): $(ARCHIVE_MPLOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPLOBJS)
+
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
@@ -103,17 +106,19 @@ mptrace: mptrace.o getopt.o tree.o utils.o version.o
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) mpatrol mprof mptrace mleak
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) \
+	$(ARCHIVE_MPTOOLS) mpatrol mprof mptrace mleak
 
 clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPAOBJS) $(ARCHIVE_MPLOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 

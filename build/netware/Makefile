@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.48 2001-02-21 11:51:46 graeme Exp $
+# $Id: Makefile,v 1.49 2001-02-21 12:06:28 graeme Exp $
 
 
 # Definitions
@@ -92,6 +92,9 @@ $(ARCHIVE_MPALLOC): $(MPAOBJS)
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
+$(ARCHIVE_MPTOOLS): $(MPLOBJS)
+	$(AR) -xar -o $@ $(MPLOBJS)
+
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
@@ -104,17 +107,19 @@ mptrace.nlm: mptrace.obj getopt.obj tree.obj utils.obj version.obj
 mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.obj getopt.obj tree.obj version.obj
 
-all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) \
+	$(ARCHIVE_MPTOOLS) mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm
 
 clean:
 	-@ rm -f $(MPTOBJS) $(MPTTOBJS) 2>&1 >/dev/null
-	-@ rm -f $(MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(MPAOBJS) $(MPLOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(OBJECT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm 2>&1 >/dev/null
 
 

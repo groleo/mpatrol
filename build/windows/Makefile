@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.58 2001-02-21 11:51:48 graeme Exp $
+# $Id: Makefile,v 1.59 2001-02-21 12:06:30 graeme Exp $
 
 
 # Definitions
@@ -120,6 +120,9 @@ $(SHARED_MPALLOC): $(SHARED_MPAOBJS) $(MPALLOC).def
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) -TP -c -Fo$@ $<
 
+$(ARCHIVE_MPTOOLS): $(ARCHIVE_MPLOBJS)
+	$(AR) -nologo -out:$@ $(ARCHIVE_MPLOBJS)
+
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
@@ -133,12 +136,14 @@ mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
-	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) mpatrol.exe mprof.exe mptrace.exe mleak.exe
+	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) $(ARCHIVE_MPTOOLS) \
+	mpatrol.exe mprof.exe mptrace.exe mleak.exe
 
 clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPTOBJS) $(SHARTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPAOBJS) $(SHARED_MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPLOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
@@ -150,6 +155,7 @@ clobber: clean
 	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(MPALLOC).lib $(MPALLOC).exp 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.exe mprof.exe mptrace.exe mleak.exe 2>&1 >/dev/null
 
 
