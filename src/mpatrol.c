@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.22 2000-10-19 18:32:22 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.23 2000-10-19 18:35:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -382,7 +382,7 @@ static void setoptions(int s)
     if (usemmap)
         addoption("USEMMAP", NULL, 0);
     if (s != 0)
-        fputs(strchr(options, '=') + 1, stdout);
+        fprintf(stdout, "%s\n", strchr(options, '=') + 1);
     else if (putenv(options))
     {
         fprintf(stderr, "%s: Cannot set environment variable `%s'\n", progname,
