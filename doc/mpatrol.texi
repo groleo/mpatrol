@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.24 2000-01-12 01:08:50 graeme Exp $
+@c $Id: mpatrol.texi,v 1.25 2000-01-13 00:40:24 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 12th January, 2000
+@set UPDATED 13th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -185,7 +185,10 @@ to @email{mpatrol@@cbmamiga.demon.co.uk}.  The mpatrol library is also
 registered at FreshMeat (@uref{http://freshmeat.net/}) so you can receive
 notification of updates there as well.  I normally only check my e-mail about
 once or twice a week, so don't expect an immediate response.  I can also be
-reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.
+reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.  There
+is now also a discussion group at @uref{http://www.egroups.com/group/mpatrol/}
+where you can post mpatrol-related questions but you must first subscribe to the
+group before you can send mail to it.
 
 @cindex references
 Note that this manual is not just intended to instruct readers on how to use the
