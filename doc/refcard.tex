@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.21 2001-03-09 00:05:17 graeme Exp $
+% $Id: refcard.tex,v 1.22 2001-03-11 23:23:40 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -306,6 +306,9 @@ noted when the mpatrol library first starts up and is reading the symbols.  Such
 functions will then be called as soon as the mpatrol library is initialised,
 which can be useful if the initialisation occurs before \function{main} is
 called.  These functions must accept no arguments and must return no value.
+Similar behaviour exists for global functions whose names begin with
+\texttt{\_\_mp\_fini\_}, except that such functions will be executed when the
+mpatrol library terminates.
 
 \vskip 12pt
 \heading{C dynamic memory allocation functions}

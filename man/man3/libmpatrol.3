@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.21 2001-03-09 00:17:23 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.22 2001-03-11 23:23:41 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "9 March 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "11 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -233,10 +233,13 @@ file or shared library whose names begin with \fB__mp_init_\fP will be noted
 when the mpatrol library first starts up and is reading the symbols.  Such
 functions will then be called as soon as the mpatrol library is initialised,
 which can be useful if the initialisation occurs before \fBmain\fP is called.
-These functions must accept no arguments and must return no value.  Note that
-this feature will have no effect if the symbol table is stripped from the
-executable file or shared library before the program is run, and the order in
-which such functions will be called if there are more than one is unspecified.
+These functions must accept no arguments and must return no value.  Similar
+behaviour exists for global functions whose names begin with \fB__mp_fini_\fP,
+except that such functions will be executed when the mpatrol library terminates.
+Note that this feature will have no effect if the symbol table is stripped from
+the executable file or shared library before the program is run, and the order
+in which such functions will be called if there are more than one is
+unspecified.
 .PP
 Memory allocation profiling is supported, with statistics about every memory
 allocation and deallocation that was made during the execution of a program

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.200 2001-03-10 17:57:19 graeme Exp $
+@c $Id: mpatrol.texi,v 1.201 2001-03-11 23:23:40 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.7
 @set VERSION 1.4.2
-@set UPDATED 9th March, 2001
+@set UPDATED 11th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2564,12 +2564,14 @@ file or shared library whose names begin with @samp{__mp_init_} will be noted
 when the mpatrol library first starts up and is reading the symbols.  Such
 functions will then be called as soon as the mpatrol library is initialised,
 which can be useful if the initialisation occurs before @code{main()} is called.
-These functions must accept no arguments and must return no value.  Note that
-this feature will have no effect if the symbol table is stripped from the
-executable file or shared library before the program is run, and the order in
-which such functions will be called if there are more than one is unspecified.
-The @code{__mp_atexit()} function can be used to register functions that should
-be called when the mpatrol library terminates.
+These functions must accept no arguments and must return no value.  Similar
+behaviour exists for global functions whose names begin with @samp{__mp_fini_},
+except that such functions will be executed when the mpatrol library terminates.
+Note that this feature will have no effect if the symbol table is stripped from
+the executable file or shared library before the program is run, and the order
+in which such functions will be called if there are more than one is
+unspecified.  The @code{__mp_atexit()} function can also be used to register
+functions that should be called when the mpatrol library terminates.
 
 It is possible to obtain a great deal of information about an existing memory
 allocation or free block using the @code{__mp_info()} function.  This takes an
