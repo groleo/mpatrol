@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.10 2000-03-01 00:41:30 graeme Exp $"
+#ident "$Id: option.c,v 1.11 2000-04-19 00:15:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -146,6 +146,12 @@ static char *options_help[] =
     "PRESERVE", NULL,
     "", "Specifies that any reallocated or freed memory allocations should",
     "", "preserve their original contents.",
+    "PROF", NULL,
+    "", "Specifies that all memory allocations are to be profiled and sent to",
+    "", "the profiling output file.",
+    "PROFFILE", "string",
+    "", "Specifies an alternative file in which to place all memory allocation",
+    "", "profiling information from the mpatrol library.",
     "PROGFILE", "string",
     "", "Specifies an alternative filename with which to locate the executable",
     "", "file containing the program's symbols.",
@@ -706,6 +712,22 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     h->alloc.flags |= FLG_PRESERVE;
                 }
+                else if (matchoption(o, "PROF"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->prof.profiling = 1;
+                }
+                else if (matchoption(o, "PROFFILE"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else
+                    {
+                        h->prof.file = a;
+                        i = OE_RECOGNISED;
+                    }
                 else if (matchoption(o, "PROGFILE"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;

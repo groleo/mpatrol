@@ -112,8 +112,9 @@
 #define MP_OPT_FAILSEED      -13
 #define MP_OPT_UNFREEDABORT  -14
 #define MP_OPT_LOGFILE       -15
-#define MP_OPT_PROGFILE      -16
-#define MP_OPT_CHECK         -17
+#define MP_OPT_PROFFILE      -16
+#define MP_OPT_PROGFILE      -17
+#define MP_OPT_CHECK         -18
 
 
 /* Flags that can be set or unset using mallopt() and MP_OPT_SETFLAGS or
@@ -138,15 +139,16 @@
 #define MP_FLG_CHECKALLOCS   0x00000100
 #define MP_FLG_CHECKREALLOCS 0x00000200
 #define MP_FLG_CHECKFREES    0x00000400
-#define MP_FLG_SAFESIGNALS   0x00000800
-#define MP_FLG_NOPROTECT     0x00001000
-#define MP_FLG_NOFREE        0x00002000
-#define MP_FLG_PRESERVE      0x00004000
-#define MP_FLG_OFLOWWATCH    0x00008000
-#define MP_FLG_PAGEALLOC     0x00010000
-#define MP_FLG_ALLOCUPPER    0x00020000
-#define MP_FLG_USEMMAP       0x00040000
-#define MP_FLG_USEDEBUG      0x00080000
+#define MP_FLG_PROF          0x00000800
+#define MP_FLG_SAFESIGNALS   0x00001000
+#define MP_FLG_NOPROTECT     0x00002000
+#define MP_FLG_NOFREE        0x00004000
+#define MP_FLG_PRESERVE      0x00008000
+#define MP_FLG_OFLOWWATCH    0x00010000
+#define MP_FLG_PAGEALLOC     0x00020000
+#define MP_FLG_ALLOCUPPER    0x00040000
+#define MP_FLG_USEMMAP       0x00080000
+#define MP_FLG_USEDEBUG      0x00100000
 
 
 /* The different types of memory allocation and operation functions.

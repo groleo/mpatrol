@@ -53,8 +53,9 @@
 #define OPT_FAILSEED      -13
 #define OPT_UNFREEDABORT  -14
 #define OPT_LOGFILE       -15
-#define OPT_PROGFILE      -16
-#define OPT_CHECK         -17
+#define OPT_PROFFILE      -16
+#define OPT_PROGFILE      -17
+#define OPT_CHECK         -18
 
 
 /* Flags that can be set at run-time.
@@ -77,15 +78,16 @@
 #define OPT_CHECKALLOCS   0x00000100
 #define OPT_CHECKREALLOCS 0x00000200
 #define OPT_CHECKFREES    0x00000400
-#define OPT_SAFESIGNALS   0x00000800
-#define OPT_NOPROTECT     0x00001000
-#define OPT_NOFREE        0x00002000
-#define OPT_PRESERVE      0x00004000
-#define OPT_OFLOWWATCH    0x00008000
-#define OPT_PAGEALLOC     0x00010000
-#define OPT_ALLOCUPPER    0x00020000
-#define OPT_USEMMAP       0x00040000
-#define OPT_USEDEBUG      0x00080000
+#define OPT_PROF          0x00000800
+#define OPT_SAFESIGNALS   0x00001000
+#define OPT_NOPROTECT     0x00002000
+#define OPT_NOFREE        0x00004000
+#define OPT_PRESERVE      0x00008000
+#define OPT_OFLOWWATCH    0x00010000
+#define OPT_PAGEALLOC     0x00020000
+#define OPT_ALLOCUPPER    0x00040000
+#define OPT_USEMMAP       0x00080000
+#define OPT_USEDEBUG      0x00100000
 
 
 /* The different types of errors when parsing options.
