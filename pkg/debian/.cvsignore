@@ -1,0 +1,6 @@
+.cvsignore
+*.changes
+*.deb
+*.diff.gz
+*.dsc
+*.orig.tar.gz
