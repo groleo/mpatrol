@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.154 2000-12-13 23:51:16 graeme Exp $
+@c $Id: mpatrol.texi,v 1.155 2000-12-18 19:19:40 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.2
 @set VERSION 1.3.2
-@set UPDATED 13th December, 2000
+@set UPDATED 18th December, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -117,6 +117,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
 * Profiling::                   Memory allocation profiling.
+* Tracing::                     Memory allocation tracing.
 * Improving performance::       Life beyond mpatrol.
 * How it works::                Implementation details.
 * Examples::                    Examples of usage.
@@ -818,12 +819,19 @@ Go up one directory level into the @file{doc} directory and examine the files
 located there.  The @file{mpatrol.texi} file contains the @TeX{}info source for
 this manual and can be translated into a wide variety of documentation formats.
 The @file{refcard.tex} file contains the La@TeX{} source for the quick reference
-card and can be translated into formats suitable for printing onto a single
-page.  There may already be translated files in the @file{doc} directory, but if
-not you will either have to generate them yourself using an appropriate tool or
-you could download an archive containing the latest mpatrol manual and reference
+card and can be translated into formats suitable for printing onto a few pages.
+There may already be translated files in the @file{doc} directory, but if not
+you will either have to generate them yourself using an appropriate tool or you
+could download an archive containing the latest mpatrol manual and reference
 card in a variety of documentation formats from the mpatrol home page.  You can
 then install or print these documents.
+
+If you are not installing on a system that supports UNIX manual pages then you
+can also check in the @file{man} directory to see if there are alternative
+formats for the mpatrol manual pages that you can install.  If not, you may be
+able to generate them yourself, or you can download an archive containing the
+latest mpatrol manual pages in a variety of documentation formats from the
+mpatrol home page.
 @end enumerate
 
 @cindex PKG package
@@ -1147,7 +1155,6 @@ The mpatrol library can be built to support all of the above types of system,
 but the more features an operating system can provide it with, the more it can
 do.
 
-@cindex address space
 On operating systems such as UNIX and Windows, all dynamic memory allocation
 requests from a process are dealt with by using a feature called @emph{virtual
 memory}.  This means that a process cannot perform illegal requests without
@@ -1633,7 +1640,6 @@ able to use other options at the same time.
 @node Logging and tracing, General errors, Library behaviour, Using mpatrol
 @section Logging and tracing
 @cindex logging
-@cindex tracing
 
 If you would like to see a complete log of all of the memory allocations,
 reallocations and deallocations performed by your program, use the
@@ -2411,7 +2417,8 @@ library.  Each command comes with its own UNIX manual page (although they also
 support the @option{--help} and @option{--version} options), but a few of the
 commands are written as UNIX shell scripts and so will not work on non-UNIX
 platforms.  Note that the @command{mprof} command is documented in the profiling
-chapter (@pxref{Profiling}).
+chapter (@pxref{Profiling}) and the @command{mptrace} command is documented in
+the tracing chapter (@pxref{Tracing}).
 
 @menu
 * The mpatrol command::         Running with the library.
@@ -2699,7 +2706,7 @@ line if possible.  Note also that the @command{mpedit} command supports the
 @option{--help} and @option{--version} options in common with the other mpatrol
 command line tools.
 
-@node Profiling, Improving performance, Using mpatrol, Top
+@node Profiling, Tracing, Using mpatrol, Top
 @chapter Profiling
 @cindex profiling
 @cindex memory allocation profiling
@@ -2746,6 +2753,7 @@ displayed tables may contain less meaningful information.  Cycles that appear in
 the allocation call graph are due to recursion and are currently dealt with by
 only recording the memory allocations once along the call stack.
 
+@cindex mpatrol.out
 Memory allocation profiling is disabled by default, but can be enabled using
 the @option{PROF} option.  This writes all of the profiling data to a file
 called @file{mpatrol.out} in the current directory at the end of program
@@ -3363,7 +3371,403 @@ written as a research project and ran on MIPS, SPARC and VAX machines.  However,
 the profiling output files are incompatible, the tables displayed have a
 different format, and the way they are implemented is entirely different.
 
-@node Improving performance, How it works, Profiling, Top
+@node Tracing, Improving performance, Profiling, Top
+@chapter Tracing
+@cindex tracing
+@cindex memory allocation tracing
+
+In addition to profiling, the mpatrol library also has the capability to
+concisely trace the details of every dynamic memory allocation and deallocation
+over the lifetime of any program that it was linked and run with.  This
+information can then be used to calculate trends in a program's memory
+allocation behaviour and provide details on the lifetimes of memory allocations.
+In contrast to profiling, it can also be used to display a program's memory
+allocation behaviour in real-time, along with some useful information that can
+be displayed in graphical or tabular form.
+
+As with profiling, only allocations and deallocations are recorded, with each
+reallocation being treated as a deallocation immediately followed by an
+allocation.  The intention of tracing is to gather concise details about each
+memory allocation event rather than complete information about some or all
+memory allocations.  As a result, the mpatrol log files and profiling output
+files contain more detailed information about individual memory allocations,
+whereas the tracing output files contain a broader view of allocation behaviour
+throughout the entire program.
+
+@cindex mpatrol.trace
+Memory allocation tracing is disabled by default, but can be enabled using the
+@option{TRACE} option.  This writes all of the tracing data to a file called
+@file{mpatrol.trace} in the current directory at the end of program execution,
+but the name of this file can be changed using the @option{TRACEFILE} option and
+the default directory in which to place these files can be changed by setting
+the @env{TRACEDIR} environment variable.
+
+Normally, the mpatrol library will perform tracing with all of its other
+features and checks enabled, but you might want to disable these if you only
+wish to trace the memory allocations.  For example, you may wish to use the
+@option{CHECK=0} and @option{NOPROTECT} options to remove the internal checking
+of the library and speed up tracing dramatically.
+
+@cindex mptrace
+@cindex mptrace command
+The @command{mptrace} command is a tool designed to read a tracing output file
+produced by the mpatrol library and display the tracing information that was
+obtained.  The tracing information is a concise encoded trace of all of the
+memory allocation events that occurred during a program's execution, and can be
+decoded into tabular or graphical form, along with any relevant statistics that
+can be calculated.
+
+The @command{mptrace} command also attempts to calculate the endianness of the
+processor that produced the tracing output file and reads the file accordingly.
+This means that it is possible to use @command{mptrace} on a SPARC machine to
+read a tracing output file that was produced on an Intel 80x86 machine, for
+example.  However, this will only work if the processor that produced the
+tracing output file has the same word size as the processor that is running the
+@command{mptrace} command.  For example, reading a 64-bit tracing output file on
+a 32-bit machine will not work.
+
+In addition, the tracing output file also contains the version number of the
+mpatrol library which produced it.  If the major version number that is embedded
+in the tracing output file is newer that the version of mpatrol that
+@command{mptrace} came with then @command{mptrace} will refuse to read the file.
+You should download the latest version of mpatrol in that case.  The reason for
+storing the version number is so that the format of the tracing output file can
+change between releases of mpatrol, but also allow @command{mptrace} to cope
+with older versions.
+
+Along with the usual @option{--help} and @option{--version} options, the
+@command{mptrace} command takes one optional argument which must be a valid
+mpatrol tracing output filename but if it is omitted then it will use
+@file{mpatrol.trace} as the name of the file to use.  If the filename argument
+is given as @samp{-} then the standard input file stream will be used as the
+tracing output file.
+
+@cindex GUI
+@cindex graphical user interface
+@cindex X Windows
+The @command{mptrace} command will normally be built with GUI@footnote{Graphical
+User Interface.} support on UNIX platforms that are running X Windows.  This
+means that a graphical memory map display of the heap will be shown in a window
+every time @command{mptrace} is run.  This display is updated every time a new
+event is read from the tracing output file and by default uses the colour red
+for internal heap memory (used by the mpatrol library), blue for unallocated
+heap memory, black for allocated memory and white for free memory.  Options
+exist to change this colour scheme, as well as the dimensions of the drawing
+area and the window.
+
+@cindex base address
+@cindex address space
+By default, it is assumed that the start address of the first event that appears
+in the tracing output file is the base address of the memory map displayed in
+the window.  If the heap grows downwards then this assumption will be incorrect
+(since nothing will be displayed) and so the @option{--base} option must be used
+to specify a reasonable lower bound for the final memory map.  In addition, the
+visible address space displayed in the memory map is fixed to a certain size (4
+megabytes by default), but this can be changed with the @option{--space} option.
+A small delay can also be added after drawing each memory allocation event
+through the use of the @option{--delay} option.
+
+The following options are specific to the GUI version of @command{mptrace} and
+are read by the X command line parser rather than directly by @command{mptrace}.
+As a result they are parsed according to X toolkit rules and do not appear in
+the quick-reference option summary produced by the @option{--help} option.  The
+application class for setting @command{mptrace} X resources is called
+@samp{MPTrace}.
+
+@cindex --alloc
+@table @asis
+@item @option{--alloc} <@var{colour}>
+Specifies the colour to use for displaying allocated memory.  The default colour
+is @samp{black}.
+
+@cindex --base
+@item @option{--base} <@var{address}>
+Specifies the base address of the visible address space displayed in the memory
+map.  The default address is calculated at run-time from the start address of
+the first memory allocation event in the tracing output file.
+
+@cindex --delay
+@item @option{--delay} <@var{length}>
+Specifies that a small delay of a certain length should be added after drawing
+each memory allocation event.  The delay does not correspond to a specific unit
+of time, but experimentation with the length should yield satisfactory results.
+The default delay is @samp{0}.
+
+@cindex --free
+@item @option{--free} <@var{colour}>
+Specifies the colour to use for displaying free memory.  The default colour is
+@samp{white}.
+
+@cindex --height
+@item @option{--height} <@var{size}>
+Specifies the height (in pixels) of the drawing area.  The default height is
+@samp{512}.
+
+@cindex --internal
+@item @option{--internal} <@var{colour}>
+Specifies the colour to use for displaying internal heap memory.  The default
+colour is @samp{red}.
+
+@cindex --space
+@item @option{--space} <@var{size}>
+Specifies the size (in megabytes) of the visible address space displayed in the
+memory map.  The default size is @samp{4}.
+
+@cindex --unalloc
+@item @option{--unalloc} <@var{colour}>
+Specifies the colour to use for displaying unallocated heap memory.  The default
+colour is @samp{blue}.
+
+@cindex --view-height
+@item @option{--view-height} <@var{size}>
+Specifies the height (in pixels) of the window.  The default height is
+@samp{256}.
+
+@cindex --view-width
+@item @option{--view-width} <@var{size}>
+Specifies the width (in pixels) of the window.  The default width is @samp{256}.
+
+@cindex --width
+@item @option{--width} <@var{size}>
+Specifies the width (in pixels) of the drawing area.  The default width is
+@samp{512}.
+@end table
+
+We'll now look at an example of using the mpatrol library to trace the dynamic
+memory allocations in a program.  As with the previous chapter we will attempt
+to trace a real application in order to examine its memory allocation behaviour.
+Since all of the following steps were performed on a Solaris machine, the
+@option{--dynamic} option of the @command{mpatrol} command was used to allow us
+to replace the system memory allocation routines with mpatrol's routines without
+requiring a relink.  It also means that we can trace all of the child processes
+that were created by the application as well.
+
+The application that we are going to trace is the GNU C compiler, as before, and
+we will discard the tracing information generated for the assembler and linker.
+All of the command line examples use the @command{bash} shell but in most cases
+these will work in other shells with a minimal amount of changes.
+
+We will use @file{tests/profile/test2.c} as the source file to compile with
+@command{gcc} and we'll turn on optimisation in order to cause @command{gcc} to
+allocate a bit more memory than it would normally.  When running it through the
+@command{mpatrol} command we also use @option{--check=0} so that we disable
+mpatrol's internal checks --- we don't need them if we are only tracing.  Note
+that use is also made of the format string feature of the @option{--log-file}
+and @option{--trace-file} options so that it is clear which mpatrol log and
+tracing output files belong to which processes.
+
+@smallexample
+bash$ mpatrol --dynamic --log-file=%p.log --trace-file=%p.trace
+              --trace --check=0 gcc -O -o test2 test2.c
+bash$ ls *.log *.trace
+as.log         cc1.trace      cpp.log        gcc.trace
+as.trace       collect2.log   cpp.trace      ld.log
+cc1.log        collect2.trace gcc.log        ld.trace
+@end smallexample
+
+As mentioned above, we're not interested in the mpatrol log and tracing output
+files for @command{as} and @command{ld} so we'll delete them.  We can now use
+@command{mptrace} to decode each of the tracing output files produced and write
+their contents in tabular form to the standard output file stream, which can be
+redirected to a file for later viewing@footnote{If you are running a GUI version
+of @command{mptrace} you will need to close the window after each file has been
+decoded.}.  You can find these tracing output files in the @file{extra}
+directory in the mpatrol distribution.
+
+@smallexample
+bash$ rm as.log as.trace ld.log ld.trace
+bash$ ls *.trace
+cc1.trace      collect2.trace cpp.trace      gcc.trace
+bash$ for file in *.trace
+> do
+>     mptrace $file >`basename $file .trace`.res
+> done
+bash$ ls *.res
+cc1.res        collect2.res   cpp.res        gcc.res
+@end smallexample
+
+For the purposes of this example we will only be looking at the tracing results
+for the @command{cc1} compiler which are now decoded in the file @file{cc1.res}.
+If you examine this file you will see something similar to the following.  Note
+that the @samp{@dots{}} marks text that has been removed.
+
+@smallexample
+ event  type     index  allocation      size    life
+------  ------  ------  ----------  --------  ------
+        internal        0x0024E000     32768
+        internal        0x00256000     32768
+        internal        0x0025E000     32768
+        reserve         0x00266000      8192
+        internal        0x00268000     32768
+        internal        0x00270000     32768
+        internal        0x00278000     32768
+        internal        0x00280000     32768
+        internal        0x00288000     32768
+        internal        0x00290000     32768
+@dots{}
+        reserve         0x00308000     16384
+     1  alloc       19  0x00266568      4072
+     2  alloc       21  0x0030A008      4072
+     3  alloc       22  0x0030AFF0      4072
+        reserve         0x0030C000      8192
+     4  alloc       23  0x0030BFD8      4072
+     5  alloc       24  0x0030CFC0      4072
+        reserve         0x0030E000      8192
+     6  alloc       25  0x0030DFA8      4072
+     7  alloc       26  0x00267550        42
+@dots{}
+  1712  free       650  0x00373FF0      4072     827
+  1713  free       649  0x00376FA8      4072     829
+  1714  alloc     1074  0x00376FA8      4072
+  1715  free       233  0x0031ED18      8200    1498
+  1716  free       234  0x00320D20      8200    1498
+  1717  free       299  0x00355CC8       620    1426
+  1718  free       655  0x00353A28      1016     823
+  1719  free       303  0x0035E000      5096    1424
+  1720  free       653  0x00354E60       152     827
+  1721  free       654  0x00354EF8       152     827
+@end smallexample
+
+There are six different columns of data displayed by the @command{mptrace}
+command when it decodes the tracing output file and displays it in tabular
+format.  Here is an explanation for each of them.
+
+@cindex event
+@table @samp
+@item event
+This contains the event number (or time line) for each memory allocation or
+deallocation (heap reservations are not considered events for this purpose).
+Each memory allocation or deallocation increases the current event number, and
+this information is used to calculate the lifetime of a heap allocation.
+
+@item type
+This contains the event type for each entry in the tracing output file.  Memory
+allocations and deallocations are represented by @samp{alloc} and @samp{free}
+respectively.  Normal heap reservations (that will be used for memory
+allocations) are represented by @samp{reserve}, while internal heap reservations
+(for use by the mpatrol library itself) are represented by @samp{internal}.
+
+@item index
+This contains the allocation index that is used by the mpatrol library to keep
+track of each unique memory allocation, and corresponds directly to any memory
+allocations listed in the log file.  Any memory allocation events that reuse
+allocation indices represent a reallocation of the original allocation.
+
+@item allocation
+This contains the start address of the memory allocation.
+
+@item size
+This contains the size (in bytes) of the memory allocation.
+
+@cindex lifetime
+@item life
+This contains the lifetime of a memory allocation and is displayed when it is
+is freed.  It is simply the difference between the current event number and the
+event number at which the original allocation took place, but is useful for
+working out how long a memory allocation is valid throughout a program's
+execution.  If a memory allocation is reallocated, its lifetime will be
+calculated from the original time of allocation, @emph{not} the point at which
+it was reallocated.
+@end table
+
+The first few entries in the table show that the mpatrol library started by
+allocating memory from the heap for its own purposes before reserving 8192 bytes
+for the memory allocations made by the object file access library for reading
+the symbols from the executable file and shared libraries@footnote{The actual
+allocation events from this do not appear since they were internal memory
+allocations.}.  Most of the further internal heap reservation events are due
+to the mpatrol library having to store details for all of the relevant symbols
+that it could read at program startup.  The more symbols that there are, the
+more memory that must be used to store them.  Note that the heap reservation
+events are not really relevant to the analysis of the program's memory
+allocations but they are used when displaying the heap graphically.
+
+The first few memory allocation events in the table show that several memory
+allocations of 4072 bytes are being made along with several more heap
+reservations that are needed to store them.  The last events in the table are
+mainly all deallocation events of allocations that were made quite early on in
+the program.  The lifetime information for these events shows that some of these
+allocations were made very near the beginning of the program, while the others
+were made near the middle.  None of them were very big and so would not be
+occupying much memory.
+
+As you will have noticed if you were running a GUI version of @command{mptrace},
+information about all of these events is displayed in graphical form inside the
+@command{mptrace} display window.
+@ifinfo
+The HTML, DVI, postscript and PDF versions of this manual contain a screenshot
+of the @command{mptrace} display window when it is run with @file{cc1.trace} as
+input.
+@end ifinfo
+@ifnotinfo
+The following screenshot shows the @command{mptrace} display window when it is
+run with @file{cc1.trace} as input.  It was generated using the
+@option{--space 2} option.
+
+@image{images/trace}
+
+Areas coloured blue indicate heap memory that has not yet been used by the
+mpatrol library (i.e.@: it has not currently been allocated from the system, or
+is currently being used by a part of the program that is not being tracked by
+the mpatrol library).  Areas coloured red indicated heap memory that is being
+used internally by the mpatrol library.  In this example, the reason that there
+is so much internal memory being used is that there are a large number of
+symbols that were read from the executable file and shared libraries.  The
+narrow band of black and white lines at the top of the memory map represents the
+memory that was used by the object file access library when it was reading the
+symbols.
+
+The large black bands in the middle of the memory map indicate memory that was
+still allocated at program termination.  While this is a substantial amount
+compared to the amount of free memory, it does not necessary indicate memory
+leaks as the memory could be being used right up until the end of the program,
+and is implicitly freed at program termination anyway.
+@end ifnotinfo
+
+@cindex pipe
+@cindex command pipe
+Unlike memory allocation profiling which summarises all of the accumulated data,
+it is possible to trace memory allocation events in real-time as the program
+runs.  This can currently be done on UNIX platforms by piping the tracing output
+file from the program being run to the @command{mptrace} command, which can be
+achieved in several ways depending on the UNIX system that you are using.  Both
+of the following methods are equivalent, where @file{testprog} is the name of
+the program that is being traced (and has previously been linked with the
+mpatrol library).
+
+@smallexample
+# This method specifies the standard output file stream as the
+# destination for the tracing output file and then runs both
+# commands in a shell command pipe.  This has a disadvantage in
+# that testprog must not write anything to stdout since that would
+# be written out to the tracing output file.  If stdout is not
+# suitable then stderr could be used instead if you redirect it.
+
+bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace -
+@end smallexample
+
+@cindex mkfifo
+@cindex mknod
+@smallexample
+# This method creates a named pipe called myfifo (but it could be
+# called anything) and runs the program being traced and the mptrace
+# command separately (perhaps in two separate windows).  If the
+# mkfifo command is not available on your system then try mknod.
+
+bash$ mkfifo myfifo
+bash$ mpatrol --trace-file=myfifo --trace ./testprog &
+bash$ mptrace myfifo
+@end smallexample
+
+@cindex xmem
+The idea for graphically displaying a memory map of the heap comes from the
+@command{xmem} tool supplied with the University of Toronto Computer Systems
+Research Institute malloc library, written by Mark Moraes.  However, the
+documentation for that tool remarks that it was written as a quick and dirty
+hack.  The @command{mptrace} command is hopefully more stable and contains a lot
+more functionality.
+
+@node Improving performance, How it works, Tracing, Top
 @chapter Improving performance
 @cindex improving performance
 @cindex performance improvements
@@ -3606,7 +4010,7 @@ local variables in the call stack in order to determine if the allocation should
 be freed.  This is an inferior method since it depends on the same function call
 sequence being used each time an mpatrol function is called.  Therefore, a
 safety boundary was added that will prevent mpatrol from freeing such
-allocations unless they are a really clear-cut case (i.e. the stack frames
+allocations unless they are a really clear-cut case (i.e.@: the stack frames
 differ by a minimum number of bytes).  As a result, this second method will not
 usually free such allocations until a much later point.
 
@@ -9422,6 +9826,29 @@ may also need to modify your @env{MANPATH} environment variable if you installed
 the manual pages in a non-standard place, and some systems require you to update
 the @emph{whatis} database after installing new manual pages, by running
 @command{makewhatis}, @command{catman} or equivalent.
+
+Alternatively, the mpatrol manual pages can be built in a variety of different
+documentation formats that can be viewed or printed without the need for a
+@command{man} command.  If you have the correct tools installed on your system
+then you should be able to do this by examining the @file{Makefile} in the
+@file{man} directory.  If not, you can always download an archive containing the
+latest mpatrol manual pages in a variety of formats from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/} and this will also contain a
+file telling you where to get programs that can be used to view or print these
+files.
+
+@cindex MANROFFSEQ
+@item
+Why does the @file{libmpatrol.3} manual page not display correctly when I view
+it with the @command{man} command?
+
+This is likely to be due to the @command{tbl} command not being run to process
+the tables when the @command{man} command displays the manual page.  Many UNIX
+systems look at the first line of the manual page to see what filters to run the
+page through before it is displayed, but some systems do not recognise this and
+instead rely on an environment variable such as @env{MANROFFSEQ} to specify
+which filters are to be run.  Look at the manual page for the @command{man}
+command on your system to find out more information.
 @end enumerate
 
 @node Building, Linking, Documentation, Frequently asked questions
@@ -9554,7 +9981,6 @@ at the top of its stack, even though it will be removed in the inlined case.
 
 @cindex Motif
 @cindex LessTif
-@cindex X Windows
 @item
 How do I build the @command{mptrace} command with GUI support?
 
