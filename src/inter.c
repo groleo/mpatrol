@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.130 2001-07-25 21:45:28 graeme Exp $"
+#ident "$Id: inter.c,v 1.131 2001-07-25 22:54:29 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.130 2001-07-25 21:45:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.131 2001-07-25 22:54:29 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2234,10 +2234,10 @@ __mp_check(void)
 /* Set the prologue function and return the previous setting.
  */
 
-void
-(*__mp_prologue(void (*h)(void *, size_t, void *)))(void *, size_t, void *)
+prologuehandler
+__mp_prologue(prologuehandler h)
 {
-    void (*p)(void *, size_t, void *);
+    prologuehandler p;
 
     savesignals();
     if (!memhead.init)
@@ -2254,10 +2254,10 @@ void
 /* Set the epilogue function and return the previous setting.
  */
 
-void
-(*__mp_epilogue(void (*h)(void *, void *)))(void *, void *)
+epiloguehandler
+__mp_epilogue(epiloguehandler h)
 {
-    void (*p)(void *, void *);
+    epiloguehandler p;
 
     savesignals();
     if (!memhead.init)
@@ -2274,10 +2274,10 @@ void
 /* Set the low-memory handler and return the previous setting.
  */
 
-void
-(*__mp_nomemory(void (*h)(void)))(void)
+nomemoryhandler
+__mp_nomemory(nomemoryhandler h)
 {
-    void (*p)(void);
+    nomemoryhandler p;
 
     savesignals();
     if (!memhead.init)
