@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.30 2001-05-17 21:53:48 graeme Exp $
+ * $Id: target.h,v 1.31 2001-07-19 22:28:36 graeme Exp $
  */
 
 
@@ -501,23 +501,43 @@
  */
 
 #if TARGET == TARGET_UNIX
+#ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
+#endif /* _POSIX_SOURCE */
+#ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199506L
+#endif /* _POSIX_C_SOURCE */
 #if SYSTEM == SYSTEM_AIX
+#ifndef _ALL_SOURCE
 #define _ALL_SOURCE 1
+#endif /* _ALL_SOURCE */
 #elif SYSTEM == SYSTEM_DGUX
+#ifndef _DGUX_SOURCE
 #define _DGUX_SOURCE 1
+#endif /* _DGUX_SOURCE */
 #elif SYSTEM == SYSTEM_HPUX
+#ifndef _HPUX_SOURCE
 #define _HPUX_SOURCE 1
+#endif /* _HPUX_SOURCE */
 #elif SYSTEM == SYSTEM_IRIX
+#ifndef _SGI_SOURCE
 #define _SGI_SOURCE 1
+#endif /* _SGI_SOURCE */
 #elif SYSTEM == SYSTEM_LINUX
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
+#endif /* _GNU_SOURCE */
 #elif SYSTEM == SYSTEM_SOLARIS
+#ifndef __EXTENSIONS__
 #define __EXTENSIONS__ 1
+#endif /* __EXTENSIONS__ */
 #elif SYSTEM == SYSTEM_TRU64
+#ifndef _OSF_SOURCE
 #define _OSF_SOURCE 1
+#endif /* _OSF_SOURCE */
+#ifndef _XOPEN_SOURCE_EXTENDED
 #define _XOPEN_SOURCE_EXTENDED 1
+#endif /* _XOPEN_SOURCE_EXTENDED */
 #endif /* SYSTEM */
 #endif /* TARGET */
 
