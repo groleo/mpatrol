@@ -1,0 +1,99 @@
+#!/bin/sh
+
+
+# mpatrol
+# A library for controlling and tracing dynamic memory allocations.
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+
+
+# UNIX shell script to build a tar distribution file
+
+
+# $Id: build,v 1.1 2000-03-09 21:54:52 graeme Exp $
+
+
+version=1.1.1
+libversion=1.1
+
+
+# Build the mpatrol library.
+
+cd ../../build/unix
+make clobber
+make libmpatrol.a libmpatrol.so.$libversion
+cd ../../pkg/tar
+
+
+# Create the distribution directory structure and copy the necessary
+# files into it.  This assumes that the Texinfo manual has already been
+# processed into the different documentation formats.
+
+rm -rf mpatrol
+cp ../../README mpatrol
+cp ../../FAQ mpatrol
+cp ../../COPYING mpatrol
+cp ../../COPYING.LIB mpatrol
+cp ../../NEWS mpatrol
+cp ../../ChangeLog mpatrol
+mkdir -p mpatrol/bin
+cp ../../bin/mpatrol mpatrol/bin
+mkdir -p mpatrol/doc/images
+cp ../../doc/README mpatrol/doc
+cp ../../doc/mpatrol.txt mpatrol/doc
+cp ../../doc/mpatrol.guide mpatrol/doc
+cp ../../doc/mpatrol.html mpatrol/doc
+cp ../../doc/mpatrol.dvi mpatrol/doc
+cp ../../doc/mpatrol.ps mpatrol/doc
+cp ../../doc/mpatrol.pdf mpatrol/doc
+cp ../../doc/images/mpatrol.jpg mpatrol/doc/images
+cp ../../doc/images/mpatrol.eps mpatrol/doc/images
+cp ../../doc/images/mpatrol.pdf mpatrol/doc/images
+mkdir -p mpatrol/include
+cp ../../src/mpatrol.h mpatrol/include
+mkdir -p mpatrol/info
+cp ../../doc/mpatrol.info mpatrol/info
+mkdir -p mpatrol/lib
+cp ../../build/unix/libmpatrol.a mpatrol/lib
+cp ../../build/unix/libmpatrol.so.$libversion mpatrol/lib
+cd mpatrol/lib
+ln -s libmpatrol.so.$libversion libmpatrol.so
+cd ../..
+mkdir -p mpatrol/man/cat1
+cp ../../man/cat1/mpatrol.1 mpatrol/man/cat1
+mkdir -p mpatrol/man/man1
+cp ../../man/man1/mpatrol.1 mpatrol/man/man1
+mkdir -p mpatrol/man/cat3
+cp ../../man/cat3/mpatrol.3 mpatrol/man/cat3
+mkdir -p mpatrol/man/man3
+cp ../../man/man3/mpatrol.3 mpatrol/man/man3
+
+
+# Create the compressed tar distribution archive.
+
+rm -f mpatrol_$version.tar
+tar cf mpatrol_$version.tar mpatrol
+rm -f mpatrol_$version.tar.gz
+gzip mpatrol_$version.tar
+rm -rf mpatrol
+
+
+# Clean up the build directory
+
+cd ../../build/unix
+make clobber
+cd ../../pkg/tar
