@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.17 2000-07-17 21:14:51 graeme Exp $
+# $Id: NMakefile,v 1.18 2000-07-24 19:55:33 graeme Exp $
 
 
 # Definitions
@@ -104,8 +104,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
-mprof.exe: mprof.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj getopt.obj tree.obj version.obj
+mprof.exe: mprof.obj graph.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj graph.obj getopt.obj tree.obj version.obj
 
 mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
@@ -116,7 +116,7 @@ all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 clean:
 	-@ del /f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) >nul 2>&1
 	-@ del /f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) >nul 2>&1
-	-@ del /f mpatrol.obj mprof.obj mleak.obj getopt.obj >nul 2>&1
+	-@ del /f mpatrol.obj mprof.obj mleak.obj graph.obj getopt.obj >nul 2>&1
 
 clobber: clean
 	-@ del /f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) >nul 2>&1
@@ -275,5 +275,7 @@ mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
+graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

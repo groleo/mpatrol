@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.22 2000-07-17 21:14:46 graeme Exp $
+# $Id: Makefile,v 1.23 2000-07-24 19:55:28 graeme Exp $
 
 
 # Definitions
@@ -78,8 +78,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
-mprof.nlm: mprof.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj getopt.obj tree.obj version.obj
+mprof.nlm: mprof.obj graph.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj graph.obj getopt.obj tree.obj version.obj
 
 mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.obj getopt.obj tree.obj version.obj
@@ -88,7 +88,7 @@ all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol.nlm mprof.nlm mleak.nlm
 
 clean:
 	-@ rm -f $(OBJECTS) $(TOBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.obj mprof.obj mleak.obj getopt.obj 2>&1 >/dev/null
+	-@ rm -f mpatrol.obj mprof.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -230,5 +230,7 @@ mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
+graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
