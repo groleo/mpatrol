@@ -35,14 +35,28 @@
 #include "alloc.h"
 
 
+/* A profhead contains all the profiling information including the
+ * filename of the output file and the current profiling state.
+ */
+
+typedef struct profhead
+{
+    char *file;     /* profiling filename */
+    char profiling; /* profiling status */
+}
+profhead;
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
-MP_EXPORT int __mp_profilealloc(allocnode *);
-MP_EXPORT int __mp_profilefree(allocnode *);
+MP_EXPORT void __mp_newprofile(profhead *);
+MP_EXPORT void __mp_deleteprofile(profhead *);
+MP_EXPORT int __mp_profilealloc(profhead *, allocnode *);
+MP_EXPORT int __mp_profilefree(profhead *, allocnode *);
 
 
 #ifdef __cplusplus

@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.1 2000-04-18 22:18:49 graeme Exp $"
+#ident "$Id: profile.c,v 1.2 2000-04-18 23:55:26 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -41,10 +41,31 @@ extern "C"
 #endif /* __cplusplus */
 
 
+/* Initialise the fields of a profhead so that the mpatrol library
+ * is ready to profile memory allocations.
+ */
+
+MP_GLOBAL void __mp_newprofile(profhead *p)
+{
+    p->file = MP_PROFFILE;
+    p->profiling = 0;
+}
+
+
+/* Forget all existing profiling information.
+ */
+
+MP_GLOBAL void __mp_deleteprofile(profhead *p)
+{
+    p->file = NULL;
+    p->profiling = 0;
+}
+
+
 /* Record a memory allocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilealloc(allocnode *n)
+MP_GLOBAL int __mp_profilealloc(profhead *p, allocnode *n)
 {
     return 1;
 }
@@ -53,7 +74,7 @@ MP_GLOBAL int __mp_profilealloc(allocnode *n)
 /* Record a memory deallocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilefree(allocnode *n)
+MP_GLOBAL int __mp_profilefree(profhead *p, allocnode *n)
 {
     return 1;
 }
