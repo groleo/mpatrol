@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.19 2000-05-04 20:03:22 graeme Exp $
+# $Id: Makefile,v 1.20 2000-05-08 20:56:54 graeme Exp $
 
 
 # Definitions
@@ -213,13 +213,19 @@ mutex.t.o mutex.s.t.o mutex.t.ln: $(SOURCE)/mutex.c $(SOURCE)/mutex.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/profile.h
-diag.o diag.s.o diag.ln diag.t.o diag.s.t.o diag.t.ln: $(SOURCE)/diag.c \
-	$(SOURCE)/diag.h $(SOURCE)/config.h $(SOURCE)/target.h \
-	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+diag.o diag.s.o diag.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/utils.h \
+	$(SOURCE)/profile.h $(SOURCE)/version.h
+diag.t.o diag.s.t.o diag.t.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
-	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/symbol.h \
-	$(SOURCE)/strtab.h $(SOURCE)/utils.h $(SOURCE)/profile.h \
-	$(SOURCE)/version.h
+	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/mutex.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/utils.h \
+	$(SOURCE)/profile.h $(SOURCE)/version.h
 option.o option.s.o option.ln option.t.o option.s.t.o option.t.ln: \
 	$(SOURCE)/option.c $(SOURCE)/option.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
