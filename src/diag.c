@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.49 2000-12-20 22:25:39 graeme Exp $"
+#ident "$Id: diag.c,v 1.50 2000-12-21 22:38:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -889,19 +889,19 @@ __mp_printalloc(symhead *y, allocnode *n)
 
 static
 void
-logcall(infohead *h, char *s, char *t, unsigned long u, stackinfo *v)
+logcall(infohead *h, loginfo *i)
 {
     __mp_diag("[");
 #if MP_THREADS_SUPPORT
     __mp_diag("%lu|", __mp_threadid());
 #endif /* MP_THREADS_SUPPORT */
-    __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-    if (u == 0)
+    __mp_diag("%s|%s|", (i->func ? i->func : "-"), (i->file ? i->file : "-"));
+    if (i->line == 0)
         __mp_diag("-");
     else
-        __mp_diag("%lu", u);
+        __mp_diag("%lu", i->line);
     __mp_diag("]\n");
-    __mp_printstack(&h->syms, v);
+    __mp_printstack(&h->syms, i->stack);
     __mp_diag("\n");
 }
 
@@ -911,8 +911,7 @@ logcall(infohead *h, char *s, char *t, unsigned long u, stackinfo *v)
 
 MP_GLOBAL
 void
-__mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
-              unsigned long u, stackinfo *v)
+__mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, loginfo *i)
 {
     __mp_diag("ALLOC: %s (%lu, ", __mp_functionnames[f], h->count);
     __mp_printsize(l);
@@ -922,7 +921,7 @@ __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
     else
         __mp_printsize(a);
     __mp_diag(") ");
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -931,8 +930,8 @@ __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
 
 MP_GLOBAL
 void
-__mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f, char *s,
-                char *t, unsigned long u, stackinfo *v)
+__mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f,
+                loginfo *i)
 {
     __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
@@ -942,7 +941,7 @@ __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f, char *s,
     else
         __mp_printsize(a);
     __mp_diag(") ");
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -951,11 +950,10 @@ __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f, char *s,
 
 MP_GLOBAL
 void
-__mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
-             unsigned long u, stackinfo *v)
+__mp_logfree(infohead *h, void *p, alloctype f, loginfo *i)
 {
     __mp_diag("FREE: %s (" MP_POINTER ") ", __mp_functionnames[f], p);
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -965,12 +963,12 @@ __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
 MP_GLOBAL
 void
 __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
-               char *s, char *t, unsigned long u, stackinfo *v)
+               loginfo *i)
 {
     __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -980,13 +978,13 @@ __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
 MP_GLOBAL
 void
 __mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
-                alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
+                alloctype f, loginfo *i)
 {
     __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -996,14 +994,14 @@ __mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
 MP_GLOBAL
 void
 __mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m,
-                  alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
+                  alloctype f, loginfo *i)
 {
     __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", " MP_POINTER ", ", q);
     __mp_printsize(m);
     __mp_diag(") ");
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
@@ -1013,13 +1011,13 @@ __mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m,
 MP_GLOBAL
 void
 __mp_logmemcompare(infohead *h, void *p, void *q, size_t l, alloctype f,
-                   char *s, char *t, unsigned long u, stackinfo *v)
+                   loginfo *i)
 {
     __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(") ");
-    logcall(h, s, t, u, v);
+    logcall(h, i);
 }
 
 
