@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.20 1999-12-21 20:12:05 graeme Exp $
+@c $Id: mpatrol.texi,v 1.21 1999-12-23 18:36:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 21st December, 1999
+@set UPDATED 23rd December, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -174,10 +174,13 @@ wrong.
 @cindex author, contacting
 @cindex getting updates
 @cindex updates
+@cindex FreshMeat
 The latest version of the mpatrol library and this manual can always be found at
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/}, and any correspondence relating
 to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
-to @email{mpatrol@@cbmamiga.demon.co.uk}.  I normally only check my e-mail about
+to @email{mpatrol@@cbmamiga.demon.co.uk}.  The mpatrol library is also
+registered at FreshMeat (@uref{http://freshmeat.net/}) so you can receive
+notification of updates there as well.  I normally only check my e-mail about
 once or twice a week, so don't expect an immediate response.  I can also be
 reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.
 
@@ -1571,67 +1574,67 @@ a supplied structure.  The following example illustrates this (it can be found
 in @file{tests/pass/test4.c}).
 
 @smallexample
-21  /*
-22   * Demonstrates and tests the facility for obtaining information
-23   * about the allocation a specific address belongs to.
-24   */
+23  /*
+24   * Demonstrates and tests the facility for obtaining information
+25   * about the allocation a specific address belongs to.
+26   */
 
 
-25  #include "mpatrol.h"
-26  #include <stdio.h>
+29  #include "mpatrol.h"
+30  #include <stdio.h>
 
 
-27  void display(void *p)
-28  @{
-29      __mp_allocstack *s;
-30      __mp_allocinfo d;
+33  void display(void *p)
+34  @{
+35      __mp_allocstack *s;
+36      __mp_allocinfo d;
 
-31      if (!__mp_info(p, &d))
-32      @{
-33          fprintf(stderr, "nothing known about address 0x%08lX\n", p);
-34          return;
-35      @}
-36      fprintf(stderr, "block:   0x%08lX\n", d.block);
-37      fprintf(stderr, "size:    %lu\n", d.size);
-38      fprintf(stderr, "type:    %lu\n", d.type);
-39      fprintf(stderr, "alloc:   %lu\n", d.alloc);
-40      fprintf(stderr, "realloc: %lu\n", d.realloc);
-41      fprintf(stderr, "func:    %s\n", d.func ? d.func : "NULL");
-42      fprintf(stderr, "file:    %s\n", d.file ? d.file : "NULL");
-43      fprintf(stderr, "line:    %lu\n", d.line);
-44      for (s = d.stack; s != NULL; s = s->next)
-45      @{
-46          fprintf(stderr, "\t0x%08lX: ", s->addr);
-47          fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
-48      @}
-49      fprintf(stderr, "freed:   %d\n", d.freed);
-50  @}
-
-
-51  void func2(void)
-52  @{
-53      void *p;
-
-54      if (p = malloc(16))
-55      @{
-56          display(p);
-57          free(p);
-58      @}
-59      display(p);
-60  @}
+38      if (!__mp_info(p, &d))
+39      @{
+40          fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+41          return;
+42      @}
+43      fprintf(stderr, "block:   0x%08lX\n", d.block);
+44      fprintf(stderr, "size:    %lu\n", d.size);
+45      fprintf(stderr, "type:    %lu\n", d.type);
+46      fprintf(stderr, "alloc:   %lu\n", d.alloc);
+47      fprintf(stderr, "realloc: %lu\n", d.realloc);
+48      fprintf(stderr, "func:    %s\n", d.func ? d.func : "NULL");
+49      fprintf(stderr, "file:    %s\n", d.file ? d.file : "NULL");
+50      fprintf(stderr, "line:    %lu\n", d.line);
+51      for (s = d.stack; s != NULL; s = s->next)
+52      @{
+53          fprintf(stderr, "\t0x%08lX: ", s->addr);
+54          fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
+55      @}
+56      fprintf(stderr, "freed:   %d\n", d.freed);
+57  @}
 
 
-61  void func1(void)
-62  @{
-63      func2();
-64  @}
+60  void func2(void)
+61  @{
+62      void *p;
+
+64      if (p = malloc(16))
+65      @{
+66          display(p);
+67          free(p);
+68      @}
+69      display(p);
+70  @}
 
 
-65  int main(void)
-66  @{
-67      func1();
-68      return EXIT_SUCCESS;
-69  @}
+73  void func1(void)
+74  @{
+75      func2();
+76  @}
+
+
+79  int main(void)
+80  @{
+81      func1();
+82      return EXIT_SUCCESS;
+83  @}
 @end smallexample
 
 When this is compiled and run, it should give the following output, although
@@ -1645,7 +1648,7 @@ alloc:   10
 realloc: 0
 func:    func2
 file:    test4.c
-line:    54
+line:    64
          0x80000BEC: func2
          0x80000C3E: func1
          0x80000C48: main
@@ -1667,51 +1670,51 @@ additional tracing or simply to add extra checks to your code.  The following
 code is an example of this and can be found in @file{tests/pass/test2.c}.
 
 @smallexample
-21  /*
-22   * Demonstrates and tests the facility for specifying user-defined
-23   * prologue and epilogue functions.
-24   */
+23  /*
+24   * Demonstrates and tests the facility for specifying user-defined
+25   * prologue and epilogue functions.
+26   */
 
 
-25  #include "mpatrol.h"
-26  #include <stdio.h>
+29  #include "mpatrol.h"
+30  #include <stdio.h>
 
 
-27  void prologue(void *p, size_t l)
-28  @{
-29      if (p == (void *) -1)
-30          fprintf(stderr, "allocating %lu bytes\n", l);
-31      else if (l == (size_t) -1)
-32          fprintf(stderr, "freeing allocation 0x%08lX\n", p);
-33      else if (l == (size_t) -2)
-34          fprintf(stderr, "duplicating string `%s'\n", p);
-35      else
-36          fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
-37  @}
+33  void prologue(void *p, size_t l)
+34  @{
+35      if (p == (void *) -1)
+36          fprintf(stderr, "allocating %lu bytes\n", l);
+37      else if (l == (size_t) -1)
+38          fprintf(stderr, "freeing allocation 0x%08lX\n", p);
+39      else if (l == (size_t) -2)
+40          fprintf(stderr, "duplicating string `%s'\n", p);
+41      else
+42          fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
+43  @}
 
 
-38  void epilogue(void *p)
-39  @{
-40      if (p != (void *) -1)
-41          fprintf(stderr, "allocation returns 0x%08lX\n", p);
-42  @}
+46  void epilogue(void *p)
+47  @{
+48      if (p != (void *) -1)
+49          fprintf(stderr, "allocation returns 0x%08lX\n", p);
+50  @}
 
 
-43  int main(void)
-44  @{
-45      void *p, *q;
+53  int main(void)
+54  @{
+55      void *p, *q;
 
-46      __mp_prologue(prologue);
-47      __mp_epilogue(epilogue);
-48      if (p = malloc(16))
-49          if (q = realloc(p, 32))
-50              free(q);
-51          else
-52              free(p);
-53      if (p = (char *) strdup("test"))
-54          free(p);
-55      return EXIT_SUCCESS;
-56  @}
+57      __mp_prologue(prologue);
+58      __mp_epilogue(epilogue);
+59      if (p = malloc(16))
+60          if (q = realloc(p, 32))
+61              free(q);
+62          else
+63              free(p);
+64      if (p = (char *) strdup("test"))
+65          free(p);
+66      return EXIT_SUCCESS;
+67  @}
 @end smallexample
 
 Once again, if you compile and run the above code, you should see the following
@@ -1775,18 +1778,22 @@ that you can trace all of its dynamic memory allocations as well as running it
 with any of the mpatrol library's debugging options.  This is mainly a
 @emph{toy} feature which allows you to view and manipulate the dynamic memory
 allocations of programs that you don't have the source for, but in theory it
-could be quite useful if you need to debug a previously released executable.
+could be quite useful if you need to debug a previously released executable and
+are unable to recompile or relink it.
 
 Note that the @command{mpatrol} shell script must be set up to use the correct
 object file format access libraries that are required for your system if you
 wish to use the @option{-d} option.  If the mpatrol library was built with
-@code{FORMAT=FORMAT_ELF} support then it must be told to preload the ELF access
-library (normally @file{libelf.so}).  If it was built with
+@code{FORMAT=FORMAT_ELF32} support then it must be told to preload the ELF
+access library (normally @file{libelf.so}).  If it was built with
 @code{FORMAT=FORMAT_BFD} support then it must be told to preload the GNU BFD
 access libraries (normally @file{libbfd.so} and @file{libiberty.so}).  However,
 if these libraries only exist on your system in archive form then you must build
 @file{libmpatrol.so} with these extra libraries incorporated into it so that
-there are no dependencies on them at run-time.
+there are no dependencies on them at run-time.  However, there may well be
+problems if the resulting shared library contains position-dependent code from
+the archive libraries you incorporated.  The only way to find out is for you to
+try it and see.
 
 @node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
@@ -4697,7 +4704,6 @@ recommendations feel free to let me know so I can add them to this list.  In
 particular, there seems to be a shortage of such programs for Netware platforms.
 
 @cindex APurify
-@cindex Devulder, Samuel
 @itemize @bullet
 @item
 APurify
@@ -4734,7 +4740,6 @@ resource leaks.
 @end table
 
 @cindex Ccmalloc
-@cindex Biere, Armin
 @item
 Ccmalloc
 @table @asis
@@ -4751,8 +4756,24 @@ Can interface with @command{gdb} to find memory leaks, multiple deallocations
 and memory corruptions in C or C++ programs.
 @end table
 
+@cindex Chaperon
+@item
+Chaperon
+@table @asis
+@item Author
+John Reiser (@email{jreiser@@BitWagon.com})
+@item License
+Commercial Software
+@item Platforms
+Linux
+@item Location
+@uref{http://www.BitWagon.com/chaperon.html}
+@item Overview
+Runs existing Intel Linux binary application programs, but checks for and
+reports bad behaviour in accessing memory.
+@end table
+
 @cindex Checker
-@cindex Gingold, Tristan
 @item
 Checker
 @table @asis
@@ -4771,7 +4792,6 @@ detecting memory leaks.
 @end table
 
 @cindex Dbmalloc
-@cindex Cahill, Conor P.
 @item
 Dbmalloc
 @table @asis
@@ -4789,8 +4809,24 @@ full set of debugging features which detect memory overruns and other types of
 misuse.
 @end table
 
+@cindex Debauch
+@item
+Debauch
+@table @asis
+@item Author
+Jon A. Christopher (@email{jac8792@@tamu.edu})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://quorum.tamu.edu/jon/gnu/}
+@item Overview
+A memory allocation debugger for C which will detect memory leaks, corrupted
+memory, stores to freed memory and more.
+@end table
+
 @cindex Dmalloc
-@cindex Watson, Gray
 @item
 Dmalloc
 @table @asis
@@ -4808,7 +4844,6 @@ powerful debugging facilities configurable at run-time.
 @end table
 
 @cindex Electric Fence
-@cindex Perens, Bruce
 @item
 Electric Fence
 @table @asis
@@ -4826,7 +4861,6 @@ detect illegal memory accesses.
 @end table
 
 @cindex Enforcer
-@cindex Sinz, Michael
 @item
 Enforcer
 @table @asis
@@ -4844,7 +4878,6 @@ and non-existent pages.
 @end table
 
 @cindex FDA (Free Debug Allocator)
-@cindex Helvey, Thomas
 @item
 FDA (Free Debug Allocator)
 @table @asis
@@ -4862,7 +4895,6 @@ Provides routines that can be plugged in to replace @code{malloc()},
 @end table
 
 @cindex Fortify
-@cindex Bullen, Simon
 @item
 Fortify
 @table @asis
@@ -4880,7 +4912,6 @@ writes beyond and before memory blocks and writes to freed memory.
 @end table
 
 @cindex GC (Garbage Collector)
-@cindex Boehm, Hans-J.
 @item
 GC (Garbage Collector)
 @table @asis
@@ -4972,7 +5003,6 @@ provides information on memory leaks.
 @end table
 
 @cindex MemDebug
-@cindex Schmit, Rene
 @item
 MemDebug
 @table @asis
@@ -5009,7 +5039,21 @@ existing malloc libraries in order to provide greater error checking.
 @end table
 
 @cindex MemWatch
-@cindex Walker, Doug
+@item
+MemWatch
+@table @asis
+@item Author
+Johan Lindh (@email{johan@@link-data.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.link-data.com/}
+@item Overview
+A fault-tolerant memory leak and corruption detection tool.
+@end table
+
 @item
 MemWatch
 @table @asis
@@ -5027,8 +5071,6 @@ debugging features that you link into your program.
 @end table
 
 @cindex Mmalloc
-@cindex Haertel, Mike
-@cindex Fish, Fred
 @item
 Mmalloc
 @table @asis
@@ -5046,7 +5088,6 @@ files for later reuse.
 @end table
 
 @cindex Mprof
-@cindex Zorn, Ben
 @item
 Mprof
 @table @asis
@@ -5065,7 +5106,6 @@ tracebacks.
 @end table
 
 @cindex MuForce
-@cindex Richter, Thomas
 @item
 MuForce
 @table @asis
@@ -5170,7 +5210,6 @@ which can then be caught and run under a debugger.
 @end table
 
 @cindex Wipeout
-@cindex Barthel, Olaf
 @item
 Wipeout
 @table @asis
@@ -5184,6 +5223,23 @@ AmigaOS
 @uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
 @item Overview
 Runs in the background checking free memory for corruption.
+@end table
+
+@cindex YAMD (Yet Another Malloc Debugger)
+@item
+YAMD (Yet Another Malloc Debugger)
+@table @asis
+@item Author
+Nate Eldredge (@email{neldredge@@hmc.edu})
+@item License
+GNU General Public License
+@item Platforms
+Linux, DOS
+@item Location
+@uref{http://www3.hmc.edu/~neldredge/yamd/}
+@item Overview
+A tool for finding bugs related to dynamic memory allocation in C and C++, and
+includes paging mechanisms to catch bugs immediately.
 @end table
 
 @cindex ZeroFault
