@@ -1,3 +1,193 @@
+2002-01-08  Graeme Roy  <graeme.roy@analog.com>
+
+	* THANKS: Credited Peter Zijlstra.
+
+	* bin/mpedit: Forgot to update the version number from last change.
+
+	* config/configure: Updated to latest configure.in.
+
+	* doc/mpatrol.texi:
+	Added more references.  Added information about diagnostics.
+
+	* src/mutex.c: Added Tru64 TIS support.
+
+2001-12-18  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c:
+	Added support for logging when not enough information is available.
+
+	* src/diag.h:
+	Added 1 onto the end of the functionnames and lognames arrays.
+
+	* src/info.c:
+	Added calls to __mp_log() before ALLOVF, FRDOVF, FRDCOR and FRECOR
+	errors.  Added logging before NULOPN, FREOPN, FRDOPN, RNGOVF and STROVF
+	errors.
+
+	* src/getopt.c, src/getopt.h: Added __mp_match().
+
+2001-12-11  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c, src/diag.h:
+	Unified all logging functions into __mp_log().  Moved checking of
+	recursive logging to __mp_log().  Added __mp_lognames.
+
+	* src/info.c:
+	Moved checking of recursive logging to __mp_log().
+
+	* src/inter.c:
+	Added default ltype to the logging information structures.
+
+2001-12-06  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c, src/diag.h:
+	Added the logged flag.  Changed some of the logging functions.  Removed
+	parameters from other logging functions.
+
+	* src/info.c:
+	Remove the logging flags.  Removed more parameters from the logging
+	functions.
+
+	* src/info.h:
+	Added the logged flag.  Added some variants to loginfo.  Added the
+	logtype enumeration.  Added the other logging types.
+
+	* src/inter.c: Added the logged flag.
+
+2001-12-05  Graeme Roy  <graeme.roy@analog.com>
+
+	* THANKS: Documented Gerrit's help.
+
+	* doc/mpatrol.texi: New changes documented.
+
+	* doc/refcard.tex: Added the --skip and --read-env options.
+
+	* man/man1/mpatrol.1: Added the --read-env option.
+
+	* man/man1/mpsym.1: Added the --skip option.
+
+	* src/target.h: Don't define POSIX_SOURCE for BSD systems.
+
+	* src/diag.h:
+	Removed alloctype from parameters as it is no longer needed.
+
+	* src/profile.c:
+	Now check if there is a problem when writing the profiling file.
+
+	* src/trace.c: Added checking when writing the trace file.
+
+	* src/info.c:
+	First set of changes to remove alloctype as an argument.  No longer need
+	the alloctype when logging operations.
+
+	* src/info.h:
+	Added the type field to the loginfo structure.  Removed alloctype
+	parameters as they are no longer needed.
+
+	* src/inter.c:
+	Added the alloctype function details to the loginfo structure.  Changes
+	for removing alloctype.
+
+	* src/mpatrol.c: Added the --read-env option.
+
+2001-10-10  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/symbol.c: Fix for FORMAT_AOUT when finding symbols.
+
+2001-10-08  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c:
+	Correctly format stack traces and symbol listings for HTML support.
+	Improved logging for HTML.
+
+2001-10-05  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/symbol.c: Added a bit of HTML support.
+
+	* src/diag.c:
+	Finished __mp_printversion().  Started adding HTML support to
+	__mp_printsummary().
+
+2001-10-04  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c: Converted some of the header to support HTML.
+
+	* src/inter.c: Draw a horizontal rule after the header for HTML.
+
+2001-10-03  Graeme Roy  <graeme.roy@analog.com>
+
+	* bin/mupdate: MP_VERSION is now defined in version.h.
+
+	* src/version.c, src/version.h:
+	Moved MP_VERSION to version.h.  Added __mp_author and __mp_email.
+
+	* src/mleak.c, src/mpatrol.c, src/mprof.c, src/mptrace.c:
+	Added __mp_author.
+
+2001-09-30  Graeme Roy  <graeme.roy@analog.com>
+
+	* THANKS: Added Diego Santa Cruz.
+
+	* bin/mpsym: Added the --skip option.
+
+	* doc/Makefile:
+	Added --no-split to the makeinfo command for producing HTML.
+
+2001-09-27  Graeme Roy  <graeme.roy@analog.com>
+
+	* src/diag.c, src/diag.h:
+	HTML-ised __mp_diag().  Added FLG_HTMLNEXT.  Fixed problem with the HTML
+	option changing formatting in the middle of a text file.
+
+	* src/option.c, src/mpatrol.h, src/option.h:
+	Added the HTML option.  Only flag the next log file to be formatted in
+	HTML, not the current one.
+
+	* src/mpatrol.c: Added the --html option.
+
+2001-09-26  Graeme Roy  <graeme.roy@analog.com>
+
+	* config/aclocal.m4: Added AM_CONDITIONAL.
+
+	* config/configure: Updated to latest configure.in.
+
+	* config/configure.in: Added the XSUPPORT automake conditional.
+
+	* config/src.in, config/src.am:
+	Added XSUPPORT.  Make use of X_CFLAGS.  Added INCLUDES.
+
+	* doc/mpatrol.texi: Documented more about GUI support.
+
+	* src/diag.c, src/diag.h: Added __mp_diagtag().  Started HTML support.
+
+	* src/info.c:
+	Removed __mp_closelogfile() out of __mp_deleteinfo().  Fixed a bug with
+	calculating the total size of marked allocations.
+
+	* src/inter.c: Moved __mp_closelogfile() out of __mp_deleteinfo().
+
+2001-09-25  Graeme Roy  <graeme.roy@analog.com>
+
+	* bin/mpsym: Now automatically detect the value for POINTER.
+
+	* config/configure.in, config/configure.in:
+	Added support for SETVBUF_REVERSED and X_DISPLAY_MISSING.
+
+	* config/src.in, config/tools.in, config/tsrc.in, config/configure.in,
+	  config/configure:
+	Added X support.
+
+	* doc/mpatrol.texi:
+	Documented POINTER no longer required to be set in mpsym.
+
+	* man/man1/mpsym.1: No longer require POINTER to be set in mpsym.
+
+	* src/config.h:
+	Now define MP_GUI_SUPPORT if autoconf has determined that we have X
+	support.
+
+	* src/diag.c, tools/mgauge.c: Added support for SETVBUF_REVERSED.
+
 2001-09-23  Graeme Roy  <graeme.roy@analog.com>
 
 	* config/acconfig.h: New file for additional macros for autoheader.
