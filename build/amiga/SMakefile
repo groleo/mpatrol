@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.43 2001-01-22 21:52:44 graeme Exp $
+# $Id: SMakefile,v 1.44 2001-01-25 22:56:30 graeme Exp $
 
 
 # Definitions
@@ -93,15 +93,17 @@ mptrace: mptrace.o getopt.o tree.o utils.o version.o
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol mprof mptrace mleak
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) mpatrol mprof mptrace mleak
 
 clean:
 	-@ Delete $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) FORCE >NIL:
+	-@ Delete $(ARCHIVE_MPAOBJS) FORCE >NIL:
 	-@ Delete mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) FORCE >NIL:
 	-@ Delete $(OBJECT_MPATROL) $(OBJTS_MPATROL) FORCE >NIL:
+	-@ Delete $(ARCHIVE_MPALLOC) FORCE >NIL:
 	-@ Delete mpatrol mpatrol.lnk mprof mprof.lnk mptrace mptrace.lnk mleak mleak.lnk FORCE >NIL:
 
 
@@ -212,6 +214,18 @@ inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/trace.h $(SOURCE)/machine.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpfailure.o: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpsetfail.o: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpmalloc.o: $(SOURCE)/mpmalloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpcalloc.o: $(SOURCE)/mpcalloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpstrdup.o: $(SOURCE)/mpstrdup.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mprealloc.o: $(SOURCE)/mprealloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
 $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \

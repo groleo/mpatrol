@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.9 2001-01-24 13:19:35 graeme Exp $
+# $Id: Makefile.aix,v 1.10 2001-01-25 22:56:36 graeme Exp $
 
 
 # Definitions
@@ -151,13 +151,14 @@ mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
 all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
-	mpatrol mprof mptrace mleak
+	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) mpatrol mprof mptrace mleak
 
-lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
+lint: $(LINT_MPATROL) $(LINTTS_MPATROL) $(LINT_MPALLOC)
 
 clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPAOBJS) $(LINT_MPAOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
@@ -165,6 +166,8 @@ clobber: clean
 	-@ rm -f $(SHARED_MPATROL) $(SHARTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
@@ -291,6 +294,18 @@ malloc.o malloc.n.ln malloc.t.o malloc.t.ln: $(SOURCE)/malloc.c \
 version.o version.n.ln version.t.o version.t.ln: $(SOURCE)/version.c \
 	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
 machine.o machine.t.o: $(SOURCE)/machine.c $(SOURCE)/config.h $(SOURCE)/target.h
+mpfailure.o mpfailure.n.ln: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mpsetfail.o mpsetfail.n.ln: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mpmalloc.o mpmalloc.n.ln: $(SOURCE)/mpmalloc.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mpcalloc.o mpcalloc.n.ln: $(SOURCE)/mpcalloc.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mpstrdup.o mpstrdup.n.ln: $(SOURCE)/mpstrdup.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mprealloc.o mprealloc.n.ln: $(SOURCE)/mprealloc.c $(SOURCE)/mpalloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \

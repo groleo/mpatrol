@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.40 2001-01-22 21:52:45 graeme Exp $
+# $Id: Makefile,v 1.41 2001-01-25 22:56:32 graeme Exp $
 
 
 # Definitions
@@ -95,15 +95,17 @@ mptrace.nlm: mptrace.obj getopt.obj tree.obj utils.obj version.obj
 mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.obj getopt.obj tree.obj version.obj
 
-all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) $(ARCHIVE_MPALLOC) mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm
 
 clean:
 	-@ rm -f $(MPTOBJS) $(MPTTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(MPAOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm 2>&1 >/dev/null
 
 
@@ -218,6 +220,18 @@ inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/trace.h $(SOURCE)/machine.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpfailure.obj: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpsetfail.obj: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpmalloc.obj: $(SOURCE)/mpmalloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpcalloc.obj: $(SOURCE)/mpcalloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mpstrdup.obj: $(SOURCE)/mpstrdup.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+mprealloc.obj: $(SOURCE)/mprealloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
 $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
