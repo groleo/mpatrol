@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.19 2001-02-21 12:06:29 graeme Exp $
+# $Id: Makefile.aix,v 1.20 2001-02-21 12:15:51 graeme Exp $
 
 
 # Definitions
@@ -65,6 +65,7 @@ ARCHIVE_MPAOBJS	= $(MPAOBJS)
 LINT_MPAOBJS	= $(MPAOBJS:.o=.n.ln)
 
 ARCHIVE_MPLOBJS	= $(MPLOBJS)
+LINT_MPLOBJS	= $(MPLOBJS:.o=.n.ln)
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= shr.o
@@ -81,6 +82,7 @@ OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 ARCHIVE_MPTOOLS	= lib$(MPTOOLS).a
+LINT_MPTOOLS	= llib-l$(MPTOOLS).ln
 
 
 # Rules
@@ -143,6 +145,9 @@ $(LINT_MPALLOC): $(LINT_MPAOBJS)
 $(ARCHIVE_MPTOOLS): $(ARCHIVE_MPLOBJS)
 	$(AR) cr $@ $(ARCHIVE_MPLOBJS)
 
+$(LINT_MPTOOLS): $(LINT_MPLOBJS)
+	$(LINT) -o $(MPTOOLS) $(LINT_MPLOBJS)
+
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s
 	$(CC) $(CFLAGS) $(OFLAGS) -c machine.s
@@ -169,13 +174,13 @@ all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) $(ARCHIVE_MPTOOLS) \
 	mpatrol mprof mptrace mleak
 
-lint: $(LINT_MPATROL) $(LINTTS_MPATROL) $(LINT_MPALLOC)
+lint: $(LINT_MPATROL) $(LINTTS_MPATROL) $(LINT_MPALLOC) $(LINT_MPTOOLS)
 
 clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPAOBJS) $(LINT_MPAOBJS) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPLOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPLOBJS) $(LINT_MPLOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
@@ -185,7 +190,7 @@ clobber: clean
 	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPALLOC) $(LINT_MPALLOC) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOOLS) $(LINT_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
@@ -392,6 +397,7 @@ graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
-heapdiff.o: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h
-mgauge.o: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h
-mtrace.o: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h
+heapdiff.o heapdiff.n.ln: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h \
+	$(SOURCE)/mpatrol.h
+mgauge.o mgauge.n.ln: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h
+mtrace.o mtrace.n.ln: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h
