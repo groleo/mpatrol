@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.70 2001-03-05 20:24:24 graeme Exp $"
+#ident "$Id: diag.c,v 1.71 2001-03-05 22:09:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.70 2001-03-05 20:24:24 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.71 2001-03-05 22:09:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1312,7 +1312,6 @@ __mp_printleaktab(infohead *h, size_t l, int o, unsigned char f)
             n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
             printleakinfo(n, o, (f & FLG_COUNTS));
         }
-    __mp_diag("\n");
 }
 
 
@@ -1329,7 +1328,7 @@ __mp_printmap(infohead *h)
     size_t l, s;
 
     a = NULL;
-    __mp_diag("\nmemory map:\n");
+    __mp_diag("memory map:\n");
     for (n = (allocnode *) h->alloc.list.head; n->lnode.next != NULL;
          n = (allocnode *) n->lnode.next)
     {
