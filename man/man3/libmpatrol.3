@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.7 2001-02-08 20:51:32 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.8 2001-02-08 22:38:16 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "8 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -109,8 +109,9 @@ All of the function definitions in \fImpatrol.h\fP can be disabled by defining
 the \fBNDEBUG\fP preprocessor macro, which is the same macro used to control
 the behaviour of the \fBassert\fP function.  If \fBNDEBUG\fP is defined then
 no macro redefinition of functions will take place and all special mpatrol
-library functions will evaluate to empty statements.  It is intended that the
-\fBNDEBUG\fP preprocessor macro be defined in release builds.
+library functions will evaluate to empty statements.  The \fImpalloc.h\fP header
+file will also be included in this case.  It is intended that the \fBNDEBUG\fP
+preprocessor macro be defined in release builds.
 .PP
 All diagnostics are sent to the file \fImpatrol.log\fP in the current directory
 by default but this can be changed at run-time.  Additional configuration
