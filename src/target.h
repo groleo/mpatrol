@@ -57,15 +57,17 @@
 #endif /* TARGET */
 
 
-#define SYSTEM_ANY     1 /* no specific system */
-#define SYSTEM_AIX     2 /* AIX */
-#define SYSTEM_DGUX    3 /* DG/UX */
-#define SYSTEM_DYNIX   4 /* DYNIX/ptx */
-#define SYSTEM_HPUX    5 /* HP/UX */
-#define SYSTEM_IRIX    6 /* IRIX */
-#define SYSTEM_LINUX   7 /* Linux */
-#define SYSTEM_LYNXOS  8 /* LynxOS */
-#define SYSTEM_SOLARIS 9 /* Solaris */
+#define SYSTEM_ANY      1  /* no specific system */
+#define SYSTEM_AIX      2  /* AIX */
+#define SYSTEM_DGUX     3  /* DG/UX */
+#define SYSTEM_DYNIX    4  /* DYNIX/ptx */
+#define SYSTEM_HPUX     5  /* HP/UX */
+#define SYSTEM_IRIX     6  /* IRIX */
+#define SYSTEM_LINUX    7  /* Linux */
+#define SYSTEM_LYNXOS   8  /* LynxOS */
+#define SYSTEM_SINIX    9  /* SINIX */
+#define SYSTEM_SOLARIS  10 /* Solaris */
+#define SYSTEM_UNIXWARE 11 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -86,11 +88,17 @@
 #define SYSTEM SYSTEM_LINUX
 #elif defined(__Lynx) || defined(__Lynx__)
 #define SYSTEM SYSTEM_LYNXOS
+#elif defined(sinix) || defined(_sinix) || defined(__sinix) || \
+      defined(__sinix__) || defined(SNI) || defined(_SNI) || defined(__SNI) || \
+      defined(__SNI__)
+#define SYSTEM SYSTEM_SINIX
 #elif (defined(sun) || defined(_sun) || defined(__sun) || defined(__sun__)) && \
       (defined(svr4) || defined(_svr4) || defined(__svr4) || \
        defined(__svr4__) || defined(SVR4) || defined(_SVR4) || \
        defined(__SVR4) || defined(__SVR4__))
 #define SYSTEM SYSTEM_SOLARIS
+#elif defined(USLC) || defined(_USLC) || defined(__USLC) || defined(__USLC__)
+#define SYSTEM SYSTEM_UNIXWARE
 #else /* SYSTEM */
 #define SYSTEM SYSTEM_ANY
 #endif /* SYSTEM */
