@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.120 2000-10-25 22:40:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.121 2000-10-26 21:45:15 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 25th October, 2000
+@set UPDATED 26th October, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2408,14 +2408,19 @@ distribution of all memory allocations and deallocations is available.
 
 @cindex GraphViz
 @cindex dot
+@cindex dotty
+@cindex gprof
+@cindex graph specification file
+@cindex graph
 A memory allocation call graph is also available for the programmer to be able
 to see the caller and callee relationships for all functions that allocated
 memory, either directly or indirectly.  This graph is shown in a tabular form
 similar to that of @command{gprof}, but it can also be written to a graph
 specification file for later processing by @command{dot}.  The @command{dot}
-command is part of GraphViz, an excellent graph visualisation package that was
-developed at AT&T Bell Labs and is available for free download for UNIX and
-Windows platforms from @uref{http://www.research.att.com/sw/tools/graphviz/}.
+and @command{dotty} commands are part of GraphViz, an excellent graph
+visualisation package that was developed at AT&T Bell Labs and is available for
+free download for UNIX and Windows platforms from
+@uref{http://www.research.att.com/sw/tools/graphviz/}.
 
 Only allocations and deallocations are recorded, with each reallocation being
 treated as a deallocation immediately followed by an allocation.  For full
@@ -2775,22 +2780,163 @@ the string as well as the structure at line 77.  A version of the above
 program that does not contain the memory leak can be found in
 @file{tests/profile/test2.c}.
 
+As a final demonstration of mpatrol's profiling features we will attempt to
+profile a real application in order to see where the memory allocations come
+from.  Since all of the following steps were performed on a Solaris machine, the
+@option{--dynamic} option of the @command{mpatrol} command was used to allow us
+to replace the system memory allocation routines with mpatrol's routines without
+requiring a relink.  It also means that we can profile all of the child
+processes that were created by the application as well.
+
+@cindex driver
+@cindex preprocessor
+@cindex assembler
+@cindex prelinker
+The application that we are going to profile is the GNU C compiler,
+@command{gcc} (version 2.95.2), which is quite a complicated and large program.
+The actual @command{gcc} command is really the compiler driver which invokes the
+C preprocessor followed by the compiler, the assembler, the prelinker and
+finally the linker (well, it does in this example).  On Solaris, the
+@command{gcc} distribution uses the system assembler and linker which come with
+no symbol tables in their executable files so we will not be profiling them.
+
+@cindex bash
+For the purpose of this demonstration we will only be looking at the graph
+files produced by the @option{--graph-file} option of the @command{mprof}
+command, but ordinarily you would want to look at the tables that
+@command{mprof} produces as well.  All of the command line examples use the
+@command{bash} shell but in most cases these will work in other shells with
+a minimal amount of changes.
+
+@cindex format string
+We will use @file{tests/profile/test2.c} as the source file to compile with
+@command{gcc} and we'll turn on optimisation in order to cause @command{gcc} to
+allocate a bit more memory than it would normally.  When running it through the
+@command{mpatrol} command we also use @option{--check=0} so that we disable
+mpatrol's internal checks --- we don't need them if we are only profiling.  Note
+that use is also made of the format string feature of the @option{--log-file}
+and @option{--prof-file} options so that it is clear which mpatrol log and
+profiling output files belong to which processes.
+
+@smallexample
+bash$ mpatrol --dynamic --log-file=%p.log --prof-file=%p.out
+              --prof --check=0 gcc -O -o test2 test2.c
+bash$ ls *.log *.out
+as.log         cc1.out        cpp.log        gcc.out
+as.out         collect2.log   cpp.out        ld.log
+cc1.log        collect2.out   gcc.log        ld.out
+@end smallexample
+
+As mentioned above, we're not interested in the mpatrol log and profiling
+output files for @command{as} and @command{ld} so we'll delete them.  We can
+now use @command{mprof} to create graph specification files for each of the
+profiling output files produced.  You can find these graph specification files
+in the @file{extra} directory in the mpatrol distribution.
+
+@smallexample
+bash$ rm as.log as.out ld.log ld.out
+bash$ ls *.out
+cc1.out        collect2.out   cpp.out        gcc.out
+bash$ for file in *.out
+> do
+>     mprof --graph-file=`basename $file .out`.dot $file
+> done >/dev/null
+bash$ ls *.dot
+cc1.dot        collect2.dot   cpp.dot        gcc.dot
+@end smallexample
+
+The graph specification files that have now been produced can be viewed and
+manipulated with the @command{dotty} command, or they can be converted to
+various image formats with the @command{dot} command.  However, this presumes
+that you already have the GraphViz graph visualisation package installed.  If
+you have then you can convert the graph specification files to GIF and
+postscript images using the following commands.
+@ifinfo
+If not, you can still view the graphs produced in the HTML, DVI, postscript and
+PDF versions of this manual, or you can look at the relevant files in the
+@file{doc/images} directory in the mpatrol distribution.
+@end ifinfo
+@ifnotinfo
+If not, you can still view the graphs produced in the following figures.
+@end ifnotinfo
+
+@smallexample
+bash$ dot -Tgif -Gsize="6,3" -Gratio=fill -o gcc.gif gcc.dot
+bash$ dot -Tgif -Gsize="6,3" -Gratio=fill -o cpp.gif cpp.dot
+bash$ dot -Tgif -Gsize="7,4" -Gratio=fill -o cc1.gif cc1.dot
+bash$ dot -Tgif -Gsize="4,3" -Gratio=fill -o collect2.gif collect2.dot
+bash$ dot -Tps -Gsize="6,3" -Gratio=fill -o gcc.ps gcc.dot
+bash$ dot -Tps -Gsize="6,3" -Gratio=fill -o cpp.ps cpp.dot
+bash$ dot -Tps -Gsize="9,6" -Gratio=fill -Grotate=90 -o cc1.ps cc1.dot
+bash$ dot -Tps -Gsize="4,3" -Gratio=fill -o collect2.ps collect2.dot
+@end smallexample
+
+@ifnotinfo
+@image{images/gcc}
+
+The figure above shows the allocation call graph for the @command{gcc} compiler
+driver.  From the graph you can see that the vast majority of memory allocations
+appear to be required for reading the driver specification file, which details
+default options and platform-specific features.  Almost all of the memory
+allocations go through the @code{xmalloc()} routine, which is an error-checking
+function built on top of @code{malloc()}.  A large amount of memory is also
+allocated by the @emph{obstack} module, which provides a functionality similar
+to @emph{arenas} for variable-sized data structures.  You'll see extensive use
+of both of these types of routines throughout the following graphs.
+
+@image{images/cpp}
+
+As would be expected, in the above allocation call graph for the @command{cpp}
+C preprocessor, the majority of memory allocations are used for macro
+processing, with a sizable chunk being allocated for reading include files.
+You may also notice the dotted lines that connect the @code{rescan()},
+@code{handle_directive()}, @code{do_include()} and @code{finclude()}
+functions@footnote{You might also have noticed the dotted lines connecting
+@code{do_spec_1()} and @code{handle_braces()} in the previous graph.}.  These
+show a cycle in the call graph where each of these functions may have been
+involved in one or more recursive calls.  The labels for such dotted edges may
+not be entirely accurate since @command{mprof} will only count allocated memory
+once for each recursive call chain.
+
+The following figure shows the allocation call graph for the @command{cc1}
+compiler itself.  As you would expect, it's a bit of a beast compared to the
+previous two graphs, and looks very hard to follow.  However, if you look closer
+you will notice that the various groups of functions that comprise the compiler
+stand out due to their close association with one another.  For example, you
+might notice that the functions between @code{cse_insn()} and
+@code{get_cse_reg_info()} form a group that allocates 9140 bytes overall.  You
+can also see the parser module at the top left of the graph, initiated with
+@code{yyparse()}, and the code generator module in the rest of the graph,
+initiated with @code{rest_of_compilation()}.
+
+@page
+
+@image{images/cc1}
+
+@page
+
+@image{images/collect2}
+
+The allocation call graph for the prelinker, @command{collect2}, is a lot
+simpler than the previous graphs.  There are no cycles in the graph and most of
+the allocations are concerned with maintaining hash tables.  Once again,
+@code{xmalloc()} and @code{_obstack_begin()} are the two main sources of memory
+allocation.
+
+As can be seen, a lot of information about the memory allocation behaviour of
+a program can be obtained by creating a visual image of the allocation call
+graph.  In addition, different graphs can be produced to show call counts
+instead of allocated bytes (via the @option{--counts} option), and graphs of
+unfreed memory can be produced to detect where memory leaks come from (via the
+@option{--leaks} option).
+@end ifnotinfo
+
 @cindex VAX
 Much of the functionality of this implementation of memory allocation profiling
 is based upon @command{mprof} by Benjamin Zorn and Paul Hilfinger, which was
 written as a research project and ran on MIPS, SPARC and VAX machines.  However,
 the profiling output files are incompatible, the tables displayed have a
 different format, and the way they are implemented is entirely different.
-
-@ifnotinfo
-@image{images/gcc}
-
-@image{images/cpp}
-
-@image{images/cc1}
-
-@image{images/collect2}
-@end ifnotinfo
 
 @node Improving performance, How it works, Profiling, Top
 @chapter Improving performance
