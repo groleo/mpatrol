@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.40 2000-07-13 23:42:15 graeme Exp $"
+#ident "$Id: inter.c,v 1.41 2000-11-02 23:42:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -137,6 +137,50 @@ static int checkrange(unsigned long l, unsigned long n, unsigned long u)
 }
 
 
+/* Check the alloca allocation stack for any allocations that should be freed.
+ */
+
+static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
+{
+    allocanode *n, *p;
+    int c;
+
+    for (n = (allocanode *) memhead.astack.head;
+         p = (allocanode *) n->node.next; n = p)
+    {
+        c = 0;
+        if (f == 1)
+            c = 1;
+        else if (memhead.alloc.heap.memory.stackdir < 0)
+        {
+            /* The stack grows down so we must ensure that the current local
+             * variable pointer occupies a higher address than that which
+             * made the original allocation if we are to free the allocation.
+             */
+            if ((char *) n->data.frame < (char *) &v->frame)
+                c = 1;
+        }
+        else
+        {
+            /* The stack grows up so we must ensure that the current local
+             * variable pointer occupies a lower address than that which
+             * made the original allocation if we are to free the allocation.
+             */
+            if ((char *) n->data.frame > (char *) &v->frame)
+                c = 1;
+        }
+        if (c == 1)
+        {
+            if (memhead.prologue && (memhead.recur == 1))
+                memhead.prologue(n->block, (size_t) -1);
+            __mp_freememory(&memhead, n->block, AT_ALLOCA, s, t, u, v);
+            if (memhead.epilogue && (memhead.recur == 1))
+                memhead.epilogue((void *) -1);
+        }
+    }
+}
+
+
 /* Initialise the mpatrol library.
  */
 
@@ -196,6 +240,8 @@ void __mp_init(void)
 
 void __mp_fini(void)
 {
+    stackinfo i;
+
     savesignals();
     if (memhead.init)
     {
@@ -204,6 +250,13 @@ void __mp_fini(void)
             /* Firstly, check the integrity of the memory blocks.
              */
             __mp_checkinfo(&memhead);
+            /* Next, determine the call stack details in case we need to
+             * free any remaining allocations that were made by alloca().
+             */
+            __mp_newframe(&i, NULL);
+            if (__mp_getframe(&i))
+                __mp_getframe(&i);
+            checkalloca(NULL, NULL, 0, &i, 1);
             /* Then close any access library handles that might still be open.
              */
             __mp_closesymbols(&memhead.syms);
@@ -330,6 +383,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
   retry:
     p = __mp_getmemory(&memhead, l, a, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
@@ -433,6 +487,7 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     if (p != NULL)
     {
         /* Determine the size of the string, allocate the memory, then
@@ -526,6 +581,7 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     p = __mp_resizememory(&memhead, p, l, a, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
@@ -590,6 +646,7 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     __mp_freememory(&memhead, p, f, s, t, u, &i);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1);
