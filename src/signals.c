@@ -45,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.13 2000-07-17 21:02:52 graeme Exp $"
+#ident "$Id: signals.c,v 1.14 2000-07-31 23:47:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -69,7 +69,8 @@ typedef void (*handlerfunction)(int);
 #if MP_SIGINFO_SUPPORT
 static void signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
-#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_LYNXOS
 #if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
 static void signalhandler(int s, struct sigcontext n)
 #else /* SYSTEM && ARCH */
@@ -126,8 +127,8 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
     __mp_diag("\n");
 #if TARGET == TARGET_UNIX
-#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_LYNXOS
+#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -153,6 +154,8 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
         a = NULL;
 #if SYSTEM == SYSTEM_AIX
         a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
+#elif SYSTEM == SYSTEM_IRIX
+        a = (void *) ((long) n->sc_badvaddr);
 #elif SYSTEM == SYSTEM_LINUX
 #if ARCH == ARCH_IX86
         a = (void *) n.cr2;
@@ -290,6 +293,9 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
 #else /* MP_SIGINFO_SUPPORT */
     signal(SIGBUS, (handlerfunction) signalhandler);
     signal(SIGSEGV, (handlerfunction) signalhandler);
+#if MP_WATCH_SUPPORT
+    signal(SIGTRAP, (handlerfunction) signalhandler);
+#endif /* MP_WATCH_SUPPORT */
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
     SetUnhandledExceptionFilter(signalhandler);
