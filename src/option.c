@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.32 2001-02-11 22:11:22 graeme Exp $"
+#ident "$Id: option.c,v 1.33 2001-02-11 22:23:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.32 2001-02-11 22:11:22 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.33 2001-02-11 22:23:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1277,6 +1277,12 @@ __mp_setopt(infohead *h, unsigned long o, unsigned long v)
         if (v > 0xFF)
             v = 0xFF;
         h->alloc.abyte = v;
+        break;
+      case OPT_DEFALIGN:
+        if ((v == 0) || (v > h->alloc.heap.memory.page))
+            r = o;
+        else
+            h->alloc.heap.memory.align = __mp_poweroftwo(v);
         break;
       case OPT_LIMIT:
         h->limit = v;
