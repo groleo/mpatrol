@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.18 2000-03-20 19:53:35 graeme Exp $"
+#ident "$Id: inter.c,v 1.19 2000-03-21 21:14:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -492,14 +492,12 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
     stackinfo i;
     int j;
 
-    if (memhead.fini)
+    if (!memhead.init || memhead.fini)
     {
         __mp_memset(p, c, l);
         return p;
     }
     savesignals();
-    if (!memhead.init)
-        __mp_init();
     /* Determine the call stack details.
      */
     __mp_newframe(&i);
@@ -542,14 +540,12 @@ void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     stackinfo i;
     int j;
 
-    if (memhead.fini)
+    if (!memhead.init || memhead.fini)
     {
         __mp_memcopy(q, p, l);
         return q;
     }
     savesignals();
-    if (!memhead.init)
-        __mp_init();
     /* Determine the call stack details.
      */
     __mp_newframe(&i);
@@ -603,11 +599,9 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         q = (void *) &b;
         m = 1;
     }
-    if (memhead.fini)
+    if (!memhead.init || memhead.fini)
         return __mp_memfind(p, l, q, m);
     savesignals();
-    if (!memhead.init)
-        __mp_init();
     /* Determine the call stack details.
      */
     __mp_newframe(&i);
@@ -651,7 +645,7 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     stackinfo i;
     int j, r;
 
-    if (memhead.fini)
+    if (!memhead.init || memhead.fini)
         if (m = __mp_memcompare(p, q, l))
         {
             l = (char *) m - (char *) p;
@@ -660,8 +654,6 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         else
             return 0;
     savesignals();
-    if (!memhead.init)
-        __mp_init();
     /* Determine the call stack details.
      */
     __mp_newframe(&i);
