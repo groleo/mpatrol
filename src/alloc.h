@@ -55,6 +55,7 @@
 typedef struct allocnode
 {
     listnode lnode; /* list node */
+    listnode fnode; /* freed list node */
     treenode tnode; /* tree node */
     void *block;    /* pointer to block of memory */
     size_t size;    /* size of block of memory */
@@ -75,6 +76,7 @@ typedef struct allochead
     heaphead heap;       /* pointer to heap */
     slottable table;     /* table of allocation nodes */
     listhead list;       /* list of allocation nodes */
+    listhead flist;      /* list of freed allocations */
     treeroot itree;      /* internal allocation tree */
     treeroot atree;      /* allocation tree */
     treeroot gtree;      /* freed tree */
@@ -83,6 +85,7 @@ typedef struct allochead
     size_t asize;        /* allocation total */
     size_t gsize;        /* freed total */
     size_t fsize;        /* free total */
+    size_t fmax;         /* maximum number of freed allocations */
     size_t oflow;        /* overflow buffer size */
     unsigned char obyte; /* overflow byte */
     unsigned char abyte; /* allocation byte */
@@ -98,8 +101,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newallocs(allochead *, size_t, unsigned char, unsigned char,
-                              unsigned char, unsigned long);
+MP_EXPORT void __mp_newallocs(allochead *, size_t, size_t, unsigned char,
+                              unsigned char, unsigned char, unsigned long);
 MP_EXPORT void __mp_deleteallocs(allochead *);
 MP_EXPORT allocnode *__mp_getalloc(allochead *, size_t, size_t, void *);
 MP_EXPORT int __mp_resizealloc(allochead *, allocnode *, size_t);

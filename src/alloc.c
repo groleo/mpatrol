@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.7 2000-07-11 23:41:15 graeme Exp $"
+#ident "$Id: alloc.c,v 1.8 2000-07-16 22:30:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,7 +48,7 @@ extern "C"
  * freed or free blocks.
  */
 
-MP_GLOBAL void __mp_newallocs(allochead *h, size_t s, unsigned char o,
+MP_GLOBAL void __mp_newallocs(allochead *h, size_t m, size_t s, unsigned char o,
                               unsigned char a, unsigned char f, unsigned long u)
 {
     struct { char x; allocnode y; } z;
@@ -62,11 +62,13 @@ MP_GLOBAL void __mp_newallocs(allochead *h, size_t s, unsigned char o,
     n = (char *) &z.y - &z.x;
     __mp_newslots(&h->table, sizeof(allocnode), __mp_poweroftwo(n));
     __mp_newlist(&h->list);
+    __mp_newlist(&h->flist);
     __mp_newtree(&h->itree);
     __mp_newtree(&h->atree);
     __mp_newtree(&h->gtree);
     __mp_newtree(&h->ftree);
     h->isize = h->asize = h->gsize = h->fsize = 0;
+    h->fmax = m;
     h->oflow = __mp_poweroftwo(s);
     h->obyte = o;
     h->abyte = a;
@@ -93,6 +95,7 @@ MP_GLOBAL void __mp_deleteallocs(allochead *h)
     h->table.free = NULL;
     h->table.size = 0;
     __mp_newlist(&h->list);
+    __mp_newlist(&h->flist);
     __mp_newtree(&h->itree);
     __mp_newtree(&h->atree);
     __mp_newtree(&h->gtree);
@@ -537,6 +540,74 @@ MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
 }
 
 
+/* Recycle a freed allocation node.
+ */
+
+static void recyclefreed(allochead *h)
+{
+    allocnode *n;
+    void *p;
+    size_t l, s;
+
+    n = (allocnode *) ((char *) h->flist.head - offsetof(allocnode, fnode));
+    /* Remove the freed node from the freed list and the freed tree.
+     */
+    __mp_remove(&h->flist, &n->fnode);
+    __mp_treeremove(&h->gtree, &n->tnode);
+    h->gsize -= n->size;
+    if (h->flags & FLG_PAGEALLOC)
+    {
+        p = (void *) __mp_rounddown((unsigned long) n->block,
+                                    h->heap.memory.page);
+        s = __mp_roundup(n->size + ((char *) n->block - (char *) p),
+                         h->heap.memory.page);
+        if (h->flags & FLG_OFLOWWATCH)
+        {
+            /* Remove any watch points within the allocated pages.
+             */
+            if ((l = (char *) n->block - (char *) p) > 0)
+                __mp_memwatch(&h->heap.memory, p, l, MA_READWRITE);
+            if ((l = s - n->size - l) > 0)
+                __mp_memwatch(&h->heap.memory, (char *) n->block + n->size, l,
+                              MA_READWRITE);
+        }
+    }
+    /* We are placing this node on the free tree and so it will become
+     * available for reuse.  If all allocations are pages then we prevent
+     * the contents from being read or written to, otherwise the contents
+     * will be filled with the free byte.
+     */
+    if (h->flags & FLG_PAGEALLOC)
+    {
+        /* Any watch points will have already been removed, and the
+         * surrounding overflow buffers will already be protected with
+         * the MA_NOACCESS flag.
+         */
+        __mp_memprotect(&h->heap.memory, n->block, n->size, MA_NOACCESS);
+        n->block = p;
+        n->size = s;
+    }
+    else if (h->flags & FLG_OFLOWWATCH)
+    {
+        /* Remove any watch points that were made to monitor the overflow
+         * buffers.
+         */
+        __mp_memwatch(&h->heap.memory, (char *) n->block - h->oflow, h->oflow,
+                      MA_READWRITE);
+        __mp_memwatch(&h->heap.memory, (char *) n->block + n->size, h->oflow,
+                      MA_READWRITE);
+    }
+    n->block = (char *) n->block - h->oflow;
+    n->size += h->oflow << 1;
+    n->info = NULL;
+    if (!(h->flags & FLG_PAGEALLOC))
+        __mp_memset(n->block, h->fbyte, n->size);
+    __mp_treeinsert(&h->ftree, &n->tnode, n->size);
+    h->fsize += n->size;
+    mergenode(h, n);
+}
+
+
 /* Free an existing allocation node.
  */
 
@@ -545,6 +616,13 @@ MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
     void *p;
     size_t l, s;
 
+    /* If we are keeping the details (and possibly the contents) of a specified
+     * number of recently freed memory allocations then we may have to recycle
+     * the oldest freed allocation if the length of the queue would extend past
+     * the user-specified limit.
+     */
+    if ((i != NULL) && (h->fmax != 0) && (h->flist.size == h->fmax))
+        recyclefreed(h);
     /* Remove the allocated node from the allocation tree.
      */
     __mp_treeremove(&h->atree, &n->tnode);
@@ -600,6 +678,7 @@ MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
                                 MA_NOACCESS);
         else if (!(h->flags & FLG_PRESERVE))
             __mp_memset(n->block, h->fbyte, n->size);
+        __mp_addtail(&h->flist, &n->fnode);
         __mp_treeinsert(&h->gtree, &n->tnode, (unsigned long) n->block);
         h->gsize += n->size;
     }
