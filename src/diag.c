@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.57 2001-02-06 21:38:16 graeme Exp $"
+#ident "$Id: diag.c,v 1.58 2001-02-07 23:58:37 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.57 2001-02-06 21:38:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.58 2001-02-07 23:58:37 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1324,6 +1324,7 @@ __mp_printsummary(infohead *h)
         __mp_diag("-");
     else
         __mp_diag("%lu", h->urange);
+    __mp_diag("\ncheck frequency:   %lu", h->check);
     __mp_diag("\nfailure frequency: %lu", h->ffreq);
     __mp_diag("\nfailure seed:      %lu", h->fseed);
     __mp_diag("\nprologue function: ");
