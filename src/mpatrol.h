@@ -26,6 +26,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef NDEBUG
+#include <mpalloc.h>
+#endif /* NDEBUG */
 
 
 /* The version of the mpatrol library.  The version is of the format vrrff,
