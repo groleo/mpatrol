@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.61 2001-01-17 23:42:37 graeme Exp $"
+#ident "$Id: inter.c,v 1.62 2001-01-24 13:17:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -368,7 +368,8 @@ __mp_init(void)
          * that file.
          */
         if (memhead.alloc.heap.memory.prog != NULL)
-            __mp_addsymbols(&memhead.syms, memhead.alloc.heap.memory.prog, 0);
+            __mp_addsymbols(&memhead.syms, memhead.alloc.heap.memory.prog, NULL,
+                            0);
         __mp_addextsymbols(&memhead.syms);
         __mp_fixsymbols(&memhead.syms);
         if (!(memhead.flags & FLG_NOPROTECT))
