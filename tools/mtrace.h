@@ -1,5 +1,5 @@
-#ifndef MTRACE_H
-#define MTRACE_H
+#ifndef MPT_MTRACE_H
+#define MPT_MTRACE_H
 
 
 /*
@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mtrace.h,v 1.2 2001-02-23 21:14:02 graeme Exp $
+ * $Id: mtrace.h,v 1.3 2001-02-26 22:50:39 graeme Exp $
  */
 
 
@@ -68,4 +68,4 @@ void __mpt_muntrace(void);
 #endif /* __cplusplus */
 
 
-#endif /* MTRACE_H */
+#endif /* MPT_MTRACE_H */

@@ -1,5 +1,5 @@
-#ifndef MGAUGE_H
-#define MGAUGE_H
+#ifndef MPT_MGAUGE_H
+#define MPT_MGAUGE_H
 
 
 /*
@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mgauge.h,v 1.2 2001-02-23 21:09:53 graeme Exp $
+ * $Id: mgauge.h,v 1.3 2001-02-26 22:50:39 graeme Exp $
  */
 
 
@@ -88,4 +88,4 @@ void __mpt_mgaugeoff(void);
 #endif /* __cplusplus */
 
 
-#endif /* MGAUGE_H */
+#endif /* MPT_MGAUGE_H */

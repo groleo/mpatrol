@@ -1,5 +1,5 @@
-#ifndef HEAPDIFF_H
-#define HEAPDIFF_H
+#ifndef MPT_HEAPDIFF_H
+#define MPT_HEAPDIFF_H
 
 
 /*
@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: heapdiff.h,v 1.4 2001-02-25 21:29:15 graeme Exp $
+ * $Id: heapdiff.h,v 1.5 2001-02-26 22:50:39 graeme Exp $
  */
 
 
@@ -112,4 +112,4 @@ void __mpt_heapdiffend(heapdiff *, MP_CONST char *, unsigned long);
 #endif /* __cplusplus */
 
 
-#endif /* HEAPDIFF_H */
+#endif /* MPT_HEAPDIFF_H */
