@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.32 2000-01-30 20:55:41 graeme Exp $
+@c $Id: mpatrol.texi,v 1.33 2000-01-31 20:59:19 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.4
-@set VERSION 1.1.0
-@set UPDATED 30th January, 2000
+@set EDITION 1.5
+@set VERSION 1.1.1
+@set UPDATED 31st January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2180,8 +2180,8 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.0.8 (99/12/20)
-Copyright (C) 1997-1999 Graeme S. Roy
+@@(#) mpatrol 1.1.0 (00/01/30)
+Copyright (C) 1997-2000 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
 certain conditions; see the GNU Library General Public License for
@@ -2230,6 +2230,10 @@ freed blocks:      0 (0 bytes)
 free blocks:       1 (8176 bytes)
 internal blocks:   25 (204800 bytes)
 total heap usage:  212992 bytes
+total compared:    0 bytes
+total located:     0 bytes
+total copied:      0 bytes
+total set:         0 bytes
 total warnings:    0
 total errors:      1
 @end smallexample
