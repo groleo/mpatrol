@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.103 2001-03-02 01:53:55 graeme Exp $
+ * $Id: mpatrol.h,v 1.104 2001-03-02 02:00:46 graeme Exp $
  */
 
 
@@ -784,9 +784,11 @@ int __mp_view(MP_CONST char *, unsigned long);
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
 #define __mp_printf(s, ...) ((int) 0)
 #define __mp_printfwithloc(s, t, u, m, ...) ((void) 0)
+#define __mp_locprintf(m, ...) ((void) 0)
 #elif defined(__GNUC__)
 #define __mp_printf(s, a...) ((int) 0)
 #define __mp_printfwithloc(s, t, u, m, a...) ((void) 0)
+#define __mp_locprintf(m, a...) ((void) 0)
 #else /* __STDC_VERSION__ && __GNUC__ */
 static
 int
@@ -799,6 +801,12 @@ static
 void
 __mp_printfwithloc(MP_CONST char *s, MP_CONST char *t, unsigned long u,
                    MP_CONST char *m, ...)
+{
+}
+
+static
+void
+__mp_locprintf(MP_CONST char *m, ...)
 {
 }
 #endif /* __STDC_VERSION__ && __GNUC__ */
