@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.77 2000-05-15 23:34:12 graeme Exp $
+@c $Id: mpatrol.texi,v 1.78 2000-05-16 01:16:04 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 15th May, 2000
+@set UPDATED 16th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -530,8 +530,9 @@ in order to detect illegal writes to the freed memory allocation.
 Calls to memory operation functions (such as @code{memset()} or @code{memcpy()})
 have their arguments checked to ensure that they do not pass null pointers or
 attempt to read or write memory straddling the boundary of a previously
-allocated memory block.  Tracing from all such functions can also optionally
-be written to the log file.
+allocated memory block, although an option exists to turn such an error into a
+warning so that the operation can still be performed.  Tracing from all such
+functions can also optionally be written to the log file.
 
 @item
 The internal data structures used by the library are kept separate from the
@@ -1642,6 +1643,15 @@ functions for many memory operation functions, such as @code{memset()} and
 @code{memcpy()}.  These new functions provide additional checks to ensure that
 if a memory operation is being performed on a memory block, the operation will
 not read or write before or beyond the boundaries of that block.
+
+Normally, if an error is discovered in the call to such functions, the mpatrol
+library will report the error but prevent the operation from being performed
+before continuing execution.  If the error was that the range of memory being
+operated on overflowed the boundaries of an existing memory allocation then the
+@option{ALLOWOFLOW} option can be used to turn the error into a warning and
+force the operation to continue.  This behaviour can be desirable in certain
+cases where third-party libraries are being used that make such calls but the
+end result does not overflow the allocation boundary.
 
 To conclude, if you suspect your program has a piece of code which is performing
 illegal memory underwrites or overwrites to a memory allocation you should use
@@ -3834,9 +3844,11 @@ ERROR: memset: range [0x00027FFF,0x00028010] overflows [0x00028000,0x0002800F]
 As you can see, the library detected that the @code{memset()} function would
 have written past the boundaries of the memory allocation and reported this to
 you.  It then proceeded to ignore the request to copy the memory and continued
-with the execution of the program.  Note that this will only be done for known
-memory allocations.  Reading and writing past the boundaries of static and stack
-memory allocations cannot be detected in this way.
+with the execution of the program@footnote{The error can be turned into a
+warning with the @option{ALLOWOFLOW} option which will also force the operation
+to be performed.}.  Note that this will only be done for known memory
+allocations.  Reading and writing past the boundaries of static and stack memory
+allocations cannot be detected in this way.
 
 If the @option{LOGMEMORY} option is added to the @env{MPATROL_OPTIONS}
 environment variable then it is possible to see a log of all the mpatrol library
@@ -5032,6 +5044,14 @@ program will be halted, and its state may be examined at that point by using a
 suitable debugger.  Note that this setting will be ignored if its value is zero.
 Default value: @option{ALLOCSTOP=0}.
 
+@cindex ALLOWOFLOW
+@item @option{ALLOWOFLOW}
+Specifies that a warning rather than an error should be produced if any memory
+operation function overflows the boundaries of a memory allocation, and that
+the operation should still be performed.  This option is provided for
+circumstances where it is desirable for the memory operation to be performed,
+regardless of whether it is erroneous or not.
+
 @cindex AUTOSAVE
 @item @option{AUTOSAVE}=<@var{unsigned-integer}>
 Specifies the frequency at which to periodically write the profiling data to
@@ -5468,6 +5488,12 @@ should fail if the total allocated memory should increase beyond this.
 @item @option{-l} <@var{string}>
 [@option{LOGFILE}]  Specifies an alternative file in which to place all
 diagnostics from the mpatrol library.
+
+@cindex -M
+@item @option{-M}
+[@option{ALLOWOFLOW}]  Specifies that a warning rather than an error should be
+produced if any memory operation function overflows the boundaries of a memory
+allocation, and that the operation should still be performed.
 
 @cindex -m
 @item @option{-m}
