@@ -80,6 +80,34 @@
 #endif /* MP_PROTECT_SUPPORT */
 
 
+/* Indicates if a UNIX system supports the mmap() function call to allocate
+ * memory as well as sbrk().  This must only be set if the system also supports
+ * the allocation of zero-initialised pages from a special device file.  Note
+ * that sbrk() will still be used by default, but the USEMMAP option will
+ * instruct the library to use mmap() instead.
+ */
+
+#ifndef MP_MMAP_SUPPORT
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
+#define MP_MMAP_SUPPORT 1
+#else /* SYSTEM */
+#define MP_MMAP_SUPPORT 0
+#endif /* SYSTEM */
+#endif /* MP_MMAP_SUPPORT */
+
+
+/* The full path to a special device file which contains an infinite number of
+ * zero bytes.  This is used with mmap() in order to allocate zero-filled pages.
+ */
+
+#if MP_MMAP_SUPPORT
+#ifndef MP_MMAP_FILENAME
+#define MP_MMAP_FILENAME "/dev/zero"
+#endif /* MP_MMAP_FILENAME */
+#endif /* MP_MMAP_SUPPORT */
+
+
 /* Indicates if the system supports watch areas.  If not, then the OFLOWWATCH
  * option will have no effect.
  */
