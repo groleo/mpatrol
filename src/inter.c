@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.1.1.1 1999-10-03 11:25:21 graeme Exp $"
+#ident "$Id: inter.c,v 1.2 1999-10-03 22:50:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -433,7 +433,7 @@ int __mp_info(void *p, allocinfo *d)
         __mp_init();
     /* Check that we know something about the address that was supplied.
      */
-    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) &&
         ((n = __mp_findfreed(&memhead.alloc, p)) == NULL))
     {
         restoresignals();
