@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.3 2000-03-13 21:13:59 graeme Exp $
+# $Id: Makefile,v 1.4 2000-03-23 19:38:07 graeme Exp $
 
 
 # Definitions
@@ -42,20 +42,21 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj version.obj
+		  signals.obj diag.obj option.obj inter.obj sbrk.obj version.obj
 SHARED_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj main.obj version.obj
+		  signals.obj diag.obj option.obj inter.obj sbrk.obj main.obj \
+		  version.obj
 ARCHTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  inter.ts.obj version.ts.obj
+		  inter.ts.obj sbrk.ts.obj version.ts.obj
 SHARTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  inter.ts.obj main.ts.obj version.ts.obj
+		  inter.ts.obj sbrk.ts.obj main.ts.obj version.ts.obj
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
 SHARED_LIBRARY	= $(LIBRARY).dll
@@ -188,6 +189,8 @@ inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h
+sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
+        $(SOURCE)/target.h $(SOURCE)/memory.h
 main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
