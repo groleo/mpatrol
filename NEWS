@@ -6,8 +6,14 @@ Changes for 1.3.0
   * Changed the format of stack traces in the mpatrol log file so that symbol
     names also contain a byte offset from the beginning of the symbol.
 
+  * Warnings and errors are now reported with error abbreviation codes.
+
   * Added the alloca(), strdupa(), strndupa() and dealloca() functions for
     tracing and debugging temporary stack-based memory allocations.
+
+  * Improved the error-checking of the strdup() family of functions and also
+    fixed a bug in strndup() and strnsave() where the string was not being
+    terminated correctly.
 
   * ICL DRS/NX is now supported.
 
@@ -16,12 +22,16 @@ Changes for 1.3.0
   * Finally fixed the determination of the address of an illegal memory access
     on IRIX platforms and added support for the SGI N32 object file format.
 
-  * MP_FUNCNAME is now supported for C9X compilers.
+  * MP_FUNCNAME is now supported for C9X compilers.  Also added MP_NONEWDELETE,
+    MP_NEW and MP_DELETE to prevent problems with the macro replacement of the
+    C++ operators.
 
-  * Added long options to the external commands and added --help.
+  * Added long options to the external commands and added --help.  The short
+    options have now been heavily revised so beware!
 
   * Added the --show-env option to the mpatrol command and removed the implicit
-    LOGALL that was always being added to MPATROL_OPTIONS.
+    LOGALL that was always being added to MPATROL_OPTIONS.  Also added the
+    --threads option to link at run-time with threadsafe libraries.
 
   * Fixed a problem with the mpatrol command on UNIX platforms when the command
     to be run was not supplied with a pathname.
@@ -43,10 +53,12 @@ Changes for 1.3.0
     references to other documentation.  The manual also contains example graph
     images illustrating the new --graph-file mprof option.
 
-  * The ASCII version of the mpatrol manual and the texinfo.tex file used to
-    build the printed manuals are now provided with the main distribution.  The
-    PDF version of the manual now includes the mpatrol logo as a proper PDF
-    image file instead of a PNG file.
+  * The ASCII, GNU Info, AmigaGuide and HTML versions of the mpatrol manual and
+    the texinfo.tex file used to build the printed manuals are now provided with
+    the main distribution.  The PDF version of the manual now includes the
+    mpatrol logo as a proper PDF image file instead of a PNG file.
+
+  * Fixed the problem with margins in the PDF reference card.
 
   * A Makefile is now provided to build the UNIX manual pages.
 
