@@ -31,23 +31,28 @@
 
 #include "stack.h"
 #include "memory.h"
-#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_IRIX
 #include <exception.h>
-#elif SYSTEM != SYSTEM_HPUX
-#include <setjmp.h>
-#if ARCH == ARCH_SPARC
 #include <ucontext.h>
+#endif /* SYSTEM */
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#include <setjmp.h>
+#if ARCH == ARCH_MIPS || ARCH == ARCH_SPARC
+#include <ucontext.h>
+#if ARCH == ARCH_SPARC
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
 #endif /* ARCH */
-#endif /* SYSTEM */
-#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
+#endif /* ARCH */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.9 2000-06-05 20:10:44 graeme Exp $"
+#ident "$Id: stack.c,v 1.10 2000-06-07 20:10:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,13 +97,18 @@
 #if MP_MAXSTACK > 8
 #error not enough frameaddress() and returnaddress() macros
 #endif /* MP_MAXSTACK */
-#elif SYSTEM == SYSTEM_HPUX
-/* The following functions are defined in the HP/UX traceback library (libcl).
+#elif !MP_LIBRARYSTACK_SUPPORT */
+#if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+/* These macros are used by the unwind() function for setting flags when
+ * certain instructions are seen.
  */
 
-frameinfo U_get_current_frame(void);
-int U_get_previous_frame(frameinfo *, frameinfo *);
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#define SP_OFFSET   1 /* stack pointer offset has been set */
+#define PC_OFFSET   2 /* program counter offset has been set */
+#define CONST_LOWER 4 /* lower part of stack pointer offset has been set */
+#define CONST_UPPER 8 /* upper part of stack pointer offset has been set */
+#endif /* TARGET && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 
 
 #ifdef __cplusplus
@@ -107,12 +117,28 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX && \
-    !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
+/* The following functions are defined in the HP/UX traceback library (libcl).
+ */
+
+frameinfo U_get_current_frame(void);
+int U_get_previous_frame(frameinfo *, frameinfo *);
+#elif SYSTEM == SYSTEM_IRIX
+/* The unwind() function in the IRIX exception-handling library (libexc) calls
+ * malloc() and several memory operation functions, so we need to guard against
+ * this by preventing recursive calls.
+ */
+
+static unsigned char recursive;
+#endif /* SYSTEM */
+#else /* MP_LIBRARYSTACK_SUPPORT */
 static jmp_buf environment;
 static void (*bushandler)(int);
 static void (*segvhandler)(int);
-#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
 
 
 /* Initialise the fields of a stackinfo structure.
@@ -125,18 +151,24 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
     for (s->index = 0; s->index < MP_MAXSTACK; s->index++)
         s->frames[s->index] = s->addrs[s->index] = NULL;
     s->index = 0;
-#elif SYSTEM == SYSTEM_HPUX
+#elif MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
     __mp_memset(&s->next, 0, sizeof(frameinfo));
 #elif SYSTEM == SYSTEM_IRIX
     __mp_memset(&s->next, 0, sizeof(struct sigcontext));
-#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+    s->next.sp = s->next.pc = 0;
+#else /* TARGET && ARCH */
     s->next = NULL;
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* TARGET && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 }
 
 
-#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX && \
-    !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+    TARGET == TARGET_UNIX
 /* Handles any signals that result from illegal memory accesses whilst
  * traversing the call stack.
  */
@@ -145,10 +177,10 @@ static void stackhandler(int s)
 {
     longjmp(environment, 1);
 }
-#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && TARGET */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -176,10 +208,107 @@ static unsigned int *getaddr(unsigned int *p)
     return a;
 }
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 
 
-#if TARGET == TARGET_UNIX && ARCH == ARCH_SPARC && !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+/* Determine the stack pointer and return address of the previous stack frame.
+ */
+
+static int unwind(frameinfo *f)
+{
+    long p, s;
+    unsigned long a, i, q;
+    unsigned short l, u;
+
+    s = -1;
+    p = 0;
+    q = 0xFFFFFFFF;
+    l = u = 0;
+    a = 0;
+    /* Search for the program counter offset in the stack frame.
+     */
+    while (!((a & SP_OFFSET) && (a & PC_OFFSET)) && (f->pc < q))
+    {
+        i = *((unsigned long *) f->pc);
+        if (i == 0x03E00008)
+        {
+            /* jr ra */
+            q = f->pc + 8;
+        }
+        else if (i == 0x03A1E821)
+        {
+            /* addu sp,sp,at */
+            s = 0;
+            a |= SP_OFFSET;
+        }
+        else
+            switch (i >> 16)
+            {
+              case 0x27BD:
+                /* addiu sp,sp,?? */
+                s = i & 0xFFFF;
+                a |= SP_OFFSET;
+                break;
+              case 0x3401:
+                /* ori at,zero,?? */
+                l = i & 0xFFFF;
+                u = 0;
+                a |= CONST_LOWER;
+                break;
+              case 0x3421:
+                /* ori at,at,?? */
+                l = i & 0xFFFF;
+                a |= CONST_LOWER;
+                break;
+              case 0x3C01:
+                /* lui at,?? */
+                l = 0;
+                u = i & 0xFFFF;
+                a |= CONST_UPPER;
+                break;
+              case 0x8FBF:
+                /* lw ra,??(sp) */
+                p = i & 0xFFFF;
+                a |= PC_OFFSET;
+                break;
+            }
+        f->pc += 4;
+    }
+    if ((s == 0) && ((a & CONST_LOWER) || (a & CONST_UPPER)))
+        s = (u << 16) | l;
+    if ((s > 0) && (i = ((unsigned long *) f->sp)[p >> 2]) &&
+        (*((unsigned long *) (i - 8)) == 0x0320F809))
+    {
+        /* jalr ra,t9 */
+        f->sp += s;
+        f->pc = i;
+        return 1;
+    }
+    return 0;
+}
+#endif /* TARGET && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+
+
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+    TARGET == TARGET_UNIX
+#if ARCH == ARCH_MIPS
+/* Determine the stack pointer and return address of the current stack frame.
+ */
+
+static int getframe(frameinfo *f)
+{
+    ucontext_t c;
+
+    if (getcontext(&c) == -1)
+        return 0;
+    f->sp = c.uc_mcontext.gregs[CTX_SP];
+    f->pc = c.uc_mcontext.gregs[CTX_RA];
+    return 1;
+}
+#elif ARCH == ARCH_SPARC
 /* Return a handle for the frame pointer at the current point in execution.
  */
 
@@ -191,7 +320,8 @@ static unsigned int *getframe(void)
         return NULL;
     return (unsigned int *) c.uc_mcontext.gregs[R_SP] + 14;
 }
-#endif /* TARGET && ARCH && MP_BUILTINSTACK_SUPPORT */
+#endif /* ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && TARGET */
 
 
 /* Return a handle for the stack frame at the current point in execution
@@ -202,16 +332,18 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 {
 #if MP_BUILTINSTACK_SUPPORT
     void *f;
-#elif SYSTEM == SYSTEM_HPUX
+#elif MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
     frameinfo f;
-#elif SYSTEM != SYSTEM_IRIX
+#endif /* SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
       TARGET == NETWARE) && ARCH == ARCH_IX86)
     unsigned int *f;
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     int r;
 
     r = 0;
@@ -238,12 +370,13 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->addr = NULL;
         p->index = MP_MAXSTACK;
     }
+#elif MP_LIBRARYSTACK_SUPPORT
     /* HP/UX and IRIX provide a library for traversing function call stack
      * frames since the stack frame format does not preserve frame pointers.
      * On HP/UX this is done via a special section which can be read by
      * debuggers.
      */
-#elif SYSTEM == SYSTEM_HPUX
+#if SYSTEM == SYSTEM_HPUX
     if (p->frame == NULL)
     {
         p->next = U_get_current_frame();
@@ -275,27 +408,41 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->addr = NULL;
     }
 #elif SYSTEM == SYSTEM_IRIX
-    if (p->frame == NULL)
+    /* On IRIX, the unwind() function calls malloc(), free() and some memory
+     * operation functions every time it is invoked.  Despite the fact that we
+     * guard against recursion here, it slows down execution to an unbearable
+     * pace, so it might be an idea to remove malloc.c from the mpatrol library
+     * if you have the option of recompiling all of your sources to include
+     * mpatrol.h.
+     */
+    if (!recursive)
     {
-        exc_setjmp(&p->next);
-        unwind(&p->next, NULL);
+        recursive = 1;
+        if (p->frame == NULL)
+        {
+            exc_setjmp(&p->next);
+            unwind(&p->next, NULL);
+        }
+        if (p->next.sc_pc != 0)
+        {
+            /* On IRIX, the sigcontext structure stores registers in 64-bit
+             * format so we must be careful when converting them to 32-bit
+             * quantities.
+             */
+            p->frame = (void *) p->next.sc_regs[CTX_SP];
+            p->addr = (void *) p->next.sc_pc;
+            unwind(&p->next, NULL);
+            r = 1;
+        }
+        else
+        {
+            p->frame = NULL;
+            p->addr = NULL;
+        }
+        recursive = 0;
     }
-    if (p->next.sc_pc != 0)
-    {
-        /* On IRIX, the sigcontext structure stores registers in 64-bit format
-         * so we must be careful when converting them to 32-bit quantities.
-         */
-        p->frame = (void *) p->next.sc_regs[29];
-        p->addr = (void *) p->next.sc_pc;
-        unwind(&p->next, NULL);
-        r = 1;
-    }
-    else
-    {
-        p->frame = NULL;
-        p->addr = NULL;
-    }
-#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -353,7 +500,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     signal(SIGSEGV, segvhandler);
 #endif /* TARGET */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     return r;
 }
 

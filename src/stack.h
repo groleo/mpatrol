@@ -35,7 +35,9 @@
 #include <signal.h>
 
 
-#if SYSTEM == SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT
+#if MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
 /* HP/UX provides functions to traverse the PA/RISC stack frames.  This
  * structure only makes visible the stack frame entries that we need to
  * use - all the rest are simply reserved.
@@ -51,7 +53,23 @@ typedef struct frameinfo
     unsigned int res[6]; /* reserved entries */
 }
 frameinfo;
-#endif /* SYSTEM && MP_BUILTINSTACK_SUPPORT */
+#endif /* SYSTEM */
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+/* The MIPS architecture does not save and restore a frame pointer on the
+ * stack so the stack pointer and program counter must be used to obtain
+ * this information.
+ */
+
+typedef struct frameinfo
+{
+    unsigned int sp; /* stack pointer */
+    unsigned int pc; /* program counter */
+}
+frameinfo;
+#endif /* TARGET && ARCH */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT */
 
 
 /* A stackinfo structure provides information about the currently selected
@@ -66,13 +84,19 @@ typedef struct stackinfo
     void *frames[MP_MAXSTACK]; /* array of frame pointers */
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
     size_t index;              /* current stack index */
-#elif SYSTEM == SYSTEM_HPUX
+#elif MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
     struct frameinfo next;     /* next frame handle */
 #elif SYSTEM == SYSTEM_IRIX
     struct sigcontext next;    /* next frame handle */
-#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+    struct frameinfo next;     /* next frame handle */
+#else /* TARGET && ARCH */
     void *next;                /* next frame handle */
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* TARGET && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 }
 stackinfo;
 
