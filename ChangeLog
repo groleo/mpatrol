@@ -1,3 +1,214 @@
+2000-12-18  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/README, doc/Makefile: Added the tracing image files.
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.txt, doc/mpatrol.texi:
+	Added a chapter on tracing.
+
+	* doc/refcard.tex: Added the mptrace command.
+
+	* doc/images/trace.jpg: Added JPEG file for tracing chapter.
+
+	* doc/images/trace.eps: Added postscript file for tracing chapter.
+
+	* doc/images/trace.pdf: Added PDF file for tracing chapter.
+
+	* extra/cc1.trace, extra/collect2.trace, extra/cpp.trace,
+	  extra/gcc.trace:
+	New files for the tracing chapter.
+
+	* man/README, man/Makefile: Added the PDF pages.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/pkg/build, pkg/pkg/prototype, pkg/lha/build:
+	Added the tracing images.  Added the PDF manual pages.
+
+2000-12-14  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/Makefile:
+	Added the mpatrol_man.tar.gz target.  Added the DVI and postscript
+	manual pages.
+
+	* man/README: New file describing the manual page formats.
+
+	* man/cat1/mptrace.1, man/man1/mptrace.1: Documented the GUI.
+
+	* man/cat3/libmpatrol.3, man/man3/libmpatrol.3:
+	Added an indicator in the first line of the file that the manual page
+	should be processed by tbl first.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the new formats of manual pages.
+
+	* pkg/lsm/mpatrol.lsm: Added mpatrol_man.tar.gz.
+
+	* src/mptrace.c: Added the --base option and also lifetime information.
+
+2000-12-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.txt, doc/mpatrol.guide, doc/mpatrol.html,
+	  doc/mpatrol.info, doc/mpatrol.texi:
+	Changed mpatrol.3 to libmpatrol.3.
+
+	* man/Makefile: Changed from nroff to groff.
+
+	* man/cat1/mptrace.1, man/man1/mptrace.1:
+	New manual page for the mptrace command.
+
+	* man/man1/mleak.1, man/man1/mpatrol.1, man/man1/mpedit.1,
+	  man/man1/mprof.1, man/man1/mpsym.1, man/cat1/mleak.1,
+	  man/cat1/mpatrol.1, man/cat1/mpedit.1, man/cat1/mprof.1,
+	  man/cat1/mpsym.1:
+	Changed mpatrol.3 to libmpatrol.3.
+
+	* man/cat3/libmpatrol.3, man/cat3/mpatrol.3, man/man3/libmpatrol.3,
+	  man/man3/mpatrol.3:
+	Changed the mpatrol.3 manual page to libmpatrol.3.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Changed the mpatrol.3 manual page to libmpatrol.3 and added the mptrace
+	manual page.
+
+2000-12-12  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.html, doc/mpatrol.info, doc/mpatrol.texi, doc/mpatrol.txt,
+	  doc/mpatrol.guide:
+	Brought the documentation slightly more up to date with recent changes.
+	Documented the tracing output file format.
+
+	* doc/refcard.tex: Added TRACE, TRACEFILE and SHOWFREE.
+
+	* man/man1/mleak.1, man/man1/mpatrol.1, man/man1/mpedit.1,
+	  man/man1/mprof.1, man/man1/mpsym.1, man/cat1/mpedit.1,
+	  man/cat1/mprof.1, man/cat1/mpsym.1, man/cat1/mleak.1,
+	  man/cat1/mpatrol.1:
+	Documented the --show-free, --trace and --trace-file options.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Documented the new SHOWFREE, TRACE and TRACEFILE options, as well as the
+	TRACEDIR environment variable.
+
+2000-12-10  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/diag.c, src/info.c, src/info.h:
+	Added information about peak number of allocations.
+
+	* src/mpatrol.h, src/option.h, src/option.c, src/inter.c:
+	Added the SHOWFREE option.
+
+	* src/mpatrol.c: Added the --show-free option.
+
+2000-12-08  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/config.h:
+	Added MP_RESCACHE_SIZE and increase MP_ALLOCFACTOR from 2 to 4.
+
+	* src/strtab.c:
+	Multiply the allocated page size for strings by MP_ALLOCFACTOR.
+
+	* src/trace.c:
+	Added the traceready flag since there were still problems determining
+	when the tracing output file was ready to be written.
+
+	* src/mptrace.c:
+	The drawing area is from 0 to width - 1 and not 0 to width.
+
+	* src/mpatrol.h: Added the mallinfo structure.
+
+2000-12-07  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added trace.h to the dependencies for heap.o.
+
+	* src/option.c, src/heap.c, src/heap.h:
+	Added support for heap reservation tracing.
+
+	* src/trace.c, src/trace.h: Added __mp_traceheap().
+
+	* src/mptrace.c: Added support for reserved and internal blocks.
+
+2000-12-06  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/unix/Makefile:
+	Added the X libraries to the link line for mptrace.  Added the default
+	X library directory to the mptrace link line.
+
+	* src/heap.c, src/heap.h, src/addr.c, src/alloc.c, src/info.c,
+	  src/profile.c, src/strtab.c, src/symbol.c:
+	Added the internal flag to __mp_heapalloc().
+
+	* src/mptrace.c: Added the start of the GUI support.
+
+2000-12-05  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/config.h: Added MP_GUI_SUPPORT.
+
+	* src/diag.c, src/diag.h:
+	Added __mp_printfree() and the %d, %f and %n filename characters.
+
+2000-12-04  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/config.h: Documented that mptrace also uses MP_BUFFER_SIZE.
+
+	* src/mptrace.c, src/trace.c, src/trace.h:
+	Removed the time information since it is not accurate enough.
+
+2000-12-03  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added the mptrace command.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the mptrace command.
+
+	* src/mptrace.c, src/trace.c, src/trace.h:
+	Added the mptrace command and added time to the tracing file.
+
+2000-11-30  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/amiga/Makefile, build/amiga/SMakefile, build/netware/Makefile:
+	Added the trace module.
+
+	* extra/magic: Added the mpatrol tracing output file.
+
+	* src/config.h:
+	Added the MP_TRACEFILE and MP_TRACEDIR definitions.  Added
+	MP_TRACEMAGIC.
+
+	* src/utils.c, src/utils.h: Added the LEB128 support routines.
+
+	* src/info.c, src/info.h: Added support for tracing.
+
+	* src/diag.c, src/diag.h:
+	Added the __mp_tracefile() function.  Added information about the
+	tracing file.
+
+	* src/trace.c, src/trace.h:
+	Added new module for tracing.  Deal with the tracing output file in the
+	same way as the log file and the profiling output file.  Added a
+	prologue and epilogue to the tracing output file.  Output the values in
+	LEB128 format.  The __mp_endtrace() function should now return an error
+	status.
+
+	* src/mpatrol.h, src/option.h, src/option.c:
+	Added the TRACE and TRACEFILE options.
+
+	* src/inter.c: Close the tracing output file in __mp_fini().
+
+	* src/library.c: Added trace.c.
+
+	* src/mpatrol.c: Added the --trace and --trace-file options.
+
 2000-11-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
