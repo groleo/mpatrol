@@ -21,8 +21,10 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: src.am,v 1.4 2001-09-19 22:02:33 graeme Exp $
+## $Id: src.am,v 1.5 2001-09-26 00:02:25 graeme Exp $
 
+
+INCLUDES = $(X_CFLAGS)
 
 libmpatrol_la_LDFLAGS = -release @VERSION@
 
