@@ -55,13 +55,13 @@ OOPPTTIIOONNSS
               overflow buffers.
 
        ----cchheecckk--aallll [--cc]
-              [CCHHEECCKKAALLLL]  Specifies that all arguments  to  func-
-              tions  which  allocate,  reallocate  and deallocate
-              memory have rigorous checks performed on them.   In
+              [CCHHEECCKKAALLLL]   Equivalent  to   the   ----cchheecckk--aallllooccss,
+              ----cchheecckk--rreeaallllooccss,  ----cchheecckk--ffrreeeess and ----cchheecckk--mmeemmoorryy
+              options specified together.
 
 
 
-Release 1.3              19 October 2000                        1
+Release 1.3              29 October 2000                        1
 
 
 
@@ -70,8 +70,23 @@ Release 1.3              19 October 2000                        1
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
-              addition, functions which perform memory operations
-              will be checked for zero-length NNUULLLL pointers.
+       ----cchheecckk--aallllooccss
+              [CCHHEECCKKAALLLLOOCCSS]  Checks that no attempt  is  made  to
+              allocate a block of memory of size zero.
+
+       ----cchheecckk--ffrreeeess
+              [CCHHEECCKKFFRREEEESS]   Checks  that  no  attempt is made to
+              deallocate a NNUULLLL pointer.
+
+       ----cchheecckk--mmeemmoorryy
+              [CCHHEECCKKMMEEMMOORRYY]  Checks that no attempt  is  made  to
+              perform  a  zero-length  memory operation on a NNUULLLL
+              pointer.
+
+       ----cchheecckk--rreeaallllooccss
+              [CCHHEECCKKRREEAALLLLOOCCSS]  Checks that no attempt is made  to
+              reallocate  a  NNUULLLL  pointer  or resize an existing
+              block of memory to size zero.
 
        ----ddeeff--aalliiggnn <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--DD]
               [DDEEFFAALLIIGGNN]  Specifies  the  default  alignment  for
@@ -109,6 +124,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
        ----llaarrggee--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--33]
               [LLAARRGGEEBBOOUUNNDD]  Specifies the limit in  bytes  up  to
               which  memory  allocations  should be classified as
+
+
+
+Release 1.3              29 October 2000                        2
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               large allocations for profiling purposes.
 
        ----lliimmiitt <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--LL]
@@ -124,17 +151,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
        ----lloogg--aallllooccss
               [LLOOGGAALLLLOOCCSS]  Specifies that all memory  allocations
               are to be logged and sent to the log file.
-
-
-
-Release 1.3              19 October 2000                        2
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
 
        ----lloogg--ffiillee <_s_t_r_i_n_g> [--ll]
               [LLOOGGFFIILLEE]   Specifies  an alternative file in which
@@ -173,6 +189,19 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               which to fill the overflow buffers  of  all  memory
               allocations.
 
+
+
+
+
+Release 1.3              29 October 2000                        3
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
        ----ooffllooww--ssiizzee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--OO]
               [OOFFLLOOWWSSIIZZEE]  Specifies the size in bytes to use for
               all overflow buffers, which must be a power of two.
@@ -190,18 +219,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        ----ppaaggee--aalllloocc--uuppppeerr [--XX]
               [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
-
-
-
-Release 1.3              19 October 2000                        3
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
               memory  allocation  should occupy at least one page
               of virtual memory and should be placed at the high-
               est point within these pages.
@@ -239,6 +256,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        ----sshhooww--aallll
               [SSHHOOWWAALLLL]    Equivalent   to   the    ----sshhooww--ffrreeeedd,
+
+
+
+Release 1.3              29 October 2000                        4
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               ----sshhooww--uunnffrreeeedd,   ----sshhooww--mmaapp   and   ----sshhooww--ssyymmbboollss
               options specified together.
 
@@ -256,18 +285,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        ----sshhooww--mmaapp [--SS]
               [SSHHOOWWMMAAPP]  Specifies  that  a  memory  map  of  the
-
-
-
-Release 1.3              19 October 2000                        4
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
               entire  heap should be displayed at the end of pro-
               gram execution.
 
@@ -304,6 +321,19 @@ MPATROL(1)               mpatrol library               MPATROL(1)
        ----vveerrssiioonn [--VV]
               Displays the version number of the mmppaattrrooll command.
 
+
+
+
+
+Release 1.3              29 October 2000                        5
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
 SSEEEE AALLSSOO
        mmlleeaakk(1), mmpprrooff(1), mmppaattrrooll(3).
 
@@ -322,17 +352,6 @@ CCOOPPYYRRIIGGHHTT
        eral Public License as  published  by  the  Free  Software
        Foundation;  either  version 2 of the License, or (at your
        option) any later version.
-
-
-
-Release 1.3              19 October 2000                        5
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
 
        This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
@@ -372,25 +391,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.3              19 October 2000                        6
+Release 1.3              29 October 2000                        6
 
 
