@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.36 2001-09-23 21:34:14 graeme Exp $
+ * $Id: target.h,v 1.37 2001-12-05 20:21:45 graeme Exp $
  */
 
 
@@ -527,12 +527,15 @@
  */
 
 #if TARGET == TARGET_UNIX
+#if SYSTEM != SYSTEM_FREEBSD && SYSTEM != SYSTEM_NETBSD && \
+    SYSTEM != SYSTEM_OPENBSD
 #ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
 #endif /* _POSIX_SOURCE */
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199506L
 #endif /* _POSIX_C_SOURCE */
+#endif /* SYSTEM */
 #if SYSTEM == SYSTEM_AIX
 #ifndef _ALL_SOURCE
 #define _ALL_SOURCE 1
