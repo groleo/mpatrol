@@ -396,6 +396,12 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 typedef void (*new_handler)(void);
 
 
+#ifdef __GNUC__
+extern "C"
+{
+#endif /* __GNUC__ */
+
+
 /* Set the low-memory handler.
  */
 
@@ -403,6 +409,11 @@ static inline new_handler set_new_handler(new_handler h)
 {
     return __mp_nomemory(h);
 }
+
+
+#ifdef __GNUC__
+}
+#endif /* __GNUC__ */
 
 
 /* Override operator new.

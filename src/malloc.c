@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.10 2000-04-02 14:23:20 graeme Exp $"
+#ident "$Id: malloc.c,v 1.11 2000-04-13 18:45:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -269,7 +269,11 @@ int bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
  */
 
 #ifdef __cplusplus
+#ifdef __GNUC__
+extern "C" void (*set_new_handler(void (*h)(void)))(void)
+#else /* __GNUC__ */
 void (*set_new_handler(void (*h)(void)))(void)
+#endif /* __GNUC__ */
 #else /* __cplusplus */
 #ifdef __GNUC__
 void (*set_new_handler(void (*h)(void)))(void)
