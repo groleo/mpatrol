@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.263 2003-11-25 23:59:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.264 2003-11-26 16:11:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -4762,11 +4762,7 @@ can also see the parser module at the top left of the graph, initiated with
 @code{yyparse()}, and the code generator module in the rest of the graph,
 initiated with @code{rest_of_compilation()}.
 
-@page
-
 @image{images/cc1}
-
-@page
 
 @image{images/collect2}
 
