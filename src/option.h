@@ -43,6 +43,7 @@ typedef enum optionerr
     OE_RECOGNISED,   /* recognised option */
     OE_NOARGUMENT,   /* missing argument */
     OE_BADNUMBER,    /* bad numeric argument */
+    OE_BADRANGE,     /* bad numeric range */
     OE_BIGNUMBER,    /* numeric argument too large */
     OE_LOWERORUPPER, /* LOWER or UPPER required */
     OE_IGNARGUMENT   /* ignoring argument */

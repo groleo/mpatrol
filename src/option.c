@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.2 1999-10-14 19:11:16 graeme Exp $"
+#ident "$Id: option.c,v 1.3 1999-10-21 20:42:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -71,6 +71,9 @@ static char *options_help[] =
     "ALLOCSTOP", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when it is",
     "", "being allocated.",
+    "CHECK", "unsigned range",
+    "", "Specifies a range of allocation indices at which to check the",
+    "", "integrity of free memory and overflow buffers.",
     "CHECKALL", NULL,
     "", "Equivalent to the CHECKALLOCS, CHECKREALLOCS and CHECKFREES options",
     "", "specified together.",
@@ -236,6 +239,64 @@ static size_t readnumber(char *s, long *n, int u)
 }
 
 
+/* Convert a string representation of a numeric range to two unsigned integers,
+ * ensuring that the first integer is less than or equal to the second.  An
+ * open range at either end is represented by -1.
+ */
+
+static int readrange(char *s, unsigned long *l, unsigned long *u)
+{
+    char *t;
+    unsigned long n;
+    int w;
+    char c;
+
+    w = 0;
+    *l = *u = (unsigned long) -1;
+    for (t = s; (*t != '-') && (*t != '\0'); t++);
+    c = *t;
+    *t = '\0';
+    /* If there was a number before the minus sign then read it.
+     */
+    if ((*s != '\0') && (s[readnumber(s, l, 1)] != '\0'))
+    {
+        *l = (unsigned long) -1;
+        w = 1;
+    }
+    else if (c == '\0')
+        *u = *l;
+    else
+    {
+        s = t + 1;
+        /* If there was a number after the minus sign then read it too.
+         */
+        if ((*s != '\0') && (s[readnumber(s, u, 1)] != '\0'))
+        {
+            *u = (unsigned long) -1;
+            w = 1;
+        }
+    }
+    if (w != 0)
+        return 0;
+    /* If one or the other of the integers was zero (but not both) then convert
+     * it to an open range.
+     */
+    if ((*l == 0) && (*u != 0))
+        *l = (unsigned long) -1;
+    else if ((*l != 0) && (*u == 0))
+        *u = (unsigned long) -1;
+    /* Swap the integers if the first number is greater than the second.
+     */
+    if ((*l != (unsigned long) -1) && (*u != (unsigned long) -1) && (*l > *u))
+    {
+        n = *l;
+        *l = *u;
+        *u = n;
+    }
+    return 1;
+}
+
+
 /* Display the quick-reference help summary.
  */
 
@@ -264,7 +325,7 @@ static void showoptions(void)
 MP_GLOBAL void __mp_parseoptions(infohead *h)
 {
     char *a, *f, *o, *s;
-    unsigned long n;
+    unsigned long m, n;
     int i, l, q;
 
     l = 0;
@@ -363,7 +424,18 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     }
                 break;
               case 'C':
-                if (matchoption(o, "CHECKALL"))
+                if (matchoption(o, "CHECK"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (!readrange(a, &m, &n))
+                        i = OE_BADRANGE;
+                    else
+                    {
+                        h->lrange = m;
+                        h->urange = n;
+                        i = OE_RECOGNISED;
+                    }
+                else if (matchoption(o, "CHECKALL"))
                 {
                     if (*a != '\0')
                         i = OE_IGNARGUMENT;
@@ -696,6 +768,9 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
             else if (i == OE_BADNUMBER)
                 __mp_error(AT_MAX, "bad numeric argument `%s' for option "
                            "`%s'\n", a, o);
+            else if (i == OE_BADRANGE)
+                __mp_error(AT_MAX, "bad numeric range `%s' for option `%s'\n",
+                           a, o);
             else if (i == OE_BIGNUMBER)
                 __mp_error(AT_MAX, "numeric argument `%s' is too large for "
                            "option `%s'\n", a, o);
