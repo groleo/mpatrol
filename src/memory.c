@@ -78,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.44 2001-01-22 19:58:32 graeme Exp $"
+#ident "$Id: memory.c,v 1.45 2001-01-24 13:18:07 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -354,10 +354,8 @@ progname(void)
             return (char *) p;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
 #if SYSTEM == SYSTEM_AIX
-        p += 4;
-        while (*p < (unsigned long) p)
-            p++;
-        return (char *) *p;
+        if (p = (unsigned long *) p[7])
+            return (char *) p;
 #else /* SYSTEM */
         if (p = (unsigned long *) p[23])
             return (char *) *p;
