@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.100 2001-12-11 21:11:02 graeme Exp $"
+#ident "$Id: diag.c,v 1.101 2001-12-11 21:20:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.100 2001-12-11 21:11:02 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.101 2001-12-11 21:20:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1552,34 +1552,33 @@ MP_GLOBAL
 void
 __mp_log(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
-    switch (i->ltype)
+    if ((h->recur == 1) && !i->logged)
     {
-      case LT_ALLOC:
-        logalloc(h, i);
-        break;
-      case LT_REALLOC:
-        logrealloc(h, i);
-        break;
-      case LT_FREE:
-        logfree(h, i);
-        break;
-      case LT_SET:
-        logmemset(h, i);
-        break;
-      case LT_COPY:
-        logmemcopy(h, i);
-        break;
-      case LT_LOCATE:
-        logmemlocate(h, i);
-        break;
-      case LT_COMPARE:
-        logmemcompare(h, i);
-        break;
-      default:
-        break;
+        i->logged = 1;
+        switch (i->ltype)
+        {
+          case LT_ALLOC:
+            logalloc(h, i);
+            break;
+          case LT_REALLOC:
+            logrealloc(h, i);
+            break;
+          case LT_FREE:
+            logfree(h, i);
+            break;
+          case LT_SET:
+            logmemset(h, i);
+            break;
+          case LT_COPY:
+            logmemcopy(h, i);
+            break;
+          case LT_LOCATE:
+            logmemlocate(h, i);
+            break;
+          case LT_COMPARE:
+            logmemcompare(h, i);
+            break;
+        }
     }
 }
 

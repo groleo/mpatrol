@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.97 2001-12-06 01:16:50 graeme Exp $"
+#ident "$Id: info.c,v 1.98 2001-12-11 21:20:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.97 2001-12-06 01:16:50 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.98 2001-12-11 21:20:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -320,8 +320,8 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
     v->ltype = LT_ALLOC;
     v->variant.logalloc.size = l;
     v->variant.logalloc.align = a;
-    if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
-        __mp_logalloc(h, v);
+    if (h->flags & FLG_LOGALLOCS)
+        __mp_log(h, v);
     if ((c == h->astop) && (h->rstop == 0))
     {
         /* Abort at the specified allocation index.
@@ -333,8 +333,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
     }
     if ((h->flags & FLG_CHECKALLOCS) && (l == 0))
     {
-        if (h->recur == 1)
-            __mp_logalloc(h, v);
+        __mp_log(h, v);
         __mp_warn(ET_ALLZER, v->type, v->file, v->line, NULL);
         __mp_diag("\n");
     }
@@ -348,8 +347,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
         {
             if (h->flags & FLG_CHECKALLOCS)
             {
-                if (h->recur == 1)
-                    __mp_logalloc(h, v);
+                __mp_log(h, v);
                 __mp_warn(ET_ZERALN, v->type, v->file, v->line, NULL);
                 __mp_diag("\n");
             }
@@ -359,8 +357,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
         {
             if (h->flags & FLG_CHECKALLOCS)
             {
-                if (h->recur == 1)
-                    __mp_logalloc(h, v);
+                __mp_log(h, v);
                 __mp_warn(ET_BADALN, v->type, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
@@ -370,8 +367,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
         {
             if (h->flags & FLG_CHECKALLOCS)
             {
-                if (h->recur == 1)
-                    __mp_logalloc(h, v);
+                __mp_log(h, v);
                 __mp_warn(ET_MAXALN, v->type, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
@@ -511,14 +507,13 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
     v->variant.logrealloc.block = p;
     v->variant.logrealloc.size = l;
     v->variant.logrealloc.align = a;
-    if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
-        __mp_logrealloc(h, v);
+    if (h->flags & FLG_LOGREALLOCS)
+        __mp_log(h, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKREALLOCS)
         {
-            if (h->recur == 1)
-                __mp_logrealloc(h, v);
+            __mp_log(h, v);
             __mp_warn(ET_RSZNUL, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -530,8 +525,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
          * returned to the free tree.
          */
         m = (infonode *) n->info;
-        if (h->recur == 1)
-            __mp_logrealloc(h, v);
+        __mp_log(h, v);
         __mp_error(ET_PRVFRD, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -543,8 +537,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
     {
         /* We know nothing about this block of memory.
          */
-        if (h->recur == 1)
-            __mp_logrealloc(h, v);
+        __mp_log(h, v);
         __mp_error(ET_NOTALL, v->type, v->file, v->line, NULL, p);
         __mp_diag("\n");
         p = NULL;
@@ -554,8 +547,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
         /* The address of the block passed in does not match the start
          * address of the block we know about.
          */
-        if (h->recur == 1)
-            __mp_logrealloc(h, v);
+        __mp_log(h, v);
         __mp_error(ET_MISMAT, v->type, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -568,8 +560,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
         /* The function used to allocate the block is incompatible with
          * alloca(), strdupa(), strndupa(), operator new or operator new[].
          */
-        if (h->recur == 1)
-            __mp_logrealloc(h, v);
+        __mp_log(h, v);
         __mp_error(ET_INCOMP, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -580,8 +571,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
     {
         if (h->flags & FLG_CHECKREALLOCS)
         {
-            if (h->recur == 1)
-                __mp_logrealloc(h, v);
+            __mp_log(h, v);
             __mp_warn(ET_RSZZER, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -777,14 +767,13 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
 
     v->ltype = LT_FREE;
     v->variant.logfree.block = p;
-    if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
-        __mp_logfree(h, v);
+    if (h->flags & FLG_LOGFREES)
+        __mp_log(h, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKFREES)
         {
-            if (h->recur == 1)
-                __mp_logfree(h, v);
+            __mp_log(h, v);
             __mp_warn(ET_FRENUL, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -796,8 +785,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
          * returned to the free tree.
          */
         m = (infonode *) n->info;
-        if (h->recur == 1)
-            __mp_logfree(h, v);
+        __mp_log(h, v);
         __mp_error(ET_PRVFRD, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -808,8 +796,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
     {
         /* We know nothing about this block of memory.
          */
-        if (h->recur == 1)
-            __mp_logfree(h, v);
+        __mp_log(h, v);
         __mp_error(ET_NOTALL, v->type, v->file, v->line, NULL, p);
         __mp_diag("\n");
     }
@@ -818,8 +805,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
         /* The address of the block passed in does not match the start
          * address of the block we know about.
          */
-        if (h->recur == 1)
-            __mp_logfree(h, v);
+        __mp_log(h, v);
         __mp_error(ET_MISMAT, v->type, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -838,8 +824,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
         /* The function used to allocate the block is incompatible with
          * the function used to free the block.
          */
-        if (h->recur == 1)
-            __mp_logfree(h, v);
+        __mp_log(h, v);
         __mp_error(ET_INCOMP, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -849,8 +834,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
     {
         /* An attempt was made to free a marked memory allocation.
          */
-        if (h->recur == 1)
-            __mp_logfree(h, v);
+        __mp_log(h, v);
         __mp_error(ET_FREMRK, v->type, v->file, v->line, NULL, p);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -950,8 +934,8 @@ __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, loginfo *v)
     v->variant.logmemset.block = p;
     v->variant.logmemset.size = l;
     v->variant.logmemset.byte = c;
-    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemset(h, v);
+    if (h->flags & FLG_LOGMEMORY)
+        __mp_log(h, v);
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
@@ -978,8 +962,8 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
     v->variant.logmemcopy.dstblock = q;
     v->variant.logmemcopy.size = l;
     v->variant.logmemcopy.byte = c;
-    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcopy(h, v);
+    if (h->flags & FLG_LOGMEMORY)
+        __mp_log(h, v);
     /* We must ensure that the memory to be copied does not overlap when
      * memcpy() or memccpy() are called.  This does not matter when calling
      * __mp_memcopy() but it will matter when calling the normal system
@@ -989,8 +973,7 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
         (((p < q) && ((char *) p + l > (char *) q)) ||
          ((q < p) && ((char *) q + l > (char *) p))))
     {
-        if (h->recur == 1)
-            __mp_logmemcopy(h, v);
+        __mp_log(h, v);
         __mp_warn(ET_RNGOVL, v->type, v->file, v->line, NULL, p,
                   (char *) p + l - 1, q, (char *) q + l - 1);
         __mp_diag("\n");
@@ -1035,8 +1018,8 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m, loginfo *v)
     v->variant.logmemlocate.size = l;
     v->variant.logmemlocate.patblock = q;
     v->variant.logmemlocate.patsize = m;
-    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemlocate(h, v);
+    if (h->flags & FLG_LOGMEMORY)
+        __mp_log(h, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
@@ -1066,8 +1049,8 @@ __mp_comparememory(infohead *h, void *p, void *q, size_t l, loginfo *v)
     v->variant.logmemcompare.block1 = p;
     v->variant.logmemcompare.block2 = q;
     v->variant.logmemcompare.size = l;
-    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcompare(h, v);
+    if (h->flags & FLG_LOGMEMORY)
+        __mp_log(h, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */
