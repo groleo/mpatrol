@@ -31,6 +31,12 @@
  */
 
 
+/* The target operating system.  This determines how the mpatrol library
+ * should interact with the underlying system, and how it should work around
+ * deficiencies in some operating systems.
+ */
+
+#define TARGET_ANY     0 /* no specific operating system */
 #define TARGET_UNIX    1 /* UNIX or UNIX-like */
 #define TARGET_AMIGA   2 /* Commodore AmigaOS */
 #define TARGET_WINDOWS 3 /* Microsoft Windows 95/98/NT */
@@ -56,6 +62,11 @@
 #endif /* TARGET */
 #endif /* TARGET */
 
+
+/* The UNIX system variant.  This is only needed on UNIX systems due to the
+ * wide variety of vendors and their UNIX systems that support different
+ * features.
+ */
 
 #define SYSTEM_ANY      0  /* no specific system */
 #define SYSTEM_AIX      1  /* AIX */
@@ -119,6 +130,11 @@
 #endif /* SYSTEM */
 
 
+/* The processor architecture.  This defines families of compatible processors
+ * from chip manufacturers rather than specific processor models.
+ */
+
+#define ARCH_ANY     0 /* no specific architecture */
 #define ARCH_IX86    1 /* Intel 80x86 */
 #define ARCH_M68K    2 /* Motorola 680x0 */
 #define ARCH_M88K    3 /* Motorola 88xx0 */
@@ -167,8 +183,13 @@
 #endif /* ARCH */
 
 
-#define ENVIRON_32 1 /* 32-bit */
-#define ENVIRON_64 2 /* 64-bit */
+/* The processor word size.  This is used to determine the size of pointers
+ * and long integers on the target processor.
+ */
+
+#define ENVIRON_ANY 0 /* no specific word size */
+#define ENVIRON_32  1 /* 32-bit */
+#define ENVIRON_64  2 /* 64-bit */
 
 
 #ifndef ENVIRON
@@ -190,6 +211,11 @@
 #endif /* SYSTEM */
 #endif /* ENVIRON */
 
+
+/* The object file format.  This can either specify an explicit file format
+ * for executable files and shared libraries, or specify an object file access
+ * library.
+ */
 
 #define FORMAT_NONE  0 /* no symbol support */
 #define FORMAT_AOUT  1 /* a.out */
@@ -241,6 +267,11 @@
 #endif /* FORMAT */
 
 
+/* The dynamic linker type.  This is used to specify the method used to obtain
+ * information about the shared libraries that a program requires when it is
+ * running.
+ */
+
 #define DYNLINK_NONE    0 /* no dynamic linker support */
 #define DYNLINK_AIX     1 /* AIX dynamic linker */
 #define DYNLINK_BSD     2 /* BSD dynamic linker */
@@ -279,6 +310,20 @@
 #define DYNLINK DYNLINK_NONE
 #endif /* TARGET */
 #endif /* DYNLINK */
+
+
+/* Target feature macros.  Some systems require certain preprocessor macros
+ * to be defined before non-standard definitions in system header files are
+ * included.
+ */
+
+#if TARGET == TARGET_UNIX
+#define _POSIX_SOURCE 1
+#define _POSIX_C_SOURCE 199506L
+#if SYSTEM == SYSTEM_SOLARIS
+#define __EXTENSIONS__ 1
+#endif /* SYSTEM */
+#endif /* TARGET */
 
 
 #endif /* MP_TARGET_H */
