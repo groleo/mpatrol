@@ -27,6 +27,7 @@
 
 
 #include "tree.h"
+#include "graph.h"
 #include "getopt.h"
 #include "version.h"
 #include <stdio.h>
@@ -35,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.20 2000-10-09 19:29:19 graeme Exp $"
+#ident "$Id: mprof.c,v 1.21 2000-10-17 18:12:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,6 +50,7 @@ typedef enum options_flags
 {
     OF_ADDRESSES  = 'a',
     OF_COUNTS     = 'c',
+    OF_GRAPHFILE  = 'g',
     OF_HELP       = 'h',
     OF_STACKDEPTH = 'n',
     OF_VERSION    = 'V'
@@ -87,6 +89,30 @@ typedef struct profilenode
     unsigned char flags;  /* temporary flags */
 }
 profilenode;
+
+
+/* Structure representing a vertex in the allocation call graph.
+ */
+
+typedef struct vertex
+{
+    treenode node;      /* tree node */
+    graphnode gnode;    /* graph node */
+    profilenode *pnode; /* profiling node */
+}
+vertex;
+
+
+/* Structure representing an edge in the allocation call graph.
+ */
+
+typedef struct edge
+{
+    graphedge node;      /* edge node */
+    profiledata data;    /* profiling data */
+    unsigned char flags; /* temporary flags */
+}
+edge;
 
 
 /* The total number of allocations and deallocations.
@@ -173,10 +199,22 @@ static treeroot proftree;
 static treeroot temptree;
 
 
+/* The allocation call graph.
+ */
+
+static graphhead graph;
+
+
 /* The profiling output file produced by mpatrol.
  */
 
 static FILE *proffile;
+
+
+/* The graph specification file optionally produced by mprof.
+ */
+
+static FILE *graphfile;
 
 
 /* The filename used to invoke this tool.
@@ -219,6 +257,9 @@ static option options_table[] =
      "\tSpecifies that certain tables should be sorted by the number of\n"
      "\tallocations or deallocations rather than the total number of bytes\n"
      "\tallocated or deallocated.\n"},
+    {"graph-file", OF_GRAPHFILE, "file",
+     "\tSpecifies that the allocation call graph should also be written to a\n"
+     "\tgraph specification file for later visualisation with dot.\n"},
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
     {"stack-depth", OF_STACKDEPTH, "depth",
@@ -268,11 +309,11 @@ static void sumdata(profiledata *a, profiledata *b)
 /* Compare two function call stacks.
  */
 
-static int comparestack(profilenode *n, profilenode *p)
+static int comparestack(profilenode *n, profilenode *p, int c)
 {
     size_t i;
 
-    for (i = 1; (maxstack == 0) || (i < maxstack); i++)
+    for (i = 1; (c != 0) || (maxstack == 0) || (i < maxstack); i++)
     {
         if ((n->parent == 0) || (p->parent == 0))
             return ((n->parent == 0) && (p->parent == 0));
@@ -513,19 +554,60 @@ static void printdata(size_t *d, size_t t)
 /* Display the symbol associated with a particular call site.
  */
 
-static void printsymbol(profilenode *n)
+static void printsymbol(FILE *f, profilenode *n)
 {
     ptrdiff_t o;
 
     if (n->name == 0)
-        fprintf(stdout, MP_POINTER, n->addr);
+        fprintf(f, MP_POINTER, n->addr);
     else
     {
-        fputs(symbols + n->name, stdout);
+        fputs(symbols + n->name, f);
         if (useaddresses && (n->symbol != 0) &&
             ((o = (char *) n->addr - (char *) addrs[n->symbol - 1]) != 0))
-            fprintf(stdout, "%+ld", o);
+            fprintf(f, "%+ld", o);
     }
+}
+
+
+/* Add a new vertex to the allocation call graph.
+ */
+
+static vertex *addvertex(profilenode *n)
+{
+    vertex *v;
+
+    if ((v = (vertex *) malloc(sizeof(vertex))) == NULL)
+    {
+        fprintf(stderr, "%s: Out of memory\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    if (useaddresses)
+        __mp_treeinsert(&temptree, &v->node, (unsigned long) n->addr);
+    else
+        __mp_treeinsert(&temptree, &v->node, n->symbol);
+    __mp_addnode(&graph, &v->gnode);
+    v->pnode = n;
+    return v;
+}
+
+
+/* Add a new edge to the allocation call graph.
+ */
+
+static edge *addedge(graphnode *p, graphnode *c)
+{
+    edge *e;
+
+    if ((e = (edge *) malloc(sizeof(edge))) == NULL)
+    {
+        fprintf(stderr, "%s: Out of memory\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    __mp_addedge(&graph, &e->node, p, c);
+    cleardata(&e->data);
+    e->flags = 0;
+    return e;
 }
 
 
@@ -708,7 +790,7 @@ static void directtable(void)
             printdata(d->dtotal, atotal - dtotal);
             fprintf(stdout, "  %6lu  ", c);
         }
-        printsymbol(n);
+        printsymbol(stdout, n);
         fputc('\n', stdout);
         cleardata(d);
     }
@@ -778,7 +860,7 @@ static void leaktable(void)
             while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
                      (p->symbol != 0) && (p->symbol == n->symbol))))
             {
-                if ((p->data != 0) && !p->flags && comparestack(n, p))
+                if ((p->data != 0) && !p->flags && comparestack(n, p, 0))
                 {
                     sumdata(d, &data[p->data - 1]);
                     p->flags = 1;
@@ -833,7 +915,7 @@ static void leaktable(void)
             fprintf(stdout, "%6.2f  %8lu  %6.2f  %6lu  %6.2f  %8lu  %6lu  ",
                     g, a, e, b, f, j, k);
         }
-        printsymbol(n);
+        printsymbol(stdout, n);
         fputc('\n', stdout);
         p = n;
         for (i = 1; (maxstack == 0) || (i < maxstack); i++)
@@ -842,7 +924,7 @@ static void leaktable(void)
                 break;
             p = &nodes[p->parent - 1];
             printchar(' ', 60);
-            printsymbol(p);
+            printsymbol(stdout, p);
             fputc('\n', stdout);
         }
         cleardata(d);
@@ -867,16 +949,151 @@ static void leaktable(void)
 }
 
 
+/* Build the allocation call graph.
+ */
+
+static void buildgraph(void)
+{
+    profilenode *n, *p;
+    vertex *u, *v;
+    edge *e;
+    profiledata d;
+
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
+         n = (profilenode *) __mp_successor(&n->node))
+        if ((n->data != 0) && !(n->flags & 1))
+        {
+            cleardata(&d);
+            sumdata(&d, &data[n->data - 1]);
+            p = (profilenode *) __mp_successor(&n->node);
+            while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
+                     (p->symbol != 0) && (p->symbol == n->symbol))))
+            {
+                if ((p->data != 0) && !(p->flags & 1) && comparestack(n, p, 1))
+                {
+                    sumdata(&d, &data[p->data - 1]);
+                    p->flags |= 1;
+                }
+                p = (profilenode *) __mp_successor(&p->node);
+            }
+            p = n;
+            if (useaddresses)
+                u = (vertex *) __mp_search(temptree.root,
+                                           (unsigned long) p->addr);
+            else
+                u = (vertex *) __mp_search(temptree.root, p->symbol);
+            if (u == NULL)
+                u = addvertex(p);
+            if (!(e = (edge *) __mp_findedge(&graph, &u->gnode, &graph.end)))
+                e = addedge(&u->gnode, &graph.end);
+            sumdata(&e->data, &d);
+            u->pnode->flags |= 2;
+            for (v = u; p->parent != 0; u = v)
+            {
+                p = &nodes[p->parent - 1];
+                if (useaddresses)
+                    v = (vertex *) __mp_search(temptree.root,
+                                               (unsigned long) p->addr);
+                else
+                    v = (vertex *) __mp_search(temptree.root, p->symbol);
+                if (v == NULL)
+                    v = addvertex(p);
+                if (!(e = (edge *) __mp_findedge(&graph, &v->gnode, &u->gnode)))
+                    e = addedge(&v->gnode, &u->gnode);
+                /* Find out if we've been here before.  If we have then we have
+                 * detected a cycle in the call graph and we should not
+                 * contribute anything to the current edge since we have done so
+                 * already.  However, we mark the edge as being part of a cycle
+                 * since it is useful to know this later on.
+                 */
+                if (v->pnode->flags & 2)
+                    e->flags |= 2;
+                else
+                {
+                    sumdata(&e->data, &d);
+                    v->pnode->flags |= 2;
+                }
+            }
+            if (!(e = (edge *) __mp_findedge(&graph, &graph.start, &v->gnode)))
+                e = addedge(&graph.start, &v->gnode);
+            sumdata(&e->data, &d);
+            /* Clear all of the flags from the current call stack that we used
+             * to determine cycles in the call graph.
+             */
+            p = n;
+            do
+            {
+                if (useaddresses)
+                    v = (vertex *) __mp_search(temptree.root,
+                                               (unsigned long) p->addr);
+                else
+                    v = (vertex *) __mp_search(temptree.root, p->symbol);
+                v->pnode->flags &= ~2;
+                if (p->parent != 0)
+                    p = &nodes[p->parent - 1];
+                else
+                    p = NULL;
+            }
+            while (p != NULL);
+        }
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
+         n = (profilenode *) __mp_successor(&n->node))
+        n->flags = 0;
+}
+
+
+/* Write out the graph specification file in dot format.
+ */
+
+static void writegraph(profilenode *p, graphnode *n)
+{
+    listnode *l;
+    vertex *v;
+    edge *e;
+    size_t i, t;
+
+    for (l = n->children.head; l->next != NULL; l = l->next)
+    {
+        e = (edge *) ((char *) l - offsetof(graphedge, cnode));
+        v = (vertex *) ((char *) e->node.child - offsetof(vertex, gnode));
+        if (!(e->flags & 1))
+        {
+            e->flags |= 1;
+            for (i = t = 0; i < 4; i++)
+                if (showcounts)
+                    t += e->data.acount[i];
+                else
+                    t += e->data.atotal[i];
+            fputs("    \"", graphfile);
+            if (p == NULL)
+                fputs("START", graphfile);
+            else
+                printsymbol(graphfile, p);
+            fputs("\" -> \"", graphfile);
+            if (&v->gnode == &graph.end)
+                fputs("ALLOC", graphfile);
+            else
+                printsymbol(graphfile, v->pnode);
+            fprintf(graphfile, "\" [label = \"%lu%s\"];\n", t,
+                    (e->flags & 2) ? "*" : "");
+            writegraph(v->pnode, &v->gnode);
+        }
+    }
+}
+
+
 /* Read the profiling output file and display all specified information.
  */
 
 int main(int argc, char **argv)
 {
     char b[256];
-    char *f;
-    int c, e, h, v;
+    char *f, *g;
+    int c, e, h, r, v;
 
+    g = NULL;
     e = h = v = 0;
+    r = EXIT_SUCCESS;
     maxstack = 1;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
@@ -888,6 +1105,9 @@ int main(int argc, char **argv)
             break;
           case OF_COUNTS:
             showcounts = 1;
+            break;
+          case OF_GRAPHFILE:
+            g = __mp_optarg;
             break;
           case OF_HELP:
             h = 1;
@@ -947,6 +1167,7 @@ int main(int argc, char **argv)
     sbound = mbound = lbound = 0;
     __mp_newtree(&proftree);
     __mp_newtree(&temptree);
+    __mp_newgraph(&graph);
     if (strcmp(f, "-") == 0)
         proffile = stdin;
     else if ((proffile = fopen(f, "rb")) == NULL)
@@ -961,6 +1182,34 @@ int main(int argc, char **argv)
     directtable();
     fputs("\n\n", stdout);
     leaktable();
+    /* The reason that the allocation call graph is not used for the direct
+     * allocation and memory leak tables is that the code to build and display
+     * the allocation call graph was added much later.  Rather than convert
+     * these tables to use the new call graph, I decided to keep the code that
+     * already worked and only use the call graph for any new tables.
+     */
+    buildgraph();
+    if (g != NULL)
+    {
+        if (strcmp(g, "stdout") == 0)
+            graphfile = stdout;
+        else if (strcmp(g, "stderr") == 0)
+            graphfile = stderr;
+        else if ((graphfile = fopen(g, "w")) == NULL)
+        {
+            fprintf(stderr, "%s: Cannot open file `%s'\n", progname, g);
+            r = EXIT_FAILURE;
+        }
+        if (r == EXIT_SUCCESS)
+        {
+            fprintf(graphfile, "/* produced by %s %s from %s */\n\n", progname,
+                    VERSION, f);
+            fputs("digraph \"allocation call graph\"\n{\n", graphfile);
+            writegraph(NULL, &graph.start);
+            fputs("}\n", graphfile);
+            fclose(graphfile);
+        }
+    }
     if (acounts != NULL)
         free(acounts);
     if (dcounts != NULL)
@@ -973,5 +1222,5 @@ int main(int argc, char **argv)
         free(addrs);
     if (symbols != NULL)
         free(symbols);
-    return EXIT_SUCCESS;
+    return r;
 }
