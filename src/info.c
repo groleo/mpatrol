@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.29 2000-05-14 22:17:02 graeme Exp $"
+#ident "$Id: info.c,v 1.30 2000-05-16 00:38:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -973,12 +973,17 @@ int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
         else if ((p < n->block) ||
                  ((char *) p + s > (char *) n->block + n->size))
         {
-            __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
-                       MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
-                       n->block, (char *) n->block + n->size - 1);
+            if (h->flags & FLG_ALLOWOFLOW)
+                __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
+                          MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
+                          n->block, (char *) n->block + n->size - 1);
+            else
+                __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
+                           MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
+                           n->block, (char *) n->block + n->size - 1);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
-            e = 0;
+            e = ((h->flags & FLG_ALLOWOFLOW) != 0);
         }
     return e;
 }
