@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.32 2001-08-23 22:46:42 graeme Exp $
+ * $Id: target.h,v 1.33 2001-09-06 21:35:07 graeme Exp $
  */
 
 
@@ -210,16 +210,17 @@
  * from chip manufacturers rather than specific processor models.
  */
 
-#define ARCH_ANY     0 /* no specific architecture */
-#define ARCH_ALPHA   1 /* DEC Alpha */
-#define ARCH_IX86    2 /* Intel 80x86 */
-#define ARCH_M68K    3 /* Motorola 680x0 */
-#define ARCH_M88K    4 /* Motorola 88xx0 */
-#define ARCH_MIPS    5 /* MIPS */
-#define ARCH_PARISC  6 /* HP PA/RISC */
-#define ARCH_POWER   7 /* IBM RS/6000 */
-#define ARCH_POWERPC 8 /* PowerPC */
-#define ARCH_SPARC   9 /* SPARC */
+#define ARCH_ANY     0  /* no specific architecture */
+#define ARCH_ALPHA   1  /* DEC Alpha */
+#define ARCH_IA64    2  /* Intel Itanium */
+#define ARCH_IX86    3  /* Intel 80x86 */
+#define ARCH_M68K    4  /* Motorola 680x0 */
+#define ARCH_M88K    5  /* Motorola 88xx0 */
+#define ARCH_MIPS    6  /* MIPS */
+#define ARCH_PARISC  7  /* HP PA/RISC */
+#define ARCH_POWER   8  /* IBM RS/6000 */
+#define ARCH_POWERPC 9  /* PowerPC */
+#define ARCH_SPARC   10 /* SPARC */
 
 
 #ifndef ARCH
@@ -227,6 +228,10 @@
     defined(__ALPHA__) || defined(alpha) || defined(_alpha) || \
     defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 #define ARCH ARCH_ALPHA
+#elif defined(ia64) || defined(_ia64) || defined(__ia64) || \
+      defined(__a64__) || defined(IA64) || defined(_IA64) || \
+      defined(__IA64) || defined(__IA64__) || defined(_M_IA64)
+#define ARCH ARCH_IA64
 #elif defined(i386) || defined(_i386) || defined(__i386) || \
       defined(__i386__) || defined(I386) || defined(_I386) || \
       defined(__I386) || defined(__I386__) || defined(ix86) || \
@@ -270,6 +275,8 @@
 
 #if ARCH == ARCH_ALPHA
 #define ARCH_STR "DEC Alpha"
+#elif ARCH == ARCH_IA64
+#define ARCH_STR "Intel Itanium"
 #elif ARCH == ARCH_IX86
 #define ARCH_STR "Intel 80x86"
 #elif ARCH == ARCH_M68K
@@ -322,7 +329,11 @@
 #define ENVIRON ENVIRON_32
 #endif /* arch64 */
 #else /* SYSTEM */
+#if ARCH == ARCH_ALPHA || ARCH == ARCH_IA64
+#define ENVIRON ENVIRON_64
+#else /* ARCH */
 #define ENVIRON ENVIRON_32
+#endif /* ARCH */
 #endif /* SYSTEM */
 #endif /* ENVIRON */
 
