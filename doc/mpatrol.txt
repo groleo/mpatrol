@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 17th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 17th
 November, 2000.
 
 Foreword
@@ -2538,13 +2538,13 @@ with no options is shown below.
             --------------------------------  --------------------------------
       size   count       %     bytes       %   count       %     bytes       %
      
-         2       8    1.56        16    0.54       8    3.12        16    1.70
-         3      99   19.34       297    9.94      99   38.67       297   31.60
-         4     118   23.05       472   15.80     118   46.09       472   50.21
-         5      31    6.05       155    5.19      31   12.11       155   16.49
-         8     256   50.00      2048   68.54       0    0.00         0    0.00
+         2       9    1.76        18    0.61       9    3.52        18    1.95
+         3     105   20.51       315   10.61     105   41.02       315   34.16
+         4     121   23.63       484   16.30     121   47.27       484   52.49
+         5      21    4.10       105    3.54      21    8.20       105   11.39
+         8     256   50.00      2048   68.96       0    0.00         0    0.00
      
-     total     512              2988             256               940
+     total     512              2970             256               922
 
                                  DIRECT ALLOCATIONS
      
@@ -2554,9 +2554,9 @@ with no options is shown below.
      --------------------------  --------------------------
      bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
      
-      2988  100.00  %%             940  100.00  %%             512  new_pair
+      2970  100.00  %%             922  100.00  %%             512  new_pair
      
-      2988          %%             940          %%             512  total
+      2970          %%             922          %%             512  total
 
                                     MEMORY LEAKS
      
@@ -2566,9 +2566,27 @@ with no options is shown below.
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940   31.46     256   50.00      2988     512  new_pair
+     100.00       922   31.04     256   50.00      2970     512  new_pair
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
+
+                               ALLOCATION CALL GRAPH
+     
+                              (number of vertices: 3)
+     
+                allocated               unfreed
+          ---------------------  ---------------------
+     index   bytes   s  m  l  x     bytes   s  m  l  x  function
+     -------------------------------------------------
+     [1]                                                _start [1]
+              2970  %%                922  %%               main [3]
+     -------------------------------------------------
+              2970  %%                922  %%               main [3]
+     [2]                                                new_pair [2]
+     -------------------------------------------------
+              2970  %%                922  %%               _start [1]
+     [3]                                                main [3]
+              2970  %%                922  %%               new_pair [2]
 
    The first table shown is the allocation bin table which summarises
 the sizes of all objects that were dynamically allocated throughout the
@@ -2630,10 +2648,10 @@ allocation bin table so the new output from `mprof' with the
      --------------------------  --------------------------
      bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
      
-      2048   68.54  69               0    0.00                 256  new_pair+20
-       940   31.46  31             940  100.00  %%             256  new_pair+140
+      2048   68.96  69               0    0.00                 256  new_pair+20
+       922   31.04  31             922  100.00  %%             256  new_pair+140
      
-      2988          %%             940          %%             512  total
+      2970          %%             922          %%             512  total
 
                                     MEMORY LEAKS
      
@@ -2643,9 +2661,31 @@ allocation bin table so the new output from `mprof' with the
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+140
+     100.00       922  100.00     256  100.00       922     256  new_pair+140
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
+
+                               ALLOCATION CALL GRAPH
+     
+                              (number of vertices: 4)
+     
+                allocated               unfreed
+          ---------------------  ---------------------
+     index   bytes   s  m  l  x     bytes   s  m  l  x  function
+     -------------------------------------------------
+     [1]                                                _start+100 [1]
+              2970  %%                922  %%               main+120 [4]
+     -------------------------------------------------
+              2048  %%                  0                   main+120 [4]
+     [2]                                                new_pair+20 [2]
+     -------------------------------------------------
+               922  %%                922  %%               main+120 [4]
+     [3]                                                new_pair+140 [3]
+     -------------------------------------------------
+              2970  %%                922  %%               _start+100 [1]
+     [4]                                                main+120 [4]
+              2048  %%                  0                   new_pair+20 [2]
+               922  %%                922  %%               new_pair+140 [3]
 
    The names of the functions displayed in the above tables now have a
 byte offset appended to them to indicate at what position in the
@@ -2675,11 +2715,11 @@ like:
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+140
+     100.00       922  100.00     256  100.00       922     256  new_pair+140
                                                                  main+120
                                                                  _start+100
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
 
    Now that we know where the memory leak is coming from, we can fix it
 by freeing the string as well as the structure at line 77.  A version

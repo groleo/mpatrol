@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 17th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 17th
 November, 2000.
 
 * Menu:
@@ -2688,13 +2688,13 @@ with no options is shown below.
             --------------------------------  --------------------------------
       size   count       %     bytes       %   count       %     bytes       %
      
-         2       8    1.56        16    0.54       8    3.12        16    1.70
-         3      99   19.34       297    9.94      99   38.67       297   31.60
-         4     118   23.05       472   15.80     118   46.09       472   50.21
-         5      31    6.05       155    5.19      31   12.11       155   16.49
-         8     256   50.00      2048   68.54       0    0.00         0    0.00
+         2       9    1.76        18    0.61       9    3.52        18    1.95
+         3     105   20.51       315   10.61     105   41.02       315   34.16
+         4     121   23.63       484   16.30     121   47.27       484   52.49
+         5      21    4.10       105    3.54      21    8.20       105   11.39
+         8     256   50.00      2048   68.96       0    0.00         0    0.00
      
-     total     512              2988             256               940
+     total     512              2970             256               922
 
                                  DIRECT ALLOCATIONS
      
@@ -2704,9 +2704,9 @@ with no options is shown below.
      --------------------------  --------------------------
      bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
      
-      2988  100.00  %%             940  100.00  %%             512  new_pair
+      2970  100.00  %%             922  100.00  %%             512  new_pair
      
-      2988          %%             940          %%             512  total
+      2970          %%             922          %%             512  total
 
                                     MEMORY LEAKS
      
@@ -2716,9 +2716,27 @@ with no options is shown below.
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940   31.46     256   50.00      2988     512  new_pair
+     100.00       922   31.04     256   50.00      2970     512  new_pair
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
+
+                               ALLOCATION CALL GRAPH
+     
+                              (number of vertices: 3)
+     
+                allocated               unfreed
+          ---------------------  ---------------------
+     index   bytes   s  m  l  x     bytes   s  m  l  x  function
+     -------------------------------------------------
+     [1]                                                _start [1]
+              2970  %%                922  %%               main [3]
+     -------------------------------------------------
+              2970  %%                922  %%               main [3]
+     [2]                                                new_pair [2]
+     -------------------------------------------------
+              2970  %%                922  %%               _start [1]
+     [3]                                                main [3]
+              2970  %%                922  %%               new_pair [2]
 
    The first table shown is the allocation bin table which summarises
 the sizes of all objects that were dynamically allocated throughout the
@@ -2780,10 +2798,10 @@ allocation bin table so the new output from `mprof' with the
      --------------------------  --------------------------
      bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
      
-      2048   68.54  69               0    0.00                 256  new_pair+20
-       940   31.46  31             940  100.00  %%             256  new_pair+140
+      2048   68.96  69               0    0.00                 256  new_pair+20
+       922   31.04  31             922  100.00  %%             256  new_pair+140
      
-      2988          %%             940          %%             512  total
+      2970          %%             922          %%             512  total
 
                                     MEMORY LEAKS
      
@@ -2793,9 +2811,31 @@ allocation bin table so the new output from `mprof' with the
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+140
+     100.00       922  100.00     256  100.00       922     256  new_pair+140
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
+
+                               ALLOCATION CALL GRAPH
+     
+                              (number of vertices: 4)
+     
+                allocated               unfreed
+          ---------------------  ---------------------
+     index   bytes   s  m  l  x     bytes   s  m  l  x  function
+     -------------------------------------------------
+     [1]                                                _start+100 [1]
+              2970  %%                922  %%               main+120 [4]
+     -------------------------------------------------
+              2048  %%                  0                   main+120 [4]
+     [2]                                                new_pair+20 [2]
+     -------------------------------------------------
+               922  %%                922  %%               main+120 [4]
+     [3]                                                new_pair+140 [3]
+     -------------------------------------------------
+              2970  %%                922  %%               _start+100 [1]
+     [4]                                                main+120 [4]
+              2048  %%                  0                   new_pair+20 [2]
+               922  %%                922  %%               new_pair+140 [3]
 
    The names of the functions displayed in the above tables now have a
 byte offset appended to them to indicate at what position in the
@@ -2825,11 +2865,11 @@ like:
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+140
+     100.00       922  100.00     256  100.00       922     256  new_pair+140
                                                                  main+120
                                                                  _start+100
      
-                  940   31.46     256   50.00      2988     512  total
+                  922   31.04     256   50.00      2970     512  total
 
    Now that we know where the memory leak is coming from, we can fix it
 by freeing the string as well as the structure at line 77.  A version
@@ -11840,60 +11880,60 @@ Node: The mleak command115392
 Node: The mpsym command117356
 Node: The mpedit command119834
 Node: Profiling123199
-Ref: Profiling-Footnote-1145770
-Node: Improving performance145994
-Ref: Improving performance-Footnote-1154688
-Ref: Improving performance-Footnote-2154730
-Ref: Improving performance-Footnote-3154807
-Ref: Improving performance-Footnote-4154879
-Node: How it works154923
-Node: Examples161568
-Node: Example 1165228
-Ref: Example 1-Footnote-1188824
-Node: Example 2189014
-Node: Example 3194414
-Node: Example 4201271
-Node: Example 5204776
-Ref: Example 5-Footnote-1208576
-Node: Example 6208705
-Node: Example 7210563
-Node: Example 8220799
-Node: Tutorial235955
-Ref: Tutorial-Footnote-1250486
-Ref: Tutorial-Footnote-2250777
-Ref: Tutorial-Footnote-3250926
-Ref: Tutorial-Footnote-4251063
-Ref: Tutorial-Footnote-5251162
-Node: Functions251443
-Node: Environment281879
-Node: Options301129
-Node: Diagnostic messages311422
-Node: Library performance327364
-Node: Profiling file format329866
-Ref: Profiling file format-Footnote-1333278
-Node: Supported systems333458
-Node: New system support347591
-Node: New processor support348787
-Node: New file format support349470
-Node: Notes349860
-Node: Generic notes351471
-Ref: Generic notes-Footnote-1369827
-Ref: Generic notes-Footnote-2370045
-Node: UNIX notes370267
-Node: Amiga notes375020
-Node: Windows notes378635
-Node: Netware notes380006
-Node: Frequently asked questions382517
-Node: Documentation383140
-Node: Building386933
-Node: Linking393536
-Node: Running397808
-Node: Files411444
-Node: Related software414440
-Ref: Related software-Footnote-1449015
-Node: References449256
-Node: Copying451849
-Node: Function index479738
-Node: Index481996
+Ref: Profiling-Footnote-1147946
+Node: Improving performance148170
+Ref: Improving performance-Footnote-1156864
+Ref: Improving performance-Footnote-2156906
+Ref: Improving performance-Footnote-3156983
+Ref: Improving performance-Footnote-4157055
+Node: How it works157099
+Node: Examples163744
+Node: Example 1167404
+Ref: Example 1-Footnote-1191000
+Node: Example 2191190
+Node: Example 3196590
+Node: Example 4203447
+Node: Example 5206952
+Ref: Example 5-Footnote-1210752
+Node: Example 6210881
+Node: Example 7212739
+Node: Example 8222975
+Node: Tutorial238131
+Ref: Tutorial-Footnote-1252662
+Ref: Tutorial-Footnote-2252953
+Ref: Tutorial-Footnote-3253102
+Ref: Tutorial-Footnote-4253239
+Ref: Tutorial-Footnote-5253338
+Node: Functions253619
+Node: Environment284055
+Node: Options303305
+Node: Diagnostic messages313598
+Node: Library performance329540
+Node: Profiling file format332042
+Ref: Profiling file format-Footnote-1335454
+Node: Supported systems335634
+Node: New system support349767
+Node: New processor support350963
+Node: New file format support351646
+Node: Notes352036
+Node: Generic notes353647
+Ref: Generic notes-Footnote-1372003
+Ref: Generic notes-Footnote-2372221
+Node: UNIX notes372443
+Node: Amiga notes377196
+Node: Windows notes380811
+Node: Netware notes382182
+Node: Frequently asked questions384693
+Node: Documentation385316
+Node: Building389109
+Node: Linking395712
+Node: Running399984
+Node: Files413620
+Node: Related software416616
+Ref: Related software-Footnote-1451191
+Node: References451432
+Node: Copying454025
+Node: Function index481914
+Node: Index484172
 
 End Tag Table
