@@ -55,6 +55,7 @@ extern "C"
 
 MP_EXPORT void __mp_newtrace(tracehead *, meminfo *);
 MP_EXPORT int __mp_endtrace(tracehead *);
+MP_EXPORT void __mp_traceheap(void *, size_t, int);
 MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t);
 MP_EXPORT void __mp_tracefree(tracehead *, unsigned long);
 

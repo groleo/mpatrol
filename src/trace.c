@@ -36,14 +36,36 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.6 2000-12-04 00:03:31 graeme Exp $"
+#ident "$Id: trace.c,v 1.7 2000-12-07 00:50:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
+
+
+/* A rescache structure stores information about memory reservations on the
+ * heap before the tracing output file has been opened.
+ */
+
+typedef struct rescache
+{
+    void *block;   /* pointer to block of memory */
+    size_t size;   /* size of block of memory */
+    char internal; /* allocation is internal */
+}
+rescache;
 
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* The cache that stores information about memory reservations on the heap
+ * before the tracing output file has been opened.  The cachecounter variable
+ * keeps a count of the number of entries stored in the cache.
+ */
+
+static rescache cache[128];
+static size_t cachecounter;
 
 
 /* The file pointer to the tracing output file.  This should not really be
@@ -103,7 +125,8 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
 static int opentracefile(tracehead *t)
 {
     char s[4];
-    size_t i;
+    void *b;
+    size_t i, l;
     unsigned long v;
 
     /* The tracing file name can also be named as stderr and stdout which
@@ -127,7 +150,64 @@ static int opentracefile(tracehead *t)
     fwrite(s, sizeof(char), 4, tracefile);
     fwrite(&i, sizeof(size_t), 1, tracefile);
     fwrite(&v, sizeof(unsigned long), 1, tracefile);
+    /* Write out all of the entries in the memory reservation cache.  This
+     * only needs to be done when the tracing output file is opened since all
+     * subsequent tracing events will be written out directly.
+     */
+    for (i = 0; i < cachecounter; i++)
+    {
+        if (cache[i].internal)
+            fputc('I', tracefile);
+        else
+            fputc('H', tracefile);
+        b = __mp_encodeuleb128((unsigned long) cache[i].block, &l);
+        fwrite(b, l, 1, tracefile);
+        b = __mp_encodeuleb128(cache[i].size, &l);
+        fwrite(b, l, 1, tracefile);
+    }
+    cachecounter = 0;
     return 1;
+}
+
+
+/* Record a heap memory reservation for tracing.
+ */
+
+MP_GLOBAL void __mp_traceheap(void *a, size_t l, int i)
+{
+    void *b;
+    size_t s;
+
+    if (tracefile == NULL)
+    {
+        /* If the tracing output file has not yet been opened then it is
+         * likely that the mpatrol library is still being initialised, in
+         * which case it is unsafe to open the file due to the possibility
+         * of recursion.  As a precautionary measure, we store the current
+         * information in a cache that will be written out when the file is
+         * finally opened.  If the cache is full, simply discard the current
+         * information.
+         */
+        if (cachecounter < sizeof(cache) / sizeof(*cache))
+        {
+            cache[cachecounter].block = a;
+            cache[cachecounter].size = l;
+            cache[cachecounter].internal = i;
+            cachecounter++;
+        }
+        return;
+    }
+    if (i != 0)
+        fputc('I', tracefile);
+    else
+        fputc('H', tracefile);
+    /* Some of the following values are written as LEB128 numbers.  This is so
+     * that the size of the tracing output file can be kept to a minimum.
+     */
+    b = __mp_encodeuleb128((unsigned long) a, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(l, &s);
+    fwrite(b, s, 1, tracefile);
 }
 
 
