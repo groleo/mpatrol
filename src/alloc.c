@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.8 2000-07-16 22:30:01 graeme Exp $"
+#ident "$Id: alloc.c,v 1.9 2000-11-05 23:05:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -80,6 +80,8 @@ MP_GLOBAL void __mp_newallocs(allochead *h, size_t m, size_t s, unsigned char o,
             h->oflow = 1;
         h->oflow = __mp_roundup(h->oflow, h->heap.memory.page);
     }
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -101,6 +103,8 @@ MP_GLOBAL void __mp_deleteallocs(allochead *h)
     __mp_newtree(&h->gtree);
     __mp_newtree(&h->ftree);
     h->isize = h->asize = h->gsize = h->fsize = 0;
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -730,13 +734,28 @@ MP_GLOBAL int __mp_protectalloc(allochead *h, memaccess a)
     allocnode *n;
     treenode *t;
 
+    if (!__mp_heapprotect(&h->heap, a))
+        return 0;
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (h->prot == a)
+    {
+        h->protrecur++;
+        return 1;
+    }
+    else if (h->protrecur > 0)
+    {
+        h->protrecur--;
+        return 1;
+    }
+    h->prot = a;
     for (t = __mp_minimum(h->itree.root); t != NULL; t = __mp_successor(t))
     {
         n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
         if (!__mp_memprotect(&h->heap.memory, n->block, n->size, a))
             return 0;
     }
-    return __mp_heapprotect(&h->heap, a);
 }
 
 

@@ -58,12 +58,14 @@ heapnode;
 
 typedef struct heaphead
 {
-    meminfo memory;  /* memory details */
-    slottable table; /* table of heap nodes */
-    treeroot itree;  /* internal allocation tree */
-    treeroot dtree;  /* heap node allocation tree */
-    size_t isize;    /* internal allocation total */
-    size_t dsize;    /* heap node allocation total */
+    meminfo memory;   /* memory details */
+    slottable table;  /* table of heap nodes */
+    treeroot itree;   /* internal allocation tree */
+    treeroot dtree;   /* heap node allocation tree */
+    size_t isize;     /* internal allocation total */
+    size_t dsize;     /* heap node allocation total */
+    memaccess prot;   /* protection status */
+    size_t protrecur; /* protection recursion count */
 }
 heaphead;
 

@@ -91,6 +91,8 @@ typedef struct allochead
     unsigned char abyte; /* allocation byte */
     unsigned char fbyte; /* free byte */
     unsigned long flags; /* allocation flags */
+    memaccess prot;      /* protection status */
+    size_t protrecur;    /* protection recursion count */
 }
 allochead;
 

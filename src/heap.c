@@ -33,7 +33,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.5 2000-04-02 15:38:57 graeme Exp $"
+#ident "$Id: heap.c,v 1.6 2000-11-05 23:00:47 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,6 +66,8 @@ MP_GLOBAL void __mp_newheap(heaphead *h)
     __mp_newtree(&h->itree);
     __mp_newtree(&h->dtree);
     h->isize = h->dsize = 0;
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -94,6 +96,8 @@ MP_GLOBAL void __mp_deleteheap(heaphead *h)
     h->table.free = NULL;
     h->table.size = 0;
     h->isize = 0;
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -162,6 +166,20 @@ MP_GLOBAL int __mp_heapprotect(heaphead *h, memaccess a)
 {
     heapnode *n;
 
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (h->prot == a)
+    {
+        h->protrecur++;
+        return 1;
+    }
+    else if (h->protrecur > 0)
+    {
+        h->protrecur--;
+        return 1;
+    }
+    h->prot = a;
     for (n = (heapnode *) __mp_minimum(h->itree.root); n != NULL;
          n = (heapnode *) __mp_successor(&n->node))
         if (!__mp_memprotect(&h->memory, n->block, n->size, a))
