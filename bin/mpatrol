@@ -3,7 +3,7 @@
 
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -24,7 +24,7 @@
 # UNIX shell script to run programs using the mpatrol library
 
 
-# $Id: mpatrol,v 1.4 1999-11-25 17:25:00 graeme Exp $
+# $Id: mpatrol,v 1.5 2000-01-09 21:36:16 graeme Exp $
 
 
 # Display a command usage message.
@@ -34,7 +34,7 @@ usage()
 cat <<ENDUSAGE
 $command $version
 A command for controlling and tracing dynamic memory allocations.
-Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
 Usage:
     $command [options] <command> [arguments]
@@ -68,6 +68,9 @@ Options:
     -f <unsigned integer>
         Specifies an 8-bit byte pattern with which to prefill newly-freed
         memory.
+    -g
+        Instructs the library to save and replace certain signal handlers
+        during the execution of library code and to restore them afterwards.
     -L <unsigned integer>
         Specifies the limit in bytes at which all memory allocations should
         fail if the total allocated memory should increase beyond this.
@@ -131,8 +134,8 @@ ENDUSAGE
 # Set up command and option variables.
 
 command=`basename "$0"`
-version="1.3"
-options="A:a:C:cD:de:F:f:L:l:mNnO:o:PpR:SsU:vwZ:z:"
+version="1.4"
+options="A:a:C:cD:de:F:f:gL:l:mNnO:o:PpR:SsU:vwZ:z:"
 preload="false"
 format="elf"
 
@@ -160,6 +163,7 @@ pagealloc=""
 preserve="false"
 progfile=""
 reallocstop=""
+safesignals="false"
 showfreed="false" # also includes showunfreed
 showmap="false"   # also includes showsymbols
 unfreedabort=""
@@ -199,6 +203,9 @@ do
             ;;
         f)
             freebyte="$OPTARG"
+            ;;
+        g)
+            safesignals="true"
             ;;
         L)
             limit="$OPTARG"
@@ -359,6 +366,10 @@ fi
 if [ "$reallocstop" != "" ]
 then
     MPATROL_OPTIONS="$MPATROL_OPTIONS REALLOCSTOP=\"$reallocstop\""
+fi
+if [ "$safesignals" = "true" ]
+then
+    MPATROL_OPTIONS="$MPATROL_OPTIONS SAFESIGNALS"
 fi
 if [ "$showmap" = "true" ]
 then
