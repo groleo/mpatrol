@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.25 2000-06-07 20:09:52 graeme Exp $"
+#ident "$Id: memory.c,v 1.26 2000-06-08 18:18:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -201,16 +201,18 @@ static char *progname(void)
     extern char **p_xargv;
 #elif SYSTEM == SYSTEM_HPUX
     extern char **__argv_value;
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX
     extern char **__Argv;
+#elif SYSTEM == SYSTEM_UNIXWARE
+    extern char **___Argv;
 #elif SYSTEM == SYSTEM_LINUX
     static char c[256];
     ssize_t l;
     int f;
 #endif /* SYSTEM */
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
-    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
-     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
+    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
+     ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     unsigned int *p;
     stackinfo s;
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
@@ -224,16 +226,18 @@ static char *progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-    /* AIX, HP/UX and IRIX have global variables containing argc and argv
-     * which we can use to determine the filename that the program was
-     * invoked with.
+    /* AIX, HP/UX, IRIX, SINIX and UnixWare have global variables containing
+     * argc and argv which we can use to determine the filename that the
+     * program was invoked with.
      */
 #if SYSTEM == SYSTEM_AIX
     return p_xargv[0];
 #elif SYSTEM == SYSTEM_HPUX
     return __argv_value[0];
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX
     return __Argv[0];
+#elif SYSTEM == SYSTEM_UNIXWARE
+    return ___Argv[0];
 #elif SYSTEM == SYSTEM_LINUX
     /* Linux has a file in the /proc filesystem which contains the argument
      * vector that a process was invoked with.
@@ -254,8 +258,8 @@ static char *progname(void)
     }
 #endif /* SYSTEM */
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
-    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
-     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
+    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
+     ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     /* Because there is no function to return the executable filename
      * of a process on UNIX, we need to cheat and rely on the ABI by walking
      * up the process stack till we reach the startup code and then find
@@ -279,6 +283,9 @@ static char *progname(void)
 #elif ARCH == ARCH_M68K
         if (p = (unsigned int *) p[3])
             return (char *) *p;
+#elif ARCH == ARCH_MIPS
+        if (p = (unsigned int *) p[7])
+            return (char *) p;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
         if (p = (unsigned int *) p[23])
             return (char *) *p;
