@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.45 2001-01-22 20:58:47 graeme Exp $
+# $Id: Makefile,v 1.46 2001-01-22 21:08:54 graeme Exp $
 
 
 # Definitions
@@ -39,6 +39,7 @@ OFLAGS = -Ogt
 TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
+MPALLOC	= mpalloc
 
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
@@ -60,6 +61,8 @@ SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
 		  sbrk.ts.obj main.ts.obj version.ts.obj
+ARCHIVE_MPAOBJS	= mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
+		  mpstrdup.obj mprealloc.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll

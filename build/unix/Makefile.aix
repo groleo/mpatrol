@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.5 2001-01-22 20:58:46 graeme Exp $
+# $Id: Makefile.aix,v 1.6 2001-01-22 21:08:50 graeme Exp $
 
 
 # Definitions
@@ -40,6 +40,7 @@ OFLAGS	= -O2 -Q!
 TFLAGS	= -DMP_THREADS_SUPPORT
 
 MPATROL	 = mpatrol
+MPALLOC	 = mpalloc
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -47,6 +48,7 @@ MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
+MPAOBJS	 = mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o mprealloc.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)

@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.33 2001-01-22 20:58:47 graeme Exp $
+# $Id: NMakefile,v 1.34 2001-01-22 21:08:54 graeme Exp $
 
 
 # Definitions
@@ -37,6 +37,7 @@ OFLAGS = -Ogt
 TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
+MPALLOC	= mpalloc
 
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
@@ -58,6 +59,8 @@ SHARTS_MPTOBJS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
 		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
 		  sbrk.ts_obj main.ts_obj version.ts_obj
+ARCHIVE_MPAOBJS	= mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
+		  mpstrdup.obj mprealloc.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll

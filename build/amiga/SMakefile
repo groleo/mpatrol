@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.40 2001-01-22 20:58:44 graeme Exp $
+# $Id: SMakefile,v 1.41 2001-01-22 21:08:48 graeme Exp $
 
 
 # Definitions
@@ -36,6 +36,7 @@ OFLAGS = OPT STRMER
 TFLAGS = DEF MP_THREADS_SUPPORT=1
 
 MPATROL	= mpatrol
+MPALLOC	= mpalloc
 
 ARCHIVE_MPTOBJS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -44,6 +45,8 @@ ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o version.t.o
+ARCHIVE_MPAOBJS	= mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
+		  mprealloc.o
 
 ARCHIVE_MPATROL	= $(MPATROL).lib
 OBJECT_MPATROL	= lib$(MPATROL).o

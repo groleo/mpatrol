@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.47 2001-01-22 20:58:46 graeme Exp $
+# $Id: Makefile,v 1.48 2001-01-22 21:08:50 graeme Exp $
 
 
 # Definitions
@@ -42,6 +42,7 @@ TFLAGS	= -DMP_THREADS_SUPPORT
 LDFLAGS	= -shared
 
 MPATROL	 = mpatrol
+MPALLOC	 = mpalloc
 VERSION	 = 1
 REVISION = 3
 
@@ -51,6 +52,7 @@ MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
+MPAOBJS	 = mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o mprealloc.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 SHARED_MPTOBJS	= $(MPTOBJS:.o=.s.o) machine.s.o
