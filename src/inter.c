@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.80 2001-02-12 19:28:58 graeme Exp $"
+#ident "$Id: inter.c,v 1.81 2001-02-14 00:02:54 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.80 2001-02-12 19:28:58 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.81 2001-02-14 00:02:54 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1523,7 +1523,7 @@ __mp_snapshot(void)
  */
 
 size_t
-__mp_iterate(int (*f)(void *), unsigned long s)
+__mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
 {
     allocnode *n, *p;
     infonode *m;
@@ -1542,7 +1542,7 @@ __mp_iterate(int (*f)(void *), unsigned long s)
             if (f == NULL)
                 r = __mp_printinfo(n->block);
             else
-                r = f(n->block);
+                r = f(n->block, d);
             if (r > 0)
                 i++;
             else if (r < 0)
