@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.22 2000-01-09 21:30:09 graeme Exp $
+@c $Id: mpatrol.texi,v 1.23 2000-01-11 00:56:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -161,6 +161,7 @@ order to get the most out of the software it describes.
 
 @cindex bug reports
 @cindex reporting bugs
+@cindex FAQ
 Due to their very nature, problems with dynamic memory allocations are
 notoriously difficult to reproduce and debug, and this is likely to be the case
 if you find a bug in the mpatrol library as it might be extremely hard to
@@ -168,7 +169,9 @@ reproduce on another system.  Details on how to report bugs are given elsewhere
 in this document (@pxref{Notes}), but it would be very useful if you could try
 to provide as much information as possible when reporting a problem, and that
 includes having a look in the library source code to see if it's obvious what is
-wrong.
+wrong.  However, please try to read the FAQ first in case your question or
+problem is covered there since it is usually updated every time I receive a
+question about mpatrol.
 
 @cindex contacting the author
 @cindex author, contacting
