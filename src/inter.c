@@ -47,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.65 2001-01-31 22:20:25 graeme Exp $"
+#ident "$Id: inter.c,v 1.66 2001-01-31 22:49:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -381,13 +381,15 @@ __mp_init(void)
         /* Output the header and version information.
          */
         __mp_printversion();
+        /* Attempt to read symbols from any shared libraries.
+         */
+        __mp_addextsymbols(&memhead.syms);
         /* Obtain the program filename and attempt to read any symbols from
          * that file.
          */
         if (memhead.alloc.heap.memory.prog != NULL)
             __mp_addsymbols(&memhead.syms, memhead.alloc.heap.memory.prog, NULL,
                             0);
-        __mp_addextsymbols(&memhead.syms);
         __mp_fixsymbols(&memhead.syms);
         __mp_diag("\n");
         if (!(memhead.flags & FLG_NOPROTECT))

@@ -120,7 +120,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.46 2001-01-31 22:20:25 graeme Exp $"
+#ident "$Id: symbol.c,v 1.47 2001-01-31 22:49:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1267,20 +1267,6 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 
     r = 1;
     l = y->dtree.size;
-#if DYNLINK == DYNLINK_WINDOWS
-    /* We always want to initialise the imagehlp library here since we will
-     * be using it to obtain the symbols from any loaded DLLs later on and
-     * possibly also from the executable file if we are not using any other
-     * object file access library.  In any case we can set the demangling
-     * option in the imagehlp library and also instruct it to load line number
-     * information if the USEDEBUG option is given.
-     */
-    if (y->lineinfo)
-        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES);
-    else
-        SymSetOptions(SYMOPT_UNDNAME);
-    SymInitialize(GetCurrentProcess(), NULL, 1);
-#endif /* DYNLINK */
 #if FORMAT == FORMAT_AOUT || (SYSTEM == SYSTEM_LYNXOS && \
      (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF))
     /* This is a very simple, yet portable, way to read symbols from a.out
@@ -1764,6 +1750,18 @@ __mp_addextsymbols(symhead *y)
         }
     }
 #elif DYNLINK == DYNLINK_WINDOWS
+    /* We always want to initialise the imagehlp library here since we will
+     * be using it to obtain the symbols from any loaded DLLs here and
+     * possibly also from the executable file if we are not using any other
+     * object file access library.  In any case we can set the demangling
+     * option in the imagehlp library and also instruct it to load line number
+     * information if the USEDEBUG option is given.
+     */
+    if (y->lineinfo)
+        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES);
+    else
+        SymSetOptions(SYMOPT_UNDNAME);
+    SymInitialize(GetCurrentProcess(), NULL, 1);
     /* The imagehlp library allows us to locate the symbols contained in
      * all of the loaded DLLs without having to actually read the files
      * themselves.
