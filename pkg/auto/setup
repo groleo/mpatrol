@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.9 2001-08-27 21:28:55 graeme Exp $
+# $Id: setup,v 1.10 2001-09-19 22:34:57 graeme Exp $
 
 
 uselinks=0
@@ -128,6 +128,20 @@ cd ..
 if [ $generate = 0 ]
 then
     copyfile ../../../config/doc.in Makefile.in
+fi
+cd ..
+
+
+# Create the extra directory for holding any additional data files.
+
+echo "Creating extra directory" >&2
+makedir extra
+cd extra
+copyfile ../../../extra/mpatrol.m4 mpatrol.m4
+copyfile ../../../config/extra.am Makefile.am
+if [ $generate = 0 ]
+then
+    copyfile ../../../config/extra.in Makefile.in
 fi
 cd ..
 
