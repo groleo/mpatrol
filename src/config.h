@@ -340,7 +340,8 @@
  */
 
 #ifndef MP_PRELOAD_SUPPORT
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
 #define MP_PRELOAD_SUPPORT 1
 #else /* SYSTEM */
 #define MP_PRELOAD_SUPPORT 0
@@ -354,7 +355,11 @@
 
 #if MP_PRELOAD_SUPPORT
 #ifndef MP_PRELOAD_NAME
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PRELOAD_NAME "_RLD_LIST"
+#else /* SYSTEM */
 #define MP_PRELOAD_NAME "LD_PRELOAD"
+#endif /* SYSTEM */
 #endif /* MP_PRELOAD_NAME */
 #endif /* MP_PRELOAD_SUPPORT */
 
@@ -367,11 +372,23 @@
 #if MP_PRELOAD_SUPPORT
 #ifndef MP_PRELOAD_LIBS
 #if FORMAT == FORMAT_NONE || FORMAT == FORMAT_COFF
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PRELOAD_LIBS "libmpatrol.so:DEFAULT"
+#else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so"
+#endif /* SYSTEM */
 #elif FORMAT == FORMAT_ELF32
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PRELOAD_LIBS "libmpatrol.so:libelf.so:DEFAULT"
+#else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so libelf.so"
+#endif /* SYSTEM */
 #elif FORMAT == FORMAT_BFD
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PRELOAD_LIBS "libmpatrol.so:libbfd.so:libiberty.so:DEFAULT"
+#else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so libbfd.so libiberty.so"
+#endif /* SYSTEM */
 #endif /* FORMAT */
 #endif /* MP_PRELOAD_LIBS */
 #endif /* MP_PRELOAD_SUPPORT */
