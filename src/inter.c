@@ -31,9 +31,9 @@
 #if MP_THREADS_SUPPORT
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
-#if TARGET == TARGET_WINDOWS
+#if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || TARGET == TARGET_WINDOWS
 #include "sbrk.h"
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
 #include "option.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.23 2000-04-04 17:38:50 graeme Exp $"
+#ident "$Id: inter.c,v 1.24 2000-04-06 19:21:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -154,6 +154,13 @@ void __mp_init(void)
     if (!memhead.init)
     {
         __mp_newinfo(&memhead);
+#if (TARGET == TARGET_AMIGA && defined(__GNUC__))
+        /* Initialise the simulated UNIX heap.  This gets done anyway, but it
+         * forces a reference to the sbrk module which is necessary since
+         * we need it for libiberty, which gets linked after libmpatrol.
+         */
+        sbrk(0);
+#endif /* TARGET && __GNUC__ */
 #if MP_INUSE_SUPPORT
         _Inuse_init(0, 0);
 #endif /* MP_INUSE_SUPPORT */
