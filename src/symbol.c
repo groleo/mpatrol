@@ -105,7 +105,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.33 2000-11-05 22:55:37 graeme Exp $"
+#ident "$Id: symbol.c,v 1.34 2000-11-06 19:40:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1434,8 +1434,6 @@ MP_GLOBAL int __mp_protectsymbols(symhead *y, memaccess a)
 {
     symnode *n;
 
-    if (!__mp_protectstrtab(&y->strings, a))
-        return 0;
     /* The library already knows what its protection status is so we don't
      * need to do anything if the request has already been done.
      */
