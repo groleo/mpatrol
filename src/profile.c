@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.25 2000-05-14 22:17:05 graeme Exp $"
+#ident "$Id: profile.c,v 1.26 2000-05-15 22:34:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -365,8 +365,10 @@ MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
      * that if an error does occur then it will not be too drastic if we
      * continue writing the rest of the file.
      */
+    i = 1;
     __mp_memcopy(s, (char *) MP_PROFMAGIC, 4);
     fwrite(s, sizeof(char), 4, f);
+    fwrite(&i, sizeof(size_t), 1, f);
     fwrite(&p->sbound, sizeof(size_t), 1, f);
     fwrite(&p->mbound, sizeof(size_t), 1, f);
     fwrite(&p->lbound, sizeof(size_t), 1, f);
