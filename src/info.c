@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.30 2000-05-16 00:38:36 graeme Exp $"
+#ident "$Id: info.c,v 1.31 2000-07-16 22:29:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -67,7 +67,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
      * because we have already entered the library at this point.  The
      * same goes for the recur field.
      */
-    __mp_newallocs(&h->alloc, MP_OVERFLOW, MP_OVERBYTE, MP_ALLOCBYTE,
+    __mp_newallocs(&h->alloc, 0, MP_OVERFLOW, MP_OVERBYTE, MP_ALLOCBYTE,
                    MP_FREEBYTE, 0);
     __mp_newaddrs(&h->addr, &h->alloc.heap);
     __mp_newsymbols(&h->syms, &h->alloc.heap);
