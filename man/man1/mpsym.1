@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpsym.1,v 1.6 2001-01-04 21:06:56 graeme Exp $
+.\" $Id: mpsym.1,v 1.7 2001-01-04 21:38:37 graeme Exp $
 .\"
 .TH MPSYM 1 "4 January 2001" "Release 1.3" "mpatrol library"
 .SH NAME
@@ -53,12 +53,13 @@ log file so the file must be randomly-accessable.
 .PP
 The \fBmpsym\fP command currently uses \fBgdb\fP as the debugger with which to
 obtain the additional information about the code addresses in the mpatrol log
-file.  It also makes use of several UNIX text processing commands in order to
-extract information from the debugger's output and from the log file.  As a
-result, the \fBmpsym\fP command is only likely to work on UNIX platforms or on
-systems which have the necessary commands installed.  By default, it is set up
-to work on 32-bit platforms, but this can be changed by altering the
-\fIPOINTER\fP definition in the \fBmpsym\fP file itself.
+file.  It also makes use of several UNIX text processing commands, including
+\fBperl\fP if it is installed, in order to extract information from the
+debugger's output and from the log file.  As a result, the \fBmpsym\fP command
+is only likely to work on UNIX platforms or on systems which have the necessary
+commands installed.  By default, it is set up to work on 32-bit platforms, but
+this can be changed by altering the \fIPOINTER\fP definition in the \fBmpsym\fP
+file itself (this is only necessary if \fBperl is not installed).
 .SH OPTIONS
 .TP
 \fB\-\-help\fP [\fB\-h\fP]
@@ -68,7 +69,8 @@ Displays a quick-reference option summary.
 Displays the version number of the \fBmpsym\fP command.
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBmprof\fP(1), \fBmptrace\fP(1), \fBmleak\fP(1),
-\fBmpedit\fP(1), \fBhexwords\fP(1), \fBgdb\fP(1), \fBlibmpatrol\fP(3).
+\fBmpedit\fP(1), \fBhexwords\fP(1), \fBgdb\fP(1), \fBperl\fP(1),
+\fBlibmpatrol\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP

@@ -47,17 +47,17 @@ DDEESSCCRRIIPPTTIIOONN
        The mmppssyymm command currently uses ggddbb as the debugger  with
        which  to obtain the additional information about the code
        addresses in the mpatrol log file.  It also makes  use  of
-       several  UNIX text processing commands in order to extract
-       information from the debugger's output and  from  the  log
-       file.   As  a  result, the mmppssyymm command is only likely to
-       work on UNIX platforms or on systems which have the neces-
-       sary commands installed.  By default, it is set up to work
-       on 32-bit platforms, but this can be changed  by  altering
-       the _P_O_I_N_T_E_R definition in the mmppssyymm file itself.
+       several  UNIX  text processing commands, including ppeerrll if
+       it is installed, in order to extract information from  the
+       debugger's output and from the log file.  As a result, the
+       mmppssyymm command is only likely to work on UNIX platforms  or
+       on  systems  which  have the necessary commands installed.
+       By default, it is set up to work on 32-bit platforms,  but
+       this  can be changed by altering the _P_O_I_N_T_E_R definition in
+       the mmppssyymm file itself (this is only necessary if  ppeerrll  iiss
+       nnoott iinnssttaalllleedd))..
 
-OOPPTTIIOONNSS
-       ----hheellpp [--hh]
-              Displays a quick-reference option summary.
+
 
 
 
@@ -70,12 +70,16 @@ Release 1.3               4 January 2001                        1
 MPSYM(1)                 mpatrol library                 MPSYM(1)
 
 
+OOPPTTIIOONNSS
+       ----hheellpp [--hh]
+              Displays a quick-reference option summary.
+
        ----vveerrssiioonn [--VV]
               Displays the version number of the mmppssyymm command.
 
 SSEEEE AALLSSOO
        mmppaattrrooll(1),  mmpprrooff(1),  mmppttrraaccee(1),  mmlleeaakk(1),  mmppeeddiitt(1),
-       hheexxwwoorrddss(1), ggddbb(1), lliibbmmppaattrrooll(3).
+       hheexxwwoorrddss(1), ggddbb(1), ppeerrll(1), lliibbmmppaattrrooll(3).
 
        The mpatrol manual and reference card.
 
@@ -103,10 +107,6 @@ CCOOPPYYRRIIGGHHTT
        Public  License  along with this library; if not, write to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
-
-
-
-
 
 
 
