@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.50 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: info.c,v 1.51 2001-01-15 20:58:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -337,6 +337,8 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                 m->data.file = v->file;
                 m->data.line = v->line;
                 m->data.stack = __mp_getaddrs(&h->addr, v->stack);
+                m->data.type = NULL;
+                m->data.typesize = 0;
                 if (h->recur > 1)
                     m->data.flags = FLG_INTERNAL;
                 else
@@ -556,6 +558,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     i->data.file = v->file;
                     i->data.line = v->line;
                     i->data.stack = __mp_getaddrs(&h->addr, v->stack);
+                    i->data.type = NULL;
+                    i->data.typesize = 0;
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
@@ -769,6 +773,8 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
             m->data.file = v->file;
             m->data.line = v->line;
             m->data.stack = __mp_getaddrs(&h->addr, v->stack);
+            m->data.type = NULL;
+            m->data.typesize = 0;
             m->data.flags |= FLG_FREED;
         }
         else

@@ -177,6 +177,8 @@ typedef union infonode
         char *file;            /* file name in which call took place */
         unsigned long line;    /* line number at which call took place */
         addrnode *stack;       /* call stack details */
+        char *type;            /* type stored in allocation */
+        size_t typesize;       /* size of type stored in allocation */
         unsigned long flags;   /* allocation flags */
     }
     data;
