@@ -34,7 +34,7 @@
 unsigned long leaktotal = 0;
 
 
-int callback(void *p)
+int callback(const void *p)
 {
     __mp_allocstack *s;
     __mp_allocinfo d;
