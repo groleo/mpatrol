@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.9 2001-03-21 22:13:55 graeme Exp $
+ * $Id: dmalloc.h,v 1.10 2001-07-26 15:46:13 graeme Exp $
  */
 
 
@@ -76,9 +76,7 @@
  * ever return DMALLOC_VERIFY_ERROR if the pointer to be checked is not
  * null and is invalid - it always terminates with an error message in the
  * mpatrol log file whenever the pointer to be checked is null and it has
- * detected heap corruption.  The information currently passed to any
- * tracker functions does not include source file and line number
- * information.
+ * detected heap corruption.
  *
  * The dmalloc_log_heap_map() and dmalloc_log_stats() functions map on to
  * the __mp_memorymap() and __mp_summary() functions and so have entirely
