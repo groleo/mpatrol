@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.5 2000-01-21 00:32:45 graeme Exp $"
+#ident "$Id: alloc.c,v 1.6 2000-03-15 00:44:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -110,12 +110,12 @@ static allocnode *getnode(allochead *h)
     heapnode *p;
 
     /* If we have no more allocation node slots left then we must allocate
-     * some more memory for them.  An extra page of memory should
-     * suffice.
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
      */
     if ((n = (allocnode *) __mp_getslot(&h->table)) == NULL)
     {
-        if ((p = __mp_heapalloc(&h->heap, h->heap.memory.page,
+        if ((p = __mp_heapalloc(&h->heap, h->heap.memory.page * MP_ALLOCFACTOR,
               h->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);

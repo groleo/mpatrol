@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.12 2000-03-09 22:06:56 graeme Exp $"
+#ident "$Id: symbol.c,v 1.13 2000-03-15 00:43:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -234,12 +234,12 @@ static symnode *getsymnode(symhead *y)
     heapnode *p;
 
     /* If we have no more symbol node slots left then we must allocate
-     * some more memory for them.  An extra page of memory should
-     * suffice.
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
      */
     if ((n = (symnode *) __mp_getslot(&y->table)) == NULL)
     {
-        if ((p = __mp_heapalloc(y->heap, y->heap->memory.page,
+        if ((p = __mp_heapalloc(y->heap, y->heap->memory.page * MP_ALLOCFACTOR,
               y->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&y->table, p->block, p->size);

@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.6 2000-03-13 22:16:59 graeme Exp $"
+#ident "$Id: strtab.c,v 1.7 2000-03-15 00:44:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,12 +122,12 @@ static hashentry *gethashentry(strtab *t)
     heapnode *p;
 
     /* If we have no more hash entry slots left then we must allocate
-     * some more memory for them.  An extra page of memory should
-     * suffice.
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
      */
     if ((e = (hashentry *) __mp_getslot(&t->table)) == NULL)
     {
-        if ((p = __mp_heapalloc(t->heap, t->heap->memory.page,
+        if ((p = __mp_heapalloc(t->heap, t->heap->memory.page * MP_ALLOCFACTOR,
               t->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&t->table, p->block, p->size);

@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: addr.c,v 1.2 2000-01-09 20:35:10 graeme Exp $"
+#ident "$Id: addr.c,v 1.3 2000-03-15 00:44:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -88,12 +88,12 @@ static addrnode *getaddrnode(addrhead *h)
     heapnode *p;
 
     /* If we have no more address node slots left then we must allocate
-     * some more memory for them.  An extra page of memory should
-     * suffice.
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
      */
     if ((n = (addrnode *) __mp_getslot(&h->table)) == NULL)
     {
-        if ((p = __mp_heapalloc(h->heap, h->heap->memory.page,
+        if ((p = __mp_heapalloc(h->heap, h->heap->memory.page * MP_ALLOCFACTOR,
               h->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);

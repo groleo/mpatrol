@@ -33,7 +33,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.2 2000-01-09 20:35:13 graeme Exp $"
+#ident "$Id: heap.c,v 1.3 2000-03-15 00:38:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,12 +103,12 @@ MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a)
     size_t s;
 
     /* If we have no more heap node slots left then we must allocate
-     * some more memory for them.  An extra page of memory should
-     * suffice.
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
      */
     if ((n = (heapnode *) __mp_getslot(&h->table)) == NULL)
     {
-        s = h->memory.page;
+        s = h->memory.page * MP_ALLOCFACTOR;
         if ((p = __mp_memalloc(&h->memory, &s, h->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p, s);

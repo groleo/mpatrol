@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.13 2000-02-24 00:58:32 graeme Exp $"
+#ident "$Id: info.c,v 1.14 2000-03-15 00:43:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -137,13 +137,13 @@ static infonode *getinfonode(infohead *h)
     heapnode *p;
 
     /* If we have no more allocation information node slots left then we
-     * must allocate some more memory for them.  An extra page of memory
-     * should suffice.
+     * must allocate some more memory for them.  An extra MP_ALLOCFACTOR
+     * pages of memory should suffice.
      */
     if ((n = (infonode *) __mp_getslot(&h->table)) == NULL)
     {
-        if ((p = __mp_heapalloc(&h->alloc.heap, h->alloc.heap.memory.page,
-              h->table.entalign)) == NULL)
+        if ((p = __mp_heapalloc(&h->alloc.heap, h->alloc.heap.memory.page *
+              MP_ALLOCFACTOR, h->table.entalign)) == NULL)
             return NULL;
         __mp_initslots(&h->table, p->block, p->size);
         n = (infonode *) __mp_getslot(&h->table);
