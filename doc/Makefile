@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.2 1999-11-14 11:41:52 graeme Exp $
+# $Id: Makefile,v 1.3 1999-11-14 18:14:11 graeme Exp $
 
 
 # Definitions
@@ -33,16 +33,36 @@ VERBOSE  = false
 
 # Rules
 
-.SUFFIXES: .texi .info .html .dvi .ps .pdf .jpg .eps
+.SUFFIXES: .texi .doc .info .guide .html .dvi .ps .pdf .jpg .eps
+
+# Build the text file from the Texinfo file using makeinfo
+
+$(DOCUMENT).doc: $(DOCUMENT).texi
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ makeinfo --no-headers --number-sections --verbose $< >$@
+else
+	@ makeinfo --no-headers --number-sections $< >$@
+endif
 
 # Build the info file from the Texinfo file using makeinfo
 
 $(DOCUMENT).info: $(DOCUMENT).texi
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ makeinfo --no-split --number-sections --verbose $<
+	@ makeinfo --no-split --verbose $<
 else
-	@ makeinfo --no-split --number-sections $<
+	@ makeinfo --no-split $<
+endif
+
+# Build the AmigaGuide file from the Texinfo file using makeinfo
+
+$(DOCUMENT).guide: $(DOCUMENT).texi
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ makeinfo --amiga --verbose $<
+else
+	@ makeinfo --amiga $<
 endif
 
 # Build the HTML file from the Texinfo file using makeinfo
@@ -85,9 +105,10 @@ else
 	@ texi2dvi --pdf --batch --clean --quiet $<
 endif
 
-all: $(DOCUMENT).info $(DOCUMENT).html $(DOCUMENT).dvi $(DOCUMENT).ps \
-	$(DOCUMENT).pdf
+all: $(DOCUMENT).doc $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
+	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf
 
 clean:
-	-@ rm -f $(DOCUMENT).info $(DOCUMENT).html >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).doc $(DOCUMENT).info >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
