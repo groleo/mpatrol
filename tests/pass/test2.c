@@ -30,12 +30,8 @@
 #include <stdio.h>
 
 
-typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
-typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
-
-
-prologue_handler old_prologue;
-epilogue_handler old_epilogue;
+__mp_prologuehandler old_prologue;
+__mp_epiloguehandler old_epilogue;
 
 
 void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.225 2001-07-25 21:31:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.226 2001-07-25 22:03:54 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2805,56 +2805,52 @@ code is an example of this and can be found in @file{tests/pass/test2.c}.
 30  #include <stdio.h>
 
 
-33  typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
-34  typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
+33  __mp_prologuehandler old_prologue;
+34  __mp_epiloguehandler old_epilogue;
 
 
-37  prologue_handler old_prologue;
-38  epilogue_handler old_epilogue;
+37  void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
+38  @{
+39      if (old_prologue != NULL)
+40          old_prologue(p, l, a);
+41      if (p == (void *) -1)
+42          fprintf(stderr, "allocating %lu bytes\n", l);
+43      else if (l == (size_t) -1)
+44          fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
+45      else if (l == (size_t) -2)
+46          fprintf(stderr, "duplicating string `%s'\n", p);
+47      else
+48          fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
+49                  sizeof(void *) * 2, p, l);
+50  @}
 
 
-41  void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
-42  @{
-43      if (old_prologue != NULL)
-44          old_prologue(p, l, a);
-45      if (p == (void *) -1)
-46          fprintf(stderr, "allocating %lu bytes\n", l);
-47      else if (l == (size_t) -1)
-48          fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
-49      else if (l == (size_t) -2)
-50          fprintf(stderr, "duplicating string `%s'\n", p);
-51      else
-52          fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
-53                  sizeof(void *) * 2, p, l);
-54  @}
+53  void epilogue(MP_CONST void *p, MP_CONST void *a)
+54  @{
+55      if (p != (void *) -1)
+56          fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
+57      if (old_epilogue != NULL)
+58          old_epilogue(p, a);
+59  @}
 
 
-57  void epilogue(MP_CONST void *p, MP_CONST void *a)
-58  @{
-59      if (p != (void *) -1)
-60          fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
-61      if (old_epilogue != NULL)
-62          old_epilogue(p, a);
-63  @}
+62  int main(void)
+63  @{
+64      void *p, *q;
 
-
-66  int main(void)
-67  @{
-68      void *p, *q;
-
-70      old_prologue = __mp_prologue(prologue);
-71      old_epilogue = __mp_epilogue(epilogue);
-72      if (p = malloc(16))
-73          if (q = realloc(p, 32))
-74              free(q);
-75          else
-76              free(p);
-77      if (p = (char *) strdup("test"))
-78          free(p);
-79      __mp_prologue(old_prologue);
-80      __mp_epilogue(old_epilogue);
-81      return EXIT_SUCCESS;
-82  @}
+66      old_prologue = __mp_prologue(prologue);
+67      old_epilogue = __mp_epilogue(epilogue);
+68      if (p = malloc(16))
+69          if (q = realloc(p, 32))
+70              free(q);
+71          else
+72              free(p);
+73      if (p = (char *) strdup("test"))
+74          free(p);
+75      __mp_prologue(old_prologue);
+76      __mp_epilogue(old_epilogue);
+77      return EXIT_SUCCESS;
+78  @}
 @end smallexample
 
 Once again, if you compile and run the above code, you should see the following
