@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.54 2001-01-15 23:03:30 graeme Exp $"
+#ident "$Id: info.c,v 1.55 2001-01-17 23:42:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -344,7 +344,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                 else
                     m->data.flags = 0;
                 p = n->block;
-                if ((f == AT_CALLOC) || (f == AT_RECALLOC))
+                if ((f == AT_CALLOC) || (f == AT_XCALLOC) || (f == AT_RECALLOC))
                     __mp_memset(p, 0, l);
                 else
                     __mp_memset(p, h->alloc.abyte, l);
