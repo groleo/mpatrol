@@ -202,8 +202,9 @@ MP_EXPORT void __mp_freememory(infohead *, void *, alloctype, char *, char *,
 MP_EXPORT void __mp_setmemory(infohead *, void *, size_t, unsigned char,
                               alloctype, char *, char *, unsigned long,
                               stackinfo *);
-MP_EXPORT void __mp_copymemory(infohead *, void *, void *, size_t, alloctype,
-                               char *, char *, unsigned long, stackinfo *);
+MP_EXPORT void *__mp_copymemory(infohead *, void *, void *, size_t,
+                                unsigned char, alloctype, char *, char *,
+                                unsigned long, stackinfo *);
 MP_EXPORT void *__mp_locatememory(infohead *, void *, size_t, void *, size_t,
                                   alloctype, char *, char *, unsigned long,
                                   stackinfo *);

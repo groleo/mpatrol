@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.34 2000-05-14 12:39:27 graeme Exp $"
+#ident "$Id: inter.c,v 1.35 2000-05-14 12:43:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -703,7 +703,7 @@ void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    __mp_copymemory(&memhead, p, q, l, f, s, t, u, &i);
+    q = __mp_copymemory(&memhead, p, q, l, c, f, s, t, u, &i);
     restoresignals();
     return q;
 }
