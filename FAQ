@@ -183,6 +183,19 @@ their corresponding answers or solutions.
     but that is mainly due to the overhead of storing the extra tracing details
     for each memory allocation.
 
+ Q. My program is written in C++ and is linked to the mpatrol library, but how
+    do I go about demangling the C++ symbol names that are shown in the stack
+    tracebacks in the resulting log file?
+
+ A. Because there is no standard way of mangling C++ symbol names, various
+    compilers and operating systems have taken different approaches to C++ name
+    mangling, many of which differ significantly from the method suggested in
+    The Annotated C++ Reference Manual by Margaret Ellis and Bjarne Stroustrup.
+    However, most compilers come with a demangling tool which can be used in a
+    command pipe to accept mangled names on its standard input file stream and
+    demangle them on its standard output file stream, and so can be used to
+    process the mpatrol log file.
+
 
  4. FILES
 
