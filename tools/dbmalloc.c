@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.6 2001-02-27 22:06:31 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.7 2001-02-27 22:40:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.6 2001-02-27 22:06:31 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.7 2001-02-27 22:40:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -424,10 +424,73 @@ __mpt_dbmallocsize(MP_CONST void *p)
 void
 __mp_init_dbmalloc(void)
 {
+    char *v;
+    dbmalloptarg a;
+
     if (!malloc_initialised)
     {
         malloc_initialised = 1;
         malloc_detail = 0;
+        if ((v = getenv("MALLOC_WARN")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_WARN, &a);
+        }
+        if ((v = getenv("MALLOC_FATAL")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_FATAL, &a);
+        }
+        if ((v = getenv("MALLOC_ERRFILE")) && (*v != '\0'))
+        {
+            a.str = v;
+            __mpt_dbmallocoption(MALLOC_ERRFILE, &a);
+        }
+        if ((v = getenv("MALLOC_CKCHAIN")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_CKCHAIN, &a);
+        }
+        if ((v = getenv("MALLOC_FILLAREA")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_FILLAREA, &a);
+        }
+        if ((v = getenv("MALLOC_LOWFRAG")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_LOWFRAG, &a);
+        }
+        if ((v = getenv("MALLOC_CKDATA")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_CKDATA, &a);
+        }
+        if ((v = getenv("MALLOC_REUSE")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_REUSE, &a);
+        }
+        if ((v = getenv("MALLOC_SHOWLINKS")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_SHOWLINKS, &a);
+        }
+        if ((v = getenv("MALLOC_DETAIL")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_DETAIL, &a);
+        }
+        if ((v = getenv("MALLOC_FREEMARK")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_FREEMARK, &a);
+        }
+        if ((v = getenv("MALLOC_ZERO")) && (*v != '\0'))
+        {
+            a.i = strtol(v, NULL, 10);
+            __mpt_dbmallocoption(MALLOC_ZERO, &a);
+        }
     }
 }
 
