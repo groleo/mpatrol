@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.68 2001-06-13 23:07:29 graeme Exp $
+# $Id: mpatrol.spec,v 1.69 2001-08-02 20:41:33 graeme Exp $
 
 
 %define libversion 1.4
@@ -29,7 +29,7 @@
 
 Summary: A library for controlling and tracing dynamic memory allocations.
 Name: mpatrol
-Version: 1.4.5
+Version: 1.4.6
 Release: 1
 License: LGPL
 Group: Development/Debuggers

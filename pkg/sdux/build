@@ -24,10 +24,10 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.31 2001-07-25 21:36:33 graeme Exp $
+# $Id: build,v 1.32 2001-08-02 20:41:37 graeme Exp $
 
 
-version=1.4.5
+version=1.4.6
 
 
 # Build the mpatrol library.
