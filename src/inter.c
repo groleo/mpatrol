@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.127 2001-06-07 17:58:42 graeme Exp $"
+#ident "$Id: inter.c,v 1.128 2001-06-12 17:54:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.127 2001-06-07 17:58:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.128 2001-06-12 17:54:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -548,7 +548,8 @@ __mp_reinit(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    else if ((i = __mp_processid()) != memhead.pid)
+    else if (((memhead.recur == 1) || (memhead.flags & FLG_CHECKFORK)) &&
+             ((i = __mp_processid()) != memhead.pid))
     {
         memhead.pid = i;
         if (!(memhead.flags & FLG_NOPROTECT))

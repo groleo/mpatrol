@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.55 2001-05-22 19:41:01 graeme Exp $
+ * $Id: info.h,v 1.56 2001-06-12 17:54:45 graeme Exp $
  */
 
 
@@ -62,6 +62,7 @@
 #define FLG_ALLOWOFLOW    0x00004000 /* allow memory operations to overflow */
 #define FLG_SAFESIGNALS   0x00008000 /* save and restore signal handlers */
 #define FLG_NOPROTECT     0x00010000 /* do not protect internal structures */
+#define FLG_CHECKFORK     0x00020000 /* check for forked processes */
 
 #define FLG_FREED         0x00000001 /* allocation has been freed */
 #define FLG_MARKED        0x00000002 /* allocation has been marked */

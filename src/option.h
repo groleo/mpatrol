@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: option.h,v 1.22 2001-03-05 22:19:08 graeme Exp $
+ * $Id: option.h,v 1.23 2001-06-12 17:54:45 graeme Exp $
  */
 
 
@@ -102,14 +102,15 @@
 #define OPT_TRACE         0x00010000
 #define OPT_SAFESIGNALS   0x00020000
 #define OPT_NOPROTECT     0x00040000
-#define OPT_PRESERVE      0x00080000
-#define OPT_OFLOWWATCH    0x00100000
-#define OPT_PAGEALLOC     0x00200000
-#define OPT_ALLOCUPPER    0x00400000
-#define OPT_USEMMAP       0x00800000
-#define OPT_USEDEBUG      0x01000000
-#define OPT_EDIT          0x02000000
-#define OPT_LIST          0x04000000
+#define OPT_CHECKFORK     0x00080000
+#define OPT_PRESERVE      0x00100000
+#define OPT_OFLOWWATCH    0x00200000
+#define OPT_PAGEALLOC     0x00400000
+#define OPT_ALLOCUPPER    0x00800000
+#define OPT_USEMMAP       0x01000000
+#define OPT_USEDEBUG      0x02000000
+#define OPT_EDIT          0x04000000
+#define OPT_LIST          0x08000000
 
 
 /* The different types of errors when parsing options.

@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.125 2001-05-30 22:56:06 graeme Exp $
+ * $Id: mpatrol.h,v 1.126 2001-06-12 17:54:45 graeme Exp $
  */
 
 
@@ -243,14 +243,15 @@
 #define MP_FLG_TRACE         0x00010000
 #define MP_FLG_SAFESIGNALS   0x00020000
 #define MP_FLG_NOPROTECT     0x00040000
-#define MP_FLG_PRESERVE      0x00080000
-#define MP_FLG_OFLOWWATCH    0x00100000
-#define MP_FLG_PAGEALLOC     0x00200000
-#define MP_FLG_ALLOCUPPER    0x00400000
-#define MP_FLG_USEMMAP       0x00800000
-#define MP_FLG_USEDEBUG      0x01000000
-#define MP_FLG_EDIT          0x02000000
-#define MP_FLG_LIST          0x04000000
+#define MP_FLG_CHECKFORK     0x00080000
+#define MP_FLG_PRESERVE      0x00100000
+#define MP_FLG_OFLOWWATCH    0x00200000
+#define MP_FLG_PAGEALLOC     0x00400000
+#define MP_FLG_ALLOCUPPER    0x00800000
+#define MP_FLG_USEMMAP       0x01000000
+#define MP_FLG_USEDEBUG      0x02000000
+#define MP_FLG_EDIT          0x04000000
+#define MP_FLG_LIST          0x08000000
 
 
 /* The various options and flags that can be passed to __mp_leaktable().

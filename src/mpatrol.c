@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.37 2001-03-05 22:34:40 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.38 2001-06-12 17:54:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.37 2001-03-05 22:34:40 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.38 2001-06-12 17:54:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "2.4" /* the current version of this program */
+#define VERSION "2.5" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -99,6 +99,7 @@ typedef enum options_flags
     OF_PRESERVE       = 'v',
     OF_OFLOWWATCH     = 'w',
     OF_CHECKALLOCS    = SHORTOPT_MAX + 1,
+    OF_CHECKFORK,
     OF_CHECKFREES,
     OF_CHECKMEMORY,
     OF_CHECKREALLOCS,
@@ -167,9 +168,9 @@ static int logallocs, logreallocs;
 static int logfrees, logmemory;
 static int allowoflow, prof, trace;
 static int safesignals, noprotect;
-static int preserve, oflowwatch;
-static int usemmap, usedebug;
-static int editlist;
+static int checkfork, preserve;
+static int oflowwatch, usemmap;
+static int usedebug, editlist;
 
 
 /* The table describing all recognised options.
@@ -199,6 +200,9 @@ static option options_table[] =
     {"check-allocs", OF_CHECKALLOCS, NULL,
      "\tChecks that no attempt is made to allocate a block of memory of size\n"
      "\tzero.\n"},
+    {"check-fork", OF_CHECKFORK, NULL,
+     "\tChecks at every call to see if the process has been forked in case\n"
+     "\tnew log, profiling and tracing output files need to be started.\n"},
     {"check-frees", OF_CHECKFREES, NULL,
      "\tChecks that no attempt is made to deallocate a NULL pointer.\n"},
     {"check-memory", OF_CHECKMEMORY, NULL,
@@ -426,6 +430,8 @@ setoptions(int s)
         if (checkreallocs)
             addoption("CHECKREALLOCS", NULL, 0);
     }
+    if (checkfork)
+        addoption("CHECKFORK", NULL, 0);
     if (defalign)
         addoption("DEFALIGN", defalign, 0);
     if (editlist == 1)
@@ -654,6 +660,9 @@ main(int argc, char **argv)
             break;
           case OF_CHECKALLOCS:
             checkallocs = 1;
+            break;
+          case OF_CHECKFORK:
+            checkfork = 1;
             break;
           case OF_CHECKFREES:
             checkfrees = 1;

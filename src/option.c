@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.38 2001-05-17 07:38:15 graeme Exp $"
+#ident "$Id: option.c,v 1.39 2001-06-12 17:54:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.38 2001-05-17 07:38:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.39 2001-06-12 17:54:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -87,6 +87,9 @@ static char *options_help[] =
     "CHECKALLOCS", NULL,
     "", "Checks that no attempt is made to allocate a block of memory of size",
     "", "zero.",
+    "CHECKFORK", NULL,
+    "", "Checks at every call to see if the process has been forked in case",
+    "", "new log, profiling and tracing output files need to be started.",
     "CHECKFREES", NULL,
     "", "Checks that no attempt is made to deallocate a NULL pointer.",
     "CHECKMEMORY", NULL,
@@ -562,6 +565,14 @@ __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     h->flags |= FLG_CHECKALLOCS;
+                }
+                else if (matchoption(o, "CHECKFORK"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_CHECKFORK;
                 }
                 else if (matchoption(o, "CHECKFREES"))
                 {
@@ -1230,6 +1241,12 @@ setflags(infohead *h, unsigned long f, int u)
                 else
                     h->flags &= ~FLG_ALLOWOFLOW;
                 break;
+              case OPT_CHECKFORK:
+                if (u == 0)
+                    h->flags |= FLG_CHECKFORK;
+                else
+                    h->flags &= ~FLG_CHECKFORK;
+                break;
               case OPT_EDIT:
                 if (u == 0)
                 {
@@ -1405,6 +1422,8 @@ getflags(infohead *h)
         f |= OPT_SAFESIGNALS;
     if (h->flags & FLG_NOPROTECT)
         f |= OPT_NOPROTECT;
+    if (h->flags & FLG_CHECKFORK)
+        f |= OPT_CHECKFORK;
     if (h->alloc.flags & FLG_PRESERVE)
         f |= OPT_PRESERVE;
     if (h->alloc.flags & FLG_OFLOWWATCH)
