@@ -221,7 +221,9 @@
  */
 
 #if MP_BUILTINSTACK_SUPPORT
+#ifndef MP_MAXSTACK
 #define MP_MAXSTACK 8
+#endif /* MP_MAXSTACK */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
