@@ -64,11 +64,19 @@
  * definitions for reading the internal structures of the dynamic linker.
  */
 #include <elf.h>
+#elif SYSTEM == SYSTEM_IRIX
+/* IRIX doesn't have a conventional SVR4 dynamic linker and so does not have the
+ * same interface for accessing information about any required shared objects at
+ * run-time.  However, this way of reading the dynamic linker's data structures
+ * will only work for O32 ABI objects and not N32 ABI objects.
+ */
+#include <obj.h>
+#include <obj_list.h>
 #endif /* SYSTEM */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.21 2000-05-30 18:22:22 graeme Exp $"
+#ident "$Id: symbol.c,v 1.22 2000-05-30 19:26:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -170,6 +178,13 @@ extern "C"
 
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
+#elif SYSTEM == SYSTEM_IRIX
+/* The __rld_obj_head symbol is always defined in IRIX and points to the first
+ * entry in a list of shared object files that are required by the program.  For
+ * statically linked programs this will either be NULL or will only contain the
+ * entry for the program itself.
+ */
+extern struct obj_list *__rld_obj_head;
 #endif /* SYSTEM */
 
 
@@ -848,16 +863,22 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     Elf32_Dyn *d;
     dynamiclink *l;
+#elif SYSTEM == SYSTEM_IRIX
+    struct obj_list *l;
+    struct obj *o;
+    size_t b;
 #endif /* SYSTEM */
 
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     /* This function liaises with the dynamic linker when a program is
      * dynamically linked in order to read symbols from any required shared
      * objects.
      */
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     if ((&_DYNAMIC != NULL) && (d = (Elf32_Dyn *) _DYNAMIC))
     {
+        /* Search for the DT_DEBUG tag in the _DYNAMIC symbol.
+         */
         for (l = NULL; d->d_tag != DT_NULL; d++)
             if (d->d_tag == DT_DEBUG)
             {
@@ -876,6 +897,21 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
             l = l->next;
         }
     }
+#elif SYSTEM == SYSTEM_IRIX
+    if (l = __rld_obj_head)
+        while (l = l->next)
+        {
+            /* We should really check here for the presence of the new style
+             * object structure representing N32 objects.  However, it doesn't
+             * seem possible to obtain the base address of a shared object from
+             * it so it isn't currently supported.
+             */
+            o = (struct obj *) l->data;
+            b = (long) o->o_text_start - (long) o->o_base_address;
+            if ((o->o_path != NULL) && (*o->o_path != '\0') &&
+                !__mp_addsymbols(y, o->o_path, b))
+                return 0;
+        }
 #endif /* SYSTEM */
     return 1;
 }
