@@ -1,8 +1,29 @@
-Changes for 1.4.8 (23rd September, 2001)
+Changes for 1.4.8 (8th January, 2002)
 
-  * Fixed diagnostics for number of symbols read from Windows DLLs.
+  * Added better logging for diagnostic messages.
 
-  * Much improved autoconf, automake and libtool support.
+  * Added much-improved autoconf, automake and libtool support.
+
+  * Added provisional HTML log file support with the HTML option.
+
+  * The library now checks to ensure that there were not any problems writing
+    the profiling and tracing output files.
+
+  * Added better Tru64 thread-safe support.
+
+  * Fixed a problem locating symbols for the a.out object file format.
+
+  * Fixed diagnostics for the number of symbols read from Windows DLLs.
+
+  * Fixed a bug which calculated the wrong total size of marked allocations.
+
+  * The mpatrol command now has the --read-env option for using the existing
+    contents of the MPATROL_OPTIONS environment variable.
+
+  * The mpsym command now autodetects 64-bit support and now has the --skip
+    option.
+
+  * The source code now compiles properly on BSD systems.
 
 
 Changes for 1.4.7 (5th September, 2001)
