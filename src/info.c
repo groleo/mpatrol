@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.12 2000-02-22 20:35:22 graeme Exp $"
+#ident "$Id: info.c,v 1.13 2000-02-24 00:58:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -166,14 +166,16 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
     allocnode *n;
     infonode *m;
     void *p;
+    unsigned long c;
 
     p = NULL;
     h->count++;
+    c = h->count;
     if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
     {
         /* Write an entry into the log file.
          */
-        __mp_diag("ALLOC: %s (%lu, ", __mp_alloctypenames[f], h->count);
+        __mp_diag("ALLOC: %s (%lu, ", __mp_alloctypenames[f], c);
         __mp_printsize(l);
         __mp_diag(", ");
         if (a == 0)
@@ -193,7 +195,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
         __mp_printstack(&h->syms, v);
         __mp_diag("\n");
     }
-    if ((h->count == h->astop) && (h->rstop == 0))
+    if ((c == h->astop) && (h->rstop == 0))
     {
         /* Abort at the specified allocation index.
          */
@@ -257,7 +259,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 /* Fill in the details of the allocation information node.
                  */
                 m->data.type = f;
-                m->data.alloc = h->count;
+                m->data.alloc = c;
                 m->data.realloc = 0;
 #if MP_THREADS_SUPPORT
                 m->data.thread = __mp_threadid();
