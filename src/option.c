@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.9 2000-01-21 00:36:37 graeme Exp $"
+#ident "$Id: option.c,v 1.10 2000-03-01 00:41:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -174,6 +174,9 @@ static char *options_help[] =
     "UNFREEDABORT", "unsigned integer",
     "", "Specifies the minimum number of unfreed allocations at which to abort",
     "", "the program just before program termination.",
+    "USEDEBUG", NULL,
+    "", "Specifies that any debugging information in the executable file",
+    "", "should be used to obtain additional source-level information.",
     "USEMMAP", NULL,
     "", "Specifies that the library should use mmap() instead of sbrk() to",
     "", "allocate system memory on UNIX platforms.",
@@ -786,6 +789,14 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         h->uabort = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "USEDEBUG"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->syms.lineinfo = 1;
+                }
                 else if (matchoption(o, "USEMMAP"))
                 {
                     if (*a != '\0')

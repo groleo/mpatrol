@@ -85,6 +85,7 @@
 #define OPT_PAGEALLOC     0x00010000
 #define OPT_ALLOCUPPER    0x00020000
 #define OPT_USEMMAP       0x00040000
+#define OPT_USEDEBUG      0x00080000
 
 
 /* The different types of errors when parsing options.
