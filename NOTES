@@ -86,10 +86,6 @@ Notes for all platforms
     number information to the call stack, but could also be used to extend the
     library to monitor static and stack variables.
 
-  * There is a potential problem in the splitnode() function if no more system
-    memory is available.  The function will return without a problem, but the
-    free node that was being split may be lost forever...
-
   * Add a SHOWFREE option to display a list of all free memory blocks at program
     termination for debugging purposes to view memory fragmentation.  If that
     option is added then perhaps SHOWALL should only be equivalent to SHOWFREE,
