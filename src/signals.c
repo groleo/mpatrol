@@ -45,9 +45,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.22 2001-03-02 01:36:38 graeme Exp $"
+#ident "$Id: signals.c,v 1.23 2001-03-13 23:10:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *signals_id = "$Id: signals.c,v 1.22 2001-03-02 01:36:38 graeme Exp $";
+static MP_CONST MP_VOLATILE char *signals_id = "$Id: signals.c,v 1.23 2001-03-13 23:10:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -181,7 +181,10 @@ signalhandler(EXCEPTION_POINTERS *e)
 #elif SYSTEM == SYSTEM_IRIX
         a = (void *) ((long) n->sc_badvaddr);
 #elif SYSTEM == SYSTEM_LINUX
-#if ARCH == ARCH_IX86
+#if ARCH == ARCH_ALPHA
+        a = (char *) n->sc_regs[(*((unsigned int *) n->sc_pc) >> 16) & 0x1F] +
+            ((*((unsigned int *) n->sc_pc) << 16) >> 16);
+#elif ARCH == ARCH_IX86
         a = (void *) n.cr2;
 #elif ARCH == ARCH_M68K
         switch ((n->sc_formatvec >> 12) & 0x0F)
