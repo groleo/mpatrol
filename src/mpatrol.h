@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.127 2001-06-13 23:09:56 graeme Exp $
+ * $Id: mpatrol.h,v 1.128 2001-07-25 21:54:41 graeme Exp $
  */
 
 
@@ -274,6 +274,13 @@
 
 typedef void *__mp_failhandler;
 #endif /* MP_MPALLOC_H */
+
+
+/* The types of the prologue and epilogue handlers.
+ */
+
+typedef void (*__mp_prologuehandler)(MP_CONST void *, size_t, MP_CONST void *);
+typedef void (*__mp_epiloguehandler)(MP_CONST void *, MP_CONST void *);
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
