@@ -42,11 +42,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.18 2000-09-25 20:06:20 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.19 2000-09-25 21:13:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "2.2" /* the current version of this program */
+#define VERSION "2.3" /* the current version of this program */
 
 
 /* The buffer used to build up the environment variable containing options
@@ -95,145 +95,127 @@ static int usemmap, usedebug;
 static int allowoflow;
 
 
-/* The table describing a summary of all recognised options.
+/* The table describing all recognised options.
  */
 
-static option options_help[] =
+static option options_table[] =
 {
     {"small-bound", '1', "unsigned integer",
-     "Specifies the limit in bytes up to which memory allocations should be "
-     "classified as small allocations for profiling purposes."},
+     "\tSpecifies the limit in bytes up to which memory allocations should be\n"
+     "\tclassified as small allocations for profiling purposes.\n"},
     {"medium-bound", '2', "unsigned integer",
-     "Specifies the limit in bytes up to which memory allocations should be "
-     "classified as medium allocations for profiling purposes."},
+     "\tSpecifies the limit in bytes up to which memory allocations should be\n"
+     "\tclassified as medium allocations for profiling purposes.\n"},
     {"large-bound", '3', "unsigned integer",
-     "Specifies the limit in bytes up to which memory allocations should be "
-     "classified as large allocations for profiling purposes."},
+     "\tSpecifies the limit in bytes up to which memory allocations should be\n"
+     "\tclassified as large allocations for profiling purposes.\n"},
     {"alloc-stop", 'A', "unsigned integer",
-     "Specifies an allocation index at which to stop the program when it is "
-     "being allocated."},
+     "\tSpecifies an allocation index at which to stop the program when it is\n"
+     "\tbeing allocated.\n"},
     {"alloc-byte", 'a', "unsigned integer",
-     "Specifies an 8-bit byte pattern with which to prefill newly-allocated "
-     "memory."},
+     "\tSpecifies an 8-bit byte pattern with which to prefill newly-allocated\n"
+     "\tmemory.\n"},
     {"check", 'C', "unsigned range",
-     "Specifies a range of allocation indices at which to check the integrity "
-     "of free memory and overflow buffers."},
+     "\tSpecifies a range of allocation indices at which to check the\n"
+     "\tintegrity of free memory and overflow buffers.\n"},
     {"check-all", 'c', NULL,
-     "Specifies that all arguments to functions which allocate, reallocate and "
-     "deallocate memory have rigorous checks performed on them."},
+     "\tSpecifies that all arguments to functions which allocate, reallocate\n"
+     "\tand deallocate memory have rigorous checks performed on them.\n"},
     {"def-align", 'D', "unsigned integer",
-     "Specifies the default alignment for general-purpose memory allocations, "
-     "which must be a power of two."},
+     "\tSpecifies the default alignment for general-purpose memory\n"
+     "\tallocations, which must be a power of two.\n"},
     {"dynamic", 'd', NULL,
-     "Specifies that programs which were not linked with the mpatrol library "
-     "should also be traced, but only if they were dynamically linked."},
+     "\tSpecifies that programs which were not linked with the mpatrol\n"
+     "\tlibrary should also be traced, but only if they were dynamically\n"
+     "\tlinked.\n"},
     {"prog-file", 'e', "string",
-     "Specifies an alternative filename with which to locate the executable "
-     "file containing the program's symbols."},
+     "\tSpecifies an alternative filename with which to locate the executable\n"
+     "\tfile containing the program's symbols.\n"},
     {"free-stop", 'F', "unsigned integer",
-     "Specifies an allocation index at which to stop the program when it is "
-     "being freed."},
+     "\tSpecifies an allocation index at which to stop the program when it is\n"
+     "\tbeing freed.\n"},
     {"free-byte", 'f', "unsigned integer",
-     "Specifies an 8-bit byte pattern with which to prefill newly-freed "
-     "memory."},
+     "\tSpecifies an 8-bit byte pattern with which to prefill newly-freed\n"
+     "\tmemory.\n"},
     {"safe-signals", 'G', NULL,
-     "Instructs the library to save and replace certain signal handlers during "
-     "the execution of library code and to restore them afterwards."},
+     "\tInstructs the library to save and replace certain signal handlers\n"
+     "\tduring the execution of library code and to restore them\n"
+     "\tafterwards.\n"},
     {"use-debug", 'g', NULL,
-     "Specifies that any debugging information in the executable file should "
-     "be used to obtain additional source-level information."},
+     "\tSpecifies that any debugging information in the executable file\n"
+     "\tshould be used to obtain additional source-level information.\n"},
     {"limit", 'L', "unsigned integer",
-     "Specifies the limit in bytes at which all memory allocations should fail "
-     "if the total allocated memory should increase beyond this."},
+     "\tSpecifies the limit in bytes at which all memory allocations should\n"
+     "\tfail if the total allocated memory should increase beyond this.\n"},
     {"log-file", 'l', "string",
-     "Specifies an alternative file in which to place all diagnostics from the "
-     "mpatrol library."},
+     "\tSpecifies an alternative file in which to place all diagnostics from\n"
+     "\tthe mpatrol library.\n"},
     {"allow-oflow", 'M', NULL,
-     "Specifies that a warning rather than an error should be produced if any "
-     "memory operation function overflows the boundaries of a memory "
-     "allocation, and that the operation should still be performed."},
+     "\tSpecifies that a warning rather than an error should be produced if\n"
+     "\tany memory operation function overflows the boundaries of a memory\n"
+     "\tallocation, and that the operation should still be performed.\n"},
     {"use-mmap", 'm', NULL,
-     "Specifies that the library should use mmap() instead of sbrk() to "
-     "allocate system memory."},
+     "\tSpecifies that the library should use mmap() instead of sbrk() to\n"
+     "\tallocate system memory.\n"},
     {"no-protect", 'N', NULL,
-     "Specifies that the mpatrol library's internal data structures should not "
-     "be made read-only after every memory allocation, reallocation or "
-     "deallocation."},
+     "\tSpecifies that the mpatrol library's internal data structures should\n"
+     "\tnot be made read-only after every memory allocation, reallocation or\n"
+     "\tdeallocation.\n"},
     {"no-free", 'n', "unsigned integer",
-     "Specifies that a number of recently-freed memory allocations should be "
-     "prevented from being returned to the free memory pool."},
+     "\tSpecifies that a number of recently-freed memory allocations should\n"
+     "\tbe prevented from being returned to the free memory pool.\n"},
     {"oflow-size", 'O', "unsigned integer",
-     "Specifies the size in bytes to use for all overflow buffers, which must "
-     "be a power of two."},
+     "\tSpecifies the size in bytes to use for all overflow buffers, which\n"
+     "\tmust be a power of two.\n"},
     {"oflow-byte", 'o', "unsigned integer",
-     "Specifies an 8-bit byte pattern with which to fill the overflow buffers "
-     "of all memory allocations."},
+     "\tSpecifies an 8-bit byte pattern with which to fill the overflow\n"
+     "\tbuffers of all memory allocations.\n"},
     {"prof-file", 'P', "string",
-     "Specifies an alternative file in which to place all memory allocation "
-     "profiling information from the mpatrol library."},
+     "\tSpecifies an alternative file in which to place all memory allocation\n"
+     "\tprofiling information from the mpatrol library.\n"},
     {"prof", 'p', NULL,
-     "Specifies that all memory allocations are to be profiled and sent to the "
-     "profiling output file."},
+     "\tSpecifies that all memory allocations are to be profiled and sent to\n"
+     "\tthe profiling output file.\n"},
     {"auto-save", 'Q', "unsigned integer",
-     "Specifies the frequency at which to periodically write the profiling "
-     "data to the profiling output file."},
+     "\tSpecifies the frequency at which to periodically write the profiling\n"
+     "\tdata to the profiling output file.\n"},
     {"realloc-stop", 'R', "unsigned integer",
-     "Specifies an allocation index at which to stop the program when a memory "
-     "allocation is being reallocated."},
+     "\tSpecifies an allocation index at which to stop the program when a\n"
+     "\tmemory allocation is being reallocated.\n"},
     {"show-map", 'S', NULL,
-     "Specifies that a memory map of the entire heap and a summary of all of "
-     "the function symbols read from the program's executable file should be "
-     "displayed at the end of program execution."},
+     "\tSpecifies that a memory map of the entire heap and a summary of all\n"
+     "\tof the function symbols read from the program's executable file\n"
+     "\tshould be displayed at the end of program execution.\n"},
     {"show-freed", 's', NULL,
-     "Specifies that a summary of all of the freed and unfreed memory "
-     "allocations should be displayed at the end of program execution."},
+     "\tSpecifies that a summary of all of the freed and unfreed memory\n"
+     "\tallocations should be displayed at the end of program execution.\n"},
     {"unfreed-abort", 'U', "unsigned integer",
-     "Specifies the minimum number of unfreed allocations at which to abort "
-     "the program just before program termination."},
+     "\tSpecifies the minimum number of unfreed allocations at which to abort\n"
+     "\tthe program just before program termination.\n"},
     {"version", 'V', NULL,
-     "Displays the version number of this program."},
+     "\tDisplays the version number of this program.\n"},
     {"preserve", 'v', NULL,
-     "Specifies that any reallocated or freed memory allocations should "
-     "preserve their original contents."},
+     "\tSpecifies that any reallocated or freed memory allocations should\n"
+     "\tpreserve their original contents.\n"},
     {"oflow-watch", 'w', NULL,
-     "Specifies that watch point areas should be used for overflow buffers "
-     "rather than filling with the overflow byte."},
+     "\tSpecifies that watch point areas should be used for overflow buffers\n"
+     "\trather than filling with the overflow byte.\n"},
     {"page-alloc-upper", 'X', NULL,
-     "Specifies that each individual memory allocation should occupy at least "
-     "one page of virtual memory and should be placed at the highest point "
-     "within these pages."},
+     "\tSpecifies that each individual memory allocation should occupy at\n"
+     "\tleast one page of virtual memory and should be placed at the highest\n"
+     "\tpoint within these pages.\n"},
     {"page-alloc-lower", 'x', NULL,
-     "Specifies that each individual memory allocation should occupy at least "
-     "one page of virtual memory and should be placed at the lowest point "
-     "within these pages."},
+     "\tSpecifies that each individual memory allocation should occupy at\n"
+     "\tleast one page of virtual memory and should be placed at the lowest\n"
+     "\tpoint within these pages.\n"},
     {"fail-seed", 'Z', "unsigned integer",
-     "Specifies the random number seed which will be used when determining "
-     "which memory allocations will randomly fail."},
+     "\tSpecifies the random number seed which will be used when determining\n"
+     "\twhich memory allocations will randomly fail.\n"},
     {"fail-freq", 'z', "unsigned integer",
-     "Specifies the frequency at which all memory allocations will randomly "
-     "fail."},
+     "\tSpecifies the frequency at which all memory allocations will randomly\n"
+     "\tfail.\n"},
     NULL
 };
-
-
-/* Display the quick-reference help summary.
- */
-
-static void showoptions(void)
-{
-    option *l;
-    char **s, **t;
-
-    fputs("Options:\n", stderr);
-    for (l = options_help; l->name != NULL; l++)
-    {
-        fprintf(stderr, "    -%c --%s", l->value, l->name);
-        if (l->arg)
-            fprintf(stderr, "=<%s>", l->arg);
-        fputc('\n', stderr);
-        fprintf(stderr, "\t%s\n", l->desc);
-    }
-}
 
 
 /* Add an option and possibly an associated value to the options buffer.
@@ -384,7 +366,7 @@ int main(int argc, char **argv)
     proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv,
              "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:",
-             options_help)) != EOF)
+             options_table)) != EOF)
         switch (c)
         {
           case '1':
@@ -517,7 +499,7 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "Usage: %s [options] <command> [arguments]\n\n",
                     progname);
-            showoptions();
+            __mp_showopts(options_table);
         }
         exit(EXIT_FAILURE);
     }
