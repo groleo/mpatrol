@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.207 2001-03-14 23:21:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.208 2001-03-19 19:09:54 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.8
 @set VERSION 1.4.3
-@set UPDATED 14th March, 2001
+@set UPDATED 19th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -135,6 +135,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Utilities::                   External programs.
 * Profiling::                   Memory allocation profiling.
 * Tracing::                     Memory allocation tracing.
+* Heap corruption::             Squashing those errors.
 * Memory leaks::                Detection and identification.
 * Improving performance::       Life beyond mpatrol.
 * How it works::                Implementation details.
@@ -4492,7 +4493,7 @@ written as a research project and ran on MIPS, SPARC and VAX machines.  However,
 the profiling output files are incompatible, the tables displayed have a
 different format, and the way they are implemented is entirely different.
 
-@node Tracing, Memory leaks, Profiling, Top
+@node Tracing, Heap corruption, Profiling, Top
 @chapter Tracing
 @cindex tracing
 @cindex memory allocation tracing
@@ -4906,7 +4907,283 @@ can be used to implement an allocated memory gauge which updates in real-time
 in a terminal window.  This can be used as an alternative to the window used by
 the @command{mptrace} command for a simpler display.
 
-@node Memory leaks, Improving performance, Tracing, Top
+@node Heap corruption, Memory leaks, Tracing, Top
+@chapter Heap corruption
+@cindex heap corruption
+@cindex corruption
+
+There can be many causes of heap corruption in a program and there can be many
+forms in which it can appear.  This chapter attempts to describe the most
+appropriate ways to narrow down and remove the causes of the most common forms
+of heap corruption.  Note that errors such as freeing an allocated block twice
+are not considered in this chapter even though they would result in heap
+corruption in a normal malloc library --- the mpatrol library catches these
+special cases so you know exactly where they occur.
+
+The three forms of errors we are going to look at are heap corruption in free
+memory blocks, freed memory blocks and overflow buffers.  As you will soon see,
+the same piece of faulty code can produce any one of these errors depending on
+which mpatrol library options you use.  The following discussion assumes that
+you have run your program with the mpatrol library and you get an @samp{ALLOVF},
+@samp{FRDCOR}, @samp{FRDOVF} or @samp{FRECOR} error in the mpatrol log file when
+your program terminates.  It also assumes that you haven't set the
+@env{MPATROL_OPTIONS} environment variable yet.
+
+By default, the only times the mpatrol library will check the heap for memory
+corruption are when it terminates or when @code{__mp_check()} is called (but
+the latter won't be happening since you won't have modified your program yet).
+This isn't good enough for errors such as these so we need to instruct it to
+make checks whenever an mpatrol library function is called.  The @option{CHECK}
+option controls when such automated checks occur, and this can normally be set
+to @option{CHECK=-} to check the heap whenever a call to an mpatrol library
+function is made.
+
+However, in programs which take a long time to execute, or programs which make a
+large number of memory allocations, this can slow the program down quite a bit
+so you might want to try the optional @samp{/freq} argument to the
+@option{CHECK} option.  This simply instructs the mpatrol library to make the
+checks every @emph{freq} calls to the mpatrol library functions rather than
+every call.  For example, @option{CHECK=/10} will make the checks every 10
+calls, which will reduce the slowdown in the program but will still help narrow
+down where the heap corruption is occurring.
+
+We'll use the following program as a running example for the discussions below,
+although you'll probably be following them using your program instead of this
+one.  It contains a small bug that doesn't normally show up when using the
+system C library but causes a @samp{FRECOR} error when linked with mpatrol.
+
+@smallexample
+ 1  /*
+ 2   * A program which causes heap corruption.
+ 3   */
+
+
+ 6  #include <stdio.h>
+ 7  #include "mpatrol.h"
+
+
+10  int main(void)
+11  @{
+12      char *p[128];
+13      size_t i;
+
+15      for (i = 0; i < 128; i++)
+16      @{
+17          if ((p[i] = (char *) malloc(9)) == NULL)
+18          @{
+19              fputs("out of memory\n", stderr);
+20              exit(EXIT_FAILURE);
+21          @}
+22          sprintf(p[i], "test%lu", i * 100);
+23          puts(p[i]);
+24          free(p[i]);
+25      @}
+26      return EXIT_SUCCESS;
+27  @}
+@end smallexample
+
+We get the following error in the mpatrol log file when we run with the above
+example linked to the mpatrol library.  The error occurs when the program
+returns from @code{main()} since that is when the mpatrol library is
+terminating.
+
+@smallexample
+ERROR: [FRECOR]: free memory corruption at 0x0002A571
+        0x0002A571  00555555 555555                      .UUUUUU
+@end smallexample
+
+If we run with the @option{CHECK=-} option then the above error occurs at line
+24 when the variable @code{i} is 100, which is slightly better since we've
+narrowed down where the fault is.
+
+Assuming all goes well, your program should now also terminate at an earlier
+point, with the mpatrol library still reporting the same heap corruption error
+in the log file.  If not, it could be that the heap is being corrupted after the
+last call to the mpatrol library is made, or if you get a different error then
+the original heap corruption might have been as a result of the earlier error.
+In either case you can still proceed with the following instructions.
+
+If you look at the summary of statistics that were produced in the mpatrol log
+file before the error was displayed you will see an entry for @samp{allocation
+count}.  The number following it is the number of memory allocations that were
+made before the error occurred.  Remember this number because you can use this
+information with the @option{CHECK} option so that checks for heap corruption
+are only made after a certain number of memory allocations.  However, you'll
+probably want to subtract a few allocations just to be sure (or in case you are
+running a multithreaded program that does not produce the same allocation count
+every time it is run).  That way, you don't need to check the entire heap.  For
+example, if the allocation count was 178, try setting the @option{CHECK=170-190}
+option so that your program will run at a reasonable speed up to that point
+(although make sure that it still gives the same error at the same point).
+There is nothing worse than debugging a problem that takes forever to reproduce.
+
+In our example, the allocation count given is 123 (excerpt given below) and
+running with @option{CHECK=120-125} gives the same behaviour as when we ran with
+@option{CHECK=-} (except that we got to the error slightly faster).
+
+@smallexample
+@dots{}
+
+symbols read:      5059
+autosave count:    0
+freed queue size:  0
+allocation count:  123
+allocation peak:   8 (11117 bytes)
+allocation limit:  0 bytes
+allocated blocks:  7 (1374 bytes)
+
+@dots{}
+@end smallexample
+
+So we now have the allocation index of the last successful memory allocation
+before the heap corruption occurred, and we can safely run the program without
+performing heap checks up to that point.  If the error was not @samp{FRECOR}
+then there will also be information displayed in the mpatrol log file about the
+associated memory allocation that was corrupted.  If the error was @samp{FRECOR}
+then quickly try to see if you can convert it to a @samp{FRDCOR} error or a
+@samp{FRDOVF} error by also running with the @option{NOFREE} option.  You may
+have to use the relevant allocation index as an argument to the @option{NOFREE}
+option just in case it was the very first memory allocation that was freed and
+corrupted, but remember that the @option{NOFREE} option may cause your program
+to use up a lot more memory and so it might be unfeasible to use.  Running with
+the @option{NOFREE=123} option in our example has no effect.
+
+One of the most common causes of heap corruption is to erroneously write beyond
+the bounds of a memory allocation.  This can corrupt the bytes directly before
+and/or after the allocated bytes and can be detected by placing overflow buffers
+on either side of the memory allocation with the @option{OFLOWSIZE} option.  By
+default, the mpatrol library does not make use of overflow buffers so you have
+to explicitly turn them on, giving the number of bytes to use for each overflow
+buffer (which must a be power of two) as the argument to the @option{OFLOWSIZE}
+option.  In our example, if we use the @option{OFLOWSIZE=4} option, the
+@samp{FRECOR} error turns into an @samp{ALLOVF} error, thus providing us with
+more information (and also that the heap corruption is due to a write beyond the
+end of a memory allocation).
+
+@smallexample
+ERROR: [ALLOVF]: allocation 0x0002A5A0 has a corrupted overflow buffer at
+                 0x0002A5A9
+        0x0002A5A9  00AAAAAA                             .ªªª
+
+    0x0002A5A0 (9 bytes) @{malloc:123:0@} [main|test.c|17]
+        0x0001372C main+88
+        0x000135A4 _start+100
+@end smallexample
+
+Sometimes it's not just a immediate overflow that can occur.  For example, if
+not enough memory has been allocated for a structure variable and then the last
+field of the structure is assigned to, the memory corruption may occur much
+further away than the few bytes surrounding the allocation.  In this case it may
+be useful to try varying the argument given to the @option{OFLOWSIZE} option
+since it is possible to convert otherwise unhelpful @samp{FRECOR} errors into
+@samp{ALLOVF}, @samp{FRDCOR} or @samp{FRDOVF} errors which describe the memory
+allocation that was affected.  Also, depending on the bytes that are being
+written to corrupt the heap, you may find it helpful to change the values of the
+free bytes and overflow bytes that the mpatrol library uses to perform heap
+integrity checks, just in case there are illegal bytes being written that are
+going unnoticed when the heap is being checked.  In our example, if the
+@option{OFLOWBYTE=0} option is used then the heap corruption is hidden
+completely and we don't get an error at all!
+
+Hopefully, we now know as much as possible about where the heap corruption is
+happening (i.e.@: the details of the allocated or freed memory block that is
+affected, or the free memory block if we are unlucky) and also when it is
+happening (i.e.@: after which allocation index).  We now have several choices
+on how to narrow the problem down to a specific source line.
+
+On systems with virtual memory we can make use of the @option{PAGEALLOC} option
+in order to write-protect a page of virtual memory on either side of each memory
+allocation.  This option takes up a lot more memory since each memory allocation
+will occupy at least 3 pages of virtual memory no matter how small it is, and on
+systems with a page size of 8192 bytes that equates to a minimum 24 kilobytes of
+memory per allocation!  However, if that is still feasible for the particular
+program that is causing the heap corruption then we can proceed by first setting
+the @option{PAGEALLOC=LOWER} option.  That aligns each memory allocation to a
+page boundary so that any underwrites occurring before the allocation will be
+trapped and cause the program to crash.  This can be caught in a debugger which
+will show the exact source line that attempted to perform the illegal write to
+memory (assuming it is a symbolic debugger and the program was compiled with
+debugging information).
+
+In our example, running with this option doesn't provide us with any more
+information since the heap corruption was occurring beyond the end of the memory
+allocation and not before the start.  In this case we need to use the
+@option{PAGEALLOC=UPPER} option to align the end of each memory allocation to a
+page boundary so that any overwrites occurring after the allocation will be
+trapped and cause the program to crash.  Unfortunately, using this option still
+doesn't help in our example, so what's wrong?
+
+The mpatrol library must align each new general-purpose memory allocation to an
+address that allows the processor to access the datatypes that may be stored
+there.  This is typically 4 bytes on 32-bit processors and 8 bytes on 64-bit
+processors, but a few processor architectures (such as the Intel x86) allow the
+processor to read misaligned data at a performance cost.  This is in direct
+conflict with the @option{PAGEALLOC=UPPER} option, which would like to align the
+end of each memory allocation to a page boundary no matter what the size of the
+allocation is.  However, if we use the @option{DEFALIGN=1} option in our example
+we can get the desired effect with the @option{PAGEALLOC=UPPER} option.
+
+@smallexample
+ERROR: [ILLMEM]: illegal memory access at address 0x00052000
+    0x00051FF7 (9 bytes) @{malloc:123:0@} [main|test.c|17]
+        0x0001372C main+88
+        0x000135A4 _start+100
+
+    call stack
+        0x7FA808E8 sprintf+64
+        0x000137B4 main+224
+        0x000135A4 _start+100
+@end smallexample
+
+Running this in a debugger shows that the failure occurs at line 22 in our
+example since we didn't allocate enough memory at line 17.  We can also achieve
+the same effect on systems that support software watchpoints by using the
+@option{OFLOWWATCH} option.  This uses the same amount of memory as the
+@option{OFLOWSIZE} option but can run very slowly as every single memory access
+is checked by the system.  Note that the @samp{FRDCOR} and @samp{FRECOR} errors
+do not occur when using the @option{PAGEALLOC} option since they will become
+illegal memory accesses instead.
+
+If you don't have the luxury of being able to use the mpatrol options that take
+advantage of virtual memory protection, you can still use more traditional means
+of finding the error.
+
+The chapter that describes how to use mpatrol (@pxref{Using mpatrol}) contains a
+section on how to pause at specific memory allocation events in a debugger
+(@pxref{Using with a debugger}).  Since we know what the allocation index of the
+last successful allocation was we can use the debugger to set a watchpoint on
+the address of the memory corruption so that it can trap the instruction that
+changes it.  Doing this is effectively the same as using the @option{PAGEALLOC}
+or @option{OFLOWWATCH} options.  There is a detailed tutorial on how to do this
+in GDB in the aforementioned section of the manual.
+
+If the debugger option isn't available to you either then you can try locating
+the problem by modifying your code.  You should know where the last successful
+memory allocation was made from the steps taken at the start of this chapter.
+Using this knowledge, you should be able to work out the range of code that is
+causing the heap corruption.  Then you can add calls to @code{__mp_check()} at
+strategic points within that range so that you can narrow down where the heap
+corruption is coming from.  If you display a unique message after each call to
+@code{__mp_check()} then you should be able to narrow it down quite quickly by
+monitoring which messages get displayed.
+
+You might also find it helpful to make calls to @code{__mp_memorymap()} so that
+you can keep track of the location of each memory allocation in the heap, and
+so that you can tell which allocations neighbour each other.  Turning on the
+@option{LOGMEMORY} option with the @code{__mp_setoption()} function might also
+help you see what is going on if there are a lot of calls to the memory
+operation functions.  Finally, if you are using the GNU compiler then the
+@option{-fcheck-memory-usage} option might come in handy if you can recompile
+the source files that you think might contain the problem.  However, the error
+may be hidden behind a call to a library function that is not compiled with that
+option, as is the case with our example.
+
+To conclude, the mpatrol library contains a wide variety of options and
+functions that you can add to your debugging toolkit, but only if you know how
+to use them correctly.  Hopefully, after reading this chapter you will feel
+slightly more confident about knowing how to slay those heap corruption demons.
+
+@node Memory leaks, Improving performance, Heap corruption, Top
 @chapter Memory leaks
 @cindex memory leaks
 @cindex leaks
