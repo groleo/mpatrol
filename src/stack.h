@@ -34,6 +34,22 @@
 #include <stddef.h>
 
 
+#if SYSTEM == SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
+/* HP/UX provides undocumented functions to traverse the PA/RISC stack frames.
+ * This structure only makes visible the stack frame entries that we need to
+ * use - all the rest are simply reserved.
+ */
+
+typedef struct frameinfo
+{
+    unsigned long res1[3];  /* reserved entries */
+    unsigned long addr;     /* return address */
+    unsigned long res2[12]; /* reserved entries */
+}
+frameinfo;
+#endif /* SYSTEM && MP_BUILTINSTACK_SUPPORT */
+
+
 /* A stackinfo structure provides information about the currently selected
  * stack frame.
  */
@@ -47,7 +63,11 @@ typedef struct stackinfo
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
     size_t index;              /* current stack index */
 #else /* MP_BUILTINSTACK_SUPPORT */
+#if SYSTEM == SYSTEM_HPUX
+    struct frameinfo next;     /* next frame handle */
+#else /* SYSTEM */
     void *next;                /* next frame handle */
+#endif /* SYSTEM */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 }
 stackinfo;
