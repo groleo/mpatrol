@@ -21,7 +21,7 @@
 ; Amiga shell script to build an LhA distribution file
 
 
-; $Id: build,v 1.12 2000-05-12 18:59:52 graeme Exp $
+; $Id: build,v 1.13 2000-05-15 20:01:27 graeme Exp $
 
 
 ; Build both the GCC and SAS/C versions of the mpatrol library.
@@ -59,6 +59,7 @@ Copy //doc/mpatrol.ps mpatrol/doc
 Copy //doc/mpatrol.pdf mpatrol/doc
 Copy //doc/refcard.dvi mpatrol/doc
 Copy //doc/refcard.ps mpatrol/doc
+Copy //doc/refcard.pdf mpatrol/doc
 MakeDir mpatrol/doc/images
 Copy //doc/images/mpatrol.txt mpatrol/doc/images
 Copy //doc/images/mpatrol.jpg mpatrol/doc/images
