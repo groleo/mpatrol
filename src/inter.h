@@ -47,6 +47,7 @@ typedef struct allocinfo
     unsigned long alloc;   /* allocation index */
     unsigned long realloc; /* reallocation index */
     unsigned long thread;  /* thread identifier */
+    unsigned long event;   /* event of last modification */
     char *func;            /* calling function name */
     char *file;            /* file name in which call took place */
     unsigned long line;    /* line number at which call took place */
@@ -93,6 +94,11 @@ void (*__mp_epilogue(void (*)(void *)))(void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
+int __mp_printf(char *, ...);
+void __mp_logmemory(void *, size_t);
+int __mp_logstack(size_t);
+int __mp_edit(char *, unsigned long);
+int __mp_list(char *, unsigned long);
 void chkr_set_right(void *, size_t, unsigned char);
 void chkr_copy_bitmap(void *, void *, size_t);
 void chkr_check_addr(void *, size_t, unsigned char);

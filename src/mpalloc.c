@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.6 2001-02-06 00:13:13 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.7 2001-02-06 19:53:17 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.6 2001-02-06 00:13:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.7 2001-02-06 19:53:17 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -619,6 +619,55 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
 {
     *s = *t = NULL;
     *u = 0;
+}
+
+
+/* Write user data to the mpatrol log file.
+ */
+
+int
+__mp_printf(char *s, ...)
+{
+    return 0;
+}
+
+
+/* Write a hex dump for a specified memory location to the mpatrol log file.
+ */
+
+void
+__mp_logmemory(void *p, size_t l)
+{
+}
+
+
+/* Write the current call stack to the mpatrol log file.
+ */
+
+int
+__mp_logstack(size_t k)
+{
+    return 0;
+}
+
+
+/* Invoke a text editor on a given source file at a specific line.
+ */
+
+int
+__mp_edit(char *f, unsigned long l)
+{
+    return 0;
+}
+
+
+/* List a given source file at a specific line.
+ */
+
+int
+__mp_list(char *f, unsigned long l)
+{
+    return 0;
 }
 
 

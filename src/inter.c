@@ -42,14 +42,15 @@
 #include "option.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.73 2001-02-06 00:10:17 graeme Exp $"
+#ident "$Id: inter.c,v 1.74 2001-02-06 19:53:17 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.73 2001-02-06 00:10:17 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.74 2001-02-06 19:53:17 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -314,6 +315,7 @@ checkalloca(loginfo *i, int f)
         {
             if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue(n->block, (size_t) -1);
+            memhead.event++;
             __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
             if (memhead.epilogue && (memhead.recur == 1))
                 memhead.epilogue((void *) -1);
@@ -582,6 +584,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.typestr = g;
     v.typesize = h;
     checkalloca(&v, 0);
+    memhead.event++;
     z = 0;
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
@@ -700,6 +703,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.typestr = "char";
     v.typesize = sizeof(char);
     checkalloca(&v, 0);
+    memhead.event++;
     z = 0;
   retry:
     if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
@@ -833,6 +837,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.typestr = g;
     v.typesize = h;
     checkalloca(&v, 0);
+    memhead.event++;
     z = 0;
   retry:
     p = __mp_resizememory(&memhead, p, l, a, f, &v);
@@ -927,6 +932,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     v.typestr = NULL;
     v.typesize = 0;
     checkalloca(&v, 0);
+    memhead.event++;
     __mp_freememory(&memhead, p, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue((void *) -1);
@@ -1222,6 +1228,7 @@ __mp_info(void *p, allocinfo *d)
 #else /* MP_THREADS_SUPPORT */
     d->thread = 0;
 #endif /* MP_THREADS_SUPPORT */
+    d->event = m->data.event;
     d->func = m->data.func;
     d->file = m->data.file;
     d->line = m->data.line;
@@ -1296,6 +1303,7 @@ __mp_printinfo(void *p)
 #if MP_THREADS_SUPPORT
     fprintf(stderr, "    thread identifier:  %lu\n", m->data.thread);
 #endif /* MP_THREADS_SUPPORT */
+    fprintf(stderr, "    modification event: %lu\n", m->data.event);
     fprintf(stderr, "    calling function:   %s\n",
             m->data.func ? m->data.func : "<unknown>");
     fprintf(stderr, "    called from file:   %s\n",
@@ -1517,6 +1525,129 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
         *s = *t = NULL;
         *u = 0;
     }
+}
+
+
+/* Write user data to the mpatrol log file.
+ */
+
+int
+__mp_printf(char *s, ...)
+{
+    char b[1024];
+    char *p, *t;
+    va_list v;
+    size_t l;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    va_start(v, s);
+    r = vsprintf(b, s, v);
+    va_end(v);
+    if (r >= 0)
+    {
+        l = strlen(MP_PRINTPREFIX);
+        for (t = b; p = strchr(t, '\n'); t = p + 1)
+        {
+            *p = '\0';
+            if (*t != '\0')
+            {
+                __mp_diag("%s%s", MP_PRINTPREFIX, t);
+                r += l;
+            }
+            __mp_diag("\n");
+        }
+        if (*t != '\0')
+        {
+            __mp_diag("%s%s\n", MP_PRINTPREFIX, t);
+            r += l + 1;
+        }
+    }
+    restoresignals();
+    return r;
+}
+
+
+/* Write a hex dump for a specified memory location to the mpatrol log file.
+ */
+
+void
+__mp_logmemory(void *p, size_t l)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    __mp_printmemory(p, l);
+    __mp_diag("\n");
+    restoresignals();
+}
+
+
+/* Write the current call stack to the mpatrol log file.
+ */
+
+int
+__mp_logstack(size_t k)
+{
+    stackinfo i;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    __mp_newframe(&i, NULL);
+    if (r = __mp_getframe(&i))
+    {
+        r = __mp_getframe(&i);
+        while ((k > 0) && (r != 0))
+        {
+            r = __mp_getframe(&i);
+            k--;
+        }
+    }
+    if (r != 0)
+    {
+        __mp_printstack(&memhead.syms, &i);
+        __mp_diag("\n");
+    }
+    restoresignals();
+    return r;
+}
+
+
+/* Invoke a text editor on a given source file at a specific line.
+ */
+
+int
+__mp_edit(char *f, unsigned long l)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    r = __mp_editfile(f, l, 0);
+    restoresignals();
+    return r;
+}
+
+
+/* List a given source file at a specific line.
+ */
+
+int
+__mp_list(char *f, unsigned long l)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    r = __mp_editfile(f, l, 1);
+    restoresignals();
+    return r;
 }
 
 

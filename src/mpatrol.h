@@ -281,6 +281,7 @@ typedef struct __mp_allocinfo
     unsigned long alloc;    /* allocation index */
     unsigned long realloc;  /* reallocation index */
     unsigned long thread;   /* thread identifier */
+    unsigned long event;    /* event of last modification */
     char *func;             /* calling function name */
     char *file;             /* file name in which call took place */
     unsigned long line;     /* line number at which call took place */
@@ -577,6 +578,11 @@ void (*__mp_epilogue(void (*)(MP_CONST void *)))(MP_CONST void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
+int __mp_printf(MP_CONST char *, ...);
+void __mp_logmemory(MP_CONST void *, size_t);
+int __mp_logstack(size_t);
+int __mp_edit(MP_CONST char *, unsigned long);
+int __mp_list(MP_CONST char *, unsigned long);
 
 
 #ifdef __cplusplus
@@ -612,6 +618,23 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #define __mp_nomemory(h) ((void (*)(void)) NULL)
 #define __mp_pushdelstack(s, t, u) ((void) 0)
 #define __mp_popdelstack(s, t, u) ((void) 0)
+#define __mp_logmemory(p, l) ((void) 0)
+#define __mp_logstack(k) ((int) 0)
+#define __mp_edit(f, l) ((int) 0)
+#define __mp_list(f, l) ((int) 0)
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
+#define __mp_printf(s, ...) ((int) 0)
+#elif defined(__GNUC__)
+#define __mp_printf(s, a...) ((int) 0)
+#else /* __STDC_VERSION__ && __GNUC__ */
+static
+int
+__mp_printf(MP_CONST char *s, ...)
+{
+    return 0;
+}
+#endif /* __STDC_VERSION__ && __GNUC__ */
 
 #endif /* NDEBUG */
 
