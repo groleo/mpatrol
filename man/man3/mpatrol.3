@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.28 2000-05-14 13:38:16 graeme Exp $
+.\" $Id: mpatrol.3,v 1.29 2000-05-16 00:54:32 graeme Exp $
 .\"
-.TH MPATROL 3 "14 May 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "16 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -578,6 +578,13 @@ allocated.  When the number of memory allocations reaches this number the
 program will be halted, and its state may be examined at that point by using
 a suitable debugger.  Note that this setting will be ignored if its value is
 zero.  Default value: \fBALLOCSTOP\fP=\fI0\fP.
+.TP
+\fBALLOWOFLOW\fP
+Specifies that a warning rather than an error should be produced if any memory
+operation function overflows the boundaries of a memory allocation, and that
+the operation should still be performed.  This option is provided for
+circumstances where it is desirable for the memory operation to be performed,
+regardless of whether it is erroneous or not.
 .TP
 \fBAUTOSAVE\fP=\fIunsigned integer\fP
 Specifies the frequency at which to periodically write the profiling data to
