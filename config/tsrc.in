@@ -71,11 +71,14 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-CFLAGS = -DMP_THREADS_SUPPORT
+INCLUDES = -DMP_THREADS_SUPPORT
 
 lib_LTLIBRARIES = libmpatrolmt.la
 
-libmpatrolmt_la_SOURCES = config.h target.h list.c list.h tree.c tree.h 			  slots.c slots.h utils.c utils.h memory.c memory.h 			  heap.c heap.h alloc.c alloc.h info.c info.h stack.c 			  stack.h addr.c addr.h strtab.c strtab.h symbol.c 			  symbol.h signals.c signals.h mutex.c mutex.h diag.c 			  diag.h option.c option.h leaktab.c leaktab.h 			  profile.c profile.h trace.c trace.h inter.c inter.h 			  malloc.c cplus.c machine.c machine.h version.c 			  version.h
+noinst_HEADERS = config.h target.h list.h tree.h slots.h utils.h memory.h 		 heap.h alloc.h info.h stack.h addr.h strtab.h symbol.h 		 signals.h mutex.h diag.h option.h leaktab.h profile.h trace.h 		 inter.h machine.h version.h
+
+
+libmpatrolmt_la_SOURCES = list.c tree.c slots.c utils.c memory.c heap.c 			  alloc.c info.c stack.c addr.c strtab.c symbol.c 			  signals.c mutex.c diag.c option.c leaktab.c 			  profile.c trace.c inter.c malloc.c cplus.c 			  machine.c version.c $(noinst_HEADERS)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -92,10 +95,13 @@ libmpatrolmt_la_OBJECTS =  list.lo tree.lo slots.lo utils.lo memory.lo \
 heap.lo alloc.lo info.lo stack.lo addr.lo strtab.lo symbol.lo \
 signals.lo mutex.lo diag.lo option.lo leaktab.lo profile.lo trace.lo \
 inter.lo malloc.lo cplus.lo machine.lo version.lo
+CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+HEADERS =  $(noinst_HEADERS)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -283,7 +289,7 @@ install-am: all-am
 install: install-am
 uninstall-am: uninstall-libLTLIBRARIES
 uninstall: uninstall-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -342,7 +348,7 @@ mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-machine.lo: machine.c
+machine.lo: machine.c config.h target.h
 	$(COMPILE) -E -P $< >machine.s
 	$(LIBTOOL) --mode=compile $(COMPILE) -c machine.s
 	rm -f machine.s

@@ -21,24 +21,25 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: tsrc.am,v 1.2 2001-09-13 20:48:06 graeme Exp $
+## $Id: tsrc.am,v 1.3 2001-09-13 21:35:55 graeme Exp $
 
 
-CFLAGS = -DMP_THREADS_SUPPORT
+INCLUDES = -DMP_THREADS_SUPPORT
 
 lib_LTLIBRARIES = libmpatrolmt.la
 
-libmpatrolmt_la_SOURCES = config.h target.h list.c list.h tree.c tree.h \
-			  slots.c slots.h utils.c utils.h memory.c memory.h \
-			  heap.c heap.h alloc.c alloc.h info.c info.h stack.c \
-			  stack.h addr.c addr.h strtab.c strtab.h symbol.c \
-			  symbol.h signals.c signals.h mutex.c mutex.h diag.c \
-			  diag.h option.c option.h leaktab.c leaktab.h \
-			  profile.c profile.h trace.c trace.h inter.c inter.h \
-			  malloc.c cplus.c machine.c machine.h version.c \
-			  version.h
+noinst_HEADERS = config.h target.h list.h tree.h slots.h utils.h memory.h \
+		 heap.h alloc.h info.h stack.h addr.h strtab.h symbol.h \
+		 signals.h mutex.h diag.h option.h leaktab.h profile.h trace.h \
+		 inter.h machine.h version.h
 
-machine.lo: machine.c
+libmpatrolmt_la_SOURCES = list.c tree.c slots.c utils.c memory.c heap.c \
+			  alloc.c info.c stack.c addr.c strtab.c symbol.c \
+			  signals.c mutex.c diag.c option.c leaktab.c \
+			  profile.c trace.c inter.c malloc.c cplus.c \
+			  machine.c version.c $(noinst_HEADERS)
+
+machine.lo: machine.c config.h target.h
 	$(COMPILE) -E -P $< >machine.s
 	$(LIBTOOL) --mode=compile $(COMPILE) -c machine.s
 	rm -f machine.s
