@@ -1,3 +1,61 @@
+Thu May  4 08:25:29 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/unix/Makefile: Added lint support.
+
+	* src/diag.c: Made the error and warning counts static.
+
+	* src/malloc.c, src/config.h:
+	Added MP_ALTFUNCNAMES and MP_ALTFUNCNAME().
+
+Wed May  3 00:20:14 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added more information on profiling.
+
+Tue May  2 23:05:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added information on the format of the profiling output file.
+
+	* src/mprof.c:
+	Need to always read the symbol name string table, even if it is size 1.
+
+Mon May  1 21:57:17 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added the profiling chapter.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1:
+	Documented that the default profiling output filename is mpatrol.%n.out.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: LARGEBOUND defaults to 2048.
+
+	* src/diag.c, src/diag.h: Added __mp_proffile().
+
+	* src/profile.c, src/option.c, src/mpatrol.c, src/config.h:
+	Allow the profiling output filename to contain special formatting
+	characters.
+
+	* tests/profile/test1.c: New profiling test.
+
+	* tests/profile/test2.c:
+	Added new profiling test with a fix for the previous test.
+
+Sun Apr 30 23:59:16 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1: Added the profiling options.
+
+	* man/man1/mprof.1, man/cat1/mprof.1: New manual page for mprof.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Added information and options about profiling.
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
+	  pkg/lha/build:
+	Added the mprof manual page.
+
+	* src/getopt.c, src/getopt.h: Added __mp_getnum().
+
+	* src/mprof.c: Added the memory leak table.
+
 Thu Apr 27 19:07:37 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented IRIX support.  Changed memleak to mleak.

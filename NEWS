@@ -1,4 +1,4 @@
-Changes for 1.2.0
+Changes for 1.2.0 (4th May, 2000)
 
   * Added memory allocation profiling, which behaves in a similar way to mprof.
 
@@ -14,11 +14,18 @@ Changes for 1.2.0
 
   * AIX and IRIX are now supported.
 
+  * Added support for duplicate functions with alternative names to be defined
+    as well as malloc(), calloc(), etc.
+
+  * Added lint support in the UNIX makefile.
+
   * Added a GDB command file for use with mpatrol.
 
   * Added instructions on how to build the mpatrol library as a shared library
     while also resolving references to any object file access libraries.  Also
     added references to more related software.
+
+  * Added new tests for illustrating profiling support.
 
 
 Changes for 1.1.4 (10th April, 2000)
