@@ -22,8 +22,8 @@ Keywords:       mpatrol malloc realloc free new delete library allocate
 Author:         graeme@epc.co.uk (Graeme S. Roy)
 Maintained-by:  graeme@epc.co.uk (Graeme S. Roy)
 Primary-site:   www.cbmamiga.demon.co.uk mpatrol/files
-                3.6M mpatrol_1.4.2.tar.gz
+                3.7M mpatrol_1.4.2.tar.gz
 Alternate-site: metalab.unc.edu pub/Linux/devel/lang/c
-                3.6M mpatrol-1.4.2.tar.gz
+                3.7M mpatrol-1.4.2.tar.gz
 Copying-policy: GPL
 End
