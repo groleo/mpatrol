@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.2 1999-11-25 11:11:54 graeme Exp $"
+#ident "$Id: signals.c,v 1.3 2000-01-09 20:08:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -142,6 +142,7 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
     signal(SIGSEGV, signalhandler);
 #endif /* MP_SIGINFO_SUPPORT && TARGET */
     s->sigint = s->sigterm = NULL;
+    s->saved = 0;
 }
 
 
@@ -152,6 +153,7 @@ MP_GLOBAL void __mp_savesignals(sighead *s)
 {
     s->sigint = signal(SIGINT, SIG_IGN);
     s->sigterm = signal(SIGTERM, SIG_IGN);
+    s->saved = 1;
 }
 
 
@@ -160,8 +162,12 @@ MP_GLOBAL void __mp_savesignals(sighead *s)
 
 MP_GLOBAL void __mp_restoresignals(sighead *s)
 {
-    signal(SIGINT, s->sigint);
-    signal(SIGTERM, s->sigterm);
+    if (s->saved)
+    {
+        signal(SIGINT, s->sigint);
+        signal(SIGTERM, s->sigterm);
+        s->saved = 0;
+    }
 }
 
 

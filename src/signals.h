@@ -41,6 +41,7 @@ typedef struct sighead
 {
     void (*sigint)(int);  /* interrupt signal handler */
     void (*sigterm)(int); /* termination signal handler */
+    char saved;           /* signal handlers have been saved */
 }
 sighead;
 
