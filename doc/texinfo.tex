@@ -948,7 +948,7 @@ where each line of input produces a line of output.}
     \ifnum\pdftexversion < 14 \else
       \pdfrefximage \pdflastximage
     \fi}
-  \def\pdfmkdest#1{\pdfdest name{#1} xyz}
+  \def\pdfmkdest#1{\pdfdest name{#1@} xyz}
   \def\pdfmkpgn#1{#1@}
   \let\linkcolor = \Blue  % was Cyan, but that seems light?
   \def\endlink{\Black\pdfendlink}
