@@ -62,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.29 2000-06-29 18:03:22 graeme Exp $"
+#ident "$Id: memory.c,v 1.30 2000-07-13 20:16:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -215,8 +215,8 @@ static char *progname(void)
     static char c[256];
     ssize_t l;
     int f;
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LYNXOS || \
-      SYSTEM == SYSTEM_SOLARIS
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+      SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_SOLARIS
     extern char **environ;
     char **e;
     char *t;
@@ -267,13 +267,14 @@ static char *progname(void)
         c[l] = '\0';
         return c;
     }
-#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LYNXOS || \
-      SYSTEM == SYSTEM_SOLARIS
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+      SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_SOLARIS
     /* We can access the argument vector from the pointer to the environment
-     * array on DG/UX, LynxOS and Solaris.  On DG/UX Intel and Solaris we stop
-     * scanning backwards along the array when we reach argc.  On DG/UX M88K
-     * and LynxOS we stop scanning forwards along the array when we reach a
-     * NULL pointer.  The contents of the argument vector then follow.
+     * array on DG/UX, DYNIX/ptx, LynxOS and Solaris.  On DG/UX Intel, DYNIX/ptx
+     * and Solaris we stop scanning backwards along the array when we reach
+     * argc.  On DG/UX M88K and LynxOS we stop scanning forwards along the array
+     * when we reach a NULL pointer.  The contents of the argument vector then
+     * follow.
      */
 #if (SYSTEM == SYSTEM_DGUX && ARCH == ARCH_M88K) || SYSTEM == SYSTEM_LYNXOS
     for (e = environ; *e != NULL; e++);
