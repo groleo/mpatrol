@@ -192,12 +192,13 @@
 
 
 #define FORMAT_NONE  0 /* no symbol support */
-#define FORMAT_COFF  1 /* COFF */
-#define FORMAT_XCOFF 2 /* XCOFF */
-#define FORMAT_ELF32 3 /* ELF32 */
-#define FORMAT_ELF64 4 /* ELF64 */
-#define FORMAT_BFD   5 /* GNU BFD */
-#define FORMAT_PE    6 /* Portable Executable */
+#define FORMAT_AOUT  1 /* a.out */
+#define FORMAT_COFF  2 /* COFF */
+#define FORMAT_XCOFF 3 /* XCOFF */
+#define FORMAT_ELF32 4 /* ELF32 */
+#define FORMAT_ELF64 5 /* ELF64 */
+#define FORMAT_BFD   6 /* GNU BFD */
+#define FORMAT_PE    7 /* Portable Executable */
 
 
 #ifndef FORMAT
@@ -205,6 +206,15 @@
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_LYNXOS
 #define FORMAT FORMAT_BFD
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_IRIX || \
+      SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
+      SYSTEM == SYSTEM_UNIXWARE
+#if ENVIRON == ENVIRON_64
+#define FORMAT FORMAT_ELF64
+#else /* ENVIRON */
+#define FORMAT FORMAT_ELF32
+#endif /* ENVIRON */
 #elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
       SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
 #ifdef __ELF__
@@ -214,14 +224,10 @@
 #define FORMAT FORMAT_ELF32
 #endif /* ENVIRON */
 #else /* __ELF__ */
-#define FORMAT FORMAT_COFF
+#define FORMAT FORMAT_AOUT
 #endif /* __ELF__ */
 #else /* SYSTEM */
-#if ENVIRON == ENVIRON_64
-#define FORMAT FORMAT_ELF64
-#else /* ENVIRON */
-#define FORMAT FORMAT_ELF32
-#endif /* ENVIRON */
+#define FORMAT FORMAT_NONE
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #define FORMAT FORMAT_PE
