@@ -31,13 +31,33 @@
 
 
 /*
- * $Id: inter.h,v 1.23 2001-02-16 23:02:56 graeme Exp $
+ * $Id: inter.h,v 1.24 2001-02-22 19:33:25 graeme Exp $
  */
 
 
 #include "config.h"
 #include "info.h"
 #include <stdarg.h>
+
+
+/* The different types of initialiser functions.  This must be kept up to
+ * date with the definition of __mp_initfunc in mpatrol.h.
+ */
+
+typedef enum initfunc
+{
+    IF_USER1,  /* user-defined initialiser function 1 */
+    IF_USER2,  /* user-defined initialiser function 2 */
+    IF_USER3,  /* user-defined initialiser function 3 */
+    IF_USER4,  /* user-defined initialiser function 4 */
+    IF_USER5,  /* user-defined initialiser function 5 */
+    IF_USER6,  /* user-defined initialiser function 6 */
+    IF_USER7,  /* user-defined initialiser function 7 */
+    IF_USER8,  /* user-defined initialiser function 8 */
+    IF_MTRACE, /* mtrace tool initialiser function */
+    IF_MAX
+}
+initfunc;
 
 
 /* An allocinfo structure provides information about a particular memory
