@@ -100,6 +100,17 @@
 #endif /* MP_ARRAY_SUPPORT */
 
 
+/* The size of the simulated UNIX heap in bytes.  This is used by the brk() and
+ * sbrk() functions on non-UNIX platforms and is used to allocate a block of
+ * memory of this size.  Any attempt to allocate memory beyond this block will
+ * cause these functions to fail.
+ */
+
+#ifndef MP_BREAK_SIZE
+#define MP_BREAK_SIZE 262144
+#endif /* MP_BREAK_SIZE */
+
+
 /* The multiple of pages to allocate from the heap every time a new block of
  * internal memory is required.  The higher the value, the less distinct
  * internal blocks to keep track of, but the potential for more memory wastage
@@ -119,10 +130,9 @@
  */
 
 #ifndef MP_DELETE
-#if TARGET == TARGET_UNIX
+#if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
 #define MP_DELETE 0
-#elif TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
-      TARGET == TARGET_NETWARE
+#elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
 #define MP_DELETE 1
 #endif /* TARGET */
 #endif /* MP_DELETE */
