@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.1 1999-10-04 23:45:33 graeme Exp $
+# $Id: Makefile,v 1.2 2000-01-09 22:01:57 graeme Exp $
 
 
 # Definitions
@@ -41,7 +41,7 @@ TFLAGS = -DMP_THREADS_SUPPORT
 
 LIBRARY	 = mpatrol
 VERSION	 = 1
-REVISION = 0
+REVISION = 1
 
 OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o inter.o \
@@ -103,8 +103,7 @@ $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(OBJECT_LIBRARY) \
-	$(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) $(OBJTS_LIBRARY)
+all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY)
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
