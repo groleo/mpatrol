@@ -2187,6 +2187,25 @@ gives you the opportunity to use that handler to either free up any
 unneeded memory or simply to abort, thus removing the need to check for
 failed allocations.
 
+   If you wish to write your own diagnostics to the mpatrol log file
+from within your source code then you can do so with the
+`__mp_printf()' and `__mp_vprintf()' functions, which are the
+functional equivalents of `printf()' and `vprintf()'.  They prefix
+every line written to the log file with `>', partly for making it clear
+where user diagnostics occur and partly to avoid problems with external
+utilities that parse the mpatrol log file.  It is also possible to
+write out a memory dump in hexadecimal format, a stack trace at the
+current point in execution and details of a memory allocation to the
+log file in standard format using the `__mp_logmemory()',
+`__mp_logstack()' and `__mp_logaddr()' functions respectively.
+
+   You can also take advantage of the `mpedit' command from within the
+mpatrol library with the `__mp_edit()', `__mp_list()' and `__mp_view()'
+functions.  The first invokes a text editor on a specified file and
+line number, while the second displays a context listing of a file at a
+given line number.  The third function performs either or neither
+depending on the setting of the `EDIT' or `LIST' options.
+
    Finally, there are three functions which affect the mpatrol library
 globally.  The first, `__mp_check()', allows you to force an internal
 check of the mpatrol library's data structures at any point during
@@ -5992,6 +6011,9 @@ special mpatrol library functions will evaluate to empty statements.
 It is intended that the `NDEBUG' preprocessor macro be defined in
 release builds.
 
+A.1 C dynamic memory allocation functions
+=========================================
+
    The following 19 functions are available as replacements for
 existing C library functions.  To use these you must include
 `mpatrol.h' before all other header files, although on UNIX and Windows
@@ -6284,6 +6306,9 @@ used.
      function is mpatrol-specific and should not be used in release
      code.
 
+A.2 C dynamic memory extension functions
+========================================
+
    The following 5 functions are available as replacements for existing
 C library extension functions that always abort and never return `NULL'
 if there is insufficient memory to fulfil a request.  To use these you
@@ -6346,6 +6371,9 @@ used anyway, albeit with slightly less tracing information.
      no memory will be freed.  All of the previous contents will be
      destroyed.
 
+A.3 C++ dynamic memory allocation functions
+===========================================
+
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
 used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  The
@@ -6406,6 +6434,9 @@ slightly less tracing information.
      log file.  Note that this function is equivalent to
      `__mp_nomemory()' and will replace the handler installed by that
      function.
+
+A.4 C memory operation functions
+================================
 
    The following 10 functions are available as replacements for
 existing C library memory operation functions.  To use these you must
@@ -6505,7 +6536,10 @@ anyway, albeit with slightly less tracing information.
      straddle that allocation's boundaries then an error message will
      be generated in the log file and no bytes will be searched.
 
-   The following 8 functions are available as support routines for
+A.5 mpatrol library functions
+=============================
+
+   The following 16 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the `mpatrol.h' header file.
 
@@ -6587,6 +6621,63 @@ you should include the `mpatrol.h' header file.
      allocation functions, when they would normally return `NULL'.  Note
      that this function is equivalent to `set_new_handler()' and will
      replace the handler installed by that function.
+
+`int __mp_printf(const char *fmt, ...)'
+     Writes format string FMT with variable arguments to the log file,
+     with each line prefixed by `>'.  The final length of the string
+     that is written to the log file must not exceed 1024 characters.
+     Returns the number of characters written, or a negative number
+     upon error.
+
+`int __mp_vprintf(const char *fmt, va_list args)'
+     Writes format string FMT with variable argument list ARGS to the
+     log file, with each line prefixed by `>'.  The final length of the
+     string that is written to the log file must not exceed 1024
+     characters.  Returns the number of characters written, or a
+     negative number upon error.
+
+`void __mp_logmemory(const void *ptr, size_t size)'
+     Displays the contents of a block of memory beginning at PTR,
+     dumping SIZE consecutive bytes to the log file in hexadecimal
+     format.
+
+`int __mp_logstack(size_t frames)'
+     Displays the current call stack, skipping FRAMES stack frames from
+     the current stack frame before writing the symbolic stack trace to
+     the log file.  Returns `1' if successful, or `0' if the call stack
+     could not be determined or if FRAMES was too large for the current
+     call stack.
+
+`int __mp_logaddr(const void *ptr)'
+     Displays information about a specific memory allocation containing
+     PTR to the log file.  If PTR does not belong to a previously
+     allocated memory allocation then `0' will be returned, otherwise
+     `1' will be returned.
+
+`int __mp_edit(const char *file, unsigned long line)'
+     Invokes a text editor to edit FILE at line number LINE via the
+     `mpedit' command.  Returns `1' if the text editor was successfully
+     invoked, `-1' if there was an error, or `0' if there is no support
+     for this feature.  This function will only work on a system where
+     the `EDIT' option works.
+
+`int __mp_list(const char *file, unsigned long line)'
+     Displays a context listing of FILE at line number LINE via the
+     `mpedit' command.  Returns `1' if the listing was successfully
+     performed, `-1' if there was an error, or `0' if there is no
+     support for this feature.  This function will only work on a
+     system where the `LIST' option works.
+
+`int __mp_view(const char *file, unsigned long line)'
+     Either invokes a text editor to edit FILE at line number LINE or
+     displays a context listing of FILE at line number LINE depending
+     on the setting of the `EDIT' and `LIST' options.  This is done via
+     the `mpedit' command and will have no effect if the `EDIT' and
+     `LIST' options are not set or if these options are not supported
+     on the system.  Returns `1' if the edit or listing was
+     successfully performed, `-1' if there was an error, or `0' if
+     neither of the options were set or if there is no support for this
+     feature.
 
 Appendix B Environment
 **********************
@@ -11997,99 +12088,115 @@ Function index
 **************
 
 __mp_check:                                        
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
+__mp_edit:                                         
+          See ``A.5 mpatrol library functions''.
 __mp_epilogue:                                     
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 __mp_info:                                         
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
+__mp_list:                                         
+          See ``A.5 mpatrol library functions''.
+__mp_logaddr:                                      
+          See ``A.5 mpatrol library functions''.
+__mp_logmemory:                                    
+          See ``A.5 mpatrol library functions''.
+__mp_logstack:                                     
+          See ``A.5 mpatrol library functions''.
 __mp_memorymap:                                    
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 __mp_nomemory:                                     
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
+__mp_printf:                                       
+          See ``A.5 mpatrol library functions''.
 __mp_printinfo:                                    
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 __mp_prologue:                                     
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 __mp_summary:                                      
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
+__mp_view:                                         
+          See ``A.5 mpatrol library functions''.
+__mp_vprintf:                                      
+          See ``A.5 mpatrol library functions''.
 alloca:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 bcmp:                                              
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 bcopy:                                             
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 bzero:                                             
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 calloc:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 cfree:                                             
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 dealloca:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 expand:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 free:                                              
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 malloc:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 memalign:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 memccpy:                                           
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memchr:                                            
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memcmp:                                            
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memcpy:                                            
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memmem:                                            
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memmove:                                           
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 memset:                                            
-          See ``Appendix A Functions''.
+          See ``A.4 C memory operation functions''.
 operator delete:                                   
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 operator delete[]:                                 
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 operator new:                                      
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 operator new[]:                                    
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 pvalloc:                                           
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 realloc:                                           
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 reallocf:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 recalloc:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 set_new_handler:                                   
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 strdup:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 strdupa:                                           
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 strndup:                                           
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 strndupa:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 strnsave:                                          
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 strsave:                                           
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 valloc:                                            
-          See ``Appendix A Functions''.
+          See ``A.1 C dynamic memory allocation functions''.
 xcalloc:                                           
-          See ``Appendix A Functions''.
+          See ``A.2 C dynamic memory extension functions''.
 xfree:                                             
-          See ``Appendix A Functions''.
+          See ``A.2 C dynamic memory extension functions''.
 xmalloc:                                           
-          See ``Appendix A Functions''.
+          See ``A.2 C dynamic memory extension functions''.
 xrealloc:                                          
-          See ``Appendix A Functions''.
+          See ``A.2 C dynamic memory extension functions''.
 xstrdup:                                           
-          See ``Appendix A Functions''.
+          See ``A.2 C dynamic memory extension functions''.
 Index
 *****
 
@@ -12262,7 +12369,7 @@ allocation boundaries:                              See 8.
 allocation byte:                                    See 7.3.
 allocation index:                                   See 12.1.
 allocation information:                            
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 allocation type:                                    See 12.1.
 ALLOCBYTE:                                         
           See ``Appendix B Environment''.
@@ -12624,7 +12731,7 @@ INCOMP:
 INFOPATH:                                          
           See ``I.1 Documentation''.
 information about an allocation:                   
-          See ``Appendix A Functions''.
+          See ``A.5 mpatrol library functions''.
 inline functions:                                  
           See ``I.2 Building''.
 installation:                                       See 3.
@@ -12838,18 +12945,18 @@ MP_ALIGN:
           See ``I.2 Building''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
 MP_DELETE:                                         
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 MP_INLINE:                                         
           See ``I.2 Building''.
 MP_LIBRARYSTACK_SUPPORT:                            See 6.2.
 MP_NEW:                                            
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 MP_NEW_NOTHROW:                                    
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 MP_NOCPLUSPLUS:                                    
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 MP_NONEWDELETE:                                    
-          See ``Appendix A Functions''.
+          See ``A.3 C++ dynamic memory allocation functions''.
 MP_USE_ATEXIT:                                     
           See ``I.4 Running''.
 mpatrol:                                            See 1.

@@ -63,6 +63,13 @@
 </ul>
 <li><a href="#Tutorial">13 Tutorial</a>
 <li><a href="#Functions">Appendix A Functions</a>
+<ul>
+<li><a href="#Functions%201">A.1 C dynamic memory allocation functions</a>
+<li><a href="#Functions%202">A.2 C dynamic memory extension functions</a>
+<li><a href="#Functions%203">A.3 C++ dynamic memory allocation functions</a>
+<li><a href="#Functions%204">A.4 C memory operation functions</a>
+<li><a href="#Functions%205">A.5 mpatrol library functions</a>
+</ul>
 <li><a href="#Environment">Appendix B Environment</a>
 <li><a href="#Options">Appendix C Options</a>
 <li><a href="#Diagnostic%20messages">Appendix D Diagnostic messages</a>
@@ -2278,6 +2285,24 @@ will be called by the mpatrol library if it ever runs out of memory during the
 call to a memory allocation function.  This gives you the opportunity to use
 that handler to either free up any unneeded memory or simply to abort, thus
 removing the need to check for failed allocations.
+
+<p>If you wish to write your own diagnostics to the mpatrol log file from within
+your source code then you can do so with the <code>__mp_printf()</code> and
+<code>__mp_vprintf()</code> functions, which are the functional equivalents of
+<code>printf()</code> and <code>vprintf()</code>.  They prefix every line written to the
+log file with <code>&gt;</code>, partly for making it clear where user diagnostics occur
+and partly to avoid problems with external utilities that parse the mpatrol log
+file.  It is also possible to write out a memory dump in hexadecimal format, a
+stack trace at the current point in execution and details of a memory allocation
+to the log file in standard format using the <code>__mp_logmemory()</code>,
+<code>__mp_logstack()</code> and <code>__mp_logaddr()</code> functions respectively.
+
+<p>You can also take advantage of the <code>mpedit</code> command from within the
+mpatrol library with the <code>__mp_edit()</code>, <code>__mp_list()</code> and
+<code>__mp_view()</code> functions.  The first invokes a text editor on a specified
+file and line number, while the second displays a context listing of a file at a
+given line number.  The third function performs either or neither depending on
+the setting of the <code>EDIT</code> or <code>LIST</code> options.
 
 <p>Finally, there are three functions which affect the mpatrol library globally. 
 The first, <code>__mp_check()</code>, allows you to force an internal check of the
@@ -6175,6 +6200,22 @@ no macro redefinition of functions will take place and all special mpatrol
 library functions will evaluate to empty statements.  It is intended that the
 <code>NDEBUG</code> preprocessor macro be defined in release builds.
 
+<ul>
+<li><a href="#Functions%201">Functions 1</a>:                  C dynamic memory allocation functions. 
+<li><a href="#Functions%202">Functions 2</a>:                  C dynamic memory extension functions. 
+<li><a href="#Functions%203">Functions 3</a>:                  C++ dynamic memory allocation functions. 
+<li><a href="#Functions%204">Functions 4</a>:                  C memory operation functions. 
+<li><a href="#Functions%205">Functions 5</a>:                  mpatrol library functions. 
+</ul>
+
+<p><hr>
+Node:<a name="Functions%201">Functions 1</a>,
+Next:<a rel=next href="#Functions%202">Functions 2</a>,
+Up:<a rel=up href="#Functions">Functions</a>
+<br>
+
+<h2>A.1 C dynamic memory allocation functions</h2>
+
 <p>The following 19 functions are available as replacements for existing C library
 functions.  To use these you must include <code>mpatrol.h</code> before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
@@ -6442,6 +6483,15 @@ memory allocations when the allocating function returns.  This function is
 mpatrol-specific and should not be used in release code. 
 </dl>
 
+<p><hr>
+Node:<a name="Functions%202">Functions 2</a>,
+Next:<a rel=next href="#Functions%203">Functions 3</a>,
+Previous:<a rel=previous href="#Functions%201">Functions 1</a>,
+Up:<a rel=up href="#Functions">Functions</a>
+<br>
+
+<h2>A.2 C dynamic memory extension functions</h2>
+
 <p>The following 5 functions are available as replacements for existing C library
 extension functions that always abort and never return <code>NULL</code> if there is
 insufficient memory to fulfil a request.  To use these you must include
@@ -6501,6 +6551,15 @@ by another call to allocate memory.  If <var>ptr</var> is <code>NULL</code> then
 will be freed.  All of the previous contents will be destroyed. 
 </dl>
 
+<p><hr>
+Node:<a name="Functions%203">Functions 3</a>,
+Next:<a rel=next href="#Functions%204">Functions 4</a>,
+Previous:<a rel=previous href="#Functions%202">Functions 2</a>,
+Up:<a rel=up href="#Functions">Functions</a>
+<br>
+
+<h2>A.3 C++ dynamic memory allocation functions</h2>
+
 <p>The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in <code>mpatrol.h</code> will only be used if the
 <code>MP_NOCPLUSPLUS</code> preprocessor macro is not defined.  The replacement
@@ -6557,6 +6616,15 @@ terminate the program and write an out of memory message to the log file.  Note
 that this function is equivalent to <code>__mp_nomemory()</code> and will replace the
 handler installed by that function. 
 </dl>
+
+<p><hr>
+Node:<a name="Functions%204">Functions 4</a>,
+Next:<a rel=next href="#Functions%205">Functions 5</a>,
+Previous:<a rel=previous href="#Functions%203">Functions 3</a>,
+Up:<a rel=up href="#Functions">Functions</a>
+<br>
+
+<h2>A.4 C memory operation functions</h2>
 
 <p>The following 10 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include <code>mpatrol.h</code>
@@ -6653,7 +6721,15 @@ allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched. 
 </dl>
 
-<p>The following 8 functions are available as support routines for additional
+<p><hr>
+Node:<a name="Functions%205">Functions 5</a>,
+Previous:<a rel=previous href="#Functions%204">Functions 4</a>,
+Up:<a rel=up href="#Functions">Functions</a>
+<br>
+
+<h2>A.5 mpatrol library functions</h2>
+
+<p>The following 16 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 <code>mpatrol.h</code> header file.
 
@@ -6757,7 +6833,58 @@ handler, or the <code>NULL</code> pointer if no handler had been previously inst
 This will be called once by C memory allocation functions, and repeatedly by C++
 memory allocation functions, when they would normally return <code>NULL</code>.  Note
 that this function is equivalent to <code>set_new_handler()</code> and will replace
-the handler installed by that function. 
+the handler installed by that function.
+
+<br><dt><code>int __mp_printf(const char *fmt, ...)</code>
+<dd>Writes format string <var>fmt</var> with variable arguments to the log file, with
+each line prefixed by <code>&gt;</code>.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  Returns the number of
+characters written, or a negative number upon error.
+
+<br><dt><code>int __mp_vprintf(const char *fmt, va_list args)</code>
+<dd>Writes format string <var>fmt</var> with variable argument list <var>args</var> to the log
+file, with each line prefixed by <code>&gt;</code>.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  Returns the number
+of characters written, or a negative number upon error.
+
+<br><dt><code>void __mp_logmemory(const void *ptr, size_t size)</code>
+<dd>Displays the contents of a block of memory beginning at <var>ptr</var>, dumping
+<var>size</var> consecutive bytes to the log file in hexadecimal format.
+
+<br><dt><code>int __mp_logstack(size_t frames)</code>
+<dd>Displays the current call stack, skipping <var>frames</var> stack frames from the
+current stack frame before writing the symbolic stack trace to the log file. 
+Returns <code>1</code> if successful, or <code>0</code> if the call stack could not be
+determined or if <var>frames</var> was too large for the current call stack.
+
+<br><dt><code>int __mp_logaddr(const void *ptr)</code>
+<dd>Displays information about a specific memory allocation containing <var>ptr</var> to
+the log file.  If <var>ptr</var> does not belong to a previously allocated memory
+allocation then <code>0</code> will be returned, otherwise <code>1</code> will be returned.
+
+<br><dt><code>int __mp_edit(const char *file, unsigned long line)</code>
+<dd>Invokes a text editor to edit <var>file</var> at line number <var>line</var> via the
+<code>mpedit</code> command.  Returns <code>1</code> if the text editor was successfully
+invoked, <code>-1</code> if there was an error, or <code>0</code> if there is no support for
+this feature.  This function will only work on a system where the <code>EDIT</code>
+option works.
+
+<br><dt><code>int __mp_list(const char *file, unsigned long line)</code>
+<dd>Displays a context listing of <var>file</var> at line number <var>line</var> via the
+<code>mpedit</code> command.  Returns <code>1</code> if the listing was successfully
+performed, <code>-1</code> if there was an error, or <code>0</code> if there is no support
+for this feature.  This function will only work on a system where the
+<code>LIST</code> option works.
+
+<br><dt><code>int __mp_view(const char *file, unsigned long line)</code>
+<dd>Either invokes a text editor to edit <var>file</var> at line number <var>line</var> or
+displays a context listing of <var>file</var> at line number <var>line</var> depending
+on the setting of the <code>EDIT</code> and <code>LIST</code> options.  This is done via
+the <code>mpedit</code> command and will have no effect if the <code>EDIT</code> and
+<code>LIST</code> options are not set or if these options are not supported on the
+system.  Returns <code>1</code> if the edit or listing was successfully performed,
+<code>-1</code> if there was an error, or <code>0</code> if neither of the options were set
+or if there is no support for this feature. 
 </dl>
 
 <p><hr>
@@ -11803,53 +11930,61 @@ Up:<a rel=up href="#Top">Top</a>
 <h1>Function index</h1>
 
 <ul compact>
-<li><code>__mp_check</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_epilogue</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_info</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_memorymap</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_nomemory</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_printinfo</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_prologue</code>: <a href="#Functions">Functions</a>
-<li><code>__mp_summary</code>: <a href="#Functions">Functions</a>
-<li><code>alloca</code>: <a href="#Functions">Functions</a>
-<li><code>bcmp</code>: <a href="#Functions">Functions</a>
-<li><code>bcopy</code>: <a href="#Functions">Functions</a>
-<li><code>bzero</code>: <a href="#Functions">Functions</a>
-<li><code>calloc</code>: <a href="#Functions">Functions</a>
-<li><code>cfree</code>: <a href="#Functions">Functions</a>
-<li><code>dealloca</code>: <a href="#Functions">Functions</a>
-<li><code>expand</code>: <a href="#Functions">Functions</a>
-<li><code>free</code>: <a href="#Functions">Functions</a>
-<li><code>malloc</code>: <a href="#Functions">Functions</a>
-<li><code>memalign</code>: <a href="#Functions">Functions</a>
-<li><code>memccpy</code>: <a href="#Functions">Functions</a>
-<li><code>memchr</code>: <a href="#Functions">Functions</a>
-<li><code>memcmp</code>: <a href="#Functions">Functions</a>
-<li><code>memcpy</code>: <a href="#Functions">Functions</a>
-<li><code>memmem</code>: <a href="#Functions">Functions</a>
-<li><code>memmove</code>: <a href="#Functions">Functions</a>
-<li><code>memset</code>: <a href="#Functions">Functions</a>
-<li><code>operator delete</code>: <a href="#Functions">Functions</a>
-<li><code>operator delete[]</code>: <a href="#Functions">Functions</a>
-<li><code>operator new</code>: <a href="#Functions">Functions</a>
-<li><code>operator new[]</code>: <a href="#Functions">Functions</a>
-<li><code>pvalloc</code>: <a href="#Functions">Functions</a>
-<li><code>realloc</code>: <a href="#Functions">Functions</a>
-<li><code>reallocf</code>: <a href="#Functions">Functions</a>
-<li><code>recalloc</code>: <a href="#Functions">Functions</a>
-<li><code>set_new_handler</code>: <a href="#Functions">Functions</a>
-<li><code>strdup</code>: <a href="#Functions">Functions</a>
-<li><code>strdupa</code>: <a href="#Functions">Functions</a>
-<li><code>strndup</code>: <a href="#Functions">Functions</a>
-<li><code>strndupa</code>: <a href="#Functions">Functions</a>
-<li><code>strnsave</code>: <a href="#Functions">Functions</a>
-<li><code>strsave</code>: <a href="#Functions">Functions</a>
-<li><code>valloc</code>: <a href="#Functions">Functions</a>
-<li><code>xcalloc</code>: <a href="#Functions">Functions</a>
-<li><code>xfree</code>: <a href="#Functions">Functions</a>
-<li><code>xmalloc</code>: <a href="#Functions">Functions</a>
-<li><code>xrealloc</code>: <a href="#Functions">Functions</a>
-<li><code>xstrdup</code>: <a href="#Functions">Functions</a>
+<li><code>__mp_check</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_edit</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_epilogue</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_info</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_list</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_logaddr</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_logmemory</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_logstack</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_memorymap</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_nomemory</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_printf</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_printinfo</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_prologue</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_summary</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_view</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>__mp_vprintf</code>: <a href="#Functions%205">Functions 5</a>
+<li><code>alloca</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>bcmp</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>bcopy</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>bzero</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>calloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>cfree</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>dealloca</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>expand</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>free</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>malloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>memalign</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>memccpy</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memchr</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memcmp</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memcpy</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memmem</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memmove</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>memset</code>: <a href="#Functions%204">Functions 4</a>
+<li><code>operator delete</code>: <a href="#Functions%203">Functions 3</a>
+<li><code>operator delete[]</code>: <a href="#Functions%203">Functions 3</a>
+<li><code>operator new</code>: <a href="#Functions%203">Functions 3</a>
+<li><code>operator new[]</code>: <a href="#Functions%203">Functions 3</a>
+<li><code>pvalloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>realloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>reallocf</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>recalloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>set_new_handler</code>: <a href="#Functions%203">Functions 3</a>
+<li><code>strdup</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>strdupa</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>strndup</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>strndupa</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>strnsave</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>strsave</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>valloc</code>: <a href="#Functions%201">Functions 1</a>
+<li><code>xcalloc</code>: <a href="#Functions%202">Functions 2</a>
+<li><code>xfree</code>: <a href="#Functions%202">Functions 2</a>
+<li><code>xmalloc</code>: <a href="#Functions%202">Functions 2</a>
+<li><code>xrealloc</code>: <a href="#Functions%202">Functions 2</a>
+<li><code>xstrdup</code>: <a href="#Functions%202">Functions 2</a>
 </ul>
 <p><hr>
 Node:<a name="Index">Index</a>,
@@ -11965,7 +12100,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>allocation boundaries: <a href="#Profiling">Profiling</a>
 <li>allocation byte: <a href="#General%20errors">General errors</a>
 <li>allocation index: <a href="#Example%201">Example 1</a>
-<li>allocation information: <a href="#Functions">Functions</a>
+<li>allocation information: <a href="#Functions%205">Functions 5</a>
 <li>allocation type: <a href="#Example%201">Example 1</a>
 <li>ALLOCBYTE: <a href="#Environment">Environment</a>
 <li>ALLOCSTOP: <a href="#Environment">Environment</a>
@@ -12211,7 +12346,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>improving performance: <a href="#Improving%20performance">Improving performance</a>
 <li>INCOMP: <a href="#Diagnostic%20messages">Diagnostic messages</a>
 <li>INFOPATH: <a href="#Documentation">Documentation</a>
-<li>information about an allocation: <a href="#Functions">Functions</a>
+<li>information about an allocation: <a href="#Functions%205">Functions 5</a>
 <li>inline functions: <a href="#Building">Building</a>
 <li>installation: <a href="#Installation">Installation</a>
 <li>instrumentation: <a href="#Related%20software">Related software</a>
@@ -12353,13 +12488,13 @@ Up:<a rel=up href="#Top">Top</a>
 <li>Motif: <a href="#Building">Building</a>
 <li>MP_ALIGN: <a href="#Building">Building</a>
 <li>MP_BUILTINSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
-<li>MP_DELETE: <a href="#Functions">Functions</a>
+<li>MP_DELETE: <a href="#Functions%203">Functions 3</a>
 <li>MP_INLINE: <a href="#Building">Building</a>
 <li>MP_LIBRARYSTACK_SUPPORT: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
-<li>MP_NEW: <a href="#Functions">Functions</a>
-<li>MP_NEW_NOTHROW: <a href="#Functions">Functions</a>
-<li>MP_NOCPLUSPLUS: <a href="#Functions">Functions</a>
-<li>MP_NONEWDELETE: <a href="#Functions">Functions</a>
+<li>MP_NEW: <a href="#Functions%203">Functions 3</a>
+<li>MP_NEW_NOTHROW: <a href="#Functions%203">Functions 3</a>
+<li>MP_NOCPLUSPLUS: <a href="#Functions%203">Functions 3</a>
+<li>MP_NONEWDELETE: <a href="#Functions%203">Functions 3</a>
 <li>MP_USE_ATEXIT: <a href="#Running">Running</a>
 <li>mpatrol: <a href="#Overview">Overview</a>
 <li>mpatrol command: <a href="#The%20mpatrol%20command">The mpatrol command</a>

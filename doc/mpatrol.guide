@@ -2398,6 +2398,25 @@ gives you the opportunity to use that handler to either free up any
 unneeded memory or simply to abort, thus removing the need to check for
 failed allocations.
 
+   If you wish to write your own diagnostics to the mpatrol log file
+from within your source code then you can do so with the @{b}__mp_printf()@{ub}
+and @{b}__mp_vprintf()@{ub} functions, which are the functional equivalents of
+@{b}printf()@{ub} and @{b}vprintf()@{ub}.  They prefix every line written to the log file
+with @{b}>@{ub}, partly for making it clear where user diagnostics occur and
+partly to avoid problems with external utilities that parse the mpatrol
+log file.  It is also possible to write out a memory dump in
+hexadecimal format, a stack trace at the current point in execution and
+details of a memory allocation to the log file in standard format using
+the @{b}__mp_logmemory()@{ub}, @{b}__mp_logstack()@{ub} and @{b}__mp_logaddr()@{ub} functions
+respectively.
+
+   You can also take advantage of the @{b}mpedit@{ub} command from within the
+mpatrol library with the @{b}__mp_edit()@{ub}, @{b}__mp_list()@{ub} and @{b}__mp_view()@{ub}
+functions.  The first invokes a text editor on a specified file and
+line number, while the second displays a context listing of a file at a
+given line number.  The third function performs either or neither
+depending on the setting of the @{b}EDIT@{ub} or @{b}LIST@{ub} options.
+
    Finally, there are three functions which affect the mpatrol library
 globally.  The first, @{b}__mp_check()@{ub}, allows you to force an internal
 check of the mpatrol library's data structures at any point during
@@ -6371,6 +6390,23 @@ mpatrol library functions will evaluate to empty statements.  It is
 intended that the @{b}NDEBUG@{ub} preprocessor macro be defined in release
 builds.
 
+
+ @{" Functions 1                " link "Functions 1"}  C dynamic memory allocation functions.
+ @{" Functions 2                " link "Functions 2"}  C dynamic memory extension functions.
+ @{" Functions 3                " link "Functions 3"}  C++ dynamic memory allocation functions.
+ @{" Functions 4                " link "Functions 4"}  C memory operation functions.
+ @{" Functions 5                " link "Functions 5"}  mpatrol library functions.
+
+
+@endnode
+
+@node "Functions 1" "mpatrol.guide/Functions 1"
+@next "Functions 2"
+@toc "Functions"
+
+C dynamic memory allocation functions
+=====================================
+
    The following 19 functions are available as replacements for
 existing C library functions.  To use these you must include @{b}mpatrol.h@{ub}
 before all other header files, although on UNIX and Windows platforms
@@ -6657,6 +6693,17 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      the allocating function returns.  This function is
      mpatrol-specific and should not be used in release code.
 
+
+@endnode
+
+@node "Functions 2" "mpatrol.guide/Functions 2"
+@next "Functions 3"
+@prev "Functions 1"
+@toc "Functions"
+
+C dynamic memory extension functions
+====================================
+
    The following 5 functions are available as replacements for existing
 C library extension functions that always abort and never return @{b}NULL@{ub}
 if there is insufficient memory to fulfil a request.  To use these you
@@ -6719,6 +6766,17 @@ anyway, albeit with slightly less tracing information.
      memory will be freed.  All of the previous contents will be
      destroyed.
 
+
+@endnode
+
+@node "Functions 3" "mpatrol.guide/Functions 3"
+@next "Functions 4"
+@prev "Functions 2"
+@toc "Functions"
+
+C++ dynamic memory allocation functions
+=======================================
+
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in @{b}mpatrol.h@{ub} will only be
 used if the @{b}MP_NOCPLUSPLUS@{ub} preprocessor macro is not defined.  The
@@ -6778,6 +6836,17 @@ information.
      the program and write an out of memory message to the log file.
      Note that this function is equivalent to @{b}__mp_nomemory()@{ub} and will
      replace the handler installed by that function.
+
+
+@endnode
+
+@node "Functions 4" "mpatrol.guide/Functions 4"
+@next "Functions 5"
+@prev "Functions 3"
+@toc "Functions"
+
+C memory operation functions
+============================
 
    The following 10 functions are available as replacements for
 existing C library memory operation functions.  To use these you must
@@ -6877,7 +6946,17 @@ anyway, albeit with slightly less tracing information.
      straddle that allocation's boundaries then an error message will
      be generated in the log file and no bytes will be searched.
 
-   The following 8 functions are available as support routines for
+
+@endnode
+
+@node "Functions 5" "mpatrol.guide/Functions 5"
+@prev "Functions 4"
+@toc "Functions"
+
+mpatrol library functions
+=========================
+
+   The following 16 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the @{b}mpatrol.h@{ub} header file.
 
@@ -6959,6 +7038,62 @@ you should include the @{b}mpatrol.h@{ub} header file.
      allocation functions, when they would normally return @{b}NULL@{ub}.  Note
      that this function is equivalent to @{b}set_new_handler()@{ub} and will
      replace the handler installed by that function.
+
+@{b}int __mp_printf(const char *fmt, ...)@{ub}
+     Writes format string FMT with variable arguments to the log file,
+     with each line prefixed by @{b}>@{ub}.  The final length of the string that
+     is written to the log file must not exceed 1024 characters.
+     Returns the number of characters written, or a negative number
+     upon error.
+
+@{b}int __mp_vprintf(const char *fmt, va_list args)@{ub}
+     Writes format string FMT with variable argument list ARGS to the
+     log file, with each line prefixed by @{b}>@{ub}.  The final length of the
+     string that is written to the log file must not exceed 1024
+     characters.  Returns the number of characters written, or a
+     negative number upon error.
+
+@{b}void __mp_logmemory(const void *ptr, size_t size)@{ub}
+     Displays the contents of a block of memory beginning at PTR,
+     dumping SIZE consecutive bytes to the log file in hexadecimal
+     format.
+
+@{b}int __mp_logstack(size_t frames)@{ub}
+     Displays the current call stack, skipping FRAMES stack frames from
+     the current stack frame before writing the symbolic stack trace to
+     the log file.  Returns @{b}1@{ub} if successful, or @{b}0@{ub} if the call stack
+     could not be determined or if FRAMES was too large for the current
+     call stack.
+
+@{b}int __mp_logaddr(const void *ptr)@{ub}
+     Displays information about a specific memory allocation containing
+     PTR to the log file.  If PTR does not belong to a previously
+     allocated memory allocation then @{b}0@{ub} will be returned, otherwise @{b}1@{ub}
+     will be returned.
+
+@{b}int __mp_edit(const char *file, unsigned long line)@{ub}
+     Invokes a text editor to edit FILE at line number LINE via the
+     @{b}mpedit@{ub} command.  Returns @{b}1@{ub} if the text editor was successfully
+     invoked, @{b}-1@{ub} if there was an error, or @{b}0@{ub} if there is no support for
+     this feature.  This function will only work on a system where the
+     @{b}EDIT@{ub} option works.
+
+@{b}int __mp_list(const char *file, unsigned long line)@{ub}
+     Displays a context listing of FILE at line number LINE via the
+     @{b}mpedit@{ub} command.  Returns @{b}1@{ub} if the listing was successfully
+     performed, @{b}-1@{ub} if there was an error, or @{b}0@{ub} if there is no support
+     for this feature.  This function will only work on a system where
+     the @{b}LIST@{ub} option works.
+
+@{b}int __mp_view(const char *file, unsigned long line)@{ub}
+     Either invokes a text editor to edit FILE at line number LINE or
+     displays a context listing of FILE at line number LINE depending
+     on the setting of the @{b}EDIT@{ub} and @{b}LIST@{ub} options.  This is done via the
+     @{b}mpedit@{ub} command and will have no effect if the @{b}EDIT@{ub} and @{b}LIST@{ub}
+     options are not set or if these options are not supported on the
+     system.  Returns @{b}1@{ub} if the edit or listing was successfully
+     performed, @{b}-1@{ub} if there was an error, or @{b}0@{ub} if neither of the
+     options were set or if there is no support for this feature.
 
 
 @endnode
@@ -12597,53 +12732,61 @@ Function index
 **************
 
 
- @{" __mp_check                               " link "Functions"}   Functions
- @{" __mp_epilogue                            " link "Functions"}   Functions
- @{" __mp_info                                " link "Functions"}   Functions
- @{" __mp_memorymap                           " link "Functions"}   Functions
- @{" __mp_nomemory                            " link "Functions"}   Functions
- @{" __mp_printinfo                           " link "Functions"}   Functions
- @{" __mp_prologue                            " link "Functions"}   Functions
- @{" __mp_summary                             " link "Functions"}   Functions
- @{" alloca                                   " link "Functions"}   Functions
- @{" bcmp                                     " link "Functions"}   Functions
- @{" bcopy                                    " link "Functions"}   Functions
- @{" bzero                                    " link "Functions"}   Functions
- @{" calloc                                   " link "Functions"}   Functions
- @{" cfree                                    " link "Functions"}   Functions
- @{" dealloca                                 " link "Functions"}   Functions
- @{" expand                                   " link "Functions"}   Functions
- @{" free                                     " link "Functions"}   Functions
- @{" malloc                                   " link "Functions"}   Functions
- @{" memalign                                 " link "Functions"}   Functions
- @{" memccpy                                  " link "Functions"}   Functions
- @{" memchr                                   " link "Functions"}   Functions
- @{" memcmp                                   " link "Functions"}   Functions
- @{" memcpy                                   " link "Functions"}   Functions
- @{" memmem                                   " link "Functions"}   Functions
- @{" memmove                                  " link "Functions"}   Functions
- @{" memset                                   " link "Functions"}   Functions
- @{" operator delete                          " link "Functions"}   Functions
- @{" operator delete[]                        " link "Functions"}   Functions
- @{" operator new                             " link "Functions"}   Functions
- @{" operator new[]                           " link "Functions"}   Functions
- @{" pvalloc                                  " link "Functions"}   Functions
- @{" realloc                                  " link "Functions"}   Functions
- @{" reallocf                                 " link "Functions"}   Functions
- @{" recalloc                                 " link "Functions"}   Functions
- @{" set_new_handler                          " link "Functions"}   Functions
- @{" strdup                                   " link "Functions"}   Functions
- @{" strdupa                                  " link "Functions"}   Functions
- @{" strndup                                  " link "Functions"}   Functions
- @{" strndupa                                 " link "Functions"}   Functions
- @{" strnsave                                 " link "Functions"}   Functions
- @{" strsave                                  " link "Functions"}   Functions
- @{" valloc                                   " link "Functions"}   Functions
- @{" xcalloc                                  " link "Functions"}   Functions
- @{" xfree                                    " link "Functions"}   Functions
- @{" xmalloc                                  " link "Functions"}   Functions
- @{" xrealloc                                 " link "Functions"}   Functions
- @{" xstrdup                                  " link "Functions"}   Functions
+ @{" __mp_check                               " link "Functions 5"}   Functions 5
+ @{" __mp_edit                                " link "Functions 5"}   Functions 5
+ @{" __mp_epilogue                            " link "Functions 5"}   Functions 5
+ @{" __mp_info                                " link "Functions 5"}   Functions 5
+ @{" __mp_list                                " link "Functions 5"}   Functions 5
+ @{" __mp_logaddr                             " link "Functions 5"}   Functions 5
+ @{" __mp_logmemory                           " link "Functions 5"}   Functions 5
+ @{" __mp_logstack                            " link "Functions 5"}   Functions 5
+ @{" __mp_memorymap                           " link "Functions 5"}   Functions 5
+ @{" __mp_nomemory                            " link "Functions 5"}   Functions 5
+ @{" __mp_printf                              " link "Functions 5"}   Functions 5
+ @{" __mp_printinfo                           " link "Functions 5"}   Functions 5
+ @{" __mp_prologue                            " link "Functions 5"}   Functions 5
+ @{" __mp_summary                             " link "Functions 5"}   Functions 5
+ @{" __mp_view                                " link "Functions 5"}   Functions 5
+ @{" __mp_vprintf                             " link "Functions 5"}   Functions 5
+ @{" alloca                                   " link "Functions 1"}   Functions 1
+ @{" bcmp                                     " link "Functions 4"}   Functions 4
+ @{" bcopy                                    " link "Functions 4"}   Functions 4
+ @{" bzero                                    " link "Functions 4"}   Functions 4
+ @{" calloc                                   " link "Functions 1"}   Functions 1
+ @{" cfree                                    " link "Functions 1"}   Functions 1
+ @{" dealloca                                 " link "Functions 1"}   Functions 1
+ @{" expand                                   " link "Functions 1"}   Functions 1
+ @{" free                                     " link "Functions 1"}   Functions 1
+ @{" malloc                                   " link "Functions 1"}   Functions 1
+ @{" memalign                                 " link "Functions 1"}   Functions 1
+ @{" memccpy                                  " link "Functions 4"}   Functions 4
+ @{" memchr                                   " link "Functions 4"}   Functions 4
+ @{" memcmp                                   " link "Functions 4"}   Functions 4
+ @{" memcpy                                   " link "Functions 4"}   Functions 4
+ @{" memmem                                   " link "Functions 4"}   Functions 4
+ @{" memmove                                  " link "Functions 4"}   Functions 4
+ @{" memset                                   " link "Functions 4"}   Functions 4
+ @{" operator delete                          " link "Functions 3"}   Functions 3
+ @{" operator delete[]                        " link "Functions 3"}   Functions 3
+ @{" operator new                             " link "Functions 3"}   Functions 3
+ @{" operator new[]                           " link "Functions 3"}   Functions 3
+ @{" pvalloc                                  " link "Functions 1"}   Functions 1
+ @{" realloc                                  " link "Functions 1"}   Functions 1
+ @{" reallocf                                 " link "Functions 1"}   Functions 1
+ @{" recalloc                                 " link "Functions 1"}   Functions 1
+ @{" set_new_handler                          " link "Functions 3"}   Functions 3
+ @{" strdup                                   " link "Functions 1"}   Functions 1
+ @{" strdupa                                  " link "Functions 1"}   Functions 1
+ @{" strndup                                  " link "Functions 1"}   Functions 1
+ @{" strndupa                                 " link "Functions 1"}   Functions 1
+ @{" strnsave                                 " link "Functions 1"}   Functions 1
+ @{" strsave                                  " link "Functions 1"}   Functions 1
+ @{" valloc                                   " link "Functions 1"}   Functions 1
+ @{" xcalloc                                  " link "Functions 2"}   Functions 2
+ @{" xfree                                    " link "Functions 2"}   Functions 2
+ @{" xmalloc                                  " link "Functions 2"}   Functions 2
+ @{" xrealloc                                 " link "Functions 2"}   Functions 2
+ @{" xstrdup                                  " link "Functions 2"}   Functions 2
 
 
 @endnode
@@ -12763,7 +12906,7 @@ Index
  @{" allocation boundaries                    " link "Profiling"}   Profiling
  @{" allocation byte                          " link "General errors"}   General errors
  @{" allocation index                         " link "Example 1"}   Example 1
- @{" allocation information                   " link "Functions"}   Functions
+ @{" allocation information                   " link "Functions 5"}   Functions 5
  @{" allocation type                          " link "Example 1"}   Example 1
  @{" ALLOCBYTE                                " link "Environment"}   Environment
  @{" ALLOCSTOP                                " link "Environment"}   Environment
@@ -13009,7 +13152,7 @@ Index
  @{" improving performance                    " link "Improving performance"}   Improving performance
  @{" INCOMP                                   " link "Diagnostic messages"}   Diagnostic messages
  @{" INFOPATH                                 " link "Documentation"}   Documentation
- @{" information about an allocation          " link "Functions"}   Functions
+ @{" information about an allocation          " link "Functions 5"}   Functions 5
  @{" inline functions                         " link "Building"}   Building
  @{" installation                             " link "Installation"}   Installation
  @{" instrumentation                          " link "Related software"}   Related software
@@ -13151,13 +13294,13 @@ Index
  @{" Motif                                    " link "Building"}   Building
  @{" MP_ALIGN                                 " link "Building"}   Building
  @{" MP_BUILTINSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
- @{" MP_DELETE                                " link "Functions"}   Functions
+ @{" MP_DELETE                                " link "Functions 3"}   Functions 3
  @{" MP_INLINE                                " link "Building"}   Building
  @{" MP_LIBRARYSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
- @{" MP_NEW                                   " link "Functions"}   Functions
- @{" MP_NEW_NOTHROW                           " link "Functions"}   Functions
- @{" MP_NOCPLUSPLUS                           " link "Functions"}   Functions
- @{" MP_NONEWDELETE                           " link "Functions"}   Functions
+ @{" MP_NEW                                   " link "Functions 3"}   Functions 3
+ @{" MP_NEW_NOTHROW                           " link "Functions 3"}   Functions 3
+ @{" MP_NOCPLUSPLUS                           " link "Functions 3"}   Functions 3
+ @{" MP_NONEWDELETE                           " link "Functions 3"}   Functions 3
  @{" MP_USE_ATEXIT                            " link "Running"}   Running
  @{" mpatrol                                  " link "Overview"}   Overview
  @{" mpatrol command                          " link "The mpatrol command"}   The mpatrol command

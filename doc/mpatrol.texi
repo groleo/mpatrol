@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.174 2001-02-12 19:12:21 graeme Exp $
+@c $Id: mpatrol.texi,v 1.175 2001-02-12 20:31:25 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2506,6 +2506,24 @@ will be called by the mpatrol library if it ever runs out of memory during the
 call to a memory allocation function.  This gives you the opportunity to use
 that handler to either free up any unneeded memory or simply to abort, thus
 removing the need to check for failed allocations.
+
+If you wish to write your own diagnostics to the mpatrol log file from within
+your source code then you can do so with the @code{__mp_printf()} and
+@code{__mp_vprintf()} functions, which are the functional equivalents of
+@code{printf()} and @code{vprintf()}.  They prefix every line written to the
+log file with @samp{>}, partly for making it clear where user diagnostics occur
+and partly to avoid problems with external utilities that parse the mpatrol log
+file.  It is also possible to write out a memory dump in hexadecimal format, a
+stack trace at the current point in execution and details of a memory allocation
+to the log file in standard format using the @code{__mp_logmemory()},
+@code{__mp_logstack()} and @code{__mp_logaddr()} functions respectively.
+
+You can also take advantage of the @command{mpedit} command from within the
+mpatrol library with the @code{__mp_edit()}, @code{__mp_list()} and
+@code{__mp_view()} functions.  The first invokes a text editor on a specified
+file and line number, while the second displays a context listing of a file at a
+given line number.  The third function performs either or neither depending on
+the setting of the @option{EDIT} or @option{LIST} options.
 
 Finally, there are three functions which affect the mpatrol library globally.
 The first, @code{__mp_check()}, allows you to force an internal check of the
@@ -6656,6 +6674,17 @@ no macro redefinition of functions will take place and all special mpatrol
 library functions will evaluate to empty statements.  It is intended that the
 @code{NDEBUG} preprocessor macro be defined in release builds.
 
+@menu
+* Functions 1::                 C dynamic memory allocation functions.
+* Functions 2::                 C dynamic memory extension functions.
+* Functions 3::                 C++ dynamic memory allocation functions.
+* Functions 4::                 C memory operation functions.
+* Functions 5::                 mpatrol library functions.
+@end menu
+
+@node Functions 1, Functions 2, , Functions
+@section C dynamic memory allocation functions
+
 The following 19 functions are available as replacements for existing C library
 functions.  To use these you must include @file{mpatrol.h} before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
@@ -6942,6 +6971,9 @@ memory allocations when the allocating function returns.  This function is
 mpatrol-specific and should not be used in release code.
 @end table
 
+@node Functions 2, Functions 3, Functions 1, Functions
+@section C dynamic memory extension functions
+
 The following 5 functions are available as replacements for existing C library
 extension functions that always abort and never return @samp{NULL} if there is
 insufficient memory to fulfil a request.  To use these you must include
@@ -7005,6 +7037,9 @@ Frees the memory allocation beginning at @var{ptr} so the memory can be reused
 by another call to allocate memory.  If @var{ptr} is @samp{NULL} then no memory
 will be freed.  All of the previous contents will be destroyed.
 @end table
+
+@node Functions 3, Functions 4, Functions 2, Functions
+@section C++ dynamic memory allocation functions
 
 @cindex MP_NOCPLUSPLUS
 @cindex MP_NONEWDELETE
@@ -7072,6 +7107,9 @@ terminate the program and write an out of memory message to the log file.  Note
 that this function is equivalent to @code{__mp_nomemory()} and will replace the
 handler installed by that function.
 @end table
+
+@node Functions 4, Functions 5, Functions 3, Functions
+@section C memory operation functions
 
 The following 10 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include @file{mpatrol.h}
@@ -7178,7 +7216,10 @@ allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 @end table
 
-The following 8 functions are available as support routines for additional
+@node Functions 5, , Functions 4, Functions
+@section mpatrol library functions
+
+The following 16 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
@@ -7296,6 +7337,65 @@ This will be called once by C memory allocation functions, and repeatedly by C++
 memory allocation functions, when they would normally return @samp{NULL}.  Note
 that this function is equivalent to @code{set_new_handler()} and will replace
 the handler installed by that function.
+
+@findex __mp_printf
+@item @code{int __mp_printf(const char *fmt, ...)}
+Writes format string @var{fmt} with variable arguments to the log file, with
+each line prefixed by @samp{>}.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  Returns the number of
+characters written, or a negative number upon error.
+
+@findex __mp_vprintf
+@item @code{int __mp_vprintf(const char *fmt, va_list args)}
+Writes format string @var{fmt} with variable argument list @var{args} to the log
+file, with each line prefixed by @samp{>}.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  Returns the number
+of characters written, or a negative number upon error.
+
+@findex __mp_logmemory
+@item @code{void __mp_logmemory(const void *ptr, size_t size)}
+Displays the contents of a block of memory beginning at @var{ptr}, dumping
+@var{size} consecutive bytes to the log file in hexadecimal format.
+
+@findex __mp_logstack
+@item @code{int __mp_logstack(size_t frames)}
+Displays the current call stack, skipping @var{frames} stack frames from the
+current stack frame before writing the symbolic stack trace to the log file.
+Returns @samp{1} if successful, or @samp{0} if the call stack could not be
+determined or if @var{frames} was too large for the current call stack.
+
+@findex __mp_logaddr
+@item @code{int __mp_logaddr(const void *ptr)}
+Displays information about a specific memory allocation containing @var{ptr} to
+the log file.  If @var{ptr} does not belong to a previously allocated memory
+allocation then @samp{0} will be returned, otherwise @samp{1} will be returned.
+
+@findex __mp_edit
+@item @code{int __mp_edit(const char *file, unsigned long line)}
+Invokes a text editor to edit @var{file} at line number @var{line} via the
+@command{mpedit} command.  Returns @samp{1} if the text editor was successfully
+invoked, @samp{-1} if there was an error, or @samp{0} if there is no support for
+this feature.  This function will only work on a system where the @option{EDIT}
+option works.
+
+@findex __mp_list
+@item @code{int __mp_list(const char *file, unsigned long line)}
+Displays a context listing of @var{file} at line number @var{line} via the
+@command{mpedit} command.  Returns @samp{1} if the listing was successfully
+performed, @samp{-1} if there was an error, or @samp{0} if there is no support
+for this feature.  This function will only work on a system where the
+@option{LIST} option works.
+
+@findex __mp_view
+@item @code{int __mp_view(const char *file, unsigned long line)}
+Either invokes a text editor to edit @var{file} at line number @var{line} or
+displays a context listing of @var{file} at line number @var{line} depending
+on the setting of the @option{EDIT} and @option{LIST} options.  This is done via
+the @command{mpedit} command and will have no effect if the @option{EDIT} and
+@option{LIST} options are not set or if these options are not supported on the
+system.  Returns @samp{1} if the edit or listing was successfully performed,
+@samp{-1} if there was an error, or @samp{0} if neither of the options were set
+or if there is no support for this feature.
 @end table
 
 @node Environment, Options, Functions, Top

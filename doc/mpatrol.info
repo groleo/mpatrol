@@ -2313,6 +2313,25 @@ gives you the opportunity to use that handler to either free up any
 unneeded memory or simply to abort, thus removing the need to check for
 failed allocations.
 
+   If you wish to write your own diagnostics to the mpatrol log file
+from within your source code then you can do so with the
+`__mp_printf()' and `__mp_vprintf()' functions, which are the
+functional equivalents of `printf()' and `vprintf()'.  They prefix
+every line written to the log file with `>', partly for making it clear
+where user diagnostics occur and partly to avoid problems with external
+utilities that parse the mpatrol log file.  It is also possible to
+write out a memory dump in hexadecimal format, a stack trace at the
+current point in execution and details of a memory allocation to the
+log file in standard format using the `__mp_logmemory()',
+`__mp_logstack()' and `__mp_logaddr()' functions respectively.
+
+   You can also take advantage of the `mpedit' command from within the
+mpatrol library with the `__mp_edit()', `__mp_list()' and `__mp_view()'
+functions.  The first invokes a text editor on a specified file and
+line number, while the second displays a context listing of a file at a
+given line number.  The third function performs either or neither
+depending on the setting of the `EDIT' or `LIST' options.
+
    Finally, there are three functions which affect the mpatrol library
 globally.  The first, `__mp_check()', allows you to force an internal
 check of the mpatrol library's data structures at any point during
@@ -6204,6 +6223,20 @@ special mpatrol library functions will evaluate to empty statements.
 It is intended that the `NDEBUG' preprocessor macro be defined in
 release builds.
 
+* Menu:
+
+* Functions 1::                 C dynamic memory allocation functions.
+* Functions 2::                 C dynamic memory extension functions.
+* Functions 3::                 C++ dynamic memory allocation functions.
+* Functions 4::                 C memory operation functions.
+* Functions 5::                 mpatrol library functions.
+
+
+File: mpatrol.info,  Node: Functions 1,  Next: Functions 2,  Up: Functions
+
+C dynamic memory allocation functions
+=====================================
+
    The following 19 functions are available as replacements for
 existing C library functions.  To use these you must include
 `mpatrol.h' before all other header files, although on UNIX and Windows
@@ -6496,6 +6529,12 @@ used.
      function is mpatrol-specific and should not be used in release
      code.
 
+
+File: mpatrol.info,  Node: Functions 2,  Next: Functions 3,  Prev: Functions 1,  Up: Functions
+
+C dynamic memory extension functions
+====================================
+
    The following 5 functions are available as replacements for existing
 C library extension functions that always abort and never return `NULL'
 if there is insufficient memory to fulfil a request.  To use these you
@@ -6558,6 +6597,12 @@ used anyway, albeit with slightly less tracing information.
      no memory will be freed.  All of the previous contents will be
      destroyed.
 
+
+File: mpatrol.info,  Node: Functions 3,  Next: Functions 4,  Prev: Functions 2,  Up: Functions
+
+C++ dynamic memory allocation functions
+=======================================
+
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
 used if the `MP_NOCPLUSPLUS' preprocessor macro is not defined.  The
@@ -6618,6 +6663,12 @@ slightly less tracing information.
      log file.  Note that this function is equivalent to
      `__mp_nomemory()' and will replace the handler installed by that
      function.
+
+
+File: mpatrol.info,  Node: Functions 4,  Next: Functions 5,  Prev: Functions 3,  Up: Functions
+
+C memory operation functions
+============================
 
    The following 10 functions are available as replacements for
 existing C library memory operation functions.  To use these you must
@@ -6717,7 +6768,13 @@ anyway, albeit with slightly less tracing information.
      straddle that allocation's boundaries then an error message will
      be generated in the log file and no bytes will be searched.
 
-   The following 8 functions are available as support routines for
+
+File: mpatrol.info,  Node: Functions 5,  Prev: Functions 4,  Up: Functions
+
+mpatrol library functions
+=========================
+
+   The following 16 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the `mpatrol.h' header file.
 
@@ -6799,6 +6856,63 @@ you should include the `mpatrol.h' header file.
      allocation functions, when they would normally return `NULL'.  Note
      that this function is equivalent to `set_new_handler()' and will
      replace the handler installed by that function.
+
+`int __mp_printf(const char *fmt, ...)'
+     Writes format string FMT with variable arguments to the log file,
+     with each line prefixed by `>'.  The final length of the string
+     that is written to the log file must not exceed 1024 characters.
+     Returns the number of characters written, or a negative number
+     upon error.
+
+`int __mp_vprintf(const char *fmt, va_list args)'
+     Writes format string FMT with variable argument list ARGS to the
+     log file, with each line prefixed by `>'.  The final length of the
+     string that is written to the log file must not exceed 1024
+     characters.  Returns the number of characters written, or a
+     negative number upon error.
+
+`void __mp_logmemory(const void *ptr, size_t size)'
+     Displays the contents of a block of memory beginning at PTR,
+     dumping SIZE consecutive bytes to the log file in hexadecimal
+     format.
+
+`int __mp_logstack(size_t frames)'
+     Displays the current call stack, skipping FRAMES stack frames from
+     the current stack frame before writing the symbolic stack trace to
+     the log file.  Returns `1' if successful, or `0' if the call stack
+     could not be determined or if FRAMES was too large for the current
+     call stack.
+
+`int __mp_logaddr(const void *ptr)'
+     Displays information about a specific memory allocation containing
+     PTR to the log file.  If PTR does not belong to a previously
+     allocated memory allocation then `0' will be returned, otherwise
+     `1' will be returned.
+
+`int __mp_edit(const char *file, unsigned long line)'
+     Invokes a text editor to edit FILE at line number LINE via the
+     `mpedit' command.  Returns `1' if the text editor was successfully
+     invoked, `-1' if there was an error, or `0' if there is no support
+     for this feature.  This function will only work on a system where
+     the `EDIT' option works.
+
+`int __mp_list(const char *file, unsigned long line)'
+     Displays a context listing of FILE at line number LINE via the
+     `mpedit' command.  Returns `1' if the listing was successfully
+     performed, `-1' if there was an error, or `0' if there is no
+     support for this feature.  This function will only work on a
+     system where the `LIST' option works.
+
+`int __mp_view(const char *file, unsigned long line)'
+     Either invokes a text editor to edit FILE at line number LINE or
+     displays a context listing of FILE at line number LINE depending
+     on the setting of the `EDIT' and `LIST' options.  This is done via
+     the `mpedit' command and will have no effect if the `EDIT' and
+     `LIST' options are not set or if these options are not supported
+     on the system.  Returns `1' if the edit or listing was
+     successfully performed, `-1' if there was an error, or `0' if
+     neither of the options were set or if there is no support for this
+     feature.
 
 
 File: mpatrol.info,  Node: Environment,  Next: Options,  Prev: Functions,  Up: Top
@@ -12318,53 +12432,61 @@ Function index
 
 * Menu:
 
-* __mp_check:                            Functions.
-* __mp_epilogue:                         Functions.
-* __mp_info:                             Functions.
-* __mp_memorymap:                        Functions.
-* __mp_nomemory:                         Functions.
-* __mp_printinfo:                        Functions.
-* __mp_prologue:                         Functions.
-* __mp_summary:                          Functions.
-* alloca:                                Functions.
-* bcmp:                                  Functions.
-* bcopy:                                 Functions.
-* bzero:                                 Functions.
-* calloc:                                Functions.
-* cfree:                                 Functions.
-* dealloca:                              Functions.
-* expand:                                Functions.
-* free:                                  Functions.
-* malloc:                                Functions.
-* memalign:                              Functions.
-* memccpy:                               Functions.
-* memchr:                                Functions.
-* memcmp:                                Functions.
-* memcpy:                                Functions.
-* memmem:                                Functions.
-* memmove:                               Functions.
-* memset:                                Functions.
-* operator delete:                       Functions.
-* operator delete[]:                     Functions.
-* operator new:                          Functions.
-* operator new[]:                        Functions.
-* pvalloc:                               Functions.
-* realloc:                               Functions.
-* reallocf:                              Functions.
-* recalloc:                              Functions.
-* set_new_handler:                       Functions.
-* strdup:                                Functions.
-* strdupa:                               Functions.
-* strndup:                               Functions.
-* strndupa:                              Functions.
-* strnsave:                              Functions.
-* strsave:                               Functions.
-* valloc:                                Functions.
-* xcalloc:                               Functions.
-* xfree:                                 Functions.
-* xmalloc:                               Functions.
-* xrealloc:                              Functions.
-* xstrdup:                               Functions.
+* __mp_check:                            Functions 5.
+* __mp_edit:                             Functions 5.
+* __mp_epilogue:                         Functions 5.
+* __mp_info:                             Functions 5.
+* __mp_list:                             Functions 5.
+* __mp_logaddr:                          Functions 5.
+* __mp_logmemory:                        Functions 5.
+* __mp_logstack:                         Functions 5.
+* __mp_memorymap:                        Functions 5.
+* __mp_nomemory:                         Functions 5.
+* __mp_printf:                           Functions 5.
+* __mp_printinfo:                        Functions 5.
+* __mp_prologue:                         Functions 5.
+* __mp_summary:                          Functions 5.
+* __mp_view:                             Functions 5.
+* __mp_vprintf:                          Functions 5.
+* alloca:                                Functions 1.
+* bcmp:                                  Functions 4.
+* bcopy:                                 Functions 4.
+* bzero:                                 Functions 4.
+* calloc:                                Functions 1.
+* cfree:                                 Functions 1.
+* dealloca:                              Functions 1.
+* expand:                                Functions 1.
+* free:                                  Functions 1.
+* malloc:                                Functions 1.
+* memalign:                              Functions 1.
+* memccpy:                               Functions 4.
+* memchr:                                Functions 4.
+* memcmp:                                Functions 4.
+* memcpy:                                Functions 4.
+* memmem:                                Functions 4.
+* memmove:                               Functions 4.
+* memset:                                Functions 4.
+* operator delete:                       Functions 3.
+* operator delete[]:                     Functions 3.
+* operator new:                          Functions 3.
+* operator new[]:                        Functions 3.
+* pvalloc:                               Functions 1.
+* realloc:                               Functions 1.
+* reallocf:                              Functions 1.
+* recalloc:                              Functions 1.
+* set_new_handler:                       Functions 3.
+* strdup:                                Functions 1.
+* strdupa:                               Functions 1.
+* strndup:                               Functions 1.
+* strndupa:                              Functions 1.
+* strnsave:                              Functions 1.
+* strsave:                               Functions 1.
+* valloc:                                Functions 1.
+* xcalloc:                               Functions 2.
+* xfree:                                 Functions 2.
+* xmalloc:                               Functions 2.
+* xrealloc:                              Functions 2.
+* xstrdup:                               Functions 2.
 
 
 File: mpatrol.info,  Node: Index,  Prev: Function index,  Up: Top
@@ -12479,7 +12601,7 @@ Index
 * allocation boundaries:                 Profiling.
 * allocation byte:                       General errors.
 * allocation index:                      Example 1.
-* allocation information:                Functions.
+* allocation information:                Functions 5.
 * allocation type:                       Example 1.
 * ALLOCBYTE:                             Environment.
 * ALLOCSTOP:                             Environment.
@@ -12725,7 +12847,7 @@ Index
 * improving performance:                 Improving performance.
 * INCOMP:                                Diagnostic messages.
 * INFOPATH:                              Documentation.
-* information about an allocation:       Functions.
+* information about an allocation:       Functions 5.
 * inline functions:                      Building.
 * installation:                          Installation.
 * instrumentation:                       Related software.
@@ -12867,13 +12989,13 @@ Index
 * Motif:                                 Building.
 * MP_ALIGN:                              Building.
 * MP_BUILTINSTACK_SUPPORT:               Call stacks and symbol tables.
-* MP_DELETE:                             Functions.
+* MP_DELETE:                             Functions 3.
 * MP_INLINE:                             Building.
 * MP_LIBRARYSTACK_SUPPORT:               Call stacks and symbol tables.
-* MP_NEW:                                Functions.
-* MP_NEW_NOTHROW:                        Functions.
-* MP_NOCPLUSPLUS:                        Functions.
-* MP_NONEWDELETE:                        Functions.
+* MP_NEW:                                Functions 3.
+* MP_NEW_NOTHROW:                        Functions 3.
+* MP_NOCPLUSPLUS:                        Functions 3.
+* MP_NONEWDELETE:                        Functions 3.
 * MP_USE_ATEXIT:                         Running.
 * mpatrol:                               Overview.
 * mpatrol command:                       The mpatrol command.
@@ -13206,77 +13328,82 @@ Node: Testing106873
 Ref: Testing-Footnote-1109610
 Ref: Testing-Footnote-2109791
 Node: Library functions109850
-Node: Utilities116731
-Node: The mpatrol command117701
-Ref: The mpatrol command-Footnote-1124395
-Ref: The mpatrol command-Footnote-2124529
-Node: The mleak command124609
-Node: The mpsym command126573
-Node: The mpedit command129141
-Node: The hexwords command132537
-Node: Profiling135778
-Ref: Profiling-Footnote-1163670
-Ref: Profiling-Footnote-2163894
-Node: Tracing163998
-Ref: Tracing-Footnote-1181188
-Ref: Tracing-Footnote-2181222
-Ref: Tracing-Footnote-3181344
-Node: Improving performance181450
-Ref: Improving performance-Footnote-1190350
-Ref: Improving performance-Footnote-2190392
-Ref: Improving performance-Footnote-3190469
-Ref: Improving performance-Footnote-4190541
-Node: How it works190585
-Node: Examples197778
-Node: Example 1201677
-Ref: Example 1-Footnote-1225801
-Node: Example 2225991
-Node: Example 3231391
-Node: Example 4238248
-Node: Example 5241753
-Node: Example 6244221
-Ref: Example 6-Footnote-1248021
-Node: Example 7248150
-Node: Example 8250008
-Node: Example 9260244
-Node: Tutorial276115
-Ref: Tutorial-Footnote-1290646
-Ref: Tutorial-Footnote-2290937
-Ref: Tutorial-Footnote-3291086
-Ref: Tutorial-Footnote-4291223
-Ref: Tutorial-Footnote-5291322
-Node: Functions291603
-Node: Environment326822
-Node: Options347590
-Node: Diagnostic messages358977
-Node: Library performance375602
-Node: File formats378095
-Ref: File formats-Footnote-1378519
-Node: Profiling file format378731
-Node: Tracing file format381993
-Node: Supported systems383860
-Node: New system support399293
-Node: New processor support400489
-Node: New file format support401172
-Node: Notes401956
-Node: Generic notes403568
-Ref: Generic notes-Footnote-1419634
-Ref: Generic notes-Footnote-2419852
-Node: UNIX notes420074
-Node: Amiga notes424671
-Node: Windows notes428335
-Node: Netware notes429894
-Node: Frequently asked questions432454
-Node: Documentation433077
-Node: Building437907
-Node: Linking446618
-Node: Running451839
-Node: Files466947
-Node: Related software469943
-Ref: Related software-Footnote-1508953
-Node: References509194
-Node: Copying511787
-Node: Function index539676
-Node: Index542246
+Node: Utilities117864
+Node: The mpatrol command118834
+Ref: The mpatrol command-Footnote-1125528
+Ref: The mpatrol command-Footnote-2125662
+Node: The mleak command125742
+Node: The mpsym command127706
+Node: The mpedit command130274
+Node: The hexwords command133670
+Node: Profiling136911
+Ref: Profiling-Footnote-1164803
+Ref: Profiling-Footnote-2165027
+Node: Tracing165131
+Ref: Tracing-Footnote-1182321
+Ref: Tracing-Footnote-2182355
+Ref: Tracing-Footnote-3182477
+Node: Improving performance182583
+Ref: Improving performance-Footnote-1191483
+Ref: Improving performance-Footnote-2191525
+Ref: Improving performance-Footnote-3191602
+Ref: Improving performance-Footnote-4191674
+Node: How it works191718
+Node: Examples198911
+Node: Example 1202810
+Ref: Example 1-Footnote-1226934
+Node: Example 2227124
+Node: Example 3232524
+Node: Example 4239381
+Node: Example 5242886
+Node: Example 6245354
+Ref: Example 6-Footnote-1249154
+Node: Example 7249283
+Node: Example 8251141
+Node: Example 9261377
+Node: Tutorial277248
+Ref: Tutorial-Footnote-1291779
+Ref: Tutorial-Footnote-2292070
+Ref: Tutorial-Footnote-3292219
+Ref: Tutorial-Footnote-4292356
+Ref: Tutorial-Footnote-5292455
+Node: Functions292736
+Node: Functions 1294093
+Node: Functions 2311695
+Node: Functions 3315468
+Node: Functions 4319053
+Node: Functions 5324906
+Node: Environment331952
+Node: Options352720
+Node: Diagnostic messages364107
+Node: Library performance380732
+Node: File formats383225
+Ref: File formats-Footnote-1383649
+Node: Profiling file format383861
+Node: Tracing file format387123
+Node: Supported systems388990
+Node: New system support404423
+Node: New processor support405619
+Node: New file format support406302
+Node: Notes407086
+Node: Generic notes408698
+Ref: Generic notes-Footnote-1424764
+Ref: Generic notes-Footnote-2424982
+Node: UNIX notes425204
+Node: Amiga notes429801
+Node: Windows notes433465
+Node: Netware notes435024
+Node: Frequently asked questions437584
+Node: Documentation438207
+Node: Building443037
+Node: Linking451748
+Node: Running456969
+Node: Files472077
+Node: Related software475073
+Ref: Related software-Footnote-1514083
+Node: References514324
+Node: Copying516917
+Node: Function index544806
+Node: Index547902
 
 End Tag Table
