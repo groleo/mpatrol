@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.114 2001-03-06 01:07:17 graeme Exp $
+ * $Id: mpatrol.h,v 1.115 2001-03-06 19:47:56 graeme Exp $
  */
 
 
@@ -251,6 +251,19 @@
 #define MP_FLG_USEDEBUG      0x01000000
 #define MP_FLG_EDIT          0x02000000
 #define MP_FLG_LIST          0x04000000
+
+
+/* The various options and flags that can be passed to __mp_leaktable().
+ * Only one of the options must be passed as its second parameter and any
+ * combination of the flags can be passed as its third parameter.
+ */
+
+#define MP_LT_ALLOCATED 1
+#define MP_LT_FREED     2
+#define MP_LT_UNFREED   3
+
+#define MP_LT_COUNTS    1
+#define MP_LT_BOTTOM    2
 
 
 #ifndef MP_MPALLOC_H
@@ -748,8 +761,8 @@ size_t __mp_iterateall(int (*)(MP_CONST void *, void *), void *);
 int __mp_addallocentry(MP_CONST char *, unsigned long, size_t);
 int __mp_addfreeentry(MP_CONST char *, unsigned long, size_t);
 void __mp_clearleaktable(void);
-void __mp_startleaktable(void);
-void __mp_stopleaktable(void);
+int __mp_startleaktable(void);
+int __mp_stopleaktable(void);
 void __mp_leaktable(size_t, int, unsigned char);
 void __mp_memorymap(int);
 void __mp_summary(void);
@@ -833,8 +846,8 @@ __mp_locprintf(MP_CONST char *m, ...)
 #define __mp_addallocentry(f, l, c) ((int) 0)
 #define __mp_addfreeentry(f, l, c) ((int) 0)
 #define __mp_clearleaktable() ((void) 0)
-#define __mp_startleaktable() ((void) 0)
-#define __mp_stopleaktable() ((void) 0)
+#define __mp_startleaktable() ((int) 0)
+#define __mp_stopleaktable() ((int) 0)
 #define __mp_leaktable(l, o, f) ((void) 0)
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)

@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.111 2001-03-06 01:07:17 graeme Exp $"
+#ident "$Id: inter.c,v 1.112 2001-03-06 19:47:55 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.111 2001-03-06 01:07:17 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.112 2001-03-06 19:47:55 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1867,28 +1867,36 @@ __mp_clearleaktable(void)
 /* Start recording memory allocation events in the leak table.
  */
 
-void
+int
 __mp_startleaktable(void)
 {
+    int r;
+
     savesignals();
     if (!memhead.init)
         __mp_init();
+    r = memhead.ltable.tracing;
     memhead.ltable.tracing = 1;
     restoresignals();
+    return r;
 }
 
 
 /* Stop recording memory allocation events in the leak table.
  */
 
-void
+int
 __mp_stopleaktable(void)
 {
+    int r;
+
     savesignals();
     if (!memhead.init)
         __mp_init();
+    r = memhead.ltable.tracing;
     memhead.ltable.tracing = 0;
     restoresignals();
+    return r;
 }
 
 
