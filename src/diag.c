@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.12 2000-03-13 21:56:56 graeme Exp $"
+#ident "$Id: diag.c,v 1.13 2000-04-03 18:36:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -637,6 +637,8 @@ MP_GLOBAL void __mp_printversion(void)
               "under certain\n");
     __mp_diag("conditions; see the GNU Library General Public License for "
               "details.\n\n");
+    __mp_diag("For the latest mpatrol release and documentation,\n");
+    __mp_diag("visit %s.\n\n", __mp_homepage);
 }
 
 
