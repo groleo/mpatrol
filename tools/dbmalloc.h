@@ -31,12 +31,55 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.1 2001-02-26 23:40:22 graeme Exp $
+ * $Id: dbmalloc.h,v 1.2 2001-02-27 00:40:46 graeme Exp $
  */
 
 
 /*
+ * This file provides Dbmalloc-compatible functions which are built on top
+ * of the mpatrol library.  They are compatible with the last known public
+ * release of Dbmalloc (patch level 14), but only the Dbmalloc-specific
+ * functions are defined here, leaving the overriding of standard functions
+ * up to the mpatrol library.  As the mpatrol library does not currrently
+ * override the C library string functions and the X toolkit heap allocation
+ * functions, neither does this file.
  *
+ * The dbmallopt() function does not support the setting of all of the
+ * Dbmalloc options.  In fact, most of them do not make sense when applied
+ * to the mpatrol library.  Some of them have slightly changed behaviour
+ * due to the mapping process.  Note that reading the options from their
+ * respective environment variables at start up is not yet implemented.
+ *
+ * The malloc_dump() function does not support the full recognition of the
+ * MALLOC_DETAIL option in that it does not display the additional columns
+ * and summary that the Dbmalloc library does.  This is because this would
+ * make no sense when applied to the mpatrol library, but it does still
+ * affect whether freed allocations are shown in the listing (although the
+ * details for such allocations are slightly different, and there are no
+ * entries displayed for free memory blocks).
+ *
+ * The output for the malloc_dump() and malloc_list() functions is almost
+ * identical to that of the Dbmalloc library except for a slight change in
+ * the pointer format when displaying the address of each memory allocation.
+ * The stack information is obtained differently as well, since the mpatrol
+ * library records symbolic stack tracebacks for each memory allocation.
+ * As a result, malloc_enter() and malloc_leave() do nothing and the return
+ * address in a stack frame is displayed if no associated symbol name, file
+ * and line number could be determined.  Parentheses are not printed at the
+ * end of symbol names so that they can be processed properly by a C++
+ * demangler if necessary.  Passing a file descriptor of 0 to malloc_dump()
+ * or malloc_list() results in the output being sent to the mpatrol log
+ * file.
+ *
+ * The malloc_inuse() function does not deduct any memory used by marked
+ * allocations, contrary to the behaviour of the Dbmalloc library.  In
+ * addition, the malloc_size() and malloc_mark() functions do not give an
+ * error message if the pointer passed in does not correspond to a heap
+ * allocation.  Neither of these three functions automatically perform an
+ * integrity check of the heap.  Note that the malloc_chain_check()
+ * function will never return a non-zero value - it always terminates with
+ * an error message in the mpatrol log file whenever it detects heap
+ * corruption.  As a result, the malloc_abort() function is not used.
  */
 
 
