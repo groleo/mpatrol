@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.29 2000-05-08 20:58:27 graeme Exp $"
+#ident "$Id: inter.c,v 1.30 2000-05-11 19:41:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -772,7 +772,8 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         if (m = __mp_memcompare(p, q, l))
         {
             l = (char *) m - (char *) p;
-            return (int) ((char *) p)[l] - (int) ((char *) q)[l];
+            return (int) ((unsigned char *) p)[l] -
+                   (int) ((unsigned char *) q)[l];
         }
         else
             return 0;
