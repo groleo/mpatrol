@@ -37,10 +37,11 @@ EXPORTS
 	__mp_setmem	@7
 	__mp_copymem	@8
 	__mp_comparemem	@9
-	__mp_info	@10
-	__mp_memorymap	@11
-	__mp_summary	@12
-	__mp_check	@13
-	__mp_prologue	@14
-	__mp_epilogue	@15
-	__mp_nomemory	@16
+	__mp_locatemem	@10
+	__mp_info	@11
+	__mp_memorymap	@12
+	__mp_summary	@13
+	__mp_check	@14
+	__mp_prologue	@15
+	__mp_epilogue	@16
+	__mp_nomemory	@17
