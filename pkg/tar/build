@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.28 2000-10-31 23:05:51 graeme Exp $
+# $Id: build,v 1.29 2000-11-01 00:24:06 graeme Exp $
 
 
 version=1.3.0
@@ -104,10 +104,12 @@ mkdir -p mpatrol/man/cat1
 cp ../../man/cat1/mpatrol.1 mpatrol/man/cat1
 cp ../../man/cat1/mprof.1 mpatrol/man/cat1
 cp ../../man/cat1/mleak.1 mpatrol/man/cat1
+cp ../../man/cat1/mpsym.1 mpatrol/man/cat1
 mkdir -p mpatrol/man/man1
 cp ../../man/man1/mpatrol.1 mpatrol/man/man1
 cp ../../man/man1/mprof.1 mpatrol/man/man1
 cp ../../man/man1/mleak.1 mpatrol/man/man1
+cp ../../man/man1/mpsym.1 mpatrol/man/man1
 mkdir -p mpatrol/man/cat3
 cp ../../man/cat3/mpatrol.3 mpatrol/man/cat3
 mkdir -p mpatrol/man/man3

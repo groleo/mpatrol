@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.34 2000-10-31 23:05:49 graeme Exp $
+# $Id: build,v 1.35 2000-11-01 00:24:04 graeme Exp $
 
 
 version=1.3.0
@@ -107,6 +107,7 @@ mkdir -p man/man1
 cp ../../man/man1/mpatrol.1 man/man1
 cp ../../man/man1/mprof.1 man/man1
 cp ../../man/man1/mleak.1 man/man1
+cp ../../man/man1/mpsym.1 man/man1
 mkdir -p man/man3
 cp ../../man/man3/mpatrol.3 man/man3
 
