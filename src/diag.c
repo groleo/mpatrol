@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.45 2000-11-30 20:49:13 graeme Exp $"
+#ident "$Id: diag.c,v 1.46 2000-11-30 21:09:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1172,6 +1172,11 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
         __mp_diag("<unset>");
     else
         __mp_diag("%s", h->prof.file);
+    __mp_diag("\ntracing file:      ");
+    if (h->trace.file == NULL)
+        __mp_diag("<unset>");
+    else
+        __mp_diag("%s", h->trace.file);
     __mp_diag("\nprogram filename:  ");
     if (h->alloc.heap.memory.prog == NULL)
         __mp_diag("<not found>");
