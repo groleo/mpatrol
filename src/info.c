@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.73 2001-03-04 13:14:51 graeme Exp $"
+#ident "$Id: info.c,v 1.74 2001-03-04 13:27:00 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.73 2001-03-04 13:14:51 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.74 2001-03-04 13:27:00 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -282,8 +282,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
             __mp_logalloc(h, l, a, f, v);
             o = 1;
         }
-        __mp_warn(ET_ALLZER, f, v->file, v->line, "attempt to create an "
-                  "allocation of size 0");
+        __mp_warn(ET_ALLZER, f, v->file, v->line, NULL);
         __mp_diag("\n");
     }
     if (f == AT_MEMALIGN)
@@ -310,8 +309,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, v);
-                __mp_warn(ET_BADALN, f, v->file, v->line, "alignment %lu is "
-                          "not a power of two", a);
+                __mp_warn(ET_BADALN, f, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
             a = __mp_poweroftwo(a);
@@ -1078,8 +1076,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(ET_FRECOR, AT_MAX, v->file, v->line,
-                           "free memory corruption at " MP_POINTER, p);
+                __mp_error(ET_FRECOR, AT_MAX, v->file, v->line, NULL, p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -1099,9 +1096,8 @@ __mp_checkinfo(infohead *h, loginfo *v)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(ET_FRDCOR, AT_MAX, v->file, v->line, "freed "
-                           "allocation " MP_POINTER " has memory corruption at "
-                           MP_POINTER, n->block, p);
+                __mp_error(ET_FRDCOR, AT_MAX, v->file, v->line, NULL, n->block,
+                           p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -1214,8 +1210,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f, loginfo *v)
         }
         else if (m->data.flags & FLG_FREED)
         {
-            __mp_error(ET_FRDOPN, f, v->file, v->line, "attempt to perform "
-                       "operation on freed memory");
+            __mp_error(ET_FRDOPN, f, v->file, v->line, NULL);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = 0;
@@ -1327,8 +1322,7 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
     }
     else if (m->data.flags & FLG_FREED)
     {
-        __mp_error(ET_FRDOPN, f, v->file, v->line, "attempt to perform "
-                   "operation on freed memory");
+        __mp_error(ET_FRDOPN, f, v->file, v->line, NULL);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         return 0;
