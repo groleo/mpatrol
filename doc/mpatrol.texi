@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.50 2000-04-04 17:40:39 graeme Exp $
+@c $Id: mpatrol.texi,v 1.51 2000-04-05 21:26:04 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.8
 @set VERSION 1.1.4
-@set UPDATED 4th April, 2000
+@set UPDATED 5th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -586,7 +586,7 @@ using @command{gcc}), since the library automatically redefines the default
 system memory allocation functions.
 
 @item
-A shell script is supplied for UNIX platforms to run a program that was linked
+A command is supplied for UNIX platforms to run a program that was linked
 with the mpatrol library with any specified options on the command line.  On
 some UNIX platforms, an option also exists to override the default memory
 allocation routines for any dynamically-linked program that was not previously
@@ -680,14 +680,11 @@ copying them.
 
 @item
 Copy the memory leak program that has been built into your local bin directory.
+On UNIX platforms, copy the mpatrol program to the same directory as well.
 
 @item
 Go up two directory levels into the @file{src} directory and copy the
 @file{mpatrol.h} header file into your local include directory.
-
-@item
-On UNIX platforms, go up one directory level into the @file{bin} directory and
-copy the @file{mpatrol} shell script into your local bin directory.
 
 @cindex manual pages
 @item
@@ -745,9 +742,9 @@ DG/UX 4.20MU07 or later platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
-use the @option{-d} option to the @file{mpatrol} shell script to override
-the default definitions of @code{malloc()}, etc. at run-time without having to
-relink your program.
+use the @option{-d} option to the @file{mpatrol} command to override the default
+definitions of @code{malloc()}, etc. at run-time without having to relink your
+program.
 
 For example, if your program's executable file is called @file{testprog} and it
 accepts an option specifying an input file, you can force the system's dynamic
@@ -760,8 +757,8 @@ mpatrol -d ./testprog -i file
 
 The resulting log file should be called @file{mpatrol.<procid>.log} by default
 (where @var{procid} is the current process id), but if no such file exists after
-running the @file{mpatrol} shell script then it will not be possible to force
-the run-time linking of mpatrol functions to your program and you will have to
+running the @file{mpatrol} command then it will not be possible to force the
+run-time linking of mpatrol functions to your program and you will have to
 proceed to the next step.
 
 @item
@@ -2086,12 +2083,11 @@ end of program execution.
 @section Utilities
 @cindex utilities
 
-On UNIX platforms, a shell script is provided which can run programs that have
-been linked with the mpatrol library using a combination of mpatrol options
-that can be set via the command line.  All of these options but one map directly
-onto their equivalent environment variable settings and exist mainly so that the
-user does not have to manually change the @env{MPATROL_OPTIONS} environment
-variable.
+On UNIX platforms, a command is provided which can run programs that have been
+linked with the mpatrol library using a combination of mpatrol options that can
+be set via the command line.  All of these options but one map directly onto
+their equivalent environment variable settings and exist mainly so that the user
+does not have to manually change the @env{MPATROL_OPTIONS} environment variable.
 
 The one option that is the exception to this is the @option{-d} option, which
 can be used to run a program under the control of the mpatrol library, even if
@@ -2117,7 +2113,7 @@ allocations of programs that you don't have the source for, but in theory it
 could be quite useful if you need to debug a previously released executable and
 are unable to recompile or relink it.
 
-Note that the @command{mpatrol} shell script must be set up to use the correct
+Note that the @command{mpatrol} command must be set up to use the correct
 object file format access libraries that are required for your system if you
 wish to use the @option{-d} option.  If the mpatrol library was built with
 @code{FORMAT=FORMAT_ELF32} support then it must be told to preload the ELF
@@ -2150,7 +2146,9 @@ unfreed allocations may not be entirely accurate.
 The @command{memleak} command takes one optional argument which must be a valid
 mpatrol log filename but if it is omitted then it will use @file{mpatrol.log} as
 the name of the log file to use.  The @command{memleak} command makes two passes
-over the log file so the file must be randomly-accessable.
+over the log file so the file must be randomly-accessable.  If the filename
+argument is given as @samp{-} then the standard input file stream will be used
+as the log file.
 
 @node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
@@ -3734,8 +3732,8 @@ However, for the purposes of this tutorial, we'll pretend that we've just been
 handed the source code for this program and have not worked on it before.  So
 let's now try to compile and link it with the mpatrol library@footnote{On UNIX
 systems with dynamic linking it might also be possible to run the program under
-the mpatrol shell script with its @option{-d} option without having to recompile
-or relink, but compiling and linking with the mpatrol library is a more generic
+the mpatrol command with its @option{-d} option without having to recompile or
+relink, but compiling and linking with the mpatrol library is a more generic
 solution across different platforms.}.
 
 First, add the inclusion of @file{mpatrol.h} to line 34 so that we can replace
@@ -4806,9 +4804,8 @@ systems that do not support the @code{mmap()} system call.
 @cindex options
 @cindex command line options
 @cindex mpatrol command
-@cindex shell script
 
-On UNIX platforms, a shell script called @command{mpatrol} is provided to run
+On UNIX platforms, a program called @command{mpatrol} is provided to run
 commands that have been linked with the mpatrol library.
 
 @smallexample
@@ -4828,8 +4825,8 @@ this can be changed using the @option{-l} option.  Any existing
 @env{MPATROL_OPTIONS} environment variable settings which are not overridden by
 @var{options} will be passed through unchanged to the mpatrol library.
 
-All of the following options (except @option{-d}) correspond to their listed
-mpatrol library option (@pxref{Environment}).
+All of the following options (except @option{-d} and @option{-V}) correspond to
+their listed mpatrol library option (@pxref{Environment}).
 
 @table @asis
 @cindex -A
@@ -4959,6 +4956,10 @@ program execution.
 @item @option{-U} <@var{unsigned-integer}>
 [@option{UNFREEDABORT}]  Specifies the minimum number of unfreed allocations at
 which to abort the program just before program termination.
+
+@cindex -V
+@item @option{-V}
+Displays the version number of the @command{mpatrol} command.
 
 @cindex -v
 @item @option{-v}
@@ -5104,8 +5105,8 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-The @option{-d} option to the @command{mpatrol} shell script does not work
-unless @file{libelf.so} is available.
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libelf.so} is available.
 @end itemize
 
 @item
@@ -5118,7 +5119,7 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-The @option{-d} option to the @command{mpatrol} shell script has no effect.
+The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex DG/UX, Motorola 88xx0
@@ -5136,7 +5137,7 @@ Cannot automatically determine the program filename.
 @item
 Call stack traversal only works with unoptimised code.
 @item
-The @option{-d} option to the @command{mpatrol} shell script has no effect.
+The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex DYNIX/ptx, Intel 80x86
@@ -5150,7 +5151,7 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-The @option{-d} option to the @command{mpatrol} shell script has no effect.
+The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex HP/UX, HP PA/RISC
@@ -5168,7 +5169,7 @@ Cannot automatically determine the program filename.
 @item
 No support for call stack traversal.
 @item
-The @option{-d} option to the @command{mpatrol} shell script has no effect.
+The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex RedHat
@@ -5183,8 +5184,8 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The address of an illegal memory access cannot be determined.
 @item
-The @option{-d} option to the @command{mpatrol} shell script does not work
-unless @file{libiberty.so} is available.
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libiberty.so} is available.
 @end itemize
 
 @cindex Linux, Motorola 680x0
@@ -5198,8 +5199,8 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The address of an illegal memory access cannot be determined.
 @item
-The @option{-d} option to the @command{mpatrol} shell script does not work
-unless @file{libiberty.so} is available.
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libiberty.so} is available.
 @end itemize
 
 @item
@@ -5214,8 +5215,8 @@ The @option{USEDEBUG} option has no effect.
 @item
 The address of an illegal memory access cannot be determined.
 @item
-The @option{-d} option to the @command{mpatrol} shell script does not work
-unless @file{libelf.so} is available.
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libelf.so} is available.
 @end itemize
 
 @cindex LynxOS, PowerPC
@@ -5235,7 +5236,7 @@ No support for call stack traversal.
 @item
 The address of an illegal memory access cannot be determined.
 @item
-The @option{-d} option to the @command{mpatrol} shell script has no effect.
+The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex Solaris, Intel 80x86
@@ -5600,16 +5601,13 @@ be useful for implementing functions such as @code{memalign()} which don't
 exist on many systems.
 
 @item
-Add an option to the @command{mpatrol} shell script to automatically invoke a
-C++ name demangler on the generated mpatrol log file.  The location and filename
+Add an option to the @command{mpatrol} command to automatically invoke a C++
+name demangler on the generated mpatrol log file.  The location and filename
 of the demangler tool could be determined from an environment variable so as to
 cater for a wide variety of C++ compilers.
 
 @item
-Script files similar to the @command{mpatrol} shell script provided for UNIX
-platforms could be added for the other operating systems that the mpatrol
-library is available on.  Perhaps this could even be extended to a common
-executable command that is written in C.
+Extend the @command{mpatrol} command to work on non-UNIX platforms.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
@@ -5675,9 +5673,9 @@ is defined in @file{elf.h}, thus resulting in a conflicting definition when
 compiling @file{symbol.c}.
 
 @item
-The @option{-d} option to the @command{mpatrol} shell script does not always
-work on systems whose dynamic linkers support the @env{LD_PRELOAD} environment
-variable.  This needs to be looked into in order to find out the cause.
+The @option{-d} option to the @command{mpatrol} command does not always work on
+systems whose dynamic linkers support the @env{LD_PRELOAD} environment variable.
+This needs to be looked into in order to find out the cause.
 @end itemize
 
 @node Amiga notes, Windows notes, UNIX notes, Notes
