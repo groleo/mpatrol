@@ -38,6 +38,18 @@
 #include <unistd.h>
 #if FORMAT == FORMAT_COFF
 #include <a.out.h>
+#if SYSTEM == SYSTEM_LYNXOS
+#include <coff.h>
+#ifndef ISCOFF
+#define ISCOFF(m) ISCOFFMAGIC(m)
+#endif /* ISCOFF */
+#ifndef ISFCN
+#define ISFCN(t) (((t) & 0x30) == (DT_FCN << 4))
+#endif /* ISFCN */
+#ifndef n_name
+#define n_name _n._n_name
+#endif /* n_name */
+#endif /* SYSTEM */
 #elif FORMAT == FORMAT_ELF32
 #include <libelf.h>
 #elif FORMAT == FORMAT_BFD
@@ -56,7 +68,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.19 2000-04-26 23:11:53 graeme Exp $"
+#ident "$Id: symbol.c,v 1.20 2000-05-29 16:49:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -428,7 +440,8 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
     h = (SCNHDR *) (e + FILHSZ + o->f_opthdr);
     b += FILHSZ + o->f_opthdr - o->f_symptr;
     for (i = t = 0; i < o->f_nscns; i++)
-        if ((h[i].s_flags & STYP_TEXT) || (strncmp(h[i].s_name, _TEXT, 8) == 0))
+        if ((h[i].s_flags & STYP_TEXT) ||
+            (strncmp(h[i].s_name, ".text", 8) == 0))
         {
             t = i + 1;
             break;
