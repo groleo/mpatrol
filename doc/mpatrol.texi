@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.258 2002-03-11 23:57:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.259 2002-07-23 20:21:14 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.14
 @set VERSION 1.4.8
-@set UPDATED 11th March, 2002
+@set UPDATED 23rd July, 2002
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -258,6 +258,15 @@ Snyder (@email{vsnyder@@math.jpl.nasa.gov}) provided suggestions and code for
 using mpatrol with FORTRAN.  Michael Anthony (@email{m@@xyzfind.com}) wrote the
 profdiff tool and Jerome Marant (@email{jerome@@debian.org}) did the Debian
 GNU/Linux port.
+
+If your native language is a language other than English, you can make use of
+the many web-based translation tools that are now available for free on the
+internet.  These can be used to translate pages of the on-line mpatrol manual
+from English to your chosen language, and although they may not be perfect, they
+should be able to translate most of the important text and convey the general
+ideas across.  Note that Gerrit Bruchhaeuser (@email{gbruchhaeuser@@orga.com})
+has written a tutorial on mpatrol in German which is available from
+@uref{http://www.c-handbuch.org/mpatrol.html}.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today
@@ -894,7 +903,7 @@ The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
 3.1.  I then installed Red Hat Linux 5.1 on my Amiga and added support for
 Linux/m68k.  I've now just recently purchased a Dell Inspiron 7500 Notebook PC
 and put my Amiga in retirement, so development will now continue on Red Hat
-Linux 6.2 and above on the Intel platform.  I've tried my best to make it as
+Linux 7.0 and above on the Intel platform.  I've tried my best to make it as
 easy as possible to build and install mpatrol on any system, but it isn't
 likely to run smoothly for everybody.  However, there shouldn't be any major
 problems if you perform the following steps.
@@ -3468,6 +3477,98 @@ then this option can require a substantial amount of disk space.  All of the
 allocation contents files will be deleted when the matching call to
 @code{heapdiffend()} is made.
 
+@smallexample
+ 1  /*
+ 2   * Illustrates the use of mpatrol's heap difference tool.
+ 3   */
+
+
+ 6  #include "mpatrol/heapdiff.h"
+
+
+ 9  int main(void)
+10  @{
+11      char *p, *q;
+12      heapdiff h;
+
+14      p = (char *) calloc(8, 1);
+15      q = (char *) calloc(8, 1);
+16      heapdiffstart(h, HD_FREED | HD_UNFREED | HD_FULL | HD_CONTENTS);
+17      p = (char *) realloc(p, 16);
+18      q[4] = ' ';
+19      heapdiffend(h);
+20      return EXIT_SUCCESS;
+21  @}
+@end smallexample
+
+Running with the @option{LOGALL} option should produce something similar to the
+following in the mpatrol log file.
+
+@smallexample
+ALLOC: calloc (23, 8 bytes, 8 bytes) [main|test.c|14]
+        0x00012BD4 main+56
+        0x00012A68 _start+100
+
+returns 0x0002A570
+
+ALLOC: calloc (24, 8 bytes, 8 bytes) [main|test.c|15]
+        0x00012C0C main+112
+        0x00012A68 _start+100
+
+returns 0x0002A578
+
+> HEAPDIFF 1 STARTING at test.c line 16 @{
+        0x00012C30 main+148
+        0x00012A68 _start+100
+
+REALLOC: realloc (0x0002A570, 16 bytes, 8 bytes) [main|test.c|17]
+        0x00012C6C main+208
+        0x00012A68 _start+100
+
+    0x0002A570 (8 bytes) @{calloc:23:0@} [main|test.c|14]
+        0x00012BD4 main
+        0x00012A68 _start
+
+returns 0x0002E590
+
+> @} HEAPDIFF 1 ENDING at test.c line 19
+        0x00012CA0 main+260
+        0x00012A68 _start+100
+
+> allocation differences:
+
+allocation 24 (0x0002A578) differences:
+        0x0002A57C  00 -> 20 (offset 4)
+
+    0x0002A578 (8 bytes) @{calloc:24:0@} [main|test.c|15]
+        0x00012C0C main
+        0x00012A68 _start
+
+allocation 23 (0x0002E590) has increased in size
+
+    0x0002E590 (16 bytes) @{realloc:23:1@} [main|test.c|17]
+        0x00012C6C main
+        0x00012A68 _start
+
+> total differences: 2 (2 allocations)
+
+> freed allocations:
+
+    0x0002A570 (8 bytes) @{realloc:23:0@} [main|test.c|17]
+        0x00012C6C main
+        0x00012A68 _start
+
+> total freed: 1 (8 bytes)
+
+> unfreed allocations:
+
+    0x0002E590 (16 bytes) @{realloc:23:1@} [main|test.c|17]
+        0x00012C6C main
+        0x00012A68 _start
+
+> total unfreed: 1 (16 bytes)
+@end smallexample
+
 @node mgauge, mtrace, heapdiff, Tools
 @section Memory allocation gauge
 @cindex mgauge
@@ -3494,6 +3595,40 @@ specifies the frequency of memory allocation events at which the gauge should be
 updated.  If it is specified as zero then all events will cause the gauge to be
 updated.
 
+@smallexample
+ 1  /*
+ 2   * Illustrates the use of mpatrol's memory allocation gauge
+ 3   * tool.
+ 4   */
+
+
+ 7  #include "mpatrol/mgauge.h"
+
+
+10  int main(void)
+11  @{
+12      void *a[1024];
+13      size_t i;
+
+15      mgaugestart(NULL, '#', 8192, 0);
+16      mgaugeon();
+17      for (i = 0; i < 1024; i++)
+18          a[i] = malloc(6);
+19      for (i = 0; i < 1024; i++)
+20          free(a[i]);
+21      mgaugeoff();
+22      mgaugeend();
+23      return EXIT_SUCCESS;
+24  @}
+@end smallexample
+
+This produces an animated gauge similar to the one displayed below.
+
+@smallexample
+0                                                           8192
+| ###################################                          |
+@end smallexample
+
 @node mtrace, , mgauge, Tools
 @section Memory allocation tracing
 @cindex mtrace
@@ -3504,6 +3639,41 @@ called in matching pairs but will have no effect unless the @env{MALLOC_TRACE}
 environment variable is set to the filename of the trace file to use.  The
 resulting trace files can be processed by the @command{mtrace} perl script which
 is distributed with the GNU C library.
+
+@smallexample
+ 1  /*
+ 2   * Illustrates the use of mpatrol's memory allocation tracing
+ 3   * tool.
+ 4   */
+
+
+ 7  #include "mpatrol/mtrace.h"
+
+
+10  int main(void)
+11  @{
+12      void *p;
+
+14      mtrace();
+15      p = malloc(16);
+16      free(p);
+17      p = malloc(8);
+18      muntrace();
+19      return EXIT_SUCCESS;
+20  @}
+@end smallexample
+
+If this is run with the @env{MALLOC_TRACE} environment variable set to a valid
+filename then the resulting trace file should look something like that displayed
+below, which can then be processed by the @command{mtrace} perl script.
+
+@smallexample
+= Start
+@@ ./a.out:(main+0x40)[12a94] + 2c578 0x10
+@@ ./a.out:(main+0x6c)[12ac0] - 2c578
+@@ ./a.out:(main+0xa0)[12af4] + 2c578 0x8
+= End
+@end smallexample
 
 @node Utilities, Profiling, Tools, Top
 @chapter Utilities
@@ -13857,7 +14027,7 @@ system.  On the Amiga, Enforcer by Michael Sinz runs in the background and
 detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
-A list of over ninety different items of software which help in debugging
+A list of over ninety five different items of software which help in debugging
 dynamic memory allocation problems is given below@footnote{This list can be
 considered to be a slightly more up to date version of @cite{Debugging Tools
 for Dynamic Storage Allocation and Memory Management}
@@ -14047,6 +14217,22 @@ Various UNIX
 A library of dynamic memory allocation functions with limited debugging and
 profiling support and detection of memory leaks.  Also comes with a graphical
 tool to display a dynamic picture of the heap.
+@end table
+
+@cindex DBAlloc
+@item
+DBAlloc
+@table @asis
+@item Author
+Peter MacDonald (@email{peter@@pdqi.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://browsex.com/dballoc.html}
+@item Overview
+A memory leak and fence-post malloc debug library.
 @end table
 
 @item
@@ -14820,6 +15006,23 @@ Windows
 @item Overview
 Quickly tracks down memory leaks and resource allocation errors with C++Builder
 and Delphi.
+@end table
+
+@cindex Memory Validator
+@cindex Software Verification
+@item
+Memory Validator
+@table @asis
+@item Author
+Software Verification (@email{sales@@softwareverify.com})
+@item License
+Commercial Software
+@item Platforms
+Windows
+@item Location
+@uref{http://www.softwareverify.com/}
+@item Overview
+Detects memory and resource leaks.
 @end table
 
 @cindex Memprof
