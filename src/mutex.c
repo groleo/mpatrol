@@ -46,26 +46,22 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.4 2000-05-23 21:57:25 graeme Exp $"
+#ident "$Id: mutex.c,v 1.5 2000-05-23 23:09:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 /* A mutex provides a way to lock a data structure in an atomic way.
  */
 
-typedef struct mutex
-{
 #if TARGET == TARGET_UNIX
-    pthread_mutex_t handle;        /* POSIX threads mutex */
+typedef pthread_mutex_t mutex;        /* POSIX threads mutex */
 #elif TARGET == TARGET_AMIGA
-    struct SignalSemaphore handle; /* Amiga semaphore */
+typedef struct SignalSemaphore mutex; /* Amiga semaphore */
 #elif TARGET == TARGET_WINDOWS
-    HANDLE handle;                 /* Windows handle */
+typedef HANDLE mutex;                 /* Windows handle */
 #elif TARGET == TARGET_NETWARE
-    LONG handle;                   /* Netware handle */
+typedef LONG mutex;                   /* Netware handle */
 #endif /* TARGET */
-}
-mutex;
 
 
 /* A recursive mutex allows a thread to relock a mutex that is currently
@@ -74,8 +70,8 @@ mutex;
 
 typedef struct recmutex
 {
-    struct mutex guard;  /* guard mutex */
-    struct mutex real;   /* actual mutex */
+    mutex guard;         /* guard mutex */
+    mutex real;          /* actual mutex */
     unsigned long owner; /* owning thread */
     unsigned long count; /* recursion count */
 }
@@ -88,75 +84,99 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/* The mutex for the library.  This should not really be a file scope
- * variable as it prevents this module from being re-entrant.
- */
-
 #if TARGET == TARGET_UNIX
 /* We can make use of the POSIX threads static initialisation of mutexes
- * feature in order to initialise the mutexes.
+ * feature in order to initialise the array of mutex locks, which has the
+ * added advantage of not having to delete the mutexes at the end of program
+ * execution.  However, care must be taken to ensure that there are exactly
+ * the same number of initialisers as there are mutex types.
  */
 
-static recmutex lock =
+static recmutex locks[MT_MAX] =
 {
-    PTHREAD_MUTEX_INITIALIZER,
-    PTHREAD_MUTEX_INITIALIZER,
-    0,
-    0
+    {PTHREAD_MUTEX_INITIALIZER, PTHREAD_MUTEX_INITIALIZER, 0, 0}
 };
 #else /* TARGET */
-static recmutex lock;
-#endif /* TARGET */
+/* We will have to initialise the array of mutex locks at run-time.  This
+ * means that we must find a way of initialising the mutexes before the
+ * mpatrol library is initialised.
+ */
+static recmutex locks[MT_MAX];
 
 
 #ifdef __cplusplus
-/* C++ provides a way of initialising the mutexes before
- * main() is called.  Unfortunately, that may not be early enough
- * if a system startup module allocates dynamic memory.
+/* C++ provides a way to initialise the array of mutex locks before main()
+ * is called.  Unfortunately, that may not be early enough if a system
+ * startup module allocates dynamic memory.
  */
 
-struct mutexinit
+static struct initmutexes
 {
-    mutexinit()
+    initmutexes()
     {
-        __mp_newmutex();
+        __mp_initmutexes();
     }
-};
-
-
-/* The library initialiser variable.  As this is a file scope variable,
- * C++ must initialise it before main() is called, which will hopefully
- * be before any calls are made to dynamically allocate memory.
- */
-
-static mutexinit init;
+}
+initlocks;
 #endif /* __cplusplus */
+#endif /* TARGET */
 
 
-/* Initialise the mpatrol library mutex.
+/* Initialise the mpatrol library mutexes.  We're up a brown smelly creek if
+ * any of these functions dynamically allocate memory.
  */
 
 MP_GLOBAL void __mp_initmutexes(void)
 {
+#if TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
+    TARGET == TARGET_NETWARE
+    unsigned long i;
+#endif /* TARGET */
+
+#if TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
+    TARGET == TARGET_NETWARE
+    for (i = 0; i < MT_MAX; i++)
+    {
 #if TARGET == TARGET_AMIGA
-    InitSemaphore(&lock.real.handle);
+        InitSemaphore(&locks[i].guard);
+        InitSemaphore(&locks[i].real);
 #elif TARGET == TARGET_WINDOWS
-    lock.real.handle = CreateMutex(NULL, 0, NULL);
+        locks[i].guard = CreateMutex(NULL, 0, NULL);
+        locks[i].real = CreateMutex(NULL, 0, NULL);
 #elif TARGET == TARGET_NETWARE
-    lock.real.handle = OpenLocalSemaphore(1);
+        locks[i].guard = OpenLocalSemaphore(1);
+        locks[i].real = OpenLocalSemaphore(1);
+#endif /* TARGET */
+        locks[i].owner = 0;
+        locks[i].count = 0;
+    }
 #endif /* TARGET */
 }
 
 
-/* Remove the mpatrol library mutex.
+/* Remove the mpatrol library mutexes.  We're up another one of those creeks
+ * if the mutexes are still locked or are likely to be used in the future.
  */
 
 MP_GLOBAL void __mp_finimutexes(void)
 {
+#if TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+    unsigned long i;
+#endif /* TARGET */
+
+#if TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+    for (i = 0; i < MT_MAX; i++)
+    {
 #if TARGET == TARGET_WINDOWS
-    CloseHandle(lock.real.handle);
+        CloseHandle(locks[i].guard);
+        CloseHandle(locks[i].real);
 #elif TARGET == TARGET_NETWARE
-    CloseLocalSemaphore(lock.real.handle);
+        CloseLocalSemaphore(locks[i].guard);
+        CloseLocalSemaphore(locks[i].real);
+#endif /* TARGET */
+        locks[i].owner = 0;
+        locks[i].count = 0;
+    }
 #endif /* TARGET */
 }
 
@@ -167,13 +187,13 @@ MP_GLOBAL void __mp_finimutexes(void)
 static void lockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
-    pthread_mutex_lock(&m->handle);
+    pthread_mutex_lock(m);
 #elif TARGET == TARGET_AMIGA
-    ObtainSemaphore(&m->handle);
+    ObtainSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
-    WaitForSingleObject(m->handle, INFINITE);
+    WaitForSingleObject(*m, INFINITE);
 #elif TARGET == TARGET_NETWARE
-    WaitOnLocalSemaphore(m->handle);
+    WaitOnLocalSemaphore(*m);
 #endif /* TARGET */
 }
 
@@ -184,13 +204,13 @@ static void lockmutex(mutex *m)
 static void unlockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
-    pthread_mutex_unlock(&m->handle);
+    pthread_mutex_unlock(m);
 #elif TARGET == TARGET_AMIGA
-    ReleaseSemaphore(&m->handle);
+    ReleaseSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
-    ReleaseMutex(m->handle);
+    ReleaseMutex(*m);
 #elif TARGET == TARGET_NETWARE
-    SignalLocalSemaphore(m->handle);
+    SignalLocalSemaphore(*m);
 #endif /* TARGET */
 }
 
@@ -200,21 +220,23 @@ static void unlockmutex(mutex *m)
 
 MP_GLOBAL void __mp_lockmutex(mutextype m)
 {
+    recmutex *l;
     unsigned long i;
 
+    l = &locks[m];
     i = __mp_threadid();
-    lockmutex(&lock.guard);
-    if ((lock.owner == i) && (lock.count > 0))
-        lock.count++;
+    lockmutex(&l->guard);
+    if ((l->owner == i) && (l->count > 0))
+        l->count++;
     else
     {
-        unlockmutex(&lock.guard);
-        lockmutex(&lock.real);
-        lockmutex(&lock.guard);
-        lock.owner = i;
-        lock.count = 1;
+        unlockmutex(&l->guard);
+        lockmutex(&l->real);
+        lockmutex(&l->guard);
+        l->owner = i;
+        l->count = 1;
     }
-    unlockmutex(&lock.guard);
+    unlockmutex(&l->guard);
 }
 
 
@@ -223,21 +245,23 @@ MP_GLOBAL void __mp_lockmutex(mutextype m)
 
 MP_GLOBAL void __mp_unlockmutex(mutextype m)
 {
+    recmutex *l;
     unsigned long i;
 
+    l = &locks[m];
     i = __mp_threadid();
-    lockmutex(&lock.guard);
-    if ((lock.owner == i) && (lock.count > 0))
-        lock.count--;
+    lockmutex(&l->guard);
+    if ((l->owner == i) && (l->count > 0))
+        l->count--;
     else
     {
-        unlockmutex(&lock.guard);
-        unlockmutex(&lock.real);
-        lockmutex(&lock.guard);
-        lock.owner = i;
-        lock.count = 1;
+        unlockmutex(&l->guard);
+        unlockmutex(&l->real);
+        lockmutex(&l->guard);
+        l->owner = i;
+        l->count = 1;
     }
-    unlockmutex(&lock.guard);
+    unlockmutex(&l->guard);
 }
 
 
