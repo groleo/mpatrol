@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.9 2000-02-29 22:17:06 graeme Exp $"
+#ident "$Id: symbol.c,v 1.10 2000-02-29 23:01:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -118,6 +118,24 @@ typedef struct objectfile
     size_t base;              /* virtual address of object file */
 }
 objectfile;
+
+
+/* This structure is used when searching for source locations corresponding
+ * to virtual addresses by looking at debugging information embedded in an
+ * object file.
+ */
+
+typedef struct sourcepos
+{
+    bfd_vma addr;       /* virtual address to search for */
+    asymbol **symbols;  /* pointer to symbols */
+    size_t base;        /* virtual address of object file */
+    char *func;         /* function name */
+    char *file;         /* file name */
+    unsigned long line; /* line number */
+    char found;         /* found flag */
+}
+sourcepos;
 #endif /* FORMAT */
 
 
@@ -937,6 +955,36 @@ MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
 }
 
 
+#if FORMAT == FORMAT_BFD
+/* Search a BFD section for a specific virtual memory address and attempt
+ * to match it up with source position information.
+ */
+
+static void findsource(bfd *h, asection *p, void *d)
+{
+    sourcepos *s;
+    bfd_vma v;
+    size_t l;
+
+    s = (sourcepos *) d;
+    if (!s->found && !bfd_is_und_section(p) &&
+        !bfd_is_abs_section(p) && !bfd_is_com_section(p) &&
+        (p->flags & SEC_ALLOC) && (p->flags & SEC_CODE))
+    {
+        v = bfd_section_vma(h, p) + s->base;
+        l = bfd_section_size(h, p);
+        if ((s->addr >= v) && (s->addr < v + l))
+        {
+            s->file = s->func = NULL;
+            s->line = 0;
+            s->found = bfd_find_nearest_line(h, p, s->symbols, s->addr - v,
+                                             &s->file, &s->func, &s->line);
+        }
+    }
+}
+#endif /* FORMAT */
+
+
 /* Attempt to find the source correspondence for a machine instruction located
  * at a particular address.
  */
@@ -944,6 +992,28 @@ MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
 MP_GLOBAL int __mp_findsource(symhead *y, void *p, char **s, char **t,
                               unsigned long *u)
 {
+#if FORMAT == FORMAT_BFD
+    objectfile *n;
+    sourcepos m;
+#endif /* FORMAT */
+
+#if FORMAT == FORMAT_BFD
+    m.addr = (bfd_vma) p;
+    m.found = 0;
+    for (n = (objectfile *) y->hhead; n != NULL; n = n->next)
+    {
+        m.symbols = n->symbols;
+        m.base = n->base;
+        bfd_map_over_sections(n->file, findsource, &m);
+        if (m.found)
+        {
+            *s = m.func;
+            *t = m.file;
+            *u = m.line;
+            return 1;
+        }
+    }
+#endif /* FORMAT */
     *s = *t = NULL;
     u = 0;
     return 0;
