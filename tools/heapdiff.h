@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: heapdiff.h,v 1.6 2001-02-26 23:01:55 graeme Exp $
+ * $Id: heapdiff.h,v 1.7 2001-06-12 17:58:19 graeme Exp $
  */
 
 
@@ -63,17 +63,25 @@
  * allocation is known and the EDIT or LIST option is being used then
  * using HD_VIEW will edit or list the relevant source file at the correct
  * line number, but only if the EDIT or LIST options are supported.
+ *
+ * If the HD_CONTENTS flag is specified then the contents of all current
+ * memory allocations will be written to files and then compared with their
+ * subsequent contents when heapdiffend() is called.  If the heap is large
+ * then this option can require a substantial amount of disk space.  All
+ * of the allocation contents files will be deleted when the matching call
+ * to heapdiffend() is made.
  */
 
 
 #include <mpatrol.h>
 
 
-#define HD_FREED   1  /* log all freed allocations */
-#define HD_UNFREED 2  /* log all unfreed allocations */
-#define HD_MARKED  4  /* include marked allocations */
-#define HD_FULL    8  /* log full details of each allocation */
-#define HD_VIEW    16 /* view each allocation */
+#define HD_FREED    1  /* log all freed allocations */
+#define HD_UNFREED  2  /* log all unfreed allocations */
+#define HD_MARKED   4  /* include marked allocations */
+#define HD_FULL     8  /* log full details of each allocation */
+#define HD_CONTENTS 16 /* detect any changes in the contents of allocations */
+#define HD_VIEW     32 /* view each allocation */
 
 
 /* The structure used to store the current state of the heap and any
