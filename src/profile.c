@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.17 2000-04-24 00:14:30 graeme Exp $"
+#ident "$Id: profile.c,v 1.18 2000-04-24 00:56:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -136,13 +136,13 @@ static profdata *getprofdata(profhead *p)
         d->index.size = h->size;
         p->size += h->size;
         d = (profdata *) __mp_getslot(&p->dtable);
-        __mp_addtail(&p->list, &d->data.node);
-        d->data.index = p->list.size;
-        for (i = 0; i < 4; i++)
-        {
-            d->data.acount[i] = d->data.dcount[i] = 0;
-            d->data.atotal[i] = d->data.dtotal[i] = 0;
-        }
+    }
+    __mp_addtail(&p->list, &d->data.node);
+    d->data.index = p->list.size;
+    for (i = 0; i < 4; i++)
+    {
+        d->data.acount[i] = d->data.dcount[i] = 0;
+        d->data.atotal[i] = d->data.dtotal[i] = 0;
     }
     return d;
 }
