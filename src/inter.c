@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.4 1999-11-25 16:34:41 graeme Exp $"
+#ident "$Id: inter.c,v 1.5 1999-11-25 16:47:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -137,9 +137,9 @@ void __mp_init(void)
         __mp_parseoptions(&memhead);
         /* Set up the random number generator for the FAILFREQ option.
          */
-        if (h->fseed == 0)
-            h->fseed = (unsigned long) time(NULL);
-        srand(h->fseed);
+        if (memhead.fseed == 0)
+            memhead.fseed = (unsigned long) time(NULL);
+        srand(memhead.fseed);
         /* Attempt to open the log file.
          */
         if (!__mp_openlogfile(memhead.log))
