@@ -32,29 +32,29 @@
 
 
 /*
- * $Id: heapdiff.h,v 1.2 2001-02-23 20:59:48 graeme Exp $
+ * $Id: heapdiff.h,v 1.3 2001-02-25 21:19:30 graeme Exp $
  */
 
 
 /*
- * This file defines HEAPDIFFSTART() and HEAPDIFFEND(), which must be
+ * This file defines heapdiffstart() and heapdiffend(), which must be
  * called in matching pairs.  They both take a heapdiff object as their
  * first parameter, which must still be in scope when the matching call
- * to HEAPDIFFEND() is made.  The heapdiff object is initialised at the
- * call to HEAPDIFFSTART() and is finalised when HEAPDIFFEND() is called.
+ * to heapdiffend() is made.  The heapdiff object is initialised at the
+ * call to heapdiffstart() and is finalised when heapdiffend() is called.
  * It must not be modified in between and should be treated as an opaque
- * type.  HEAPDIFFEND() can only be called once per heapdiff object
+ * type.  heapdiffend() can only be called once per heapdiff object
  * before requiring that the heapdiff object be reinitialised through a
- * call to HEAPDIFFSTART().
+ * call to heapdiffstart().
  *
- * The second parameter to HEAPDIFFSTART() specifies a set of flags that
+ * The second parameter to heapdiffstart() specifies a set of flags that
  * can be used to control what is written to the mpatrol log.  A list of
  * all unfreed memory allocations can be logged with the HD_UNFREED flag
  * and a list of all freed memory allocations can be logged with the
  * HD_FREED flag, although the latter makes use of the NOFREE option and
  * can incur a large performance and space penalty, and also relies on
- * the NOFREE option being unmodified between the calls to HEAPDIFFSTART()
- * and HEAPDIFFEND().
+ * the NOFREE option being unmodified between the calls to heapdiffstart()
+ * and heapdiffend().
  *
  * By default, only a minimal amount of detail is logged for each
  * allocation, but this can be changed with the HD_FULL flag to log full
@@ -90,8 +90,8 @@ typedef struct heapdiff
 heapdiff;
 
 
-#define HEAPDIFFSTART(h, f) __mpt_heapdiffstart(&(h), (f), __FILE__, __LINE__)
-#define HEAPDIFFEND(h) __mpt_heapdiffend(&(h), __FILE__, __LINE__)
+#define heapdiffstart(h, f) __mpt_heapdiffstart(&(h), (f), __FILE__, __LINE__)
+#define heapdiffend(h) __mpt_heapdiffend(&(h), __FILE__, __LINE__)
 
 
 #ifdef __cplusplus
