@@ -54,7 +54,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.3 1999-10-19 18:37:12 graeme Exp $"
+#ident "$Id: memory.c,v 1.4 1999-11-07 12:50:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,6 +76,23 @@ watchcmd;
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+#if MP_ARRAY_SUPPORT
+/* The static memory array used to implement a simulated heap.  This is
+ * most likely to be zero-initialized at the beginning of program execution,
+ * but this should not be relied upon as the memory it contains will be reused.
+ */
+
+static char memoryarray[MP_ARRAY_SIZE];
+
+
+/* The current number of bytes that have been allocated from the static memory
+ * array.  This will never be allowed to increase beyond MP_ARRAY_SIZE.
+ */
+
+static size_t memorysize;
+#endif /* MP_ARRAY_SUPPORT */
 
 
 /* Determine the minimum alignment for a general-purpose memory allocation
@@ -229,6 +246,9 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
     char b[64];
 #endif /* MP_WATCH_SUPPORT */
 
+#if MP_ARRAY_SUPPORT
+    memorysize = 0;
+#endif /* MP_ARRAY_SUPPORT */
     i->align = minalign();
     i->page = pagesize();
     i->prog = progname();
@@ -285,6 +305,34 @@ MP_GLOBAL unsigned long __mp_processid(void)
 }
 
 
+#if MP_ARRAY_SUPPORT
+/* Provide sbrk()-like functionality for systems that have no system functions
+ * for allocating heap memory.  The simulated heap grows upwards in this
+ * implementation.
+ */
+
+static void *getmemory(long l)
+{
+    void *p;
+
+    p = memoryarray + memorysize;
+    if (l > 0)
+        if (memorysize + l > MP_ARRAY_SIZE)
+            p = (void *) -1;
+        else
+            memorysize += l;
+    else if (l < 0)
+        if (memorysize < -l)
+            p = (void *) -1;
+        else
+            memorysize += l;
+    return p;
+}
+#elif TARGET == TARGET_UNIX
+#define getmemory(l) sbrk(l)
+#endif /* MP_ARRAY_SUPPORT && TARGET */
+
+
 /* Allocate a specified size of general-purpose memory from the system
  * with a required alignment.
  */
@@ -332,7 +380,8 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
     else
 #endif /* MP_MMAP_SUPPORT */
     {
-        if (((t = sbrk(0)) == (void *) -1) || ((p = sbrk(*l)) == (void *) -1))
+        if (((t = getmemory(0)) == (void *) -1) ||
+            ((p = getmemory(*l)) == (void *) -1))
             p = NULL;
         else
         {
@@ -349,12 +398,12 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
                 /* We need to allocate a little more memory in order to make the
                  * allocation page-aligned.
                  */
-                if ((p = sbrk(n)) == (void *) -1)
+                if ((p = getmemory(n)) == (void *) -1)
                 {
                     /* We failed to allocate more memory, but we try to be nice
                      * and return our original allocation.
                      */
-                    sbrk(-*l);
+                    getmemory(-*l);
                     p = NULL;
                 }
                 else if (p >= t)
