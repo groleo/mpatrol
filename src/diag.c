@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.106 2002-02-05 01:01:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.107 2005-03-09 00:44:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.106 2002-02-05 01:01:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.107 2005-03-09 00:44:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -166,6 +166,8 @@ MP_GLOBAL errorinfo __mp_errordetails[ET_MAX + 1] =
      "string " MP_POINTER " overflows [" MP_POINTER "," MP_POINTER "]"},
     {"ZERALN", "alignment too small",
      "alignment 0 is invalid"},
+    {"ZEROPN", "zero-sized operation",
+     "attempt to perform a zero-sized operation"},
     {"INTRNL", "internal error",
      "internal error"}
 };

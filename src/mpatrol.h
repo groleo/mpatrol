@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.142 2002-03-11 23:51:49 graeme Exp $
+ * $Id: mpatrol.h,v 1.143 2005-03-09 00:44:25 graeme Exp $
  */
 
 
@@ -320,6 +320,7 @@ typedef enum __mp_errortype
     MP_ET_RSZZER, /* reallocation too small */
     MP_ET_STROVF, /* string overflow */
     MP_ET_ZERALN, /* alignment too small */
+    MP_ET_ZEROPN, /* zero-sized operation */
     MP_ET_MAX
 }
 __mp_errortype;

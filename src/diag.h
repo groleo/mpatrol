@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.48 2002-02-05 00:47:25 graeme Exp $
+ * $Id: diag.h,v 1.49 2005-03-09 00:44:25 graeme Exp $
  */
 
 
@@ -81,6 +81,7 @@ typedef enum errortype
     ET_RSZZER, /* attempt to resize an allocation to size 0 */
     ET_STROVF, /* string %1 overflows [%2,%3] */
     ET_ZERALN, /* alignment 0 is invalid */
+    ET_ZEROPN, /* attempt to perform a zero-sized operation */
     ET_MAX
 }
 errortype;
