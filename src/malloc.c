@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.18 2000-11-02 19:08:56 graeme Exp $"
+#ident "$Id: malloc.c,v 1.19 2000-11-02 20:14:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -54,6 +54,23 @@ void *alloca(size_t l)
 void *MP_ALTFUNCNAME(alloca)(size_t l)
 {
     return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Explicitly free an existing block of temporary memory.
+ */
+
+void dealloca(void *p)
+{
+    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void MP_ALTFUNCNAME(dealloca)(void *p)
+{
+    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

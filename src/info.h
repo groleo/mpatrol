@@ -65,6 +65,7 @@
 typedef enum alloctype
 {
     AT_ALLOCA,    /* alloca() */
+    AT_DEALLOCA,  /* dealloca() */
     AT_MALLOC,    /* malloc() */
     AT_CALLOC,    /* calloc() */
     AT_MEMALIGN,  /* memalign() */
@@ -179,6 +180,7 @@ typedef struct infohead
     slottable atable;                 /* table of allocanodes */
     listhead list;                    /* internal allocation list */
     listhead alist;                   /* internal allocanode list */
+    listhead astack;                  /* alloca allocation stack */
     size_t size;                      /* internal allocation total */
     size_t count;                     /* allocation count */
     size_t peak;                      /* allocation peak */

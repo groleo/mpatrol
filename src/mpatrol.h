@@ -165,6 +165,7 @@
 typedef enum __mp_alloctype
 {
     MP_AT_ALLOCA,    /* alloca() */
+    MP_AT_DEALLOCA,  /* dealloca() */
     MP_AT_MALLOC,    /* malloc() */
     MP_AT_CALLOC,    /* calloc() */
     MP_AT_MEMALIGN,  /* memalign() */
@@ -235,6 +236,9 @@ __mp_allocinfo;
 #ifdef alloca
 #undef alloca
 #endif /* alloca */
+#ifdef dealloca
+#undef dealloca
+#endif /* dealloca */
 #ifdef malloc
 #undef malloc
 #endif /* malloc */
@@ -322,6 +326,8 @@ __mp_allocinfo;
 
 #define alloca(l) __mp_alloc((l), 0, MP_AT_ALLOCA, MP_FUNCNAME, __FILE__, \
                              __LINE__, 0)
+#define dealloca(p) __mp_free((p), MP_AT_DEALLOCA, MP_FUNCNAME, __FILE__, \
+                              __LINE__, 0)
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
                              __LINE__, 0)
 #define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, MP_FUNCNAME, \
@@ -418,6 +424,8 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #endif /* __cplusplus */
 
 #else /* NDEBUG */
+
+#define dealloca(p)
 
 #define __mp_init() ((void) 0)
 #define __mp_fini() ((void) 0)
