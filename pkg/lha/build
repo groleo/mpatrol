@@ -21,10 +21,7 @@
 ; Amiga shell script to build an LhA distribution file
 
 
-; $Id: build,v 1.1 2000-03-22 19:17:47 graeme Exp $
-
-
-Set MPATROL_VERSION 1.1.2
+; $Id: build,v 1.2 2000-03-23 19:07:52 graeme Exp $
 
 
 ; Build both the GCC and SAS/C versions of the mpatrol library.
@@ -85,8 +82,8 @@ Copy //man/man3/mpatrol.3 mpatrol/man/man3
 ; Create the LhA distribution archive.
 
 Protect mpatrol GROUPFLAGS -rwed OTHERFLAGS -rwed ALL QUIET
-Delete mpatrol-${MPATROL_VERSION}.lha FORCE QUIET >NIL:
-LhA -a -e -m -r -x a mpatrol-${MPATROL_VERSION}.lha mpatrol
+Delete mpatrol.lha FORCE QUIET >NIL:
+LhA -a -e -m -r -x a mpatrol.lha mpatrol
 Delete mpatrol ALL FORCE QUIET >NIL:
 
 
@@ -96,4 +93,3 @@ CD //build/amiga
 Make clobber
 SMake clobber
 CD //pkg/lha
-UnSet MPATROL_VERSION
