@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.43 2001-10-03 23:11:45 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.44 2001-12-05 20:44:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.43 2001-10-03 23:11:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.44 2001-12-05 20:44:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define PROGVERSION "2.6" /* the current version of this program */
+#define PROGVERSION "2.7" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -74,6 +74,7 @@ typedef enum options_flags
     OF_USEDEBUG       = 'g',
     OF_HTML           = 'H',
     OF_HELP           = 'h',
+    OF_READENV        = 'I',
     OF_LIST           = 'i',
     OF_THREADS        = 'j',
     OF_LOGALL         = 'L',
@@ -309,6 +310,9 @@ static option options_table[] =
     {"prog-file", OF_PROGFILE, "string",
      "\tSpecifies an alternative filename with which to locate the executable\n"
      "\tfile containing the program's symbols.\n"},
+    {"read-env", OF_READENV, NULL,
+     "\tReads and passes through the contents of the " MP_OPTIONS "\n"
+     "\tenvironment variable.\n"},
     {"realloc-stop", OF_REALLOCSTOP, "unsigned integer",
      "\tSpecifies an allocation index at which to stop the program when a\n"
      "\tmemory allocation is being reallocated.\n"},
@@ -405,11 +409,21 @@ addoption(char *o, char *v, int s)
 
 static
 void
-setoptions(int s)
+setoptions(int r, int s)
 {
+    char *t;
+
     sprintf(options, "%s=", MP_OPTIONS);
     optlen = strlen(options);
-    addoption("LOGFILE", logfile, 1);
+    if (r != 0)
+        if (((t = getenv(MP_OPTIONS)) != NULL) && (*t != '\0'))
+        {
+            strcpy(options + optlen, t);
+            optlen += strlen(t);
+        }
+        else
+            r = 0;
+    addoption("LOGFILE", logfile, (r == 0));
     if (allocbyte)
         addoption("ALLOCBYTE", allocbyte, 0);
     if (allocstop)
@@ -622,9 +636,9 @@ main(int argc, char **argv)
 #endif /* TARGET */
     size_t i, l;
 #endif /* TARGET */
-    int c, d, e, h, r, t, v, w;
+    int c, d, e, h, r, t, v, w, x;
 
-    d = e = h = r = t = v = w = 0;
+    d = e = h = r = t = v = w = x = 0;
     progname = __mp_basename(argv[0]);
     if ((a = getenv(MP_LOGDIR)) && (*a != '\0'))
         logfile = "%n.%p.log";
@@ -774,6 +788,9 @@ main(int argc, char **argv)
           case OF_PROGFILE:
             progfile = __mp_optarg;
             break;
+          case OF_READENV:
+            x = 1;
+            break;
           case OF_REALLOCSTOP:
             reallocstop = __mp_optarg;
             break;
@@ -861,12 +878,12 @@ main(int argc, char **argv)
                 __mp_showopts(options_table);
         }
         if (w == 1)
-            setoptions(1);
+            setoptions(x, 1);
         if (e == 1)
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
-    setoptions(0);
+    setoptions(x, 0);
 #if MP_PRELOAD_SUPPORT
     /* The dynamic linker on some UNIX systems supports requests for it to
      * preload a specified list of shared libraries before running a process,
