@@ -100,6 +100,18 @@
 #endif /* MP_ARRAY_SUPPORT */
 
 
+/* The number of entries in the memory reservation cache.  This cache is used
+ * when tracing in order to store information about heap memory reservations
+ * before the tracing output file has been opened.  If the number of entries
+ * to store exceeds this number then all subsequent entries will be discarded
+ * until the tracing output file has been opened.
+ */
+
+#ifndef MP_RESCACHE_SIZE
+#define MP_RESCACHE_SIZE 256
+#endif /* MP_RESCACHE_SIZE */
+
+
 /* The size of the simulated UNIX heap in bytes.  This is used by the brk() and
  * sbrk() functions on non-UNIX platforms and is used to allocate a block of
  * memory of this size.  Any attempt to allocate memory beyond this block will
@@ -111,10 +123,10 @@
 #endif /* MP_BREAK_SIZE */
 
 
-/* The size of the input line buffer in the mptrace and mleak tools.  If any of
- * the entries in the tracing output file or any of the lines in the log file
- * are longer than this then an error message will be generated and mptrace or
- * mleak will terminate.
+/* The size of the input line buffer in bytes in the mptrace and mleak tools.
+ * If any of the entries in the tracing output file or any of the lines in the
+ * log file are longer than this then an error message will be generated and
+ * mptrace or mleak will terminate.
  */
 
 #ifndef MP_BUFFER_SIZE
@@ -148,7 +160,7 @@
  */
 
 #ifndef MP_ALLOCFACTOR
-#define MP_ALLOCFACTOR 2
+#define MP_ALLOCFACTOR 4
 #endif /* MP_ALLOCFACTOR */
 
 
