@@ -126,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.62 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: symbol.c,v 1.63 2005-03-10 01:25:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.62 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.63 2005-03-10 01:25:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1157,7 +1157,12 @@ addsymbols(symhead *y, bfd *h, char *a, char *f, size_t b)
             __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: %s\n", f, m);
         return 0;
     }
-    if (n == 0)
+    /* Some recent versions of the BFD library return non-zero for the
+     * bfd_get_symtab_upper_bound() function even if a symbol table doesn't
+     * exist.  This isn't very helpful, so just assume that any symbol table
+     * with less than five symbols isn't really there.
+     */
+    if (n < 5)
     {
         /* If we couldn't find the symbol table then it is likely that the file
          * has been stripped.  However, if the file was dynamically linked then
