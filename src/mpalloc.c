@@ -31,6 +31,7 @@
 
 #include "inter.h"
 #include "mpalloc.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.32 2001-05-23 20:04:08 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.33 2001-05-23 20:19:11 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.32 2001-05-23 20:04:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.33 2001-05-23 20:19:11 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 

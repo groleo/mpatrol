@@ -40,6 +40,7 @@
 #include "sbrk.h"
 #endif /* TARGET && __GNUC__ */
 #include "option.h"
+#include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -51,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.125 2001-05-23 20:04:08 graeme Exp $"
+#ident "$Id: inter.c,v 1.126 2001-05-23 20:19:11 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.125 2001-05-23 20:04:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.126 2001-05-23 20:19:11 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
