@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.67 2001-12-06 00:36:25 graeme Exp $
+ * $Id: info.h,v 1.68 2001-12-06 01:02:11 graeme Exp $
  */
 
 
@@ -174,37 +174,67 @@ allocanode;
 
 typedef struct loginfo
 {
-    logtype ltype;        /* overall type of memory allocation */
+    logtype ltype;              /* overall type of memory allocation */
     union
     {
         struct
         {
-            size_t size;  /* size */
-            size_t align; /* alignment */
+            size_t size;        /* size */
+            size_t align;       /* alignment */
         }
         logalloc;
         struct
         {
-            void *block;  /* memory block */
-            size_t size;  /* size */
-            size_t align; /* alignment */
+            void *block;        /* memory block */
+            size_t size;        /* size */
+            size_t align;       /* alignment */
         }
         logrealloc;
         struct
         {
-            void *block;  /* memory block */
+            void *block;        /* memory block */
         }
         logfree;
+        struct
+        {
+            void *block;        /* memory block */
+            size_t size;        /* size */
+            unsigned char byte; /* filler byte */
+        }
+        logmemset;
+        struct
+        {
+            void *srcblock;     /* source memory block */
+            void *dstblock;     /* destination memory block */
+            size_t size;        /* size */
+            unsigned char byte; /* stop byte */
+        }
+        logmemcopy;
+        struct
+        {
+            void *block;        /* memory block */
+            size_t size;        /* size */
+            void *patblock;     /* pattern memory block */
+            size_t patsize;     /* pattern size */
+        }
+        logmemlocate;
+        struct
+        {
+            void *block1;       /* memory block 1 */
+            void *block2;       /* memory block 2 */
+            size_t size;        /* size */
+        }
+        logmemcompare;
     }
     variant;
-    alloctype type;       /* type of memory allocation */
-    char *func;           /* calling function name */
-    char *file;           /* file name in which call took place */
-    unsigned long line;   /* line number at which call took place */
-    stackinfo *stack;     /* call stack details */
-    char *typestr;        /* type stored in allocation */
-    size_t typesize;      /* size of type stored in allocation */
-    char logged;          /* logged flag */
+    alloctype type;             /* type of memory allocation */
+    char *func;                 /* calling function name */
+    char *file;                 /* file name in which call took place */
+    unsigned long line;         /* line number at which call took place */
+    stackinfo *stack;           /* call stack details */
+    char *typestr;              /* type stored in allocation */
+    size_t typesize;            /* size of type stored in allocation */
+    char logged;                /* logged flag */
 }
 loginfo;
 
