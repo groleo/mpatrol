@@ -25,10 +25,11 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.1 2001-08-02 21:17:01 graeme Exp $
+# $Id: setup,v 1.2 2001-08-02 21:55:06 graeme Exp $
 
 
 uselinks=1
+generate=0
 
 
 # Create a new directory if it does not already exist.
@@ -68,6 +69,16 @@ for file in $files
 do
     copyfile "$file" `basename "$file"`
 done
+if [ $generate = 0 ]
+then
+    files="../../config/INSTALL ../../config/install-sh ../../config/missing
+           ../../config/mkinstalldirs ../../config/config.guess
+           ../../config/config.sub ../../config/ltconfig ../../config/ltmain.sh"
+    for file in $files
+    do
+        copyfile "$file" `basename "$file"`
+    done
+fi
 copyfile ../../config/top.am Makefile.am
 
 
