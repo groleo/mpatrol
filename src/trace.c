@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.17 2001-08-23 22:42:34 graeme Exp $"
+#ident "$Id: trace.c,v 1.18 2001-12-05 22:44:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.17 2001-08-23 22:42:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.18 2001-12-05 22:44:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -229,6 +229,24 @@ __mp_endtrace(tracehead *t)
 }
 
 
+/* Check that there were no errors writing to the tracing output file.
+ */
+
+static
+int
+checktracefile(tracehead *t)
+{
+    if (ferror(tracefile))
+    {
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: problem writing tracing "
+                   "file\n", t->file);
+        __mp_endtrace(t);
+        return 0;
+    }
+    return 1;
+}
+
+
 /* Attempt to open the tracing output file.
  */
 
@@ -279,7 +297,7 @@ opentracefile(tracehead *t)
         fwrite(b, l, 1, tracefile);
     }
     cachecounter = 0;
-    return 1;
+    return checktracefile(t);
 }
 
 
@@ -441,6 +459,7 @@ __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l,
     writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
+    checktracefile(t);
 }
 
 
@@ -473,6 +492,7 @@ __mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l,
     writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
+    checktracefile(t);
 }
 
 
@@ -501,6 +521,7 @@ __mp_tracefree(tracehead *t, unsigned long n, unsigned long d, char *f, char *g,
     writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
+    checktracefile(t);
 }
 
 
