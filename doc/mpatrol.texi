@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.108 2000-07-20 18:15:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.109 2000-07-25 20:30:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 20th July, 2000
+@set UPDATED 25th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2397,6 +2397,12 @@ than just at the end, even if it is only partially complete, and this behaviour
 can be controlled with the @option{AUTOSAVE} option.  This can be particularly
 useful when running the program from within a debugger, when it is necessary to
 analyse the profiling information at a certain point during program execution.
+
+Normally, the mpatrol library will perform profiling with all of its other
+features and checks enabled, but you might want to disable these if you only
+wish to profile the memory allocations.  For example, you may wish to use the
+@option{CHECK=0} and @option{NOPROTECT} options to remove the internal checking
+of the library and speed up profiling dramatically.
 
 @cindex allocation boundaries
 When profiling memory allocations, it is necessary to distinguish between small,
@@ -7241,13 +7247,6 @@ MS-DOS might be possible as well.
 
 @itemize @bullet
 @item
-Need to add watch point area support for non-Solaris operating systems.  This
-may be a case of preventing all heap memory from being accessed and providing a
-signal handler that is called when a read from or write to such memory triggers
-a signal.  The handler could then determine if the address is in a watch point,
-and if it is not it could unprotect the memory and return.
-
-@item
 Need to improve watch point facility in order to speed it up by an order of
 magnitudes.  This will most likely involve removing all watch points when
 entering the library and replacing them when returning to user code.
@@ -7406,10 +7405,6 @@ Perhaps add an @command{Installer} installation script with icons.
 @cindex Windows notes
 
 @itemize @bullet
-@item
-Need to add watch point area support, possibly by using guard pages as a basis
-for an implementation.
-
 @item
 Need to add support for processors other than the Intel 80x86.  However, about
 99% of Windows platforms run on this processor family --- does anyone really use
