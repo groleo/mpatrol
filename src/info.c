@@ -33,12 +33,11 @@
 #endif /* MP_THREADS_SUPPORT */
 #include "utils.h"
 #include <stdlib.h>
-#include <string.h>
 #include <errno.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.4 1999-11-25 16:51:35 graeme Exp $"
+#ident "$Id: info.c,v 1.5 1999-12-21 20:20:34 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -266,9 +265,9 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 m->data.freed = 0;
                 p = n->block;
                 if ((f == AT_CALLOC) || (f == AT_RECALLOC))
-                    memset(p, 0, l);
+                    __mp_memset(p, 0, l);
                 else
-                    memset(p, h->alloc.abyte, l);
+                    __mp_memset(p, h->alloc.abyte, l);
             }
             else
                 __mp_freeslot(&h->table, m);
@@ -428,7 +427,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     i->data.line = u;
                     i->data.stack = __mp_getaddrs(&h->addr, v);
                     i->data.freed = 1;
-                    memcpy(r->block, n->block, (l > d) ? d : l);
+                    __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     __mp_freealloc(&h->alloc, n, i);
                     p = r->block;
                 }
@@ -453,7 +452,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                       (h->alloc.flags & FLG_ALLOCUPPER)) || (l > d)) &&
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
-                    memcpy(r->block, n->block, (l > d) ? d : l);
+                    __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     __mp_freealloc(&h->alloc, n, NULL);
                     p = r->block;
                 }
@@ -463,9 +462,9 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                 __mp_protectinfo(h, MA_READONLY);
             if ((p != NULL) && (l > d))
                 if (f == AT_RECALLOC)
-                    memset((char *) p + d, 0, l - d);
+                    __mp_memset((char *) p + d, 0, l - d);
                 else
-                    memset((char *) p + d, h->alloc.abyte, l - d);
+                    __mp_memset((char *) p + d, h->alloc.abyte, l - d);
             if (h->peak < h->alloc.asize)
                 h->peak = h->alloc.asize;
         }
