@@ -62,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.27 2000-06-16 17:43:49 graeme Exp $"
+#ident "$Id: memory.c,v 1.28 2000-06-23 19:29:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -293,7 +293,7 @@ static char *progname(void)
      * argv[0].  This is very OS-specific and is not my first choice for
      * doing this, but unfortunately it seemed to be the only way.
      */
-    __mp_newframe(&s);
+    __mp_newframe(&s, NULL);
     for (p = NULL; __mp_getframe(&s); p = (unsigned int *) s.frame);
     if (p != NULL)
 #if ARCH == ARCH_IX86

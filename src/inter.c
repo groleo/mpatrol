@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.38 2000-05-24 00:04:10 graeme Exp $"
+#ident "$Id: inter.c,v 1.39 2000-06-23 19:29:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -305,7 +305,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
         memhead.prologue((void *) -1, l);
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -408,7 +408,7 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         memhead.prologue(p, (size_t) -2);
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -501,7 +501,7 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         memhead.prologue(p, l);
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -565,7 +565,7 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
         memhead.prologue(p, (size_t) -1);
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -614,7 +614,7 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
     savesignals();
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -674,7 +674,7 @@ void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
     savesignals();
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -730,7 +730,7 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     savesignals();
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
@@ -783,7 +783,7 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     savesignals();
     /* Determine the call stack details.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i))
     {
         j = __mp_getframe(&i);
