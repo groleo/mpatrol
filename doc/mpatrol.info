@@ -6261,8 +6261,8 @@ and link it with the mpatrol library(1).
    First, add the inclusion of `mpatrol.h' to line 34 so that we can
 replace calls to `malloc()' and `free()' with their mpatrol
 equivalents(2).  Then, recompile the program and link it with the
-mpatrol library.  This time, running it with even the simplest of
-non-empty input lines should cause it to abort!
+mpatrol library.  This time, running it with the `CHECK=-' option and
+even the simplest of non-empty input lines should cause it to abort!
 
    If you look at the `mpatrol.log' file produced, you should see
 something along the lines of the following at the end of the log file.
@@ -8979,7 +8979,7 @@ Supported systems
 
    Following is a list of systems on which the mpatrol library has been
 built and tested.  The system details include the operating system and
-version, the processor type, the object file format and the C compiler
+version, the processor type, the object file format and the compiler
 used to compile the library and tests.  The details following each
 system list any features of the library that are not (or cannot be)
 supported on that system.
@@ -10247,8 +10247,8 @@ Building
      preprocessor macro `MP_NOCPLUSPLUS' when compiling your source
      file, which will disable the overriding of any C++ operators in
      `mpatrol.h'.  Alternatively, if you define `MP_NONEWDELETE' then
-     you can use `MP_NEW' and `MP_DELETE' in order to call the mpatrol
-     versions of the C++ operators.
+     you can use `MP_NEW', `MP_NEW_NOTHROW' and `MP_DELETE' in order to
+     call the mpatrol versions of the C++ operators.
 
   4. I still have the above problem, but I don't think it's due to
      placement `new' since the compiler complains about `operator
@@ -10645,7 +10645,16 @@ Running
      either try to live with that, or you could try disabling the
      overriding handlers.
 
- 13. I've linked and run my program with mpatrol under UNIX and it uses
+ 13. How do I set a breakpoint on the `malloc()' function when it is
+     implemented as a preprocessor macro in `mpatrol.h'?
+
+     There are four different mpatrol interface functions which are
+     used to allocate memory, duplicate strings, reallocate memory and
+     deallocate memory.  If you look in `mpatrol.h' you should be able
+     to see the name of the function that will be called when the macro
+     is invoked.  The same goes for the memory operation functions.
+
+ 14. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -10665,7 +10674,7 @@ Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 14. Why does my program run so slowly after I link it with the mpatrol
+ 15. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -10679,7 +10688,7 @@ Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 15. My program is written in C++ and is linked to the mpatrol library,
+ 16. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -10696,7 +10705,7 @@ Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 16. Why does my program not stop when the mpatrol library notices an
+ 17. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -10708,7 +10717,7 @@ Running
      of program execution, and then search backwards in the log file for
      `WARNING' or `ERROR'.
 
- 17. I have linked my program with the mpatrol library on an Amiga or
+ 18. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -10722,7 +10731,7 @@ Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 18. I have built the mpatrol library with `gcc' on AmigaOS and have
+ 19. I have built the mpatrol library with `gcc' on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the `MPATROL_OPTIONS' environment variable
      recognised when I run it?
@@ -10735,7 +10744,7 @@ Running
      allows you to set an environment variable that the GNU `getenv()'
      function can read when you are running in AmigaDOS.
 
- 19. How do I suppress all diagnostic output from the mpatrol library?
+ 20. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's _bit bucket_, which is `/dev/null' on UNIX platforms and
@@ -10774,7 +10783,8 @@ Files
      releases can be easily retrieved, but the CVS system needs to have
      a way of determining the versions of currently checked-out files,
      hence the `CVS' subdirectories.  You shouldn't need to worry about
-     them, so just ignore them.
+     them, so just ignore them, and in later releases they should have
+     been removed before a distribution was made.
 
   3. Why does the `mpsym' command not work for me?
 
@@ -13965,49 +13975,49 @@ Node: Example 7265868
 Node: Example 8267726
 Node: Example 9277962
 Node: Tutorial293833
-Ref: Tutorial-Footnote-1308364
-Ref: Tutorial-Footnote-2308655
-Ref: Tutorial-Footnote-3308804
-Ref: Tutorial-Footnote-4308941
-Ref: Tutorial-Footnote-5309040
-Node: Functions309321
-Node: Functions 1311203
-Node: Functions 2328792
-Node: Functions 3332565
-Node: Functions 4337649
-Node: Functions 5341300
-Node: Functions 6347153
-Node: Environment359459
-Node: Options380464
-Node: Diagnostic messages391851
-Node: Library performance408489
-Node: File formats411035
-Ref: File formats-Footnote-1411459
-Node: Profiling file format411671
-Node: Tracing file format414933
-Node: Supported systems416800
-Node: New system support432233
-Node: New processor support433429
-Node: New file format support434112
-Node: Notes434896
-Node: Generic notes436508
-Ref: Generic notes-Footnote-1453778
-Ref: Generic notes-Footnote-2453996
-Node: UNIX notes454218
-Node: Amiga notes458815
-Node: Windows notes462479
-Node: Netware notes464038
-Node: Frequently asked questions466598
-Node: Documentation467221
-Node: Building472051
-Node: Linking480767
-Node: Running485988
-Node: Files501096
-Node: Related software504092
-Ref: Related software-Footnote-1543102
-Node: References543343
-Node: Copying545936
-Node: Function index573825
-Node: Index577677
+Ref: Tutorial-Footnote-1308389
+Ref: Tutorial-Footnote-2308680
+Ref: Tutorial-Footnote-3308829
+Ref: Tutorial-Footnote-4308966
+Ref: Tutorial-Footnote-5309065
+Node: Functions309346
+Node: Functions 1311228
+Node: Functions 2328817
+Node: Functions 3332590
+Node: Functions 4337674
+Node: Functions 5341325
+Node: Functions 6347178
+Node: Environment359484
+Node: Options380489
+Node: Diagnostic messages391876
+Node: Library performance408514
+Node: File formats411060
+Ref: File formats-Footnote-1411484
+Node: Profiling file format411696
+Node: Tracing file format414958
+Node: Supported systems416825
+Node: New system support432256
+Node: New processor support433452
+Node: New file format support434135
+Node: Notes434919
+Node: Generic notes436531
+Ref: Generic notes-Footnote-1453801
+Ref: Generic notes-Footnote-2454019
+Node: UNIX notes454241
+Node: Amiga notes458838
+Node: Windows notes462502
+Node: Netware notes464061
+Node: Frequently asked questions466621
+Node: Documentation467244
+Node: Building472074
+Node: Linking480808
+Node: Running486029
+Node: Files501615
+Node: Related software504700
+Ref: Related software-Footnote-1543710
+Node: References543951
+Node: Copying546544
+Node: Function index574433
+Node: Index578285
 
 End Tag Table

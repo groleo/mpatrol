@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.183 2001-02-20 21:02:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.184 2001-02-20 21:51:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -6721,8 +6721,8 @@ calls to @code{malloc()} and @code{free()} with their mpatrol
 equivalents@footnote{This is not strictly necessary on UNIX and Windows
 platforms (and AmigaOS when using @command{gcc}), but it does give us more
 debugging information.}.  Then, recompile the program and link it with the
-mpatrol library.  This time, running it with even the simplest of non-empty
-input lines should cause it to abort!
+mpatrol library.  This time, running it with the @option{CHECK=-} option and
+even the simplest of non-empty input lines should cause it to abort!
 
 If you look at the @file{mpatrol.log} file produced, you should see something
 along the lines of the following at the end of the log file.
@@ -9542,7 +9542,7 @@ encoded as an unsigned LEB128 number.
 
 Following is a list of systems on which the mpatrol library has been built and
 tested.  The system details include the operating system and version, the
-processor type, the object file format and the C compiler used to compile the
+processor type, the object file format and the compiler used to compile the
 library and tests.  The details following each system list any features of the
 library that are not (or cannot be) supported on that system.
 
@@ -10998,8 +10998,8 @@ calling @code{operator new}.  You can either try not to use placement
 @code{new} or you can define the preprocessor macro @code{MP_NOCPLUSPLUS} when
 compiling your source file, which will disable the overriding of any C++
 operators in @file{mpatrol.h}.  Alternatively, if you define
-@code{MP_NONEWDELETE} then you can use @code{MP_NEW} and @code{MP_DELETE} in
-order to call the mpatrol versions of the C++ operators.
+@code{MP_NONEWDELETE} then you can use @code{MP_NEW}, @code{MP_NEW_NOTHROW} and
+@code{MP_DELETE} in order to call the mpatrol versions of the C++ operators.
 
 @item
 I still have the above problem, but I don't think it's due to placement
@@ -11394,6 +11394,16 @@ external library, sets up a signal handler that handles @code{SIGBUS} or
 longer be able to catch illegal memory accesses.  You can either try to live
 with that, or you could try disabling the overriding handlers.
 
+@item
+How do I set a breakpoint on the @code{malloc()} function when it is implemented
+as a preprocessor macro in @file{mpatrol.h}?
+
+There are four different mpatrol interface functions which are used to allocate
+memory, duplicate strings, reallocate memory and deallocate memory.  If you look
+in @file{mpatrol.h} you should be able to see the name of the function that will
+be called when the macro is invoked.  The same goes for the memory operation
+functions.
+
 @cindex core file
 @item
 I've linked and run my program with mpatrol under UNIX and it uses a large
@@ -11517,7 +11527,8 @@ system.  All of the source files that comprise an mpatrol release are stored in
 a central CVS repository so that previous releases can be easily retrieved, but
 the CVS system needs to have a way of determining the versions of currently
 checked-out files, hence the @file{CVS} subdirectories.  You shouldn't need to
-worry about them, so just ignore them.
+worry about them, so just ignore them, and in later releases they should have
+been removed before a distribution was made.
 
 @item
 Why does the @command{mpsym} command not work for me?

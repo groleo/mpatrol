@@ -6250,8 +6250,8 @@ let's now try to compile and link it with the mpatrol library<a rel=footnote hre
 <p>First, add the inclusion of <code>mpatrol.h</code> to line 34 so that we can replace
 calls to <code>malloc()</code> and <code>free()</code> with their mpatrol
 equivalents<a rel=footnote href="#fn-45"><sup>45</sup></a>.  Then, recompile the program and link it with the
-mpatrol library.  This time, running it with even the simplest of non-empty
-input lines should cause it to abort!
+mpatrol library.  This time, running it with the <code>CHECK=-</code> option and
+even the simplest of non-empty input lines should cause it to abort!
 
 <p>If you look at the <code>mpatrol.log</code> file produced, you should see something
 along the lines of the following at the end of the log file.
@@ -8842,7 +8842,7 @@ Up:<a rel=up href="#Top">Top</a>
 
 <p>Following is a list of systems on which the mpatrol library has been built and
 tested.  The system details include the operating system and version, the
-processor type, the object file format and the C compiler used to compile the
+processor type, the object file format and the compiler used to compile the
 library and tests.  The details following each system list any features of the
 library that are not (or cannot be) supported on that system.
 
@@ -10010,8 +10010,8 @@ calling <code>operator new</code>.  You can either try not to use placement
 <code>new</code> or you can define the preprocessor macro <code>MP_NOCPLUSPLUS</code> when
 compiling your source file, which will disable the overriding of any C++
 operators in <code>mpatrol.h</code>.  Alternatively, if you define
-<code>MP_NONEWDELETE</code> then you can use <code>MP_NEW</code> and <code>MP_DELETE</code> in
-order to call the mpatrol versions of the C++ operators.
+<code>MP_NONEWDELETE</code> then you can use <code>MP_NEW</code>, <code>MP_NEW_NOTHROW</code> and
+<code>MP_DELETE</code> in order to call the mpatrol versions of the C++ operators.
 
 </p><li>I still have the above problem, but I don't think it's due to placement
 <code>new</code> since the compiler complains about <code>operator new[]</code>, so could
@@ -10372,6 +10372,15 @@ external library, sets up a signal handler that handles <code>SIGBUS</code> or
 longer be able to catch illegal memory accesses.  You can either try to live
 with that, or you could try disabling the overriding handlers.
 
+</p><li>How do I set a breakpoint on the <code>malloc()</code> function when it is implemented
+as a preprocessor macro in <code>mpatrol.h</code>?
+
+<p>There are four different mpatrol interface functions which are used to allocate
+memory, duplicate strings, reallocate memory and deallocate memory.  If you look
+in <code>mpatrol.h</code> you should be able to see the name of the function that will
+be called when the macro is invoked.  The same goes for the memory operation
+functions.
+
 </p><li>I've linked and run my program with mpatrol under UNIX and it uses a large
 amount of heap memory.  However, it crashes near the end of execution and then
 proceeds to freeze up the whole system, sometimes requiring a reboot.  What am I
@@ -10487,7 +10496,8 @@ system.  All of the source files that comprise an mpatrol release are stored in
 a central CVS repository so that previous releases can be easily retrieved, but
 the CVS system needs to have a way of determining the versions of currently
 checked-out files, hence the <code>CVS</code> subdirectories.  You shouldn't need to
-worry about them, so just ignore them.
+worry about them, so just ignore them, and in later releases they should have
+been removed before a distribution was made.
 
 </p><li>Why does the <code>mpsym</code> command not work for me?
 

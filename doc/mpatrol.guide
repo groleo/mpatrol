@@ -6430,8 +6430,8 @@ and link it with the mpatrol library(1).
    First, add the inclusion of @{b}mpatrol.h@{ub} to line 34 so that we can
 replace calls to @{b}malloc()@{ub} and @{b}free()@{ub} with their mpatrol equivalents(2).
 Then, recompile the program and link it with the mpatrol library.
-This time, running it with even the simplest of non-empty input lines
-should cause it to abort!
+This time, running it with the @{b}CHECK=-@{ub} option and even the simplest of
+non-empty input lines should cause it to abort!
 
    If you look at the @{b}mpatrol.log@{ub} file produced, you should see
 something along the lines of the following at the end of the log file.
@@ -9199,7 +9199,7 @@ Supported systems
 
    Following is a list of systems on which the mpatrol library has been
 built and tested.  The system details include the operating system and
-version, the processor type, the object file format and the C compiler
+version, the processor type, the object file format and the compiler
 used to compile the library and tests.  The details following each
 system list any features of the library that are not (or cannot be)
 supported on that system.
@@ -10505,8 +10505,9 @@ Building
      use placement @{b}new@{ub} or you can define the preprocessor macro
      @{b}MP_NOCPLUSPLUS@{ub} when compiling your source file, which will disable
      the overriding of any C++ operators in @{b}mpatrol.h@{ub}.  Alternatively,
-     if you define @{b}MP_NONEWDELETE@{ub} then you can use @{b}MP_NEW@{ub} and @{b}MP_DELETE@{ub}
-     in order to call the mpatrol versions of the C++ operators.
+     if you define @{b}MP_NONEWDELETE@{ub} then you can use @{b}MP_NEW@{ub},
+     @{b}MP_NEW_NOTHROW@{ub} and @{b}MP_DELETE@{ub} in order to call the mpatrol versions
+     of the C++ operators.
 
   4. I still have the above problem, but I don't think it's due to
      placement @{b}new@{ub} since the compiler complains about @{b}operator new[]@{ub},
@@ -10910,7 +10911,16 @@ Running
      try to live with that, or you could try disabling the overriding
      handlers.
 
- 13. I've linked and run my program with mpatrol under UNIX and it uses
+ 13. How do I set a breakpoint on the @{b}malloc()@{ub} function when it is
+     implemented as a preprocessor macro in @{b}mpatrol.h@{ub}?
+
+     There are four different mpatrol interface functions which are
+     used to allocate memory, duplicate strings, reallocate memory and
+     deallocate memory.  If you look in @{b}mpatrol.h@{ub} you should be able to
+     see the name of the function that will be called when the macro is
+     invoked.  The same goes for the memory operation functions.
+
+ 14. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -10930,7 +10940,7 @@ Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 14. Why does my program run so slowly after I link it with the mpatrol
+ 15. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -10944,7 +10954,7 @@ Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 15. My program is written in C++ and is linked to the mpatrol library,
+ 16. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -10961,7 +10971,7 @@ Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 16. Why does my program not stop when the mpatrol library notices an
+ 17. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -10973,7 +10983,7 @@ Running
      of program execution, and then search backwards in the log file for
      @{b}WARNING@{ub} or @{b}ERROR@{ub}.
 
- 17. I have linked my program with the mpatrol library on an Amiga or
+ 18. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -10987,7 +10997,7 @@ Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 18. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
+ 19. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the @{b}MPATROL_OPTIONS@{ub} environment variable recognised
      when I run it?
@@ -11000,7 +11010,7 @@ Running
      allows you to set an environment variable that the GNU @{b}getenv()@{ub}
      function can read when you are running in AmigaDOS.
 
- 19. How do I suppress all diagnostic output from the mpatrol library?
+ 20. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's @{i}bit bucket@{ui}, which is @{b}/dev/null@{ub} on UNIX platforms and @{b}NIL:@{ub}
@@ -11042,7 +11052,8 @@ Files
      releases can be easily retrieved, but the CVS system needs to have
      a way of determining the versions of currently checked-out files,
      hence the @{b}CVS@{ub} subdirectories.  You shouldn't need to worry about
-     them, so just ignore them.
+     them, so just ignore them, and in later releases they should have
+     been removed before a distribution was made.
 
   3. Why does the @{b}mpsym@{ub} command not work for me?
 
