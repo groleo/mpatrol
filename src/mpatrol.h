@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.116 2001-03-06 22:02:26 graeme Exp $
+ * $Id: mpatrol.h,v 1.117 2001-03-07 20:33:54 graeme Exp $
  */
 
 
@@ -427,6 +427,8 @@ typedef struct __mp_heapinfo
     size_t gtotal; /* total size of freed blocks */
     size_t icount; /* total number of internal blocks */
     size_t itotal; /* total size of internal blocks */
+    size_t mcount; /* total number of marked blocks */
+    size_t mtotal; /* total size of marked blocks */
 }
 __mp_heapinfo;
 

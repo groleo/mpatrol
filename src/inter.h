@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.41 2001-03-06 19:47:56 graeme Exp $
+ * $Id: inter.h,v 1.42 2001-03-07 20:33:54 graeme Exp $
  */
 
 
@@ -104,6 +104,8 @@ typedef struct heapinfo
     size_t gtotal; /* total size of freed blocks */
     size_t icount; /* total number of internal blocks */
     size_t itotal; /* total size of internal blocks */
+    size_t mcount; /* total number of marked blocks */
+    size_t mtotal; /* total size of marked blocks */
 }
 heapinfo;
 
