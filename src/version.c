@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+ * Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.33 2000-12-18 22:20:46 graeme Exp $"
+#ident "$Id: version.c,v 1.34 2000-12-26 10:46:17 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -65,7 +65,7 @@ MP_GLOBAL char *__mp_version = MP_VERSION " (18 December 2000)";
 #endif /* TARGET */
 
 
-MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2000 Graeme S. Roy";
+MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2001 Graeme S. Roy";
 MP_GLOBAL char *__mp_homepage = "http://www.cbmamiga.demon.co.uk/mpatrol";
 
 

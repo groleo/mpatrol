@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+ * Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.21 2000-12-20 23:02:14 graeme Exp $"
+#ident "$Id: malloc.c,v 1.22 2000-12-26 10:46:17 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
