@@ -449,6 +449,28 @@
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 
 
+/* Indicates if support for full stack tracebacks is available.  This
+ * information can then be used to decide if we should compare two call stacks
+ * for the purpose of determining when memory allocations made by the alloca()
+ * family of functions go out of scope.  Otherwise we have to use a less
+ * accurate system which takes the addresses of local variables.
+ */
+
+#ifndef MP_FULLSTACK
+#if MP_BUILTINSTACK_SUPPORT
+#define MP_FULLSTACK 0
+#elif MP_LIBRARYSTACK_SUPPORT || (TARGET == TARGET_UNIX && \
+       (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K || \
+        ARCH == ARCH_MIPS || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
+        ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
+        TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
+#define MP_FULLSTACK 1
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ... */
+#define MP_FULLSTACK 0
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ... */
+#endif /* MP_FULLSTACK */
+
+
 /* Indicates if the system dynamic linker supports preloading a set of shared
  * libraries specified in an environment variable.
  */
