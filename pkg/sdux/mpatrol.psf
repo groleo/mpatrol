@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.11 2000-12-26 10:50:42 graeme Exp $
+# $Id: mpatrol.psf,v 1.12 2001-01-03 21:38:17 graeme Exp $
 
 
 product
@@ -43,6 +43,7 @@ product
 	file -m 0775		mleak
 	file -m 0775		mpsym
 	file -m 0775		mpedit
+	file -m 0775		hexwords
 	directory		mpatrol/doc=/usr/local/doc
 	directory		mpatrol/doc/mpatrol=/usr/local/doc/mpatrol
 	file			README

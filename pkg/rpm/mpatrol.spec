@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.48 2000-12-26 10:50:11 graeme Exp $
+# $Id: mpatrol.spec,v 1.49 2001-01-03 21:38:15 graeme Exp $
 
 
 %define libversion 1.3
@@ -79,6 +79,7 @@ install -m755 -s build/unix/mptrace $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mleak $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
+install -m755 bin/hexwords $RPM_BUILD_ROOT/%{_bindir}
 mv man/dvi .
 mv man/ps .
 mv man/pdf .
