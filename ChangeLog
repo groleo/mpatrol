@@ -1,3 +1,86 @@
+2001-09-05  Graeme Roy  <graeme.roy@analog.com>
+
+	* bin/mupdate: Also remove any .cvsignore files.
+
+	* build/windows/.cvsignore, build/unix/.cvsignore,
+	  build/netware/.cvsignore, build/amiga/.cvsignore, doc/.cvsignore,
+	  man/ps/.cvsignore, man/pdf/.cvsignore, man/html/.cvsignore,
+	  man/dvi/.cvsignore, man/cat3/.cvsignore, man/cat1/.cvsignore,
+	  pkg/sdux/.cvsignore, pkg/rpm/.cvsignore, pkg/pkg/.cvsignore,
+	  pkg/zip/.cvsignore, pkg/tar/.cvsignore, pkg/lha/.cvsignore:
+	Added .cvsignore files.
+
+	* doc/mpatrol.texi:
+	Added information about the Debian package format.  Added information
+	about pageheap on Windows 2000.
+
+	* pkg/debian/README.debian, pkg/debian/changelog, pkg/debian/copyright,
+	  pkg/debian/dirs, pkg/debian/docs, pkg/debian/doc-base,
+	  pkg/debian/info, pkg/debian/rules, pkg/debian/watch:
+	Added Debian package files.
+
+2001-09-04  Graeme Roy  <graeme.roy@analog.com>
+
+	* INSTALL:
+	New top-level INSTALL with information on how to build and install
+	mpatrol with autoconf, automake and libtool.
+
+	* THANKS:
+	Added Jerome Marant for his work on producing a debian package.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_symbol().
+
+	* doc/mpatrol.texi, doc/refcard.tex:
+	Added the __mp_symbol() function.  Documented that Tru64 stack unwinding
+	is sort of fixed.  Documented that Jerome Marant did the Debian port.
+
+	* man/man3/libmpatrol.3:
+	Added the __mp_symbol() function.
+
+	* pkg/debian/control: New control file for Debian.
+
+	* src/stack.c: Fixed Tru64 stack unwinding (for now).
+
+	* src/inter.c: Added init_flag for Tru64 stack unwinding.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added the __mp_symbol() function.
+
+2001-09-03  Graeme Roy  <graeme.roy@analog.com>
+
+	* README:
+	Elaborated slightly about seeing the manual for more information.
+
+	* bin/mpsym: Removed need for printf command by replacing it with awk.
+
+	* bin/mpedit:
+	Added support for elvis, pico and nano.  Use awk if nl is not available.
+
+	* build/unix/Makefile:
+	Changed ln -fs to ln -f -s for full portability.  MP_GUI_SUPPORT is 0
+	by default so remove explicit default.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def:
+	Restored the EXPORTS lists.  Added __mp_memhead().
+
+	* doc/mpatrol.texi:
+	Documented that elvis, pico and nano are now supported with mpedit and
+	that it now works fully on FreeBSD and LynxOS.  Forgot to add that LIST
+	now works with the previous change.  Documented that mpsym now works on
+	LynxOS since the printf command is no longer required.
+
+	* man/man1/mpedit.1: Added elvis, pico and nano.
+
+	* src/config.h: Now default MP_API to nothing.
+
+2001-08-29  Graeme Roy  <graeme.roy@analog.com>
+
+	* doc/mpatrol.texi: Updated some of the things to do.
+
 2001-08-27  Graeme Roy  <graeme.roy@analog.com>
 
 	* build/unix/Makefile.aix: Explicitly add MP_GUI_SUPPORT.
