@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.52 2001-01-15 23:14:13 graeme Exp $"
+#ident "$Id: diag.c,v 1.53 2001-01-15 23:42:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -909,7 +909,7 @@ __mp_printalloc(symhead *y, allocnode *n)
 
 static
 void
-logcall(infohead *h, loginfo *i)
+logcall(infohead *h, loginfo *i, size_t s)
 {
     __mp_diag("[");
 #if MP_THREADS_SUPPORT
@@ -920,7 +920,15 @@ logcall(infohead *h, loginfo *i)
         __mp_diag("-");
     else
         __mp_diag("%lu", i->line);
-    __mp_diag("]\n");
+    __mp_diag("]");
+    if ((i->typestr != NULL) && (i->typesize != 0))
+    {
+        __mp_diag(" (%s", i->typestr);
+        if ((s /= i->typesize) > 1)
+            __mp_diag(" x %lu", s);
+        __mp_diag(")");
+    }
+    __mp_diag("\n");
     __mp_printstack(&h->syms, i->stack);
     __mp_diag("\n");
 }
@@ -941,7 +949,7 @@ __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, loginfo *i)
     else
         __mp_printsize(a);
     __mp_diag(") ");
-    logcall(h, i);
+    logcall(h, i, l);
 }
 
 
@@ -961,7 +969,7 @@ __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f,
     else
         __mp_printsize(a);
     __mp_diag(") ");
-    logcall(h, i);
+    logcall(h, i, l);
 }
 
 
@@ -973,7 +981,7 @@ void
 __mp_logfree(infohead *h, void *p, alloctype f, loginfo *i)
 {
     __mp_diag("FREE: %s (" MP_POINTER ") ", __mp_functionnames[f], p);
-    logcall(h, i);
+    logcall(h, i, 0);
 }
 
 
@@ -988,7 +996,7 @@ __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
     __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
-    logcall(h, i);
+    logcall(h, i, 0);
 }
 
 
@@ -1004,7 +1012,7 @@ __mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
-    logcall(h, i);
+    logcall(h, i, 0);
 }
 
 
@@ -1021,7 +1029,7 @@ __mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m,
     __mp_diag(", " MP_POINTER ", ", q);
     __mp_printsize(m);
     __mp_diag(") ");
-    logcall(h, i);
+    logcall(h, i, 0);
 }
 
 
@@ -1037,7 +1045,7 @@ __mp_logmemcompare(infohead *h, void *p, void *q, size_t l, alloctype f,
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(") ");
-    logcall(h, i);
+    logcall(h, i, 0);
 }
 
 
