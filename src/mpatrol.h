@@ -114,7 +114,11 @@
 #define MP_OPT_LOGFILE       -15
 #define MP_OPT_PROFFILE      -16
 #define MP_OPT_PROGFILE      -17
-#define MP_OPT_CHECK         -18
+#define MP_OPT_AUTOSAVE      -18
+#define MP_OPT_CHECK         -19
+#define MP_OPT_SMALLBOUND    -20
+#define MP_OPT_MEDIUMBOUND   -21
+#define MP_OPT_LARGEBOUND    -22
 
 
 /* Flags that can be set or unset using mallopt() and MP_OPT_SETFLAGS or

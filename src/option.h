@@ -55,7 +55,11 @@
 #define OPT_LOGFILE       -15
 #define OPT_PROFFILE      -16
 #define OPT_PROGFILE      -17
-#define OPT_CHECK         -18
+#define OPT_AUTOSAVE      -18
+#define OPT_CHECK         -19
+#define OPT_SMALLBOUND    -20
+#define OPT_MEDIUMBOUND   -21
+#define OPT_LARGEBOUND    -22
 
 
 /* Flags that can be set at run-time.
