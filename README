@@ -21,10 +21,10 @@ Introduction
     mpatrol library performs extensive checking to detect any misuse of
     dynamically allocated memory.  All of this functionality can be integrated
     into existing code through the inclusion of a single header file at
-    compile-time.  On UNIX platforms (and AmigaOS when using gcc) this may not
-    even be necessary as the mpatrol library can be linked with existing object
-    files at link-time or, on some platforms, even dynamically linked with
-    existing programs at run-time.
+    compile-time.  On UNIX and Windows platforms (and AmigaOS when using gcc)
+    this may not even be necessary as the mpatrol library can be linked with
+    existing object files at link-time or, on some platforms, even dynamically
+    linked with existing programs at run-time.
 
     All logging and tracing output from the mpatrol library is sent to a
     separate log file in order to keep its diagnostics separate from any that
