@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.8 2000-10-19 20:54:58 graeme Exp $
+% $Id: refcard.tex,v 1.9 2000-10-29 23:16:40 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -367,15 +367,6 @@ as large allocations for profiling purposes.
 \end{description}
 
 \vskip 12pt
-
-The commands that are distributed with the mpatrol library all parse their
-command line options in a similar way to the UNIX \function{getopt} function.
-Only the long names of the options are shown here.  If an option has a single
-character equivalent it will be listed in the \flag{help} output.  Options that
-accept numeric arguments can have their value specified in binary, octal,
-decimal or hexadecimal notation.
-
-\vskip 12pt
 \heading{mpatrol command options}
 \vskip 6pt
 
@@ -392,6 +383,14 @@ decimal or hexadecimal notation.
 \hfill See \option{CHECK}.
 \item[\flag{check-all}]
 \hfill See \option{CHECKALL}.
+\item[\flag{check-allocs}]
+\hfill See \option{CHECKALLOCS}.
+\item[\flag{check-frees}]
+\hfill See \option{CHECKFREES}.
+\item[\flag{check-memory}]
+\hfill See \option{CHECKMEMORY}.
+\item[\flag{check-reallocs}]
+\hfill See \option{CHECKREALLOCS}.
 \item[\flagpar{def-align}{unsigned integer}]
 \hfill See \option{DEFALIGN}.
 \item[\flag{dynamic}]
