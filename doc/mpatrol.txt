@@ -3,8 +3,8 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
-September, 2000.
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 12th
+October, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -41,8 +41,8 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
-September, 2000.
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 12th
+October, 2000.
 
 Foreword
 ********
@@ -111,18 +111,6 @@ that is my work e-mail address.  There is now also a discussion group at
 `http://www.egroups.com/group/mpatrol/' where you can post
 mpatrol-related questions but you must first subscribe to the group
 before you can send mail to it.
-
-   Note that this manual is not just intended to instruct readers on
-how to use the mpatrol library -- it is also written to give a detailed
-look at how malloc libraries work in general and how to improve the
-efficiency of existing code which uses them.  If this subject interests
-you, you may find further useful material at _The Memory Management
-Reference_ located at `http://www.xanalys.com/software_tools/mm/'.  It
-has links to many documents and research papers in the field of memory
-management, and has a large glossary which lists and explains related
-terms.  You may also wish to look at _A Memory Allocator_ by Doug Lea
-for information on general memory allocation principles.  It is located
-at `http://gee.cs.oswego.edu/dl/html/malloc.html'.
 
    Finally, I'd like to thank Stephan Springl (<springl@bfw-online.de>)
 for his help on reading debugging information from object files via the
@@ -584,8 +572,8 @@ will require a complete recompilation of all your code.
 
      If your program or application has been dynamically linked with
      the system C library (`libc.so') or an alternative malloc shared
-     library then you can use the `-d' option to the `mpatrol' command
-     to override the default definitions of `malloc()', etc. at
+     library then you can use the `--dynamic' option to the `mpatrol'
+     command to override the default definitions of `malloc()', etc. at
      run-time without having to relink your program.
 
      For example, if your program's executable file is called
@@ -2014,11 +2002,11 @@ All of these options but one map directly onto their equivalent
 environment variable settings and exist mainly so that the user does
 not have to manually change the `MPATROL_OPTIONS' environment variable.
 
-   The one option that is the exception to this is the `-d' option,
-which can be used to run a program under the control of the mpatrol
-library, even if it wasn't originally linked with the mpatrol library.
-This can only be done on systems that support dynamic linking and where
-the dynamic linker recognises the `LD_PRELOAD' or `_RLD_LIST'
+   The one option that is the exception to this is the `--dynamic'
+option, which can be used to run a program under the control of the
+mpatrol library, even if it wasn't originally linked with the mpatrol
+library.  This can only be done on systems that support dynamic linking
+and where the dynamic linker recognises the `LD_PRELOAD' or `_RLD_LIST'
 environment variables.  Even then, it can only be used when the program
 that is being run has been dynamically linked with the system C
 library, rather than statically linked.
@@ -2032,9 +2020,9 @@ with the mpatrol versions, but only if they were marked as undefined in
 the original executable file and would therefore have to have been
 loaded from `libc.so'.
 
-   However, if a program qualifies for use with the `-d' option, it
-means that you can trace all of its dynamic memory allocations as well
-as running it with any of the mpatrol library's debugging options.
+   However, if a program qualifies for use with the `--dynamic' option,
+it means that you can trace all of its dynamic memory allocations as
+well as running it with any of the mpatrol library's debugging options.
 This is mainly a _toy_ feature which allows you to view and manipulate
 the dynamic memory allocations of programs that you don't have the
 source for, but in theory it could be quite useful if you need to debug
@@ -2043,18 +2031,18 @@ it.
 
    Note that the `mpatrol' command must be set up to use the correct
 object file format access libraries that are required for your system
-if you wish to use the `-d' option.  If the mpatrol library was built
-with `FORMAT=FORMAT_ELF32' or `FORMAT=FORMAT_ELF64' support then it must
-be told to preload the ELF access library (normally `libelf.so').  If it
-was built with `FORMAT=FORMAT_BFD' support then it must be told to
-preload the GNU BFD access libraries (normally `libbfd.so' and
-`libiberty.so').  However, if these libraries only exist on your system
-in archive form then you must build `libmpatrol.so' with these extra
-libraries incorporated into it so that there are no dependencies on
-them at run-time.  However, there may well be problems if the resulting
-shared library contains position-dependent code from the archive
-libraries you incorporated.  The only way to find out is for you to try
-it and see.
+if you wish to use the `--dynamic' option.  If the mpatrol library was
+built with `FORMAT=FORMAT_ELF32' or `FORMAT=FORMAT_ELF64' support then
+it must be told to preload the ELF access library (normally
+`libelf.so').  If it was built with `FORMAT=FORMAT_BFD' support then it
+must be told to preload the GNU BFD access libraries (normally
+`libbfd.so' and `libiberty.so').  However, if these libraries only
+exist on your system in archive form then you must build
+`libmpatrol.so' with these extra libraries incorporated into it so that
+there are no dependencies on them at run-time.  However, there may well
+be problems if the resulting shared library contains position-dependent
+code from the archive libraries you incorporated.  The only way to find
+out is for you to try it and see.
 
    In order to build a shared version of the mpatrol library with
 embedded object file format access libraries, you must first modify the
@@ -2085,12 +2073,21 @@ that as a result of this, no attempt is made to account for resizing of
 memory allocations and so the total amount of memory used by the
 resulting unfreed allocations may not be entirely accurate.
 
+   This command will also read the unfreed allocations table produced
+by the `SHOWUNFREED' option in the log file if one is present.  The
+entries in the table will be compared with the currently allocated
+entries and will be added if not already present.  However, this
+behaviour can be disabled by supplying the `--ignore' option to the
+`mleak' command.
+
    The `mleak' command takes one optional argument which must be a valid
 mpatrol log filename but if it is omitted then it will use
 `mpatrol.log' as the name of the log file to use.  The `mleak' command
 makes two passes over the log file so the file must be
 randomly-accessible.  If the filename argument is given as `-' then the
-standard input file stream will be used as the log file.
+standard input file stream will be used as the log file.  Note also
+that the `mleak' command supports the `--help' and `--version' options
+in common with the other mpatrol command line tools.
 
 8 Profiling
 ***********
@@ -2153,35 +2150,43 @@ summaries of all of the memory allocations listed by size and the
 function that allocated them and a list of memory leaks with the call
 stack of the allocating function.
 
+   The `mprof' command also attempts to calculate the endianness of the
+processor that produced the profiling output file and reads the file
+accordingly.  This means that it is possible to use `mprof' on a SPARC
+machine to read a profiling output file that was produced on an Intel
+80x86 machine, for example.  However, this will only work if the
+processor that produced the profiling output file has the same word
+size as the processor that is running the `mprof' command.  For
+example, reading a 64-bit profiling output file on a 32-bit machine
+will not work.
+
    Along with the options listed below, the `mprof' command takes one
 optional argument which must be a valid mpatrol profiling output
 filename but if it is omitted then it will use `mpatrol.out' as the
 name of the file to use.  If the filename argument is given as `-' then
 the standard input file stream will be used as the profiling output
-file.
+file.  Note also that the `mprof' command supports the `--help' and
+`--version' options in common with the other mpatrol command line tools.
 
-`-a'
+`--addresses'
      Specifies that different call sites from within the same function
      are to be differentiated and that the names of all functions
      should be displayed with their call site offset in bytes.  This
      affects the direct allocation and memory leak tables.
 
-`-c'
+`--counts'
      Specifies that certain tables should be sorted by the number of
      allocations or deallocations rather than the total number of bytes
      allocated or deallocated.  This affects the direct allocation and
      memory leak tables.
 
-`-n' <DEPTH>
+`--stack-depth' <DEPTH>
      Specifies the maximum stack depth to use when calculating if one
      call site has the same call stack as another call site.  This also
      specifies the maximum number of functions to display in a call
      stack.  If DEPTH is `0' then the call stack depth will be
      unlimited in size.  The default call stack depth is `1'.  This
      affects the memory leak table.
-
-`-V'
-     Displays the version number of the `mprof' command.
 
    We'll now look at an example of using the mpatrol library to profile
 the dynamic memory allocations in a program.  However, remember that
@@ -2352,12 +2357,13 @@ were between 1 and 32 bytes in size.
 
    We could now choose to sort the direct allocation table by the
 number of calls to allocate memory, rather than the number of bytes
-allocated, with the `-c' option to `mprof', but that is not relevant in
-this example.  However, we know that there are two calls to allocate
-memory from `new_pair()', so we can use the `-a' option to `mprof' to
-show all call sites within functions rather than just the total for each
-function.  This option does not affect the allocation bin table so the
-new output from `mprof' with the `-a' option looks like:
+allocated, with the `--counts' option to `mprof', but that is not
+relevant in this example.  However, we know that there are two calls to
+allocate memory from `new_pair()', so we can use the `--addresses'
+option to `mprof' to show all call sites within functions rather than
+just the total for each function.  This option does not affect the
+allocation bin table so the new output from `mprof' with the
+`--addresses' option looks like:
 
                                  DIRECT ALLOCATIONS
      
@@ -2396,12 +2402,13 @@ table and lists all of the functions that allocated memory but did not
 free all of their memory during the lifetime of the program.  The
 default behaviour of `mprof' is to show only the function that directly
 allocated the memory in the memory leak table, but this can be changed
-with the `-n' option.  This accepts an argument specifying the maximum
-number of functions to display in one call stack, with zero indicating
-that all functions in a call stack should be displayed.  This can be
-useful for tracing down the functions that were indirectly responsible
-for the memory leak.  The new memory leak table displayed by `mprof'
-with the `-a' and `-n0' options looks like:
+with the `--stack-depth' option.  This accepts an argument specifying
+the maximum number of functions to display in one call stack, with zero
+indicating that all functions in a call stack should be displayed.
+This can be useful for tracing down the functions that were indirectly
+responsible for the memory leak.  The new memory leak table displayed
+by `mprof' with the `--addresses' and `--stack-depth 0' options looks
+like:
 
                                     MEMORY LEAKS
      
@@ -4303,9 +4310,9 @@ final program.
    ---------- Footnotes ----------
 
    (1) On UNIX systems with dynamic linking it might also be possible
-to run the program under the mpatrol command with its `-d' option
-without having to recompile or relink, but compiling and linking with
-the mpatrol library is a more generic solution across different
+to run the program under the mpatrol command with its `--dynamic'
+option without having to recompile or relink, but compiling and linking
+with the mpatrol library is a more generic solution across different
 platforms.
 
    (2) This is not strictly necessary on UNIX and Windows platforms
@@ -5139,15 +5146,16 @@ have been linked with the mpatrol library.
 
    The `mpatrol' command is used to set various mpatrol library OPTIONS
 when running COMMAND with its ARGUMENTS.  In most cases, COMMAND must
-have been linked with the mpatrol library, unless the `-d' option is
-used in which case COMMAND need only have been dynamically linked.
+have been linked with the mpatrol library, unless the `--dynamic'
+option is used in which case COMMAND need only have been dynamically
+linked.
 
    All mpatrol library diagnostics are sent to the file
 `mpatrol.%n.log' in the current directory by default (where `%n' is the
-current process id) but this can be changed using the `-l' option.
-Similarly, the default profiling output filename is `mpatrol.%n.out'.
-Note that the `LOGALL' option is always implicitly used for commands
-that are run by this command.
+current process id) but this can be changed using the `--log-file'
+option.  Similarly, the default profiling output filename is
+`mpatrol.%n.out'.  Note that the `LOGALL' option is always implicitly
+used for commands that are run by this command.
 
    Alternatively, the log file and profiling output file names can
 contain `%p', which will be replaced with the name of the program being
@@ -5155,172 +5163,180 @@ executed without the directory components.  If the executable filename
 could not be determined or was not set then it will be replaced with
 `mpatrol'.
 
-   All of the following options (except `-d' and `-V') correspond to
-their listed mpatrol library option (*note Environment::).
+   All of the following options (except `--dynamic', `--help' and
+`--version') correspond to their listed mpatrol library option (*note
+Environment::).  Note that some of these options have a one character
+equivalent option that can be used for brevity.  The list of one
+character options can be viewed with the `--help' option or viewed in
+the UNIX manual pages.  Such options are parsed on the command line in
+a similar way to the UNIX function `getopt()'.
 
-`-1' <UNSIGNED-INTEGER>
-     [`SMALLBOUND']  Specifies the limit in bytes up to which memory
-     allocations should be classified as small allocations for
-     profiling purposes.
-
-`-2' <UNSIGNED-INTEGER>
-     [`MEDIUMBOUND']  Specifies the limit in bytes up to which memory
-     allocations should be classified as medium allocations for
-     profiling purposes.
-
-`-3' <UNSIGNED-INTEGER>
-     [`LARGEBOUND']  Specifies the limit in bytes up to which memory
-     allocations should be classified as large allocations for
-     profiling purposes.
-
-`-A' <UNSIGNED-INTEGER>
-     [`ALLOCSTOP']  Specifies an allocation index at which to stop the
-     program when it is being allocated.
-
-`-a' <UNSIGNED-INTEGER>
+`--alloc-byte' <UNSIGNED-INTEGER>
      [`ALLOCBYTE']  Specifies an 8-bit byte pattern with which to
      prefill newly-allocated memory.
 
-`-C' <UNSIGNED-RANGE>
+`--alloc-stop' <UNSIGNED-INTEGER>
+     [`ALLOCSTOP']  Specifies an allocation index at which to stop the
+     program when it is being allocated.
+
+`--allow-oflow'
+     [`ALLOWOFLOW']  Specifies that a warning rather than an error
+     should be produced if any memory operation function overflows the
+     boundaries of a memory allocation, and that the operation should
+     still be performed.
+
+`--auto-save' <UNSIGNED-INTEGER>
+     [`AUTOSAVE']  Specifies the frequency at which to periodically
+     write the profiling data to the profiling output file.
+
+`--check' <UNSIGNED-RANGE>
      [`CHECK']  Specifies a range of allocation indices at which to
      check the integrity of free memory and overflow buffers.
 
-`-c'
+`--check-all'
      [`CHECKALL']  Specifies that all arguments to functions which
      allocate, reallocate and deallocate memory have rigorous checks
      performed on them.  In addition, functions which perform memory
      operations will be checked for zero-length `NULL' pointers.
 
-`-D' <UNSIGNED-INTEGER>
+`--def-align' <UNSIGNED-INTEGER>
      [`DEFALIGN']  Specifies the default alignment for general-purpose
      memory allocations, which must be a power of two.
 
-`-d'
+`--dynamic'
      Specifies that programs which were not linked with the mpatrol
      library should also be traced, but only if they were dynamically
      linked.  This option will only work if the system dynamic linker
      has the ability to preload a set of user-specified shared
      libraries via a special environment variable.
 
-`-e' <STRING>
-     [`PROGFILE']  Specifies an alternative filename with which to
-     locate the executable file containing the program's symbols.
+`--fail-freq' <UNSIGNED-INTEGER>
+     [`FAILFREQ']  Specifies the frequency at which all memory
+     allocations will randomly fail.
 
-`-F' <UNSIGNED-INTEGER>
-     [`FREESTOP']  Specifies an allocation index at which to stop the
-     program when it is being freed.
+`--fail-seed' <UNSIGNED-INTEGER>
+     [`FAILSEED']  Specifies the random number seed which will be used
+     when determining which memory allocations will randomly fail.
 
-`-f' <UNSIGNED-INTEGER>
+`--free-byte' <UNSIGNED-INTEGER>
      [`FREEBYTE']  Specifies an 8-bit byte pattern with which to prefill
      newly-freed memory.
 
-`-G'
-     [`SAFESIGNALS']  Instructs the library to save and replace certain
-     signal handlers during the execution of library code and to
-     restore them afterwards.
+`--free-stop' <UNSIGNED-INTEGER>
+     [`FREESTOP']  Specifies an allocation index at which to stop the
+     program when it is being freed.
 
-`-g'
-     [`USEDEBUG']  Specifies that any debugging information in the
-     executable file should be used to obtain additional source-level
-     information.
+`--help'
+     Displays a quick-reference option summary.
 
-`-L' <UNSIGNED-INTEGER>
+`--large-bound' <UNSIGNED-INTEGER>
+     [`LARGEBOUND']  Specifies the limit in bytes up to which memory
+     allocations should be classified as large allocations for
+     profiling purposes.
+
+`--limit' <UNSIGNED-INTEGER>
      [`LIMIT']  Specifies the limit in bytes at which all memory
      allocations should fail if the total allocated memory should
      increase beyond this.
 
-`-l' <STRING>
+`--log-file' <STRING>
      [`LOGFILE']  Specifies an alternative file in which to place all
      diagnostics from the mpatrol library.
 
-`-M'
-     [`ALLOWOFLOW']  Specifies that a warning rather than an error
-     should be produced if any memory operation function overflows the
-     boundaries of a memory allocation, and that the operation should
-     still be performed.
+`--medium-bound' <UNSIGNED-INTEGER>
+     [`MEDIUMBOUND']  Specifies the limit in bytes up to which memory
+     allocations should be classified as medium allocations for
+     profiling purposes.
 
-`-m'
-     [`USEMMAP']  Specifies that the library should use `mmap()' instead
-     of `sbrk()' to allocate system memory.
-
-`-N'
-     [`NOPROTECT']  Specifies that the mpatrol library's internal data
-     structures should not be made read-only after every memory
-     allocation, reallocation or deallocation.
-
-`-n' <UNSIGNED-INTEGER>
+`--no-free' <UNSIGNED-INTEGER>
      [`NOFREE']  Specifies that a number of recently-freed memory
      allocations should be prevented from being returned to the free
      memory pool.
 
-`-O' <UNSIGNED-INTEGER>
-     [`OFLOWSIZE']  Specifies the size in bytes to use for all overflow
-     buffers, which must be a power of two.
+`--no-protect'
+     [`NOPROTECT']  Specifies that the mpatrol library's internal data
+     structures should not be made read-only after every memory
+     allocation, reallocation or deallocation.
 
-`-o' <UNSIGNED-INTEGER>
+`--oflow-byte' <UNSIGNED-INTEGER>
      [`OFLOWBYTE']  Specifies an 8-bit byte pattern with which to fill
      the overflow buffers of all memory allocations.
 
-`-P' <STRING>
-     [`PROFFILE']  Specifies an alternative file in which to place all
-     memory allocation profiling information from the mpatrol library.
+`--oflow-size' <UNSIGNED-INTEGER>
+     [`OFLOWSIZE']  Specifies the size in bytes to use for all overflow
+     buffers, which must be a power of two.
 
-`-p'
+`--oflow-watch'
+     [`OFLOWWATCH']  Specifies that watch point areas should be used for
+     overflow buffers rather than filling with the overflow byte.
+
+`--page-alloc-lower'
+     [`PAGEALLOC=LOWER']  Specifies that each individual memory
+     allocation should occupy at least one page of virtual memory and
+     should be placed at the lowest point within these pages.
+
+`--page-alloc-upper'
+     [`PAGEALLOC=UPPER']  Specifies that each individual memory
+     allocation should occupy at least one page of virtual memory and
+     should be placed at the highest point within these pages.
+
+`--preserve'
+     [`PRESERVE']  Specifies that any reallocated or freed memory
+     allocations should preserve their original contents.
+
+`--prof'
      [`PROF']  Specifies that all memory allocations are to be profiled
      and sent to the profiling output file.
 
-`-Q' <UNSIGNED-INTEGER>
-     [`AUTOSAVE']  Specifies the frequency at which to periodically
-     write the profiling data to the profiling output file.
+`--prof-file' <STRING>
+     [`PROFFILE']  Specifies an alternative file in which to place all
+     memory allocation profiling information from the mpatrol library.
 
-`-R' <UNSIGNED-INTEGER>
+`--prog-file' <STRING>
+     [`PROGFILE']  Specifies an alternative filename with which to
+     locate the executable file containing the program's symbols.
+
+`--realloc-stop' <UNSIGNED-INTEGER>
      [`REALLOCSTOP']  Specifies an allocation index at which to stop the
      program when a memory allocation is being reallocated.
 
-`-S'
+`--safe-signals'
+     [`SAFESIGNALS']  Instructs the library to save and replace certain
+     signal handlers during the execution of library code and to
+     restore them afterwards.
+
+`--show-freed'
+     [`SHOWFREED' & `SHOWUNFREED']  Specifies that a summary of all of
+     the freed and unfreed memory allocations should be displayed at
+     the end of program execution.
+
+`--show-map'
      [`SHOWMAP' & `SHOWSYMBOLS']  Specifies that a memory map of the
      entire heap and a summary of all of the function symbols read from
      the program's executable file should be displayed at the end of
      program execution.
 
-`-s'
-     [`SHOWFREED' & `SHOWUNFREED']  Specifies that a summary of all of
-     the freed and unfreed memory allocations should be displayed at
-     the end of program execution.
+`--small-bound' <UNSIGNED-INTEGER>
+     [`SMALLBOUND']  Specifies the limit in bytes up to which memory
+     allocations should be classified as small allocations for
+     profiling purposes.
 
-`-U' <UNSIGNED-INTEGER>
+`--unfreed-abort' <UNSIGNED-INTEGER>
      [`UNFREEDABORT']  Specifies the minimum number of unfreed
      allocations at which to abort the program just before program
      termination.
 
-`-V'
+`--use-debug'
+     [`USEDEBUG']  Specifies that any debugging information in the
+     executable file should be used to obtain additional source-level
+     information.
+
+`--use-mmap'
+     [`USEMMAP']  Specifies that the library should use `mmap()' instead
+     of `sbrk()' to allocate system memory.
+
+`--version'
      Displays the version number of the `mpatrol' command.
-
-`-v'
-     [`PRESERVE']  Specifies that any reallocated or freed memory
-     allocations should preserve their original contents.
-
-`-w'
-     [`OFLOWWATCH']  Specifies that watch point areas should be used for
-     overflow buffers rather than filling with the overflow byte.
-
-`-X'
-     [`PAGEALLOC=UPPER']  Specifies that each individual memory
-     allocation should occupy at least one page of virtual memory and
-     should be placed at the highest point within these pages.
-
-`-x'
-     [`PAGEALLOC=LOWER']  Specifies that each individual memory
-     allocation should occupy at least one page of virtual memory and
-     should be placed at the lowest point within these pages.
-
-`-Z' <UNSIGNED-INTEGER>
-     [`FAILSEED']  Specifies the random number seed which will be used
-     when determining which memory allocations will randomly fail.
-
-`-z' <UNSIGNED-INTEGER>
-     [`FAILFREQ']  Specifies the frequency at which all memory
-     allocations will randomly fail.
 
 Appendix D Diagnostic messages
 ******************************
@@ -5958,7 +5974,7 @@ supported on that system.
           link instead of a dynamic link: `-bnoautoimp'
           `-bimport:/lib/syscalls.exp'.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * AIX 4.1, IBM RS/6000, XCOFF, `cc'
         * The thread-safe version of the library does not work.
@@ -5973,22 +5989,22 @@ supported on that system.
           link instead of a dynamic link: `-bnoautoimp'
           `-bimport:/lib/syscalls.exp'.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * DG/UX 4.11, Intel Pentium Pro, ELF32, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * DG/UX 4.20MU07, Intel Pentium Pro, ELF32, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libelf.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libelf.so' is available.
 
    * DG/UX 4.11, Motorola 88100, ELF32, `gcc'
         * The thread-safe version of the library does not work if the
@@ -6000,7 +6016,7 @@ supported on that system.
 
         * Call stack traversal only works with unoptimised code.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * DRS/NX 6.2, SPARC V7, ELF32, `cc'
         * The option `-DSYSTEM=SYSTEM_DRSNX' must be added to the
@@ -6015,15 +6031,15 @@ supported on that system.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * DYNIX/ptx 4.5, Intel Pentium Pro, ELF32, `cc'
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libelf.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libelf.so' is available.
 
    * HP/UX 10.20, HP PA/RISC 9000, BFD, `gcc'
         * The thread-safe version of the library does not work.  This
@@ -6032,7 +6048,7 @@ supported on that system.
 
         * The `OFLOWWATCH' option has no effect.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * IRIX 5.3, MIPS R4000, ELF32, `cc'
         * The thread-safe version of the library does not work.  This
@@ -6048,6 +6064,12 @@ supported on that system.
 
         * Stack traversal may be unreliable from signal-handlers.
 
+   * Red Hat Linux 6.0, Intel Pentium III, BFD, `gcc'
+        * The `OFLOWWATCH' option has no effect.
+
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libiberty.so' is available.
+
    * Red Hat Linux 6.1, Intel Pentium III, BFD, `gcc'
         * The thread-safe version of the library does not work due to
           the system threads library calling `malloc()' and `bzero()'
@@ -6055,14 +6077,14 @@ supported on that system.
 
         * The `OFLOWWATCH' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libiberty.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libiberty.so' is available.
 
    * Red Hat Linux 6.2, Intel Pentium III, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libiberty.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libiberty.so' is available.
 
    * Red Hat Linux 5.1, Motorola 68040, BFD, `gcc'
         * The thread-safe version of the library does not work due to
@@ -6071,8 +6093,8 @@ supported on that system.
 
         * The `OFLOWWATCH' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libiberty.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libiberty.so' is available.
 
    * Red Hat Linux 5.1, Motorola 68040, ELF32, `gcc'
         * The thread-safe version of the library does not work due to
@@ -6083,8 +6105,8 @@ supported on that system.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command does not work unless
-          `libelf.so' is available.
+        * The `--dynamic' option to the `mpatrol' command does not work
+          unless `libelf.so' is available.
 
    * LynxOS 3.0.0, Intel Pentium Pro, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -6096,7 +6118,7 @@ supported on that system.
           static link instead of a dynamic link when linking your
           program, but that is the default on LynxOS anyway.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * LynxOS 3.0.0, Intel Pentium Pro, COFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -6110,7 +6132,7 @@ supported on that system.
           static link instead of a dynamic link when linking your
           program, but that is the default on LynxOS anyway.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * LynxOS 3.0.0, PowerPC, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -6122,7 +6144,7 @@ supported on that system.
           static link instead of a dynamic link when linking your
           program, but that is the default on LynxOS anyway.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * LynxOS 3.0.0, PowerPC, XCOFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -6136,7 +6158,7 @@ supported on that system.
           static link instead of a dynamic link when linking your
           program, but that is the default on LynxOS anyway.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * SINIX 5.43, MIPS R4000, ELF32, `cc'
         * The thread-safe version of the library does not work.  This
@@ -6149,7 +6171,7 @@ supported on that system.
 
         * Stack traversal may be unreliable from signal-handlers.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * Solaris 2.6, Intel Pentium Pro, BFD, `gcc'
         * No known issues.
@@ -6206,7 +6228,7 @@ supported on that system.
 
         * The `USEDEBUG' option has no effect.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * AmigaOS 3.1, Motorola 68040, BFD, `gcc'
         * No memory protection so the `PAGEALLOC' option has no effect.
@@ -6223,7 +6245,7 @@ supported on that system.
 
         * No detection of illegal memory accesses.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * AmigaOS 3.1, Motorola 68040, n/a, SAS/C
         * No automatic override of `malloc()', etc., without inclusion
@@ -6243,7 +6265,7 @@ supported on that system.
 
         * No detection of illegal memory accesses.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
@@ -6255,7 +6277,7 @@ supported on that system.
           version of mpatrol with the DLL version of the Microsoft
           Runtime Library, and vice versa.
 
-        * The `-d' option to the `mpatrol' command has no effect.
+        * The `--dynamic' option to the `mpatrol' command has no effect.
 
 G.1 Adding a new operating system
 =================================
@@ -6556,10 +6578,7 @@ H.1 Notes for all platforms
 
    * Perhaps remove the automatic logging of memory operations from
      programs run through the `mpatrol' command, and instead add an
-     option to do it explicitly.  Also, change all of the options in
-     the command line tools to have long option names instead of single
-     letters, as I am running out of letters, and the letters get
-     harder to remember.
+     option to do it explicitly.
 
    * An option should be added to the `mpatrol' command to display the
      contents of the `MPATROL_OPTIONS' environment variable after all
@@ -6685,8 +6704,8 @@ H.2 Notes for UNIX platforms
      symbol is defined in `elf.h', thus resulting in a conflicting
      definition when compiling `symbol.c'.
 
-   * The `-d' option to the `mpatrol' command does not always work on
-     systems whose dynamic linkers support the `LD_PRELOAD' or
+   * The `--dynamic' option to the `mpatrol' command does not always
+     work on systems whose dynamic linkers support the `LD_PRELOAD' or
      `_RLD_LIST' environment variables.  This is because the object
      file format access libraries do not exist in shared form on such
      systems.  There is also likely to be an issue when running with
@@ -6706,8 +6725,8 @@ H.3 Notes for Amiga platforms
      library works fine.  However, if it is built as a shared library
      and `malloc()' and related functions are dynamically linked in
      some executable files then perhaps it would be possible to override
-     these functions, thus getting the `-d' option in the `mpatrol'
-     command to work.
+     these functions, thus getting the `--dynamic' option in the
+     `mpatrol' command to work.
 
    * Need to fix the problem where the maximum guaranteed alignment of
      an internal mpatrol library memory allocation is 8 bytes.
@@ -6769,8 +6788,8 @@ H.4 Notes for Windows platforms
    * The library cannot currently read any symbols from DLLs that have
      been read via `LoadLibrary()'.
 
-   * Perhaps add support for the `mpatrol' command's `-d' option by
-     preloading the mpatrol DLL from the `mpatrol' command.
+   * Perhaps add support for the `mpatrol' command's `--dynamic' option
+     by preloading the mpatrol DLL from the `mpatrol' command.
 
    * Add a Windows resource file to the mpatrol library with copyright
      and version information.
@@ -6791,8 +6810,8 @@ H.5 Notes for Netware platforms
      library should suffice for most purposes.  However, if it is built
      as an NLM and `malloc()' and related functions are dynamically
      linked in some executable files then perhaps it would be possible
-     to override these functions, thus getting the `-d' option in the
-     `mpatrol' command to work.
+     to override these functions, thus getting the `--dynamic' option
+     in the `mpatrol' command to work.
 
    * Need to add support for processors other than the Intel 80x86.
      However, about 99% of Netware platforms run on this processor
@@ -7107,14 +7126,14 @@ I.4 Running
      However, even though it runs successfully, no mpatrol log file is
      produced.  Why is this?
 
-     First, check that you are passing the `-d' option to the `mpatrol'
-     command.  If that doesn't work then check that the executable file
-     has been dynamically linked; statically linked executables cannot
-     be forced to use the mpatrol library.  If it still doesn't work
-     then it may be that the dynamic linker on your system doesn't have
-     the ability to preload any shared libraries that have been
-     specified in a special environment variable, in which case you
-     can't use this feature.
+     First, check that you are passing the `--dynamic' option to the
+     `mpatrol' command.  If that doesn't work then check that the
+     executable file has been dynamically linked; statically linked
+     executables cannot be forced to use the mpatrol library.  If it
+     still doesn't work then it may be that the dynamic linker on your
+     system doesn't have the ability to preload any shared libraries
+     that have been specified in a special environment variable, in
+     which case you can't use this feature.
 
   7. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
@@ -7148,7 +7167,21 @@ I.4 Running
      which is why the behaviour was moved to an option for those that
      needed it.
 
-  9. I've linked and run my program with mpatrol under UNIX and it uses
+  9. Why does mpatrol not report an illegal memory access when it can
+     be detected by a debugger?
+
+     First of all, illegal memory accesses can only be detected on
+     systems that support virtual memory, so that precludes AmigaOS and
+     Netware.  Secondly, it might be possible that something is
+     overriding the illegal memory access handler that mpatrol sets up
+     when it is first initialised.  If your program, or an external
+     library, sets up a signal handler that handles `SIGBUS' or
+     `SIGSEGV' (or their equivalent on Windows platforms) then mpatrol
+     will no longer be able to catch illegal memory accesses.  You can
+     either try to live with that, or you could try disabling the
+     overriding handlers.
+
+ 10. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -7168,7 +7201,7 @@ I.4 Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 10. Why does my program run so slowly after I link it with the mpatrol
+ 11. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -7182,7 +7215,7 @@ I.4 Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 11. My program is written in C++ and is linked to the mpatrol library,
+ 12. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -7199,7 +7232,7 @@ I.4 Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 12. Why does my program not stop when the mpatrol library notices an
+ 13. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -7211,7 +7244,7 @@ I.4 Running
      of program execution, and then search backwards in the log file for
      `WARNING' or `ERROR'.
 
- 13. I have linked my program with the mpatrol library on an Amiga or
+ 14. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -7225,7 +7258,7 @@ I.4 Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 14. I have built the mpatrol library with `gcc' on AmigaOS and have
+ 15. I have built the mpatrol library with `gcc' on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the `MPATROL_OPTIONS' environment variable
      recognised when I run it?
@@ -7238,7 +7271,7 @@ I.4 Running
      allows you to set an environment variable that the GNU `getenv()'
      function can read when you are running in AmigaDOS.
 
- 15. How do I suppress all diagnostic output from the mpatrol library?
+ 16. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's _bit bucket_, which is `/dev/null' on UNIX platforms and
@@ -8664,6 +8697,93 @@ version of `Debugging Tools for Dynamic Storage Allocation and Memory
 Management' (`http://www.cs.colorado.edu/~zorn/MallocDebug.html') by
 Ben Zorn (<zorn@microsoft.com>).
 
+Appendix K References
+*********************
+
+   This section contains references to interesting papers and resources
+on related topics and the field of memory management in general.  The
+vast majority of theoretical information can be found at the Memory
+Management Reference, although this does tend to concentrate on garbage
+collection.  The other references take a more practical approach to
+memory management and in some cases provide implementation details.
+Let me know if you'd like to see any other references or resources
+added to this list.
+
+   * Avoiding Motif Memory Leaks
+    Author
+          Kenton Lee (<kenton@rahul.net>)
+
+    Location
+          `http://www.rahul.net/kenton/txa/mar96.html'
+
+    Overview
+          An article on avoiding memory leaks in Motif applications.
+
+   * Effective C++ Memory Allocation
+    Author
+          Aaron Dailey (<adailey@chaparraltec.com>)
+
+    Location
+          `http://www.embedded.com/1999/9901/9901feat2.htm'
+
+    Overview
+          Documents techniques for better use of the C++ dynamic memory
+          allocation operators.
+
+   * A Memory Allocator
+    Author
+          Doug Lea (<dl@gee.cs.oswego.edu>)
+
+    Location
+          `http://gee.cs.oswego.edu/dl/html/malloc.html'
+
+    Overview
+          Information on general memory allocation principles.
+
+   * The Memory Management Reference
+    Author
+          XANALYS Software Tools (<mm-web@xanalys.com>)
+
+    Location
+          `http://www.xanalys.com/software_tools/mm/'
+
+    Overview
+          Links to many documents and research papers in the field of
+          memory management, and has a large glossary which lists and
+          explains related terms.
+
+   * My Rant on C++'s `operator new'
+    Author
+          David Mazieres (<dm@cs.nyu.edu>)
+
+    Location
+          `http://www.pdos.lcs.mit.edu/~dm/c++-new.html'
+
+    Overview
+          Provides a scathing critique on the C++ dynamic memory
+          allocation operators.
+
+   * The Virtual Memory Tutorial
+    Author
+          The Hyperlearning Center (<webmaster@cne.gmu.edu>)
+
+    Location
+          `http://www.cne.gmu.edu/modules/vm/'
+
+    Overview
+          Provides a comprehensive tutorial on virtual memory, as well
+          as detailing its history, theory and implementation.
+
+   * X Window System Memory Leaks and Other Memory Bugs
+    Author
+          Kenton Lee (<kenton@rahul.net>)
+
+    Location
+          `http://www.rahul.net/kenton/txa/feb96.html'
+
+    Overview
+          An article on debugging memory problems in X applications.
+
 Function index
 **************
 
@@ -8744,77 +8864,83 @@ valloc:
 Index
 *****
 
--1:                                                
+-addresses:                                         See 8.
+-alloc-byte:                                       
           See ``Appendix C Options''.
--2:                                                
+-alloc-stop:                                       
           See ``Appendix C Options''.
--3:                                                
+-allow-oflow:                                      
           See ``Appendix C Options''.
--a:                                                
+-auto-save:                                        
           See ``Appendix C Options''.
--A:                                                
+-check:                                            
           See ``Appendix C Options''.
--c:                                                
+-check-all:                                        
           See ``Appendix C Options''.
--C:                                                
+-counts:                                            See 8.
+-def-align:                                        
           See ``Appendix C Options''.
--d:                                                
+-dynamic:                                          
           See ``Appendix C Options''.
--D:                                                
+-fail-freq:                                        
           See ``Appendix C Options''.
--e:                                                
+-fail-seed:                                        
           See ``Appendix C Options''.
--f:                                                
+-free-byte:                                        
           See ``Appendix C Options''.
--F:                                                
+-free-stop:                                        
           See ``Appendix C Options''.
--g:                                                
+-help:                                             
           See ``Appendix C Options''.
--G:                                                
+-ignore:                                            See 7.8.
+-large-bound:                                      
           See ``Appendix C Options''.
--l:                                                
+-limit:                                            
           See ``Appendix C Options''.
--L:                                                
+-log-file:                                         
           See ``Appendix C Options''.
--m:                                                
+-medium-bound:                                     
           See ``Appendix C Options''.
--M:                                                
+-no-free:                                          
           See ``Appendix C Options''.
--n:                                                
+-no-protect:                                       
           See ``Appendix C Options''.
--N:                                                
+-oflow-byte:                                       
           See ``Appendix C Options''.
--o:                                                
+-oflow-size:                                       
           See ``Appendix C Options''.
--O:                                                
+-oflow-watch:                                      
           See ``Appendix C Options''.
--p:                                                
+-page-alloc-lower:                                 
           See ``Appendix C Options''.
--P:                                                
+-page-alloc-upper:                                 
           See ``Appendix C Options''.
--Q:                                                
+-preserve:                                         
           See ``Appendix C Options''.
--R:                                                
+-prof:                                             
           See ``Appendix C Options''.
--s:                                                
+-prof-file:                                        
           See ``Appendix C Options''.
--S:                                                
+-prog-file:                                        
           See ``Appendix C Options''.
--U:                                                
+-realloc-stop:                                     
           See ``Appendix C Options''.
--v:                                                
+-safe-signals:                                     
           See ``Appendix C Options''.
--V:                                                
+-show-freed:                                       
           See ``Appendix C Options''.
--w:                                                
+-show-map:                                         
           See ``Appendix C Options''.
--x:                                                
+-small-bound:                                      
           See ``Appendix C Options''.
--X:                                                
+-stack-depth:                                       See 8.
+-unfreed-abort:                                    
           See ``Appendix C Options''.
--z:                                                
+-use-debug:                                        
           See ``Appendix C Options''.
--Z:                                                
+-use-mmap:                                         
+          See ``Appendix C Options''.
+-version:                                          
           See ``Appendix C Options''.
 .gdbinit:                                           See 7.5.
 32-bit:                                            
@@ -8872,6 +8998,8 @@ ARCH:
           See ``I.2 Building''.
 archive library:                                    See 2.
 arenas:                                             See 9.
+articles:                                          
+          See ``Appendix K References''.
 ATOM:                                              
           See ``Appendix J Related software''.
 author, contacting:                                
@@ -9027,6 +9155,7 @@ ELF32:                                              See 11.
 ELF64:                                              See 11.
 embedded libraries:                                 See 7.8.
 embedded systems:                                   See 6.
+endianness:                                         See 8.
 Enforcer:                                          
           See ``Appendix J Related software''.
 enhancements:                                      
@@ -9128,6 +9257,8 @@ hidden memory:                                      See 10.
 hints:                                              See 9.
 HP/UX, HP PA/RISC:                                 
           See ``Appendix G Supported systems''.
+Hyperlearning Center:                              
+          See ``Appendix K References''.
 IBM Corporation:                                   
           See ``Appendix J Related software''.
 illegal memory accesses:                            See 11.3.
@@ -9285,6 +9416,8 @@ memory dump:                                        See 11.4.
 memory leak table:                                  See 8.
 memory leaks:                                       See 11.7.
 memory management interface:                        See 6.
+Memory Management Reference:                       
+          See ``Appendix K References''.
 memory management unit:                             See 6.1.
 memory map:                                         See 7.2.
 memory mapped files:                                See 6.1.
@@ -9316,6 +9449,8 @@ Mmalloc:
 mmap:                                               See 7.1.
 MMU:                                                See 6.1.
 modules:                                            See 10.
+Motif:                                             
+          See ``Appendix K References''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
 MP_LIBRARYSTACK_SUPPORT:                            See 6.2.
 MP_NOCPLUSPLUS:                                    
@@ -9423,6 +9558,8 @@ page fault:                                         See 6.1.
 page size:                                          See 6.1.
 PAGEALLOC:                                         
           See ``Appendix B Environment''.
+papers:                                            
+          See ``Appendix K References''.
 parallel programming:                               See 6.3.
 parameter variables:                                See 5.2.
 Parasoft:                                          
@@ -9493,7 +9630,7 @@ Red Hat:
           See ``Appendix G Supported systems''.
 reference card:                                     See 3.
 references:                                        
-          See ``Foreword''.
+          See ``Appendix K References''.
 registers:                                          See 5.2.
 related software:                                  
           See ``Appendix J Related software''.
@@ -9501,6 +9638,8 @@ release builds:
           See ``Foreword''.
 reporting bugs:                                    
           See ``Foreword''.
+resources:                                         
+          See ``Appendix K References''.
 return address:                                     See 6.2.
 RISC:                                               See 6.2.
 RPM package:                                        See 3.
@@ -9638,6 +9777,8 @@ VERSION:
           See ``I.5 Files''.
 virtual address:                                    See 6.1.
 virtual memory:                                     See 6.1.
+Virtual Memory Tutorial:                           
+          See ``Appendix K References''.
 Vmalloc:                                           
           See ``Appendix J Related software''.
 warnings:                                          
@@ -9654,8 +9795,10 @@ Windows, Intel 80x86:
 Wipeout:                                           
           See ``Appendix J Related software''.
 write protection:                                   See 6.1.
-Xanalys:                                           
-          See ``Foreword''.
+X Windows:                                         
+          See ``Appendix K References''.
+XANALYS Software Tools:                            
+          See ``Appendix K References''.
 XCOFF:                                              See 11.
 YaMa:                                              
           See ``Appendix J Related software''.
