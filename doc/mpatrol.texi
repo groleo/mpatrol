@@ -2,9 +2,9 @@
 
 @c mpatrol
 @c A library for controlling and tracing dynamic memory allocations.
-@c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+@c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.21 1999-12-23 18:36:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.22 2000-01-09 21:30:09 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 23rd December, 1999
+@set UPDATED 9th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -31,7 +31,7 @@
 This file documents mpatrol, a library for controlling and tracing dynamic
 memory allocations.
 
-Copyright @copyright{} 1997-1999 Graeme S. Roy @email{graeme@@epc.co.uk}
+Copyright @copyright{} 1997-2000 Graeme S. Roy @email{graeme@@epc.co.uk}
 
 This is edition @value{EDITION} of the mpatrol manual for version
 @value{VERSION}, @value{UPDATED}.
@@ -71,7 +71,7 @@ library are the trademarks of their respective owners.
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1997-1999 Graeme S. Roy <@email{graeme@@epc.co.uk}>
+Copyright @copyright{} 1997-2000 Graeme S. Roy <@email{graeme@@epc.co.uk}>
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -427,7 +427,7 @@ as it can slow the program down.
 
 @cindex signals
 @item
-Signals are always saved and restored on entry to each library function and
+Certain signals can be saved and restored on entry to each library function and
 @code{errno} is set to @code{ENOMEM} if memory cannot be allocated.
 
 @item
@@ -3766,6 +3766,14 @@ be halted the first time any allocation is reallocated the specified number of
 times.  Note that this setting will be ignored if its value is zero.  Default
 value: @option{REALLOCSTOP=0}.
 
+@cindex SAFESIGNALS
+@item @option{SAFESIGNALS}
+Instructs the library to save and replace certain signal handlers during the
+execution of library code and to restore them afterwards.  This was the default
+behaviour in version 1.0 of the mpatrol library and was changed since some
+memory-intensive programs became very hard to interrupt using the keyboard,
+thus giving the impression that the program or system had hung.
+
 @cindex SHOWALL
 @item @option{SHOWALL}
 Equivalent to the @option{SHOWFREED}, @option{SHOWUNFREED}, @option{SHOWMAP} and
@@ -3893,6 +3901,11 @@ when it is being freed.
 @item @option{-f} <@var{unsigned-integer}>
 [@option{FREEBYTE}]  Specifies an 8-bit byte pattern with which to prefill
 newly-freed memory.
+
+@cindex -g
+@item @option{-g}
+[@option{SAFESIGNALS}]  Instructs the library to save and replace certain signal
+handlers during the execution of library code and to restore them afterwards.
 
 @cindex -L
 @item @option{-L} <@var{unsigned-integer}>
@@ -4440,9 +4453,7 @@ cannot be used.
 @item
 An option should be added to suppress stack traversal, and therefore symbol
 reading, in case of problems where the library crashes during reading a call
-stack.  An option should also be added to suppress the saving and restoring of
-signals upon entry and exit of the mpatrol library, since this would make it
-easier to interrupt programs.
+stack.
 
 @item
 In object file formats that support nested symbols (such as ELF), the current
