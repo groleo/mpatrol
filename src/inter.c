@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.43 2000-11-06 01:07:09 graeme Exp $"
+#ident "$Id: inter.c,v 1.44 2000-11-06 19:40:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -170,11 +170,16 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
         if (f == 1)
             c = 1;
 #if MP_FULLSTACK
+        /* We need to compare the call stacks of the two calling functions in
+         * order to see if we can free the allocation.  Currently, this just
+         * involves ensuring that the call stacks are different or that the
+         * current call stack is shallower than that which made the original
+         * allocation.  In theory we could also free the allocation if the
+         * current call stack was deeper and the initial addresses differ, but
+         * that would involve a lot more calculations.
+         */
         else
         {
-            /* We need to compare the call stacks of the two calling functions
-             * in order to see if we can free the allocation.
-             */
             b = (addrnode *) n->data.frame;
             if ((b->data.next != NULL) && (a->data.next != NULL) &&
                 (((r = __mp_compareaddrs(b->data.next, a->data.next)) ==
@@ -182,13 +187,21 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
                 c = 1;
         }
 #else /* MP_FULLSTACK */
+        /* We need to add an arbitrary number of bytes to the address of the
+         * local variable in order to be completely safe, since the current
+         * call may differ by one stack frame if the entry to the mpatrol
+         * library was via a macro defined in mpatrol.h rather than a function
+         * defined in malloc.c, or vice versa.  Unfortunately, this means that
+         * we are going to be unable to free the allocation at the first
+         * available point when it goes out of scope.
+         */
         else if (memhead.alloc.heap.memory.stackdir < 0)
         {
             /* The stack grows down so we must ensure that the current local
              * variable pointer occupies a higher address than that which
              * made the original allocation if we are to free the allocation.
              */
-            if ((char *) n->data.frame < (char *) &v->frame)
+            if ((char *) n->data.frame + 256 < (char *) &v->frame)
                 c = 1;
         }
         else
@@ -197,7 +210,7 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
              * variable pointer occupies a lower address than that which
              * made the original allocation if we are to free the allocation.
              */
-            if ((char *) n->data.frame > (char *) &v->frame)
+            if ((char *) n->data.frame > (char *) &v->frame + 256)
                 c = 1;
         }
 #endif /* MP_FULLSTACK */
@@ -271,6 +284,7 @@ void __mp_init(void)
         __mp_fixsymbols(&memhead.syms);
         if (!(memhead.flags & FLG_NOPROTECT))
         {
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
             __mp_protectsymbols(&memhead.syms, MA_READONLY);
             __mp_protectinfo(&memhead, MA_READONLY);
         }
@@ -346,6 +360,7 @@ void __mp_fini(void)
         {
             __mp_protectinfo(&memhead, MA_READWRITE);
             __mp_protectsymbols(&memhead.syms, MA_READWRITE);
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
         }
         __mp_deleteinfo(&memhead);
 #if MP_THREADS_SUPPORT
