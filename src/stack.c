@@ -60,7 +60,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.18 2000-07-13 20:20:45 graeme Exp $"
+#ident "$Id: stack.c,v 1.19 2000-07-16 22:28:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -219,10 +219,12 @@ static unsigned long *getaddr(unsigned long *p)
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
     a = (unsigned long *) *(p + 2);
 #elif ARCH == ARCH_SPARC
+    if (*p == 0)
+        a = NULL;
 #if ENVIRON == ENVIRON_64
-    if (a = (unsigned long *) *((unsigned long *) (*p + 0x7FF) + 15))
+    else if (a = (unsigned long *) *((unsigned long *) (*p + 0x7FF) + 15))
 #else /* ENVIRON */
-    if (a = (unsigned long *) *((unsigned long *) *p + 15))
+    else if (a = (unsigned long *) *((unsigned long *) *p + 15))
 #endif /* ENVIRON */
         a += 2;
 #endif /* ARCH */
