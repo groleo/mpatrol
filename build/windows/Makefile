@@ -18,10 +18,10 @@
 # MA 02111-1307, USA.
 
 
-# GNU Makefile to compile on Windows with Microsoft Visual C/C++
+# GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.49 2001-02-01 20:46:22 graeme Exp $
+# $Id: Makefile,v 1.50 2001-02-04 21:45:22 graeme Exp $
 
 
 # Definitions
@@ -79,10 +79,10 @@ ARCHIVE_MPALLOC	= lib$(MPALLOC).lib
 .SUFFIXES: .c .obj .ts.obj
 
 .c.obj:
-	$(CC) $(CFLAGS) $(OFLAGS) -c $<
+	$(CC) $(CFLAGS) $(OFLAGS) -TP -c $<
 
 .c.ts.obj:
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -TP -c -Fo$@ $<
 
 $(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_MPTOBJS)
@@ -91,7 +91,7 @@ $(SHARED_MPATROL): $(SHARED_MPTOBJS) $(MPATROL).def
 	$(LD) -dll -nologo -def:$(MPATROL).def -out:$@ $(SHARED_MPTOBJS) -defaultlib:imagehlp
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
-	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
+	$(CC) $(CFLAGS) $(OFLAGS) -TP -c -Fo$@ $<
 
 $(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
 	$(AR) -nologo -out:$@ $(ARCHTS_MPTOBJS)
@@ -100,7 +100,7 @@ $(SHARTS_MPATROL): $(SHARTS_MPTOBJS) $(MPATROL)mt.def
 	$(LD) -dll -nologo -def:$(MPATROL)mt.def -out:$@ $(SHARTS_MPTOBJS) -defaultlib:imagehlp
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -TP -c -Fo$@ $<
 
 $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_MPAOBJS)
