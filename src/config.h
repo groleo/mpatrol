@@ -220,7 +220,8 @@
     SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_IRIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
     SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS || \
+    SYSTEM == SYSTEM_UNIXWARE
 #define MP_MMAP_SUPPORT 1
 #else /* SYSTEM */
 #define MP_MMAP_SUPPORT 0
@@ -301,7 +302,7 @@
       SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || \
       SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD || \
       SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_SUNOS || SYSTEM == SYSTEM_UNIXWARE
 #ifndef _REENTRANT
 #define _REENTRANT 1
 #endif /* _REENTRANT */
@@ -677,11 +678,16 @@
 
 #ifndef MP_INIT_SUPPORT
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 #define MP_INIT_SUPPORT 1
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+#ifdef __ELF__
+#define MP_INIT_SUPPORT 1
+#else /* __ELF__ */
+#define MP_INIT_SUPPORT 0
+#endif /* __ELF__ */
 #else /* SYSTEM */
 #define MP_INIT_SUPPORT 0
 #endif /* SYSTEM */
@@ -707,17 +713,23 @@
 
 
 /* Indicates if the compiler supports the ident preprocessor directive for
- * placing a version string in the comment section of an object file.
+ * placing a version string in the comment section of an object file.  This
+ * is only likely to be true for ELF systems.
  */
 
 #ifndef MP_IDENT_SUPPORT
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
-    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD || \
-    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 #define MP_IDENT_SUPPORT 1
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+#ifdef __ELF__
+#define MP_IDENT_SUPPORT 1
+#else /* __ELF__ */
+#define MP_IDENT_SUPPORT 0
+#endif /* __ELF__ */
 #else /* SYSTEM */
 #define MP_IDENT_SUPPORT 0
 #endif /* SYSTEM */
