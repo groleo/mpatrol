@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.17 2000-10-11 19:29:54 graeme Exp $
+# $Id: Makefile,v 1.18 2000-10-25 20:13:33 graeme Exp $
 
 
 # Definitions
@@ -37,7 +37,7 @@ VERBOSE   = false
 
 # Rules
 
-.SUFFIXES: .texi .tex .txt .info .guide .html .dvi .ps .pdf .jpg .eps .png
+.SUFFIXES: .texi .tex .txt .info .guide .html .dvi .ps .pdf .jpg .eps
 
 # Build the text file from the Texinfo file using makeinfo
 
@@ -115,7 +115,7 @@ endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).png
+$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).pdf
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<

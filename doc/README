@@ -11,11 +11,6 @@ due to differences in the systems that they were generated on.  Note that the
 UNIX manual pages are not considered part of this documentation (although they
 are kept up to date) and are located in a separate directory.
 
-Note that the texinfo.tex file that is currently supplied with the main
-distribution contains a change to make it work with the current version of
-PDFTeX.  The change involved replacing the .pdf image file extension with .png
-and can be found by looking for png in the file itself.
-
 
 The following files are provided with the main distribution and contain all of
 the information necessary to generate each of the preformatted files.
@@ -54,9 +49,9 @@ the information necessary to generate each of the preformatted files.
         Notes:     The mpatrol logo required by the DVI and Postscript versions
                    of the mpatrol manual.
 
-  * images/mpatrol.png
-        Format:    Portable Network Graphics (PNG) colour image
-                   http://www.cdrom.com/pub/png/
+  * images/mpatrol.pdf
+        Format:    Adobe Portable Document Format (PDF) colour image
+                   http://www.adobe.com/
         Notes:     The mpatrol logo required by the PDF version of the mpatrol
                    manual.
 
@@ -129,5 +124,5 @@ with a variety of programs, not just the ones listed here.
                    http://www.tug.org/applications/pdftex/
         Viewer:    XPDF
                    http://www.foolabs.com/xpdf/
-        Notes:     Contains hypertext links along with embedded PNG images and
+        Notes:     Contains hypertext links along with embedded PDF images and
                    Postscript Type 1 fonts.
