@@ -180,6 +180,8 @@
 #define MP_FLG_USEMMAP       0x00080000
 #define MP_FLG_USEDEBUG      0x00100000
 #define MP_FLG_ALLOWOFLOW    0x00200000
+#define MP_FLG_EDIT          0x00400000
+#define MP_FLG_LIST          0x00800000
 
 
 /* The different types of memory allocation and operation functions.

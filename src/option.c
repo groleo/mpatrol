@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.21 2000-11-13 21:51:05 graeme Exp $"
+#ident "$Id: option.c,v 1.22 2000-11-14 18:17:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -98,6 +98,10 @@ static char *options_help[] =
     "DEFALIGN", "unsigned integer",
     "", "Specifies the default alignment for general-purpose memory",
     "", "allocations, which must be a power of two.",
+    "EDIT", NULL,
+    "", "Specifies that a text editor should be invoked to edit any relevant",
+    "", "source files that are associated with any warnings or errors when",
+    "", "they occur.",
     "FAILFREQ", "unsigned integer",
     "", "Specifies the frequency at which all memory allocations will randomly",
     "", "fail.",
@@ -118,6 +122,10 @@ static char *options_help[] =
     "LIMIT", "unsigned integer",
     "", "Specifies the limit in bytes at which all memory allocations should",
     "", "fail if the total allocated memory should increase beyond this.",
+    "LIST", NULL,
+    "", "Specifies that a context listing should be shown for any relevant",
+    "", "source files that are associated with any warnings or errors when",
+    "", "they occur.",
     "LOGALL", NULL,
     "", "Equivalent to the LOGALLOCS, LOGREALLOCS, LOGFREES and LOGMEMORY",
     "", "options specified together.",
@@ -552,6 +560,19 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     }
                 break;
+              case 'E':
+                if (matchoption(o, "EDIT"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_LIST;
+                    __mp_diagflags |= FLG_EDIT;
+#endif /* TARGET */
+                }
+                break;
               case 'F':
                 if (matchoption(o, "FAILFREQ"))
                     if (*a == '\0')
@@ -630,6 +651,17 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         h->limit = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "LIST"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+#if TARGET == TARGET_UNIX
+                    __mp_diagflags &= ~FLG_EDIT;
+                    __mp_diagflags |= FLG_LIST;
+#endif /* TARGET */
+                }
                 else if (matchoption(o, "LOGALL"))
                 {
                     if (*a != '\0')
