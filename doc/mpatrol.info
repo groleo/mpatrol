@@ -2557,6 +2557,15 @@ size as the processor that is running the `mprof' command.  For
 example, reading a 64-bit profiling output file on a 32-bit machine
 will not work.
 
+   In addition, the profiling output file also contains the version
+number of the mpatrol library which produced it.  If the major version
+number that is embedded in the profiling output file is newer that the
+version of mpatrol that `mprof' came with then `mprof' will refuse to
+read the file.  You should download the latest version of mpatrol in
+that case.  The reason for storing the version number is so that the
+format of the profiling output file can change between releases of
+mpatrol, but also allow `mprof' to cope with older versions.
+
    Along with the options listed below, the `mprof' command takes one
 optional argument which must be a valid mpatrol profiling output
 filename but if it is omitted then it will use `mpatrol.out' as the
@@ -11931,61 +11940,61 @@ Node: The mleak command115392
 Node: The mpsym command117356
 Node: The mpedit command119834
 Node: Profiling123199
-Ref: Profiling-Footnote-1150558
-Ref: Profiling-Footnote-2150782
-Node: Improving performance150886
-Ref: Improving performance-Footnote-1159580
-Ref: Improving performance-Footnote-2159622
-Ref: Improving performance-Footnote-3159699
-Ref: Improving performance-Footnote-4159771
-Node: How it works159815
-Node: Examples166460
-Node: Example 1170120
-Ref: Example 1-Footnote-1193716
-Node: Example 2193906
-Node: Example 3199306
-Node: Example 4206163
-Node: Example 5209668
-Ref: Example 5-Footnote-1213468
-Node: Example 6213597
-Node: Example 7215455
-Node: Example 8225691
-Node: Tutorial240847
-Ref: Tutorial-Footnote-1255378
-Ref: Tutorial-Footnote-2255669
-Ref: Tutorial-Footnote-3255818
-Ref: Tutorial-Footnote-4255955
-Ref: Tutorial-Footnote-5256054
-Node: Functions256335
-Node: Environment286771
-Node: Options306021
-Node: Diagnostic messages316314
-Node: Library performance332256
-Node: Profiling file format334758
-Ref: Profiling file format-Footnote-1338170
-Node: Supported systems338350
-Node: New system support352483
-Node: New processor support353679
-Node: New file format support354362
-Node: Notes354752
-Node: Generic notes356363
-Ref: Generic notes-Footnote-1374719
-Ref: Generic notes-Footnote-2374937
-Node: UNIX notes375159
-Node: Amiga notes379912
-Node: Windows notes383527
-Node: Netware notes384898
-Node: Frequently asked questions387409
-Node: Documentation388032
-Node: Building391825
-Node: Linking398428
-Node: Running402700
-Node: Files416336
-Node: Related software419332
-Ref: Related software-Footnote-1453907
-Node: References454148
-Node: Copying456741
-Node: Function index484630
-Node: Index486888
+Ref: Profiling-Footnote-1151105
+Ref: Profiling-Footnote-2151329
+Node: Improving performance151433
+Ref: Improving performance-Footnote-1160127
+Ref: Improving performance-Footnote-2160169
+Ref: Improving performance-Footnote-3160246
+Ref: Improving performance-Footnote-4160318
+Node: How it works160362
+Node: Examples167007
+Node: Example 1170667
+Ref: Example 1-Footnote-1194263
+Node: Example 2194453
+Node: Example 3199853
+Node: Example 4206710
+Node: Example 5210215
+Ref: Example 5-Footnote-1214015
+Node: Example 6214144
+Node: Example 7216002
+Node: Example 8226238
+Node: Tutorial241394
+Ref: Tutorial-Footnote-1255925
+Ref: Tutorial-Footnote-2256216
+Ref: Tutorial-Footnote-3256365
+Ref: Tutorial-Footnote-4256502
+Ref: Tutorial-Footnote-5256601
+Node: Functions256882
+Node: Environment287318
+Node: Options306568
+Node: Diagnostic messages316861
+Node: Library performance332803
+Node: Profiling file format335305
+Ref: Profiling file format-Footnote-1338717
+Node: Supported systems338897
+Node: New system support353030
+Node: New processor support354226
+Node: New file format support354909
+Node: Notes355299
+Node: Generic notes356910
+Ref: Generic notes-Footnote-1375266
+Ref: Generic notes-Footnote-2375484
+Node: UNIX notes375706
+Node: Amiga notes380459
+Node: Windows notes384074
+Node: Netware notes385445
+Node: Frequently asked questions387956
+Node: Documentation388579
+Node: Building392372
+Node: Linking398975
+Node: Running403247
+Node: Files416883
+Node: Related software419879
+Ref: Related software-Footnote-1454454
+Node: References454695
+Node: Copying457288
+Node: Function index485177
+Node: Index487435
 
 End Tag Table

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.146 2000-11-18 14:24:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.147 2000-11-18 15:22:52 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2739,6 +2739,15 @@ machine, for example.  However, this will only work if the processor that
 produced the profiling output file has the same word size as the processor that
 is running the @command{mprof} command.  For example, reading a 64-bit profiling
 output file on a 32-bit machine will not work.
+
+In addition, the profiling output file also contains the version number of the
+mpatrol library which produced it.  If the major version number that is embedded
+in the profiling output file is newer that the version of mpatrol that
+@command{mprof} came with then @command{mprof} will refuse to read the file.
+You should download the latest version of mpatrol in that case.  The reason for
+storing the version number is so that the format of the profiling output file
+can change between releases of mpatrol, but also allow @command{mprof} to cope
+with older versions.
 
 Along with the options listed below, the @command{mprof} command takes one
 optional argument which must be a valid mpatrol profiling output filename but

@@ -2514,6 +2514,15 @@ produced the profiling output file has the same word size as the processor that
 is running the <code>mprof</code> command.  For example, reading a 64-bit profiling
 output file on a 32-bit machine will not work.
 
+<p>In addition, the profiling output file also contains the version number of the
+mpatrol library which produced it.  If the major version number that is embedded
+in the profiling output file is newer that the version of mpatrol that
+<code>mprof</code> came with then <code>mprof</code> will refuse to read the file. 
+You should download the latest version of mpatrol in that case.  The reason for
+storing the version number is so that the format of the profiling output file
+can change between releases of mpatrol, but also allow <code>mprof</code> to cope
+with older versions.
+
 <p>Along with the options listed below, the <code>mprof</code> command takes one
 optional argument which must be a valid mpatrol profiling output filename but
 if it is omitted then it will use <code>mpatrol.out</code> as the name of the file to
