@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.30 2001-01-25 23:15:14 graeme Exp $
+rem $Id: build.bat,v 1.31 2001-02-05 21:29:52 graeme Exp $
 
 
 set version=1.3.4
@@ -36,7 +36,7 @@ cd ..\..\build\windows
 nmake -f NMakefile clobber
 nmake -f NMakefile libmpatrol.lib mpatrol.dll
 nmake -f NMakefile libmpatrolmt.lib mpatrolmt.dll
-nmake -f NMakefile libmpalloc.lib
+nmake -f NMakefile libmpalloc.lib mpalloc.dll
 nmake -f NMakefile mpatrol.exe mprof.exe mptrace.exe mleak.exe
 cd ..\..\pkg\zip
 
@@ -63,6 +63,7 @@ copy ..\..\bin\mpedit mpatrol\bin
 copy ..\..\bin\hexwords mpatrol\bin
 copy ..\..\build\windows\mpatrol.dll mpatrol\bin
 copy ..\..\build\windows\mpatrolmt.dll mpatrol\bin
+copy ..\..\build\windows\mpalloc.dll mpatrol\bin
 mkdir mpatrol\doc
 copy ..\..\doc\README mpatrol\doc\README.txt
 copy ..\..\doc\mpatrol.txt mpatrol\doc
@@ -147,6 +148,8 @@ copy ..\..\build\windows\mpatrol.lib mpatrol\lib
 copy ..\..\build\windows\mpatrol.exp mpatrol\lib
 copy ..\..\build\windows\mpatrolmt.lib mpatrol\lib
 copy ..\..\build\windows\mpatrolmt.exp mpatrol\lib
+copy ..\..\build\windows\mpalloc.lib mpatrol\lib
+copy ..\..\build\windows\mpalloc.exp mpatrol\lib
 mkdir mpatrol\man
 mkdir mpatrol\man\cat1
 copy ..\..\man\cat1\mpatrol.1 mpatrol\man\cat1
