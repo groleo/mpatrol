@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.4 1999-10-21 21:35:07 graeme Exp $
+.\" $Id: mpatrol.3,v 1.5 1999-11-25 17:17:40 graeme Exp $
 .\"
-.TH MPATROL 3 "21 October 1999" "Release 1.0" "mpatrol library"
+.TH MPATROL 3 "25 November 1999" "Release 1.0" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -390,8 +390,8 @@ before that point.
 .SH ENVIRONMENT
 The library can read certain options at run-time from an environment variable
 called \fBMPATROL_OPTIONS\fP.  This variable must contain one or more valid
-option keywords from the list below and must be no longer than 256 characters in
-length.  If \fBMPATROL_OPTIONS\fP is unset or empty then the default settings
+option keywords from the list below and must be no longer than 1024 characters
+in length.  If \fBMPATROL_OPTIONS\fP is unset or empty then the default settings
 will be used.
 .PP
 The syntax for options specified within the \fBMPATROL_OPTIONS\fP environment
@@ -451,6 +451,20 @@ Specifies the default alignment for general-purpose memory allocations, which
 must be a power of two (and will be rounded up to the nearest power of two if it
 is not).  The default alignment for a particular system is calculated at
 run-time.
+.TP
+\fBFAILFREQ\fP=\fIunsigned integer\fP
+Specifies the frequency at which all memory allocations will randomly fail.  For
+example, a value of \fI10\fP will mean that roughly 1 in 10 memory allocations
+will fail, but a value of \fI0\fP will disable all random failures.  This option
+can be useful for stress-testing an application.  Default value:
+\fBFAILFREQ\fP=\fI0\fP.
+.TP
+\fBFAILSEED\fP=\fIunsigned integer\fP
+Specifies the random number seed which will be used when determining which
+memory allocations will randomly fail.  A value of \fI0\fP will instruct the
+library to pick a random seed every time it is run.  Any other value will mean
+that the random failures will be the same every time the program is run, but
+only as long as the seed stays the same.  Default value: \fBFAILSEED\fP=\fI0\fP.
 .TP
 \fBFREEBYTE\fP=\fIunsigned integer\fP
 Specifies an 8-bit byte pattern with which to prefill newly-freed memory.  This
@@ -618,6 +632,8 @@ library which uses \fBsbrk()\fP to allocate its memory.  It is ignored on
 systems that do not support the \fBmmap()\fP system call.
 .SH SEE ALSO
 \fBmpatrol\fP(1), \fBelf\fP(3e), \fBbfd\fP(3).
+.PP
+The mpatrol manual.
 .SH AUTHOR
 Graeme S. Roy <graeme@epc.co.uk>
 .SH COPYRIGHT
