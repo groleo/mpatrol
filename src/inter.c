@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.141 2001-08-01 22:49:26 graeme Exp $"
+#ident "$Id: inter.c,v 1.142 2001-08-01 23:02:40 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.141 2001-08-01 22:49:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.142 2001-08-01 23:02:40 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -888,7 +888,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    m = a;
+    m = __mp_fixalign(&memhead, f, a);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue((void *) -1, l, m, s, t, u, i.addr);
     v.func = s;
@@ -1150,7 +1150,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
-    m = a;
+    m = __mp_fixalign(&memhead, f, a);
     if (memhead.prologue && (memhead.recur == 1))
         memhead.prologue(p, l, m, s, t, u, i.addr);
     v.func = s;
