@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.10 1999-11-25 11:18:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.11 1999-11-25 15:56:34 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -109,6 +109,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Installation::                Building and installing.
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
+* Using mpatrol::               Using the library.
 * Improving performance::       Life beyond mpatrol.
 * Examples::                    Examples of usage.
 * Functions::                   Library functions.
@@ -759,7 +760,7 @@ useful warnings about using uninitialised variables, using freed memory, running
 off the end of a dynamically-allocated array, etc.  It is these types of memory
 allocation problems that the mpatrol library loves to get its teeth into!
 
-@node Operating system support, Improving performance, Memory allocations, Top
+@node Operating system support, Using mpatrol, Memory allocations, Top
 @chapter Operating system support
 @cindex operating systems
 
@@ -992,7 +993,243 @@ is usually necessary to liaise with the @emph{dynamic linker}@footnote{Which is
 the part of the operating system that performs the run-time linking of shared
 libraries.} on many systems.
 
-@node Improving performance, Examples, Operating system support, Top
+@node Using mpatrol, Improving performance, Operating system support, Top
+@chapter Using mpatrol
+@cindex using mpatrol
+
+This chapter contains a general description of all of the features of mpatrol
+and how to use them effectively.  You'll also find a complete reference for
+mpatrol in the appendices, but you may wish to try out the examples
+(@pxref{Examples}) before reading further.
+
+@menu
+* Logging and tracing::         General information.
+* Using with a debugger::       Setting breakpoints.
+@end menu
+
+@node Logging and tracing, Using with a debugger, , Using mpatrol
+@section Logging and tracing
+@cindex logging
+@cindex tracing
+
+If you would like to see a complete log of all of the memory allocations,
+reallocations and deallocations performed by your program, use the
+@option{LOGALL} option.  This provides detailed tracing for each of the mpatrol
+library functions, and a full description of the format of such tracing is given
+in Example 1 (@pxref{Example 1}).  Alternatively, you may select one or more
+types of functions to be traced using the @option{LOGALLOCS},
+@option{LOGREALLOCS} and @option{LOGFREES} options if you feel that the log file
+is too large when @option{LOGALL} is used.  By default all diagnostics from the
+mpatrol library get sent to @file{mpatrol.log} in the current directory, but
+this can be changed using the @option{LOGFILE} option.
+
+@cindex library settings
+@cindex settings
+@cindex library statistics
+@cindex statistics
+The mpatrol library will always try to display as much useful information as
+possible in this log file, and will always display a summary of library settings
+and statistics when your program terminates successfully.  If you don't get this
+then your program did not call @code{exit()} and either called @code{abort()} or
+was terminated by the operating system instead.  In such cases, either use a
+debugger to see where your program crashed or use the @option{LOGALL} option to
+see the last successful library call in the log file so that you have a rough
+idea of where your program crashed.
+
+@cindex memory map
+@cindex map of memory
+@cindex symbol summary
+It is also possible to get mpatrol to write more summary information to the log
+file after it writes out its settings and statistics at program termination.
+Use the @option{SHOWFREED} and @option{SHOWUNFREED} options to display a list of
+freed and unfreed memory allocations.  The former will only be displayed if the
+@option{NOFREE} option is used, but the latter can be useful for detecting
+memory leaks.  The @option{SHOWMAP} option will display a memory map of the heap
+that was valid when the process terminated, and the @option{SHOWSYMBOLS} option
+will display any symbolic information that the mpatrol library managed to obtain
+from any executable files and libraries that were relevant to the program being
+tested.  All of these options can be selected with the @option{SHOWALL} option.
+
+@node Using with a debugger, , Logging and tracing, Using mpatrol
+@section Using with a debugger
+@cindex using with a debugger
+@cindex debugger
+@cindex debugging
+
+@cindex halting the library
+@cindex gdb
+@cindex breakpoint
+If you would like to use mpatrol to pause at a specific memory allocation,
+reallocation or deallocation in a debugger then this section will describe how
+to go about it.  Unfortunately, debuggers vary widely in function and usage and
+are normally very system-dependant.  The example below will use @command{gdb} as
+the debugger, but as long as you know how to set a breakpoint within a debugger,
+any one will do.
+
+First of all, decide where you would like the mpatrol library to pause when
+running your program within the debugger.  You can choose one allocation index
+to break at using the @option{ALLOCSTOP} option, or you can choose to break at
+a specific reallocation of that allocation by also using the
+@option{REALLOCSTOP} option.  If you use @option{REALLOCSTOP} without using
+@option{ALLOCSTOP} then you will break at the first memory allocation that has
+been reallocated the specified number of times.  You can also choose to break at
+the point in your program that frees a specific allocation index by using the
+@option{FREESTOP} option.
+
+The normal process for determining where you would like to pause your program
+in the debugger is by using the @option{LOGALL} option and examining the log
+file produced by mpatrol.  If your program crashed then you should look at the
+last entry in the log file to see what the allocation index (and possibly also
+the reallocation index) of the last successful call was.  You can then decide
+which of the above options to use.  Note that the debugger will break at a point
+before any work is done by the mpatrol library for that allocation index so that
+you can see if it was the last successful operation that caused the damage.
+
+Having decided which combination of mpatrol options to use, you should set them
+in the @env{MPATROL_OPTIONS} environment variable before running the debugger on
+your program.  Alternatively, your debugger may have a command that allows you
+to modify your environment during debugging, but you're just as well setting the
+environment variable before you run the debugger as it shouldn't make any
+difference@footnote{Unless you've linked the debugger with the mpatrol
+library.}.
+
+After you get to the debugger command prompt, you should set a breakpoint at the
+@code{__mp_trap()} function.  This is the function that gets called when the
+specified allocation index and/or reallocation index appears and so when you
+run your program under the debugger the mpatrol library will call
+@code{__mp_trap()} and the debugger will stop at that point.  If you are not
+running your program within a debugger, or if you haven't set the breakpoint,
+then @code{__mp_trap()} will still be called, but it won't do anything.  Note
+that there may be some naming issues on some platforms where the visible name of
+a global function gets an underscore prepended to it.  You may have to take that
+into account when setting the breakpoint on such systems.
+
+@cindex single-step
+Now that you have set the @env{MPATROL_OPTIONS} environment variable and have
+set the debugger to break at @code{__mp_trap()}, all that is required is for you
+to run your program.  Hopefully, the debugger should stop at @code{__mp_trap()}.
+If it doesn't then you may have to check your environment variable settings to
+ensure that they are the same as when you ran the program outwith the debugger,
+although obviously with the addition of @option{ALLOCSTOP}, etc.  Once the
+program has been halted by the debugger, you can then single-step through your
+code until you see where it goes wrong.  If this is near the end of your program
+then you'll have saved yourself a lot of time by using this method.
+
+The following example will be used to illustrate the steps involved in using the
+@option{ALLOCSTOP}, @option{REALLOCSTOP} and @option{FREESTOP} options.
+However, it is only for tutorial purposes and the same effect could easily be
+achieved by breaking at line 18 in a debugger because in this case it is obvious
+from the code and the mpatrol log file where it is going wrong.  In real
+programs this is hardly ever the case@footnote{The other reason that this
+program is simple is because a proper example would generally involve crashing
+the program, but on AmigaOS and Netware that would also involve crashing the
+system --- not something you'd want to do whilst trying this out.}.
+
+@smallexample
+ 1  /*
+ 2   * Allocates 1000 blocks of 16 bytes, freeing each block immediately
+ 3   * after it is allocated, and freeing the last block twice.
+ 4   */
+
+
+ 7  #include "mpatrol.h"
+
+
+10  int main(void)
+11  @{
+12      void *p;
+13      int i;
+
+15      for (i = 0; i < 1000; i++)
+16          if (p = malloc(16))
+17              free(p);
+18      free(p);
+19      return EXIT_SUCCESS;
+20  @}
+@end smallexample
+
+Compile this example code with debugging information enabled and link it with
+the mpatrol library, then set @env{MPATROL_OPTIONS} to @option{LOGALL} and run
+the resulting program.  If you examine @file{mpatrol.log} you will see the
+following near the bottom of the file.
+
+@smallexample
+@dots{}
+
+ALLOC: malloc (1000, 16 bytes, 2 bytes) [main|test.c|16]
+        0x80000D8E main
+        0x80000D24 _start
+
+returns 0x80033000
+
+FREE: free (0x80033000) [main|test.c|17]
+        0x80000DBE main
+        0x80000D24 _start
+
+    0x80033000 (16 bytes) @{malloc:1000:0@} [main|test.c|16]
+        0x80000D8E main
+        0x80000D24 _start
+
+FREE: free (0x80033000) [main|test.c|18]
+        0x80000DE8 main
+        0x80000D24 _start
+
+ERROR: free: 0x80033000 has not been allocated
+
+@dots{}
+@end smallexample
+
+In this example, we'll want to use @option{ALLOCSTOP} to halt the program at
+the 1000th memory allocation so that we can step through it with a debugger.
+So, set @env{MPATROL_OPTIONS} to @option{ALLOCSTOP=1000} and load the program
+into the debugger.  If you are using @command{gdb} you can now do the following
+steps, but if you are not you will have to use the equivalent commands in your
+debugger.  Note that @samp{(gdb)} is the debugger command prompt and so anything
+that appears on that line after that should be typed as a command.
+
+@smallexample
+(gdb) break __mp_trap
+Breakpoint 1 at 0x80004026
+(gdb) run
+Starting program: a.out
+Breakpoint 1, 0x80004026 in __mp_trap()
+(gdb) backtrace
+#0  0x80004026 in __mp_trap()
+#1  0x800027ec in __mp_getmemory()
+#2  0x80001138 in __mp_alloc()
+#3  0x80000d8e in main() at test.c:16
+(gdb) return
+Make selected stack frame return now? (y or n) y
+#0  0x800027ec in __mp_getmemory()
+(gdb) return
+Make selected stack frame return now? (y or n) y
+#0  0x80001138 in __mp_alloc()
+(gdb) return
+Make selected stack frame return now? (y or n) y
+#0  0x80000d8e in main() at test.c:16
+16              if (p = malloc(16))
+(gdb) step
+Single stepping until exit from function __mp_trap,
+which has no line number information.
+17                  free(p);
+(gdb) step
+15          for (i = 0; i < 1000; i++)
+(gdb) step
+18          free(p);
+(gdb) quit
+The program is running.  Quit anyway (and kill it)? (y or n) y
+@end smallexample
+
+After setting the breakpoint and running the program, the debugger halts at
+@code{__mp_trap()}.  Because @code{__mp_trap()} is a function within the mpatrol
+library, you don't want to bother stepping through any of the library functions,
+and in this case you can't since the mpatrol library was not compiled with
+debugging information enabled.  So, after returning from all of the library
+functions, the source line becomes line 16 because that was the location of the
+1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
+destination.
+
+@node Improving performance, Examples, Using mpatrol, Top
 @chapter Improving performance
 @cindex improving performance
 @cindex performance improvements
@@ -1503,10 +1740,6 @@ it.  When the library terminates it always displays a summary of various memory
 allocation statistics and settings that were used during the execution of the
 program.
 
-@cindex library settings
-@cindex settings
-@cindex library statistics
-@cindex statistics
 The various settings and statistics displayed by the library for the above
 example have been numbered and their descriptions appear below.
 
@@ -1584,8 +1817,6 @@ allocation byte is used to fill newly-allocated memory (except from
 blocks or freed memory allocations.  These can be changed at run-time using the
 @option{OFLOWBYTE}, @option{ALLOCBYTE} and @option{FREEBYTE} options.
 
-@cindex debugger
-@cindex halting the library
 @item
 Allocation stop.
 @item
@@ -2146,8 +2377,6 @@ program termination.  It also shows how to easily detect memory leaks.  Use the
 19  @}
 @end smallexample
 
-@cindex memory map
-@cindex map of memory
 The information that we are interested in comes after the summary of library
 statistics generated in the log file.  The first block of data shows a memory
 map of the heap that is being handled by mpatrol.  This can be used to see
@@ -2203,7 +2432,6 @@ memory map:
 --- 0x8002DBD0-0x8002DFFF free (1072 bytes)
 @end smallexample
 
-@cindex symbol summary
 The next block of data shows a summary of all the symbols that could be read
 from the program's executable file and/or any shared libraries that the program
 requires.  This can be useful to see which symbols have actually been read by
@@ -3728,6 +3956,12 @@ to add support for reading symbols from any shared libraries that are required
 by the program.  The Amiga executable file format doesn't seem to contain enough
 information for this to be worthwhile, and even then it would only be worth
 doing if call stack traversal worked.
+
+@item
+Possibly make use of other software such as Enforcer, Mungwall or MuLib in order
+to provide some form of memory protection.  The features of SegTracker could
+also be put to good use so that the file and hunk location of entries on the
+call stack could be determined.
 
 @item
 It is currently not possible to override the definition of @code{malloc()},
