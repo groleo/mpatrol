@@ -18,35 +18,14 @@
 # MA 02111-1307, USA.
 
 
-# GDB command file for use with mpatrol
+# csh/tcsh shell script for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.2 2000-10-30 20:13:40 graeme Exp $
+# $Id: .cshrc,v 1.1 2000-10-30 20:13:40 graeme Exp $
 
 
-# Set mpatrol library options in the current process environment.
-# GDB doesn't support commands with variable arguments so we have
-# to make use of the shell in order to set the new environment.
+# Set mpatrol library options in the current shell environment.
 # Note that there is a known problem when using option arguments
 # that contain spaces, so try to avoid using such arguments.
 
-define mallopt
-printf "Enter mpatrol library options: "
-shell read arg; echo set environment MPATROL_OPTIONS `mpatrol --show-env $arg` >/tmp/mpatrol.gdb
-source /tmp/mpatrol.gdb
-shell rm -f /tmp/mpatrol.gdb
-show environment MPATROL_OPTIONS
-end
-document mallopt
-Sets mpatrol library options in the current process environment.
-end
-
-
-# Display information about an address in the heap.
-
-define printalloc
-call __mp_printinfo($arg0)
-end
-document printalloc
-Displays information about an address in the heap.
-end
+alias mallopt 'setenv MPATROL_OPTIONS "`mpatrol --show-env \!*`"; echo "$MPATROL_OPTIONS"'
