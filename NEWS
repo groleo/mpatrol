@@ -1,3 +1,20 @@
+Changes for 1.1.2 (18th March, 2000)
+
+  * Added a section on integration to the mpatrol manual.
+
+  * Added ability to determine source level information from call if USEDEBUG
+    is enabled, even if mpatrol.h was not included.
+
+  * Internal blocks are now allocated in larger chunks which will increase the
+    efficiency of library execution and cause less memory fragmentation.
+
+  * Added a default low-memory handler for C++ operators new and new[].
+
+  * Added special name mangling for the GNU C++ operators.
+
+  * Fixed a bug which occurred when allocating lots of pages using sbrk().
+
+
 Changes for 1.1.1 (9th March, 2000)
 
   * Added a section on threads to the mpatrol manual.

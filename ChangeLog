@@ -1,3 +1,40 @@
+Wed Mar 15 01:42:53 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added a chapter on integration.
+
+	* man/cat3/mpatrol.3, man/man3/mpatrol.3:
+	Added information about the default new handler.
+
+	* src/config.h: Added the MP_ALLOCFACTOR macro.
+
+	* src/memory.c:
+	Fixed a rather important bug in __mp_memalloc() when allocating more
+	than one initial page of memory.
+
+	* src/strtab.c, src/alloc.c, src/addr.c, src/info.c, src/symbol.c,
+	  src/heap.c:
+	Made use of MP_ALLOCFACTOR.
+
+Tue Mar 14 00:57:58 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/inter.c:
+	Added ability to determine source level information from call if
+	USEDEBUG is enabled, even if none was passed through.  Also added a
+	default low-memory handler for operators new and new[].
+
+	* src/malloc.c: Added special mangling for GNU C++ operators.
+
+Mon Mar 13 22:48:55 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/netware/Makefile, build/amiga/SMakefile,
+	  build/unix/Makefile:
+	Added list.h to the dependencies for strtab.o.
+
+	* src/config.h: Added MP_HASHTABSIZE.
+
+	* src/strtab.c, src/strtab.h, src/diag.c:
+	Added slots and a list for internal nodes for the hash table.
+
 Thu Mar  9 22:11:30 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added the section on building.
