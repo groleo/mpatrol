@@ -224,6 +224,8 @@ typedef struct __mp_allocinfo
 __mp_allocinfo;
 
 
+#ifndef NDEBUG
+
 #ifdef malloc
 #undef malloc
 #endif /* malloc */
@@ -396,9 +398,35 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 }
 #endif /* __cplusplus */
 
+#else /* NDEBUG */
+
+#define __mp_init() ((void) 0)
+#define __mp_fini() ((void) 0)
+#define __mp_alloc(l, a, f, s, t, u, k) ((void *) NULL)
+#define __mp_strdup(p, l, f, s, t, u, k) ((char *) NULL)
+#define __mp_realloc(p, l, a, f, s, t, u, k) ((void *) NULL)
+#define __mp_free(p, f, s, t, u, k) ((void) 0)
+#define __mp_setmem(p, l, c, f, s, t, u, k) ((void *) NULL)
+#define __mp_copymem(p, q, l, f, s, t, u, k) ((void *) NULL)
+#define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
+#define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
+#define __mp_info(p, d) ((int) 0)
+#define __mp_printinfo(p) ((int) 0)
+#define __mp_memorymap(s) ((void) 0)
+#define __mp_summary() ((void) 0)
+#define __mp_check() ((void) 0)
+#define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t)) NULL)
+#define __mp_epilogue(h) ((void (*)(MP_CONST void *)) NULL)
+#define __mp_nomemory(h) ((void (*)(void)) NULL)
+#define __mp_pushdelstack(s, t, u) ((void) 0)
+#define __mp_popdelstack(s, t, u) ((void) 0)
+
+#endif /* NDEBUG */
+
 
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
+#ifndef NDEBUG
 
 typedef void (*new_handler)(void);
 
@@ -472,6 +500,7 @@ static inline void operator delete[](void *p)
 #define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
 #define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
 
+#endif /* NDEBUG */
 #endif /* __cplusplus */
 #endif /* MP_NOCPLUSPLUS */
 
