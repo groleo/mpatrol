@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.29 2000-10-25 20:25:46 graeme Exp $
+# $Id: mpatrol.spec,v 1.30 2000-10-25 22:51:07 graeme Exp $
 
 
 %define version 1.3.0
@@ -94,6 +94,18 @@ cp doc/images/mpatrol.txt $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/gcc.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/gcc.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/gcc.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cpp.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cpp.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cpp.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cc1.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cc1.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/cc1.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/collect2.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/collect2.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
+cp doc/images/collect2.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
 cp tests/pass/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/fail
