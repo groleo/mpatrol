@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.79 2000-05-16 01:21:30 graeme Exp $
+@c $Id: mpatrol.texi,v 1.80 2000-05-23 21:30:56 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.9
-@set VERSION 1.2.0
-@set UPDATED 16th May, 2000
+@set EDITION 1.10
+@set VERSION 1.2.1
+@set UPDATED 23rd May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -758,6 +758,10 @@ card in a variety of documentation formats from the mpatrol home page.  You can
 then install or print these documents.
 @end enumerate
 
+@cindex PKG package
+@cindex RPM package
+@cindex TAR archive
+@cindex LhA archive
 Alternatively, the @file{pkg} directory contains files that can be used to
 automatically generate a @emph{package} in a specific format suitable for
 installation on a system.  Two package formats (PKG and RPM) and two archive
@@ -771,6 +775,11 @@ is roughly the same, but is intended for Amiga systems and is used for Aminet
 distributions.  You should really know what you are doing before you attempt to
 build a package, and you should also be aware that some of the package files may
 need to be modified before you begin.
+
+@cindex Linux Software Map
+@cindex LSM
+In addition, a Linux Software Map index file exists in the @file{pkg/lsm}
+directory.
 
 @node Integration, Memory allocations, Installation, Top
 @chapter Integration
@@ -5997,6 +6006,28 @@ The @option{USEDEBUG} option has no effect.
 @end itemize
 
 @cindex Solaris, SPARC
+@item
+Solaris 2.5, SPARC V9, BFD, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.  The @option{-DMP_WATCH_SUPPORT=0}
+option must be added to @code{CFLAGS} in the @file{Makefile}.
+@end itemize
+
+@item
+Solaris 2.5, SPARC V9, ELF32, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.  The @option{-DMP_WATCH_SUPPORT=0}
+option must be added to @code{CFLAGS} in the @file{Makefile}.
+@item
+The @option{USEDEBUG} option has no effect.
+@end itemize
+
 @item
 Solaris 7, SPARC V9, BFD, @command{gcc}
 @itemize @bullet
