@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mtrace.c,v 1.5 2001-07-25 21:58:23 graeme Exp $"
+#ident "$Id: mtrace.c,v 1.6 2001-07-26 16:01:32 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.5 2001-07-25 21:58:23 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.6 2001-07-26 16:01:32 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -83,26 +83,26 @@ static size_t alloc_size;
 
 static
 void
-location(MP_CONST void *a)
+location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
 {
-    __mp_symbolinfo s;
+    __mp_symbolinfo i;
     long o;
 
     if (a == NULL)
         return;
     fputs("@ ", trace_file);
-    if (__mp_syminfo(a, &s))
-        if ((s.file != NULL) && (s.line != 0))
+    if (__mp_syminfo(a, &i))
+        if ((i.file != NULL) && (i.line != 0))
         {
-            fprintf(trace_file, "%s:%lu ", s.file, s.line);
+            fprintf(trace_file, "%s:%lu ", i.file, i.line);
             return;
         }
-        else if (s.name != NULL)
+        else if (i.name != NULL)
         {
-            if (s.object != NULL)
-                fprintf(trace_file, "%s:", s.object);
-            fprintf(trace_file, "(%s", s.name);
-            o = (char *) a - (char *) s.addr;
+            if (i.object != NULL)
+                fprintf(trace_file, "%s:", i.object);
+            fprintf(trace_file, "(%s", i.name);
+            o = (char *) a - (char *) i.addr;
             if (o > 0)
                 fprintf(trace_file, "+%#lx", o);
             else if (o < 0)
@@ -119,10 +119,11 @@ location(MP_CONST void *a)
 
 static
 void
-prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
+prologue(MP_CONST void *p, size_t l, MP_CONST char *s, MP_CONST char *t,
+         unsigned long u, MP_CONST void *a)
 {
     if (old_prologue != NULL)
-        old_prologue(p, l, a);
+        old_prologue(p, l, s, t, u, a);
     alloc_pointer = (void *) p;
     alloc_size = l;
 }
@@ -134,11 +135,12 @@ prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
 
 static
 void
-epilogue(MP_CONST void *p, MP_CONST void *a)
+epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t, unsigned long u,
+         MP_CONST void *a)
 {
     size_t l;
 
-    location(a);
+    location(s, t, u, a);
     if (alloc_pointer == (void *) -1)
         fprintf(trace_file, "+ %p %#lx\n", p, alloc_size);
     else if (alloc_size == (size_t) -1)
@@ -160,11 +162,11 @@ epilogue(MP_CONST void *p, MP_CONST void *a)
     else
     {
         fprintf(trace_file, "< %p\n", alloc_pointer);
-        location(a);
+        location(s, t, u, a);
         fprintf(trace_file, "> %p %#lx\n", p, alloc_size);
     }
     if (old_epilogue != NULL)
-        old_epilogue(p, a);
+        old_epilogue(p, s, t, u, a);
 }
 
 
