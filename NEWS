@@ -1,3 +1,27 @@
+Changes for 1.3.4 (25th January, 2001)
+
+  * Added the MP_MALLOC() family of functions for recording the type name and
+    type size of a memory allocation.  Also added the xmalloc() family of
+    functions which never return NULL.
+
+  * Added a new header file and library for use when mpatrol is not being used.
+
+  * Added FreeBSD, NetBSD, OpenBSD and SunOS support.
+
+  * Added the ability to read symbols from a.out files.  Also added the ability
+    to build mpatrol as a shared library on AIX, as well as being able to read
+    symbols from shared libraries on AIX.  The COFF and XCOFF symbol readers now
+    require the use of the libld object file access library.
+
+  * Changed the behaviour of the low memory handler to automatically retry the
+    memory allocation once the handler has been called.
+
+  * Now store information about the point of last reallocation rather than the
+    point of original allocation.
+
+  * The manual pages are now also supplied in HTML format.
+
+
 Changes for 1.3.3 (6th January, 2001)
 
   * Added support for the -fcheck-memory-usage option of the GNU compiler.
