@@ -4494,7 +4494,8 @@ program that has been linked with the library.
  @{" Example 6                  " link "Example 6"}  Bad memory operations.
  @{" Example 7                  " link "Example 7"}  Incompatible function calls.
  @{" Example 8                  " link "Example 8"}  The @{b}alloca()@{ub} functions.
- @{" Example 9                  " link "Example 9"}  Additional useful information.
+ @{" Example 9                  " link "Example 9"}  The @{b}MP_MALLOC()@{ub} functions.
+ @{" Example 10                 " link "Example 10"}  Additional useful information.
 
 
 @endnode
@@ -6024,7 +6025,138 @@ functions will never show up in the list of unfreed memory allocations.
 @endnode
 
 @node "Example 9" "mpatrol.guide/Example 9"
+@next "Example 10"
 @prev "Example 8"
+@toc "Examples"
+
+The @{b}MP_MALLOC()@{ub} functions
+=========================
+
+   The mpatrol library comes with a set of alternative dynamic memory
+allocation functions for C.  These allow it to record the type and type
+size of every memory allocation made through these functions, which can
+be very useful for debugging purposes.  It also means that the
+alignment for each memory allocation can be determined according to its
+type.  The following test can be found in @{b}tests/pass/test9.c@{ub}.
+
+     23  /*
+     24   * Allocates 16 floats and then resizes the allocation to 8 floats and
+     25   * frees them.  Then allocates 16 integers and resizes the allocation
+     26   * to 32 integers before freeing them.  Finally, duplicates a string
+     27   * and then frees it.
+     28   */
+     
+     
+     31  #include "mpatrol.h"
+     
+     
+     34  int main(void)
+     35  {
+     36      float *f;
+     37      int *i;
+     38      char *s;
+     
+     40      MP_MALLOC(f, 16, float);
+     41      MP_REALLOC(f, 8, float);
+     42      MP_FREE(f);
+     43      MP_CALLOC(i, 16, int);
+     44      MP_REALLOC(i, 32, int);
+     45      MP_FREE(i);
+     46      MP_STRDUP(s, "test");
+     47      MP_FREE(s);
+     48      return EXIT_SUCCESS;
+     49  }
+
+   If this test is compiled and linked with the mpatrol library and
+then run with the @{b}LOGALL@{ub} option, the following output will be seen in
+the mpatrol log file.
+
+     ALLOC: xmalloc (84, 64 bytes, 4 bytes) [main|test9.c|40] (float x 16)
+             0x0804AC36 main+38
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     returns 0x080510E8
+     
+     REALLOC: xrealloc (0x080510E8, 32 bytes, 4 bytes) [main|test9.c|41] (float x 8)
+             0x0804AC60 main+80
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+         0x080510E8 (64 bytes) {xmalloc:84:0} [main|test9.c|40] (float x 16)
+             0x0804AC36 main+38
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     returns 0x080510E8
+     
+     FREE: xfree (0x080510E8) [main|test9.c|42]
+             0x0804AC7F main+111
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+         0x080510E8 (32 bytes) {xrealloc:84:1} [main|test9.c|41] (float x 8)
+             0x0804AC60 main+80
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     ALLOC: xcalloc (85, 64 bytes, 4 bytes) [main|test9.c|43] (int x 16)
+             0x0804ACB2 main+162
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     returns 0x080510E8
+     
+     REALLOC: xrealloc (0x080510E8, 128 bytes, 4 bytes) [main|test9.c|44] (int x 32)
+             0x0804ACDF main+207
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+         0x080510E8 (64 bytes) {xcalloc:85:0} [main|test9.c|43] (int x 16)
+             0x0804ACB2 main+162
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     returns 0x080510E8
+     
+     FREE: xfree (0x080510E8) [main|test9.c|45]
+             0x0804ACFE main+238
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+         0x080510E8 (128 bytes) {xrealloc:85:1} [main|test9.c|44] (int x 32)
+             0x0804ACDF main+207
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     ALLOC: xstrdup (86, 5 bytes, 1 byte) [main|test9.c|46] (char x 5)
+             0x0804AD2E main+286
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+     returns 0x080510E5
+     
+     FREE: xfree (0x080510E5) [main|test9.c|47]
+             0x0804AD4F main+319
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+     
+         0x080510E5 (5 bytes) {xstrdup:86:0} [main|test9.c|46] (char x 5)
+             0x0804AD2E main+286
+             0x400A09CB __libc_start_main+255
+             0x0804AB81 _start+33
+
+   As you can see, the type and number of items allocated of that type
+are associated with each memory allocation.  The function names that
+are logged as having made the memory allocations are from the @{b}xmalloc()@{ub}
+family of functions since that is how the @{b}MP_MALLOC()@{ub} family of
+functions are implemented.
+
+
+@endnode
+
+@node "Example 10" "mpatrol.guide/Example 10"
+@prev "Example 9"
 @toc "Examples"
 
 Additional useful information
@@ -13894,7 +14026,7 @@ Index
  @{" memory debugger                          " link "Related software"}   Related software
  @{" memory dump                              " link "Example 4"}   Example 4
  @{" memory leak table                        " link "Profiling"}   Profiling
- @{" memory leaks                             " link "Example 9"}   Example 9
+ @{" memory leaks                             " link "Example 10"}   Example 10
  @{" memory management interface              " link "Operating system support"}   Operating system support
  @{" Memory Management Reference              " link "References"}   References
  @{" memory management unit                   " link "Virtual memory"}   Virtual memory
