@@ -79,8 +79,12 @@ memchr
 memmem
 memcmp
 bcmp
+set_new_handler__3stdFPFv_v
 __nw__FUi
-__arr_nw__FUi
+__nw__FUiRCQ2_3std9nothrow_t
+__nwa__FUi
+__nwa__FUiRCQ2_3std9nothrow_t
 __dl__FPv
-__arr_dl__FPv
-set_new_handler__FPFv_v
+__dl__FPvRCQ2_3std9nothrow_t
+__dla__FPv
+__dla__FPvRCQ2_3std9nothrow_t
