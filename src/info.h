@@ -96,6 +96,26 @@ typedef enum alloctype
 alloctype;
 
 
+/* An allocanode belongs to a stack of memory allocations that were made
+ * by the alloca() and related functions.  Some memory allocations at the
+ * top of the stack may be automatically freed when the next call to an
+ * mpatrol function is made and the stack has been unwound.
+ */
+
+typedef struct allocanode
+{
+    listnode node;   /* list node */
+    void *block;     /* pointer to block of memory */
+    union
+    {
+        size_t size; /* size of block of memory */
+        void *frame; /* pointer to stack frame */
+    }
+    data;
+}
+allocanode;
+
+
 /* The structure used to record source level information about recursive
  * calls to C++ operator delete and operator delete[].
  */
