@@ -44,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.31 2000-11-30 22:03:24 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.32 2000-12-10 22:36:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -106,6 +106,7 @@ typedef enum options_flags
     OF_LOGMEMORY,
     OF_LOGREALLOCS,
     OF_MEDIUMBOUND,
+    OF_SHOWFREE,
     OF_SHOWFREED,
     OF_SHOWMAP,
     OF_SHOWSYMBOLS,
@@ -154,17 +155,17 @@ static char *smallbound, *mediumbound, *largebound;
  * setting the environment variable containing mpatrol library options.
  */
 
-static int logallocs, logreallocs;
-static int logfrees, logmemory;
-static int showmap, showsymbols;
-static int showfreed, showunfreed;
 static int checkallocs, checkreallocs;
 static int checkfrees, checkmemory;
-static int prof, trace;
+static int showmap, showsymbols;
+static int showfree, showfreed, showunfreed;
+static int logallocs, logreallocs;
+static int logfrees, logmemory;
+static int allowoflow, prof, trace;
 static int safesignals, noprotect;
 static int preserve, oflowwatch;
 static int usemmap, usedebug;
-static int editlist, allowoflow;
+static int editlist;
 
 
 /* The table describing all recognised options.
@@ -302,10 +303,13 @@ static option options_table[] =
      "\tduring the execution of library code and to restore them\n"
      "\tafterwards.\n"},
     {"show-all", OF_SHOWALL, NULL,
-     "\tEquivalent to the --show-freed, --show-unfreed, --show-map and\n"
-     "\t--show-symbols options specified together.\n"},
+     "\tEquivalent to the --show-free, --show-freed, --show-unfreed,\n"
+     "\t--show-map and --show-symbols options specified together.\n"},
     {"show-env", OF_SHOWENV, NULL,
      "\tDisplays the contents of the " MP_OPTIONS " environment variable.\n"},
+    {"show-free", OF_SHOWFREE, NULL,
+     "\tSpecifies that a summary of all of the free memory blocks should be\n"
+     "\tdisplayed at the end of program execution.\n"},
     {"show-freed", OF_SHOWFREED, NULL,
      "\tSpecifies that a summary of all of the freed memory allocations\n"
      "\tshould be displayed at the end of program execution.\n"},
@@ -468,10 +472,12 @@ static void setoptions(int s)
         addoption("REALLOCSTOP", reallocstop, 0);
     if (safesignals)
         addoption("SAFESIGNALS", NULL, 0);
-    if (showfreed && showmap && showsymbols && showunfreed)
+    if (showfree && showfreed && showmap && showsymbols && showunfreed)
         addoption("SHOWALL", NULL, 0);
     else
     {
+        if (showfree)
+            addoption("SHOWFREE", NULL, 0);
         if (showfreed)
             addoption("SHOWFREED", NULL, 0);
         if (showmap)
@@ -739,11 +745,15 @@ int main(int argc, char **argv)
           case OF_SHOWALL:
             showmap = 1;
             showsymbols = 1;
+            showfree = 1;
             showfreed = 1;
             showunfreed = 1;
             break;
           case OF_SHOWENV:
             w = 1;
+            break;
+          case OF_SHOWFREE:
+            showfree = 1;
             break;
           case OF_SHOWFREED:
             showfreed = 1;
