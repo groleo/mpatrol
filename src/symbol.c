@@ -126,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.58 2001-08-23 22:42:34 graeme Exp $"
+#ident "$Id: symbol.c,v 1.59 2001-09-06 21:53:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.58 2001-08-23 22:42:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.59 2001-09-06 21:53:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1254,11 +1254,13 @@ addsyms(char *f, unsigned long b, void *p)
     char *t;
     syminfo s;
     IMAGEHLP_MODULE m;
+    size_t l;
     int r;
 
     r = 1;
     i = (modinfo *) p;
     y = i->syms;
+    l = y->dtree.size;
     /* The executable file is the first module, so we only want to examine it
      * if we are not looking for external symbols.  The DLLs are the subsequent
      * modules, so we only want to examine them if we are looking for external
@@ -1280,6 +1282,17 @@ addsyms(char *f, unsigned long b, void *p)
             s.syms = y;
             s.file = t;
             r = SymEnumerateSymbols(GetCurrentProcess(), b, addsym, &s);
+        }
+        if (i->libs)
+        {
+            if (r == 1)
+            {
+                l = y->dtree.size - l;
+                __mp_diag("read %lu symbol%s", l, (l == 1) ? "" : "s");
+            }
+            else
+                __mp_diag("problem reading symbols");
+            __mp_diag(" from %s\n", f);
         }
     }
     i->index++;
