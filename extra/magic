@@ -21,10 +21,11 @@
 # Magic data file for use with the file command
 
 
-# $Id: magic,v 1.1 2000-07-07 10:43:33 graeme Exp $
+# $Id: magic,v 1.2 2000-11-30 23:10:37 graeme Exp $
 
 
 0	string	@(#)\ mpatrol	mpatrol log file (UNIX)
 0	string	$VER:\ mpatrol	mpatrol log file (AmigaOS)
 0	string	mpatrol		mpatrol log file
 0	string	MPTL		mpatrol profiling output file
+0	string	MTRC		mpatrol tracing output file
