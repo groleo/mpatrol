@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.30 2000-07-24 19:55:32 graeme Exp $
+# $Id: Makefile,v 1.31 2000-07-24 20:02:07 graeme Exp $
 
 
 # Definitions
@@ -100,8 +100,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
-mprof.exe: mprof.obj graph.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj graph.obj getopt.obj tree.obj version.obj
+mprof.exe: mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 
 mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj

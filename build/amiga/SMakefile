@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.26 2000-07-24 19:55:26 graeme Exp $
+# $Id: SMakefile,v 1.27 2000-07-24 20:01:56 graeme Exp $
 
 
 # Definitions
@@ -76,8 +76,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mpatrol.o getopt.o version.o
 
-mprof: mprof.o graph.o getopt.o tree.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mprof.o graph.o getopt.o tree.o version.o LIB LIB:scm.lib
+mprof: mprof.o graph.o getopt.o list.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mprof.o graph.o getopt.o list.o tree.o version.o LIB LIB:scm.lib
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mleak.o getopt.o tree.o version.o

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.29 2000-07-24 19:55:30 graeme Exp $
+# $Id: Makefile,v 1.30 2000-07-24 20:02:05 graeme Exp $
 
 
 # Definitions
@@ -145,8 +145,8 @@ machine.s.t.o: $(SOURCE)/machine.c
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
-mprof: mprof.o graph.o getopt.o tree.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o tree.o version.o
+mprof: mprof.o graph.o getopt.o list.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o

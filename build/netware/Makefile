@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.23 2000-07-24 19:55:28 graeme Exp $
+# $Id: Makefile,v 1.24 2000-07-24 20:02:03 graeme Exp $
 
 
 # Definitions
@@ -78,8 +78,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
-mprof.nlm: mprof.obj graph.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj graph.obj getopt.obj tree.obj version.obj
+mprof.nlm: mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 
 mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.obj getopt.obj tree.obj version.obj
