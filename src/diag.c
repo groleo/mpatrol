@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.7 2000-01-24 20:31:46 graeme Exp $"
+#ident "$Id: diag.c,v 1.8 2000-01-28 00:24:07 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,7 +103,9 @@ MP_GLOBAL char *__mp_alloctypenames[AT_MAX] =
     "bzero",
     "memcpy",
     "memmove",
-    "bcopy"
+    "bcopy",
+    "memcmp",
+    "bcmp"
 };
 
 
@@ -706,6 +708,8 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
     __mp_printsize(n);
+    __mp_diag("\ntotal compared:    ");
+    __mp_printsize(h->dtotal);
     __mp_diag("\ntotal copied:      ");
     __mp_printsize(h->ctotal);
     __mp_diag("\ntotal set:         ");
