@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.59 2001-02-26 00:32:19 graeme Exp $"
+#ident "$Id: diag.c,v 1.60 2001-03-04 12:19:57 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.59 2001-02-26 00:32:19 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.60 2001-03-04 12:19:57 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -98,6 +98,7 @@ static unsigned long errors, warnings;
 
 static char *errornames[ET_MAX] =
 {
+    "NOERR",
     "ALLOVF",
     "ALLZER",
     "BADALN",
