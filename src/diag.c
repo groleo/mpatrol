@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.2 1999-10-19 19:17:35 graeme Exp $"
+#ident "$Id: diag.c,v 1.3 1999-10-21 20:50:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -630,6 +630,16 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag("\nreallocation stop: %lu", h->rstop);
     __mp_diag("\nfree stop:         %lu", h->fstop);
     __mp_diag("\nunfreed abort:     %lu", h->uabort);
+    __mp_diag("\nlower check range: ");
+    if (h->lrange == (size_t) -1)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", h->lrange);
+    __mp_diag("\nupper check range: ");
+    if (h->urange == (size_t) -1)
+        __mp_diag("-");
+    else
+        __mp_diag("%lu", h->urange);
     __mp_diag("\nprologue function: ");
     if (h->prologue == NULL)
         __mp_diag("<unset>");

@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.2 1999-10-05 17:34:06 graeme Exp $"
+#ident "$Id: info.c,v 1.3 1999-10-21 20:50:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -75,6 +75,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
      */
     h->size = h->count = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
+    h->lrange = h->urange = (size_t) -1;
     h->prologue = NULL;
     h->epilogue = NULL;
     h->nomemory = NULL;
