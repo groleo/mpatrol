@@ -1,3 +1,23 @@
+Mon Nov 29 20:15:50 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* pkg/pkg/build, pkg/pkg/prototype, pkg/pkg/pkginfo:
+	New files for use when building a PKG package.
+
+Sun Nov 28 15:10:28 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* pkg/rpm/build, pkg/rpm/mpatrol.spec:
+	New files for use when building an RPM package.
+
+Sat Nov 27 16:23:59 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added the how it works chapter.
+
+Fri Nov 26 14:35:45 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added the overwrites and underwrites, testing, library behaviour and
+	general errors sections.
+
 Thu Nov 25 18:09:43 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mpatrol: Added the -Z and -z options.

@@ -1,3 +1,11 @@
+Changes for 1.0.7 (29th November, 1999)
+
+  * Added the overwrites and underwrites, testing, library behaviour and general
+    errors sections and the how it works chapter to the mpatrol manual.
+
+  * Added support for building PKG and RPM packages.
+
+
 Changes for 1.0.6 (25th November, 1999)
 
   * Removed the NOTES, INSTALL and EXAMPLES files as their contents are now
