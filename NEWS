@@ -1,16 +1,42 @@
 Changes for 1.4.2
 
+  * Added the LEAKTABLE option which displays a leak table at the end of program
+    execution.  Also added functions for users to manipulate the leak table.
+
+  * Added the __mp_iterateall() function to walk the entire heap, including
+    free blocks and internal allocations.  The __mp_info() and __mp_printinfo()
+    functions now also return information about free blocks.
+
+  * Added functions to print to the log file along with their source position
+    and a stack traceback.
+
+  * Added the __mp_errno global variable and a function to obtain the error
+    message string corresponding to an error code.
+
   * Added __mp_init_* initialisation function support.
+
+  * Allocations made by the alloca() family of functions are no longer allowed
+    to be marked.
+
+  * Tru64 is now supported.
+
+  * The library is now no longer initialised on Linux until the environment
+    variables are fully set up.
 
   * Removed calls to ZeroMemory(), etc. on Windows platforms as they ended up
     calling memset(), etc. thus defeating the whole purpose of the original
     change!
 
+  * Fixed the mpsym command which had problems when GDB displayed lines that
+    were too long.
+
+  * Added Dmalloc-compatible function implementations as an external package.
+
   * Forgot to build the dbmalloc module and install its header file in the
     previous release.  Also now read all relevant Dbmalloc environment variables
-    on initialisation.
+    on initialisation and mapped all Dbmalloc error codes onto mpatrol errors.
 
-  * Added the AUTHORS and THANKS files.
+  * Added the AUTHORS, CHECKSUMS and THANKS files.
 
 
 Changes for 1.4.1 (27th February, 2001)

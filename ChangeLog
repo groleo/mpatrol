@@ -1,3 +1,207 @@
+2001-03-06  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpsym: Added set width 0.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added leaktab module dependencies.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_addallocentry() and __mp_addfreeentry().
+
+	* man/man1/mpatrol.1: Added the --leak-table option.
+
+	* man/man3/libmpatrol.3: Added more functions.
+
+	* src/config.h: Reduced the size of the leak table from 97 to 47 slots.
+
+	* src/diag.c: Added totals to __mp_printleaktab().
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added __mp_addallocentry() and __mp_addfreeentry().  Added a return
+	value to __mp_startleaktable() and __mp_stopleaktable().
+
+	* tests/pass/test4.c, tests/pass/test10.c:
+	Made use of the allocated flag.
+
+	* tools/dbmalloc.c, tools/dmalloc.c:
+	Changed to make use of the allocated flag.
+
+	* tools/dmalloc.c, tools/dmalloc.h:
+	Added support for the leak table.  Added calls to __mp_startleaktable()
+	and __mp_stopleaktable().
+
+2001-03-05  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added the leaktab module.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_clearleaktable(), __mp_startleaktable() and
+	__mp_stopleaktable().  Added __mp_leaktable().
+
+	* man/man3/libmpatrol.3: Added more functions.
+
+	* pkg/pkg/build: Forgot to delete the share directory when cleaning up.
+
+	* src/config.h: Added MP_LEAKTAB_SIZE.
+
+	* src/target.h: Also need to define _XOPEN_SOURCE_EXTENDED for Tru64.
+
+	* src/memory.c: Added way to get program name on Tru64.
+
+	* src/info.c, src/info.h:
+	Added support for the leak table.  Added FLG_LEAKTABLE.
+
+	* src/stack.c: Completed Tru64 stack traversal support.
+
+	* src/leaktab.c, src/leaktab.h: New files for implementing a leak table.
+
+	* src/diag.c, src/diag.h:
+	Added __mp_printleaktab().  Added FLG_COUNTS and FLG_BOTTOM.  Added a
+	flags argument to __mp_printleaktab().
+
+	* src/option.c, src/option.h, src/mpatrol.h: Added the LEAKTABLE option.
+
+	* src/inter.c:
+	Added support for free blocks in __mp_info().  Added LEAKTABLE support.
+	Don't initialise the library on Linux until the environment is set up.
+
+	* src/inter.c, src/inter.h, src/mpatrol.h: Added new allocated field.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added __mp_clearleaktable(), __mp_startleaktable() and
+	__mp_stopleaktable().  Added __mp_leaktable().
+
+	* src/library.c:
+	Added the leaktab module.
+
+	* src/mpatrol.c: Added the --leak-table option.
+
+2001-03-04  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_iterateall().  Added __mp_errno and __mp_strerror().
+
+	* doc/mpatrol.texi: Quick update.
+
+	* src/info.c: Converted the error messages.
+
+	* src/diag.c:
+	Added the format field to errordetails.  Added the error strings for
+	__mp_strerror().  Added NOERR.  Added the errorinfo structure.
+
+	* src/diag.h: Added ET_NONE.
+
+	* src/diag.h, src/mpatrol.h: Added __mp_errortype.
+
+	* src/diag.c, src/diag.h, src/inter.c, src/inter.h, src/mpalloc.c,
+	  src/mpatrol.h:
+	Made __mp_errno an mpatrol global variable.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added __mp_iterateall().  Added __mp_strerror().
+
+	* src/inter.c:
+	Added more information about free memory blocks in __mp_printinfo().
+
+	* src/cplus.c, src/inter.c: Updated the error messages.
+
+	* tools/dbmalloc.c, tools/dbmalloc.h: Added malloc_perror().
+
+	* tools/dbmalloc.h:
+	Added __mp_errno and mapped error codes onto the mpatrol error codes.
+
+	* tools/dmalloc.c: Added __mpt_dmallocstrerror().
+
+	* tools/dmalloc.h: Added support for __mp_errno and __mp_strerror().
+
+2001-03-03  Graeme Roy  <graeme@epc.co.uk>
+
+	* THANKS: Added Ivan Finch for his help with the Tru64 port.
+
+	* src/config.h, src/target.h: Added DEC Alpha Tru64 support.
+
+	* src/stack.c, src/stack.h: Added MP_LIBRARYSTACK_SUPPORT for Tru64.
+
+	* src/inter.c: Added Tru64 __init_* and __fini_* support.
+
+	* src/mpatrol.h: Added __mp_locprintf().
+
+	* tools/dmalloc.h: Fixed the GNU variable arguments list.
+
+2001-03-02  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_trap(), __mp_printfwithloc() and __mp_vprintfwithloc().
+
+	* src/info.c:
+	Have to declare __mp_trap() here since we don't want to include inter.h.
+
+	* src/signals.c, src/signals.h, src/inter.c, src/inter.h:
+	Moved __mp_trap() from the signals module.
+
+	* src/inter.c:
+	Don't allow marking of allocations made by alloc(), strdupa() or
+	strndupa().
+
+	* src/inter.c, src/inter.h, src/mpatrol.h, src/mpalloc.c:
+	Added __mp_printfwithloc() and __mp_vprintfwithloc().
+
+	* src/mpalloc.c: New definition of __mp_trap().
+
+	* src/mpatrol.h:
+	Added __mp_vlocprintf().  Added NDEBUG definitions of __mp_locprintf().
+
+2001-03-01  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added the Dmalloc tool.
+
+	* pkg/sdux/mpatrol.psf, pkg/pkg/prototype:
+	Added the dmalloc.h header file.
+
+	* src/config.h, src/inter.c, src/sbrk.c:
+	Changed MP_DELETE to MP_DELETEHEAP to avoid a clash with mpatrol.h.
+
+	* tools/dmalloc.c, tools/dmalloc.h:
+	New files for implementing a Dmalloc library interface.
+
+	* tools/dmalloc.h:
+	Removed __mpt_dmalloclogunfreed.  Finished documentation.
+
+	* tools/dmalloc.c:
+	Added more features.  Finished the basic functionality.
+
+2001-02-28  Graeme Roy  <graeme@epc.co.uk>
+
+	* THANKS: Added more people.
+
+	* bin/mupdate: Now generate the CHECKSUMS file.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the AUTHORS and THANKS files.
+
+	* src/config.h:
+	Don't define MP_INITFUNC_SUPPORT if AIX or LynxOS PowerPC.
+
+	* tools/dbmalloc.c, tools/dbmalloc.h: Fixed a few minor errors.
+
 2001-02-27  Graeme Roy  <graeme@epc.co.uk>
 
 	* THANKS: Added the THANKS file.
