@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.29 2000-06-29 23:56:49 graeme Exp $"
+#ident "$Id: diag.c,v 1.30 2000-07-13 20:19:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -444,7 +444,12 @@ MP_GLOBAL void __mp_printsymbols(symhead *y)
          n = (symnode *) __mp_successor(&n->data.node))
     {
         if (n->data.size == 0)
+        {
+#if ENVIRON == ENVIRON_64
+            __mp_diag("\t");
+#endif /* ENVIRON */
             __mp_diag("\t       " MP_POINTER, n->data.addr);
+        }
         else
             __mp_diag("    " MP_POINTER "-" MP_POINTER, n->data.addr,
                       (char *) n->data.addr + n->data.size - 1);
@@ -755,7 +760,11 @@ MP_GLOBAL void __mp_printmap(infohead *h)
         }
         if ((a != NULL) && (a < b))
         {
+#if ENVIRON == ENVIRON_64
+            __mp_diag("    ------------------------------------- gap (");
+#else /* ENVIRON */
             __mp_diag("    --------------------- gap (");
+#endif /* ENVIRON */
             __mp_printsize((char *) b - (char *) a);
             __mp_diag(")\n");
         }
