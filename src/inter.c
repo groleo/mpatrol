@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.6 1999-12-21 20:21:37 graeme Exp $"
+#ident "$Id: inter.c,v 1.7 2000-01-09 20:23:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -70,7 +70,8 @@ static void savesignals(void)
 #endif /* MP_THREADS_SUPPORT */
         if (!memhead.init)
             __mp_initsignals(&memhead.signals);
-        __mp_savesignals(&memhead.signals);
+        if (memhead.flags & FLG_SAFESIGNALS)
+            __mp_savesignals(&memhead.signals);
     }
     memhead.recur++;
 }
