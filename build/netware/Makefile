@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.29 2000-11-30 22:41:31 graeme Exp $
+# $Id: Makefile,v 1.30 2000-11-30 23:13:49 graeme Exp $
 
 
 # Definitions
@@ -190,7 +190,7 @@ trace.obj trace.ts.obj: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
 	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/signals.h $(SOURCE)/utils.h
+	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/version.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

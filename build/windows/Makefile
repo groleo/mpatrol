@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.37 2000-11-30 22:44:18 graeme Exp $
+# $Id: Makefile,v 1.38 2000-11-30 23:13:52 graeme Exp $
 
 
 # Definitions
@@ -217,7 +217,7 @@ trace.obj trace.ts.obj: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
 	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/signals.h $(SOURCE)/utils.h
+	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/version.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

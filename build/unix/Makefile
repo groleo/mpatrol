@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.36 2000-11-30 22:42:45 graeme Exp $
+# $Id: Makefile,v 1.37 2000-11-30 23:13:50 graeme Exp $
 
 
 # Definitions
@@ -274,7 +274,8 @@ trace.o trace.s.o trace.t.o trace.s.t.o: $(SOURCE)/trace.c $(SOURCE)/trace.h \
 	$(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
 	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
-	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/utils.h
+	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/utils.h \
+	$(SOURCE)/version.h
 inter.o inter.s.o inter.n.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
