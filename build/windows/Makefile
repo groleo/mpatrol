@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.64 2001-03-06 20:13:27 graeme Exp $
+# $Id: Makefile,v 1.65 2001-03-07 22:39:50 graeme Exp $
 
 
 # Definitions
@@ -185,14 +185,15 @@ info.obj: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
-	$(SOURCE)/utils.h $(SOURCE)/profile.h $(SOURCE)/trace.h
+	$(SOURCE)/utils.h $(SOURCE)/profile.h $(SOURCE)/trace.h \
+	$(SOURCE)/leaktab.h
 info.ts.obj: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/utils.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
 stack.obj stack.ts.obj: $(SOURCE)/stack.c $(SOURCE)/stack.h $(SOURCE)/memory.h \
 	$(SOURCE)/machine.h $(SOURCE)/config.h $(SOURCE)/target.h
 addr.obj addr.ts.obj: $(SOURCE)/addr.c $(SOURCE)/addr.h $(SOURCE)/config.h \
@@ -209,19 +210,20 @@ symbol.obj symbol.ts.obj: $(SOURCE)/symbol.c $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
 signals.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h
+	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h
 signals.ts.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/mutex.h
+	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
+	$(SOURCE)/mutex.h
 mutex.ts.obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 diag.obj: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
@@ -229,21 +231,22 @@ diag.obj: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/utils.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/version.h
+	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
+	$(SOURCE)/version.h
 diag.ts.obj: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/mutex.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/utils.h $(SOURCE)/profile.h $(SOURCE)/trace.h \
-	$(SOURCE)/version.h
+	$(SOURCE)/leaktab.h $(SOURCE)/version.h
 option.obj option.ts.obj: $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
 leaktab.obj leaktab.ts.obj: $(SOURCE)/leaktab.c $(SOURCE)/leaktab.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/list.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
@@ -253,45 +256,48 @@ profile.obj profile.ts.obj: $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
 	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
+	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h \
+	$(SOURCE)/leaktab.h $(SOURCE)/version.h
 trace.obj trace.ts.obj: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/diag.h \
 	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/version.h
+	$(SOURCE)/signals.h $(SOURCE)/leaktab.h $(SOURCE)/utils.h \
+	$(SOURCE)/version.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/option.h $(SOURCE)/sbrk.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/machine.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/machine.h
 inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h $(SOURCE)/sbrk.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/machine.h
+	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
+	$(SOURCE)/machine.h
 malloc.obj malloc.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h
+	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h
 cplus.obj: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/diag.h
+	$(SOURCE)/trace.h $(SOURCE)/diag.h $(SOURCE)/leaktab.h
 cplus.ts.obj: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/diag.h $(SOURCE)/mutex.h
+	$(SOURCE)/trace.h $(SOURCE)/diag.h $(SOURCE)/leaktab.h $(SOURCE)/mutex.h
 sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
         $(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 main.obj main.ts.obj: main.c $(SOURCE)/inter.h $(SOURCE)/config.h \
@@ -299,7 +305,7 @@ main.obj main.ts.obj: main.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
@@ -307,7 +313,7 @@ mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
-	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h
+	$(SOURCE)/leaktab.h $(SOURCE)/signals.h $(SOURCE)/mpalloc.h
 mpfailure.obj: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.obj: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
@@ -358,9 +364,9 @@ $(OBJECT_MPALLOC): $(SOURCE)/library2.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
 	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/signals.h \
-	$(SOURCE)/mpalloc.h $(SOURCE)/mpfailure.c $(SOURCE)/mpsetfail.c \
-	$(SOURCE)/mpmalloc.c $(SOURCE)/mpcalloc.c $(SOURCE)/mpstrdup.c \
-	$(SOURCE)/mprealloc.c
+	$(SOURCE)/leaktab.h $(SOURCE)/mpalloc.h $(SOURCE)/mpfailure.c \
+	$(SOURCE)/mpsetfail.c $(SOURCE)/mpmalloc.c $(SOURCE)/mpcalloc.c \
+	$(SOURCE)/mpstrdup.c $(SOURCE)/mprealloc.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
