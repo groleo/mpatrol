@@ -1,3 +1,10 @@
+Changes for 1.4.8 (23rd September, 2001)
+
+  * Fixed diagnostics for number of symbols read from Windows DLLs.
+
+  * Much improved autoconf, automake and libtool support.
+
+
 Changes for 1.4.7 (5th September, 2001)
 
   * Fixed the problems building Windows DLLs.
