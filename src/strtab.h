@@ -86,6 +86,8 @@ typedef struct strtab
     treeroot tree;                   /* allocation tree */
     size_t size;                     /* allocation total */
     size_t align;                    /* alignment for each strnode */
+    memaccess prot;                  /* protection status */
+    size_t protrecur;                /* protection recursion count */
 }
 strtab;
 

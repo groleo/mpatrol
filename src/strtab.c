@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.9 2000-07-13 20:16:05 graeme Exp $"
+#ident "$Id: strtab.c,v 1.10 2000-11-05 22:45:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -69,6 +69,8 @@ MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
      */
     n = (char *) &z.y - &z.x;
     t->align = __mp_poweroftwo(n);
+    t->prot = MA_NOACCESS;
+    t->protrecur = 0;
 }
 
 
@@ -90,6 +92,8 @@ MP_GLOBAL void __mp_deletestrtab(strtab *t)
     __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
     t->size = 0;
+    t->prot = MA_NOACCESS;
+    t->protrecur = 0;
 }
 
 
@@ -213,6 +217,20 @@ MP_GLOBAL int __mp_protectstrtab(strtab *t, memaccess a)
     hashentry *e;
     strnode *n;
 
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (t->prot == a)
+    {
+        t->protrecur++;
+        return 1;
+    }
+    else if (t->protrecur > 0)
+    {
+        t->protrecur--;
+        return 1;
+    }
+    t->prot = a;
     for (n = (strnode *) __mp_minimum(t->tree.root); n != NULL;
          n = (strnode *) __mp_successor(&n->node))
         if (!__mp_memprotect(&t->heap->memory, n->block, n->size, a))
