@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.33 2000-11-18 15:11:24 graeme Exp $
+# $Id: build,v 1.34 2000-11-22 21:32:37 graeme Exp $
 
 
 version=1.3.0
@@ -92,6 +92,8 @@ cp ../../doc/images/collect2.jpg mpatrol/doc/images
 cp ../../doc/images/collect2.eps mpatrol/doc/images
 cp ../../doc/images/collect2.pdf mpatrol/doc/images
 mkdir -p mpatrol/extra
+cp ../../extra/.profile mpatrol/extra
+cp ../../extra/.cshrc mpatrol/extra
 cp ../../extra/.gdbinit mpatrol/extra
 cp ../../extra/magic mpatrol/extra
 mkdir -p mpatrol/include
