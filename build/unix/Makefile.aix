@@ -21,15 +21,17 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.8 2001-01-22 21:42:47 graeme Exp $
+# $Id: Makefile.aix,v 1.9 2001-01-24 13:19:35 graeme Exp $
 
 
 # Definitions
 
 SHELL = /bin/sh
 CC    = cc
+CCR   = cc_r
 AR    = ar
 LD    = $(CC)
+LDR   = $(CCR)
 LINT  = lint
 
 SOURCE = ../../src
@@ -84,7 +86,7 @@ LINT_MPALLOC	= llib-l$(MPALLOC).ln
 	-@ mv -f `basename $@ .n.ln`.ln $@
 
 .c.t.o:
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
+	$(CCR) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 .c.t.ln:
 	$(LINT) $(CFLAGS) $(TFLAGS) -c $<
@@ -95,7 +97,7 @@ $(ARCHIVE_MPATROL): $(SHARED_MPATROL) $(ARCHIVE_MPTOBJS)
 	$(AR) cr $@ $(SHARED_MPATROL) $(ARCHIVE_MPTOBJS)
 
 $(SHARED_MPATROL): $(ARCHIVE_MPTOBJS) $(MPATROL).exp
-	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHIVE_MPTOBJS)
+	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHIVE_MPTOBJS) -lld
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
@@ -108,10 +110,10 @@ $(ARCHTS_MPATROL): $(SHARTS_MPATROL) $(ARCHTS_MPTOBJS)
 	$(AR) cr $@ $(SHARTS_MPATROL) $(ARCHTS_MPTOBJS)
 
 $(SHARTS_MPATROL): $(ARCHTS_MPTOBJS) $(MPATROL).exp
-	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHTS_MPTOBJS) -lpthreads
+	$(LDR) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHTS_MPTOBJS) -lld -lpthreads
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
+	$(CCR) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 $(LINTTS_MPATROL): $(LINTTS_MPTOBJS)
 	$(LINT) -o $(MPATROL)mt $(LINTTS_MPTOBJS)
@@ -132,8 +134,8 @@ machine.o: $(SOURCE)/machine.c
 	-@ rm -f machine.s 2>&1 >/dev/null
 
 machine.t.o: $(SOURCE)/machine.c
-	$(CC) $(CFLAGS) $(TFLAGS) -E -P $< >machine.s
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ machine.s
+	$(CCR) $(CFLAGS) $(TFLAGS) -E -P $< >machine.s
+	$(CCR) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ machine.s
 	-@ rm -f machine.s 2>&1 >/dev/null
 
 mpatrol: mpatrol.o getopt.o version.o
