@@ -21,13 +21,13 @@
 # PKG package specification file
 
 
-# $Id: pkginfo,v 1.23 2001-02-22 19:21:05 graeme Exp $
+# $Id: pkginfo,v 1.24 2001-03-06 22:22:07 graeme Exp $
 
 
 PKG=GSRmptrl
 NAME=The mpatrol library for controlling and tracing dynamic memory allocations.
 ARCH=sparc
-VERSION=1.4.1
+VERSION=1.4.2
 CATEGORY=application
 DESC=Attempts to diagnose run-time errors that are caused by the wrong use of dynamically allocated memory, and provides a comprehensive and configurable log of all dynamic memory operations that occurred during the lifetime of a program.
 VENDOR=Graeme S. Roy <graeme@epc.co.uk>
