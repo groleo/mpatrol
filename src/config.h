@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.83 2001-09-03 20:29:41 graeme Exp $
+ * $Id: config.h,v 1.84 2001-09-20 23:18:10 graeme Exp $
  */
 
 
@@ -297,6 +297,9 @@
  */
 
 #ifndef MP_MMAP_SUPPORT
+#if defined(HAVE_CONFIG_H) && defined(HAVE_MMAP)
+#define MP_MMAP_SUPPORT 1
+#else /* HAVE_CONFIG_H && HAVE_MMAP */
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_CYGWIN || \
     SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
     SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
@@ -309,6 +312,7 @@
 #else /* SYSTEM */
 #define MP_MMAP_SUPPORT 0
 #endif /* SYSTEM */
+#endif /* HAVE_CONFIG_H && HAVE_MMAP */
 #endif /* MP_MMAP_SUPPORT */
 
 
