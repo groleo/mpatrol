@@ -5,7 +5,7 @@ This document contains information about known bugs and limitations in the
 mpatrol library as well as listing potential future enhancements.  Guidelines
 on how to add support for new operating systems, processor architectures and
 object file formats to the library source code appear at the bottom of this
-file.
+file, as well as a list of related software.
 
 Bugs should be reported to <mpatrol@cbmamiga.demon.co.uk> along with the
 details of the operating system, processor architecture and object file format
@@ -241,3 +241,101 @@ Adding support for a new object file format
   * Add any support for stack traversal in stack.c.
 
   * Add any support for symbol reading in symbol.c.
+
+
+Related software
+
+    A list of software which helps in debugging dynamic memory allocation
+    problems is given below.  They all provide some of the features that mpatrol
+    contains and you may wish to use one of them to solve your problem if you
+    have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
+    Fence, so I can't vouch for any of the others, although if you have any
+    recommendations feel free to let me know so I can add them to this list.  In
+    particular, there seems to be shortage of such programs for AmigaOS and
+    Netware platforms.
+
+      * BoundsChecker
+            Author:    NuMega Corporation <info@numega.com>
+            License:   Commercial Software
+            Platforms: MS-DOS, Windows
+            Location:  http://www.numega.com/
+            Overview:  Detects and diagnoses errors in static, stack and heap
+                       memory and in memory and resource leaks.
+
+      * Ccmalloc
+            Author:    Armin Biere <armin@ira.uk.de>
+            License:   GNU General Public License
+            Platforms: Various UNIX
+            Location:  http://iseran.ira.uka.de/~armin/ccmalloc/
+            Overview:  Can interface with gdb to find memory leaks, multiple
+                       deallocations and memory corruptions in C or C++
+                       programs.
+
+      * Dbmalloc
+            Author:    Conor P. Cahill <cpcahil@virtech.vti.com>
+            License:   Free Software
+            Platforms: Various UNIX
+            Location:  http://www.clark.net/pub/dickey/dbmalloc/dbmalloc.html
+            Overview:  Provides replacements for memory management library
+                       functions and provides a full set of debugging features
+                       which detect memory overruns and other types of misuse.
+
+      * Dmalloc
+            Author:    Gray Watson <gray@burger.letters.com>
+            License:   Free Software
+            Platforms: Various UNIX, MS-DOS, Windows
+            Location:  http://www.dmalloc.com/
+            Overview:  A drop-in replacement for the system's memory management
+                       routines, providing powerful debugging facilities
+                       configurable at run-time.
+
+      * Electric Fence
+            Author:    Bruce Perens <Bruce@Pixar.com>
+            License:   GNU General Public License
+            Platforms: Various UNIX
+            Location:  ftp://ftp.perens.com/pub/ElectricFence/
+            Overview:  Uses virtual memory hardware to protect dynamically
+                       allocated memory in order to detect illegal memory
+                       accesses.
+
+      * FDA (Free Debug Allocator)
+            Author:    Thomas Helvey <tomh@inxpress.net>
+            License:   GNU General Public License
+            Platforms: Linux, Windows
+            Location:  http://www.debian.org/Packages/unstable/devel/fda.html
+            Overview:  Provides routines that can be plugged in to replace
+                       malloc(), calloc(), realloc() and free().
+
+      * HeapAgent
+            Author:    MicroQuill <info@microquill.com>
+            License:   Commercial Software
+            Platforms: Windows
+            Location:  http://www.microquill.com/
+            Overview:  Instruments the heap to provide heap error detection
+                       without the need to recompile any source code.
+
+      * Insure++
+            Author:    ParaSoft <info@parasoft.com>
+            License:   Commercial Software
+            Platforms: Various UNIX, Windows
+            Location:  http://www.parasoft.com/
+            Overview:  Uses Source Code Instrumentation and Runtime Pointer
+                       Tracking technologies to pinpoint memory corruption,
+                       memory leaks, operations on unrelated pointers and more.
+
+      * MEMDEBUG
+            Author:    Rene Schmit <rene.schmit@crpht.lu>
+            License:   Free Software
+            Platforms: Various UNIX, MS-DOS, Windows, MacOS
+            Location:  ftp://ftp.crpht.lu/pub/sources/memdebug
+            Overview:  Provides memory management error detection, memory usage
+                       error detection, memory usage profiling and error
+                       simulation.
+
+      * Purify
+            Author:    Rational Software <info@rational.com>
+            License:   Commercial Software
+            Platforms: Various UNIX, Windows
+            Location:  http://www.rational.com/
+            Overview:  Uses Object Code Insertion technology to provide run-time
+                       error checking and memory leak detection.
