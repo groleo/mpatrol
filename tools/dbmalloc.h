@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.6 2001-02-27 22:13:27 graeme Exp $
+ * $Id: dbmalloc.h,v 1.7 2001-02-27 23:17:11 graeme Exp $
  */
 
 
@@ -183,6 +183,9 @@ void __mpt_dbmalloclist(int, unsigned long, unsigned long);
 unsigned long __mpt_dbmallocinuse(unsigned long *);
 size_t __mpt_dbmallocsize(MP_CONST void *);
 void __mp_init_dbmalloc(void);
+
+
+static MP_VOLATILE void *__mpt_init_dbmalloc = (void *) __mp_init_dbmalloc;
 
 
 #ifdef __cplusplus
