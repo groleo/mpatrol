@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.97 2001-02-25 23:52:46 graeme Exp $
+ * $Id: mpatrol.h,v 1.98 2001-02-26 00:01:58 graeme Exp $
  */
 
 
@@ -742,8 +742,8 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)
 #define __mp_stats(d) ((int) 0)
-#define __mp_check() ((void) 0)
 #define __mp_checkheap(s, t, u) ((void) 0)
+#define __mp_check() ((void) 0)
 #define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t, MP_CONST void *)) \
                           NULL)
 #define __mp_epilogue(h) ((void (*)(MP_CONST void *, MP_CONST void *)) NULL)

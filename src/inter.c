@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.92 2001-02-25 23:46:10 graeme Exp $"
+#ident "$Id: inter.c,v 1.93 2001-02-26 00:01:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.92 2001-02-25 23:46:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.93 2001-02-26 00:01:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1737,6 +1737,17 @@ __mp_checkheap(char *s, char *t, unsigned long u)
     __mp_checkinfo(&memhead, &v);
     checkalloca(&v, 0);
     restoresignals();
+}
+
+
+/* Check the validity of all memory blocks that have been filled with
+ * a predefined pattern.
+ */
+
+void
+__mp_check(void)
+{
+    __mp_checkheap(NULL, NULL, 0);
 }
 
 
