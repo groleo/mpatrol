@@ -20,6 +20,12 @@ the information necessary to generate each of the preformatted files.
                    http://texinfo.org/
         Notes:     The unprocessed source of the mpatrol manual.
 
+  * images/mpatrol.txt
+        Format:    ASCII text
+                   http://www.bbsinc.com/iso8859.html
+        Notes:     The mpatrol logo required by the ASCII text, GNU Info and
+                   AmigaGuide versions of the mpatrol manual.
+
   * images/mpatrol.jpg
         Format:    Joint Photographic Experts Group (JPEG) colour image
                    http://www.jpeg.org/

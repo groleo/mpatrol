@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.9 2000-04-03 18:17:44 graeme Exp $
+# $Id: Makefile,v 1.10 2000-05-11 00:05:15 graeme Exp $
 
 
 # Definitions
@@ -40,7 +40,7 @@ VERBOSE   = false
 
 # Build the text file from the Texinfo file using makeinfo
 
-$(DOCUMENT).txt: $(DOCUMENT).texi
+$(DOCUMENT).txt: $(DOCUMENT).texi images/$(DOCUMENT).txt
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeinfo --no-headers --number-sections --verbose $< >$@
@@ -50,7 +50,7 @@ endif
 
 # Build the info file from the Texinfo file using makeinfo
 
-$(DOCUMENT).info: $(DOCUMENT).texi
+$(DOCUMENT).info: $(DOCUMENT).texi images/$(DOCUMENT).txt
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeinfo --no-split --verbose $<
@@ -60,7 +60,7 @@ endif
 
 # Build the AmigaGuide file from the Texinfo file using makeguide
 
-$(DOCUMENT).guide: $(DOCUMENT).texi
+$(DOCUMENT).guide: $(DOCUMENT).texi images/$(DOCUMENT).txt
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeguide --amiga --verbose $<
