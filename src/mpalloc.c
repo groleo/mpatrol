@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.36 2001-07-26 17:26:40 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.37 2001-07-26 17:46:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.36 2001-07-26 17:26:40 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.37 2001-07-26 17:46:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -321,6 +321,7 @@ __mp_memhead(void)
 /* Allocate a new block of memory of a specified size and alignment.
  */
 
+MP_API
 void *
 __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
            char *g, size_t h, size_t k)
@@ -401,6 +402,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
 /* Allocate a new block of memory to duplicate a string.
  */
 
+MP_API
 char *
 __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             size_t k)
@@ -442,6 +444,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
 /* Resize an existing block of memory to a new size and alignment.
  */
 
+MP_API
 void *
 __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              unsigned long u, char *g, size_t h, size_t k)
@@ -490,6 +493,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
 /* Free an existing block of memory.
  */
 
+MP_API
 void
 __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
 {
@@ -505,6 +509,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
 /* Set a block of memory to contain a specific byte.
  */
 
+MP_API
 void *
 __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
             unsigned long u, size_t k)
@@ -518,6 +523,7 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
 /* Copy a block of memory from one address to another.
  */
 
+MP_API
 void *
 __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
              char *t, unsigned long u, size_t k)
@@ -553,6 +559,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
 /* Attempt to locate the position of one block of memory in another block.
  */
 
+MP_API
 void *
 __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
                char *t, unsigned long u, size_t k)
@@ -580,6 +587,7 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
 /* Compare two blocks of memory.
  */
 
+MP_API
 int
 __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
                 unsigned long u, size_t k)
