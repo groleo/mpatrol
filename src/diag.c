@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.65 2001-03-04 14:29:00 graeme Exp $"
+#ident "$Id: diag.c,v 1.66 2001-03-04 15:39:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.65 2001-03-04 14:29:00 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.66 2001-03-04 15:39:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -62,6 +62,7 @@ static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.65 2001-03-04 14:29
 typedef struct errorinfo
 {
     char *code;   /* error abbreviation code */
+    char *string; /* error information string */
     char *format; /* error format */
 }
 errorinfo;
@@ -110,61 +111,61 @@ static unsigned long errors, warnings;
 
 static errorinfo errordetails[ET_MAX + 1] =
 {
-    {"NOERR",
+    {"NOERR", "no error",
      "no error has occurred"},
-    {"ALLOVF",
+    {"ALLOVF", "allocation overflow",
      "allocation " MP_POINTER " has a corrupted overflow buffer at "
      MP_POINTER},
-    {"ALLZER",
+    {"ALLZER", "allocation too small",
      "attempt to create an allocation of size 0"},
-    {"BADALN",
+    {"BADALN", "illegal alignment",
      "alignment %lu is not a power of two"},
-    {"FRDCOR",
+    {"FRDCOR", "freed memory corruption",
      "freed allocation " MP_POINTER " has memory corruption at " MP_POINTER},
-    {"FRDOPN",
+    {"FRDOPN", "illegal operation on freed memory",
      "attempt to perform operation on freed memory"},
-    {"FRDOVF",
+    {"FRDOVF", "freed allocation overflow",
      "freed allocation " MP_POINTER " has a corrupted overflow buffer at "
      MP_POINTER},
-    {"FRECOR",
+    {"FRECOR", "free memory corruption",
      "free memory corruption at " MP_POINTER},
-    {"FREMRK",
+    {"FREMRK", "freeing a marked allocation",
      "attempt to free marked memory allocation " MP_POINTER},
-    {"FRENUL",
+    {"FRENUL", "freeing a NULL pointer",
      "attempt to free a NULL pointer"},
-    {"FREOPN",
+    {"FREOPN", "illegal operation on free memory",
      "attempt to perform operation on free memory\n"},
-    {"ILLMEM",
+    {"ILLMEM", "illegal memory access",
      NULL},
-    {"INCOMP",
+    {"INCOMP", "incompatible functions",
      MP_POINTER " was allocated with %s"},
-    {"MAXALN",
+    {"MAXALN", "alignment too large",
      "alignment %lu is greater than the system page size"},
-    {"MISMAT",
+    {"MISMAT", "allocated pointer mismatch",
      MP_POINTER " does not match allocation of " MP_POINTER},
-    {"NOTALL",
+    {"NOTALL", "no such allocation",
      MP_POINTER " has not been allocated"},
-    {"NULOPN",
+    {"NULOPN", "illegal operation on a NULL pointer",
      "attempt to perform operation on a NULL pointer\n"},
-    {"OUTMEM",
+    {"OUTMEM", "out of memory",
      "out of memory"},
-    {"PRVFRD",
+    {"PRVFRD", "allocation already freed",
      MP_POINTER " was freed with %s"},
-    {"RNGOVF",
+    {"RNGOVF", "range overflow",
      "range [" MP_POINTER "," MP_POINTER "] overflows [" MP_POINTER ","
      MP_POINTER "]"},
-    {"RNGOVL",
+    {"RNGOVL", "range overlap",
      "range [" MP_POINTER "," MP_POINTER "] overlaps [" MP_POINTER ","
      MP_POINTER "]"},
-    {"RSZNUL",
+    {"RSZNUL", "reallocating a NULL pointer",
      "attempt to resize a NULL pointer"},
-    {"RSZZER",
+    {"RSZZER", "reallocation too small",
      "attempt to resize an allocation to size 0"},
-    {"STROVF",
+    {"STROVF", "string overflow",
      "string " MP_POINTER " overflows [" MP_POINTER "," MP_POINTER "]"},
-    {"ZERALN",
+    {"ZERALN", "alignment too small",
      "alignment 0 is invalid"},
-    {"INTRNL",
+    {"INTRNL", "internal error",
      "internal error"}
 };
 
