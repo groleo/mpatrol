@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.15 2000-06-15 20:27:05 graeme Exp $
+# $Id: NMakefile,v 1.16 2000-06-23 19:33:03 graeme Exp $
 
 
 # Definitions
@@ -87,7 +87,7 @@ $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
 
 $(SHARED_LIBRARY): $(SHARED_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS)
+	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS) -defaultlib:imagehlp
 
 $(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
@@ -96,7 +96,7 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
 $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS)
+	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
 
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
