@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.1 1999-10-04 23:45:38 graeme Exp $
+# $Id: Makefile,v 1.2 2000-01-09 22:08:18 graeme Exp $
 
 
 # Definitions
@@ -93,8 +93,7 @@ $(SHARTS_LIBRARY): $(SHARTS_OBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
-all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(OBJECT_LIBRARY) \
-	$(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) $(OBJTS_LIBRARY)
+all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY)
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
