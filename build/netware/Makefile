@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.57 2001-03-08 20:13:37 graeme Exp $
+# $Id: Makefile,v 1.58 2001-05-23 20:23:44 graeme Exp $
 
 
 # Definitions
@@ -235,14 +235,15 @@ inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/option.h $(SOURCE)/profile.h $(SOURCE)/trace.h \
-	$(SOURCE)/leaktab.h $(SOURCE)/machine.h
+	$(SOURCE)/leaktab.h $(SOURCE)/machine.h $(SOURCE)/version.h
 inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/machine.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/machine.h \
+	$(SOURCE)/version.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
@@ -251,7 +252,7 @@ mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
 	$(SOURCE)/leaktab.h $(SOURCE)/signals.h $(SOURCE)/diag.h \
-	$(SOURCE)/mpalloc.h
+	$(SOURCE)/mpalloc.h $(SOURCE)/version.h
 mpfailure.obj: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.obj: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \

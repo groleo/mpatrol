@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.60 2001-03-08 20:13:36 graeme Exp $
+# $Id: Makefile,v 1.61 2001-05-23 20:23:42 graeme Exp $
 
 
 # Definitions
@@ -231,7 +231,8 @@ inter.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/option.h $(SOURCE)/sbrk.h $(SOURCE)/profile.h \
-	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/machine.h
+	$(SOURCE)/trace.h $(SOURCE)/leaktab.h $(SOURCE)/machine.h \
+	$(SOURCE)/version.h
 inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
@@ -239,7 +240,7 @@ inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h $(SOURCE)/sbrk.h \
 	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/leaktab.h \
-	$(SOURCE)/machine.h
+	$(SOURCE)/machine.h $(SOURCE)/version.h
 malloc.o malloc.t.o: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
@@ -268,7 +269,7 @@ mpalloc.o: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
 	$(SOURCE)/leaktab.h $(SOURCE)/signals.h $(SOURCE)/diag.h \
-	$(SOURCE)/mpalloc.h
+	$(SOURCE)/mpalloc.h $(SOURCE)/version.h
 mpfailure.o: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.o: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
