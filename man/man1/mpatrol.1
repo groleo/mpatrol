@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.24 2000-10-10 19:16:27 graeme Exp $
+.\" $Id: mpatrol.1,v 1.25 2000-10-19 19:31:32 graeme Exp $
 .\"
-.TH MPATROL 1 "10 October 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 1 "19 October 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -36,12 +36,11 @@ dynamically linked.
 All mpatrol library diagnostics are sent to the file \fImpatrol.%n.log\fP in the
 current directory by default (where \fI%n\fP is the current process id) but this
 can be changed using the \fB\-\-log\-file\fP option.  Similarly, the default
-profiling output filename is \fImpatrol.%n.out\fP.  Note that the \fBLOGALL\fP
-option is always implicitly used for commands that are run by this command.
+profiling output filename is \fImpatrol.%n.out\fP.
 .SH OPTIONS
-All of the following options (except \fB\-\-dynamic\fP, \fB\-\-help\fP and
-\fB\-\-version\fP) correspond to their listed mpatrol library option.  See
-\fBmpatrol\fP(3) for more details on these options.
+All of the following options (except \fB\-\-dynamic\fP, \fB\-\-help\fP,
+\fB\-\-show\-env\fP and \fB\-\-version\fP) correspond to their listed mpatrol
+library option.  See \fBmpatrol\fP(3) for more details on these options.
 .TP
 \fB\-\-alloc\-byte\fP <\fIunsigned integer\fP> [\fB\-a\fP]
 [\fBALLOCBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
@@ -107,9 +106,30 @@ should be classified as large allocations for profiling purposes.
 [\fBLIMIT\fP]  Specifies the limit in bytes at which all memory allocations
 should fail if the total allocated memory should increase beyond this.
 .TP
+\fB\-\-log\-all\fP
+[\fBLOGALL\fP]  Equivalent to the \fB\-\-log\-allocs\fP,
+\fB\-\-log\-reallocs\fP, \fB\-\-log\-frees\fP and \fB\-\-log\-memory\fP options
+specified together.
+.TP
+\fB\-\-log\-allocs\fP
+[\fBLOGALLOCS\fP]  Specifies that all memory allocations are to be logged and
+sent to the log file.
+.TP
 \fB\-\-log\-file\fP <\fIstring\fP> [\fB\-l\fP]
 [\fBLOGFILE\fP]  Specifies an alternative file in which to place all diagnostics
 from the mpatrol library.
+.TP
+\fB\-\-log\-frees\fP
+[\fBLOGFREES\fP]  Specifies that all memory deallocations are to be logged and
+sent to the log file.
+.TP
+\fB\-\-log\-memory\fP
+[\fBLOGMEMORY\fP]  Specifies that all memory operations are to be logged and
+sent to the log file.
+.TP
+\fB\-\-log\-reallocs\fP
+[\fBLOGREALLOCS\fP]  Specifies that all memory reallocations are to be logged
+and sent to the log file.
 .TP
 \fB\-\-medium\-bound\fP <\fIunsigned integer\fP> [\fB\-2\fP]
 [\fBMEDIUMBOUND\fP]  Specifies the limit in bytes up to which memory allocations
@@ -170,15 +190,32 @@ when a memory allocation is being reallocated.
 [\fBSAFESIGNALS\fP]  Instructs the library to save and replace certain signal
 handlers during the execution of library code and to restore them afterwards.
 .TP
+\fB\-\-show\-all\fP
+[\fBSHOWALL\fP]  Equivalent to the \fB\-\-show\-freed\fP,
+\fB\-\-show\-unfreed\fP, \fB\-\-show\-map\fP and \fB\-\-show\-symbols\fP options
+specified together.
+.TP
+\fB\-\-show\-env\fP
+Displays the contents of the \fBMPATROL_OPTIONS\fP environment variable.  This
+will be shown after all of the other command line options have been processed
+and will prevent the specified command from being run.
+.TP
 \fB\-\-show\-freed\fP [\fB\-s\fP]
-[\fBSHOWFREED\fP & \fBSHOWUNFREED\fP]  Specifies that a summary of all of the
-freed and unfreed memory allocations should be displayed at the end of program
-execution.
+[\fBSHOWFREED\fP]  Specifies that a summary of all of the freed memory
+allocations should be displayed at the end of program execution.
 .TP
 \fB\-\-show\-map\fP [\fB\-S\fP]
-[\fBSHOWMAP\fP & \fBSHOWSYMBOLS\fP]  Specifies that a memory map of the entire
-heap and a summary of all of the function symbols read from the program's
-executable file should be displayed at the end of program execution.
+[\fBSHOWMAP\fP]  Specifies that a memory map of the entire heap should be
+displayed at the end of program execution.
+.TP
+\fB\-\-show\-symbols\fP
+[\fBSHOWSYMBOLS\fP]  Specifies that a summary of all of the function symbols
+read from the program's executable file should be displayed at the end of
+program execution.
+.TP
+\fB\-\-show\-unfreed\fP
+[\fBSHOWUNFREED\fP]  Specifies that a summary of all of the unfreed memory
+allocations should be displayed at the end of program execution.
 .TP
 \fB\-\-small\-bound\fP <\fIunsigned integer\fP> [\fB\-1\fP]
 [\fBSMALLBOUND\fP]  Specifies the limit in bytes up to which memory allocations

@@ -21,14 +21,13 @@ DDEESSCCRRIIPPTTIIOONN
        _t_r_o_l_._%_n_._l_o_g in the current directory by default (where  _%_n
        is  the  current process id) but this can be changed using
        the ----lloogg--ffiillee option.  Similarly, the  default  profiling
-       output  filename  is _m_p_a_t_r_o_l_._%_n_._o_u_t.  Note that the LLOOGGAALLLL
-       option is always implicitly used for commands that are run
-       by this command.
+       output filename is _m_p_a_t_r_o_l_._%_n_._o_u_t.
 
 OOPPTTIIOONNSS
-       All of the following options (except ----ddyynnaammiicc, ----hheellpp and
-       ----vveerrssiioonn) correspond  to  their  listed  mpatrol  library
-       option.  See mmppaattrrooll(3) for more details on these options.
+       All  of  the  following options (except ----ddyynnaammiicc, ----hheellpp,
+       ----sshhooww--eennvv and ----vveerrssiioonn) correspond to their listed  mpa-
+       trol  library  option.  See mmppaattrrooll(3) for more details on
+       these options.
 
        ----aalllloocc--bbyyttee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--aa]
               [AALLLLOOCCBBYYTTEE]  Specifies an 8-bit byte  pattern  with
@@ -58,10 +57,11 @@ OOPPTTIIOONNSS
        ----cchheecckk--aallll [--cc]
               [CCHHEECCKKAALLLL]  Specifies that all arguments  to  func-
               tions  which  allocate,  reallocate  and deallocate
+              memory have rigorous checks performed on them.   In
 
 
 
-Release 1.3              10 October 2000                        1
+Release 1.3              19 October 2000                        1
 
 
 
@@ -70,7 +70,6 @@ Release 1.3              10 October 2000                        1
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
-              memory have rigorous checks performed on them.   In
               addition, functions which perform memory operations
               will be checked for zero-length NNUULLLL pointers.
 
@@ -117,17 +116,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               memory  allocations  should fail if the total allo-
               cated memory should increase beyond this.
 
-       ----lloogg--ffiillee <_s_t_r_i_n_g> [--ll]
-              [LLOOGGFFIILLEE]  Specifies an alternative file  in  which
-              to  place all diagnostics from the mpatrol library.
+       ----lloogg--aallll
+              [LLOOGGAALLLL]    Equivalent   to    the    ----lloogg--aallllooccss,
+              ----lloogg--rreeaallllooccss,    ----lloogg--ffrreeeess   and   ----lloogg--mmeemmoorryy
+              options specified together.
 
-       ----mmeeddiiuumm--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--22]
-              [MMEEDDIIUUMMBBOOUUNNDD]  Specifies the limit in bytes  up  to
-              which  memory  allocations  should be classified as
+       ----lloogg--aallllooccss
+              [LLOOGGAALLLLOOCCSS]  Specifies that all memory  allocations
+              are to be logged and sent to the log file.
 
 
 
-Release 1.3              10 October 2000                        2
+Release 1.3              19 October 2000                        2
 
 
 
@@ -136,6 +136,25 @@ Release 1.3              10 October 2000                        2
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+       ----lloogg--ffiillee <_s_t_r_i_n_g> [--ll]
+              [LLOOGGFFIILLEE]   Specifies  an alternative file in which
+              to place all diagnostics from the mpatrol  library.
+
+       ----lloogg--ffrreeeess
+              [LLOOGGFFRREEEESS]  Specifies that all memory deallocations
+              are to be logged and sent to the log file.
+
+       ----lloogg--mmeemmoorryy
+              [LLOOGGMMEEMMOORRYY]  Specifies that all  memory  operations
+              are to be logged and sent to the log file.
+
+       ----lloogg--rreeaallllooccss
+              [LLOOGGRREEAALLLLOOCCSS]   Specifies that all memory realloca-
+              tions are to be logged and sent to the log file.
+
+       ----mmeeddiiuumm--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--22]
+              [MMEEDDIIUUMMBBOOUUNNDD]  Specifies the limit in bytes  up  to
+              which  memory  allocations  should be classified as
               medium allocations for profiling purposes.
 
        ----nnoo--ffrreeee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--nn]
@@ -171,6 +190,18 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        ----ppaaggee--aalllloocc--uuppppeerr [--XX]
               [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
+
+
+
+Release 1.3              19 October 2000                        3
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
               memory  allocation  should occupy at least one page
               of virtual memory and should be placed at the high-
               est point within these pages.
@@ -190,18 +221,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               to place all memory allocation  profiling  informa-
               tion from the mpatrol library.
 
-
-
-
-Release 1.3              10 October 2000                        3
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
        ----pprroogg--ffiillee <_s_t_r_i_n_g> [--ee]
               [PPRROOGGFFIILLEE]   Specifies an alternative filename with
               which to locate the executable file containing  the
@@ -218,18 +237,50 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               tion  of  library  code  and to restore them after-
               wards.
 
+       ----sshhooww--aallll
+              [SSHHOOWWAALLLL]    Equivalent   to   the    ----sshhooww--ffrreeeedd,
+              ----sshhooww--uunnffrreeeedd,   ----sshhooww--mmaapp   and   ----sshhooww--ssyymmbboollss
+              options specified together.
+
+       ----sshhooww--eennvv
+              Displays the contents of the MMPPAATTRROOLL__OOPPTTIIOONNSS  envi-
+              ronment  variable.  This will be shown after all of
+              the other command line options have been  processed
+              and  will  prevent the specified command from being
+              run.
+
        ----sshhooww--ffrreeeedd [--ss]
-              [SSHHOOWWFFRREEEEDD & SSHHOOWWUUNNFFRREEEEDD]  Specifies that a summary
-              of  all of the freed and unfreed memory allocations
-              should be displayed at the end  of  program  execu-
-              tion.
+              [SSHHOOWWFFRREEEEDD]  Specifies that a summary of all of the
+              freed memory allocations should be displayed at the
+              end of program execution.
 
        ----sshhooww--mmaapp [--SS]
-              [SSHHOOWWMMAAPP  &  SSHHOOWWSSYYMMBBOOLLSS]   Specifies that a memory
-              map of the entire heap and a summary of all of  the
-              function symbols read from the program's executable
-              file should be displayed at the end of program exe-
-              cution.
+              [SSHHOOWWMMAAPP]  Specifies  that  a  memory  map  of  the
+
+
+
+Release 1.3              19 October 2000                        4
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
+              entire  heap should be displayed at the end of pro-
+              gram execution.
+
+       ----sshhooww--ssyymmbboollss
+              [SSHHOOWWSSYYMMBBOOLLSS]  Specifies that a summary of  all  of
+              the  function  symbols read from the program's exe-
+              cutable file should be displayed at the end of pro-
+              gram execution.
+
+       ----sshhooww--uunnffrreeeedd
+              [SSHHOOWWUUNNFFRREEEEDD]   Specifies  that a summary of all of
+              the unfreed memory allocations should be  displayed
+              at the end of program execution.
 
        ----ssmmaallll--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--11]
               [SSMMAALLLLBBOOUUNNDD]   Specifies  the  limit in bytes up to
@@ -256,18 +307,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 SSEEEE AALLSSOO
        mmlleeaakk(1), mmpprrooff(1), mmppaattrrooll(3).
 
-
-
-
-Release 1.3              10 October 2000                        4
-
-
-
-
-
-MPATROL(1)               mpatrol library               MPATROL(1)
-
-
        The mpatrol manual and reference card.
 
        http://www.cbmamiga.demon.co.uk/mpatrol/
@@ -283,6 +322,17 @@ CCOOPPYYRRIIGGHHTT
        eral Public License as  published  by  the  Free  Software
        Foundation;  either  version 2 of the License, or (at your
        option) any later version.
+
+
+
+Release 1.3              19 October 2000                        5
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
 
        This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
@@ -325,6 +375,22 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.3              10 October 2000                        5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Release 1.3              19 October 2000                        6
 
 
