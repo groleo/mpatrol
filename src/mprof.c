@@ -36,13 +36,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.28 2001-03-22 19:20:57 graeme Exp $"
+#ident "$Id: mprof.c,v 1.29 2001-06-07 17:59:05 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.28 2001-03-22 19:20:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.29 2001-06-07 17:59:05 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.2" /* the current version of this program */
+#define VERSION "1.3" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -1563,7 +1563,8 @@ main(int argc, char **argv)
                 fputs("digraph \"allocation call graph\"\n{\n", graphfile);
             writegraph(NULL, &graph.start);
             fputs("}\n", graphfile);
-            fclose(graphfile);
+            if ((graphfile != stdout) && (graphfile != stderr))
+                fclose(graphfile);
         }
     }
     deletegraph();
