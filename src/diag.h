@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.37 2001-08-23 22:46:42 graeme Exp $
+ * $Id: diag.h,v 1.38 2001-09-26 21:58:22 graeme Exp $
  */
 
 
@@ -42,6 +42,7 @@
 
 #define FLG_EDIT   1 /* edit any source files associated with diagnostics */
 #define FLG_LIST   2 /* list any source files associated with diagnostics */
+#define FLG_HTML   4 /* format the log file in HTML rather than text */
 
 #define FLG_COUNTS 1 /* display counts in leak table */
 #define FLG_BOTTOM 2 /* display bottom entries in leak table */
