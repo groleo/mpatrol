@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.43 2000-12-13 23:41:50 graeme Exp $
+# $Id: mpatrol.spec,v 1.44 2000-12-14 18:15:57 graeme Exp $
 
 
 %define libversion 1.3
@@ -70,6 +70,7 @@ make mpatrol mprof mptrace mleak
 %install
 rm -rf $RPM_BUILD_ROOT
 mv doc/README README.DOC
+mv man/README README.MAN
 mkdir -p $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mpatrol $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mprof $RPM_BUILD_ROOT/%{_bindir}
@@ -77,6 +78,8 @@ install -m755 -s build/unix/mptrace $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mleak $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
+mv man/dvi .
+mv man/ps .
 mkdir -p $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpatrol.h $RPM_BUILD_ROOT/%{_includedir}
 mkdir -p $RPM_BUILD_ROOT/%{_infodir}
@@ -99,11 +102,11 @@ install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 %files
 %defattr(-,root,root)
-%doc README README.DOC COPYING COPYING.LIB NEWS ChangeLog
+%doc README README.DOC README.MAN COPYING COPYING.LIB NEWS ChangeLog
 %doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
 %doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
 %doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf
-%doc doc/images
+%doc doc/images dvi ps
 %doc tests
 %{_bindir}
 %{_includedir}
