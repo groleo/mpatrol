@@ -65,6 +65,12 @@ Notes for all platforms
     when the top of stack is reached.  If this is not the case then this method
     cannot be used.
 
+  * An option should be added to suppress stack traversal, and therefore symbol
+    reading, in case of problems where the library crashes during reading a call
+    stack.  An option should also be added to suppress the saving and restoring
+    of signals upon entry and exit of the mpatrol library, since this would make
+    it easier to interrupt programs.
+
   * In object file formats that support nested symbols (such as ELF), the
     current implementation will tend to show some shortcomings.  This is because
     there is currently no nesting count in the function that deals with symbol
@@ -80,13 +86,28 @@ Notes for all platforms
     number information to the call stack, but could also be used to extend the
     library to monitor static and stack variables.
 
+  * Add versions of mallopt(), mallinfo(), memorymap() and mallocctl() which
+    are provided in many other malloc libraries.  These won't necessarily behave
+    in exactly the same way as existing implementations, but at least there
+    won't be link errors when compiling source code which uses them.
+
   * Script files similar to the mpatrol shell script provided for UNIX platforms
     could be added for the other operating systems that the mpatrol library is
     available on.  Perhaps this could even be extended to a common executable
     command that is written in C.
 
+  * TeXinfo documentation should be written, containing most of the information
+    from the UNIX manual pages as well as a set of tutorials and examples
+    illustrating how best to use mpatrol.  TeXinfo documentation can be
+    converted to wide variety of documentation formats.
+
 
 Notes for UNIX platforms
+
+  * Perhaps add support for allocating new heap space using mmap() instead of
+    sbrk().  This could be controlled by a run-time option, since using mmap()
+    would add the feature of being able to map memory onto files for later
+    reading.
 
   * Need to add watch point area support for non-Solaris operating systems.
     This may be a case of preventing all heap memory from being accessed and
@@ -332,7 +353,7 @@ Related software
             Author:    Rene Schmit <rene.schmit@crpht.lu>
             License:   Free Software
             Platforms: Various UNIX, MS-DOS, Windows, MacOS
-            Location:  ftp://ftp.crpht.lu/pub/sources/memdebug
+            Location:  ftp://ftp.crpht.lu/pub/sources/memdebug/
             Overview:  Provides memory management error detection, memory usage
                        error detection, memory usage profiling and error
                        simulation.
