@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.33 2001-02-11 22:23:48 graeme Exp $"
+#ident "$Id: option.c,v 1.34 2001-02-12 19:27:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.33 2001-02-11 22:23:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.34 2001-02-12 19:27:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1103,12 +1103,12 @@ __mp_parseoptions(infohead *h)
 }
 
 
-/* Modify mpatrol flags after the library has been initialised.
+/* Set mpatrol flags after the library has been initialised.
  */
 
 static
 unsigned long
-modifyflags(infohead *h, unsigned long f, int u)
+setflags(infohead *h, unsigned long f, int u)
 {
     unsigned long i;
 
@@ -1248,7 +1248,7 @@ modifyflags(infohead *h, unsigned long f, int u)
 
 MP_GLOBAL
 unsigned long
-__mp_setopt(infohead *h, unsigned long o, unsigned long v)
+__mp_set(infohead *h, unsigned long o, unsigned long v)
 {
     unsigned long r;
 
@@ -1259,10 +1259,10 @@ __mp_setopt(infohead *h, unsigned long o, unsigned long v)
         showoptions();
         break;
       case OPT_SETFLAGS:
-        r = modifyflags(h, v, 0);
+        r = setflags(h, v, 0);
         break;
       case OPT_UNSETFLAGS:
-        r = modifyflags(h, v, 1);
+        r = setflags(h, v, 1);
         break;
       case OPT_ALLOCSTOP:
         h->astop = v;
@@ -1313,6 +1313,164 @@ __mp_setopt(infohead *h, unsigned long o, unsigned long v)
         break;
       default:
         r = o;
+        break;
+    }
+    return r;
+}
+
+
+/* Get mpatrol flags after the library has been initialised.
+ */
+
+static
+unsigned long
+getflags(infohead *h)
+{
+    unsigned long f;
+
+    f = 0;
+    if (h->flags & FLG_CHECKALLOCS)
+        f |= OPT_CHECKALLOCS;
+    if (h->flags & FLG_CHECKREALLOCS)
+        f |= OPT_CHECKREALLOCS;
+    if (h->flags & FLG_CHECKFREES)
+        f |= OPT_CHECKFREES;
+    if (h->flags & FLG_CHECKMEMORY)
+        f |= OPT_CHECKMEMORY;
+    if (h->flags & FLG_LOGALLOCS)
+        f |= OPT_LOGALLOCS;
+    if (h->flags & FLG_LOGREALLOCS)
+        f |= OPT_LOGREALLOCS;
+    if (h->flags & FLG_LOGFREES)
+        f |= OPT_LOGFREES;
+    if (h->flags & FLG_LOGMEMORY)
+        f |= OPT_LOGMEMORY;
+    if (h->flags & FLG_SHOWMAP)
+        f |= OPT_SHOWMAP;
+    if (h->flags & FLG_SHOWSYMBOLS)
+        f |= OPT_SHOWSYMBOLS;
+    if (h->flags & FLG_SHOWFREE)
+        f |= OPT_SHOWFREE;
+    if (h->flags & FLG_SHOWFREED)
+        f |= OPT_SHOWFREED;
+    if (h->flags & FLG_SHOWUNFREED)
+        f |= OPT_SHOWUNFREED;
+    if (h->flags & FLG_ALLOWOFLOW)
+        f |= OPT_ALLOWOFLOW;
+    if (h->prof.profiling)
+        f |= OPT_PROF;
+    if (h->trace.tracing)
+        f |= OPT_TRACE;
+    if (h->flags & FLG_SAFESIGNALS)
+        f |= OPT_SAFESIGNALS;
+    if (h->flags & FLG_NOPROTECT)
+        f |= OPT_NOPROTECT;
+    if (h->alloc.flags & FLG_PRESERVE)
+        f |= OPT_PRESERVE;
+    if (h->alloc.flags & FLG_OFLOWWATCH)
+        f |= OPT_OFLOWWATCH;
+    if (h->alloc.flags & FLG_PAGEALLOC)
+        f |= OPT_PAGEALLOC;
+    if (h->alloc.flags & FLG_ALLOCUPPER)
+        f |= OPT_ALLOCUPPER;
+    if (h->alloc.heap.memory.flags & FLG_USEMMAP)
+        f |= OPT_USEMMAP;
+    if (h->syms.lineinfo)
+        f |= OPT_USEDEBUG;
+    if (__mp_diagflags & FLG_EDIT)
+        f |= OPT_EDIT;
+    if (__mp_diagflags & FLG_LIST)
+        f |= OPT_LIST;
+    return f;
+}
+
+
+/* Get an mpatrol option after the library has been initialised.
+ */
+
+MP_GLOBAL
+int
+__mp_get(infohead *h, unsigned long o, unsigned long *v)
+{
+    int r;
+
+    r = 1;
+    switch (o)
+    {
+      case OPT_HELP:
+        *v = 0;
+        break;
+      case OPT_SETFLAGS:
+        *v = getflags(h);
+        break;
+      case OPT_UNSETFLAGS:
+        *v = ~getflags(h);
+        break;
+      case OPT_ALLOCSTOP:
+        *v = h->astop;
+        break;
+      case OPT_REALLOCSTOP:
+        *v = h->rstop;
+        break;
+      case OPT_FREESTOP:
+        *v = h->fstop;
+        break;
+      case OPT_ALLOCBYTE:
+        *v = h->alloc.abyte;
+        break;
+      case OPT_FREEBYTE:
+        *v = h->alloc.fbyte;
+        break;
+      case OPT_OFLOWBYTE:
+        *v = h->alloc.obyte;
+        break;
+      case OPT_OFLOWSIZE:
+        *v = h->alloc.oflow;
+        break;
+      case OPT_DEFALIGN:
+        *v = h->alloc.heap.memory.align;
+        break;
+      case OPT_LIMIT:
+        *v = h->limit;
+        break;
+      case OPT_FAILFREQ:
+        *v = h->ffreq;
+        break;
+      case OPT_FAILSEED:
+        *v = h->fseed;
+        break;
+      case OPT_UNFREEDABORT:
+        *v = h->uabort;
+        break;
+      case OPT_LOGFILE:
+        *v = (unsigned long) h->log;
+        break;
+      case OPT_PROFFILE:
+        *v = (unsigned long) h->prof.file;
+        break;
+      case OPT_TRACEFILE:
+        *v = (unsigned long) h->trace.file;
+        break;
+      case OPT_PROGFILE:
+        *v = (unsigned long) h->alloc.heap.memory.prog;
+        break;
+      case OPT_AUTOSAVE:
+        *v = h->prof.autosave;
+        break;
+      case OPT_NOFREE:
+        *v = h->alloc.fmax;
+        break;
+      case OPT_SMALLBOUND:
+        *v = h->prof.sbound;
+        break;
+      case OPT_MEDIUMBOUND:
+        *v = h->prof.mbound;
+        break;
+      case OPT_LARGEBOUND:
+        *v = h->prof.lbound;
+        break;
+      default:
+        r = 0;
         break;
     }
     return r;

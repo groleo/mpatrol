@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: option.h,v 1.18 2001-02-10 16:45:39 graeme Exp $
+ * $Id: option.h,v 1.19 2001-02-12 19:27:35 graeme Exp $
  */
 
 
@@ -130,7 +130,8 @@ extern "C"
 
 
 MP_EXPORT void __mp_parseoptions(infohead *);
-MP_EXPORT unsigned long __mp_setopt(infohead *, unsigned long, unsigned long);
+MP_EXPORT unsigned long __mp_set(infohead *, unsigned long, unsigned long);
+MP_EXPORT int __mp_get(infohead *, unsigned long, unsigned long *);
 
 
 #ifdef __cplusplus
