@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.3 2000-03-24 01:37:55 graeme Exp $
+# $Id: Makefile,v 1.4 2000-03-31 08:43:40 graeme Exp $
 
 
 # Definitions
@@ -74,14 +74,19 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY)
+memleak: memleak.o tree.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o tree.o
+
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) memleak
 
 clean:
 	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
+	-@ Delete memleak.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
 	-@ Delete $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) FORCE >NIL:
+	-@ Delete memleak FORCE >NIL:
 
 
 # Dependencies
@@ -193,3 +198,5 @@ $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
+memleak.o: $(SOURCE)/memleak.c $(SOURCE)/tree.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h

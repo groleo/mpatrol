@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.3 2000-03-13 21:13:23 graeme Exp $
+# $Id: Makefile,v 1.4 2000-03-31 08:40:59 graeme Exp $
 
 
 # Definitions
@@ -75,14 +75,19 @@ $(ARCHTS_LIBRARY): $(TOBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY)
+memleak.nlm: memleak.obj tree.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.obj tree.obj
+
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) memleak.nlm
 
 clean:
 	-@ rm -f $(OBJECTS) $(TOBJECTS) 2>&1 >/dev/null
+	-@ rm -f memleak.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f memleak.nlm 2>&1 >/dev/null
 
 
 # Dependencies
@@ -191,3 +196,5 @@ $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
+memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/tree.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
