@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.36 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.37 2001-03-05 22:34:40 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.36 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.37 2001-03-05 22:34:40 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,6 +103,7 @@ typedef enum options_flags
     OF_CHECKMEMORY,
     OF_CHECKREALLOCS,
     OF_LARGEBOUND,
+    OF_LEAKTABLE,
     OF_LOGALLOCS,
     OF_LOGFREES,
     OF_LOGMEMORY,
@@ -160,7 +161,8 @@ static char *smallbound, *mediumbound, *largebound;
 static int checkallocs, checkreallocs;
 static int checkfrees, checkmemory;
 static int showmap, showsymbols;
-static int showfree, showfreed, showunfreed;
+static int showfree, showfreed;
+static int showunfreed, leaktable;
 static int logallocs, logreallocs;
 static int logfrees, logmemory;
 static int allowoflow, prof, trace;
@@ -233,6 +235,9 @@ static option options_table[] =
     {"large-bound", OF_LARGEBOUND, "unsigned integer",
      "\tSpecifies the limit in bytes up to which memory allocations should be\n"
      "\tclassified as large allocations for profiling purposes.\n"},
+    {"leak-table", OF_LEAKTABLE, NULL,
+     "\tSpecifies that the leak table should be automatically used and a leak\n"
+     "\ttable summary should be displayed at the end of program execution.\n"},
     {"limit", OF_LIMIT, "unsigned integer",
      "\tSpecifies the limit in bytes at which all memory allocations should\n"
      "\tfail if the total allocated memory should increase beyond this.\n"},
@@ -435,6 +440,8 @@ setoptions(int s)
         addoption("FREESTOP", freestop, 0);
     if (largebound)
         addoption("LARGEBOUND", largebound, 0);
+    if (leaktable)
+        addoption("LEAKTABLE", NULL, 0);
     if (limit)
         addoption("LIMIT", limit, 0);
     if (editlist == 2)
@@ -683,6 +690,9 @@ main(int argc, char **argv)
             break;
           case OF_LARGEBOUND:
             largebound = __mp_optarg;
+            break;
+          case OF_LEAKTABLE:
+            leaktable = 1;
             break;
           case OF_LIST:
             editlist = 2;
