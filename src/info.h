@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.54 2001-03-07 20:37:05 graeme Exp $
+ * $Id: info.h,v 1.55 2001-05-22 19:41:01 graeme Exp $
  */
 
 
@@ -257,6 +257,7 @@ typedef struct infohead
     delstack dels[MP_MAXDELSTACK];    /* delete stack */
     long delpos;                      /* delete stack pointer */
     unsigned long flags;              /* global flags */
+    unsigned long pid;                /* process identifier */
     memaccess prot;                   /* protection status */
     size_t recur;                     /* recursion count */
     char init;                        /* initialisation flag */

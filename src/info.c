@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.83 2001-05-17 07:37:23 graeme Exp $"
+#ident "$Id: info.c,v 1.84 2001-05-22 19:41:01 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.83 2001-05-17 07:37:23 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.84 2001-05-22 19:41:01 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -118,6 +118,7 @@ __mp_newinfo(infohead *h)
      */
     h->flags = FLG_NOPROTECT;
 #endif /* MP_PROTECT_SUPPORT */
+    h->pid = __mp_processid();
     h->prot = MA_READWRITE;
     /* Now that the infohead has valid fields we can now set the initialised
      * flag.  This means that the library can now recursively call malloc()
