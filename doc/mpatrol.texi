@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.31 2000-01-30 20:28:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.32 2000-01-30 20:55:41 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 28th January, 2000
+@set UPDATED 30th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -343,7 +343,7 @@ Contains 4 replacement C++ dynamic memory allocation functions:
 @end multitable
 
 @item
-Contains 7 replacement C memory operation functions:
+Contains 9 replacement C memory operation functions:
 
 @multitable @columnfractions .2 .1 .7
 @item @code{memset()}
@@ -365,8 +365,14 @@ Contains 7 replacement C memory operation functions:
 @tab ANSI
 @tab Compares two blocks of memory.
 @item @code{bcmp()}
-@tab old
+@tab UNIX
 @tab Compares two blocks of memory.
+@item @code{memchr()}
+@tab ANSI
+@tab Searches memory for a specific byte.
+@item @code{memmem()}
+@tab UNIX
+@tab Searches memory for specific bytes.
 @end multitable
 
 @item
@@ -2462,10 +2468,11 @@ example have been numbered and their descriptions appear below.
 27  internal blocks:   25 (204800 bytes)
 28  total heap usage:  212992 bytes
 29  total compared:    0 bytes
-30  total copied:      0 bytes
-31  total set:         0 bytes
-32  total warnings:    0
-33  total errors:      1
+30  total located:     0 bytes
+31  total copied:      0 bytes
+32  total set:         0 bytes
+33  total warnings:    0
+34  total errors:      1
 @end smallexample
 
 @enumerate 1
@@ -2631,16 +2638,20 @@ that has been allocated by the mpatrol library.
 @cindex bytes compared
 Total compared.
 @item
+@cindex bytes located
+Total located.
+@item
 @cindex bytes copied
 Total copied.
 @item
 @cindex bytes set
 Total set.  These values contain the total number of bytes that have been
 tracked by the mpatrol library in byte comparison operations (such as
-@code{memcmp()}), byte copy operations (such as @code{memcpy()}) and byte set
-operations (such as @code{memset()}) respectively.  They do not take into
-account any other such operations that occur outwith these functions, such as
-loading and storing from machine instructions.
+@code{memcmp()}), byte location operations (such as @code{memchr()}, byte copy
+operations (such as @code{memcpy()}) and byte set operations (such as
+@code{memset()}) respectively.  They do not take into account any other such
+operations that occur outwith these functions, such as loading and storing from
+machine instructions.
 
 @item
 Total warnings.
@@ -3942,7 +3953,7 @@ requested space.  Note that this function is equivalent to
 @code{__mp_nomemory()} and will replace the handler installed by that function.
 @end table
 
-The following 7 functions are available as replacements for existing C library
+The following 9 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include @file{mpatrol.h}
 before all other header files, although on UNIX platforms they will be used
 anyway, albeit with slightly less tracing information.
@@ -4013,6 +4024,25 @@ existing memory allocation in the heap but would straddle that allocation's
 boundaries then an error message will be generated in the log file and no bytes
 will be compared.  This function is available for backwards compatibility with
 older C libraries and should not be used in new code.
+
+@findex memchr
+@item @code{void *memchr(void *ptr, int byte, size_t size)}
+Searches up to @var{size} bytes in @var{ptr} for the first occurrence of
+@var{byte} and returns a pointer to it or @samp{NULL} if no such byte occurs.
+If @var{size} is @samp{0} then no bytes will be searched.  If the operation
+would affect an existing memory allocation in the heap but would straddle that
+allocation's boundaries then an error message will be generated in the log file
+and no bytes will be searched.
+
+@findex memmem
+@item @code{void *memmem(void *ptr1, size_t size1, void *ptr2, size_t size2)}
+Searches up to @var{size1} bytes in @var{ptr1} for the first occurrence of
+@var{ptr2} (which is exactly @var{size2} bytes in length) and returns a pointer
+to it or @samp{NULL} if no such sequence of bytes occur.  If @var{size1} or
+@var{size2} is @samp{0} then no bytes will be searched.  If the operation would
+affect an existing memory allocation in the heap but would straddle that
+allocation's boundaries then an error message will be generated in the log file
+and no bytes will be searched.
 @end table
 
 The following 7 functions are available as support routines for additional
