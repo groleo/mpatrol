@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.2 2000-12-04 00:05:44 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.3 2000-12-04 19:08:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,9 +59,10 @@ options_flags;
 
 typedef struct allocation
 {
-    treenode node; /* tree node */
-    void *addr;    /* allocation address */
-    size_t size;   /* allocation size */
+    treenode node;       /* tree node */
+    unsigned long event; /* event number */
+    void *addr;          /* allocation address */
+    size_t size;         /* allocation size */
 }
 allocation;
 
@@ -115,7 +116,7 @@ static option options_table[] =
 /* Create a new memory allocation.
  */
 
-static void newalloc(unsigned long i, void *a, size_t l)
+static void newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
@@ -125,6 +126,7 @@ static void newalloc(unsigned long i, void *a, size_t l)
         exit(EXIT_FAILURE);
     }
     __mp_treeinsert(&alloctree, &n->node, i);
+    n->event = e;
     n->addr = a;
     n->size = l;
 }
@@ -334,28 +336,48 @@ static void readfile(void)
         fprintf(stderr, "%s: Tracing file version too new\n", progname);
         exit(EXIT_FAILURE);
     }
+    /* Display the tracing table headings.
+     */
+    fputs(" event  type     index  ", stdout);
+#if ENVIRON == ENVIRON_64
+    fputs("    allocation    ", stdout);
+#else /* ENVIRON */
+    fputs("allocation", stdout);
+#endif /* ENVIRON */
+    fputs("  size\n", stdout);
+    fputs("------  ------  ------  ", stdout);
+#if ENVIRON == ENVIRON_64
+    fputs("------------------", stdout);
+#else /* ENVIRON */
+    fputs("----------", stdout);
+#endif /* ENVIRON */
+    fputs("  ----\n", stdout);
     /* Read each allocation or deallocation entry.
      */
     e = 0;
+    i = 0;
     while ((e == 0) && refill(1))
         switch (*bufferpos)
         {
           case 'A':
             bufferpos++;
             bufferlen--;
+            i++;
             n = getuleb128();
             a = (void *) getuleb128();
             l = getuleb128();
-            newalloc(n, a, l);
-            fprintf(stdout, "A %lu " MP_POINTER " %lu\n", n, a, l);
+            newalloc(n, i, a, l);
+            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %lu\n", i, n,
+                    a, l);
             break;
           case 'F':
             bufferpos++;
             bufferlen--;
+            i++;
             n = getuleb128();
             if (f = (allocation *) __mp_search(alloctree.root, n))
-                fprintf(stdout, "F %lu " MP_POINTER " %lu\n", n, f->addr,
-                        f->size);
+                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %lu\n", i,
+                        n, f->addr, f->size);
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
