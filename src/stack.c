@@ -41,18 +41,20 @@
 #include <setjmp.h>
 #if ARCH == ARCH_MIPS || ARCH == ARCH_SPARC
 #include <ucontext.h>
-#if ARCH == ARCH_SPARC
+#if SYSTEM == SYSTEM_SINIX
+#define gregs gpregs
+#elif ARCH == ARCH_SPARC
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
-#endif /* ARCH */
+#endif /* SYSTEM && ARCH */
 #endif /* ARCH */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.11 2000-06-07 21:10:37 graeme Exp $"
+#ident "$Id: stack.c,v 1.12 2000-06-08 18:21:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -97,7 +99,7 @@
 #if MP_MAXSTACK > 8
 #error not enough frameaddress() and returnaddress() macros
 #endif /* MP_MAXSTACK */
-#elif !MP_LIBRARYSTACK_SUPPORT */
+#elif !MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
 /* These macros are used by the unwind() function for setting flags when
  * certain instructions are seen.
@@ -248,29 +250,29 @@ static int unwind(frameinfo *f)
             switch (i >> 16)
             {
               case 0x27BD:
-                /* addiu sp,sp,?? */
+                /* addiu sp,sp,## */
                 s = i & 0xFFFF;
                 a |= SP_OFFSET;
                 break;
               case 0x3401:
-                /* ori at,zero,?? */
+                /* ori at,zero,## */
                 l = i & 0xFFFF;
                 u = 0;
                 a |= SP_LOWER;
                 break;
               case 0x3421:
-                /* ori at,at,?? */
+                /* ori at,at,## */
                 l = i & 0xFFFF;
                 a |= SP_LOWER;
                 break;
               case 0x3C01:
-                /* lui at,?? */
+                /* lui at,## */
                 l = 0;
                 u = i & 0xFFFF;
                 a |= SP_UPPER;
                 break;
               case 0x8FBF:
-                /* lw ra,??(sp) */
+                /* lw ra,##(sp) */
                 p = i & 0xFFFF;
                 a |= RA_OFFSET;
                 break;
@@ -306,8 +308,8 @@ static int getframe(frameinfo *f)
 
     if (getcontext(&c) == -1)
         return 0;
-    f->sp = c.uc_mcontext.gregs[CTX_SP];
-    f->ra = c.uc_mcontext.gregs[CTX_RA];
+    f->sp = c.uc_mcontext.gregs[CXT_SP];
+    f->ra = c.uc_mcontext.gregs[CXT_RA];
     return 1;
 }
 #elif ARCH == ARCH_SPARC
@@ -431,7 +433,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
              * format so we must be careful when converting them to 32-bit
              * quantities.
              */
-            p->frame = (void *) p->next.sc_regs[CTX_SP];
+            p->frame = (void *) p->next.sc_regs[CXT_SP];
             p->addr = (void *) p->next.sc_pc;
             unwind(&p->next, NULL);
             r = 1;
