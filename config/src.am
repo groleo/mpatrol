@@ -21,7 +21,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: src.am,v 1.1 2001-08-27 22:11:05 graeme Exp $
+## $Id: src.am,v 1.2 2001-09-13 20:48:06 graeme Exp $
 
 
 bin_PROGRAMS = mpatrol mprof mptrace mleak
@@ -53,6 +53,6 @@ libmpalloc_la_SOURCES = mpalloc.c mpfailure.c mpsetfail.c mpmalloc.c \
 			mpcalloc.c mpstrdup.c mprealloc.c
 
 machine.lo: machine.c
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $< >machine.s
+	$(COMPILE) -E -P $< >machine.s
 	$(LIBTOOL) --mode=compile $(COMPILE) -c machine.s
 	rm -f machine.s

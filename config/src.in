@@ -452,7 +452,7 @@ mostlyclean distclean maintainer-clean
 
 
 machine.lo: machine.c
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) $< >machine.s
+	$(COMPILE) -E -P $< >machine.s
 	$(LIBTOOL) --mode=compile $(COMPILE) -c machine.s
 	rm -f machine.s
 
