@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.20 2000-05-16 00:56:44 graeme Exp $
+.\" $Id: mpatrol.1,v 1.21 2000-07-17 00:00:24 graeme Exp $
 .\"
-.TH MPATROL 1 "16 May 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 1 "17 July 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -123,9 +123,9 @@ allocation, and that the operation should still be performed.
 should not be made read-only after every memory allocation, reallocation or
 deallocation.
 .TP
-\fB\-n\fP
-[\fBNOFREE\fP]  Specifies that the mpatrol library should keep all reallocated
-and freed memory allocations.
+\fB\-n\fP <\fIunsigned integer\fP>
+[\fBNOFREE\fP]  Specifies that a number of recently-freed memory allocations
+should be prevented from being returned to the free memory pool.
 .TP
 \fB\-O\fP <\fIunsigned integer\fP>
 [\fBOFLOWSIZE\fP]  Specifies the size in bytes to use for all overflow buffers,
