@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: graph.c,v 1.1 2000-07-24 19:42:44 graeme Exp $"
+#ident "$Id: graph.c,v 1.2 2000-12-20 22:28:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -46,7 +46,9 @@ extern "C"
  * of the graph, which make manipulation and traversal a lot easier.
  */
 
-MP_GLOBAL void __mp_newgraph(graphhead *g)
+MP_GLOBAL
+void
+__mp_newgraph(graphhead *g)
 {
     __mp_newlist(&g->start.parents);
     __mp_newlist(&g->start.children);
@@ -59,7 +61,9 @@ MP_GLOBAL void __mp_newgraph(graphhead *g)
 /* Initialise the fields of a graph node and associate it with a given graph.
  */
 
-MP_GLOBAL void __mp_addnode(graphhead *g, graphnode *n)
+MP_GLOBAL
+void
+__mp_addnode(graphhead *g, graphnode *n)
 {
     __mp_newlist(&n->parents);
     __mp_newlist(&n->children);
@@ -70,7 +74,9 @@ MP_GLOBAL void __mp_addnode(graphhead *g, graphnode *n)
 /* Remove a graph node from a given graph.
  */
 
-MP_GLOBAL void __mp_removenode(graphhead *g, graphnode *n)
+MP_GLOBAL
+void
+__mp_removenode(graphhead *g, graphnode *n)
 {
     graphedge *e;
     listnode *l, *p;
@@ -93,8 +99,9 @@ MP_GLOBAL void __mp_removenode(graphhead *g, graphnode *n)
  * child nodes in a given graph.
  */
 
-MP_GLOBAL void __mp_addedge(graphhead *g, graphedge *e, graphnode *p,
-                            graphnode *c)
+MP_GLOBAL
+void
+__mp_addedge(graphhead *g, graphedge *e, graphnode *p, graphnode *c)
 {
     __mp_addtail(&c->parents, &e->pnode);
     __mp_addtail(&p->children, &e->cnode);
@@ -107,7 +114,9 @@ MP_GLOBAL void __mp_addedge(graphhead *g, graphedge *e, graphnode *p,
 /* Remove a graph edge from a given graph.
  */
 
-MP_GLOBAL void __mp_removeedge(graphhead *g, graphedge *e)
+MP_GLOBAL
+void
+__mp_removeedge(graphhead *g, graphedge *e)
 {
     __mp_remove(&e->child->parents, &e->pnode);
     __mp_remove(&e->parent->children, &e->cnode);
@@ -119,7 +128,9 @@ MP_GLOBAL void __mp_removeedge(graphhead *g, graphedge *e)
 /* Search for a graph edge which joins one graph node to another.
  */
 
-MP_GLOBAL graphedge *__mp_findedge(graphhead *g, graphnode *p, graphnode *c)
+MP_GLOBAL
+graphedge *
+__mp_findedge(graphhead *g, graphnode *p, graphnode *c)
 {
     graphedge *e;
     listnode *n;

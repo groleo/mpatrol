@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.48 2000-12-10 22:37:08 graeme Exp $"
+#ident "$Id: diag.c,v 1.49 2000-12-20 22:25:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -174,7 +174,9 @@ MP_GLOBAL unsigned long __mp_diagflags = 0;
 /* Process a file name, expanding any special characters.
  */
 
-static void processfile(meminfo *m, char *s, char *b, size_t l)
+static
+void
+processfile(meminfo *m, char *s, char *b, size_t l)
 {
     char *p, *t;
     size_t i;
@@ -271,7 +273,9 @@ static void processfile(meminfo *m, char *s, char *b, size_t l)
  * Note that this function is not currently re-entrant.
  */
 
-MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
+MP_GLOBAL
+char *
+__mp_logfile(meminfo *m, char *s)
 {
     static char b[256];
     char p[256];
@@ -322,7 +326,9 @@ MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
  * Note that this function is not currently re-entrant.
  */
 
-MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
+MP_GLOBAL
+char *
+__mp_proffile(meminfo *m, char *s)
 {
     static char b[256];
     char p[256];
@@ -373,7 +379,9 @@ MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
  * Note that this function is not currently re-entrant.
  */
 
-MP_GLOBAL char *__mp_tracefile(meminfo *m, char *s)
+MP_GLOBAL
+char *
+__mp_tracefile(meminfo *m, char *s)
 {
     static char b[256];
     char p[256];
@@ -423,7 +431,9 @@ MP_GLOBAL char *__mp_tracefile(meminfo *m, char *s)
 /* Attempt to open the log file.
  */
 
-MP_GLOBAL int __mp_openlogfile(char *s)
+MP_GLOBAL
+int
+__mp_openlogfile(char *s)
 {
     /* The log file name can also be named as stderr and stdout which will go
      * to the standard error and standard output streams respectively.
@@ -458,7 +468,9 @@ MP_GLOBAL int __mp_openlogfile(char *s)
 /* Attempt to close the log file.
  */
 
-MP_GLOBAL int __mp_closelogfile(void)
+MP_GLOBAL
+int
+__mp_closelogfile(void)
 {
     int r;
 
@@ -482,7 +494,9 @@ MP_GLOBAL int __mp_closelogfile(void)
 /* Invokes a text editor on a given source file at a specific line.
  */
 
-static int editfile(char *f, unsigned long l, int d)
+static
+int
+editfile(char *f, unsigned long l, int d)
 {
 #if TARGET == TARGET_UNIX
 #if MP_PRELOAD_SUPPORT
@@ -542,7 +556,9 @@ static int editfile(char *f, unsigned long l, int d)
 /* Sends a diagnostic message to the log file.
  */
 
-MP_GLOBAL void __mp_diag(char *s, ...)
+MP_GLOBAL
+void
+__mp_diag(char *s, ...)
 {
     va_list v;
 
@@ -557,8 +573,9 @@ MP_GLOBAL void __mp_diag(char *s, ...)
 /* Sends a warning message to the log file.
  */
 
-MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *n, unsigned long l,
-                         char *s, ...)
+MP_GLOBAL
+void
+__mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
 {
     va_list v;
 
@@ -599,8 +616,9 @@ MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *n, unsigned long l,
 /* Sends an error message to the log file.
  */
 
-MP_GLOBAL void __mp_error(errortype e, alloctype f, char *n, unsigned long l,
-                          char *s, ...)
+MP_GLOBAL
+void
+__mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
 {
     va_list v;
 
@@ -641,7 +659,9 @@ MP_GLOBAL void __mp_error(errortype e, alloctype f, char *n, unsigned long l,
 /* Display up to sixteen bytes of memory in one line.
  */
 
-static void printline(char *s, size_t l)
+static
+void
+printline(char *s, size_t l)
 {
     size_t i;
 
@@ -668,7 +688,9 @@ static void printline(char *s, size_t l)
 /* Display a hex dump of a specified memory location and length.
  */
 
-MP_GLOBAL void __mp_printmemory(void *p, size_t l)
+MP_GLOBAL
+void
+__mp_printmemory(void *p, size_t l)
 {
     while (l >= 16)
     {
@@ -684,7 +706,9 @@ MP_GLOBAL void __mp_printmemory(void *p, size_t l)
 /* Display a size in bytes.
  */
 
-MP_GLOBAL void __mp_printsize(size_t l)
+MP_GLOBAL
+void
+__mp_printsize(size_t l)
 {
     __mp_diag("%lu byte", l);
     if (l != 1)
@@ -696,7 +720,9 @@ MP_GLOBAL void __mp_printsize(size_t l)
  * and reallocation count.
  */
 
-MP_GLOBAL void __mp_printtype(infonode *n)
+MP_GLOBAL
+void
+__mp_printtype(infonode *n)
 {
     __mp_diag("{%s:%lu:%lu}", __mp_functionnames[n->data.type], n->data.alloc,
               n->data.realloc);
@@ -708,7 +734,9 @@ MP_GLOBAL void __mp_printtype(infonode *n)
  * safe library is being used.
  */
 
-MP_GLOBAL void __mp_printloc(infonode *n)
+MP_GLOBAL
+void
+__mp_printloc(infonode *n)
 {
     __mp_diag("[");
 #if MP_THREADS_SUPPORT
@@ -735,7 +763,9 @@ MP_GLOBAL void __mp_printloc(infonode *n)
 /* Display the name of a symbol associated with a particular address.
  */
 
-MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
+MP_GLOBAL
+void
+__mp_printsymbol(symhead *y, void *a)
 {
     symnode *n;
     char *s, *t;
@@ -760,7 +790,9 @@ MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
 /* Display details of all of the symbols that have been read.
  */
 
-MP_GLOBAL void __mp_printsymbols(symhead *y)
+MP_GLOBAL
+void
+__mp_printsymbols(symhead *y)
 {
     symnode *n;
 
@@ -788,7 +820,9 @@ MP_GLOBAL void __mp_printsymbols(symhead *y)
 /* Display the call stack details for an address node.
  */
 
-MP_GLOBAL void __mp_printaddrs(symhead *y, addrnode *n)
+MP_GLOBAL
+void
+__mp_printaddrs(symhead *y, addrnode *n)
 {
     while (n != NULL)
     {
@@ -806,7 +840,9 @@ MP_GLOBAL void __mp_printaddrs(symhead *y, addrnode *n)
 /* Display the call stack details for a call stack handle.
  */
 
-MP_GLOBAL void __mp_printstack(symhead *y, stackinfo *p)
+MP_GLOBAL
+void
+__mp_printstack(symhead *y, stackinfo *p)
 {
     stackinfo s;
 
@@ -830,7 +866,9 @@ MP_GLOBAL void __mp_printstack(symhead *y, stackinfo *p)
 /* Display the details of an individual allocation node.
  */
 
-MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
+MP_GLOBAL
+void
+__mp_printalloc(symhead *y, allocnode *n)
 {
     infonode *m;
 
@@ -849,8 +887,9 @@ MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
 /* Log the details of where a function call came from.
  */
 
-static void logcall(infohead *h, char *s, char *t, unsigned long u,
-                    stackinfo *v)
+static
+void
+logcall(infohead *h, char *s, char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("[");
 #if MP_THREADS_SUPPORT
@@ -870,8 +909,10 @@ static void logcall(infohead *h, char *s, char *t, unsigned long u,
 /* Log the details of a call to allocate memory.
  */
 
-MP_GLOBAL void __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f,
-                             char *s, char *t, unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, char *s, char *t,
+              unsigned long u, stackinfo *v)
 {
     __mp_diag("ALLOC: %s (%lu, ", __mp_functionnames[f], h->count);
     __mp_printsize(l);
@@ -888,9 +929,10 @@ MP_GLOBAL void __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f,
 /* Log the details of a call to reallocate memory.
  */
 
-MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
-                               alloctype f, char *s, char *t, unsigned long u,
-                               stackinfo *v)
+MP_GLOBAL
+void
+__mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f, char *s,
+                char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
@@ -907,8 +949,10 @@ MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
 /* Log the details of a call to deallocate memory.
  */
 
-MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
-                            unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
+             unsigned long u, stackinfo *v)
 {
     __mp_diag("FREE: %s (" MP_POINTER ") ", __mp_functionnames[f], p);
     logcall(h, s, t, u, v);
@@ -918,9 +962,10 @@ MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
 /* Log the details of a call to set memory.
  */
 
-MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
-                              alloctype f, char *s, char *t, unsigned long u,
-                              stackinfo *v)
+MP_GLOBAL
+void
+__mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
+               char *s, char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
@@ -932,9 +977,10 @@ MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
 /* Log the details of a call to copy memory.
  */
 
-MP_GLOBAL void __mp_logmemcopy(infohead *h, void *p, void *q, size_t l,
-                               unsigned char c, alloctype f, char *s, char *t,
-                               unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
+                alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
@@ -947,9 +993,10 @@ MP_GLOBAL void __mp_logmemcopy(infohead *h, void *p, void *q, size_t l,
 /* Log the details of a call to locate memory.
  */
 
-MP_GLOBAL void __mp_logmemlocate(infohead *h, void *p, size_t l, void *q,
-                                 size_t m, alloctype f, char *s, char *t,
-                                 unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m,
+                  alloctype f, char *s, char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
@@ -963,9 +1010,10 @@ MP_GLOBAL void __mp_logmemlocate(infohead *h, void *p, size_t l, void *q,
 /* Log the details of a call to compare memory.
  */
 
-MP_GLOBAL void __mp_logmemcompare(infohead *h, void *p, void *q, size_t l,
-                                  alloctype f, char *s, char *t,
-                                  unsigned long u, stackinfo *v)
+MP_GLOBAL
+void
+__mp_logmemcompare(infohead *h, void *p, void *q, size_t l, alloctype f,
+                   char *s, char *t, unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
@@ -978,7 +1026,9 @@ MP_GLOBAL void __mp_logmemcompare(infohead *h, void *p, void *q, size_t l,
 /* Display the details of all allocation nodes on the allocation tree.
  */
 
-MP_GLOBAL void __mp_printallocs(infohead *h, int e)
+MP_GLOBAL
+void
+__mp_printallocs(infohead *h, int e)
 {
     allocnode *n;
     treenode *t;
@@ -1027,7 +1077,9 @@ MP_GLOBAL void __mp_printallocs(infohead *h, int e)
 /* Display the details of all allocation nodes on the freed tree.
  */
 
-MP_GLOBAL void __mp_printfreed(infohead *h)
+MP_GLOBAL
+void
+__mp_printfreed(infohead *h)
 {
     allocnode *n;
     treenode *t;
@@ -1053,7 +1105,9 @@ MP_GLOBAL void __mp_printfreed(infohead *h)
 /* Display the details of all free blocks.
  */
 
-MP_GLOBAL void __mp_printfree(infohead *h)
+MP_GLOBAL
+void
+__mp_printfree(infohead *h)
 {
     allocnode *n, *p;
     treenode *s, *t;
@@ -1084,7 +1138,9 @@ MP_GLOBAL void __mp_printfree(infohead *h)
 /* Display a complete memory map of the heap.
  */
 
-MP_GLOBAL void __mp_printmap(infohead *h)
+MP_GLOBAL
+void
+__mp_printmap(infohead *h)
 {
     allocnode *n;
     infonode *m;
@@ -1171,7 +1227,9 @@ MP_GLOBAL void __mp_printmap(infohead *h)
 /* Display the version and copyright details.
  */
 
-MP_GLOBAL void __mp_printversion(void)
+MP_GLOBAL
+void
+__mp_printversion(void)
 {
     __mp_diag("%s\n%s\n\n", __mp_version, __mp_copyright);
     __mp_diag("This is free software, and you are welcome to redistribute it "
@@ -1190,7 +1248,9 @@ MP_GLOBAL void __mp_printversion(void)
 /* Display a summary of all mpatrol library settings and statistics.
  */
 
-MP_GLOBAL void __mp_printsummary(infohead *h)
+MP_GLOBAL
+void
+__mp_printsummary(infohead *h)
 {
     size_t n;
 

@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.8 2000-12-07 01:02:31 graeme Exp $"
+#ident "$Id: heap.c,v 1.9 2000-12-20 22:30:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -52,7 +52,9 @@ void _Inuse_heapalloc(void *, unsigned long);
 /* Initialise the fields of a heap head so that the heap becomes empty.
  */
 
-MP_GLOBAL void __mp_newheap(heaphead *h)
+MP_GLOBAL
+void
+__mp_newheap(heaphead *h)
 {
     struct { char x; heapnode y; } z;
     long n;
@@ -76,7 +78,9 @@ MP_GLOBAL void __mp_newheap(heaphead *h)
 /* Return all of the memory allocated by a heap back to the system.
  */
 
-MP_GLOBAL void __mp_deleteheap(heaphead *h)
+MP_GLOBAL
+void
+__mp_deleteheap(heaphead *h)
 {
     heapnode *n, *p;
 
@@ -108,7 +112,9 @@ MP_GLOBAL void __mp_deleteheap(heaphead *h)
  * memory block could be allocated.
  */
 
-MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
+MP_GLOBAL
+heapnode *
+__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
 {
     heapnode *n;
     void *p;
@@ -159,7 +165,9 @@ MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
 /* Return a block of memory belonging to the heap back to the system.
  */
 
-MP_GLOBAL void __mp_heapfree(heaphead *h, heapnode *n)
+MP_GLOBAL
+void
+__mp_heapfree(heaphead *h, heapnode *n)
 {
     h->dsize -= n->size;
     __mp_memfree(&h->memory, n->block, n->size);
@@ -172,7 +180,9 @@ MP_GLOBAL void __mp_heapfree(heaphead *h, heapnode *n)
  * supplied access permission.
  */
 
-MP_GLOBAL int __mp_heapprotect(heaphead *h, memaccess a)
+MP_GLOBAL
+int
+__mp_heapprotect(heaphead *h, memaccess a)
 {
     heapnode *n;
 

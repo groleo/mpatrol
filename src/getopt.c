@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.9 2000-11-17 18:05:28 graeme Exp $"
+#ident "$Id: getopt.c,v 1.10 2000-12-20 22:26:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -63,7 +63,9 @@ MP_GLOBAL char *__mp_optarg;
  * reporting any errors that occur during the conversion.
  */
 
-MP_GLOBAL int __mp_getnum(char *p, char *s, long *n, int u)
+MP_GLOBAL
+int
+__mp_getnum(char *p, char *s, long *n, int u)
 {
     char *t;
     int e;
@@ -107,7 +109,9 @@ MP_GLOBAL int __mp_getnum(char *p, char *s, long *n, int u)
 /* Search for an option in the long options table.
  */
 
-static option *findopt(char *s, option *l, char **a)
+static
+option *
+findopt(char *s, option *l, char **a)
 {
     char *t;
     size_t n;
@@ -134,7 +138,9 @@ static option *findopt(char *s, option *l, char **a)
 /* Read an option from a supplied command line argument array.
  */
 
-MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s, option *l)
+MP_GLOBAL
+int
+__mp_getopt(unsigned long n, char **a, char *s, option *l)
 {
     static char *t;
     option *m;
@@ -250,7 +256,9 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s, option *l)
 /* Build a string of short options letters from the long options table.
  */
 
-MP_GLOBAL char *__mp_shortopts(char *s, option *l)
+MP_GLOBAL
+char *
+__mp_shortopts(char *s, option *l)
 {
     char *t;
 
@@ -273,7 +281,9 @@ MP_GLOBAL char *__mp_shortopts(char *s, option *l)
 /* Display a quick-reference option summary.
  */
 
-MP_GLOBAL void __mp_showopts(option *l)
+MP_GLOBAL
+void
+__mp_showopts(option *l)
 {
     fputs("Options:\n", stdout);
     while (l->name != NULL)
