@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.63 2001-02-22 20:07:00 graeme Exp $"
+#ident "$Id: info.c,v 1.64 2001-02-25 23:10:01 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.63 2001-02-22 20:07:00 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.64 2001-02-25 23:10:01 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -633,6 +633,9 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
             }
             if (p != NULL)
             {
+                if (m->data.flags & FLG_PROFILED)
+                    __mp_profilefree(&h->prof, d, m,
+                                     !(h->flags & FLG_NOPROTECT));
                 m->data.type = f;
 #if MP_THREADS_SUPPORT
                 m->data.thread = __mp_threadid();
@@ -646,12 +649,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                 m->data.typestr = v->typestr;
                 m->data.typesize = v->typesize;
                 if (m->data.flags & FLG_PROFILED)
-                {
-                    __mp_profilefree(&h->prof, d, m,
-                                     !(h->flags & FLG_NOPROTECT));
                     __mp_profilealloc(&h->prof, l, m,
                                       !(h->flags & FLG_NOPROTECT));
-                }
             }
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
