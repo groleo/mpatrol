@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.36 2001-08-24 10:46:00 graeme Exp $
+# $Id: Makefile,v 1.37 2001-09-30 23:20:52 graeme Exp $
 
 
 # Definitions
@@ -101,9 +101,9 @@ $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/test.jpg \
 	images/trace.jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ makeinfo --html --number-sections --verbose $<
+	@ makeinfo --html --no-split --number-sections --verbose $<
 else
-	@ makeinfo --html --number-sections $<
+	@ makeinfo --html --no-split --number-sections $<
 endif
 	@ sed "s/<[ ]*<[ ]*[Pp][ ]*>[ ]*[Ii][Mm][Gg][ ]*/<img /g" $@ >$@.new
 	@ mv $@.new $@
