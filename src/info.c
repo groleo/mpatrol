@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.55 2001-01-17 23:42:04 graeme Exp $"
+#ident "$Id: info.c,v 1.56 2001-02-01 19:20:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -273,7 +273,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                           "invalid");
                 __mp_diag("\n");
             }
-            a = h->alloc.heap.memory.page;
+            a = 1;
         }
         else if (!__mp_ispoweroftwo(a))
         {
