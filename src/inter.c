@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.30 2000-05-11 19:41:11 graeme Exp $"
+#ident "$Id: inter.c,v 1.31 2000-05-11 19:50:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -235,13 +235,8 @@ void __mp_fini(void)
              * output file.
              */
             if (memhead.prof.autocount > 0)
-            {
-                if (!(memhead.flags & FLG_NOPROTECT))
-                    __mp_protectsymbols(&memhead.syms, MA_READWRITE);
-                __mp_writeprofile(&memhead.prof);
-                if (!(memhead.flags & FLG_NOPROTECT))
-                    __mp_protectsymbols(&memhead.syms, MA_READONLY);
-            }
+                __mp_writeprofile(&memhead.prof,
+                                  !(memhead.flags & FLG_NOPROTECT));
             memhead.fini = 1;
 #if MP_INUSE_SUPPORT
             _Inuse_close();

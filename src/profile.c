@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.23 2000-05-01 10:11:07 graeme Exp $"
+#ident "$Id: profile.c,v 1.24 2000-05-11 19:50:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -226,7 +226,7 @@ static profnode *getcallsite(profhead *p, addrnode *a)
 /* Record a memory allocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
+MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d, int w)
 {
     profnode *n;
     infonode *m;
@@ -271,7 +271,7 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
      */
     p->autocount++;
     if ((p->autosave != 0) && (p->autocount % p->autosave == 0))
-        __mp_writeprofile(p);
+        __mp_writeprofile(p, w);
     return 1;
 }
 
@@ -279,7 +279,7 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 /* Record a memory deallocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
+MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d, int w)
 {
     profnode *n;
     infonode *m;
@@ -324,7 +324,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
      */
     p->autocount++;
     if ((p->autosave != 0) && (p->autocount % p->autosave == 0))
-        __mp_writeprofile(p);
+        __mp_writeprofile(p, w);
     return 1;
 }
 
@@ -332,7 +332,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 /* Write the profiling information to the output file.
  */
 
-MP_GLOBAL int __mp_writeprofile(profhead *p)
+MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
 {
     char s[4];
     profdata *d;
@@ -356,6 +356,8 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         p->file = NULL;
         return 0;
     }
+    if (w != 0)
+        __mp_protectsymbols(p->syms, MA_READWRITE);
     /* Technically, we should check the return values from each of the calls
      * to fwrite().  However, that would increase the complexity of this
      * function and would make the code extremely hard to follow.  Instead,
@@ -448,6 +450,8 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
                 fputc('\0', f);
             }
     fwrite(s, sizeof(char), 4, f);
+    if (w != 0)
+        __mp_protectsymbols(p->syms, MA_READONLY);
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
     return 1;

@@ -130,9 +130,9 @@ extern "C"
 
 MP_EXPORT void __mp_newprofile(profhead *, heaphead *, symhead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
-MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
-MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
-MP_EXPORT int __mp_writeprofile(profhead *);
+MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *, int);
+MP_EXPORT int __mp_profilefree(profhead *, size_t, void *, int);
+MP_EXPORT int __mp_writeprofile(profhead *, int);
 MP_EXPORT int __mp_protectprofile(profhead *, memaccess);
 
 
