@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.32 2000-06-20 17:55:48 graeme Exp $
+.\" $Id: mpatrol.3,v 1.33 2000-07-16 23:57:22 graeme Exp $
 .\"
-.TH MPATROL 3 "20 June 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "16 July 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -719,14 +719,16 @@ as medium allocations for profiling purposes.  This limit must be greater than
 the small bound but less than the large bound.  Default value:
 \fBMEDIUMBOUND\fP=\fI256\fP.
 .TP
-\fBNOFREE\fP
-Specifies that the mpatrol library should keep all reallocated and freed memory
-allocations.  Such freed memory allocations will then be flagged as freed and
-can be used by the library to provide better diagnostics.  However, as no system
-memory will ever be reused by the mpatrol library, this option can quickly lead
-to a shortage of available system memory for a process.  Note that this option
-will always force a memory reallocation to return a pointer to newly-allocated
-memory, but the \fBexpand\fP function will never be affected by this option.
+\fBNOFREE\fP=\fIunsigned integer\fP
+Specifies that a number of recently-freed memory allocations should be prevented
+from being returned to the free memory pool.  Such freed memory allocations will
+then be flagged as freed and can be used by the library to provide better
+diagnostics.  However, if the size of the freed queue is specified as zero then
+no system memory will ever be reused by the mpatrol library, which can quickly
+lead to a shortage of available system memory for a process.  Note that this
+option will always force a memory reallocation to return a pointer to
+newly-allocated memory, but the \fBexpand\fP function will never be affected
+by this option.
 .TP
 \fBNOPROTECT\fP
 Specifies that the mpatrol library's internal data structures should not be made

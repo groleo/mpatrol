@@ -61,7 +61,7 @@ DDEESSCCRRIIPPTTIIOONN
 
 
 
-Release 1.2                20 June 2000                         1
+Release 1.2                16 July 2000                         1
 
 
 
@@ -127,7 +127,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         2
+Release 1.2                16 July 2000                         2
 
 
 
@@ -193,7 +193,7 @@ FFUUNNCCTTIIOONNSS
 
 
 
-Release 1.2                20 June 2000                         3
+Release 1.2                16 July 2000                         3
 
 
 
@@ -259,7 +259,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         4
+Release 1.2                16 July 2000                         4
 
 
 
@@ -325,7 +325,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         5
+Release 1.2                16 July 2000                         5
 
 
 
@@ -391,7 +391,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         6
+Release 1.2                16 July 2000                         6
 
 
 
@@ -457,7 +457,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         7
+Release 1.2                16 July 2000                         7
 
 
 
@@ -523,7 +523,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         8
+Release 1.2                16 July 2000                         8
 
 
 
@@ -589,7 +589,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                         9
+Release 1.2                16 July 2000                         9
 
 
 
@@ -655,7 +655,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                        10
+Release 1.2                16 July 2000                        10
 
 
 
@@ -721,7 +721,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                        11
+Release 1.2                16 July 2000                        11
 
 
 
@@ -787,7 +787,7 @@ EENNVVIIRROONNMMEENNTT
 
 
 
-Release 1.2                20 June 2000                        12
+Release 1.2                16 July 2000                        12
 
 
 
@@ -853,7 +853,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                        13
+Release 1.2                16 July 2000                        13
 
 
 
@@ -919,7 +919,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                        14
+Release 1.2                16 July 2000                        14
 
 
 
@@ -985,7 +985,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2                20 June 2000                        15
+Release 1.2                16 July 2000                        15
 
 
 
@@ -1038,20 +1038,20 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               greater than the small  bound  but  less  than  the
               large bound.  Default value: MMEEDDIIUUMMBBOOUUNNDD=_2_5_6.
 
-       NNOOFFRREEEE Specifies  that the mpatrol library should keep all
-              reallocated and  freed  memory  allocations.   Such
-              freed  memory  allocations  will then be flagged as
-              freed and can be used by  the  library  to  provide
-              better  diagnostics.   However, as no system memory
-              will ever be reused by the  mpatrol  library,  this
-              option  can quickly lead to a shortage of available
-              system memory for a process.  Note that this option
-              will always force a memory reallocation to return a
-              pointer to newly-allocated memory, but  the  eexxppaanndd
+       NNOOFFRREEEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies  that  a  number of recently-freed memory
+              allocations should be prevented from being returned
+              to the free memory pool.  Such freed memory alloca-
+              tions will then be flagged as freed and can be used
+              by the library to provide better diagnostics.  How-
+              ever, if the size of the freed queue  is  specified
+              as  zero  then no system memory will ever be reused
+              by the mpatrol library, which can quickly lead to a
+              shortage  of available system memory for a process.
 
 
 
-Release 1.2                20 June 2000                        16
+Release 1.2                16 July 2000                        16
 
 
 
@@ -1060,7 +1060,10 @@ Release 1.2                20 June 2000                        16
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              function will never be affected by this option.
+              Note that this option will always  force  a  memory
+              reallocation to return a pointer to newly-allocated
+              memory, but  the  eexxppaanndd  function  will  never  be
+              affected by this option.
 
        NNOOPPRROOTTEECCTT
               Specifies  that the mpatrol library's internal data
@@ -1111,13 +1114,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               place an overflow buffer of one page on either side
               of  every memory allocation and write-protect these
               pages as well as all free and freed  memory.   Note
-              that  this  option has no effect on systems that do
-              not support memory protection, and is  disabled  by
-              default  on  other  systems as it can slow down the
 
 
 
-Release 1.2                20 June 2000                        17
+Release 1.2                16 July 2000                        17
 
 
 
@@ -1126,6 +1126,9 @@ Release 1.2                20 June 2000                        17
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              that  this  option has no effect on systems that do
+              not support memory protection, and is  disabled  by
+              default  on  other  systems as it can slow down the
               speed of program execution.
 
        PPRREESSEERRVVEE
@@ -1177,13 +1180,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               code and to restore them afterwards.  This was  the
               default  behaviour  in  version  1.0 of the mpatrol
               library and was changed since some memory-intensive
-              programs  became  very  hard to interrupt using the
-              keyboard, thus giving the impression that the  pro-
-              gram or system had hung.
 
 
 
-Release 1.2                20 June 2000                        18
+Release 1.2                16 July 2000                        18
 
 
 
@@ -1191,6 +1191,10 @@ Release 1.2                20 June 2000                        18
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              programs  became  very  hard to interrupt using the
+              keyboard, thus giving the impression that the  pro-
+              gram or system had hung.
 
        SSHHOOWWAALLLL
               Equivalent  to  the SSHHOOWWFFRREEEEDD, SSHHOOWWUUNNFFRREEEEDD, SSHHOOWWMMAAPP
@@ -1242,14 +1246,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               they  do  not  free  up  a minimum number of memory
               allocations.   Note  that  this  setting  will   be
               ignored  if  its  value  is  zero.   Default value:
-              UUNNFFRREEEEDDAABBOORRTT=_0.
-
-       UUSSEEDDEEBBUUGG
-              Specifies that any  debugging  information  in  the
 
 
 
-Release 1.2                20 June 2000                        19
+Release 1.2                16 July 2000                        19
 
 
 
@@ -1258,6 +1258,10 @@ Release 1.2                20 June 2000                        19
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              UUNNFFRREEEEDDAABBOORRTT=_0.
+
+       UUSSEEDDEEBBUUGG
+              Specifies that any  debugging  information  in  the
               executable file should be used to obtain additional
               source-level information.  This  option  will  only
               have  an  effect  if the executable file contains a
@@ -1311,10 +1315,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-Release 1.2                20 June 2000                        20
+Release 1.2                16 July 2000                        20
 
 
