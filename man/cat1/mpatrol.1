@@ -25,9 +25,9 @@ DDEESSCCRRIIPPTTIIOONN
 
 OOPPTTIIOONNSS
        All  of  the  following options (except ----ddyynnaammiicc, ----hheellpp,
-       ----sshhooww--eennvv and ----vveerrssiioonn) correspond to their listed  mpa-
-       trol  library  option.  See mmppaattrrooll(3) for more details on
-       these options.
+       ----sshhooww--eennvv, ----tthhrreeaaddss and ----vveerrssiioonn) correspond  to  their
+       listed  mpatrol  library  option.  See mmppaattrrooll(3) for more
+       details on these options.
 
        ----aalllloocc--bbyyttee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--aa]
               [AALLLLOOCCBBYYTTEE]  Specifies an 8-bit byte  pattern  with
@@ -44,24 +44,24 @@ OOPPTTIIOONNSS
               cation, and that the operation should still be per-
               formed.
 
-       ----aauuttoo--ssaavvee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--QQ]
+       ----aauuttoo--ssaavvee <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--ss]
               [AAUUTTOOSSAAVVEE]  Specifies the  frequency  at  which  to
               periodically  write  the profiling data to the pro-
               filing output file.
 
-       ----cchheecckk <_u_n_s_i_g_n_e_d _r_a_n_g_e> [--CC]
+       ----cchheecckk <_u_n_s_i_g_n_e_d _r_a_n_g_e> [--cc]
               [CCHHEECCKK]  Specifies a range of allocation indices at
               which  to  check  the  integrity of free memory and
               overflow buffers.
 
-       ----cchheecckk--aallll [--cc]
+       ----cchheecckk--aallll [--CC]
               [CCHHEECCKKAALLLL]   Equivalent  to   the   ----cchheecckk--aallllooccss,
               ----cchheecckk--rreeaallllooccss,  ----cchheecckk--ffrreeeess and ----cchheecckk--mmeemmoorryy
               options specified together.
 
 
 
-Release 1.3              31 October 2000                        1
+Release 1.3              7 November 2000                        1
 
 
 
@@ -101,11 +101,11 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               ability to preload a set of  user-specified  shared
               libraries via a special environment variable.
 
-       ----ffaaiill--ffrreeqq <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--zz]
+       ----ffaaiill--ffrreeqq <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--qq]
               [FFAAIILLFFRREEQQ]   Specifies  the  frequency at which all
               memory allocations will randomly fail.
 
-       ----ffaaiill--sseeeedd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--ZZ]
+       ----ffaaiill--sseeeedd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--QQ]
               [FFAAIILLSSEEEEDD]  Specifies the random number seed  which
               will  be used when determining which memory alloca-
               tions will randomly fail.
@@ -121,13 +121,13 @@ MPATROL(1)               mpatrol library               MPATROL(1)
        ----hheellpp [--hh]
               Displays a quick-reference option summary.
 
-       ----llaarrggee--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--33]
+       ----llaarrggee--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [LLAARRGGEEBBOOUUNNDD]  Specifies the limit in  bytes  up  to
               which  memory  allocations  should be classified as
 
 
 
-Release 1.3              31 October 2000                        2
+Release 1.3              7 November 2000                        2
 
 
 
@@ -138,12 +138,12 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
               large allocations for profiling purposes.
 
-       ----lliimmiitt <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--LL]
+       ----lliimmiitt <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--uu]
               [LLIIMMIITT]  Specifies the limit in bytes at which  all
               memory  allocations  should fail if the total allo-
               cated memory should increase beyond this.
 
-       ----lloogg--aallll
+       ----lloogg--aallll [--LL]
               [LLOOGGAALLLL]    Equivalent   to    the    ----lloogg--aallllooccss,
               ----lloogg--rreeaallllooccss,    ----lloogg--ffrreeeess   and   ----lloogg--mmeemmoorryy
               options specified together.
@@ -168,7 +168,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               [LLOOGGRREEAALLLLOOCCSS]   Specifies that all memory realloca-
               tions are to be logged and sent to the log file.
 
-       ----mmeeddiiuumm--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--22]
+       ----mmeeddiiuumm--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [MMEEDDIIUUMMBBOOUUNNDD]  Specifies the limit in bytes  up  to
               which  memory  allocations  should be classified as
               medium allocations for profiling purposes.
@@ -193,7 +193,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-Release 1.3              31 October 2000                        3
+Release 1.3              7 November 2000                        3
 
 
 
@@ -211,13 +211,13 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               should be used for  overflow  buffers  rather  than
               filling with the overflow byte.
 
-       ----ppaaggee--aalllloocc--lloowweerr [--xx]
+       ----ppaaggee--aalllloocc--lloowweerr [--bb]
               [PPAAGGEEAALLLLOOCC=_L_O_W_E_R]   Specifies  that each individual
               memory allocation should occupy at least  one  page
               of  virtual memory and should be placed at the low-
               est point within these pages.
 
-       ----ppaaggee--aalllloocc--uuppppeerr [--XX]
+       ----ppaaggee--aalllloocc--uuppppeerr [--BB]
               [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
               memory  allocation  should occupy at least one page
               of virtual memory and should be placed at the high-
@@ -254,12 +254,12 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               tion  of  library  code  and to restore them after-
               wards.
 
-       ----sshhooww--aallll
+       ----sshhooww--aallll [--SS]
               [SSHHOOWWAALLLL]    Equivalent   to   the    ----sshhooww--ffrreeeedd,
 
 
 
-Release 1.3              31 October 2000                        4
+Release 1.3              7 November 2000                        4
 
 
 
@@ -271,19 +271,19 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               ----sshhooww--uunnffrreeeedd,   ----sshhooww--mmaapp   and   ----sshhooww--ssyymmbboollss
               options specified together.
 
-       ----sshhooww--eennvv
+       ----sshhooww--eennvv [--EE]
               Displays the contents of the MMPPAATTRROOLL__OOPPTTIIOONNSS  envi-
               ronment  variable.  This will be shown after all of
               the other command line options have been  processed
               and  will  prevent the specified command from being
               run.
 
-       ----sshhooww--ffrreeeedd [--ss]
+       ----sshhooww--ffrreeeedd
               [SSHHOOWWFFRREEEEDD]  Specifies that a summary of all of the
               freed memory allocations should be displayed at the
               end of program execution.
 
-       ----sshhooww--mmaapp [--SS]
+       ----sshhooww--mmaapp
               [SSHHOOWWMMAAPP]  Specifies  that  a  memory  map  of  the
               entire  heap should be displayed at the end of pro-
               gram execution.
@@ -299,10 +299,17 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               the unfreed memory allocations should be  displayed
               at the end of program execution.
 
-       ----ssmmaallll--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--11]
+       ----ssmmaallll--bboouunndd <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [SSMMAALLLLBBOOUUNNDD]   Specifies  the  limit in bytes up to
               which memory allocations should  be  classified  as
               small allocations for profiling purposes.
+
+       ----tthhrreeaaddss [--tt]
+              Specifies  that  the  program  to  be run is multi-
+              threaded if the ----ddyynnaammiicc  option  is  used.   This
+              option  is required if the multithreaded version of
+              the mpatrol library should be preloaded instead  of
+              the normal version.
 
        ----uunnffrreeeedd--aabboorrtt <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r> [--UU]
               [UUNNFFRREEEEDDAABBOORRTT]   Specifies  the  minimum  number of
@@ -314,18 +321,11 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               tion in the  executable  file  should  be  used  to
               obtain additional source-level information.
 
-       ----uussee--mmmmaapp [--mm]
-              [UUSSEEMMMMAAPP]   Specifies  that  the library should use
-              mmmmaapp(()) instead of ssbbrrkk(()) to allocate system memory.
-
-       ----vveerrssiioonn [--VV]
-              Displays the version number of the mmppaattrrooll command.
 
 
 
 
-
-Release 1.3              31 October 2000                        5
+Release 1.3              7 November 2000                        5
 
 
 
@@ -333,6 +333,13 @@ Release 1.3              31 October 2000                        5
 
 MPATROL(1)               mpatrol library               MPATROL(1)
 
+
+       ----uussee--mmmmaapp [--mm]
+              [UUSSEEMMMMAAPP]   Specifies  that  the library should use
+              mmmmaapp(()) instead of ssbbrrkk(()) to allocate system memory.
+
+       ----vveerrssiioonn [--VV]
+              Displays the version number of the mmppaattrrooll command.
 
 SSEEEE AALLSSOO
        mmpprrooff(1), mmlleeaakk(1), mmppssyymm(1), mmppaattrrooll(3).
@@ -384,13 +391,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-
-
-
-Release 1.3              31 October 2000                        6
+Release 1.3              7 November 2000                        6
 
 

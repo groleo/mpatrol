@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.27 2000-10-31 23:11:29 graeme Exp $
+.\" $Id: mpatrol.1,v 1.28 2000-11-07 18:56:20 graeme Exp $
 .\"
-.TH MPATROL 1 "31 October 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 1 "7 November 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -39,8 +39,9 @@ can be changed using the \fB\-\-log\-file\fP option.  Similarly, the default
 profiling output filename is \fImpatrol.%n.out\fP.
 .SH OPTIONS
 All of the following options (except \fB\-\-dynamic\fP, \fB\-\-help\fP,
-\fB\-\-show\-env\fP and \fB\-\-version\fP) correspond to their listed mpatrol
-library option.  See \fBmpatrol\fP(3) for more details on these options.
+\fB\-\-show\-env\fP, \fB\-\-threads\fP and \fB\-\-version\fP) correspond to
+their listed mpatrol library option.  See \fBmpatrol\fP(3) for more details on
+these options.
 .TP
 \fB\-\-alloc\-byte\fP <\fIunsigned integer\fP> [\fB\-a\fP]
 [\fBALLOCBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
@@ -55,15 +56,15 @@ when it is being allocated.
 produced if any memory operation function overflows the boundaries of a memory
 allocation, and that the operation should still be performed.
 .TP
-\fB\-\-auto\-save\fP <\fIunsigned integer\fP> [\fB\-Q\fP]
+\fB\-\-auto\-save\fP <\fIunsigned integer\fP> [\fB\-s\fP]
 [\fBAUTOSAVE\fP]  Specifies the frequency at which to periodically write the
 profiling data to the profiling output file.
 .TP
-\fB\-\-check\fP <\fIunsigned range\fP> [\fB\-C\fP]
+\fB\-\-check\fP <\fIunsigned range\fP> [\fB\-c\fP]
 [\fBCHECK\fP]  Specifies a range of allocation indices at which to check the
 integrity of free memory and overflow buffers.
 .TP
-\fB\-\-check\-all\fP [\fB\-c\fP]
+\fB\-\-check\-all\fP [\fB\-C\fP]
 [\fBCHECKALL\fP]  Equivalent to the \fB\-\-check\-allocs\fP,
 \fB\-\-check\-reallocs\fP, \fB\-\-check\-frees\fP and \fB\-\-check\-memory\fP
 options specified together.
@@ -94,11 +95,11 @@ also be traced, but only if they were dynamically linked.  This option will
 only work if the system dynamic linker has the ability to preload a set of
 user-specified shared libraries via a special environment variable.
 .TP
-\fB\-\-fail\-freq\fP <\fIunsigned integer\fP> [\fB\-z\fP]
+\fB\-\-fail\-freq\fP <\fIunsigned integer\fP> [\fB\-q\fP]
 [\fBFAILFREQ\fP]  Specifies the frequency at which all memory allocations will
 randomly fail.
 .TP
-\fB\-\-fail\-seed\fP <\fIunsigned integer\fP> [\fB\-Z\fP]
+\fB\-\-fail\-seed\fP <\fIunsigned integer\fP> [\fB\-Q\fP]
 [\fBFAILSEED\fP]  Specifies the random number seed which will be used when
 determining which memory allocations will randomly fail.
 .TP
@@ -113,15 +114,15 @@ when it is being freed.
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
 .TP
-\fB\-\-large\-bound\fP <\fIunsigned integer\fP> [\fB\-3\fP]
+\fB\-\-large\-bound\fP <\fIunsigned integer\fP>
 [\fBLARGEBOUND\fP]  Specifies the limit in bytes up to which memory allocations
 should be classified as large allocations for profiling purposes.
 .TP
-\fB\-\-limit\fP <\fIunsigned integer\fP> [\fB\-L\fP]
+\fB\-\-limit\fP <\fIunsigned integer\fP> [\fB\-u\fP]
 [\fBLIMIT\fP]  Specifies the limit in bytes at which all memory allocations
 should fail if the total allocated memory should increase beyond this.
 .TP
-\fB\-\-log\-all\fP
+\fB\-\-log\-all\fP [\fB\-L\fP]
 [\fBLOGALL\fP]  Equivalent to the \fB\-\-log\-allocs\fP,
 \fB\-\-log\-reallocs\fP, \fB\-\-log\-frees\fP and \fB\-\-log\-memory\fP options
 specified together.
@@ -146,7 +147,7 @@ sent to the log file.
 [\fBLOGREALLOCS\fP]  Specifies that all memory reallocations are to be logged
 and sent to the log file.
 .TP
-\fB\-\-medium\-bound\fP <\fIunsigned integer\fP> [\fB\-2\fP]
+\fB\-\-medium\-bound\fP <\fIunsigned integer\fP>
 [\fBMEDIUMBOUND\fP]  Specifies the limit in bytes up to which memory allocations
 should be classified as medium allocations for profiling purposes.
 .TP
@@ -171,12 +172,12 @@ which must be a power of two.
 [\fBOFLOWWATCH\fP]  Specifies that watch point areas should be used for overflow
 buffers rather than filling with the overflow byte.
 .TP
-\fB\-\-page\-alloc\-lower\fP [\fB\-x\fP]
+\fB\-\-page\-alloc\-lower\fP [\fB\-b\fP]
 [\fBPAGEALLOC\fP=\fILOWER\fP]  Specifies that each individual memory allocation
 should occupy at least one page of virtual memory and should be placed at the
 lowest point within these pages.
 .TP
-\fB\-\-page\-alloc\-upper\fP [\fB\-X\fP]
+\fB\-\-page\-alloc\-upper\fP [\fB\-B\fP]
 [\fBPAGEALLOC\fP=\fIUPPER\fP]  Specifies that each individual memory allocation
 should occupy at least one page of virtual memory and should be placed at the
 highest point within these pages.
@@ -205,21 +206,21 @@ when a memory allocation is being reallocated.
 [\fBSAFESIGNALS\fP]  Instructs the library to save and replace certain signal
 handlers during the execution of library code and to restore them afterwards.
 .TP
-\fB\-\-show\-all\fP
+\fB\-\-show\-all\fP [\fB\-S\fP]
 [\fBSHOWALL\fP]  Equivalent to the \fB\-\-show\-freed\fP,
 \fB\-\-show\-unfreed\fP, \fB\-\-show\-map\fP and \fB\-\-show\-symbols\fP options
 specified together.
 .TP
-\fB\-\-show\-env\fP
+\fB\-\-show\-env\fP [\fB\-E\fP]
 Displays the contents of the \fBMPATROL_OPTIONS\fP environment variable.  This
 will be shown after all of the other command line options have been processed
 and will prevent the specified command from being run.
 .TP
-\fB\-\-show\-freed\fP [\fB\-s\fP]
+\fB\-\-show\-freed\fP
 [\fBSHOWFREED\fP]  Specifies that a summary of all of the freed memory
 allocations should be displayed at the end of program execution.
 .TP
-\fB\-\-show\-map\fP [\fB\-S\fP]
+\fB\-\-show\-map\fP
 [\fBSHOWMAP\fP]  Specifies that a memory map of the entire heap should be
 displayed at the end of program execution.
 .TP
@@ -232,9 +233,14 @@ program execution.
 [\fBSHOWUNFREED\fP]  Specifies that a summary of all of the unfreed memory
 allocations should be displayed at the end of program execution.
 .TP
-\fB\-\-small\-bound\fP <\fIunsigned integer\fP> [\fB\-1\fP]
+\fB\-\-small\-bound\fP <\fIunsigned integer\fP>
 [\fBSMALLBOUND\fP]  Specifies the limit in bytes up to which memory allocations
 should be classified as small allocations for profiling purposes.
+.TP
+\fB\-\-threads\fP [\fB\-t\fP]
+Specifies that the program to be run is multithreaded if the \fB\-\-dynamic\fP
+option is used.  This option is required if the multithreaded version of the
+mpatrol library should be preloaded instead of the normal version.
 .TP
 \fB\-\-unfreed\-abort\fP <\fIunsigned integer\fP> [\fB\-U\fP]
 [\fBUNFREEDABORT\fP]  Specifies the minimum number of unfreed allocations at
