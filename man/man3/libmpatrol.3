@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.17 2001-02-21 12:28:44 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.18 2001-02-26 00:23:52 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "21 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "26 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -109,10 +109,12 @@ void *memchr(const void *ptr, int byte, size_t size);
 .if t \{void *memmem(const void *ptr1, size_t size1, const void *ptr2, size_t size2);
 \}
 
+int __mp_atexit(void (*func)(void));
 unsigned long __mp_setoption(long opt, unsigned long val);
 int __mp_getoption(long opt, unsigned long *val);
 char *__mp_function(__mp_alloctype func);
 int __mp_setuser(const void *ptr, const void *data);
+int __mp_setmark(const void *ptr);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
@@ -676,9 +678,15 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 24 functions are available as support routines for additional
+The following 26 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
+.TP
+\fB__mp_atexit\fP
+Installs a function to be called when the mpatrol library terminates.  Up to 32
+such functions can be registered and will be called in reverse order of
+registration.  Returns \fI1\fP on success or \fP0\fP if \fIfunc\fP could not be
+registered.
 .TP
 \fB__mp_setoption\fP
 Sets the value of an mpatrol option after the library has been initialised.
@@ -714,8 +722,14 @@ allocation for its entire lifetime unless overridden by a subsequent call to
 \fB__mp_setuser\fP.  As such, the user data must be valid for the entire
 lifetime of the memory allocation, perhaps even after the allocation has been
 freed if the \fBNOFREE\fP option is being used.  This function returns \fI1\fP
-if there is an allocated (or freed) memory block containing \fIptr\fP, and
-\fI0\fP otherwise.
+if there is an allocated memory block containing \fIptr\fP, and \fI0\fP
+otherwise.
+.TP
+\fB__mp_setmark\fP
+Sets the marked flag for the memory allocation containing \fIptr\fP, indicating
+that the memory allocation cannot be freed (but can be reallocated) and thus
+will not be listed as a memory leak.  This function returns \fI1\fP if there is
+an allocated memory block containing \fIptr\fP, and \fI0\fP otherwise.
 .TP
 \fB__mp_info\fP
 Obtains information about a specific memory allocation by placing statistics
@@ -742,6 +756,10 @@ l l.
 \fBtypesize\fP	Size of type stored in allocation.
 \fBuserdata\fP	User data associated with allocation.
 \fBfreed\fP	Indicates if alloc has been freed.
+\fBmarked\fP	Indicates if alloc has been marked.
+\fBprofiled\fP	Indicates if alloc has been profiled.
+\fBtraced\fP	Indicates if alloc has been traced.
+\fBinternal\fP	Indicates if alloc is internal.
 .TE
 .TP
 \fB__mp_syminfo\fP
