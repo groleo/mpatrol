@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.28 2000-05-14 23:10:09 graeme Exp $"
+#ident "$Id: diag.c,v 1.29 2000-06-29 23:56:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -842,9 +842,12 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag("\nreallocation stop: %lu", h->rstop);
     __mp_diag("\nfree stop:         %lu", h->fstop);
     __mp_diag("\nunfreed abort:     %lu", h->uabort);
-    __mp_diag("\nsmall boundary:    %lu", h->prof.sbound);
-    __mp_diag("\nmedium boundary:   %lu", h->prof.mbound);
-    __mp_diag("\nlarge boundary:    %lu", h->prof.lbound);
+    __mp_diag("\nsmall boundary:    ");
+    __mp_printsize(h->prof.sbound);
+    __mp_diag("\nmedium boundary:   ");
+    __mp_printsize(h->prof.mbound);
+    __mp_diag("\nlarge boundary:    ");
+    __mp_printsize(h->prof.lbound);
     __mp_diag("\nlower check range: ");
     if (h->lrange == (size_t) -1)
         __mp_diag("-");
