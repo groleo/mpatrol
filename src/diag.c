@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.91 2001-10-05 22:05:16 graeme Exp $"
+#ident "$Id: diag.c,v 1.92 2001-10-05 22:32:06 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.91 2001-10-05 22:05:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.92 2001-10-05 22:32:06 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2088,46 +2088,217 @@ __mp_printsummary(infohead *h)
     {
         __mp_diagtag("</TD>\n");
         __mp_diagtag("</TR>\n");
-        __mp_diagtag("</TABLE>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("symbols read");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->syms.dtree.size);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("autosave count");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->prof.autosave);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("freed queue size");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->alloc.fmax);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocation count");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->count);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocation peak");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", h->cpeak);
+        __mp_printsize(h->peak);
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocation limit");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->limit);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocated blocks");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", h->alloc.atree.size);
+        __mp_printsize(h->alloc.asize);
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("marked blocks");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", h->mcount);
+        __mp_printsize(h->mtotal);
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("freed blocks");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", h->alloc.gtree.size);
+        __mp_printsize(h->alloc.gsize);
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("free blocks");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", h->alloc.ftree.size);
+        __mp_printsize(h->alloc.fsize);
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
     }
-    __mp_diag("\nsymbols read:      %lu", h->syms.dtree.size);
-    __mp_diag("\nautosave count:    %lu", h->prof.autosave);
-    __mp_diag("\nfreed queue size:  %lu", h->alloc.fmax);
-    __mp_diag("\nallocation count:  %lu", h->count);
-    __mp_diag("\nallocation peak:   %lu (", h->cpeak);
-    __mp_printsize(h->peak);
-    __mp_diag(")\nallocation limit:  ");
-    __mp_printsize(h->limit);
-    __mp_diag("\nallocated blocks:  %lu (", h->alloc.atree.size);
-    __mp_printsize(h->alloc.asize);
-    __mp_diag(")\nmarked blocks:     %lu (", h->mcount);
-    __mp_printsize(h->mtotal);
-    __mp_diag(")\nfreed blocks:      %lu (", h->alloc.gtree.size);
-    __mp_printsize(h->alloc.gsize);
-    __mp_diag(")\nfree blocks:       %lu (", h->alloc.ftree.size);
-    __mp_printsize(h->alloc.fsize);
+    else
+    {
+        __mp_diag("\nsymbols read:      %lu", h->syms.dtree.size);
+        __mp_diag("\nautosave count:    %lu", h->prof.autosave);
+        __mp_diag("\nfreed queue size:  %lu", h->alloc.fmax);
+        __mp_diag("\nallocation count:  %lu", h->count);
+        __mp_diag("\nallocation peak:   %lu (", h->cpeak);
+        __mp_printsize(h->peak);
+        __mp_diag(")\nallocation limit:  ");
+        __mp_printsize(h->limit);
+        __mp_diag("\nallocated blocks:  %lu (", h->alloc.atree.size);
+        __mp_printsize(h->alloc.asize);
+        __mp_diag(")\nmarked blocks:     %lu (", h->mcount);
+        __mp_printsize(h->mtotal);
+        __mp_diag(")\nfreed blocks:      %lu (", h->alloc.gtree.size);
+        __mp_printsize(h->alloc.gsize);
+        __mp_diag(")\nfree blocks:       %lu (", h->alloc.ftree.size);
+        __mp_printsize(h->alloc.fsize);
+    }
     n = h->alloc.heap.itree.size + h->alloc.itree.size + h->addr.list.size +
         h->syms.strings.list.size + h->syms.strings.tree.size +
         h->syms.itree.size + h->ltable.list.size + h->prof.ilist.size +
         h->list.size + h->alist.size;
-    __mp_diag(")\ninternal blocks:   %lu (", n);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("internal blocks");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu (", n);
+    }
+    else
+        __mp_diag(")\ninternal blocks:   %lu (", n);
     n = h->alloc.heap.isize + h->alloc.isize + h->addr.size +
         h->syms.strings.size + h->syms.size + h->ltable.isize + h->prof.size +
         h->size;
     __mp_printsize(n);
-    __mp_diag(")\ntotal heap usage:  ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diag(")");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total heap usage");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
     __mp_printsize(n);
-    __mp_diag("\ntotal compared:    ");
-    __mp_printsize(h->dtotal);
-    __mp_diag("\ntotal located:     ");
-    __mp_printsize(h->ltotal);
-    __mp_diag("\ntotal copied:      ");
-    __mp_printsize(h->ctotal);
-    __mp_diag("\ntotal set:         ");
-    __mp_printsize(h->stotal);
-    __mp_diag("\ntotal warnings:    %lu", warnings);
-    __mp_diag("\ntotal errors:      %lu\n", errors);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total compared");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->dtotal);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total located");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->ltotal);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total copied");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->ctotal);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total set");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->stotal);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total warnings");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", warnings);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("total errors");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", errors);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("</TABLE>\n");
+    }
+    else
+    {
+        __mp_diag("\ntotal compared:    ");
+        __mp_printsize(h->dtotal);
+        __mp_diag("\ntotal located:     ");
+        __mp_printsize(h->ltotal);
+        __mp_diag("\ntotal copied:      ");
+        __mp_printsize(h->ctotal);
+        __mp_diag("\ntotal set:         ");
+        __mp_printsize(h->stotal);
+        __mp_diag("\ntotal warnings:    %lu", warnings);
+        __mp_diag("\ntotal errors:      %lu\n", errors);
+    }
 }
 
 
