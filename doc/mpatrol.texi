@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.194 2001-03-07 18:46:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.195 2001-03-07 19:24:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -7151,6 +7151,22 @@ unfreed allocations: 7 (1369 bytes)
     @dots{}
 @end smallexample
 
+Beginning with mpatrol release 1.4.2, the @option{LEAKTABLE} option is
+available to summarise the above unfreed memory allocations without including
+the internal memory allocations that were made when the mpatrol library was
+initialised.  If you add the @option{LEAKTABLE} option to the
+@env{MPATROL_OPTIONS} environment variable and then re-run the program you
+should see the following in the mpatrol log file:
+
+@smallexample
+top 1 unfreed memory entry in leak table:
+
+       bytes   count  location
+    --------  ------  --------
+           4       1  test.c line 14
+           4       1  total
+@end smallexample
+
 @node Tutorial, Functions, Examples, Top
 @chapter Tutorial
 @cindex tutorial
@@ -7453,7 +7469,7 @@ program is run and is given a relatively small text file as input.
 @smallexample
 unfreed allocations: 10 (185 bytes)
     0x08062000 (176 bytes) @{malloc:1:0@} [-|-|-]
-        0x400B681B _IO_new_fopen+27
+        0x400B681B __new_fopen+27
         0x0804F24E __mp_openlogfile+70
         0x080497B5 __mp_init+109
         0x08049973 __mp_alloc+31
@@ -7526,6 +7542,20 @@ can see that @code{free()} is only ever called for non-empty strings and
 therefore if we move the call to @code{free()} outside the test for an empty
 string we will fix the memory leak.  The file @file{tests/tutorial/test3.c}
 contains the source for the final program.
+
+Note that we can come to the same conclusion as above in a much quicker manner
+by using the @option{LEAKTABLE} option.  The following is written to the mpatrol
+log file when we use that option on the same program (note that the internal
+memory allocation has not automatically been added to the leak table):
+
+@smallexample
+top 1 unfreed memory entry in leak table:
+
+       bytes   count  location
+    --------  ------  --------
+           9       9  test2.c line 43
+           9       9  total
+@end smallexample
 
 @node Functions, Environment, Tutorial, Top
 @appendix Functions
@@ -11753,18 +11783,6 @@ first call the @code{alloca()}.  If @code{alloca.h} is also being included then
 @code{mpatrol.h} must be included after it, otherwise it may redefine
 @code{alloca()} back to the default version.
 
-@item
-Why do I get @code{xmalloc()} as a multiply-defined symbol when I link with the
-archive version of the mpatrol library?
-
-If the mpatrol library was built with @code{FORMAT=FORMAT_BFD} then it is
-because the libiberty library contains definitions of the @code{xmalloc()}
-family of functions as well.  You should rebuild the mpatrol library without
-the definitions of the relevant @code{xmalloc()} functions in @file{malloc.c}.
-You're also likely to get this error if you link with the archive version of
-the mpatrol library and one or more of the @code{xmalloc()} family of functions
-is defined in another archive library that you are linking with.
-
 @cindex inline functions
 @item
 Why do some of the @file{Makefile}s contain the @option{-fno-inline-functions}
@@ -11895,6 +11913,18 @@ This is most likely caused by your code, or a library, providing definitions of
 @code{malloc()} and @code{free()} which conflict with those defined in the
 mpatrol library.  You'll need to disable these in order to perform a successful
 link and use the replacements in mpatrol instead.
+
+@item
+Why do I get @code{xmalloc()} as a multiply-defined symbol when I link with the
+archive version of the mpatrol library?
+
+If the mpatrol library was built with @code{FORMAT=FORMAT_BFD} then it is
+because the libiberty library contains definitions of the @code{xmalloc()}
+family of functions as well.  You should rebuild the mpatrol library without
+the definitions of the relevant @code{xmalloc()} functions in @file{malloc.c}.
+You're also likely to get this error if you link with the archive version of
+the mpatrol library and one or more of the @code{xmalloc()} family of functions
+is defined in another archive library that you are linking with.
 
 @cindex LD_LIBRARY_PATH
 @cindex LD_RUN_PATH
