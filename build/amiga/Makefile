@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
+# Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.62 2001-08-23 23:08:57 graeme Exp $
+# $Id: Makefile,v 1.63 2002-01-08 20:40:00 graeme Exp $
 
 
 # Definitions

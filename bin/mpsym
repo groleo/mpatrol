@@ -3,7 +3,7 @@
 
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
+# Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -26,7 +26,7 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.13 2001-09-30 23:44:22 graeme Exp $
+# $Id: mpsym,v 1.14 2002-01-08 20:38:24 graeme Exp $
 
 
 # Program version.
@@ -102,7 +102,7 @@ fi
 if [ $version = 1 ]
 then
     echo "$progname $VERSION"
-    echo "Copyright (C) 1997-2001 Graeme S. Roy"
+    echo "Copyright (C) 1997-2002 Graeme S. Roy"
     echo
     echo "This is free software, and you are welcome to redistribute it under certain"
     echo "conditions; see the GNU Library General Public License for details."
