@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.31 2001-09-04 22:56:09 graeme Exp $
+% $Id: refcard.tex,v 1.32 2001-12-05 21:16:54 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -700,6 +700,9 @@ Displays a quick-reference option summary.
 \hfill See \option{PROFFILE}.
 \item[\flagpar{prog-file}{string}]
 \hfill See \option{PROGFILE}.
+\item[\flag{read-env}]
+Reads and passes through the contents of the \texttt{MPATROL\_OPTIONS}
+environment variable.
 \item[\flagpar{realloc-stop}{unsigned integer}]
 \hfill See \option{REALLOCSTOP}.
 \item[\flag{safe-signals}]
@@ -847,6 +850,8 @@ Displays the version number of the \command{mleak} command.
 \begin{description}
 \item[\flag{help}]
 Displays a quick-reference option summary.
+\item[\flag{skip}]
+Skip symbols marked as \texttt{???} in the log file.
 \item[\flag{version}]
 Displays the version number of the \command{mpsym} command.
 \end{description}
