@@ -17,7 +17,7 @@ the preformatted files.
 
   * mpatrol.texi
         Format:    GNU TeXinfo
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Notes:     The unprocessed source of the mpatrol manual.
 
   * refcard.tex
@@ -32,7 +32,7 @@ the preformatted files.
 
   * texinfo.tex
         Format:    TeX
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Notes:     The TeXinfo macro package required by the DVI and PDF
                    versions of the mpatrol manual.
 
@@ -72,15 +72,15 @@ viewer program.
         Format:    ASCII text
                    http://www.bbsinc.com/iso8859.html
         Generator: GNU MakeInfo
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Viewer:    Any text viewer
         Notes:     Plain text with no formatting codes.
 
   * mpatrol.info
         Format:    GNU Info
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Generator: GNU MakeInfo
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Viewer:    GNU Info
         Notes:     Contains hypertext links but no formatting codes.
 
@@ -96,7 +96,7 @@ viewer program.
         Format:    DocBook
                    http://www.oasis-open.org/docbook/
         Generator: GNU MakeInfo
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
         Viewer:    Any web browser with a DocBook DTD
         Notes:     Contains hypertext links with formatting codes.
 
@@ -104,7 +104,7 @@ viewer program.
         Format:    Hypertext Markup Language (HTML)
                    http://www.w3c.org/MarkUp/
         Generator: GNU MakeInfo
-                   http://texinfo.org/
+                   http://www.gnu.org/software/texinfo/
                    Texi2HTML
                    http://www.mathematik.uni-kl.de/~obachman/Texi2html
         Viewer:    Any web browser
@@ -142,7 +142,9 @@ with a variety of programs, not just the ones listed here.
                    http://www.tug.org/applications/pdftex/
                    PStill
                    http://www.this.net/~frank/pstill.html
-        Viewer:    XPDF
+        Viewer:    Adobe Reader
+                   http://www.adobe.com/
+                   XPDF
                    http://www.foolabs.com/xpdf/
         Notes:     Contains hypertext links along with embedded PDF images and
                    Postscript Type 1 fonts.
