@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.202 2001-03-11 23:49:21 graeme Exp $
+@c $Id: mpatrol.texi,v 1.203 2001-03-12 20:20:30 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.7
 @set VERSION 1.4.2
-@set UPDATED 11th March, 2001
+@set UPDATED 12th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -240,6 +240,12 @@ and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris Makushkin
 (@email{oberon@@antibiotic.ru}) requested, helped with, and provided initial
 testing for the FreeBSD port and Ivan Finch (@email{i.finch@@rl.ac.uk}) did the
 same for the Tru64 port.
+
+In addition, after spending well over 2000 hours designing and programming
+mpatrol, my sanity would not have been preserved in the state it is in today
+were it not for the music of The Chemical Brothers, The Manic Street Preachers,
+Orbital and The Prodigy.  You can now argue how sane I am depending on your
+musical tastes!
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -2715,6 +2721,7 @@ calling functions from the command prompt.  Note that the textual representation
 of the @code{type} field returned by the @code{__mp_info()} function can be
 obtained by calling @code{__mp_function()}.
 
+@cindex __mp_errno
 The mpatrol library records the error code from the most recently encountered
 warning or error in the @code{__mp_errno} global variable.  This variable can be
 read and compared with the known error codes listed in @file{mpatrol.h}.  It can
@@ -3178,6 +3185,13 @@ to check for memory leaks, but it is not as detailed as full memory allocation
 profiling which is controlled by the @option{PROF} option.  It is probably
 better at summarising unfreed allocations than the @option{SHOWUNFREED} option
 but does not show the call stack for each allocation.
+
+In addition, the @code{__mp_iterate()} function can be used within user code to
+obtain details about changes in the heap since a certain point in a program's
+execution.  However, it can only provide details about freed memory allocations
+if the @option{NOFREE} option is used.  The leak table will provide less details
+on freed memory allocations but its advantage is that it does not require the
+use of the @option{NOFREE} option.
 
 @node Tools, Utilities, Leak table, Using mpatrol
 @section Tools
@@ -10187,48 +10201,49 @@ system, but were run several times to obtain an average result.  Obviously,
 these times can only be an approximation, but should serve to illustrate the
 effects on performance that each option can have.  All times are given in
 seconds, and the second time on each line was obtained with the same options
-plus the @option{NOPROTECT} option.  The tests were all run with the
-@option{CHECK=-} option, so running with the @option{CHECK=0} option would speed
-things up dramatically, albeit at the expense of less error checking.
+plus the @option{NOPROTECT} option.  The tests were all run with the default
+@option{CHECK=0} option, so running with the @option{CHECK=-} option would slow
+things down dramatically, albeit with more checking being performed to detect
+heap corruption.
 
 Running with basic options:
 
 @multitable @columnfractions .6 .15 .15
 @item @emph{no options}
-@tab 0.618
+@tab 0.525
 @tab 0.258
 @item @option{OFLOWSIZE=2}
-@tab 0.645
-@tab 0.296
+@tab 0.569
+@tab 0.265
 @item @option{OFLOWSIZE=8}
-@tab 0.686
-@tab 0.327
+@tab 0.580
+@tab 0.276
 @item @option{PAGEALLOC=LOWER}
-@tab 7.785
-@tab 7.372
+@tab 0.709
+@tab 0.462
 @item @option{PAGEALLOC=UPPER}
-@tab 7.821
-@tab 7.469
+@tab 0.742
+@tab 0.485
 @end multitable
 
 Running when all freed memory allocations are kept:
 
 @multitable @columnfractions .6 .15 .15
 @item @option{NOFREE=0xFFFF}
-@tab 0.943
-@tab 0.506
+@tab 0.711
+@tab 0.338
 @item @option{NOFREE=0xFFFF OFLOWSIZE=2}
-@tab 1.026
-@tab 0.579
+@tab 0.725
+@tab 0.350
 @item @option{NOFREE=0xFFFF OFLOWSIZE=8}
-@tab 1.091
-@tab 0.645
+@tab 0.739
+@tab 0.358
 @item @option{NOFREE=0xFFFF PAGEALLOC=LOWER}
-@tab 8.013
-@tab 7.598
+@tab 1.048
+@tab 0.710
 @item @option{NOFREE=0xFFFF PAGEALLOC=UPPER}
-@tab 8.026
-@tab 7.616
+@tab 1.079
+@tab 0.722
 @end multitable
 
 Running when all freed memory allocations are kept and their contents are
@@ -10236,42 +10251,43 @@ preserved:
 
 @multitable @columnfractions .6 .15 .15
 @item @option{NOFREE=0xFFFF PRESERVE}
-@tab 0.719
-@tab 0.292
+@tab 0.725
+@tab 0.341
 @item @option{NOFREE=0xFFFF PRESERVE OFLOWSIZE=2}
-@tab 0.792
-@tab 0.367
+@tab 0.735
+@tab 0.357
 @item @option{NOFREE=0xFFFF PRESERVE OFLOWSIZE=8}
-@tab 0.850
-@tab 0.419
+@tab 0.745
+@tab 0.360
 @item @option{NOFREE=0xFFFF PRESERVE PAGEALLOC=LOWER}
-@tab 8.043
-@tab 7.616
+@tab 1.055
+@tab 0.722
 @item @option{NOFREE=0xFFFF PRESERVE PAGEALLOC=UPPER}
-@tab 8.052
-@tab 7.631
+@tab 1.081
+@tab 0.729
 @end multitable
 
 Running using watch points to check the overflow buffers:
 
-@multitable @columnfractions .6 .4
+@multitable @columnfractions .6 .15 .15
 @item @option{OFLOWSIZE=2 OFLOWWATCH}
-@tab Interrupted after half an hour as it still hadn't finished.
+@tab 28.758
+@tab 28.372
 @end multitable
 
 Running using the Solaris malloc libraries:
 
 @multitable @columnfractions .6 .3
 @item Solaris malloc(3c) library
-@tab 0.033
+@tab 0.030
 @item Solaris malloc(3x) library
-@tab 0.036
-@item Solaris bsdmalloc(3x) library
-@tab 0.028
-@item Solaris mapmalloc(3x) library
 @tab 0.033
+@item Solaris bsdmalloc(3x) library
+@tab 0.027
+@item Solaris mapmalloc(3x) library
+@tab 0.030
 @item Solaris watchmalloc(3x) library
-@tab 40.845
+@tab 30.323
 @end multitable
 
 @node File formats, Supported systems, Library performance, Top
@@ -10881,7 +10897,16 @@ The mpatrol library can be compiled and run in a 64-bit environment.
 Tru64 5.0, Alpha, BFD, @command{cxx}
 @itemize @bullet
 @item
+The thread-safe version of the library has not yet been tested.
+@item
 The @option{OFLOWWATCH} option has no effect.
+@item
+The system exception-handling library (libexc) is used for call stack traversal.
+Unfortunately, this library makes several calls to @code{malloc()} when
+initialising itself and this results in a recursive loop when used in
+combination with the mpatrol library.  Until this is resolved, either
+@code{MP_BUILTINSTACK_SUPPORT=1} must be defined or the mpatrol library must
+be built without the @file{malloc.o} module.
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
@@ -11346,6 +11371,11 @@ also be extended to prevent memory leaks from being reported if the original
 allocations were made from a given set of functions.
 
 @item
+Add a function to add a block of memory to the heap, possibly a memory-mapped
+file.  Also add a function that can shrink the heap if large areas of free
+memory exist.
+
+@item
 Maybe show the contents of the @env{MPATROL_OPTIONS} environment variable in the
 summary as well.
 
@@ -11360,6 +11390,8 @@ some options before the mpatrol library has been initialised.
 
 @item
 Add similar functions to the GNU @code{mcheck()} and @code{mprobe()} functions.
+Perhaps also add an mpatrol tool to add compatibility with the GNU memusage
+tool.
 
 @item
 Perhaps add debugging/tracing versions of the string manipulation functions,
@@ -11371,8 +11403,8 @@ displaying memory range errors.
 
 @item
 Add wide-character equivalents of @code{memset()}, etc.  These are defined as
-@code{wmemset()}, etc.@: and are now part of ANSI C.  Also add @code{memdup()}
-and @code{xmemdup()}.
+@code{wmemset()}, etc.@: and are now part of ANSI C.  Also add @code{wcsdup()},
+@code{memdup()} and @code{xmemdup()}.
 
 @item
 Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
@@ -11460,6 +11492,11 @@ behaviour of libmpatrol, although this isn't a big issue since the program
 should be completely recompiled to remove mpatrol debugging before a release.
 In the same vein, perhaps there should be some sort of support for
 @code{set_new_handler()} in libmpalloc.
+
+@item
+Perhaps change the prefixes in the names of the visible interface functions to
+the mpatrol library.  They all currently begin with @samp{__mp_} but perhaps
+it would be more user-friendly to make them begin with @samp{mpatrol_}?
 
 @item
 Add an option to write the mpatrol log file in HTML format, or even better XML
@@ -11612,7 +11649,8 @@ work on systems whose dynamic linkers support the @env{LD_PRELOAD} or
 access libraries do not exist in shared form on such systems.
 
 @item
-Perhaps add files to build the mpatrol library and tools as a Debian package.
+Perhaps add files to build the mpatrol library and tools as BSD and Debian
+packages.
 @end itemize
 
 @node Amiga notes, Windows notes, UNIX notes, Notes
