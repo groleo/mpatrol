@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.36 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: memory.c,v 1.37 2001-01-02 22:12:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -478,7 +478,7 @@ getmemory(long l)
 
 MP_GLOBAL
 void *
-__mp_memalloc(meminfo *i, size_t *l, size_t a)
+__mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
 {
     void *p;
 #if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX

@@ -73,7 +73,7 @@ extern "C"
 MP_EXPORT void __mp_newmemory(meminfo *);
 MP_EXPORT void __mp_endmemory(meminfo *);
 MP_EXPORT unsigned long __mp_processid(void);
-MP_EXPORT void *__mp_memalloc(meminfo *, size_t *, size_t);
+MP_EXPORT void *__mp_memalloc(meminfo *, size_t *, size_t, int);
 MP_EXPORT void __mp_memfree(meminfo *, void *, size_t);
 MP_EXPORT int __mp_memprotect(meminfo *, void *, size_t, memaccess);
 MP_EXPORT int __mp_memwatch(meminfo *, void *, size_t, memaccess);
