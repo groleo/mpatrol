@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.27 2001-01-18 22:01:19 graeme Exp $
+rem $Id: build.bat,v 1.28 2001-01-25 22:00:32 graeme Exp $
 
 
 set version=1.3.3
@@ -99,6 +99,15 @@ copy ..\..\doc\images\trace.eps mpatrol\doc\images
 copy ..\..\doc\images\trace.pdf mpatrol\doc\images
 mkdir mpatrol\doc\man
 copy ..\..\man\README mpatrol\doc\man\README.txt
+mkdir mpatrol\doc\man\html
+copy ..\..\man\html\mpatrol.html mpatrol\doc\man\html
+copy ..\..\man\html\mprof.html mpatrol\doc\man\html
+copy ..\..\man\html\mptrace.html mpatrol\doc\man\html
+copy ..\..\man\html\mleak.html mpatrol\doc\man\html
+copy ..\..\man\html\mpsym.html mpatrol\doc\man\html
+copy ..\..\man\html\mpedit.html mpatrol\doc\man\html
+copy ..\..\man\html\hexwords.html mpatrol\doc\man\html
+copy ..\..\man\html\libmpatrol.html mpatrol\doc\man\html
 mkdir mpatrol\doc\man\dvi
 copy ..\..\man\dvi\mpatrol.dvi mpatrol\doc\man\dvi
 copy ..\..\man\dvi\mprof.dvi mpatrol\doc\man\dvi

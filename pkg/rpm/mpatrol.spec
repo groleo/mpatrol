@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.52 2001-01-18 22:01:15 graeme Exp $
+# $Id: mpatrol.spec,v 1.53 2001-01-25 22:00:29 graeme Exp $
 
 
 %define libversion 1.3
@@ -80,6 +80,7 @@ install -m755 -s build/unix/mleak $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/hexwords $RPM_BUILD_ROOT/%{_bindir}
+mv man/html .
 mv man/dvi .
 mv man/ps .
 mv man/pdf .
@@ -111,7 +112,7 @@ install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
 %doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
 %doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf
-%doc doc/images dvi ps pdf
+%doc doc/images html dvi ps pdf
 %doc tests
 %{_bindir}
 %{_includedir}
