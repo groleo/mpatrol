@@ -126,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.59 2001-09-06 21:53:25 graeme Exp $"
+#ident "$Id: symbol.c,v 1.60 2001-10-05 21:14:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.59 2001-09-06 21:53:25 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.60 2001-10-05 21:14:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1288,11 +1288,19 @@ addsyms(char *f, unsigned long b, void *p)
             if (r == 1)
             {
                 l = y->dtree.size - l;
-                __mp_diag("read %lu symbol%s", l, (l == 1) ? "" : "s");
+                __mp_diag("read %lu symbol%s from ", l, (l == 1) ? "" : "s");
             }
             else
-                __mp_diag("problem reading symbols");
-            __mp_diag(" from %s\n", f);
+                __mp_diag("problem reading symbols from ");
+            if (__mp_diagflags & FLG_HTML)
+                __mp_diagtag("<TT>");
+            __mp_diag("%s", f);
+            if (__mp_diagflags & FLG_HTML)
+            {
+                __mp_diagtag("</TT>\n");
+                __mp_diagtag("<BR>");
+            }
+            __mp_diag("\n");
         }
     }
     i->index++;
@@ -1634,14 +1642,29 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
     if (r == 1)
     {
         l = y->dtree.size - l;
-        __mp_diag("read %lu symbol%s", l, (l == 1) ? "" : "s");
+        __mp_diag("read %lu symbol%s from ", l, (l == 1) ? "" : "s");
     }
     else
-        __mp_diag("problem reading symbols");
+        __mp_diag("problem reading symbols from ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", s);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
     if (v != NULL)
-        __mp_diag(" from %s [%s]\n", s, v);
-    else
-        __mp_diag(" from %s\n", s);
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diag(" [");
+            __mp_diagtag("<TT>");
+            __mp_diag("%s", v);
+            __mp_diagtag("</TT>");
+            __mp_diag("]");
+        }
+        else
+            __mp_diag(" [%s]", v);
+    __mp_diag("\n");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<BR>\n");
     return r;
 }
 
