@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.14 2000-05-15 22:50:06 graeme Exp $"
+#ident "$Id: mprof.c,v 1.15 2000-05-15 23:13:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -246,16 +246,45 @@ static int comparestack(profilenode *n, profilenode *p)
 }
 
 
+/* Byte-swap a block of memory.
+ */
+
+static void byteswap(void *b, size_t n)
+{
+    char *s, *t;
+    char c;
+
+    s = b;
+    t = b + n - 1;
+    while (s < t)
+    {
+        c = *s;
+        *s++ = *t;
+        *t-- = c;
+    }
+}
+
+
 /* Read an entry from the profiling output file.
  */
 
 static void getentry(void *d, size_t l, size_t n, int b)
 {
+    size_t i;
+
     if (fread(d, l, n, proffile) != n)
     {
         fprintf(stderr, "%s: Error reading file\n", progname);
         exit(EXIT_FAILURE);
     }
+    /* Byte-swap all of the elements if necessary.
+     */
+    if (b != 0)
+        for (i = 0; i < n; i++)
+        {
+            byteswap(d, l);
+            d = (char *) d + l;
+        }
 }
 
 
