@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.24 2001-03-05 18:59:57 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.25 2001-03-05 20:36:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.24 2001-03-05 18:59:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.25 2001-03-05 20:36:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -695,6 +695,15 @@ __mp_startleaktable(void)
 
 void
 __mp_stopleaktable(void)
+{
+}
+
+
+/* Display the leak table.
+ */
+
+void
+__mp_leaktable(size_t l, int o, unsigned char f)
 {
 }
 

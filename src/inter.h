@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.38 2001-03-05 18:59:57 graeme Exp $
+ * $Id: inter.h,v 1.39 2001-03-05 20:36:35 graeme Exp $
  */
 
 
@@ -152,6 +152,7 @@ size_t __mp_iterateall(int (*)(void *, void *), void *);
 void __mp_clearleaktable(void);
 void __mp_startleaktable(void);
 void __mp_stopleaktable(void);
+void __mp_leaktable(size_t, int, unsigned char);
 void __mp_memorymap(int);
 void __mp_summary(void);
 int __mp_stats(heapinfo *);

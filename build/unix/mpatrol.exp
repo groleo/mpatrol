@@ -49,6 +49,7 @@ __mp_iterateall
 __mp_clearleaktable
 __mp_startleaktable
 __mp_stopleaktable
+__mp_leaktable
 __mp_memorymap
 __mp_summary
 __mp_stats

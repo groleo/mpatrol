@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.107 2001-03-05 18:59:57 graeme Exp $"
+#ident "$Id: inter.c,v 1.108 2001-03-05 20:36:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.107 2001-03-05 18:59:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.108 2001-03-05 20:36:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1804,6 +1804,24 @@ __mp_stopleaktable(void)
     if (!memhead.init)
         __mp_init();
     memhead.ltable.tracing = 0;
+    restoresignals();
+}
+
+
+/* Display the leak table.
+ */
+
+void
+__mp_leaktable(size_t l, int o, unsigned char f)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectinfo(&memhead, MA_READWRITE);
+    __mp_printleaktab(&memhead, l, o, f);
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectinfo(&memhead, MA_READONLY);
     restoresignals();
 }
 
