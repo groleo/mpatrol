@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.3 2000-09-25 18:22:21 graeme Exp $"
+#ident "$Id: getopt.c,v 1.4 2000-09-25 19:53:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -118,7 +118,7 @@ static option *findopt(char *s, option *l, char **a)
         n = strlen(s);
     while (l->name != NULL)
     {
-        if (strncmp(s, l->name, n) == 0)
+        if ((strncmp(s, l->name, n) == 0) && (l->name[n] == '\0'))
         {
             if (t != NULL)
                 n++;
