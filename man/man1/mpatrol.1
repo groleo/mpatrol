@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.37 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: mpatrol.1,v 1.38 2001-03-06 19:33:47 graeme Exp $
 .\"
-.TH MPATROL 1 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH MPATROL 1 "6 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -123,6 +123,10 @@ Displays a quick-reference option summary.
 \fB\-\-large\-bound\fP <\fIunsigned integer\fP>
 [\fBLARGEBOUND\fP]  Specifies the limit in bytes up to which memory allocations
 should be classified as large allocations for profiling purposes.
+.TP
+\fB\-\-leak\-table\fP
+[\fBLEAKTABLE\fP] Specifies that the leak table should be automatically used
+and a leak table summary should be displayed at the end of program execution.
 .TP
 \fB\-\-limit\fP <\fIunsigned integer\fP> [\fB\-u\fP]
 [\fBLIMIT\fP]  Specifies the limit in bytes at which all memory allocations
