@@ -30,15 +30,19 @@
 
 
 #include "inter.h"
+#include "diag.h"
+#if MP_THREADS_SUPPORT
+#include "mutex.h"
+#endif /* MP_THREADS_SUPPORT */
 #ifdef __cplusplus
 #include <new>
 #endif /* __cplusplus */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: cplus.c,v 1.3 2001-02-05 23:22:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.3 2001-02-05 23:22:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -79,14 +83,33 @@ void *
 __nw__FUi(size_t l)
 #endif /* __cplusplus && __GNUC__ */
 {
+#ifndef __cplusplus
+    infohead *h;
+#endif /* __cplusplus */
     void *p;
 
     if ((p = __mp_alloc(l, 0, AT_NEW, NULL, NULL, 0, NULL, 0, 1)) == NULL)
+    {
 #ifdef __cplusplus
         throw std::bad_alloc();
 #else /* __cplusplus */
-        abort();
+        /* The C++ standard specifies that operator new should always return
+         * a non-NULL pointer (unless it is the nothrow version).  Since this
+         * is being compiled by a C compiler we cannot throw an exception and
+         * so we have to abort.
+         */
+#if MP_THREADS_SUPPORT
+        __mp_lockmutex(MT_MAIN);
+#endif /* MP_THREADS_SUPPORT */
+        h = __mp_memhead();
+        h->recur++;
+        __mp_printsummary(h);
+        __mp_diag("\n");
+        __mp_error(ET_OUTMEM, AT_NEW, NULL, 0, "out of memory");
+        h->fini = 1;
+        __mp_abort();
 #endif /* __cplusplus */
+    }
     return p;
 }
 
@@ -125,14 +148,33 @@ void *
 __nwa__FUi(size_t l)
 #endif /* __cplusplus && __GNUC__ */
 {
+#ifndef __cplusplus
+    infohead *h;
+#endif /* __cplusplus */
     void *p;
 
     if ((p = __mp_alloc(l, 0, AT_NEWVEC, NULL, NULL, 0, NULL, 0, 1)) == NULL)
+    {
 #ifdef __cplusplus
         throw std::bad_alloc();
 #else /* __cplusplus */
-        abort();
+        /* The C++ standard specifies that operator new[] should always return
+         * a non-NULL pointer (unless it is the nothrow version).  Since this
+         * is being compiled by a C compiler we cannot throw an exception and
+         * so we have to abort.
+         */
+#if MP_THREADS_SUPPORT
+        __mp_lockmutex(MT_MAIN);
+#endif /* MP_THREADS_SUPPORT */
+        h = __mp_memhead();
+        h->recur++;
+        __mp_printsummary(h);
+        __mp_diag("\n");
+        __mp_error(ET_OUTMEM, AT_NEWVEC, NULL, 0, "out of memory");
+        h->fini = 1;
+        __mp_abort();
 #endif /* __cplusplus */
+    }
     return p;
 }
 
