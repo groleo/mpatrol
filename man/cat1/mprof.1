@@ -18,50 +18,50 @@ DDEESSCCRRIIPPTTIIOONN
        ing  information  includes  summaries of all of the memory
        allocations listed by size and the function that allocated
        them and a list of memory leaks with the call stack of the
-       allocating function.
+       allocating function.  It also includes a graph of all mem-
+       ory  allocations  listed  in tabular form, and an optional
+       graph specification file for later processing by  the  ddoott
+       graph visualisation package.
 
-       When the PPRROOFF option is used  with  the  mpatrol  library,
-       statistics  for all dynamic memory allocations and deallo-
-       cations are written to a profiling output file.  The  name
-       of  this  file can be changed with the PPRROOFFFFIILLEE option and
-       the frequency at which the file is written can  be  speci-
+       When  the  PPRROOFF  option  is used with the mpatrol library,
+       statistics for all dynamic memory allocations and  deallo-
+       cations  are written to a profiling output file.  The name
+       of this file can be changed with the PPRROOFFFFIILLEE  option  and
+       the  frequency  at which the file is written can be speci-
        fied with the AAUUTTOOSSAAVVEE option.  The bounds for small allo-
-       cations, medium allocations, large allocations  and  extra
-       large  allocations can be set with the SSMMAALLLLBBOOUUNNDD, MMEEDDIIUUMM--
+       cations,  medium  allocations, large allocations and extra
+       large allocations can be set with the SSMMAALLLLBBOOUUNNDD,  MMEEDDIIUUMM--
        BBOOUUNNDD and LLAARRGGEEBBOOUUNNDD options.
 
        Only allocations and deallocations are recorded, with each
-       reallocation  being  treated as a deallocation immediately
-       followed by an allocation.   For  full  memory  allocation
-       profiling  support, call stack traversal must be supported
-       in the mpatrol library and all of  the  program's  symbols
-       must  have  been  successfully read by the mpatrol library
-       before the  program  was  run.   The  mmpprrooff  command  will
-       attempt  to compensate if either of these requirements are
-       not met, but the displayed tables may contain  less  mean-
+       reallocation being treated as a  deallocation  immediately
+       followed  by  an  allocation.   For full memory allocation
+       profiling support, call stack traversal must be  supported
+       in  the  mpatrol  library and all of the program's symbols
+       must have been successfully read by  the  mpatrol  library
+       before  the  program  was  run.   The  mmpprrooff  command will
+       attempt to compensate if either of these requirements  are
+       not  met,  but the displayed tables may contain less mean-
        ingful information.
 
        The _f_i_l_e argument must be a valid mpatrol profiling output
-       filename but if _f_i_l_e is omitted then mmpprrooff will  use  _m_p_a_-
-       _t_r_o_l_._o_u_t  as the name of the profiling output file to use.
-       If _f_i_l_e is given as _- then the standard input file  stream
+       filename  but  if _f_i_l_e is omitted then mmpprrooff will use _m_p_a_-
+       _t_r_o_l_._o_u_t as the name of the profiling output file to  use.
+       If  _f_i_l_e is given as _- then the standard input file stream
        will be used as the profiling output file.
 
        Much of the functionality of this tool is based upon mmpprrooff
-       by Benjamin Zorn and Paul Hilfinger, which was written  as
+       by  Benjamin Zorn and Paul Hilfinger, which was written as
        a  research  project  and  ran  on  MIPS,  SPARC  and  VAX
-       machines.  However, the profiling output files are  incom-
+       machines.   However, the profiling output files are incom-
        patible, the tables displayed have a different format, and
        the way they are implemented is entirely different.
 
-OOPPTTIIOONNSS
-       ----aaddddrreesssseess [--aa]
-              Specifies that different call sites from within the
-              same function are to be differentiated and that the
 
 
 
-Release 1.3              10 October 2000                        1
+
+Release 1.3              19 October 2000                        1
 
 
 
@@ -70,19 +70,40 @@ Release 1.3              10 October 2000                        1
 MPROF(1)                 mpatrol library                 MPROF(1)
 
 
-              names of all functions  should  be  displayed  with
-              their  call site offset in bytes.  This affects the
-              direct allocation and memory leak tables.
+OOPPTTIIOONNSS
+       ----aaddddrreesssseess [--aa]
+              Specifies that different call sites from within the
+              same function are to be differentiated and that the
+              names  of  all  functions  should be displayed with
+              their call site offset in bytes.  This affects  the
+              direct  allocation  and memory leak tables, as well
+              as the allocation call graph and the graph specifi-
+              cation file.
 
        ----ccoouunnttss [--cc]
-              Specifies that certain tables should be  sorted  by
-              the  number  of allocations or deallocations rather
+              Specifies  that  certain tables should be sorted by
+              the number of allocations or  deallocations  rather
               than the total number of bytes allocated or deallo-
               cated.  This affects the direct allocation and mem-
-              ory leak tables.
+              ory  leak  tables,  as  well as the allocation call
+              graph and the graph specification file.
+
+       ----ggrraapphh--ffiillee _f_i_l_e [--gg]
+              Specifies that the  allocation  call  graph  should
+              also  be  written to a graph specification file for
+              later visualisation with ddoott.  If _f_i_l_e is given  as
+              _s_t_d_o_u_t or _s_t_d_e_r_r then the corresponding file stream
+              will be used as the target for the graph specifica-
+              tion file.
 
        ----hheellpp [--hh]
               Displays a quick-reference option summary.
+
+       ----lleeaakkss [--ll]
+              Specifies  that  memory  leaks  rather  than memory
+              allocations are to be written to the graph specifi-
+              cation  file.   This option only affects the output
+              from the ----ggrraapphh--ffiillee option.
 
        ----ssttaacckk--ddeepptthh _d_e_p_t_h [--nn]
               Specifies the maximum stack depth to use when  cal-
@@ -97,37 +118,16 @@ MPROF(1)                 mpatrol library                 MPROF(1)
               Displays the version number of the mmpprrooff command.
 
 SSEEEE AALLSSOO
-       mmppaattrrooll(1), mmlleeaakk(1), pprrooff(1), ggpprrooff(1), mmppaattrrooll(3).
+       mmppaattrrooll(1),  mmlleeaakk(1),  pprrooff(1),  ggpprrooff(1),  ddoott(1),  mmppaa--
+       ttrrooll(3).
 
        The mpatrol manual and reference card.
 
        http://www.cbmamiga.demon.co.uk/mpatrol/
 
-AAUUTTHHOORR
-       Graeme S. Roy <graeme@epc.co.uk>
-
-CCOOPPYYRRIIGGHHTT
-       Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
-
-       This library is free software;  you  can  redistribute  it
-       and/or  modify  it under the terms of the GNU Library Gen-
-       eral Public License as  published  by  the  Free  Software
-       Foundation;  either  version 2 of the License, or (at your
-       option) any later version.
-
-       This library is distributed in the hope that  it  will  be
-       useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
-       PURPOSE.   See  the GNU Library General Public License for
-       more details.
-
-       You should have received a copy of the GNU Library General
-       Public  License  along with this library; if not, write to
-       the Free Software Foundation, Inc., 59 Temple Place, Suite
 
 
-
-Release 1.3              10 October 2000                        2
+Release 1.3              19 October 2000                        2
 
 
 
@@ -136,6 +136,27 @@ Release 1.3              10 October 2000                        2
 MPROF(1)                 mpatrol library                 MPROF(1)
 
 
+AAUUTTHHOORR
+       Graeme S. Roy <graeme@epc.co.uk>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
+
+       This  library  is  free  software; you can redistribute it
+       and/or modify it under the terms of the GNU  Library  Gen-
+       eral  Public  License  as  published  by the Free Software
+       Foundation; either version 2 of the License, or  (at  your
+       option) any later version.
+
+       This  library  is  distributed in the hope that it will be
+       useful, but WITHOUT ANY WARRANTY; without even the implied
+       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
+       PURPOSE.  See the GNU Library General Public  License  for
+       more details.
+
+       You should have received a copy of the GNU Library General
+       Public License along with this library; if not,  write  to
+       the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
 
@@ -172,27 +193,6 @@ MPROF(1)                 mpatrol library                 MPROF(1)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.3              10 October 2000                        3
+Release 1.3              19 October 2000                        3
 
 
