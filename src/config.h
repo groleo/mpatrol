@@ -246,7 +246,7 @@
  */
 
 #ifndef MP_WATCH_SUPPORT
-#if SYSTEM == SYSTEM_SOLARIS
+#if SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SOLARIS
 #define MP_WATCH_SUPPORT 1
 #else /* SYSTEM */
 #define MP_WATCH_SUPPORT 0
@@ -318,8 +318,8 @@
 #ifndef MP_SIGINFO_SUPPORT
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
     SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_HPUX || \
-    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
+    SYSTEM == SYSTEM_UNIXWARE
 #define MP_SIGINFO_SUPPORT 1
 #else /* SYSTEM */
 #define MP_SIGINFO_SUPPORT 0
@@ -328,12 +328,13 @@
 
 
 /* Indicates if the system supports the /proc filesystem.  If this is the case
- * then it will be possible to obtain more information about the running process
+ * then it may be possible to obtain more information about the running process
  * as well as controlling certain aspects of it.
  */
 
 #ifndef MP_PROCFS_SUPPORT
-#if SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
+#if SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
     SYSTEM == SYSTEM_UNIXWARE
 #define MP_PROCFS_SUPPORT 1
 #else /* SYSTEM */
@@ -360,7 +361,9 @@
 
 #if MP_PROCFS_SUPPORT
 #ifndef MP_PROCFS_CMDNAME
-#define MP_PROCFS_CMDNAME "cmdline"
+#if SYSTEM == SYSTEM_LINUX
+#define MP_PROCFS_CMDNAME MP_PROCFS_DIRNAME "/%lu/cmdline"
+#endif /* SYSTEM */
 #endif /* MP_PROCFS_CMDNAME */
 #endif /* MP_PROCFS_SUPPORT */
 
@@ -371,10 +374,10 @@
 
 #if MP_PROCFS_SUPPORT
 #ifndef MP_PROCFS_EXENAME
-#if SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
-#define MP_PROCFS_EXENAME "object/a.out"
-#else /* SYSTEM */
-#define MP_PROCFS_EXENAME "exe"
+#if SYSTEM == SYSTEM_LINUX
+#define MP_PROCFS_EXENAME MP_PROCFS_DIRNAME "/%lu/exe"
+#elif SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#define MP_PROCFS_EXENAME MP_PROCFS_DIRNAME "/%lu/object/a.out"
 #endif /* SYSTEM */
 #endif /* MP_PROCFS_EXENAME */
 #endif /* MP_PROCFS_SUPPORT */
@@ -386,7 +389,11 @@
 
 #if MP_PROCFS_SUPPORT && MP_WATCH_SUPPORT
 #ifndef MP_PROCFS_CTLNAME
-#define MP_PROCFS_CTLNAME "ctl"
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PROCFS_CTLNAME MP_PROCFS_DIRNAME "/%05lu"
+#elif SYSTEM == SYSTEM_SOLARIS
+#define MP_PROCFS_CTLNAME MP_PROCFS_DIRNAME "/%lu/ctl"
+#endif /* SYSTEM */
 #endif /* MP_PROCFS_CTLNAME */
 #endif /* MP_PROCFS_SUPPORT && MP_WATCH_SUPPORT */
 
