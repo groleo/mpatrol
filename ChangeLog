@@ -1,0 +1,16 @@
+Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.c:
+	Fixed a bug in __mp_checkinfo() when all allocations are pages and no
+	freed allocations are being reused, since we don't need to check overflow
+	buffers if the allocation has been freed.
+
+	* src/stack.c:
+	Fixed a bug in __mp_newframe() if using MP_BUILTINSTACK_SUPPORT when the
+	loop went round one too many times, causing an infinite loop.
+
+Sun Oct  3 22:50:22 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/inter.c:
+	Fixed problem in __mp_info() where the check for a known memory block was
+	doing an || instead of an && in the test.
