@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.27 2001-06-13 22:19:40 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.28 2001-06-13 22:42:36 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "13 June 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -741,8 +741,10 @@ allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
 The following 41 functions are available as support routines for additional
-control and tracing in the mpatrol library.  To use these you should include the
-\fImpatrol.h\fP header file:
+control and tracing in the mpatrol library.  Although they are documented here
+as being prefixed by \fB__mp_\fP, their equivalent functions that are prefixed
+by \fBmpatrol_\fP are also defined as aliases in the \fImpatrol.h\fP header
+file.  To use these you should include the \fImpatrol.h\fP header file:
 .TP
 \fB__mp_atexit\fP
 Installs a function to be called when the mpatrol library terminates.  Up to 32
