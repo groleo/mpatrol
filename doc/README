@@ -105,8 +105,6 @@ viewer program.
                    http://www.w3c.org/MarkUp/
         Generator: GNU MakeInfo
                    http://www.gnu.org/software/texinfo/
-                   Texi2HTML
-                   http://www.mathematik.uni-kl.de/~obachman/Texi2html
         Viewer:    Any web browser
         Notes:     Contains hypertext links with formatting codes, but contains
                    links to JPEG images rather than embedding them.

@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.48 2003-11-26 00:44:38 graeme Exp $
+# $Id: Makefile,v 1.49 2003-11-26 15:43:43 graeme Exp $
 
 
 # Definitions
@@ -91,25 +91,22 @@ else
 	@ makeinfo --docbook --ifinfo $<
 endif
 
-ifeq ($(SPLIT),true)
-# Build the HTML files from the Texinfo file using texi2html
-
-$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/test.jpg \
-	images/gcc.jpg images/cpp.jpg images/cc1.jpg images/collect2.jpg \
-	images/trace.jpg
-	@ echo creating $@ from $<...
-ifeq ($(VERBOSE),true)
-	@ texi2html -top_file $@ -expand none -split section -menu -number -verbose $<
-else
-	@ texi2html -top_file $@ -expand none -split section -menu -number $<
-endif
-else
 # Build the HTML file from the Texinfo file using makeinfo
 
 $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/test.jpg \
 	images/gcc.jpg images/cpp.jpg images/cc1.jpg images/collect2.jpg \
 	images/trace.jpg
 	@ echo creating $@ from $<...
+ifeq ($(SPLIT),true)
+ifeq ($(VERBOSE),true)
+	@ makeinfo --html --number-sections --output pages --verbose $<
+else
+	@ makeinfo --html --number-sections --output pages $<
+endif
+	@ echo "<html><head>mpatrol</head><body>" >$@
+	@ echo "<a href="pages/index.html">documentation</a>" >>$@
+	@ echo "</body></html>" >>$@
+else
 ifeq ($(VERBOSE),true)
 	@ makeinfo --html --no-split --number-sections --verbose $<
 else
@@ -253,9 +250,9 @@ source: $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf
 
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT).info-* >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).xml >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT).html $(DOCUMENT)_*.html >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).info-* $(DOCUMENT).guide >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).xml $(DOCUMENT).html >/dev/null 2>&1
+	-@ rm -rf pages >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
 	-@ rm -f $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf >/dev/null 2>&1
