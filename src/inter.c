@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.45 2000-11-08 00:21:38 graeme Exp $"
+#ident "$Id: inter.c,v 1.46 2000-11-09 18:54:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -509,7 +509,10 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
             if ((o = (char *) sbrk(n + 1)) == (void *) -1)
                 o = NULL;
             else
-                __mp_memcopy(o, p, n + 1);
+            {
+                __mp_memcopy(o, p, n);
+                o[n] = '\0';
+            }
         }
         return o;
     }
@@ -549,22 +552,25 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     checkalloca(s, t, u, &i, 0);
-    if (p != NULL)
+    if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
+        j = 1;
+    else
+        j = 0;
+    n = l;
+    /* If the string is not NULL and does not overflow any memory blocks then
+     * allocate the memory and copy the string to the new allocation.
+     */
+    if (__mp_checkstring(&memhead, p, &n, f, j))
     {
-        /* Determine the size of the string, allocate the memory, then
-         * copy the string to the new memory block.
-         */
         o = p;
-        n = strlen(p);
-        if (((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA)) &&
-            (n > l))
-            n = l;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
         {
             __mp_memcopy(p, o, n);
             p[n] = '\0';
         }
     }
+    else
+        p = NULL;
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
     /* Call the low-memory handler if no memory block was allocated.
