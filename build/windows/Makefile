@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.2 2000-01-09 22:08:18 graeme Exp $
+# $Id: Makefile,v 1.3 2000-03-13 21:13:59 graeme Exp $
 
 
 # Definitions
@@ -145,7 +145,8 @@ addr.obj addr.ts.obj: $(SOURCE)/addr.c $(SOURCE)/addr.h $(SOURCE)/config.h \
 	$(SOURCE)/utils.h
 strtab.obj strtab.ts.obj: $(SOURCE)/strtab.c $(SOURCE)/strtab.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/heap.h \
-	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/utils.h
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/utils.h
 symbol.obj symbol.ts.obj: $(SOURCE)/symbol.c $(SOURCE)/symbol.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
