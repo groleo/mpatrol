@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.18 2000-07-16 23:01:36 graeme Exp $"
+#ident "$Id: option.c,v 1.19 2000-08-31 20:03:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -82,13 +82,16 @@ static char *options_help[] =
     "", "Specifies a range of allocation indices at which to check the",
     "", "integrity of free memory and overflow buffers.",
     "CHECKALL", NULL,
-    "", "Equivalent to the CHECKALLOCS, CHECKREALLOCS and CHECKFREES options",
-    "", "specified together.",
+    "", "Equivalent to the CHECKALLOCS, CHECKREALLOCS, CHECKFREES and",
+    "", "CHECKMEMORY options specified together.",
     "CHECKALLOCS", NULL,
     "", "Checks that no attempt is made to allocate a block of memory of size",
     "", "zero.",
     "CHECKFREES", NULL,
     "", "Checks that no attempt is made to deallocate a NULL pointer.",
+    "CHECKMEMORY", NULL,
+    "", "Checks that no attempt is made to perform a zero-length memory",
+    "", "operation on a NULL pointer.",
     "CHECKREALLOCS", NULL,
     "", "Checks that no attempt is made to reallocate a NULL pointer or resize",
     "", "an existing block of memory to size zero.",
@@ -497,7 +500,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     h->flags |= FLG_CHECKALLOCS | FLG_CHECKREALLOCS |
-                                FLG_CHECKFREES;
+                                FLG_CHECKFREES | FLG_CHECKMEMORY;
                 }
                 else if (matchoption(o, "CHECKALLOCS"))
                 {
@@ -514,6 +517,14 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     h->flags |= FLG_CHECKFREES;
+                }
+                else if (matchoption(o, "CHECKMEMORY"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_CHECKMEMORY;
                 }
                 else if (matchoption(o, "CHECKREALLOCS"))
                 {
