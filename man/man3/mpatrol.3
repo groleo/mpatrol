@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.39 2000-11-09 19:08:13 graeme Exp $
+.\" $Id: mpatrol.3,v 1.40 2000-11-09 21:23:51 graeme Exp $
 .\"
 .TH MPATROL 3 "9 November 2000" "Release 1.3" "mpatrol library"
 .SH NAME
@@ -372,10 +372,14 @@ mpatrol-specific and should not be used in release code.
 .PP
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in \fImpatrol.h\fP will only be used if the
-\fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  To use these you must
-include \fImpatrol.h\fP before all other header files, although on UNIX and
-Windows platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway,
-albeit with slightly less tracing information:
+\fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  The replacement
+operators make use of the preprocessor in order to obtain source-level
+information.  If this causes problems then you should define the
+\fBMP_NONEWDELETE\fP preprocessor macro and use the \fBMP_NEW\fP and
+\fBMP_DELETE\fP macros instead of \fBnew\fP and \fBdelete\fP directly.  To use
+these C++ features you must include \fImpatrol.h\fP before all other header
+files, although on UNIX and Windows platforms (and AmigaOS when using \fBgcc\fP)
+they will be used anyway, albeit with slightly less tracing information:
 .TP
 \fBoperator new\fP
 Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
