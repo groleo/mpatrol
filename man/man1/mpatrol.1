@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.6 2000-01-24 00:28:55 graeme Exp $
+.\" $Id: mpatrol.1,v 1.7 2000-03-07 21:06:51 graeme Exp $
 .\"
-.TH MPATROL 1 "24 January 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 1 "7 March 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -81,9 +81,13 @@ when it is being freed.
 [\fBFREEBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
 newly-freed memory.
 .TP
-\fB\-g\fP
+\fB\-G\fP
 [\fBSAFESIGNALS\fP]  Instructs the library to save and replace certain signal
 handlers during the execution of library code and to restore them afterwards.
+.TP
+\fB\-g\fP
+[\fBUSEDEBUG\fP]  Specifies that any debugging information in the executable
+file should be used to obtain additional source-level information.
 .TP
 \fB\-L\fP <\fIunsigned integer\fP>
 [\fBLIMIT\fP]  Specifies the limit in bytes at which all memory allocations
