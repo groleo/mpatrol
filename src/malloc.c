@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.16 2000-05-14 11:58:20 graeme Exp $"
+#ident "$Id: malloc.c,v 1.17 2000-05-14 12:10:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -325,7 +325,7 @@ void MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 #endif /* MP_ALTFUNCNAMES */
 
 
-/* Copy a possibly-overlapping block of memory from one address to another,
+/* Copy a non-overlapping block of memory from one address to another,
  * stopping when a specific character is found.
  */
 
@@ -337,7 +337,7 @@ void *memccpy(void *q, MP_CONST void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
-/* Copy a possibly-overlapping block of memory from one address to another,
+/* Copy a non-overlapping block of memory from one address to another,
  * stopping when a specific character is found.
  */
 
