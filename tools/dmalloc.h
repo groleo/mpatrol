@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.1 2001-03-01 00:51:28 graeme Exp $
+ * $Id: dmalloc.h,v 1.2 2001-03-01 19:42:11 graeme Exp $
  */
 
 
@@ -158,7 +158,7 @@ typedef void (*dmalloc_track_t)(MP_CONST char *, unsigned long, int, size_t,
 #define dmalloc_shutdown() __mpt_dmallocshutdown()
 #define dmalloc_log_heap_map() __mp_memorymap(0)
 #define dmalloc_log_stats() __mp_summary()
-#define dmalloc_log_unfreed() __mpt_dmalloclogunfreed()
+#define dmalloc_log_unfreed() __mpt_dmalloclogchanged(0, 1, 0, 1)
 #define dmalloc_verify(p) __mpt_dmallocverify((p), MP_FUNCNAME, __FILE__, \
                                               __LINE__)
 #define dmalloc_debug(f) __mpt_dmallocdebug(f)
@@ -187,7 +187,6 @@ extern unsigned long dmalloc_address_count;
 
 
 void __mpt_dmallocshutdown(void);
-void __mpt_dmalloclogunfreed(void);
 int __mpt_dmallocverify(MP_CONST void *, MP_CONST char *, MP_CONST char *,
                         unsigned long);
 unsigned long __mpt_dmallocdebug(unsigned long);
