@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.71 2001-03-05 22:09:48 graeme Exp $"
+#ident "$Id: diag.c,v 1.72 2001-03-06 01:01:55 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.71 2001-03-05 22:09:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.72 2001-03-06 01:01:55 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1282,7 +1282,7 @@ __mp_printleaktab(infohead *h, size_t l, int o, unsigned char f)
         s = "unfreed";
     if (l == 0)
     {
-        __mp_diag("no %s memory entries in leak table\n\n", s);
+        __mp_diag("no %s memory entries in leak table\n", s);
         return;
     }
     __mp_diag("%s %lu %s memory %s in leak table:\n\n",
