@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.13 2000-04-20 18:37:22 graeme Exp $"
+#ident "$Id: profile.c,v 1.14 2000-04-20 23:45:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -303,6 +303,9 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     fwrite(&p->dtotals, sizeof(size_t), 1, f);
     /* Write out the statistics from every call site.
      */
+    fwrite(&p->sbound, sizeof(size_t), 1, f);
+    fwrite(&p->mbound, sizeof(size_t), 1, f);
+    fwrite(&p->lbound, sizeof(size_t), 1, f);
     fwrite(&p->tree.size, sizeof(size_t), 1, f);
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
          n = (profnode *) __mp_successor(&n->data.node))
