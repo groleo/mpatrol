@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.39 2000-03-09 21:11:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.40 2000-03-09 22:11:30 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -687,12 +687,15 @@ these documents.
 
 Alternatively, the @file{pkg} directory contains files that can be used to
 automatically generate a @emph{package} in a specific format suitable for
-installation on a system.  Two package formats are currently supported; PKG and
-RPM.  The first is generally used on UNIX SVR4 systems, while the second was
-introduced by Red Hat for use in their Linux distributions.  You should really
-know what you are doing before you attempt to build a package, and you should
-also be aware that some of the package files may need to be modified before you
-begin.
+installation on a system.  Three package formats are currently supported; PKG,
+RPM and generic tape archive.  The first is generally used on UNIX SVR4 systems,
+while the second was introduced by Red Hat for use in their Linux distributions.
+The generic tape archive can be used as a distribution for UNIX systems where no
+package format is supported, but it does not contain information on how to
+install the files on the system once they have been extracted from the
+distribution.  You should really know what you are doing before you attempt to
+build a package, and you should also be aware that some of the package files may
+need to be modified before you begin.
 
 @node Memory allocations, Operating system support, Installation, Top
 @chapter Memory allocations
