@@ -2149,86 +2149,122 @@ takes an address as an argument and fills in any details about its
 corresponding memory allocation in a supplied structure.  The following
 example illustrates this (it can be found in `tests/pass/test4.c').
 
-     23  /*
-     24   * Demonstrates and tests the facility for obtaining information
-     25   * about the allocation a specific address belongs to.
-     26   */
+         23	/*
+         24	 * Demonstrates and tests the facility for obtaining information about
+         25	 * the allocation a specific address belongs to.
+         26	 */
      
      
-     29  #include "mpatrol.h"
-     30  #include <stdio.h>
+         29	#include "mpatrol.h"
+         30	#include <stdio.h>
      
      
-     33  void display(void *p)
-     34  {
-     35      __mp_allocstack *s;
-     36      __mp_allocinfo d;
+         33	void display(void *p)
+         34	{
+         35	    __mp_allocstack *s;
+         36	    __mp_allocinfo d;
+         37	    __mp_symbolinfo i;
      
-     38      if (!__mp_info(p, &d))
-     39      {
-     40          fprintf(stderr, "nothing known about address 0x%08lX\n", p);
-     41          return;
-     42      }
-     43      fprintf(stderr, "block:   0x%08lX\n", d.block);
-     44      fprintf(stderr, "size:    %lu\n", d.size);
-     45      fprintf(stderr, "type:    %lu\n", d.type);
-     46      fprintf(stderr, "alloc:   %lu\n", d.alloc);
-     47      fprintf(stderr, "realloc: %lu\n", d.realloc);
-     48      fprintf(stderr, "func:    %s\n", d.func ? d.func : "NULL");
-     49      fprintf(stderr, "file:    %s\n", d.file ? d.file : "NULL");
-     50      fprintf(stderr, "line:    %lu\n", d.line);
-     51      for (s = d.stack; s != NULL; s = s->next)
-     52      {
-     53          fprintf(stderr, "\t0x%08lX: ", s->addr);
-     54          fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
-     55      }
-     56      fprintf(stderr, "freed:   %d\n", d.freed);
-     57  }
+         39	    if (!__mp_info(p, &d))
+         40	    {
+         41	        if (sizeof(void *) == 8)
+         42	            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
+         43	        else
+         44	            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+         45	        return;
+         46	    }
+         47	    if (sizeof(void *) == 8)
+         48	        fprintf(stderr, "block:    0x%016lX\n", d.block);
+         49	    else
+         50	        fprintf(stderr, "block:    0x%08lX\n", d.block);
+         51	    fprintf(stderr, "size:     %lu\n", d.size);
+         52	    fprintf(stderr, "type:     %s\n", __mp_function(d.type));
+         53	    fprintf(stderr, "alloc:    %lu\n", d.alloc);
+         54	    fprintf(stderr, "realloc:  %lu\n", d.realloc);
+         55	    fprintf(stderr, "thread:   %lu\n", d.thread);
+         56	    fprintf(stderr, "event:    %lu\n", d.event);
+         57	    fprintf(stderr, "func:     %s\n", d.func ? d.func : "<unknown>");
+         58	    fprintf(stderr, "file:     %s\n", d.file ? d.file : "<unknown>");
+         59	    fprintf(stderr, "line:     %lu\n", d.line);
+         60	    for (s = d.stack; s != NULL; s = s->next)
+         61	    {
+         62	        if (sizeof(void *) == 8)
+         63	            fprintf(stderr, "\t0x%016lX", s->addr);
+         64	        else
+         65	            fprintf(stderr, "\t0x%08lX", s->addr);
+         66	        if (__mp_syminfo(s->addr, &i))
+         67	        {
+         68	            if (i.name != NULL)
+         69	                fprintf(stderr, " %s", i.name);
+         70	            if ((i.addr != NULL) && (i.addr != s->addr))
+         71	                fprintf(stderr, "%+ld",
+         72	                        (char *) s->addr - (char *) i.addr);
+         73	            if (i.object != NULL)
+         74	                fprintf(stderr, " [%s]", i.object);
+         75	        }
+         76	        else if (s->name != NULL)
+         77	            fprintf(stderr, " %s", s->name);
+         78	        fputc('\n', stderr);
+         79	    }
+         80	    fprintf(stderr, "typestr:  %s\n",
+         81	            d.typestr ? d.typestr : "<unknown>");
+         82	    fprintf(stderr, "typesize: %lu\n", d.typesize);
+         83	    if (sizeof(void *) == 8)
+         84	        fprintf(stderr, "userdata: 0x%016lX\n", d.userdata);
+         85	    else
+         86	        fprintf(stderr, "userdata: 0x%08lX\n", d.userdata);
+         87	    fprintf(stderr, "freed:    %d\n", d.freed);
+         88	}
      
      
-     60  void func2(void)
-     61  {
-     62      void *p;
+         91	void func2(void)
+         92	{
+         93	    void *p;
      
-     64      if (p = malloc(16))
-     65      {
-     66          display(p);
-     67          free(p);
-     68      }
-     69      display(p);
-     70  }
-     
-     
-     73  void func1(void)
-     74  {
-     75      func2();
-     76  }
+         95	    if (p = malloc(16))
+         96	    {
+         97	        display(p);
+         98	        free(p);
+         99	    }
+        100	    display(p);
+        101	}
      
      
-     79  int main(void)
-     80  {
-     81      func1();
-     82      return EXIT_SUCCESS;
-     83  }
+        104	void func1(void)
+        105	{
+        106	    func2();
+        107	}
+     
+     
+        110	int main(void)
+        111	{
+        112	    func1();
+        113	    return EXIT_SUCCESS;
+        114	}
 
    When this is compiled and run, it should give the following output,
 although the pointers are likely to be different.
 
-     block:   0x080620E8
-     size:    16
-     type:    0
-     alloc:   52
-     realloc: 0
-     func:    func2
-     file:    test4.c
-     line:    73
-              0x0804960B: func2
-              0x08049658: func1
-              0x08049664: main
-              0x4007C9CB: __libc_start_main
-              0x08049381: _start
-     freed:   0
-     nothing known about address 0x080620E8
+     block:    0x0806A0E8
+     size:     16
+     type:     malloc
+     alloc:    52
+     realloc:  0
+     thread:   0
+     event:    97
+     func:     func2
+     file:     test4.c
+     line:     95
+               0x0804A7AB func2+35 [./a.out]
+               0x0804A7F8 func1+8 [./a.out]
+               0x0804A804 main+8 [./a.out]
+               0x4007C9CB __libc_start_main+255 [/lib/libc.so.6]
+               0x0804A3E1 _start+33 [./a.out]
+     typestr:  <unknown>
+     typesize: 0
+     userdata: 0x00000000
+     freed:    0
+     nothing known about address 0x0806A0E8
 
    As you can see, anything that the mpatrol library knows about any
 memory allocation can be obtained for use in your own code, which can
@@ -2237,7 +2273,17 @@ allocations, etc. for debugging purposes.  It can also be useful to
 have this information when running your program within a debugger, so
 you can use the `__mp_printinfo()' function to display information
 about a heap address if your debugger supports calling functions from
-the command prompt.
+the command prompt.  Note that the textual representation of the `type'
+field returned by the `__mp_info()' function can be obtained by calling
+`__mp_function()'.
+
+   You may also have noticed the use of `__mp_syminfo()' in the above
+example.  This function is very similar to the `__mp_info()' function
+except that instead of looking for the details of a memory allocation
+at a specific address, it looks for the details of a function symbol at
+that address.  This provides user access to the data obtained by the
+mpatrol symbol handler, including line number information if the
+`USEDEBUG' option is supported and used.
 
    It is also possible for you to be able to intercept calls to
 allocate, reallocate and deallocate memory for your own purposes.  You
@@ -2312,6 +2358,141 @@ out of memory during the call to a memory allocation function.  This
 gives you the opportunity to use that handler to either free up any
 unneeded memory or simply to abort, thus removing the need to check for
 failed allocations.
+
+   It is also possible to iterate over all of the allocated and freed
+memory allocations that are currently in the heap at any point in a
+program.  This is done by invoking the `__mp_iterate()' function with a
+callback function which is called once per allocation with the start
+address of the memory block being passed as the argument to the
+callback function.  Any further information about the memory allocation
+can then be obtained via the `__mp_info()' function.
+
+   Differences in the heap allocations (their details, not their
+contents) between a previous point in a program's execution and the
+current point of execution can be determined by calling the
+`__mp_snapshot()' function and then invoking `__mp_iterate()' with that
+snapshot value as its second argument at a later point in execution.
+The callback function passed to `__mp_iterate()' will then only be
+invoked with the start address of any memory allocation that has been
+allocated or reallocated (or freed if the `NOFREE' option is being
+used) since the snapshot point.  This makes it possible to detect
+localised memory leaks very easily, as the following example (found in
+`tests/pass/test10.c') shows.
+
+         23	/*
+         24	 * Demonstrates and tests the facility for obtaining information on
+         25	 * local memory leaks.  Will also edit or list the location of each
+         26	 * leak if the EDIT or LIST option is in effect.
+         27	 */
+     
+     
+         30	#include "mpatrol.h"
+         31	#include <stdio.h>
+     
+     
+         34	unsigned long leaktotal = 0;
+     
+     
+         37	int callback(const void *p)
+         38	{
+         39	    __mp_allocstack *s;
+         40	    __mp_allocinfo d;
+     
+         42	    if (!__mp_info(p, &d))
+         43	    {
+         44	        if (sizeof(void *) == 8)
+         45	            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
+         46	        else
+         47	            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+         48	        return -1;
+         49	    }
+         50	    if (!d.freed)
+         51	    {
+         52	        if (sizeof(void *) == 8)
+         53	            fprintf(stderr, "0x%016lX", d.block);
+         54	        else
+         55	            fprintf(stderr, "0x%08lX", d.block);
+         56	        fprintf(stderr, " %s", d.func ? d.func : "<unknown>");
+         57	        fprintf(stderr, " %s", d.file ? d.file : "<unknown>");
+         58	        fprintf(stderr, " %lu", d.line);
+         59	        for (s = d.stack; s != NULL; s = s->next)
+         60	        {
+         61	            if (s == d.stack)
+         62	                fputs(" (", stderr);
+         63	            else
+         64	                fputs("->", stderr);
+         65	            if (s->name != NULL)
+         66	                fprintf(stderr, "%s", s->name);
+         67	            else if (sizeof(void *) == 8)
+         68	                fprintf(stderr, "0x%016lX", s->addr);
+         69	            else
+         70	                fprintf(stderr, "0x%08lX", s->addr);
+         71	            if (s->next == NULL)
+         72	                fputc(')', stderr);
+         73	        }
+         74	        fputc('\n', stderr);
+         75	        if ((d.file != NULL) && (d.line != 0))
+         76	            __mp_view(d.file, d.line);
+         77	        leaktotal += d.size;
+         78	        return 1;
+         79	    }
+         80	    return 0;
+         81	}
+     
+     
+         84	void func2(unsigned long n)
+         85	{
+         86	    void *p;
+     
+         88	    p = malloc((n * 10) + 1);
+         89	    if (n % 13)
+         90	        free(p);
+         91	}
+     
+     
+         94	void func1(void)
+         95	{
+         96	    void *p;
+         97	    size_t i, n;
+         98	    unsigned long s;
+     
+        100	    p = malloc(16);
+        101	    s = __mp_snapshot();
+        102	    for (i = 0; i < 128; i++)
+        103	        func2(i);
+        104	    free(p);
+        105	    if (n = __mp_iterate(callback, s))
+        106	        fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\n", n,
+        107	                leaktotal);
+        108	    if ((n != 10) || (leaktotal != 5860))
+        109	        fputs("Expected 10 memory leaks (5860 bytes)\n", stderr);
+        110	}
+     
+     
+        113	int main(void)
+        114	{
+        115	    void *p;
+     
+        117	    p = malloc(16);
+        118	    func1();
+        119	    free(p);
+        120	    return EXIT_SUCCESS;
+        121	}
+
+   Compiling this example with mpatrol and then running it will produce
+the following list of memory leaks that were located between the points
+of calling `__mp_snapshot()' and `__mp_iterate()'.
+
+     0x0806A108 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A674 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A6F8 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A800 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A988 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806AB94 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806AE20 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B130 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B4C0 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B8D4 func2 test10.c 88 (func2->func1->main->_start)
 
    If you wish to write your own diagnostics to the mpatrol log file
 from within your source code then you can do so with the
@@ -6774,9 +6955,13 @@ File: mpatrol.info,  Node: Functions 5,  Prev: Functions 4,  Up: Functions
 mpatrol library functions
 =========================
 
-   The following 16 functions are available as support routines for
+   The following 20 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the `mpatrol.h' header file.
+
+`char *__mp_function(__mp_alloctype func)'
+     Returns the name of the function corresponding to the allocation
+     type FUNC or `NULL' if no such allocation type exists.
 
 `int __mp_info(const void *ptr, __mp_allocinfo *info)'
      Obtains information about a specific memory allocation by placing
@@ -6798,12 +6983,43 @@ you should include the `mpatrol.h' header file.
      `stack'       Pointer to function call stack.
      `freed'       Indicates if allocation has been freed.
 
+`int __mp_syminfo(const void *ptr, __mp_symbolinfo *info)'
+     Obtains symbolic information about a specific code address by
+     placing statistics about PTR in INFO.  If PTR does not belong to a
+     function symbol then `0' will be returned, otherwise `1' will be
+     returned and INFO will contain the following information:
+
+     _Field_       _Description_
+     `name'        Name of symbol.
+     `object'      File containing symbol.
+     `addr'        Start address of symbol.
+     `size'        Size of symbol.
+     `file'        Filename corresponding to address.
+     `line'        Line number corresponding to address.
+
 `int __mp_printinfo(const void *ptr)'
      Displays information about a specific memory allocation containing
      PTR to the standard error file stream.  If PTR does not belong to
      a previously allocated memory allocation then `0' will be
      returned, otherwise `1' will be returned.  This function is
      intended to be called from within a debugger.
+
+`unsigned long __mp_snapshot(void)'
+     Returns the current event number, effectively taking a snapshot of
+     the heap.  This number can then be used in later calls to
+     `__mp_iterate()'.
+
+`size_t __mp_iterate(int (*func)(const void *), unsigned long event)'
+     Iterates over all of the current allocated and freed memory
+     allocations, calling FUNC with the start address of every memory
+     allocation that has been modified since event number EVENT.  If
+     FUNC is `NULL' then `__mp_printinfo()' will be used as the
+     callback function.  If EVENT is `0' then FUNC will be called with
+     the start address of every memory allocation.  If FUNC returns a
+     negative number then the iteration process will be stopped
+     immediately.  If FUNC returns a positive number above zero then
+     `__mp_iterate()' will return the number of times FUNC returned a
+     non-zero number after the iteration process has stopped.
 
 `void __mp_memorymap(int stats)'
      If STATS is non-zero then the current statistics of the mpatrol
@@ -12435,7 +12651,9 @@ Function index
 * __mp_check:                            Functions 5.
 * __mp_edit:                             Functions 5.
 * __mp_epilogue:                         Functions 5.
+* __mp_function:                         Functions 5.
 * __mp_info:                             Functions 5.
+* __mp_iterate:                          Functions 5.
 * __mp_list:                             Functions 5.
 * __mp_logaddr:                          Functions 5.
 * __mp_logmemory:                        Functions 5.
@@ -12445,7 +12663,9 @@ Function index
 * __mp_printf:                           Functions 5.
 * __mp_printinfo:                        Functions 5.
 * __mp_prologue:                         Functions 5.
+* __mp_snapshot:                         Functions 5.
 * __mp_summary:                          Functions 5.
+* __mp_syminfo:                          Functions 5.
 * __mp_view:                             Functions 5.
 * __mp_vprintf:                          Functions 5.
 * alloca:                                Functions 1.
@@ -13328,82 +13548,82 @@ Node: Testing106873
 Ref: Testing-Footnote-1109610
 Ref: Testing-Footnote-2109791
 Node: Library functions109850
-Node: Utilities117864
-Node: The mpatrol command118834
-Ref: The mpatrol command-Footnote-1125528
-Ref: The mpatrol command-Footnote-2125662
-Node: The mleak command125742
-Node: The mpsym command127706
-Node: The mpedit command130274
-Node: The hexwords command133670
-Node: Profiling136911
-Ref: Profiling-Footnote-1164803
-Ref: Profiling-Footnote-2165027
-Node: Tracing165131
-Ref: Tracing-Footnote-1182321
-Ref: Tracing-Footnote-2182355
-Ref: Tracing-Footnote-3182477
-Node: Improving performance182583
-Ref: Improving performance-Footnote-1191483
-Ref: Improving performance-Footnote-2191525
-Ref: Improving performance-Footnote-3191602
-Ref: Improving performance-Footnote-4191674
-Node: How it works191718
-Node: Examples198911
-Node: Example 1202810
-Ref: Example 1-Footnote-1226934
-Node: Example 2227124
-Node: Example 3232524
-Node: Example 4239381
-Node: Example 5242886
-Node: Example 6245354
-Ref: Example 6-Footnote-1249154
-Node: Example 7249283
-Node: Example 8251141
-Node: Example 9261377
-Node: Tutorial277248
-Ref: Tutorial-Footnote-1291779
-Ref: Tutorial-Footnote-2292070
-Ref: Tutorial-Footnote-3292219
-Ref: Tutorial-Footnote-4292356
-Ref: Tutorial-Footnote-5292455
-Node: Functions292736
-Node: Functions 1294093
-Node: Functions 2311695
-Node: Functions 3315468
-Node: Functions 4319053
-Node: Functions 5324906
-Node: Environment331952
-Node: Options352720
-Node: Diagnostic messages364107
-Node: Library performance380732
-Node: File formats383225
-Ref: File formats-Footnote-1383649
-Node: Profiling file format383861
-Node: Tracing file format387123
-Node: Supported systems388990
-Node: New system support404423
-Node: New processor support405619
-Node: New file format support406302
-Node: Notes407086
-Node: Generic notes408698
-Ref: Generic notes-Footnote-1424764
-Ref: Generic notes-Footnote-2424982
-Node: UNIX notes425204
-Node: Amiga notes429801
-Node: Windows notes433465
-Node: Netware notes435024
-Node: Frequently asked questions437584
-Node: Documentation438207
-Node: Building443037
-Node: Linking451748
-Node: Running456969
-Node: Files472077
-Node: Related software475073
-Ref: Related software-Footnote-1514083
-Node: References514324
-Node: Copying516917
-Node: Function index544806
-Node: Index547902
+Node: Utilities125724
+Node: The mpatrol command126694
+Ref: The mpatrol command-Footnote-1133388
+Ref: The mpatrol command-Footnote-2133522
+Node: The mleak command133602
+Node: The mpsym command135566
+Node: The mpedit command138134
+Node: The hexwords command141530
+Node: Profiling144771
+Ref: Profiling-Footnote-1172663
+Ref: Profiling-Footnote-2172887
+Node: Tracing172991
+Ref: Tracing-Footnote-1190181
+Ref: Tracing-Footnote-2190215
+Ref: Tracing-Footnote-3190337
+Node: Improving performance190443
+Ref: Improving performance-Footnote-1199343
+Ref: Improving performance-Footnote-2199385
+Ref: Improving performance-Footnote-3199462
+Ref: Improving performance-Footnote-4199534
+Node: How it works199578
+Node: Examples206771
+Node: Example 1210670
+Ref: Example 1-Footnote-1234794
+Node: Example 2234984
+Node: Example 3240384
+Node: Example 4247241
+Node: Example 5250746
+Node: Example 6253214
+Ref: Example 6-Footnote-1257014
+Node: Example 7257143
+Node: Example 8259001
+Node: Example 9269237
+Node: Tutorial285108
+Ref: Tutorial-Footnote-1299639
+Ref: Tutorial-Footnote-2299930
+Ref: Tutorial-Footnote-3300079
+Ref: Tutorial-Footnote-4300216
+Ref: Tutorial-Footnote-5300315
+Node: Functions300596
+Node: Functions 1301953
+Node: Functions 2319555
+Node: Functions 3323328
+Node: Functions 4326913
+Node: Functions 5332766
+Node: Environment341560
+Node: Options362328
+Node: Diagnostic messages373715
+Node: Library performance390340
+Node: File formats392833
+Ref: File formats-Footnote-1393257
+Node: Profiling file format393469
+Node: Tracing file format396731
+Node: Supported systems398598
+Node: New system support414031
+Node: New processor support415227
+Node: New file format support415910
+Node: Notes416694
+Node: Generic notes418306
+Ref: Generic notes-Footnote-1434372
+Ref: Generic notes-Footnote-2434590
+Node: UNIX notes434812
+Node: Amiga notes439409
+Node: Windows notes443073
+Node: Netware notes444632
+Node: Frequently asked questions447192
+Node: Documentation447815
+Node: Building452645
+Node: Linking461356
+Node: Running466577
+Node: Files481685
+Node: Related software484681
+Ref: Related software-Footnote-1523691
+Node: References523932
+Node: Copying526525
+Node: Function index554414
+Node: Index557726
 
 End Tag Table

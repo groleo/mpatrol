@@ -2234,86 +2234,122 @@ an address as an argument and fills in any details about its
 corresponding memory allocation in a supplied structure.  The following
 example illustrates this (it can be found in @{b}tests/pass/test4.c@{ub}).
 
-     23  /*
-     24   * Demonstrates and tests the facility for obtaining information
-     25   * about the allocation a specific address belongs to.
-     26   */
+         23	/*
+         24	 * Demonstrates and tests the facility for obtaining information about
+         25	 * the allocation a specific address belongs to.
+         26	 */
      
      
-     29  #include "mpatrol.h"
-     30  #include <stdio.h>
+         29	#include "mpatrol.h"
+         30	#include <stdio.h>
      
      
-     33  void display(void *p)
-     34  {
-     35      __mp_allocstack *s;
-     36      __mp_allocinfo d;
+         33	void display(void *p)
+         34	{
+         35	    __mp_allocstack *s;
+         36	    __mp_allocinfo d;
+         37	    __mp_symbolinfo i;
      
-     38      if (!__mp_info(p, &d))
-     39      {
-     40          fprintf(stderr, "nothing known about address 0x%08lX\\n", p);
-     41          return;
-     42      }
-     43      fprintf(stderr, "block:   0x%08lX\\n", d.block);
-     44      fprintf(stderr, "size:    %lu\\n", d.size);
-     45      fprintf(stderr, "type:    %lu\\n", d.type);
-     46      fprintf(stderr, "alloc:   %lu\\n", d.alloc);
-     47      fprintf(stderr, "realloc: %lu\\n", d.realloc);
-     48      fprintf(stderr, "func:    %s\\n", d.func ? d.func : "NULL");
-     49      fprintf(stderr, "file:    %s\\n", d.file ? d.file : "NULL");
-     50      fprintf(stderr, "line:    %lu\\n", d.line);
-     51      for (s = d.stack; s != NULL; s = s->next)
-     52      {
-     53          fprintf(stderr, "\\t0x%08lX: ", s->addr);
-     54          fprintf(stderr, "%s\\n", s->name ? s->name : "NULL");
-     55      }
-     56      fprintf(stderr, "freed:   %d\\n", d.freed);
-     57  }
+         39	    if (!__mp_info(p, &d))
+         40	    {
+         41	        if (sizeof(void *) == 8)
+         42	            fprintf(stderr, "nothing known about address 0x%016lX\\n", p);
+         43	        else
+         44	            fprintf(stderr, "nothing known about address 0x%08lX\\n", p);
+         45	        return;
+         46	    }
+         47	    if (sizeof(void *) == 8)
+         48	        fprintf(stderr, "block:    0x%016lX\\n", d.block);
+         49	    else
+         50	        fprintf(stderr, "block:    0x%08lX\\n", d.block);
+         51	    fprintf(stderr, "size:     %lu\\n", d.size);
+         52	    fprintf(stderr, "type:     %s\\n", __mp_function(d.type));
+         53	    fprintf(stderr, "alloc:    %lu\\n", d.alloc);
+         54	    fprintf(stderr, "realloc:  %lu\\n", d.realloc);
+         55	    fprintf(stderr, "thread:   %lu\\n", d.thread);
+         56	    fprintf(stderr, "event:    %lu\\n", d.event);
+         57	    fprintf(stderr, "func:     %s\\n", d.func ? d.func : "<unknown>");
+         58	    fprintf(stderr, "file:     %s\\n", d.file ? d.file : "<unknown>");
+         59	    fprintf(stderr, "line:     %lu\\n", d.line);
+         60	    for (s = d.stack; s != NULL; s = s->next)
+         61	    {
+         62	        if (sizeof(void *) == 8)
+         63	            fprintf(stderr, "\\t0x%016lX", s->addr);
+         64	        else
+         65	            fprintf(stderr, "\\t0x%08lX", s->addr);
+         66	        if (__mp_syminfo(s->addr, &i))
+         67	        {
+         68	            if (i.name != NULL)
+         69	                fprintf(stderr, " %s", i.name);
+         70	            if ((i.addr != NULL) && (i.addr != s->addr))
+         71	                fprintf(stderr, "%+ld",
+         72	                        (char *) s->addr - (char *) i.addr);
+         73	            if (i.object != NULL)
+         74	                fprintf(stderr, " [%s]", i.object);
+         75	        }
+         76	        else if (s->name != NULL)
+         77	            fprintf(stderr, " %s", s->name);
+         78	        fputc('\\n', stderr);
+         79	    }
+         80	    fprintf(stderr, "typestr:  %s\\n",
+         81	            d.typestr ? d.typestr : "<unknown>");
+         82	    fprintf(stderr, "typesize: %lu\\n", d.typesize);
+         83	    if (sizeof(void *) == 8)
+         84	        fprintf(stderr, "userdata: 0x%016lX\\n", d.userdata);
+         85	    else
+         86	        fprintf(stderr, "userdata: 0x%08lX\\n", d.userdata);
+         87	    fprintf(stderr, "freed:    %d\\n", d.freed);
+         88	}
      
      
-     60  void func2(void)
-     61  {
-     62      void *p;
+         91	void func2(void)
+         92	{
+         93	    void *p;
      
-     64      if (p = malloc(16))
-     65      {
-     66          display(p);
-     67          free(p);
-     68      }
-     69      display(p);
-     70  }
-     
-     
-     73  void func1(void)
-     74  {
-     75      func2();
-     76  }
+         95	    if (p = malloc(16))
+         96	    {
+         97	        display(p);
+         98	        free(p);
+         99	    }
+        100	    display(p);
+        101	}
      
      
-     79  int main(void)
-     80  {
-     81      func1();
-     82      return EXIT_SUCCESS;
-     83  }
+        104	void func1(void)
+        105	{
+        106	    func2();
+        107	}
+     
+     
+        110	int main(void)
+        111	{
+        112	    func1();
+        113	    return EXIT_SUCCESS;
+        114	}
 
    When this is compiled and run, it should give the following output,
 although the pointers are likely to be different.
 
-     block:   0x080620E8
-     size:    16
-     type:    0
-     alloc:   52
-     realloc: 0
-     func:    func2
-     file:    test4.c
-     line:    73
-              0x0804960B: func2
-              0x08049658: func1
-              0x08049664: main
-              0x4007C9CB: __libc_start_main
-              0x08049381: _start
-     freed:   0
-     nothing known about address 0x080620E8
+     block:    0x0806A0E8
+     size:     16
+     type:     malloc
+     alloc:    52
+     realloc:  0
+     thread:   0
+     event:    97
+     func:     func2
+     file:     test4.c
+     line:     95
+               0x0804A7AB func2+35 [./a.out]
+               0x0804A7F8 func1+8 [./a.out]
+               0x0804A804 main+8 [./a.out]
+               0x4007C9CB __libc_start_main+255 [/lib/libc.so.6]
+               0x0804A3E1 _start+33 [./a.out]
+     typestr:  <unknown>
+     typesize: 0
+     userdata: 0x00000000
+     freed:    0
+     nothing known about address 0x0806A0E8
 
    As you can see, anything that the mpatrol library knows about any
 memory allocation can be obtained for use in your own code, which can
@@ -2322,7 +2358,17 @@ allocations, etc. for debugging purposes.  It can also be useful to
 have this information when running your program within a debugger, so
 you can use the @{b}__mp_printinfo()@{ub} function to display information about
 a heap address if your debugger supports calling functions from the
-command prompt.
+command prompt.  Note that the textual representation of the @{b}type@{ub} field
+returned by the @{b}__mp_info()@{ub} function can be obtained by calling
+@{b}__mp_function()@{ub}.
+
+   You may also have noticed the use of @{b}__mp_syminfo()@{ub} in the above
+example.  This function is very similar to the @{b}__mp_info()@{ub} function
+except that instead of looking for the details of a memory allocation
+at a specific address, it looks for the details of a function symbol at
+that address.  This provides user access to the data obtained by the
+mpatrol symbol handler, including line number information if the
+@{b}USEDEBUG@{ub} option is supported and used.
 
    It is also possible for you to be able to intercept calls to
 allocate, reallocate and deallocate memory for your own purposes.  You
@@ -2397,6 +2443,141 @@ out of memory during the call to a memory allocation function.  This
 gives you the opportunity to use that handler to either free up any
 unneeded memory or simply to abort, thus removing the need to check for
 failed allocations.
+
+   It is also possible to iterate over all of the allocated and freed
+memory allocations that are currently in the heap at any point in a
+program.  This is done by invoking the @{b}__mp_iterate()@{ub} function with a
+callback function which is called once per allocation with the start
+address of the memory block being passed as the argument to the
+callback function.  Any further information about the memory allocation
+can then be obtained via the @{b}__mp_info()@{ub} function.
+
+   Differences in the heap allocations (their details, not their
+contents) between a previous point in a program's execution and the
+current point of execution can be determined by calling the
+@{b}__mp_snapshot()@{ub} function and then invoking @{b}__mp_iterate()@{ub} with that
+snapshot value as its second argument at a later point in execution.
+The callback function passed to @{b}__mp_iterate()@{ub} will then only be
+invoked with the start address of any memory allocation that has been
+allocated or reallocated (or freed if the @{b}NOFREE@{ub} option is being used)
+since the snapshot point.  This makes it possible to detect localised
+memory leaks very easily, as the following example (found in
+@{b}tests/pass/test10.c@{ub}) shows.
+
+         23	/*
+         24	 * Demonstrates and tests the facility for obtaining information on
+         25	 * local memory leaks.  Will also edit or list the location of each
+         26	 * leak if the EDIT or LIST option is in effect.
+         27	 */
+     
+     
+         30	#include "mpatrol.h"
+         31	#include <stdio.h>
+     
+     
+         34	unsigned long leaktotal = 0;
+     
+     
+         37	int callback(const void *p)
+         38	{
+         39	    __mp_allocstack *s;
+         40	    __mp_allocinfo d;
+     
+         42	    if (!__mp_info(p, &d))
+         43	    {
+         44	        if (sizeof(void *) == 8)
+         45	            fprintf(stderr, "nothing known about address 0x%016lX\\n", p);
+         46	        else
+         47	            fprintf(stderr, "nothing known about address 0x%08lX\\n", p);
+         48	        return -1;
+         49	    }
+         50	    if (!d.freed)
+         51	    {
+         52	        if (sizeof(void *) == 8)
+         53	            fprintf(stderr, "0x%016lX", d.block);
+         54	        else
+         55	            fprintf(stderr, "0x%08lX", d.block);
+         56	        fprintf(stderr, " %s", d.func ? d.func : "<unknown>");
+         57	        fprintf(stderr, " %s", d.file ? d.file : "<unknown>");
+         58	        fprintf(stderr, " %lu", d.line);
+         59	        for (s = d.stack; s != NULL; s = s->next)
+         60	        {
+         61	            if (s == d.stack)
+         62	                fputs(" (", stderr);
+         63	            else
+         64	                fputs("->", stderr);
+         65	            if (s->name != NULL)
+         66	                fprintf(stderr, "%s", s->name);
+         67	            else if (sizeof(void *) == 8)
+         68	                fprintf(stderr, "0x%016lX", s->addr);
+         69	            else
+         70	                fprintf(stderr, "0x%08lX", s->addr);
+         71	            if (s->next == NULL)
+         72	                fputc(')', stderr);
+         73	        }
+         74	        fputc('\\n', stderr);
+         75	        if ((d.file != NULL) && (d.line != 0))
+         76	            __mp_view(d.file, d.line);
+         77	        leaktotal += d.size;
+         78	        return 1;
+         79	    }
+         80	    return 0;
+         81	}
+     
+     
+         84	void func2(unsigned long n)
+         85	{
+         86	    void *p;
+     
+         88	    p = malloc((n * 10) + 1);
+         89	    if (n % 13)
+         90	        free(p);
+         91	}
+     
+     
+         94	void func1(void)
+         95	{
+         96	    void *p;
+         97	    size_t i, n;
+         98	    unsigned long s;
+     
+        100	    p = malloc(16);
+        101	    s = __mp_snapshot();
+        102	    for (i = 0; i < 128; i++)
+        103	        func2(i);
+        104	    free(p);
+        105	    if (n = __mp_iterate(callback, s))
+        106	        fprintf(stderr, "Detected %lu memory leaks (%lu bytes)\\n", n,
+        107	                leaktotal);
+        108	    if ((n != 10) || (leaktotal != 5860))
+        109	        fputs("Expected 10 memory leaks (5860 bytes)\\n", stderr);
+        110	}
+     
+     
+        113	int main(void)
+        114	{
+        115	    void *p;
+     
+        117	    p = malloc(16);
+        118	    func1();
+        119	    free(p);
+        120	    return EXIT_SUCCESS;
+        121	}
+
+   Compiling this example with mpatrol and then running it will produce
+the following list of memory leaks that were located between the points
+of calling @{b}__mp_snapshot()@{ub} and @{b}__mp_iterate()@{ub}.
+
+     0x0806A108 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A674 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A6F8 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A800 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806A988 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806AB94 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806AE20 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B130 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B4C0 func2 test10.c 88 (func2->func1->main->_start)
+     0x0806B8D4 func2 test10.c 88 (func2->func1->main->_start)
 
    If you wish to write your own diagnostics to the mpatrol log file
 from within your source code then you can do so with the @{b}__mp_printf()@{ub}
@@ -6956,9 +7137,13 @@ anyway, albeit with slightly less tracing information.
 mpatrol library functions
 =========================
 
-   The following 16 functions are available as support routines for
+   The following 20 functions are available as support routines for
 additional control and tracing in the mpatrol library.  To use these
 you should include the @{b}mpatrol.h@{ub} header file.
+
+@{b}char *__mp_function(__mp_alloctype func)@{ub}
+     Returns the name of the function corresponding to the allocation
+     type FUNC or @{b}NULL@{ub} if no such allocation type exists.
 
 @{b}int __mp_info(const void *ptr, __mp_allocinfo *info)@{ub}
      Obtains information about a specific memory allocation by placing
@@ -6980,12 +7165,43 @@ you should include the @{b}mpatrol.h@{ub} header file.
      @{b}stack@{ub}         Pointer to function call stack.
      @{b}freed@{ub}         Indicates if allocation has been freed.
 
+@{b}int __mp_syminfo(const void *ptr, __mp_symbolinfo *info)@{ub}
+     Obtains symbolic information about a specific code address by
+     placing statistics about PTR in INFO.  If PTR does not belong to a
+     function symbol then @{b}0@{ub} will be returned, otherwise @{b}1@{ub} will be
+     returned and INFO will contain the following information:
+
+     @{i}Field@{ui}         @{i}Description@{ui}
+     @{b}name@{ub}          Name of symbol.
+     @{b}object@{ub}        File containing symbol.
+     @{b}addr@{ub}          Start address of symbol.
+     @{b}size@{ub}          Size of symbol.
+     @{b}file@{ub}          Filename corresponding to address.
+     @{b}line@{ub}          Line number corresponding to address.
+
 @{b}int __mp_printinfo(const void *ptr)@{ub}
      Displays information about a specific memory allocation containing
      PTR to the standard error file stream.  If PTR does not belong to
      a previously allocated memory allocation then @{b}0@{ub} will be returned,
      otherwise @{b}1@{ub} will be returned.  This function is intended to be
      called from within a debugger.
+
+@{b}unsigned long __mp_snapshot(void)@{ub}
+     Returns the current event number, effectively taking a snapshot of
+     the heap.  This number can then be used in later calls to
+     @{b}__mp_iterate()@{ub}.
+
+@{b}size_t __mp_iterate(int (*func)(const void *), unsigned long event)@{ub}
+     Iterates over all of the current allocated and freed memory
+     allocations, calling FUNC with the start address of every memory
+     allocation that has been modified since event number EVENT.  If
+     FUNC is @{b}NULL@{ub} then @{b}__mp_printinfo()@{ub} will be used as the callback
+     function.  If EVENT is @{b}0@{ub} then FUNC will be called with the start
+     address of every memory allocation.  If FUNC returns a negative
+     number then the iteration process will be stopped immediately.  If
+     FUNC returns a positive number above zero then @{b}__mp_iterate()@{ub} will
+     return the number of times FUNC returned a non-zero number after
+     the iteration process has stopped.
 
 @{b}void __mp_memorymap(int stats)@{ub}
      If STATS is non-zero then the current statistics of the mpatrol
@@ -12735,7 +12951,9 @@ Function index
  @{" __mp_check                               " link "Functions 5"}   Functions 5
  @{" __mp_edit                                " link "Functions 5"}   Functions 5
  @{" __mp_epilogue                            " link "Functions 5"}   Functions 5
+ @{" __mp_function                            " link "Functions 5"}   Functions 5
  @{" __mp_info                                " link "Functions 5"}   Functions 5
+ @{" __mp_iterate                             " link "Functions 5"}   Functions 5
  @{" __mp_list                                " link "Functions 5"}   Functions 5
  @{" __mp_logaddr                             " link "Functions 5"}   Functions 5
  @{" __mp_logmemory                           " link "Functions 5"}   Functions 5
@@ -12745,7 +12963,9 @@ Function index
  @{" __mp_printf                              " link "Functions 5"}   Functions 5
  @{" __mp_printinfo                           " link "Functions 5"}   Functions 5
  @{" __mp_prologue                            " link "Functions 5"}   Functions 5
+ @{" __mp_snapshot                            " link "Functions 5"}   Functions 5
  @{" __mp_summary                             " link "Functions 5"}   Functions 5
+ @{" __mp_syminfo                             " link "Functions 5"}   Functions 5
  @{" __mp_view                                " link "Functions 5"}   Functions 5
  @{" __mp_vprintf                             " link "Functions 5"}   Functions 5
  @{" alloca                                   " link "Functions 1"}   Functions 1
