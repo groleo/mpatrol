@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.16 2000-12-26 10:34:17 graeme Exp $
+% $Id: refcard.tex,v 1.17 2001-01-04 22:10:37 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -104,7 +104,7 @@ Instructs the library to save and replace certain signal handlers during the
 execution of library code and to restore them afterwards.
 \item[\option{USEMMAP}]
 Specifies that the library should use \function{mmap} instead of \function{sbrk}
-to allocate system memory on UNIX platforms.
+to allocate user memory on UNIX platforms.
 \end{description}
 
 \vskip 12pt
@@ -709,6 +709,23 @@ editor.
 Adds a directory to the search path used to locate the source file.
 \item[\flag{version}]
 Displays the version number of the \command{mpedit} command.
+\end{description}
+
+\vskip 12pt
+\heading{hexwords command options}
+\vskip 6pt
+
+\begin{description}
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flagpar{match}{exact\texttt{|}lower\texttt{|}upper\texttt{|}any}]
+Sets the type of case-sensitivity to use.
+\item[\flagpar{maximum}{count}]
+Sets the maximum number of letters to match.
+\item[\flagpar{minimum}{count}]
+Sets the minimum number of letters to match.
+\item[\flag{version}]
+Displays the version number of the \command{hexwords} command.
 \end{description}
 
 \vskip 12pt
