@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.254 2002-01-08 20:02:51 graeme Exp $
+@c $Id: mpatrol.texi,v 1.255 2002-01-08 21:33:39 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -244,9 +244,12 @@ Barton (@email{abarton@@innotrac.com}) and Dave Gibson
 Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
 command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve
 McIntyre (@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the
-@code{fork()} problem and provided example code on how to fix it.  Boris
-Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
-initial testing for the FreeBSD port, and Ivan Finch
+@code{fork()} problem and provided example code on how to fix it.  Peter
+Zijlstra (@email{peter@@xlnt-software.com}) contributed code to enhance stack
+traces for errors.
+
+Boris Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and
+provided initial testing for the FreeBSD port, and Ivan Finch
 (@email{i.finch@@rl.ac.uk}), Gerrit Bruchhaeuser
 (@email{gbruchhaeuser@@orga.com}) and Andreas Schallenberg
 (@email{andreas.schallenberg@@informatik.uni-oldenburg.de}) did the same for the
