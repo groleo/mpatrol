@@ -95,6 +95,8 @@ MP_EXPORT int __mp_addextsymbols(symhead *);
 MP_EXPORT void __mp_fixsymbols(symhead *);
 MP_EXPORT int __mp_protectsymbols(symhead *, memaccess);
 MP_EXPORT symnode *__mp_findsymbol(symhead *, void *);
+MP_EXPORT int __mp_findsource(symhead *, void *, char **, char **,
+                              unsigned long *);
 
 
 #ifdef __cplusplus
