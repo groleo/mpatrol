@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.82 2001-02-14 21:56:08 graeme Exp $"
+#ident "$Id: inter.c,v 1.83 2001-02-15 21:32:36 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.82 2001-02-14 21:56:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.83 2001-02-15 21:32:36 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -318,11 +318,11 @@ checkalloca(loginfo *i, int f)
         if (c == 1)
         {
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(n->block, (size_t) -1);
+                memhead.prologue(n->block, (size_t) -1, i->stack->addr);
             memhead.event++;
             __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
             if (memhead.epilogue && (memhead.recur == 1))
-                memhead.epilogue((void *) -1);
+                memhead.epilogue((void *) -1, i->stack->addr);
         }
     }
 #if MP_FULLSTACK
@@ -603,8 +603,6 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     if (!memhead.init)
         __mp_init();
     checkheap(memhead.count + 1);
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue((void *) -1, l);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -617,6 +615,8 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
             k--;
         }
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue((void *) -1, l, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -646,7 +646,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p);
+        memhead.epilogue(p, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && (memhead.nomemory))
@@ -655,7 +655,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue((void *) -1, l);
+                memhead.prologue((void *) -1, l, i.addr);
             if ((f != AT_NEW) && (f != AT_NEWVEC))
                 z = 1;
             goto retry;
@@ -723,8 +723,6 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     if (!memhead.init)
         __mp_init();
     checkheap(memhead.count + 1);
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -2);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -737,6 +735,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             k--;
         }
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, (size_t) -2, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -760,6 +760,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.typesize = sizeof(char);
     checkalloca(&v, 0);
     memhead.event++;
+    o = p;
     z = 0;
   retry:
     if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
@@ -770,9 +771,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     /* If the string is not NULL and does not overflow any memory blocks then
      * allocate the memory and copy the string to the new allocation.
      */
-    if (__mp_checkstring(&memhead, p, &n, f, &v, j))
+    if (__mp_checkstring(&memhead, o, &n, f, &v, j))
     {
-        o = p;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, &v))
         {
             __mp_memcopy(p, o, n);
@@ -782,7 +782,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     else
         p = NULL;
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p);
+        memhead.epilogue(p, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && memhead.nomemory)
@@ -791,7 +791,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(p, (size_t) -2);
+                memhead.prologue(o, (size_t) -2, i.addr);
             z = 1;
             goto retry;
         }
@@ -819,9 +819,7 @@ void *
 __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              unsigned long u, char *g, size_t h, size_t k)
 {
-#if TARGET == TARGET_WINDOWS && !defined(__GNUC__)
     void *q;
-#endif /* TARGET && __GNUC__ */
     stackinfo i;
     loginfo v;
     int j, z;
@@ -859,8 +857,6 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     if (!memhead.init)
         __mp_init();
     checkheap(memhead.count);
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, l);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -873,6 +869,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             k--;
         }
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, l, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -898,11 +896,12 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     memhead.event++;
     if ((f == AT_XREALLOC) && (l == 0) && (h != 0))
         l = h;
+    q = p;
     z = 0;
   retry:
-    p = __mp_resizememory(&memhead, p, l, a, f, &v);
+    p = __mp_resizememory(&memhead, q, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p);
+        memhead.epilogue(p, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && memhead.nomemory)
@@ -911,7 +910,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(p, l);
+                memhead.prologue(q, l, i.addr);
             z = 1;
             goto retry;
         }
@@ -955,8 +954,6 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     if (!memhead.init)
         __mp_init();
     checkheap(memhead.count);
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -1);
     /* Determine the call stack details.
      */
     __mp_newframe(&i, NULL);
@@ -969,6 +966,8 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
             k--;
         }
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, (size_t) -1, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -994,7 +993,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     memhead.event++;
     __mp_freememory(&memhead, p, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue((void *) -1);
+        memhead.epilogue((void *) -1, i.addr);
     restoresignals();
 }
 
@@ -1620,7 +1619,7 @@ __mp_check(void)
  */
 
 void
-(*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
+(*__mp_prologue(void (*h)(void *, size_t, void *)))(void *, size_t, void *)
 {
     void (*p)(void *, size_t);
 
@@ -1638,7 +1637,7 @@ void
  */
 
 void
-(*__mp_epilogue(void (*h)(void *)))(void *)
+(*__mp_epilogue(void (*h)(void *, void *)))(void *, void *)
 {
     void (*p)(void *);
 
