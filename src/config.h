@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.82 2001-08-27 22:43:58 graeme Exp $
+ * $Id: config.h,v 1.83 2001-09-03 20:29:41 graeme Exp $
  */
 
 
@@ -59,11 +59,7 @@
  */
 
 #ifndef MP_API
-#if TARGET == TARGET_WINDOWS
-#define MP_API __declspec(dllexport)
-#else /* TARGET */
 #define MP_API
-#endif /* TARGET */
 #endif /* MP_API */
 
 
