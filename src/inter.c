@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.81 2001-02-14 00:02:54 graeme Exp $"
+#ident "$Id: inter.c,v 1.82 2001-02-14 21:56:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.81 2001-02-14 00:02:54 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.82 2001-02-14 21:56:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1920,6 +1920,35 @@ __mp_view(char *f, unsigned long l)
     restoresignals();
     return r;
 }
+
+
+/* The following function definitions are used by GNU autoconf to determine
+ * which libraries must be linked in with mpatrol on a specific system.
+ * They must be globally visible and have to be function symbols rather than
+ * data symbols so that AC_CHECK_LIB() works reliably.
+ */
+
+#if TARGET == TARGET_WINDOWS || SYSTEM == SYSTEM_CYGWIN
+#if FORMAT == FORMAT_PE || DYNLINK == DYNLINK_WINDOWS || MP_LIBRARYSTACK_SUPPORT
+void __mp_libimagehlp(void) {}
+#endif /* FORMAT && DYNLINK && MP_LIBRARYSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_HPUX
+#if MP_LIBRARYSTACK_SUPPORT
+void __mp_libcl(void) {}
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_IRIX
+#if MP_LIBRARYSTACK_SUPPORT
+void __mp_libexc(void) {}
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#endif /* TARGET && SYSTEM */
+#if (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF) && SYSTEM != SYSTEM_LYNXOS
+void __mp_libld(void) {}
+#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
+void __mp_libelf(void) {}
+#elif FORMAT == FORMAT_BFD
+void __mp_libbfd(void) {}
+void __mp_libiberty(void) {}
+#endif /* FORMAT */
 
 
 /* Set the access rights for a block of memory using the checker interface.
