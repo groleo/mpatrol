@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.72 2001-03-05 18:56:33 graeme Exp $
+ * $Id: config.h,v 1.73 2001-03-06 00:20:26 graeme Exp $
  */
 
 
@@ -173,7 +173,7 @@
  */
 
 #ifndef MP_LEAKTAB_SIZE
-#define MP_LEAKTAB_SIZE 97
+#define MP_LEAKTAB_SIZE 47
 #endif /* MP_LEAKTAB_SIZE */
 
 
