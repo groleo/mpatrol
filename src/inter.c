@@ -34,10 +34,11 @@
 #include "option.h"
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.3 1999-10-21 21:21:22 graeme Exp $"
+#ident "$Id: inter.c,v 1.4 1999-11-25 16:34:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -134,6 +135,11 @@ void __mp_init(void)
         /* Read any options from the specified environment variable.
          */
         __mp_parseoptions(&memhead);
+        /* Set up the random number generator for the FAILFREQ option.
+         */
+        if (h->fseed == 0)
+            h->fseed = (unsigned long) time(NULL);
+        srand(h->fseed);
         /* Attempt to open the log file.
          */
         if (!__mp_openlogfile(memhead.log))
