@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.19 2001-03-02 01:25:09 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.20 2001-03-02 01:38:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.19 2001-03-02 01:25:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.20 2001-03-02 01:38:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -234,6 +234,15 @@ __mp_init(void)
 
 void
 __mp_fini(void)
+{
+}
+
+
+/* Provide a function which can be used as a breakpoint target in a debugger.
+ */
+
+void
+__mp_trap(void)
 {
 }
 
