@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.90 2001-02-23 23:09:53 graeme Exp $"
+#ident "$Id: inter.c,v 1.91 2001-02-25 23:32:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.90 2001-02-23 23:09:53 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.91 2001-02-25 23:32:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -218,7 +218,7 @@ restoresignals(void)
 
 static
 void
-checkheap(unsigned long n)
+checkheap(loginfo *v, unsigned long n)
 {
     unsigned long l;
 
@@ -231,7 +231,7 @@ checkheap(unsigned long n)
             l = 0;
         if ((l <= n) && (n <= memhead.urange) &&
             ((memhead.check == 1) || (memhead.event % memhead.check == 0)))
-            __mp_checkinfo(&memhead);
+            __mp_checkinfo(&memhead, v);
     }
 }
 
@@ -426,18 +426,7 @@ __mp_fini(void)
     {
         if (!memhead.fini)
         {
-            /* Firstly, check the integrity of the memory blocks.
-             */
-            __mp_checkinfo(&memhead);
-            /* Then call any finalisation functions in the reverse order in
-             * which they were registered.
-             */
-            while (memhead.finicount > 0)
-            {
-                memhead.finis[--memhead.finicount]();
-                memhead.finis[memhead.finicount] = NULL;
-            }
-            /* Next, determine the call stack details in case we need to
+            /* First, determine the call stack details in case we need to
              * free any remaining allocations that were made by alloca().
              */
             __mp_newframe(&i, NULL);
@@ -449,7 +438,16 @@ __mp_fini(void)
             v.stack = &i;
             v.typestr = NULL;
             v.typesize = 0;
+            __mp_checkinfo(&memhead, &v);
             checkalloca(&v, 1);
+            /* Then call any finalisation functions in the reverse order in
+             * which they were registered.
+             */
+            while (memhead.finicount > 0)
+            {
+                memhead.finis[--memhead.finicount]();
+                memhead.finis[memhead.finicount] = NULL;
+            }
             /* Then close any access library handles that might still be open.
              */
             __mp_closesymbols(&memhead.syms);
@@ -1709,7 +1707,6 @@ __mp_check(void)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    __mp_checkinfo(&memhead);
     /* Determine the call stack details in case we need to free any
      * allocations that were made by alloca().
      */
@@ -1722,6 +1719,7 @@ __mp_check(void)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
+    __mp_checkinfo(&memhead, &v);
     checkalloca(&v, 0);
     restoresignals();
 }
