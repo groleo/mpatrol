@@ -25,7 +25,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.6 2001-08-23 23:10:59 graeme Exp $
+# $Id: mpedit,v 1.7 2001-09-03 21:57:53 graeme Exp $
 
 
 # Program version.
@@ -324,7 +324,7 @@ else
         # Both emacs and xemacs normally come with built-in support for X, so
         # assume that they open their own windows.
         "$EDITOR" +$linenumber "$sourcefile";;
-      vi|view|vedit)
+      vi|view|vedit|elvis|pico|nano)
         # The vi editor (and its related commands) does not open a window, so
         # we need to open an xterm for use by the editor.
         xterm -e "$EDITOR" +$linenumber "$sourcefile";;
