@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.132 2001-07-26 16:34:03 graeme Exp $"
+#ident "$Id: inter.c,v 1.133 2001-07-26 16:51:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.132 2001-07-26 16:34:03 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.133 2001-07-26 16:51:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -902,7 +902,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         {
             /* Call the low-memory handler if no memory block was allocated.
              */
-            memhead.nomemory();
+            memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue((void *) -1, l, s, t, u, i.addr);
             if ((f != AT_NEW) && (f != AT_NEWVEC))
@@ -1040,7 +1040,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
         {
             /* Call the low-memory handler if no memory block was allocated.
              */
-            memhead.nomemory();
+            memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue(o, (size_t) -2, s, t, u, i.addr);
             z = 1;
@@ -1161,7 +1161,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         {
             /* Call the low-memory handler if no memory block was allocated.
              */
-            memhead.nomemory();
+            memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
                 memhead.prologue(q, l, s, t, u, i.addr);
             z = 1;

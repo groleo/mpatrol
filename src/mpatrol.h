@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.132 2001-07-26 16:40:59 graeme Exp $
+ * $Id: mpatrol.h,v 1.133 2001-07-26 16:51:10 graeme Exp $
  */
 
 
@@ -1008,7 +1008,7 @@ MP_INLINE
 new_handler
 set_new_handler(new_handler h) throw()
 {
-    return (new_handler) __mp_nomemory(h);
+    return (new_handler) __mp_nomemory((__mp_nomemoryhandler) h);
 }
 
 

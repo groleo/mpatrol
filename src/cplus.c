@@ -43,9 +43,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.8 2001-07-25 22:43:39 graeme Exp $"
+#ident "$Id: cplus.c,v 1.9 2001-07-26 16:51:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.8 2001-07-25 22:43:39 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.9 2001-07-26 16:51:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -72,9 +72,9 @@ void
 #endif /* __cplusplus && __GNUC__ */
 {
 #ifdef __cplusplus
-    return (new_handler) __mp_nomemory(h);
+    return (new_handler) __mp_nomemory((nomemoryhandler) h);
 #else /* __cplusplus */
-    return (void (*)(void)) __mp_nomemory(h);
+    return (void (*)(void)) __mp_nomemory((nomemoryhandler) h);
 #endif /* __cplusplus */
 }
 
