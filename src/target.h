@@ -62,9 +62,10 @@
 #define SYSTEM_DGUX    3 /* DG/UX */
 #define SYSTEM_DYNIX   4 /* DYNIX/ptx */
 #define SYSTEM_HPUX    5 /* HP/UX */
-#define SYSTEM_LINUX   6 /* Linux */
-#define SYSTEM_LYNXOS  7 /* LynxOS */
-#define SYSTEM_SOLARIS 8 /* Solaris */
+#define SYSTEM_IRIX    6 /* IRIX */
+#define SYSTEM_LINUX   7 /* Linux */
+#define SYSTEM_LYNXOS  8 /* LynxOS */
+#define SYSTEM_SOLARIS 9 /* Solaris */
 
 
 #ifndef SYSTEM
@@ -78,6 +79,8 @@
 #define SYSTEM SYSTEM_DYNIX
 #elif defined(hpux) || defined(_hpux) || defined(__hpux) || defined(__hpux__)
 #define SYSTEM SYSTEM_HPUX
+#elif defined(sgi) || defined(_sgi) || defined(__sgi) || defined(__sgi__)
+#define SYSTEM SYSTEM_IRIX
 #elif defined(linux) || defined(_linux) || defined(__linux) || \
       defined(__linux__)
 #define SYSTEM SYSTEM_LINUX

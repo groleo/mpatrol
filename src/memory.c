@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.14 2000-04-23 15:40:53 graeme Exp $"
+#ident "$Id: memory.c,v 1.15 2000-04-27 18:22:26 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -180,6 +180,8 @@ static char *progname(void)
 #if TARGET == TARGET_UNIX
 #if MP_PROCFS_SUPPORT
     static char b[64];
+#elif SYSTEM == SYSTEM_IRIX
+    extern char **__Argv;
 #elif ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC
     unsigned int *p;
     stackinfo s;
@@ -199,6 +201,11 @@ static char *progname(void)
     sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
             MP_PROCFS_EXENAME);
     return b;
+#elif SYSTEM == SYSTEM_IRIX
+    /* IRIX has global variables containing argc and argv which we can use
+     * to determine the filename that the program was invoked with.
+     */
+    return __Argv[0];
 #elif (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC) && \
       !MP_BUILTINSTACK_SUPPORT
     /* Because there is no function to return the executable filename
