@@ -22,7 +22,9 @@ DDEESSCCRRIIPPTTIIOONN
        is  the  current process id) but this can be changed using
        the --ll option.  Any existing  MMPPAATTRROOLL__OOPPTTIIOONNSS  environment
        variable settings which are not overridden by _o_p_t_i_o_n_s will
-       be passed through unchanged to the mpatrol library.
+       be passed through unchanged to the mpatrol  library.   The
+       LLOOGGAALLLL  option is always implicitly used for commands that
+       are run by this script.
 
 OOPPTTIIOONNSS
        All of the following options  (except  --dd)  correspond  to
@@ -55,13 +57,11 @@ OOPPTTIIOONNSS
               should  be  set so that even programs that were not
               compiled with the mpatrol library  can  be  traced,
               but  only  if  they  were dynamically linked.  This
-              option will only work if the dynamic linker  recog-
-              nises the LLDD__PPRREELLOOAADD environment variable.
+              option  will  only  work  if  the  dynamic   linker
 
 
 
-
-Release 1.1               9 January 2000                        1
+Release 1.1              24 January 2000                        1
 
 
 
@@ -69,6 +69,8 @@ Release 1.1               9 January 2000                        1
 
 MPATROL(1)               mpatrol library               MPATROL(1)
 
+
+              recognises the LLDD__PPRREELLOOAADD environment variable.
 
        --ee <_s_t_r_i_n_g>
               [PPRROOGGFFIILLEE]   Specifies an alternative filename with
@@ -122,12 +124,10 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               of virtual memory and should be placed at the high-
               est point within these pages.
 
-       --pp     [PPAAGGEEAALLLLOOCC=_L_O_W_E_R]  Specifies that  each  individual
-              memory  allocation  should occupy at least one page
 
 
 
-Release 1.1               9 January 2000                        2
+Release 1.1              24 January 2000                        2
 
 
 
@@ -136,6 +136,8 @@ Release 1.1               9 January 2000                        2
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+       --pp     [PPAAGGEEAALLLLOOCC=_L_O_W_E_R]  Specifies that  each  individual
+              memory  allocation  should occupy at least one page
               of virtual memory and should be placed at the  low-
               est point within these pages.
 
@@ -180,7 +182,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 SSEEEE AALLSSOO
        mmppaattrrooll(3).
 
-       The mpatrol manual.
+       The mpatrol manual and FAQ.
 
 AAUUTTHHOORR
        Graeme S. Roy <graeme@epc.co.uk>
@@ -188,12 +190,10 @@ AAUUTTHHOORR
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-       This  library  is  free  software; you can redistribute it
-       and/or modify it  under  the  terms  of  the  GNU  Library
 
 
 
-Release 1.1               9 January 2000                        3
+Release 1.1              24 January 2000                        3
 
 
 
@@ -202,7 +202,9 @@ Release 1.1               9 January 2000                        3
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
-       General  Public  License as published by the Free Software
+       This  library  is  free  software; you can redistribute it
+       and/or modify it under the terms of the GNU  Library  Gen-
+       eral  Public  License  as  published  by the Free Software
        Foundation; either version 2 of the License, or  (at  your
        option) any later version.
 
@@ -257,8 +259,6 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-
-
-Release 1.1               9 January 2000                        4
+Release 1.1              24 January 2000                        4
 
 

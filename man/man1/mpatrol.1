@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.5 2000-01-09 20:56:39 graeme Exp $
+.\" $Id: mpatrol.1,v 1.6 2000-01-24 00:28:55 graeme Exp $
 .\"
-.TH MPATROL 1 "9 January 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 1 "24 January 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -37,7 +37,8 @@ All mpatrol library diagnostics are sent to the file \fImpatrol.%n.log\fP in the
 current directory by default (where \fI%n\fP is the current process id) but this
 can be changed using the \fB\-l\fP option.  Any existing \fBMPATROL_OPTIONS\fP
 environment variable settings which are not overridden by \fIoptions\fP will be
-passed through unchanged to the mpatrol library.
+passed through unchanged to the mpatrol library.  The \fBLOGALL\fP option is
+always implicitly used for commands that are run by this script.
 .SH OPTIONS
 All of the following options (except \fB\-d\fP) correspond to their listed
 mpatrol library option.  See \fBmpatrol\fP(3) for more details on these options.
@@ -159,7 +160,7 @@ randomly fail.
 .SH SEE ALSO
 \fBmpatrol\fP(3).
 .PP
-The mpatrol manual.
+The mpatrol manual and FAQ.
 .SH AUTHOR
 Graeme S. Roy <graeme@epc.co.uk>
 .SH COPYRIGHT
