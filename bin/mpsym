@@ -26,19 +26,12 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.10 2001-09-03 23:34:26 graeme Exp $
+# $Id: mpsym,v 1.11 2001-09-25 20:15:54 graeme Exp $
 
 
 # Program version.
 
 VERSION="1.3"
-
-
-# The following value must match how pointers are formatted in the mpatrol
-# log file.  It must be changed for non 32-bit platforms, but only if perl is
-# not being used to process the log file.
-
-POINTER="0x%08X"
 
 
 # Parse the command line options.
@@ -159,6 +152,18 @@ then
         exit 1
     fi
     logfile="$logfile2"
+fi
+
+
+# Attempt to determine how pointers are formatted in the mpatrol log file.
+# It is only necessary if perl is not being used to process the log file.
+
+grep '^processor word size: *64-bit$' "$logfile" >/dev/null 2>&1
+if [ $? = 0 ]
+then
+    POINTER="0x%016X"
+else
+    POINTER="0x%08X"
 fi
 
 
