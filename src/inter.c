@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.49 2000-11-21 22:32:16 graeme Exp $"
+#ident "$Id: inter.c,v 1.50 2000-11-30 21:14:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -407,6 +407,10 @@ void __mp_fini(void)
                     (memhead.alloc.asize >= memhead.uabort))
                     __mp_printallocs(&memhead, 1);
             }
+            /* Next, close the tracing output file.  This will do nothing if
+             * tracing has not been enabled.
+             */
+            __mp_endtrace(&memhead.trace);
             /* Finally, write out any profiling information to the profiling
              * output file.
              */
