@@ -6,9 +6,9 @@ exactly is possible with the mpatrol library and how to go about using it
 effectively.
 
 You should already have built and installed the library and should know how to
-link programs with the library.  Unfortunately I can't give specific
-instructions on how to do this as it varies from system to system and also
-depends on your preferred compiler and development tools.
+link programs with the library.  Unfortunately it isn't possible to give
+specific instructions on how to do this as it varies from system to system and
+also depends on your preferred compiler and development tools.
 
 However, on a typical SVR4 UNIX system, with mpatrol installed in /usr/local,
 the mpatrol library can usually be incorporated into a program using the
@@ -79,7 +79,7 @@ Example 1
     program should be executed, generating the following output in mpatrol.log.
 
     ----------------------------------------------------------------------------
-    @(#) mpatrol 1.0.0 (99/10/11)
+    @(#) mpatrol 1.0.4 (99/10/21)
     Copyright (C) 1997-1999 Graeme S. Roy
 
     This is free software, and you are welcome to redistribute it under certain

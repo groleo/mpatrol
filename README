@@ -4,7 +4,7 @@ README FOR THE MPATROL LIBRARY
 This document contains an overview of the mpatrol library.  For instructions on
 how to build and install the mpatrol library, see INSTALL.  The documentation
 for the library currently exists as a set of UNIX manual pages located in the
-man directory.
+man directory or as Texinfo format located in the doc directory.
 
 
 Introduction
@@ -213,7 +213,8 @@ Overview of features
 
       * A small test suite is provided in order to test basic features.
 
-      * User documentation is currently available as UNIX manual pages.
+      * User documentation is currently available in Texinfo format as well as
+        UNIX manual pages.
 
 
 Supported systems
