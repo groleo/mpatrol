@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.25 2000-07-24 20:01:55 graeme Exp $
+# $Id: Makefile,v 1.26 2000-10-17 18:18:26 graeme Exp $
 
 
 # Definitions
@@ -232,7 +232,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
+	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/version.h
 mleak.o: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.24 2000-07-24 20:02:03 graeme Exp $
+# $Id: Makefile,v 1.25 2000-10-17 18:18:27 graeme Exp $
 
 
 # Definitions
@@ -227,7 +227,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
+	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
