@@ -93,6 +93,10 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
+X_CFLAGS = @X_CFLAGS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
 libmpatrolmt_la_LIBADD = 
 libmpatrolmt_la_OBJECTS =  list.lo tree.lo slots.lo utils.lo memory.lo \
 heap.lo alloc.lo info.lo stack.lo addr.lo strtab.lo symbol.lo \
