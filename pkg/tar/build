@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.56 2001-02-21 11:03:25 graeme Exp $
+# $Id: build,v 1.57 2001-02-21 12:25:30 graeme Exp $
 
 
 version=1.4.0
@@ -38,6 +38,7 @@ make clobber
 make libmpatrol.a libmpatrol.so.$libversion
 make libmpatrolmt.a libmpatrolmt.so.$libversion
 make libmpalloc.a libmpalloc.so.$libversion
+make libmptools.a
 make mpatrol mprof mptrace mleak
 strip mpatrol
 strip mprof
@@ -111,6 +112,7 @@ cp ../../build/unix/libmpatrolmt.a mpatrol/lib
 cp ../../build/unix/libmpatrolmt.so.$libversion mpatrol/lib
 cp ../../build/unix/libmpalloc.a mpatrol/lib
 cp ../../build/unix/libmpalloc.so.$libversion mpatrol/lib
+cp ../../build/unix/libmptools.a mpatrol/lib
 cd mpatrol/lib
 ln -s libmpatrol.so.$libversion libmpatrol.so
 ln -s libmpatrolmt.so.$libversion libmpatrolmt.so

@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.61 2001-02-21 11:03:23 graeme Exp $
+# $Id: mpatrol.spec,v 1.62 2001-02-21 12:25:27 graeme Exp $
 
 
 %define libversion 1.4
@@ -64,6 +64,7 @@ cd build/unix
 make libmpatrol.a libmpatrol.so.%{libversion}
 make libmpatrolmt.a libmpatrolmt.so.%{libversion}
 make libmpalloc.a libmpalloc.so.%{libversion}
+make libmptools.a
 make mpatrol mprof mptrace mleak
 
 
@@ -98,6 +99,7 @@ install -m644 build/unix/libmpatrolmt.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmpalloc.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpalloc.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+install -m644 build/unix/libmptools.a $RPM_BUILD_ROOT/%{_libdir}
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/*.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3

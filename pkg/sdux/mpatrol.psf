@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.23 2001-02-21 11:03:24 graeme Exp $
+# $Id: mpatrol.psf,v 1.24 2001-02-21 12:25:28 graeme Exp $
 
 
 product
@@ -177,6 +177,7 @@ product
 	file -m 0775		libmpatrol.sl
 	file			libmpalloc.a
 	file -m 0775		libmpalloc.sl
+	file			libmptools.a
 	directory		mpatrol/man=/usr/local/man
 	directory		mpatrol/man/man1=/usr/local/man/man1
 	file			mpatrol.1
