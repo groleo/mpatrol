@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.3 2000-04-19 17:51:05 graeme Exp $"
+#ident "$Id: profile.c,v 1.4 2000-04-19 18:58:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -68,6 +68,17 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
 
 MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 {
+    /* Note the size of the allocation in one of the allocation bins.
+     * The highest allocation bin stores a count of all the allocations
+     * that are larger than the largest bin.
+     */
+    if (l < MP_BIN_SIZE)
+        p->acounts[l - 1]++;
+    else
+    {
+        p->acounts[MP_BIN_SIZE - 1]++;
+        p->acountl += l;
+    }
     return 1;
 }
 
@@ -77,6 +88,17 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 
 MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 {
+    /* Note the size of the deallocation in one of the deallocation bins.
+     * The highest deallocation bin stores a count of all the deallocations
+     * that are larger than the largest bin.
+     */
+    if (l < MP_BIN_SIZE)
+        p->dcounts[l - 1]++;
+    else
+    {
+        p->dcounts[MP_BIN_SIZE - 1]++;
+        p->dcountl += l;
+    }
     return 1;
 }
 

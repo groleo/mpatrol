@@ -41,8 +41,12 @@
 
 typedef struct profhead
 {
-    char *file;     /* profiling filename */
-    char profiling; /* profiling status */
+    unsigned long acounts[MP_BIN_SIZE]; /* allocation bins */
+    unsigned long dcounts[MP_BIN_SIZE]; /* deallocation bins */
+    unsigned long acountl;              /* total bytes of large allocations */
+    unsigned long dcountl;              /* total bytes of large deallocations */
+    char *file;                         /* profiling filename */
+    char profiling;                     /* profiling status */
 }
 profhead;
 
