@@ -57,7 +57,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.15 2000-06-23 20:17:02 graeme Exp $"
+#ident "$Id: stack.c,v 1.16 2000-06-26 22:57:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -171,8 +171,8 @@ MP_GLOBAL void __mp_newframe(stackinfo *s, void *f)
 #else /* TARGET && ARCH */
     s->next = NULL;
 #endif /* TARGET && ARCH */
-    s->first = f;
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+    s->first = f;
 }
 
 
