@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.54 2000-04-06 18:45:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.55 2000-04-11 21:48:34 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.8
-@set VERSION 1.1.4
-@set UPDATED 6th April, 2000
+@set EDITION 1.9
+@set VERSION 1.1.5
+@set UPDATED 11th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -5505,7 +5505,10 @@ implementation at a lower level in assembly, but this is much less portable.
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
 write one?  I can think of many applications that would benefit from such a
-library besides this one.
+library besides this one@footnote{The latest release of the GNU C library
+includes a @code{backtrace()} function which fills in an array of return
+addresses, but this requires the presence of the library and some features of
+GCC.}.
 
 @item
 An alternative implementation for call stack traversal uses the functions
@@ -5533,6 +5536,13 @@ In object file formats that don't store the sizes of symbols (such as basic
 COFF, or when using the GNU BFD library), the current implementation will simply
 assume that the current symbol terminates at the beginning of the next symbol in
 the virtual address space.
+
+@item
+There still appears to be a problem with the code address to line number mapping
+provided by the GNU BFD library, and this needs to be looked into further.  Also
+need to store filename and line number information in all call stacks so that
+the information can be used at program termination.  May also need to display
+this information in the @code{__mp_printinfo()} function.
 
 @item
 Perhaps add a memory allocation profiling feature (something similar to mprof),
@@ -5749,6 +5759,11 @@ need to add support for reading symbols from any DLLs that are required by the
 program.  This may be possible in a limited fashion by using the GNU BFD
 library, but may only work with code compiled with @command{gcc}.
 @end itemize
+
+@item
+There seems to be a problem when mixing the archive version of the mpatrol
+library and the Microsoft C run-time library DLL, and vice versa.  This needs
+to be looked into, but for the moment, don't mix them.
 
 @node Netware notes, , Windows notes, Notes
 @appendixsec Notes for Netware platforms
@@ -6601,6 +6616,15 @@ Uses @code{mmap()} instead of @code{sbrk()} to allocate heap space.
 @item watchmalloc(3x)
 Uses watch point areas to check for overflows.
 @end table
+
+@cindex GNU C library
+On platforms with the GNU C library, such as Linux, there are several
+environment variables that can be used to enable various debugging features of
+@code{malloc()}, etc.  There are also extra functions provided in the library
+which can be used to aid in debugging, and some shell scripts which can
+translate return addresses or locate unfreed memory allocations in the log files
+produced.  Useful information on the debugging features available within the
+GNU C library is located at @uref{http://sdb.suse.de/sdb/en/html/aj_debug.html}.
 
 @node Function index, Index, Related software, Top
 @unnumbered Function index
