@@ -1,3 +1,12 @@
+Changes for 1.0.8 (20th December, 1999)
+
+  * Added the utilities and library functions sections and documented the pkg
+    directory and how to use other libraries with mpatrol in the mpatrol manual.
+
+  * Made reading the ELF dynamic linker independent of file format since Linux
+    now uses the GNU BFD library rather than the ELF access library.
+
+
 Changes for 1.0.7 (29th November, 1999)
 
   * Added the overwrites and underwrites, testing, library behaviour and general

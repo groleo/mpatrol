@@ -1,3 +1,25 @@
+Mon Dec 20 22:06:49 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added a section on using the library functions.
+
+	* src/target.h:
+	Now use BFD file format by default on Linux since later RedHat releases
+	don't come with libelf.
+
+	* src/symbol.c:
+	Made reading the ELF dynamic linker independent of file format.
+
+	* src/memory.h, src/memory.c: Added __mp_memset() and __mp_memcopy().
+
+Mon Dec  6 20:50:44 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added the utilities section and also documented the pkg directory and
+	how to use other libraries with mpatrol.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Added information about core file sizes.
+
 Mon Nov 29 20:15:50 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/pkg/build, pkg/pkg/prototype, pkg/pkg/pkginfo:
