@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.1 1999-10-04 23:45:28 graeme Exp $
+# $Id: SMakefile,v 1.2 2000-01-09 21:58:53 graeme Exp $
 
 
 # Definitions
@@ -39,7 +39,7 @@ TFLAGS = DEF MP_THREADS_SUPPORT=1
 
 LIBRARY	 = mpatrol
 VERSION	 = 1
-REVISION = 0
+REVISION = 1
 
 ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -104,8 +104,7 @@ $(SHARTS_LIBRARY): $(SHARTS_OBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
 
-all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(OBJECT_LIBRARY) \
-	$(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) $(OBJTS_LIBRARY)
+all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY)
 
 clean:
 	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
