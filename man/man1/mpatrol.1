@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.38 2001-03-06 19:33:47 graeme Exp $
+.\" $Id: mpatrol.1,v 1.39 2001-06-13 22:22:21 graeme Exp $
 .\"
-.TH MPATROL 1 "6 March 2001" "Release 1.4" "mpatrol library"
+.TH MPATROL 1 "13 June 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -73,6 +73,10 @@ options specified together.
 \fB\-\-check\-allocs\fP
 [\fBCHECKALLOCS\fP]  Checks that no attempt is made to allocate a block of
 memory of size zero.
+.TP
+\fB\-\-check\-fork\fP
+[\fBCHECKFORK\fP]  Checks at every call to see if the process has been forked in
+case new log, profiling and tracing output files need to be started.
 .TP
 \fB\-\-check\-frees\fP
 [\fBCHECKFREES\fP]  Checks that no attempt is made to deallocate a \fBNULL\fP
