@@ -21,7 +21,9 @@
 
 
 /*
- * Mathematical support routines.
+ * Mathematical support routines.  The signed and unsigned LEB128 support
+ * routines are derived from algorithms printed in the DWARF 2 debugging
+ * information format specification.
  */
 
 
@@ -29,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: utils.c,v 1.4 2000-01-31 21:06:39 graeme Exp $"
+#ident "$Id: utils.c,v 1.5 2000-11-30 19:07:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,6 +107,102 @@ MP_GLOBAL unsigned long __mp_roundup(unsigned long n, unsigned long a)
     return ((n - 1) & ~(a - 1)) + a;
 }
 #endif /* MP_MACROROUTINES */
+
+
+/* Convert a signed integer to a signed LEB128 number.
+ */
+
+MP_GLOBAL void *__mp_encodesleb128(long n, size_t *l)
+{
+    static unsigned char b[32];
+    size_t i;
+    int p, s;
+
+    i = 0;
+    p = (n >= 0);
+    do
+    {
+        b[i] = n & 0x7F;
+        n >>= 7;
+        if (!p)
+            n |= -(1 << ((sizeof(long) << 3) - 7));
+        s = b[i] & 0x40;
+        if (((n != 0) || (s != 0)) && ((n != -1) || (s == 0)))
+            b[i] |= 0x80;
+    }
+    while (b[i++] & 0x80);
+    *l = i;
+    return b;
+}
+
+
+/* Convert an unsigned integer to an unsigned LEB128 number.
+ */
+
+MP_GLOBAL void *__mp_encodeuleb128(unsigned long n, size_t *l)
+{
+    static unsigned char b[32];
+    size_t i;
+
+    i = 0;
+    do
+    {
+        b[i] = n & 0x7F;
+        if (n >>= 7)
+            b[i] |= 0x80;
+    }
+    while (b[i++] & 0x80);
+    *l = i;
+    return b;
+}
+
+
+/* Convert a signed LEB128 number to a signed integer.
+ */
+
+MP_GLOBAL long __mp_decodesleb128(void *d, size_t *l)
+{
+    unsigned char *b;
+    long n;
+    unsigned char s;
+
+    b = (unsigned char *) d;
+    n = 0;
+    s = 0;
+    do
+    {
+        n |= (*b & 0x7F) << s;
+        s += 7;
+    }
+    while (*b++ & 0x80);
+    if ((s < sizeof(long) << 3) && (*(b - 1) & 0x40))
+        n |= -(1 << s);
+    *l = (size_t) (b - (unsigned char *) d);
+    return n;
+}
+
+
+/* Convert an unsigned LEB128 number to an unsigned integer.
+ */
+
+MP_GLOBAL unsigned long __mp_decodeuleb128(void *d, size_t *l)
+{
+    unsigned char *b;
+    unsigned long n;
+    unsigned char s;
+
+    b = (unsigned char *) d;
+    n = 0;
+    s = 0;
+    do
+    {
+        n |= (*b & 0x7F) << s;
+        s += 7;
+    }
+    while (*b++ & 0x80);
+    *l = (size_t) (b - (unsigned char *) d);
+    return n;
+}
 
 
 #ifdef __cplusplus

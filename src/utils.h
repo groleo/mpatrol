@@ -30,6 +30,7 @@
 
 
 #include "config.h"
+#include <stddef.h>
 
 
 #if MP_MACROROUTINES
@@ -60,6 +61,10 @@ MP_EXPORT unsigned long __mp_poweroftwo(unsigned long);
 MP_EXPORT unsigned long __mp_rounddown(unsigned long, unsigned long);
 MP_EXPORT unsigned long __mp_roundup(unsigned long, unsigned long);
 #endif /* MP_MACROROUTINES */
+MP_EXPORT void *__mp_encodesleb128(long, size_t *);
+MP_EXPORT void *__mp_encodeuleb128(unsigned long, size_t *);
+MP_EXPORT long __mp_decodesleb128(void *, size_t *);
+MP_EXPORT unsigned long __mp_decodeuleb128(void *, size_t *);
 
 
 #ifdef __cplusplus
