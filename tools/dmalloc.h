@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.3 2001-03-01 23:14:01 graeme Exp $
+ * $Id: dmalloc.h,v 1.4 2001-03-01 23:18:58 graeme Exp $
  */
 
 
@@ -54,7 +54,9 @@
  * has no effect yet.  The dmalloc_errno variable is not used and so the
  * dmalloc_strerror() function always returns a constant string.  Note
  * that unlike the actual Dmalloc library, this file is not threadsafe,
- * and the lockon option has no effect.
+ * and the lockon option has no effect.  In addition, the start option
+ * ignores the file:line syntax and uses allocation indices rather than
+ * events.
  *
  * The dmalloc_debug() function does not support the setting of all of the
  * Dmalloc flags, although this file defines preprocessor macros for each
@@ -74,7 +76,9 @@
  * ever return DMALLOC_VERIFY_ERROR if the pointer to be checked is not
  * null and is invalid - it always terminates with an error message in the
  * mpatrol log file whenever the pointer to be checked is null and it has
- * detected heap corruption.
+ * detected heap corruption.  The information currently passed to any
+ * tracker functions does not include source file and line number
+ * information.
  *
  * The dmalloc_log_heap_map() and dmalloc_log_stats() functions map on to
  * the __mp_memorymap() and __mp_summary() functions and so have entirely
