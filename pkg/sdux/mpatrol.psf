@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
+# Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.37 2001-09-13 19:36:04 graeme Exp $
+# $Id: mpatrol.psf,v 1.38 2002-01-08 20:22:47 graeme Exp $
 
 
 product
@@ -31,7 +31,7 @@ product
     category			language
     category_title		"Languages"
     description			"The mpatrol library for controlling and tracing dynamic memory allocations."
-    copyright			"Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>"
+    copyright			"Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>"
     fileset
 	tag			mpatrol
 	file_permissions	-m 0664 -o bin -g bin

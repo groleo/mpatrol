@@ -3,7 +3,7 @@
 
 rem mpatrol
 rem A library for controlling and tracing dynamic memory allocations.
-rem Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
+rem Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
 rem
 rem This library is free software; you can redistribute it and/or
 rem modify it under the terms of the GNU Library General Public
@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.48 2001-09-13 19:34:59 graeme Exp $
+rem $Id: build.bat,v 1.49 2002-01-08 20:23:50 graeme Exp $
 
 
 set version=1.4.8

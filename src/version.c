@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.52 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: version.c,v 1.53 2002-01-08 20:14:50 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.52 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.53 2002-01-08 20:14:50 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -64,7 +64,7 @@ MP_GLOBAL char *__mp_version = MP_VERSION " (05 September 2001)";
 #endif /* TARGET */
 
 
-MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2001";
+MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2002";
 MP_GLOBAL char *__mp_author = "Graeme S. Roy";
 MP_GLOBAL char *__mp_email = "graeme.roy@analog.com";
 MP_GLOBAL char *__mp_homepage = "http://www.cbmamiga.demon.co.uk/mpatrol";
