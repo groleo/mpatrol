@@ -1,3 +1,105 @@
+2001-02-26  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_checkheap().
+
+	* man/man3/libmpatrol.3: Added __mp_atexit() and __mp_setmark().
+
+	* src/info.c, src/diag.c, src/diag.h: Added the FREMRK error.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Reintroduced __mp_check().
+
+2001-02-25  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more information in NOTES and FAQ.  Changed example 4 for new
+	flags.
+
+	* src/info.c: Fixed problem with profiling reallocations.  Oops!
+
+	* src/info.c, src/info.h, src/inter.c:
+	Added file and line information to __mp_checkinfo().
+
+	* src/inter.c, src/inter.h, src/mpalloc.c:
+	Changed __mp_check() to __mp_checkheap().
+
+	* src/mpatrol.h:
+	Added __mp_checkheap() in order to add source-level information to the
+	__mp_check() call.
+
+	* tests/pass/test4.c: Added the extra flags.
+
+	* tools/heapdiff.c, tools/heapdiff.h:
+	Changed HEAPDIFFSTART() and HEAPDIFFEND() to lower case.  Added the
+	HD_MARKED flag.
+
+2001-02-23  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added config.h and target.h to tools.
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __mp_setmark().
+
+	* src/info.h: Added FLG_MARKED.
+
+	* src/inter.h, src/mpatrol.h: Added the marked field.
+
+	* src/inter.h, src/inter.c, src/mpatrol.h: Added other flags.
+
+	* src/inter.h, src/inter.c, src/mpatrol.h, src/mpalloc.c:
+	Added __mp_setmark().
+
+	* tools/heapdiff.c, tools/mgauge.c, tools/mtrace.c: Added config.h.
+
+	* tools/mtrace.c, tools/mtrace.h, tools/mgauge.c, tools/mgauge.h,
+	  tools/heapdiff.c, tools/heapdiff.h:
+	Added the __mpt_* prefixes to the global symbols.
+
+2001-02-22  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/unix/mpalloc.exp, build/unix/mpatrol.exp,
+	  build/windows/mpatrol.def, build/windows/mpatrolmt.def,
+	  build/windows/mpalloc.def:
+	Added the __mp_atexit() function.
+
+	* doc/mpatrol.texi:
+	Fixed a few problems that showed up in the 1.4.0 release.  Added
+	MemTrace from Frank Pilhofer to related software.
+
+	* man/man1/hexwords.1: Fixed a formatting problem.
+
+	* pkg/sdux/mpatrol.psf, pkg/pkg/prototype: Forgot to add pass/test10.c.
+
+	* src/config.h, src/mpatrol.h, src/mpalloc.h:
+	Define MP_CONST and MP_VOLATILE if C++ as well.
+
+	* src/config.h: Added the MP_MAXFINIS definition.
+
+	* src/info.c: Initialised the finicount field.
+
+	* src/info.h: Added the finalisation function array.
+
+	* src/info.h, src/option.h:
+	Commented that some definitions must be kept up to date with mpatrol.h.
+
+	* src/inter.c:
+	Fixed a typing error on Windows platforms.  Added the __mp_atexit()
+	function.
+
+	* src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added the __mp_atexit() function.
+
+	* tools/mtrace.c:
+	Added a call to __mp_atexit() to terminate the trace file.
+
 2001-02-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate: No longer build the documentation archives.

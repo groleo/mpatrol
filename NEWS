@@ -1,3 +1,25 @@
+Changes for 1.4.1
+
+  * Added the __mp_atexit() and __mp_setmark() functions.  Also added more
+    fields to the information returned by __mp_info() and better source-level
+    information when __mp_check() is called.
+
+  * Added the FREMRK error for when an attempt is made to free a marked memory
+    allocation.
+
+  * Fixed a problem which prevented the const keyword being used when compiling
+    with a C++ compiler.
+
+  * Fixed a problem when profiling memory reallocations.
+
+  * Fixed a typing error which would prevent compilation on Windows platforms.
+
+  * Changed HEAPDIFFSTART() and HEAPDIFFEND() to their lowercase equivalents and
+    added support in the heapdiff tool for marked memory allocations.
+
+  * The trace file in the mtrace tool is now automatically closed at exit.
+
+
 Changes for 1.4.0 (21st February, 2001)
 
   * Added release versions of all of the mpatrol library functions that can be
