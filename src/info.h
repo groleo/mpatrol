@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.50 2001-03-05 18:59:08 graeme Exp $
+ * $Id: info.h,v 1.51 2001-03-05 21:59:51 graeme Exp $
  */
 
 
@@ -45,28 +45,29 @@
 #include "signals.h"
 
 
-#define FLG_CHECKALLOCS   1     /* check all memory allocations */
-#define FLG_CHECKREALLOCS 2     /* check all memory reallocations */
-#define FLG_CHECKFREES    4     /* check all memory deallocations */
-#define FLG_CHECKMEMORY   8     /* check all memory operations */
-#define FLG_LOGALLOCS     16    /* log all memory allocations */
-#define FLG_LOGREALLOCS   32    /* log all memory reallocations */
-#define FLG_LOGFREES      64    /* log all memory deallocations */
-#define FLG_LOGMEMORY     128   /* log all memory operations */
-#define FLG_SHOWFREE      256   /* show all free blocks */
-#define FLG_SHOWFREED     512   /* show all freed allocations */
-#define FLG_SHOWUNFREED   1024  /* show all unfreed allocations */
-#define FLG_SHOWMAP       2048  /* show memory map of heap */
-#define FLG_SHOWSYMBOLS   4096  /* show all symbols read */
-#define FLG_ALLOWOFLOW    8192  /* allow memory operations to overflow */
-#define FLG_SAFESIGNALS   16384 /* save and restore signal handlers */
-#define FLG_NOPROTECT     32768 /* do not protect internal structures */
+#define FLG_CHECKALLOCS   0x00000001 /* check all memory allocations */
+#define FLG_CHECKREALLOCS 0x00000002 /* check all memory reallocations */
+#define FLG_CHECKFREES    0x00000004 /* check all memory deallocations */
+#define FLG_CHECKMEMORY   0x00000008 /* check all memory operations */
+#define FLG_LOGALLOCS     0x00000010 /* log all memory allocations */
+#define FLG_LOGREALLOCS   0x00000020 /* log all memory reallocations */
+#define FLG_LOGFREES      0x00000040 /* log all memory deallocations */
+#define FLG_LOGMEMORY     0x00000080 /* log all memory operations */
+#define FLG_SHOWFREE      0x00000100 /* show all free blocks */
+#define FLG_SHOWFREED     0x00000200 /* show all freed allocations */
+#define FLG_SHOWUNFREED   0x00000400 /* show all unfreed allocations */
+#define FLG_SHOWMAP       0x00000800 /* show memory map of heap */
+#define FLG_SHOWSYMBOLS   0x00001000 /* show all symbols read */
+#define FLG_LEAKTABLE     0x00002000 /* automatically use the leak table */
+#define FLG_ALLOWOFLOW    0x00004000 /* allow memory operations to overflow */
+#define FLG_SAFESIGNALS   0x00008000 /* save and restore signal handlers */
+#define FLG_NOPROTECT     0x00010000 /* do not protect internal structures */
 
-#define FLG_FREED         1     /* allocation has been freed */
-#define FLG_MARKED        2     /* allocation has been marked */
-#define FLG_PROFILED      4     /* allocation has been profiled */
-#define FLG_TRACED        8     /* allocation has been traced */
-#define FLG_INTERNAL      16    /* allocation was made inside the library */
+#define FLG_FREED         0x00000001 /* allocation has been freed */
+#define FLG_MARKED        0x00000002 /* allocation has been marked */
+#define FLG_PROFILED      0x00000004 /* allocation has been profiled */
+#define FLG_TRACED        0x00000008 /* allocation has been traced */
+#define FLG_INTERNAL      0x00000010 /* allocation was made inside mpatrol */
 
 
 /* The different types of memory allocation and operation functions.
