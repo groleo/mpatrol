@@ -32,12 +32,13 @@
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
 #include "utils.h"
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.3 1999-10-21 20:50:30 graeme Exp $"
+#ident "$Id: info.c,v 1.4 1999-11-25 16:51:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,6 +77,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->size = h->count = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
+    h->ffreq = h->fseed = 0;
     h->prologue = NULL;
     h->epilogue = NULL;
     h->nomemory = NULL;
@@ -238,7 +240,9 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
         }
         a = h->alloc.heap.memory.page;
     }
-    if ((h->limit > 0) && (h->alloc.asize + l > h->limit))
+    if ((h->recur == 1) && (((h->limit > 0) &&
+          (h->alloc.asize + l > h->limit)) ||
+         ((h->ffreq > 0) && ((rand() % h->ffreq) == 0))))
         errno = ENOMEM;
     else
     {
@@ -390,8 +394,9 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                           h->rstop, h->astop);
             __mp_trap();
         }
-        if ((h->limit > 0) && (l > n->size) &&
-            (h->alloc.asize + l - n->size > h->limit))
+        if ((h->recur == 1) && (((h->limit > 0) && (l > n->size) &&
+              (h->alloc.asize + l - n->size > h->limit)) ||
+             ((h->ffreq > 0) && ((rand() % h->ffreq) == 0))))
         {
             errno = ENOMEM;
             p = NULL;
