@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.13 2001-01-05 18:46:43 graeme Exp $
+# $Id: mupdate,v 1.14 2001-02-21 10:21:01 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -139,6 +139,15 @@ do
 done
 
 
+# Build the documentation.
+
+cd doc
+make all >/dev/null 2>&1
+cd ../man
+make all >/dev/null 2>&1
+cd ..
+
+
 # Create a new release archive.
 
 archive="mpatrol_$release.tar"
@@ -147,16 +156,3 @@ cd ..
 tar cf "$archive" mpatrol
 gzip "$archive"
 echo "created $archive.gz" >&2
-
-
-# Create the documentation release archives.
-
-cd mpatrol/doc
-make mpatrol_doc.tar.gz
-mv mpatrol_doc.tar.gz ../..
-echo "created mpatrol_doc.tar.gz" >&2
-cd ../man
-make mpatrol_man.tar.gz
-mv mpatrol_man.tar.gz ../..
-echo "created mpatrol_man.tar.gz" >&2
-cd ..
