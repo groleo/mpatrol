@@ -1016,4 +1016,8 @@ Summary
     should be easy for you understand and use these other features now that you
     know how to use the ones I've just described.
 
+    And always remember to do final release builds without the mpatrol library
+    as the library is much slower than normal malloc implementations and uses
+    much more memory.
+
     Happy debugging!
