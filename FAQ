@@ -206,6 +206,28 @@ their corresponding answers or solutions.
     the summary at the end of program execution, and then search backwards in
     the log file for WARNING or ERROR.
 
+ Q. I have linked my program with the mpatrol library on an Amiga or Netware
+    machine, but when it runs it still crashes the entire system.  Why is
+    this?
+
+ A. AmigaOS and Netware do not have virtual memory and so do not have memory
+    protection turned on by default.  This means that any rogue write to an
+    erroneous address may actually overwrite the data of another process or
+    perhaps even the operating system, thus bringing the entire machine down.
+    There are several third-party system utilities available for the Amiga to
+    add memory protection to machines with built-in MMUs, which can then be
+    used in conjunction with mpatrol.  I'm not sure about the availability of
+    such software for Netware.
+
+ Q. Why aren't the __mp_prologue() and __mp_epilogue() functions passed
+    valid arguments in the Amiga version of mpatrol?
+
+ A. Any code which calls mpatrol library functions must be compiled with the
+    SAS/C compiler switch PARMS=BOTH in order for these functions to work
+    correctly.  This is because the shared library version of mpatrol requires
+    function arguments passed in registers and, because of the build process,
+    this is required for code linked with the static library as well.
+
 
  4. FILES
 
