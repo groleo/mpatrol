@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.11 2001-02-05 22:58:34 graeme Exp $"
+#ident "$Id: trace.c,v 1.12 2001-04-26 22:56:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.11 2001-02-05 22:58:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.12 2001-04-26 22:56:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -240,6 +240,31 @@ __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
     if ((tracefile == NULL) && !opentracefile(t))
         return;
     fputc('A', tracefile);
+    /* Some of the following values are written as LEB128 numbers.  This is so
+     * that the size of the tracing output file can be kept to a minimum.
+     */
+    b = __mp_encodeuleb128(n, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128((unsigned long) a, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(l, &s);
+    fwrite(b, s, 1, tracefile);
+}
+
+
+/* Record a memory reallocation for tracing.
+ */
+
+MP_GLOBAL
+void
+__mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l)
+{
+    void *b;
+    size_t s;
+
+    if ((tracefile == NULL) && !opentracefile(t))
+        return;
+    fputc('R', tracefile);
     /* Some of the following values are written as LEB128 numbers.  This is so
      * that the size of the tracing output file can be kept to a minimum.
      */

@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.81 2001-03-07 20:37:05 graeme Exp $"
+#ident "$Id: info.c,v 1.82 2001-04-26 22:56:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.81 2001-03-07 20:37:05 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.82 2001-04-26 22:56:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -653,10 +653,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
-                    {
-                        __mp_tracefree(&h->trace, m->data.alloc);
-                        __mp_tracealloc(&h->trace, m->data.alloc, r->block, l);
-                    }
+                        __mp_tracerealloc(&h->trace, m->data.alloc, r->block,
+                                          l);
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -686,10 +684,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                 {
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
-                    {
-                        __mp_tracefree(&h->trace, m->data.alloc);
-                        __mp_tracealloc(&h->trace, m->data.alloc, r->block, l);
-                    }
+                        __mp_tracerealloc(&h->trace, m->data.alloc, r->block,
+                                          l);
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -704,10 +700,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                  * block without having to relocate it.
                  */
                 if (m->data.flags & FLG_TRACED)
-                {
-                    __mp_tracefree(&h->trace, m->data.alloc);
-                    __mp_tracealloc(&h->trace, m->data.alloc, n->block, l);
-                }
+                    __mp_tracerealloc(&h->trace, m->data.alloc, n->block, l);
 #if MP_INUSE_SUPPORT
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
