@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.245 2001-09-04 23:29:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.246 2001-09-05 20:24:31 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1035,24 +1035,34 @@ you will have to generate them yourself using the @file{Makefile} provided.
 @cindex PKG package
 @cindex SD/UX package
 @cindex RPM package
+@cindex Debian package
 @cindex TAR archive
 @cindex LhA archive
 @cindex ZIP archive
 Alternatively, the @file{pkg} directory contains files that can be used to
 automatically generate a @emph{package} in a specific format suitable for
-installation on a system.  Three package formats (PKG, SD/UX and RPM) and three
-archive formats are currently supported (generic tape archive, LhA and ZIP).
+installation on a system.  Four package formats (PKG, SD/UX, RPM and Debian) and
+three archive formats are currently supported (generic tape archive, LhA and
+ZIP).
+
 The first package format is generally used on UNIX SVR4 systems, while the
-second is used on HP/UX systems and the third was introduced by Red Hat for use
-in their Linux distributions.  The generic tape archive can be used as a
-distribution for UNIX systems where no package format is supported, but it does
-not contain information on how to install the files on the system once they
-have been extracted from the distribution.  The LhA and ZIP formats are also
-roughly the same, but the LhA format is intended for Amiga systems and is used
-for Aminet distributions, while the ZIP format is intended for Windows systems
-and is used for WinSite distributions.  You should really know what you are
-doing before you attempt to build a package, and you should also be aware that
-some of the package files may need to be modified before you begin.
+second is used on HP/UX systems.  The RPM and Debian package formats were
+introduced by Red Hat and Debian respectively for use in their Linux
+distributions.
+
+@cindex Aminet
+@cindex WinSite
+The generic tape archive can be used as a distribution for UNIX systems where no
+package format is supported, but it does not contain information on how to
+install the files on the system once they have been extracted from the
+distribution.  The LhA and ZIP formats are also roughly the same, but the LhA
+format is intended for Amiga systems and is used for Aminet distributions, while
+the ZIP format is intended for Windows systems and is used for WinSite
+distributions.
+
+You should really know what you are doing before you attempt to build a package,
+and you should also be aware that some of the package files may need to be
+modified before you begin.
 
 @cindex Linux Software Map
 @cindex LSM
