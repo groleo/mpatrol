@@ -3,6 +3,10 @@ Changes for 1.3.0
   * Added the CHECKMEMORY option for displaying an error for each zero-size
     memory operation on a NULL pointer.
 
+  * Added the EDIT and LIST options for editing and listing source lines that
+    cause warnings or error messages.  Also added the mpedit command which is
+    used by these options.
+
   * Changed the format of stack traces in the mpatrol log file so that symbol
     names also contain a byte offset from the beginning of the symbol.
 
@@ -14,6 +18,8 @@ Changes for 1.3.0
   * Improved the error-checking of the strdup() family of functions and also
     fixed a bug in strndup() and strnsave() where the string was not being
     terminated correctly.
+
+  * Added support for the LOGDIR and PROFDIR environment variables.
 
   * ICL DRS/NX is now supported.
 
@@ -36,8 +42,10 @@ Changes for 1.3.0
   * Fixed a problem with the mpatrol command on UNIX platforms when the command
     to be run was not supplied with a pathname.
 
-  * Added the --graph-file and --leaks options to the mprof command for writing
-    out graph specification files for later visualisation with dot.
+  * The mprof command can now display the full allocation call graph for a
+    profiling output file.  Added the --graph-file and --leaks options to the
+    mprof command for writing out graph specification files for later
+    visualisation with dot.
 
   * Added the ability to read the unfreed allocations table from the log file
     with the mleak command and also added the --ignore option.
@@ -56,9 +64,11 @@ Changes for 1.3.0
   * The ASCII, GNU Info, AmigaGuide and HTML versions of the mpatrol manual and
     the texinfo.tex file used to build the printed manuals are now provided with
     the main distribution.  The PDF version of the manual now includes the
-    mpatrol logo as a proper PDF image file instead of a PNG file.
+    mpatrol logo as a proper PDF image file instead of a PNG file and now
+    includes thumbnail images as well.
 
-  * Fixed the problem with margins in the PDF reference card.
+  * Fixed the problem with margins in the PDF reference card.  The printed
+    mpatrol manual is now A4 by default.
 
   * A Makefile is now provided to build the UNIX manual pages.
 

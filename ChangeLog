@@ -1,3 +1,155 @@
+2000-11-19  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate: Also update the MP_VERNUM preprocessor macro.
+
+2000-11-18  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/Makefile, doc/README: Added the test images.
+
+	* doc/mpatrol.html, doc/mpatrol.info, doc/mpatrol.txt,
+	  doc/mpatrol.guide, doc/mpatrol.texi:
+	Added information about the --graph-file and --leaks options.
+
+	* doc/images/test.jpg: Added JPEG file for example graph.
+
+	* doc/images/test.eps: Added EPS file for example graph.
+
+	* doc/images/test.pdf: Added PDF file for example graph.
+
+	* extra/test.dot, extra/test.out:
+	New files for the example in the mpatrol manual.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the test graph images to the packages.
+
+2000-11-17  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpedit, bin/mpsym:
+	Send the output of --help and --version to stdout instead of stderr.
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.texi, doc/mpatrol.txt:
+	Added the allocation call graph.
+
+	* src/getopt.c: Send the output of --help to stdout instead of stderr.
+
+	* src/mleak.c, src/mpatrol.c:
+	Send the output of --help and --version to stdout instead of stderr.
+
+	* src/mprof.c:
+	Send the output of --help and --version to stdout instead of stderr and
+	also finished the allocation call graph table.
+
+2000-11-16  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.txt, doc/mpatrol.guide, doc/mpatrol.html,
+	  doc/mpatrol.info, doc/mpatrol.texi:
+	Added lots more things to do.  Added information on StackTrace.
+	Documented the LOGDIR and PROFDIR environment variables.
+
+	* doc/refcard.tex:
+	Added the EDIT and LIST options and also documented the mpedit command.
+	Added error abbreviation codes.
+
+	* pkg/zip/build.bat: Now use WinZip instead of PKZip.
+
+2000-11-15  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added version.h to the dependencies for profile.o.
+
+	* doc/Makefile:
+	Added support for building thumbnails.  Changed SPLITHTML to SPLIT since
+	we may want to split the info file as well.  Remove the split info
+	files.
+
+	* doc/texinfo.tex: Added support for thumbpdf.
+
+	* extra/cc1.out, extra/collect2.out, extra/cpp.out, extra/gcc.out:
+	Added the profiling output files used to produce the examples.
+
+	* src/profile.c: Added version information to the profiling output file.
+
+2000-11-14  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpedit:
+	Add a message describing the file and line number when --list is used.
+
+	* doc/Makefile: Specify that the postscript manual should be A4.
+
+	* doc/mpatrol.texi, doc/mpatrol.txt, doc/mpatrol.guide,
+	  doc/mpatrol.html, doc/mpatrol.info:
+	Added information about the error abbreviation codes and specified A4
+	paper.
+
+	* man/Makefile: Added the mpedit manual page.
+
+	* man/man3/mpatrol.3, man/man1/mleak.1, man/man1/mpatrol.1,
+	  man/man1/mprof.1, man/man1/mpsym.1, man/cat3/mpatrol.3,
+	  man/cat1/mpatrol.1, man/cat1/mprof.1, man/cat1/mpsym.1,
+	  man/cat1/mleak.1:
+	Added references to the mpedit manual page.
+
+	* man/man1/mpedit.1, man/cat1/mpedit.1: New manual page for mpedit.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1:
+	Added the --edit and --list options.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Documented the EDIT and LIST options, as well as the LOGDIR and PROFDIR
+	environment variables.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the mpedit manual page to the distributions.
+
+	* src/config.h: Added MP_LOGDIR and MP_PROFDIR.
+
+	* src/version.h: Added MP_VERNUM.
+
+	* src/info.c:
+	Reformatted some of the error messages for the EDIT option.
+
+	* src/diag.c, src/diag.h:
+	Added support for the EDIT and LIST options, added recognition of the
+	LOGDIR and PROFDIR environment variables and made a change for --dynamic
+	support when editing files.  Don't alter the filenames of the log file
+	or the profiling output file if they are stderr or stdout.
+
+	* src/mpatrol.h, src/option.c, src/option.h:
+	Added the EDIT and LIST options.
+
+	* src/mpatrol.c: Added the --edit and --list options.
+
+	* src/mprof.c:
+	Now include the version number in the profiling output file.
+
+2000-11-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpedit:
+	New command for invoking an editor on a specific source file.
+
+	* doc/Makefile: Added the default rule.
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.texi, doc/mpatrol.txt:
+	Added the GNU Library General Public License.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the mpedit command and also strip the executables.
+
+	* src/config.h: Added the MP_EDITOR definition.
+
+	* src/diag.c: Added the editfile() function.
+
+	* src/info.c, src/diag.c, src/diag.h, src/inter.c, src/option.c,
+	  src/profile.c, src/signals.c, src/symbol.c:
+	Added file and line number information to calls to __mp_error() and
+	__mp_warn().
+
 2000-11-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/diag.c:
