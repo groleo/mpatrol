@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.89 2001-02-23 23:01:23 graeme Exp $"
+#ident "$Id: inter.c,v 1.90 2001-02-23 23:09:53 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.89 2001-02-23 23:01:23 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.90 2001-02-23 23:09:53 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1402,6 +1402,9 @@ __mp_info(void *p, allocinfo *d)
     d->userdata = m->data.userdata;
     d->freed = ((m->data.flags & FLG_FREED) != 0);
     d->marked = ((m->data.flags & FLG_MARKED) != 0);
+    d->profiled = ((m->data.flags & FLG_PROFILED) != 0);
+    d->traced = ((m->data.flags & FLG_TRACED) != 0);
+    d->internal = ((m->data.flags & FLG_INTERNAL) != 0);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);
     /* The names of the symbols in the call stack may not have been determined

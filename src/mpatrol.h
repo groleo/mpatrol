@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.95 2001-02-23 22:46:42 graeme Exp $
+ * $Id: mpatrol.h,v 1.96 2001-02-23 23:09:53 graeme Exp $
  */
 
 
@@ -327,8 +327,11 @@ typedef struct __mp_allocinfo
     char *typestr;          /* type stored in allocation */
     size_t typesize;        /* size of type stored in allocation */
     void *userdata;         /* user data associated with allocation */
-    char freed;             /* allocation has been freed */
-    char marked;            /* allocation has been marked */
+    int freed : 1;          /* allocation has been freed */
+    int marked : 1;         /* allocation has been marked */
+    int profiled : 1;       /* allocation has been profiled */
+    int traced : 1;         /* allocation has been traced */
+    int internal : 1;       /* allocation is internal */
 }
 __mp_allocinfo;
 
