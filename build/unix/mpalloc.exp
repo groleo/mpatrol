@@ -21,7 +21,6 @@
 * AIX Shared Library Exports
 
 
-__mp_failure
 __mp_setfailhandler
 __mp_xmalloc
 __mp_xcalloc
