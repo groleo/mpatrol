@@ -32,12 +32,13 @@
 #include "config.h"
 
 
-#if MP_THREADS_SUPPORT && MP_INIT_SUPPORT
+#if MP_INIT_SUPPORT
 /* Provide support for initialising the mpatrol mutexes and data structures
  * before main() is called.  This is preferred over any other such solutions
  * on the following systems since it means that we can link with any compiler
  * rather than relying on linking with the same compiler that built the mutex
- * module.
+ * module.  We can also use exactly the same system when terminating the
+ * mpatrol library.
  */
 
 
@@ -55,12 +56,18 @@ __mp_initsection:
 
 
 /* Place calls to initialise the mpatrol mutexes and data structures into
- * the .init section.
+ * the .init section and a call to terminate the mpatrol library in the
+ * .fini section.
  */
 
 	.section .init,"ax"
+#if MP_THREADS_SUPPORT
 	call	__mp_initmutexes
+#endif /* MP_THREADS_SUPPORT */
 	call	__mp_init
+
+	.section .fini,"ax"
+	call	__mp_fini
 #elif ARCH == ARCH_M68K
 /* Define the __mp_initsection variable.
  */
@@ -75,12 +82,18 @@ __mp_initsection:
 
 
 /* Place calls to initialise the mpatrol mutexes and data structures into
- * the .init section.
+ * the .init section and a call to terminate the mpatrol library in the
+ * .fini section.
  */
 
 	.section .init,"ax",@progbits
+#if MP_THREADS_SUPPORT
 	jbsr	__mp_initmutexes
+#endif /* MP_THREADS_SUPPORT */
 	jbsr	__mp_init
+
+	.section .fini,"ax",@progbits
+	jbsr	__mp_fini
 #elif ARCH == ARCH_M88K
 /* Define the __mp_initsection variable.
  */
@@ -95,12 +108,18 @@ ___mp_initsection:
 
 
 /* Place calls to initialise the mpatrol mutexes and data structures into
- * the .init section.
+ * the .init section and a call to terminate the mpatrol library in the
+ * .fini section.
  */
 
 	section	.init,"ax",#progbits
+#if MP_THREADS_SUPPORT
 	bsr	___mp_initmutexes
+#endif /* MP_THREADS_SUPPORT */
 	bsr	___mp_init
+
+	section	.fini,"ax",#progbits
+	bsr	___mp_fini
 #elif ARCH == ARCH_SPARC
 /* Define the __mp_initsection variable.
  */
@@ -115,16 +134,23 @@ __mp_initsection:
 
 
 /* Place calls to initialise the mpatrol mutexes and data structures into
- * the .init section.
+ * the .init section and a call to terminate the mpatrol library in the
+ * .fini section.
  */
 
 	.section ".init",#alloc,#execinstr
+#if MP_THREADS_SUPPORT
 	call	__mp_initmutexes
 	nop
+#endif /* MP_THREADS_SUPPORT */
 	call	__mp_init
 	nop
+
+	.section ".fini",#alloc,#execinstr
+	call	__mp_fini
+	nop
 #endif /* ARCH */
-#endif /* MP_THREADS_SUPPORT && MP_INIT_SUPPORT */
+#endif /* MP_INIT_SUPPORT */
 
 
 #if !MP_BUILTINSTACK_SUPPORT
