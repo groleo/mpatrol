@@ -8,7 +8,7 @@ their corresponding answers or solutions.
  1. DOCUMENTATION
 
  Q. I can't seem to format the TeXinfo manual for mpatrol into anything that I
-    can view or print.
+    can view or print.  What am I doing wrong?
 
  A. You'll need to have the appropriate document formatting programs installed
     on your system before you can do this, and even then you'll also need to
@@ -20,7 +20,8 @@ their corresponding answers or solutions.
     on-line at the same site.
 
  Q. I'd like to convert the mpatrol manual to a different documentation format
-    but there is no support for that format in the Makefile.
+    but there is no support for that format in the Makefile.  How would I go
+    about doing this?
 
  A. Since TeXinfo is intended to be converted to other documentation formats it
     should be fairly easy for you to find a tool which will convert it into your
@@ -57,7 +58,7 @@ their corresponding answers or solutions.
 
  2. LINKING
 
- Q. I get undefined symbols when linking with the mpatrol library.
+ Q. Why do I get undefined symbols when linking with the mpatrol library?
 
  A. This is most likely caused by the mpatrol library requiring additional
     symbols defined in an object file access library.  If mpatrol was built with
@@ -67,8 +68,8 @@ their corresponding answers or solutions.
     instead.  If you are using the thread-safe version of mpatrol then you may
     also need to link with the system threads library.
 
- Q. I get duplicate definitions of symbols when linking with the mpatrol
-    library.
+ Q. Why do I get duplicate definitions of symbols when linking with the mpatrol
+    library?
 
  A. This is most likely caused by your code, or a library, providing definitions
     of malloc() and free() which conflict with those defined in the mpatrol
@@ -77,7 +78,7 @@ their corresponding answers or solutions.
 
  Q. I linked my program to a shared library version of mpatrol.  Now, when I try
     to run my program, the system complains that it cannot find the mpatrol
-    library.
+    library.  How do I get this to work?
 
  A. You need to tell the system where to find the shared library version of the
     mpatrol library, either by setting your LD_LIBRARY_PATH environment variable
@@ -100,7 +101,7 @@ their corresponding answers or solutions.
 
  Q. I am trying to use the mpatrol shell script to debug an executable file that
     was not originally compiled with the mpatrol library.  However, even though
-    it runs successfully, no mpatrol log file is produced.
+    it runs successfully, no mpatrol log file is produced.  Why is this?
 
  A. First, check that you are passing the -d option to the mpatrol shell script.
     If that doesn't work then check that the executable file has been
@@ -122,3 +123,16 @@ their corresponding answers or solutions.
     as Purify to isolate it.  If that fails then you'll just have to employ the
     traditional debugging method of single-stepping through your program in a
     debugger until something unusual or unexpected happens.
+
+ Q. If I link my program to version 1.0 of the mpatrol library then I cannot
+    interrupt it using the keyboard, which I would normally be able to do
+    without using mpatrol.  Is this a bug?
+
+ A. Not really, but it is undesirable behaviour in most cases, which is why it
+    was removed in later releases of mpatrol and replaced with the SAFESIGNALS
+    option.  The reason that the program could not be interrupted using the
+    keyboard was that mpatrol would ignore such signals when its library code
+    was being executed, otherwise user-defined signal handlers that used
+    malloc() and related functions would have the capability to cause lots of
+    undesirable side effects.  However, this does not normally happen, which is
+    why the behaviour was moved to an option for those that needed it.
