@@ -29,11 +29,14 @@
 
 #include "getopt.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <limits.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.1 2000-04-05 17:49:19 graeme Exp $"
+#ident "$Id: getopt.c,v 1.2 2000-04-30 15:05:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -53,6 +56,51 @@ MP_GLOBAL unsigned long __mp_optindex;
  */
 
 MP_GLOBAL char *__mp_optarg;
+
+
+/* Convert a string representation of a number to an integer,
+ * reporting any errors that occur during the conversion.
+ */
+
+MP_GLOBAL int __mp_getnum(char *p, char *s, long *n, int u)
+{
+    char *t;
+    int e;
+
+    e = errno;
+    errno = 0;
+    if ((u == 1) && (*s == '-'))
+    {
+        fprintf(stderr, "%s: Illegal positive number `%s'\n", p, s);
+        t = s;
+    }
+    else if ((u == 0) && (*s == '-') && (s[1] == '0') && ((s[2] == 'b') ||
+             (s[2] == 'B')))
+        /* This is a negative binary number.
+         */
+        *n = -strtol(s + 3, &t, 2);
+    else if ((*s == '0') && ((s[1] == 'b') || (s[1] == 'B')))
+    {
+        /* This is a positive binary number.
+         */
+        if (u == 0)
+            *n = strtol(s + 2, &t, 2);
+        else
+            *n = strtoul(s + 2, &t, 2);
+    }
+    /* Otherwise let the conversion function work out the number base
+     * from the prefix.
+     */
+    else if (u == 0)
+        *n = strtol(s, &t, 0);
+    else
+        *n = strtoul(s, &t, 0);
+    if (errno == ERANGE)
+        fprintf(stderr, "%s: %s number overflow in `%s'\n", p, ((u == 0) &&
+                 (*n == LONG_MIN)) ? "Negative" : "Positive", s);
+    errno = e;
+    return (*t == '\0');
+}
 
 
 /* Read an option from a supplied command line argument array.
@@ -114,7 +162,7 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s)
             if (++__mp_optindex >= n)
             {
                 fprintf(stderr, "%s: Option `-%c' requires an argument\n", a[0],
-                        *t);
+                        r);
                 t = NULL;
                 return '?';
             }
