@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.1 2000-04-06 18:30:13 graeme Exp $
+# $Id: NMakefile,v 1.2 2000-04-06 19:17:16 graeme Exp $
 
 
 # Definitions
@@ -197,13 +197,13 @@ inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
-	$(SOURCE)/option.h
+	$(SOURCE)/option.h $(SOURCE)/sbrk.h
 inter.ts_obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
-	$(SOURCE)/mutex.h $(SOURCE)/option.h
+	$(SOURCE)/mutex.h $(SOURCE)/option.h $(SOURCE)/sbrk.h
 malloc.obj malloc.ts_obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
