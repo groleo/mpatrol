@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.9 2000-11-05 23:05:01 graeme Exp $"
+#ident "$Id: alloc.c,v 1.10 2000-11-05 23:18:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -756,6 +756,7 @@ MP_GLOBAL int __mp_protectalloc(allochead *h, memaccess a)
         if (!__mp_memprotect(&h->heap.memory, n->block, n->size, a))
             return 0;
     }
+    return 1;
 }
 
 
