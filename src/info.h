@@ -85,6 +85,11 @@ typedef enum alloctype
     AT_FREE,      /* free() */
     AT_CFREE,     /* cfree() */
     AT_DEALLOCA,  /* dealloca() */
+    AT_XMALLOC,   /* xmalloc() */
+    AT_XCALLOC,   /* xcalloc() */
+    AT_XSTRDUP,   /* xstrdup() */
+    AT_XREALLOC,  /* xrealloc() */
+    AT_XFREE,     /* xfree() */
     AT_NEW,       /* operator new */
     AT_NEWVEC,    /* operator new[] */
     AT_DELETE,    /* operator delete */

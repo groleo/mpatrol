@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.53 2001-01-15 23:42:43 graeme Exp $"
+#ident "$Id: diag.c,v 1.54 2001-01-17 23:41:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -148,6 +148,11 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "free",
     "cfree",
     "dealloca",
+    "xmalloc",
+    "xcalloc",
+    "xstrdup",
+    "xrealloc",
+    "xfree",
     "operator new",
     "operator new[]",
     "operator delete",

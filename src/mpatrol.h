@@ -226,6 +226,11 @@ typedef enum __mp_alloctype
     MP_AT_FREE,      /* free() */
     MP_AT_CFREE,     /* cfree() */
     MP_AT_DEALLOCA,  /* dealloca() */
+    MP_AT_XMALLOC,   /* xmalloc() */
+    MP_AT_XCALLOC,   /* xcalloc() */
+    MP_AT_XSTRDUP,   /* xstrdup() */
+    MP_AT_XREALLOC,  /* xrealloc() */
+    MP_AT_XFREE,     /* xfree() */
     MP_AT_NEW,       /* operator new */
     MP_AT_NEWVEC,    /* operator new[] */
     MP_AT_DELETE,    /* operator delete */
@@ -353,6 +358,21 @@ struct mallinfo
 #ifdef dealloca
 #undef dealloca
 #endif /* dealloca */
+#ifdef xmalloc
+#undef xmalloc
+#endif /* xmalloc */
+#ifdef xcalloc
+#undef xcalloc
+#endif /* xcalloc */
+#ifdef xstrdup
+#undef xstrdup
+#endif /* xstrdup */
+#ifdef xrealloc
+#undef xrealloc
+#endif /* xrealloc */
+#ifdef xfree
+#undef xfree
+#endif /* xfree */
 #ifdef memset
 #undef memset
 #endif /* memset */
@@ -457,6 +477,15 @@ struct mallinfo
                                  __LINE__, 0)
 #define dealloca(p) __mp_free((p), MP_AT_DEALLOCA, MP_FUNCNAME, __FILE__, \
                               __LINE__, 0)
+#define xmalloc(l) __mp_alloc((l), 0, MP_AT_XMALLOC, MP_FUNCNAME, __FILE__, \
+                              __LINE__, NULL, 0, 0)
+#define xcalloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_XCALLOC, MP_FUNCNAME, \
+                                 __FILE__, __LINE__, NULL, 0, 0)
+#define xstrdup(p) __mp_strdup((p), 0, MP_AT_XSTRDUP, MP_FUNCNAME, __FILE__, \
+                               __LINE__, 0)
+#define xrealloc(p, l) __mp_realloc((p), (l), 0, MP_AT_XREALLOC, MP_FUNCNAME, \
+                                    __FILE__, __LINE__, NULL, 0, 0)
+#define xfree(p) __mp_free((p), MP_AT_XFREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), \
                                     MP_AT_MEMSET, MP_FUNCNAME, __FILE__, \
                                     __LINE__, 0)
@@ -482,18 +511,18 @@ struct mallinfo
                                       __FILE__, __LINE__, 0)
 
 #define MP_MALLOC(l, t) (t *) __mp_alloc((l) * sizeof(t), MP_ALIGN(t), \
-                                         MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
+                                         MP_AT_XMALLOC, MP_FUNCNAME, __FILE__, \
                                          __LINE__, #t, sizeof(t), 0)
 #define MP_CALLOC(l, t) (t *) __mp_alloc((l) * sizeof(t), MP_ALIGN(t), \
-                                         MP_AT_CALLOC, MP_FUNCNAME, __FILE__, \
+                                         MP_AT_XCALLOC, MP_FUNCNAME, __FILE__, \
                                          __LINE__, #t, sizeof(t), 0)
-#define MP_STRDUP(p) __mp_strdup((p), 0, MP_AT_STRDUP, MP_FUNCNAME, __FILE__, \
+#define MP_STRDUP(p) __mp_strdup((p), 0, MP_AT_XSTRDUP, MP_FUNCNAME, __FILE__, \
                                  __LINE__, 0)
 #define MP_REALLOC(p, l, t) (t *) __mp_realloc((p), (l) * sizeof(t), \
-                                               MP_ALIGN(t), MP_AT_REALLOC, \
+                                               MP_ALIGN(t), MP_AT_XREALLOC, \
                                                MP_FUNCNAME, __FILE__, \
                                                __LINE__, #t, sizeof(t), 0)
-#define MP_FREE(p) do { __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, \
+#define MP_FREE(p) do { __mp_free((p), MP_AT_XFREE, MP_FUNCNAME, __FILE__, \
                                   __LINE__, 0); p = NULL; } while (0)
 
 

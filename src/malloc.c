@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.23 2001-01-15 21:33:55 graeme Exp $"
+#ident "$Id: malloc.c,v 1.24 2001-01-17 23:41:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -394,6 +394,102 @@ void
 MP_ALTFUNCNAME(dealloca)(void *p)
 {
     __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Allocate an uninitialised memory block of a given size and abort on failure.
+ */
+
+void *
+xmalloc(size_t l)
+{
+    return __mp_alloc(l, 0, AT_XMALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *
+MP_ALTFUNCNAME(xmalloc)(size_t l)
+{
+    return __mp_alloc(l, 0, AT_XMALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Allocate a zero-initialised memory block to hold enough space for an
+ * array of elements of a given size and abort on failure.
+ */
+
+void *
+xcalloc(size_t l, size_t n)
+{
+    return __mp_alloc(l * n, 0, AT_XCALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *
+MP_ALTFUNCNAME(xcalloc)(size_t l, size_t n)
+{
+    return __mp_alloc(l * n, 0, AT_XCALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Duplicate an existing string using memory from the heap and abort on failure.
+ */
+
+char *
+xstrdup(MP_CONST char *p)
+{
+    return __mp_strdup((char *) p, 0, AT_XSTRDUP, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+char *
+MP_ALTFUNCNAME(xstrdup)(MP_CONST char *p)
+{
+    return __mp_strdup((char *) p, 0, AT_XSTRDUP, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Resize an existing block of memory and abort on failure.
+ */
+
+void *
+xrealloc(void *p, size_t l)
+{
+    return __mp_realloc(p, l, 0, AT_XREALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *
+MP_ALTFUNCNAME(xrealloc)(void *p, size_t l)
+{
+    return __mp_realloc(p, l, 0, AT_XREALLOC, NULL, NULL, 0, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Free an existing block of memory, usually a block allocated by xmalloc().
+ */
+
+void
+xfree(void *p)
+{
+    __mp_free(p, AT_XFREE, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void
+MP_ALTFUNCNAME(xfree)(void *p)
+{
+    __mp_free(p, AT_XFREE, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
