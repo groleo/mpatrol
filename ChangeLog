@@ -1,3 +1,171 @@
+2001-08-23  Graeme Roy  <graeme.roy@analog.com>
+
+	* build/unix/Makefile:
+	Added /usr/X11R6/include to the include directory path when building
+	mptrace with GUI support.
+
+2001-08-22  Graeme Roy  <graeme.roy@analog.com>
+
+	* doc/Makefile: Need -expand none when invoking texi2html.
+
+	* doc/mpatrol.texi: Added third author of HATF.
+
+2001-08-19  Graeme Roy  <graeme.roy@analog.com>
+
+	* pkg/auto/cleanup, pkg/auto/setup: Added the doc and man directories.
+
+2001-08-02  Graeme Roy  <graeme.roy@analog.com>
+
+	* config/ltconfig, config/ltmain.sh, config/config.guess,
+	  config/config.sub:
+	libtool installation files.
+
+	* config/install-sh, config/missing, config/mkinstalldirs,
+	  config/INSTALL:
+	automake installation files.
+
+	* pkg/auto/setup: New file for setting up directory structure.
+
+	* pkg/auto/cleanup: New file to remove directory structure.
+
+2001-08-01  Graeme Roy  <graeme.roy@analog.com>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def:
+	Removed all exports as they are now defined by MP_API.
+
+	* doc/mpatrol.texi, man/man3/libmpatrol.3:
+	Added the alignment argument to the prologue function.
+
+	* src/info.h, src/info.c: Added the __mp_fixalign() function.
+
+	* src/info.h, src/inter.c, src/mpatrol.h:
+	Added alignment argument to prologue function.
+
+	* src/inter.c: Added MP_API to the __mp_lib* functions.
+
+	* src/mpcalloc.c, src/mpmalloc.c, src/mprealloc.c, src/mpsetfail.c,
+	  src/mpstrdup.c, src/cplus.c, src/malloc.c, src/sbrk.c, src/sbrk.h:
+	Added the MP_API macro.
+
+	* src/mleak.c, src/mpatrol.c, src/mprof.c, src/mptrace.c:
+	Changed VERSION to PROGVERSION to prevent conflicts with automake.
+
+	* tests/pass/test2.c: Added alignment to prologue function.
+
+	* tools/dmalloc.c: Added support for alignment in the tracker function.
+
+	* tools/heapdiff.c, tools/mtrace.c:
+	Added alignment support to the prologue function.
+
+2001-07-26  Graeme Roy  <graeme.roy@analog.com>
+
+	* doc/mpatrol.texi, man/man3/libmpatrol.3:
+	Documented the additional 3 arguments passed to the prologue and
+	epilogue functions.  Documented the additional arguments to the
+	low-memory handler.
+
+	* src/config.h: Added MP_API.
+
+	* src/diag.c, src/info.c, src/inter.c, src/inter.h, src/mpalloc.c:
+	Converted some function prototypes to include MP_API.
+
+	* src/info.h, src/mpatrol.h:
+	Added function name, file name and line number to the prologue and
+	epilogue handlers.  Added 4 extra arguments to the low memory handler.
+
+	* src/cplus.c, src/inter.c, src/mpatrol.h:
+	Added an additional 3 arguments to the prologue and epilogue functions.
+	Added new arguments to the nomemory handler.
+
+	* tests/pass/test2.c:
+	Added new arguments to the prologue and epilogue handlers.
+
+	* tests/pass/test3.c: Added extra arguments to the low memory handler.
+
+	* tools/dmalloc.c, tools/dmalloc.h:
+	Now pass source file and line number to malloc tracker function.
+
+	* tools/heapdiff.c: Updated prologue function arguments.
+
+	* tools/mgauge.c: Updated the arguments passed to the epilogue function.
+
+	* tools/mtrace.c:
+	Updated the arguments for the prologue and epilogue handlers.  Can now
+	get the function name, file name and line number if that was available
+	in the source code.
+
+2001-07-25  Graeme Roy  <graeme.roy@analog.com>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added __cyg_profile_func_enter() and __cyg_profile_func_exit().
+
+	* doc/mpatrol.texi:
+	Documented mpatrol patch 4 and GUISUP.  Changed test to use
+	__mp_prologuehandler and __mp_epiloguehandler.  Updated __mp_prologue
+	and __mp_epilogue.  Converted __mp_nomemory().
+
+	* man/man3/libmpatrol.3:
+	Updated __mp_prologue and __mp_epilogue.  Converted __mp_nomemory().
+
+	* pkg/sdux/build, pkg/pkg/build:
+	Added GUISUP=true when building mptrace.
+
+	* src/info.h:
+	Added prologuehandler, epiloguehandler and nomemoryhandler typedefs.
+
+	* src/inter.h, src/mpalloc.c:
+	Changed the definitions of __mp_prologue, __mp_epilogue and
+	__mp_nomemory.
+
+	* src/inter.c, src/inter.h, src/mpalloc.c:
+	Added __cyg_profile_func_enter() and __cyg_profile_func_exit().
+
+	* src/cplus.c: Added an extra cast in case __mp_nomemory() is redefined.
+
+	* src/mpatrol.h:
+	Added __mp_prologuehandler and __mp_epiloguehandler.  Defined
+	__mp_prologue and __mp_epilogue in terms of __mp_prologuehandler and
+	__mp_epiloguehandler.  Added __mp_nomemoryhandler.
+
+	* tests/pass/test2.c:
+	Changed test to use __mp_prologuehandler and __mp_epiloguehandler.
+
+	* tools/dmalloc.c, tools/heapdiff.c, tools/mgauge.c, tools/mtrace.c:
+	Now use definitions of __mp_prologuehandler and __mp_epiloguehandler.
+
+2001-07-19  Graeme Roy  <graeme.roy@analog.com>
+
+	* doc/mpatrol.texi:
+	Finally got around to documenting the libiberty.so problem in the FAQ.
+	Added more related software.
+
+	* src/config.h:
+	Increased MP_BUFFER_SIZE to 8192 due to the length of C++ identifiers.
+
+	* src/target.h:
+	Don't redefine _POSIX_SOURCE, etc, if they are already defined.
+
+	* src/getopt.c, src/getopt.h:
+	Added __mp_basename().  Use the basename of the program name for any
+	diagnostics.
+
+	* src/mleak.c, src/mpatrol.c, src/mprof.c, src/mptrace.c:
+	Now make progname the basename of argv[0].
+
+	* src/mptrace.c:
+	Now only display source if available rather than a blank line.
+
+2001-07-12  Graeme Roy  <graeme.roy@analog.com>
+
+	* doc/Makefile: Added ability to build the source code documentation.
+
+	* doc/source.tex: New file for source code documentation.
+
+	* build/unix/Makefile: Added the GUISUP flag.
+
 2001-06-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* THANKS: Credited Michael Anthony.

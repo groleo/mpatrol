@@ -1,3 +1,21 @@
+Changes for 1.4.6 (23rd August, 2001)
+
+  * Added many new arguments that are passed to prologue, epilogue and low
+    memory callback functions and updated the tools that already use them.
+
+  * The Windows DLL version of the mpatrol library now correctly exports the
+    C++ functions defined within it.
+
+  * Increased the maximum input line length for the mptrace and mleak commands
+    due to the excessive length of some C++ identifiers.
+
+  * Improved the UNIX Makefile when building mptrace with GUI support.
+
+  * Added ability to build full documentation from the source code.
+
+  * Added skeleton autoconf, automake and libtool support.
+
+
 Changes for 1.4.5 (14th June, 2001)
 
   * Added the CHECKFORK option in order to fix the fork() problem on UNIX
