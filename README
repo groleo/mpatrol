@@ -90,6 +90,11 @@ Overview of features
         reallocation or deallocation on systems that support the trap signal.
         This can be extremely useful when running the program under a debugger.
 
+      * On UNIX platforms, the mmap() function can optionally be used to
+        allocate memory instead of the sbrk() function, but only if the system
+        supports it.  This can be useful if the mpatrol library clashes with
+        another malloc library that uses sbrk() to allocate heap memory.
+
       * All newly-allocated memory that is not allocated by the calloc() or
         recalloc() functions will be pre-filled with a non-zero value in order
         to catch out programs that wrongly assume that all newly-allocated
@@ -241,6 +246,7 @@ Supported systems
 
         The thread-safe version of the library does not work.
         The OFLOWWATCH option has no effect.
+        The USEMMAP option has no effect.
         Cannot automatically determine the program filename.
         No support for call stack traversal.
         The -d option to the mpatrol shell script has no effect.
@@ -256,6 +262,7 @@ Supported systems
 
         The thread-safe version of the library does not work.
         The OFLOWWATCH option has no effect.
+        The USEMMAP option has no effect.
         Cannot automatically determine the program filename.
         No support for call stack traversal.
         The address of an illegal memory access cannot be determined.
@@ -275,6 +282,7 @@ Supported systems
         No automatic override of malloc(), etc., without inclusion of mpatrol.h.
         No memory protection so the PAGEALLOC option has no effect.
         The OFLOWWATCH option has no effect.
+        The USEMMAP option has no effect.
         The ALLOCSTOP, FREESTOP and REALLOCSTOP options have no effect.
         No support for call stack traversal.
         No support for reading symbols.
@@ -284,6 +292,7 @@ Supported systems
 
         No automatic override of malloc(), etc., without inclusion of mpatrol.h.
         The OFLOWWATCH option has no effect.
+        The USEMMAP option has no effect.
         The ALLOCSTOP, FREESTOP and REALLOCSTOP options have no effect.
         No support for reading symbols.
         The address of an illegal memory access cannot be determined.
