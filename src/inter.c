@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.108 2001-03-05 20:36:35 graeme Exp $"
+#ident "$Id: inter.c,v 1.109 2001-03-05 22:15:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.108 2001-03-05 20:36:35 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.109 2001-03-05 22:15:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -439,6 +439,10 @@ __mp_init(void)
             __mp_protectsymbols(&memhead.syms, MA_READONLY);
             __mp_protectinfo(&memhead, MA_READONLY);
         }
+        /* Start the leak table if necessary.
+         */
+        if (memhead.flags & FLG_LEAKTABLE)
+            memhead.ltable.tracing = 1;
         /* Finally, call any initialisation functions in the order in which
          * they were registered.
          */
@@ -495,10 +499,24 @@ __mp_fini(void)
             /* Then print a summary of library statistics and settings.
              */
             __mp_printsummary(&memhead);
+            /* Display the leak table if necessary.
+             */
+            if (memhead.flags & FLG_LEAKTABLE)
+            {
+                if (!(memhead.flags & FLG_NOPROTECT))
+                    __mp_protectinfo(&memhead, MA_READWRITE);
+                __mp_diag("\n");
+                __mp_printleaktab(&memhead, 0, 2, 0);
+                if (!(memhead.flags & FLG_NOPROTECT))
+                    __mp_protectinfo(&memhead, MA_READONLY);
+            }
             /* Then deal with any SHOW options that may have been requested.
              */
             if ((memhead.flags & FLG_SHOWMAP) && (memhead.alloc.list.size > 0))
+            {
+                __mp_diag("\n");
                 __mp_printmap(&memhead);
+            }
             if ((memhead.flags & FLG_SHOWSYMBOLS) &&
                 (memhead.syms.dtree.size > 0))
                 __mp_printsymbols(&memhead.syms);
@@ -1839,7 +1857,11 @@ __mp_memorymap(int s)
     if (s != 0)
         __mp_printsummary(&memhead);
     if (memhead.alloc.list.size > 0)
+    {
+        if (s != 0)
+            __mp_diag("\n");
         __mp_printmap(&memhead);
+    }
     restoresignals();
 }
 
