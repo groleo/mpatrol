@@ -32,8 +32,7 @@
 
 
 #include "config.h"
-#include "heap.h"
-#include "list.h"
+#include "symbol.h"
 
 
 /* A profdata structure belongs to a list of profdata structures and contains
@@ -86,6 +85,7 @@ typedef union profnode
         union profnode *parent; /* parent node */
         unsigned long index;    /* node index */
         void *addr;             /* return address */
+        symnode *symbol;        /* associated symbol */
         profdata *data;         /* profiling data */
     }
     data;
@@ -100,6 +100,7 @@ profnode;
 typedef struct profhead
 {
     heaphead *heap;              /* pointer to heap */
+    symhead *syms;               /* pointer to symbol table */
     slottable dtable;            /* table of profdata structures */
     slottable ntable;            /* table of profnodes */
     listhead ilist;              /* internal list of memory blocks */
@@ -127,7 +128,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newprofile(profhead *, heaphead *);
+MP_EXPORT void __mp_newprofile(profhead *, heaphead *, symhead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
 MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
 MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
