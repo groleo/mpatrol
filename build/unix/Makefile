@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.32 2000-11-15 00:25:48 graeme Exp $
+# $Id: Makefile,v 1.33 2000-11-21 21:47:08 graeme Exp $
 
 
 # Definitions
@@ -29,16 +29,17 @@
 SHELL = /bin/sh
 CC    = gcc
 AR    = ar
-LD    = ld
+LD    = $(CC)
 LINT  = lint
 
 SOURCE = ../../src
 VPATH  = $(SOURCE)
 
-CFLAGS = -I$(SOURCE)
-OFLAGS = -O3 -fno-inline-functions
-SFLAGS = -fPIC
-TFLAGS = -DMP_THREADS_SUPPORT
+CFLAGS	= -I$(SOURCE)
+OFLAGS	= -O3 -fno-inline-functions
+SFLAGS	= -fPIC
+TFLAGS	= -DMP_THREADS_SUPPORT
+LDFLAGS	= -shared
 
 LIBRARY	 = mpatrol
 VERSION	 = 1
@@ -96,7 +97,7 @@ $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
 
 $(SHARED_LIBRARY).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
-	$(LD) -G -h $@ -o $@ $(SHARED_OBJECTS)
+	$(LD) $(LDFLAGS) -o $@ $(SHARED_OBJECTS)
 
 $(SHARED_LIBRARY): $(SHARED_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
@@ -111,7 +112,7 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) cr $@ $(ARCHTS_OBJECTS)
 
 $(SHARTS_LIBRARY).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
-	$(LD) -G -h $@ -o $@ $(SHARTS_OBJECTS)
+	$(LD) $(LDFLAGS) -o $@ $(SHARTS_OBJECTS)
 
 $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
