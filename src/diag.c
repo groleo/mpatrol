@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.94 2001-10-08 22:35:06 graeme Exp $"
+#ident "$Id: diag.c,v 1.95 2001-10-08 23:03:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.94 2001-10-08 22:35:06 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.95 2001-10-08 23:03:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1344,7 +1344,21 @@ MP_GLOBAL
 void
 __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f, loginfo *i)
 {
-    __mp_diag("ALLOC: %s (%lu, ", __mp_functionnames[f], h->count);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("ALLOC");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (%lu, ", h->count);
     __mp_printsize(l);
     __mp_diag(", ");
     if (a == 0)
@@ -1364,7 +1378,21 @@ void
 __mp_logrealloc(infohead *h, void *p, size_t l, size_t a, alloctype f,
                 loginfo *i)
 {
-    __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("REALLOC");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ", ", p);
     __mp_printsize(l);
     __mp_diag(", ");
     if (a == 0)
@@ -1383,7 +1411,21 @@ MP_GLOBAL
 void
 __mp_logfree(infohead *h, void *p, alloctype f, loginfo *i)
 {
-    __mp_diag("FREE: %s (" MP_POINTER ") ", __mp_functionnames[f], p);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("FREE");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ") ", p);
     logcall(h, i, 0);
 }
 
@@ -1396,7 +1438,21 @@ void
 __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
                loginfo *i)
 {
-    __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("MEMSET");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ", ", p);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
     logcall(h, i, 0);
@@ -1411,8 +1467,21 @@ void
 __mp_logmemcopy(infohead *h, void *p, void *q, size_t l, unsigned char c,
                 alloctype f, loginfo *i)
 {
-    __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
-              __mp_functionnames[f], p, q);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("MEMCOPY");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ", p, q);
     __mp_printsize(l);
     __mp_diag(", 0x%02X) ", c);
     logcall(h, i, 0);
@@ -1427,7 +1496,21 @@ void
 __mp_logmemlocate(infohead *h, void *p, size_t l, void *q, size_t m,
                   alloctype f, loginfo *i)
 {
-    __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("MEMFIND");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ", ", p);
     __mp_printsize(l);
     __mp_diag(", " MP_POINTER ", ", q);
     __mp_printsize(m);
@@ -1444,8 +1527,21 @@ void
 __mp_logmemcompare(infohead *h, void *p, void *q, size_t l, alloctype f,
                    loginfo *i)
 {
-    __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
-              __mp_functionnames[f], p, q);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<P>\n");
+        __mp_diagtag("<B>");
+    }
+    __mp_diag("MEMCMP");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</B>");
+    __mp_diag(": ");
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("<TT>");
+    __mp_diag("%s", __mp_functionnames[f]);
+    if (__mp_diagflags & FLG_HTML)
+        __mp_diagtag("</TT>");
+    __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ", p, q);
     __mp_printsize(l);
     __mp_diag(") ");
     logcall(h, i, 0);
