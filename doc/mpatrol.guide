@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 11th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 11th
 January, 2001.
 
 
@@ -2457,16 +2457,16 @@ add the @{b}--threads@{ub} option as well.
 object file format access libraries that are required for your system
 if you wish to use the @{b}--dynamic@{ub} option.  If the mpatrol library was
 built with @{b}FORMAT=FORMAT_ELF32@{ub} or @{b}FORMAT=FORMAT_ELF64@{ub} support then it
-must be told to preload the ELF access library (normally @{b}libelf.so@{ub}).  If
-it was built with @{b}FORMAT=FORMAT_BFD@{ub} support then it must be told to
+must be told to preload the ELF access library (normally @{b}libelf.so@{ub})(1).
+If it was built with @{b}FORMAT=FORMAT_BFD@{ub} support then it must be told to
 preload the GNU BFD access libraries (normally @{b}libbfd.so@{ub} and
-@{b}libiberty.so@{ub}).  However, if these libraries only exist on your system in
-archive form then you must build @{b}libmpatrol.so@{ub} with these extra
-libraries incorporated into it so that there are no dependencies on
-them at run-time.  However, there may well be problems if the resulting
-shared library contains position-dependent code from the archive
-libraries you incorporated.  The only way to find out is for you to try
-it and see.
+@{b}libiberty.so@{ub})(2).  However, if these libraries only exist on your
+system in archive form then you must build @{b}libmpatrol.so@{ub} with these
+extra libraries incorporated into it so that there are no dependencies
+on them at run-time.  However, there may well be problems if the
+resulting shared library contains position-dependent code from the
+archive libraries you incorporated.  The only way to find out is for
+you to try it and see.
 
    If you have access to the GNU linker on your system then there may
 be a way to convert archive libraries into shared libraries if
@@ -2537,6 +2537,14 @@ variable in the current shell or debugger process.
      document mallopt
      Sets mpatrol library options in the current process environment.
      end
+
+   ---------- Footnotes ----------
+
+   (1) A freely available version of the ELF access library, libelf,
+can be downloaded from `ftp://sunsite.unc.edu/pub/Linux/libs/'.
+
+   (2) The GNU BFD access library can be downloaded from
+`ftp://ftp.gnu.org/'.
 
 
 @endnode
@@ -4123,8 +4131,8 @@ library, the @{b}MPATROL_OPTIONS@{ub} environment variable should be set to be
 @{b}LOGALL@{ub} and the program should be executed, generating the following
 output in @{b}mpatrol.log@{ub}.
 
-     @(#) mpatrol 1.3.2 (00/12/18)
-     Copyright (C) 1997-2000 Graeme S. Roy
+     @(#) mpatrol 1.3.3 (01/01/06)
+     Copyright (C) 1997-2001 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
      certain conditions; see the GNU Library General Public License for
@@ -4133,7 +4141,7 @@ output in @{b}mpatrol.log@{ub}.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Wed Nov 22 22:26:31 2000
+     Log file generated on Fri Jan  5 22:26:31 2001
      
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
              0x0804942F main+31
@@ -9293,9 +9301,9 @@ Notes for UNIX platforms
      command.  Also add a way to specify editor options to the @{b}mpedit@{ub}
      command.
 
-   * Add support for Digital UNIX and also the BSD systems
-     (specifically FreeBSD, NetBSD, OpenBSD and SunOS) and other
-     non-System V UNIX operating systems.
+   * Add support for Digital UNIX and also the other BSD systems
+     (specifically NetBSD, OpenBSD and SunOS) and other non-System V
+     UNIX operating systems.
 
    * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command does not always work
      on systems whose dynamic linkers support the @{b}LD_PRELOAD@{ub} or

@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 11th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 11th
 January, 2001.
 
 * Menu:
@@ -2368,9 +2368,9 @@ object file format access libraries that are required for your system
 if you wish to use the `--dynamic' option.  If the mpatrol library was
 built with `FORMAT=FORMAT_ELF32' or `FORMAT=FORMAT_ELF64' support then
 it must be told to preload the ELF access library (normally
-`libelf.so').  If it was built with `FORMAT=FORMAT_BFD' support then it
-must be told to preload the GNU BFD access libraries (normally
-`libbfd.so' and `libiberty.so').  However, if these libraries only
+`libelf.so')(1).  If it was built with `FORMAT=FORMAT_BFD' support then
+it must be told to preload the GNU BFD access libraries (normally
+`libbfd.so' and `libiberty.so')(2).  However, if these libraries only
 exist on your system in archive form then you must build
 `libmpatrol.so' with these extra libraries incorporated into it so that
 there are no dependencies on them at run-time.  However, there may well
@@ -2448,6 +2448,14 @@ process.
      document mallopt
      Sets mpatrol library options in the current process environment.
      end
+
+   ---------- Footnotes ----------
+
+   (1) A freely available version of the ELF access library, libelf,
+can be downloaded from `ftp://sunsite.unc.edu/pub/Linux/libs/'.
+
+   (2) The GNU BFD access library can be downloaded from
+`ftp://ftp.gnu.org/'.
 
 
 File: mpatrol.info,  Node: The mleak command,  Next: The mpsym command,  Prev: The mpatrol command,  Up: Utilities
@@ -4001,8 +4009,8 @@ library, the `MPATROL_OPTIONS' environment variable should be set to be
 `LOGALL' and the program should be executed, generating the following
 output in `mpatrol.log'.
 
-     @(#) mpatrol 1.3.2 (00/12/18)
-     Copyright (C) 1997-2000 Graeme S. Roy
+     @(#) mpatrol 1.3.3 (01/01/06)
+     Copyright (C) 1997-2001 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
      certain conditions; see the GNU Library General Public License for
@@ -4011,7 +4019,7 @@ output in `mpatrol.log'.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Wed Nov 22 22:26:31 2000
+     Log file generated on Fri Jan  5 22:26:31 2001
      
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
              0x0804942F main+31
@@ -9090,9 +9098,9 @@ Notes for UNIX platforms
      command.  Also add a way to specify editor options to the `mpedit'
      command.
 
-   * Add support for Digital UNIX and also the BSD systems
-     (specifically FreeBSD, NetBSD, OpenBSD and SunOS) and other
-     non-System V UNIX operating systems.
+   * Add support for Digital UNIX and also the other BSD systems
+     (specifically NetBSD, OpenBSD and SunOS) and other non-System V
+     UNIX operating systems.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
@@ -12859,125 +12867,127 @@ Index
 
 
 Tag Table:
-Node: Top1255
-Node: Foreword3525
-Node: Overview8144
-Node: Features11121
-Node: Installation28813
-Node: Integration34953
-Ref: Integration-Footnote-141353
-Node: Memory allocations41474
-Node: Static memory allocations42151
-Ref: Static memory allocations-Footnote-144612
-Node: Stack memory allocations44654
-Ref: Stack memory allocations-Footnote-146518
-Node: Dynamic memory allocations46557
-Ref: Dynamic memory allocations-Footnote-149979
-Ref: Dynamic memory allocations-Footnote-250098
-Node: Operating system support50202
-Node: Virtual memory52162
-Ref: Virtual memory-Footnote-158190
-Ref: Virtual memory-Footnote-258446
-Ref: Virtual memory-Footnote-358622
-Ref: Virtual memory-Footnote-458657
-Ref: Virtual memory-Footnote-558716
-Node: Call stacks and symbol tables58940
-Ref: Call stacks and symbol tables-Footnote-164618
-Ref: Call stacks and symbol tables-Footnote-264686
-Ref: Call stacks and symbol tables-Footnote-364737
-Ref: Call stacks and symbol tables-Footnote-464781
-Ref: Call stacks and symbol tables-Footnote-564823
-Ref: Call stacks and symbol tables-Footnote-664865
-Ref: Call stacks and symbol tables-Footnote-764913
-Node: Threads65019
-Ref: Threads-Footnote-171025
-Node: Using mpatrol71120
-Node: Library behaviour71986
-Ref: Library behaviour-Footnote-177883
-Node: Logging and tracing77941
-Node: General errors82807
-Ref: General errors-Footnote-186945
-Ref: General errors-Footnote-287101
-Node: Overwrites and underwrites87269
-Ref: Overwrites and underwrites-Footnote-195671
-Ref: Overwrites and underwrites-Footnote-295734
-Node: Using with a debugger95858
-Ref: Using with a debugger-Footnote-1104912
-Ref: Using with a debugger-Footnote-2104980
-Ref: Using with a debugger-Footnote-3105236
-Node: Testing105325
-Ref: Testing-Footnote-1108062
-Ref: Testing-Footnote-2108243
-Node: Library functions108302
-Node: Utilities115183
-Node: The mpatrol command116153
-Node: The mleak command122651
-Node: The mpsym command124615
-Node: The mpedit command127183
-Node: The hexwords command130579
-Node: Profiling133721
-Ref: Profiling-Footnote-1161613
-Ref: Profiling-Footnote-2161837
-Node: Tracing161941
-Ref: Tracing-Footnote-1179131
-Ref: Tracing-Footnote-2179165
-Ref: Tracing-Footnote-3179287
-Node: Improving performance179393
-Ref: Improving performance-Footnote-1188293
-Ref: Improving performance-Footnote-2188335
-Ref: Improving performance-Footnote-3188412
-Ref: Improving performance-Footnote-4188484
-Node: How it works188528
-Node: Examples195721
-Node: Example 1199439
-Ref: Example 1-Footnote-1223555
-Node: Example 2223745
-Node: Example 3229145
-Node: Example 4236002
-Node: Example 5239507
-Node: Example 6241975
-Ref: Example 6-Footnote-1245775
-Node: Example 7245904
-Node: Example 8247762
-Node: Example 9257998
-Node: Tutorial273869
-Ref: Tutorial-Footnote-1288400
-Ref: Tutorial-Footnote-2288691
-Ref: Tutorial-Footnote-3288840
-Ref: Tutorial-Footnote-4288977
-Ref: Tutorial-Footnote-5289076
-Node: Functions289357
-Node: Environment319793
-Node: Options340561
-Node: Diagnostic messages351948
-Node: Library performance368168
-Node: File formats370661
-Ref: File formats-Footnote-1371085
-Node: Profiling file format371297
-Node: Tracing file format374559
-Node: Supported systems376426
-Node: New system support390761
-Node: New processor support391957
-Node: New file format support392640
-Node: Notes393030
-Node: Generic notes394641
-Ref: Generic notes-Footnote-1412089
-Ref: Generic notes-Footnote-2412307
-Node: UNIX notes412529
-Node: Amiga notes417041
-Node: Windows notes420705
-Node: Netware notes422125
-Node: Frequently asked questions424685
-Node: Documentation425308
-Node: Building430138
-Node: Linking437163
-Node: Running441435
-Node: Files456543
-Node: Related software459539
-Ref: Related software-Footnote-1496224
-Node: References496465
-Node: Copying499058
-Node: Function index526947
-Node: Index529205
+Node: Top1256
+Node: Foreword3527
+Node: Overview8146
+Node: Features11123
+Node: Installation28815
+Node: Integration34955
+Ref: Integration-Footnote-141355
+Node: Memory allocations41476
+Node: Static memory allocations42153
+Ref: Static memory allocations-Footnote-144614
+Node: Stack memory allocations44656
+Ref: Stack memory allocations-Footnote-146520
+Node: Dynamic memory allocations46559
+Ref: Dynamic memory allocations-Footnote-149981
+Ref: Dynamic memory allocations-Footnote-250100
+Node: Operating system support50204
+Node: Virtual memory52164
+Ref: Virtual memory-Footnote-158192
+Ref: Virtual memory-Footnote-258448
+Ref: Virtual memory-Footnote-358624
+Ref: Virtual memory-Footnote-458659
+Ref: Virtual memory-Footnote-558718
+Node: Call stacks and symbol tables58942
+Ref: Call stacks and symbol tables-Footnote-164620
+Ref: Call stacks and symbol tables-Footnote-264688
+Ref: Call stacks and symbol tables-Footnote-364739
+Ref: Call stacks and symbol tables-Footnote-464783
+Ref: Call stacks and symbol tables-Footnote-564825
+Ref: Call stacks and symbol tables-Footnote-664867
+Ref: Call stacks and symbol tables-Footnote-764915
+Node: Threads65021
+Ref: Threads-Footnote-171027
+Node: Using mpatrol71122
+Node: Library behaviour71988
+Ref: Library behaviour-Footnote-177885
+Node: Logging and tracing77943
+Node: General errors82809
+Ref: General errors-Footnote-186947
+Ref: General errors-Footnote-287103
+Node: Overwrites and underwrites87271
+Ref: Overwrites and underwrites-Footnote-195673
+Ref: Overwrites and underwrites-Footnote-295736
+Node: Using with a debugger95860
+Ref: Using with a debugger-Footnote-1104914
+Ref: Using with a debugger-Footnote-2104982
+Ref: Using with a debugger-Footnote-3105238
+Node: Testing105327
+Ref: Testing-Footnote-1108064
+Ref: Testing-Footnote-2108245
+Node: Library functions108304
+Node: Utilities115185
+Node: The mpatrol command116155
+Ref: The mpatrol command-Footnote-1122695
+Ref: The mpatrol command-Footnote-2122829
+Node: The mleak command122909
+Node: The mpsym command124873
+Node: The mpedit command127441
+Node: The hexwords command130837
+Node: Profiling133979
+Ref: Profiling-Footnote-1161871
+Ref: Profiling-Footnote-2162095
+Node: Tracing162199
+Ref: Tracing-Footnote-1179389
+Ref: Tracing-Footnote-2179423
+Ref: Tracing-Footnote-3179545
+Node: Improving performance179651
+Ref: Improving performance-Footnote-1188551
+Ref: Improving performance-Footnote-2188593
+Ref: Improving performance-Footnote-3188670
+Ref: Improving performance-Footnote-4188742
+Node: How it works188786
+Node: Examples195979
+Node: Example 1199697
+Ref: Example 1-Footnote-1223813
+Node: Example 2224003
+Node: Example 3229403
+Node: Example 4236260
+Node: Example 5239765
+Node: Example 6242233
+Ref: Example 6-Footnote-1246033
+Node: Example 7246162
+Node: Example 8248020
+Node: Example 9258256
+Node: Tutorial274127
+Ref: Tutorial-Footnote-1288658
+Ref: Tutorial-Footnote-2288949
+Ref: Tutorial-Footnote-3289098
+Ref: Tutorial-Footnote-4289235
+Ref: Tutorial-Footnote-5289334
+Node: Functions289615
+Node: Environment320051
+Node: Options340819
+Node: Diagnostic messages352206
+Node: Library performance368426
+Node: File formats370919
+Ref: File formats-Footnote-1371343
+Node: Profiling file format371555
+Node: Tracing file format374817
+Node: Supported systems376684
+Node: New system support391019
+Node: New processor support392215
+Node: New file format support392898
+Node: Notes393288
+Node: Generic notes394899
+Ref: Generic notes-Footnote-1412347
+Ref: Generic notes-Footnote-2412565
+Node: UNIX notes412787
+Node: Amiga notes417296
+Node: Windows notes420960
+Node: Netware notes422380
+Node: Frequently asked questions424940
+Node: Documentation425563
+Node: Building430393
+Node: Linking437418
+Node: Running441690
+Node: Files456798
+Node: Related software459794
+Ref: Related software-Footnote-1496479
+Node: References496720
+Node: Copying499313
+Node: Function index527202
+Node: Index529460
 
 End Tag Table

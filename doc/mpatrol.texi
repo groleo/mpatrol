@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.162 2001-01-05 18:39:22 graeme Exp $
+@c $Id: mpatrol.texi,v 1.163 2001-01-11 23:02:59 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -20,9 +20,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.3
-@set VERSION 1.3.3
-@set UPDATED 5th January, 2001
+@set EDITION 2.4
+@set VERSION 1.3.4
+@set UPDATED 11th January, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2527,11 +2527,14 @@ Note that the @command{mpatrol} command must be set up to use the correct
 object file format access libraries that are required for your system if you
 wish to use the @option{--dynamic} option.  If the mpatrol library was built
 with @code{FORMAT=FORMAT_ELF32} or @code{FORMAT=FORMAT_ELF64} support then it
-must be told to preload the ELF access library (normally @file{libelf.so}).  If
-it was built with @code{FORMAT=FORMAT_BFD} support then it must be told to
+must be told to preload the ELF access library (normally
+@file{libelf.so})@footnote{A freely available version of the ELF access library,
+libelf, can be downloaded from @uref{ftp://sunsite.unc.edu/pub/Linux/libs/}.}.
+If it was built with @code{FORMAT=FORMAT_BFD} support then it must be told to
 preload the GNU BFD access libraries (normally @file{libbfd.so} and
-@file{libiberty.so}).  However, if these libraries only exist on your system in
-archive form then you must build @file{libmpatrol.so} with these extra
+@file{libiberty.so})@footnote{The GNU BFD access library can be downloaded from
+@uref{ftp://ftp.gnu.org/}.}.  However, if these libraries only exist on your
+system in archive form then you must build @file{libmpatrol.so} with these extra
 libraries incorporated into it so that there are no dependencies on them at
 run-time.  However, there may well be problems if the resulting shared library
 contains position-dependent code from the archive libraries you incorporated.
@@ -4354,8 +4357,8 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.3.2 (00/12/18)
-Copyright (C) 1997-2000 Graeme S. Roy
+@@(#) mpatrol 1.3.3 (01/01/06)
+Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
 certain conditions; see the GNU Library General Public License for
@@ -4364,7 +4367,7 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
-Log file generated on Wed Nov 22 22:26:31 2000
+Log file generated on Fri Jan  5 22:26:31 2001
 
 ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
         0x0804942F main+31
@@ -9776,7 +9779,7 @@ command.  Also add a way to specify editor options to the @command{mpedit}
 command.
 
 @item
-Add support for Digital UNIX and also the BSD systems (specifically FreeBSD,
+Add support for Digital UNIX and also the other BSD systems (specifically
 NetBSD, OpenBSD and SunOS) and other non-System V UNIX operating systems.
 
 @item
