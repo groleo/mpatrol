@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.4 2000-01-24 20:32:05 graeme Exp $"
+#ident "$Id: malloc.c,v 1.5 2000-01-27 21:26:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -196,9 +196,13 @@ void bzero(void *p, size_t l)
 /* Copy a non-overlapping block of memory from one address to another.
  */
 
+#ifdef __GNUC__
+void *memcpy(void *q, const void *p, size_t l)
+#else /* __GNUC__ */
 void *memcpy(void *q, void *p, size_t l)
+#endif /* __GNUC__ */
 {
-    return __mp_copymem(p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 
 
