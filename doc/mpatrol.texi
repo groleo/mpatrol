@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.102 2000-07-07 10:45:32 graeme Exp $
+@c $Id: mpatrol.texi,v 1.103 2000-07-13 21:41:47 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.14
-@set VERSION 1.2.5
-@set UPDATED 7th July, 2000
+@set EDITION 1.15
+@set VERSION 1.2.6
+@set UPDATED 13th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -166,7 +166,9 @@ wish to delve right in and use the library, the Installation
 (@pxref{Installation}) and Examples (@pxref{Examples}) chapters should be enough
 to get started in combination with the quick reference card.  Otherwise, this
 manual should be read from beginning to end in order to get the most out of the
-software it describes.
+software it describes.  Note that all of the output shown from the examples was
+produced on 32-bit environments, although mpatrol can be built to support 64-bit
+environments as well.
 
 @cindex bug reports
 @cindex reporting bugs
@@ -191,13 +193,14 @@ The latest version of the mpatrol library and this manual can always be found at
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/}, and any correspondence relating
 to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk}.  The mpatrol library is also
-registered at FreshMeat (@uref{http://freshmeat.net/}) so you can receive
-notification of updates there as well.  I normally only check my e-mail about
-once or twice a week, so don't expect an immediate response.  I can also be
-reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.  There
-is now also a discussion group at @uref{http://www.egroups.com/group/mpatrol/}
-where you can post mpatrol-related questions but you must first subscribe to the
-group before you can send mail to it.
+registered at FreshMeat (@uref{http://freshmeat.net/}) and several other
+software sites so you can receive notification of updates there as well.  I
+normally only check my e-mail about once or twice a week, so don't expect an
+immediate response.  I can also be reached at @email{graeme@@epc.co.uk} but that
+is my work e-mail address.  There is now also a discussion group at
+@uref{http://www.egroups.com/group/mpatrol/} where you can post mpatrol-related
+questions but you must first subscribe to the group before you can send mail to
+it.
 
 @cindex references
 Note that this manual is not just intended to instruct readers on how to use the
@@ -286,7 +289,7 @@ does is to read the documentation and try it out.
 
 @itemize @bullet
 @item
-Written for UNIX, AmigaOS, Windows and Netware platforms.
+Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms.
 
 @item
 Can be built to allocate memory from a fixed-sized static array rather than
@@ -799,10 +802,10 @@ of all your code.
 
 @enumerate 1
 @item
-This step is currently only available on IRIX, Linux and Solaris platforms and
-on DG/UX 4.20MU07@footnote{Also available on DG/UX 4.20MU05 with patch
-dgux_R4.20MU05.p59 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.} or later
-platforms with the @env{LD_PRELOAD} feature.
+This step is currently only available on DYNIX/ptx, IRIX, Linux and Solaris
+platforms and on DG/UX 4.20MU07@footnote{Also available on DG/UX 4.20MU05 with
+patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.} or
+later platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -6044,13 +6047,12 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 DYNIX/ptx 4.5, Intel Pentium Pro, ELF32, @command{cc}
 @itemize @bullet
 @item
-The thread-safe version of the library does not work.
-@item
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-The @option{-d} option to the @command{mpatrol} command has no effect.
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libelf.so} is available.
 @end itemize
 
 @cindex HP/UX, HP PA/RISC
@@ -6225,7 +6227,7 @@ The @option{USEDEBUG} option has no effect.
 
 @cindex Solaris, SPARC
 @item
-Solaris 2.5, SPARC V9, BFD, @command{gcc}
+Solaris 2.5, SPARC V8, BFD, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work due to a problem with a
@@ -6237,7 +6239,7 @@ be added to @code{CFLAGS} in the @file{Makefile}.
 @end itemize
 
 @item
-Solaris 2.5, SPARC V9, ELF32, @command{gcc}
+Solaris 2.5, SPARC V8, ELF32, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work due to a problem with a
@@ -6254,28 +6256,32 @@ The @option{USEDEBUG} option has no effect.
 Solaris 7, SPARC V9, BFD, @command{gcc}
 @itemize @bullet
 @item
-No known issues.
+The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
-Solaris 7, SPARC V9, ELF32, @command{gcc}
+Solaris 7, SPARC V9, ELF32/ELF64, @command{gcc}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
+@item
+The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
 Solaris 8, SPARC V9, BFD, @command{gcc}
 @itemize @bullet
 @item
-No known issues.
+The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
-Solaris 8, SPARC V9, ELF32, @command{gcc}
+Solaris 8, SPARC V9, ELF32/ELF64, @command{gcc}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
+@item
+The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @cindex UnixWare, Intel 80x86
@@ -6416,7 +6422,10 @@ the new operating system.
 
 @itemize @bullet
 @item
-Add a new @code{ARCH} definition in @file{target.h}.
+Add a new @code{ARCH} and/or @code{ENVIRON} definition in @file{target.h}.  The
+@code{ARCH} macro specifies a processor family, whereas the @code{ENVIRON} macro
+specifies the size of a word if the processor family can support different word
+sizes.
 
 @item
 Make any necessary modifications to @file{config.h}.
@@ -6505,10 +6514,11 @@ errors, and the way that source level information is obtained for
 @code{operator delete} means that the resulting code will not be thread-safe.
 
 @item
-Need to add support for 64-bit processors.  This shouldn't be too hard, but I
-haven't got access to a 64-bit environment to test it, so I haven't bothered
-yet.  Also need to add support for building on targets and architectures where
-no operating system features are required or even available.
+Need to add support for other 64-bit processors in addition to the existing
+SPARC V9 support.  This shouldn't be too hard, but I haven't got access to such
+processors to test them, so I haven't been able to yet.  Also need to add
+support for building on targets and architectures where no operating system
+features are required or even available.
 
 @item
 Need to make the library re-entrant.  This could be achieved by moving the
@@ -6797,11 +6807,9 @@ platforms by making use of the TDESC information stored in the object files.
 
 @item
 Need to add support for obtaining the program name from the stack for the Alpha,
-Itanium and Motorola 88xx0 processor architectures, and also need to add support
-for obtaining the program name from somewhere other than the stack for the
-DYNIX/ptx platform.  If there is no support for either of these methods then the
-@option{PROGFILE} option can currently be used to specify the program name at
-run-time.
+Itanium and Motorola 88xx0 processor architectures.  If there is no support for
+determining the filename that a program was invoked with then the
+@option{PROGFILE} option can be used to specify the program name at run-time.
 
 @item
 If the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro is defined when
