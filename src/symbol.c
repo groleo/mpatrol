@@ -120,7 +120,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.45 2001-01-24 20:12:52 graeme Exp $"
+#ident "$Id: symbol.c,v 1.46 2001-01-31 22:20:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1262,9 +1262,11 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 #elif FORMAT == FORMAT_PE
     modinfo m;
 #endif /* FORMAT */
+    size_t l;
     int r;
 
     r = 1;
+    l = y->dtree.size;
 #if DYNLINK == DYNLINK_WINDOWS
     /* We always want to initialise the imagehlp library here since we will
      * be using it to obtain the symbols from any loaded DLLs later on and
@@ -1571,6 +1573,17 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
     m.libs = 0;
     r = SymEnumerateModules(GetCurrentProcess(), addsyms, &m);
 #endif /* FORMAT */
+    if (r == 1)
+    {
+        l = y->dtree.size - l;
+        __mp_diag("read %lu symbol%s", l, (l == 1) ? "" : "s");
+    }
+    else
+        __mp_diag("problem reading symbols");
+    if (v != NULL)
+        __mp_diag(" from %s [%s]\n", s, v);
+    else
+        __mp_diag(" from %s\n", s);
     return r;
 }
 
