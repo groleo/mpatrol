@@ -23,7 +23,7 @@ SSYYNNOOPPSSIISS
        void *recalloc(void *ptr, size_t size);
        void *expand(void *ptr, size_t size);
        void free(void *ptr);
-       void cfree(void *ptr);
+       void cfree(void *ptr, size_t nelem, size_t size);
 
        void *operator new(size_t size);
        void *operator new[](size_t size);
@@ -61,7 +61,7 @@ DDEESSCCRRIIPPTTIIOONN
 
 
 
-Release 1.2               30 April 2000                         1
+Release 1.2                 4 May 2000                          1
 
 
 
@@ -127,7 +127,7 @@ FFUUNNCCTTIIOONNSS
 
 
 
-Release 1.2               30 April 2000                         2
+Release 1.2                 4 May 2000                          2
 
 
 
@@ -193,7 +193,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                         3
+Release 1.2                 4 May 2000                          3
 
 
 
@@ -259,7 +259,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                         4
+Release 1.2                 4 May 2000                          4
 
 
 
@@ -325,7 +325,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                         5
+Release 1.2                 4 May 2000                          5
 
 
 
@@ -385,13 +385,13 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               memory  can  be  reused by another call to allocate
               memory.  If _p_t_r is NNUULLLL  then  no  memory  will  be
               freed.   All  of  the  previous  contents  will  be
-              destroyed.  This function is  available  for  back-
-              wards compatibility with older C libraries and ccaall--
-              lloocc and should not be used in new code.
+              destroyed.   The  _n_e_l_e_m  and  _s_i_z_e  parameters  are
+              ignored  in  this implementation.  This function is
+              available for backwards compatibility with older  C
 
 
 
-Release 1.2               30 April 2000                         6
+Release 1.2                 4 May 2000                          6
 
 
 
@@ -399,6 +399,9 @@ Release 1.2               30 April 2000                         6
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              libraries  and ccaalllloocc and should not be used in new
+              code.
 
        The following 5 functions are  available  as  replacements
        for  existing  C++ library functions, but the replacements
@@ -451,13 +454,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               destroyed.  This function must only  be  used  with
               memory allocated by ooppeerraattoorr nneeww[[]].
 
-       sseett__nneeww__hhaannddlleerr
-              Installs  a low-memory handler specifically for use
-              with ooppeerraattoorr nneeww and ooppeerraattoorr nneeww[[]] and returns  a
 
 
 
-Release 1.2               30 April 2000                         7
+Release 1.2                 4 May 2000                          7
 
 
 
@@ -466,6 +466,9 @@ Release 1.2               30 April 2000                         7
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       sseett__nneeww__hhaannddlleerr
+              Installs  a low-memory handler specifically for use
+              with ooppeerraattoorr nneeww and ooppeerraattoorr nneeww[[]] and returns  a
               pointer to the previously installed handler, or the
               null pointer if  no  handler  had  been  previously
               installed.   This will be called repeatedly by both
@@ -517,13 +520,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Copies _s_i_z_e bytes from  _s_r_c  to  _d_e_s_t  and  returns
               _d_e_s_t.  If _s_i_z_e is 00 or _s_r_c is the same as _d_e_s_t then
               no bytes will be copied.  If  the  operation  would
-              affect  an  existing  memory allocation in the heap
-              but would  straddle  that  allocation's  boundaries
-              then  an error message will be generated in the log
 
 
 
-Release 1.2               30 April 2000                         8
+Release 1.2                 4 May 2000                          8
 
 
 
@@ -532,6 +532,9 @@ Release 1.2               30 April 2000                         8
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              affect  an  existing  memory allocation in the heap
+              but would  straddle  that  allocation's  boundaries
+              then  an error message will be generated in the log
               file and no bytes will be copied.
 
        bbccooppyy  Copies _s_i_z_e bytes from _s_r_c to _d_e_s_t.  If _s_i_z_e  is  00
@@ -583,13 +586,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               would affect an existing memory allocation  in  the
               heap  but  would  straddle that allocation's bound-
               aries then an error message will  be  generated  in
-              the log file and no bytes will be searched.
-
-       The   following  8  functions  are  available  as  support
 
 
 
-Release 1.2               30 April 2000                         9
+Release 1.2                 4 May 2000                          9
 
 
 
@@ -598,7 +598,10 @@ Release 1.2               30 April 2000                         9
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-       routines for additional control and tracing in the mpatrol
+              the log file and no bytes will be searched.
+
+       The  following  8  functions are available as support rou-
+       tines for additional control and tracing  in  the  mpatrol
        library.   To  use  these you should include the _m_p_a_t_r_o_l_._h
        header file:
 
@@ -649,13 +652,10 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Forces the library to perform an immediate check of
               the overflow buffers of every memory allocation and
               to  ensure  that  nothing  has overwritten any free
-              blocks.
 
 
 
-
-
-Release 1.2               30 April 2000                        10
+Release 1.2                 4 May 2000                         10
 
 
 
@@ -663,6 +663,8 @@ Release 1.2               30 April 2000                        10
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              blocks.
 
        ____mmpp__pprroolloogguuee
               Installs a prologue function to  be  called  before
@@ -716,12 +718,10 @@ LLIINNKKIINNGG
         _-_l_m_p_a_t_r_o_l      To use this library.
         _-_l_e_l_f          If built with FFOORRMMAATT==FFOORRMMAATT__EELLFF3322.
         _-_l_b_f_d _-_l_i_b_e_r_t_y If built with FFOORRMMAATT==FFOORRMMAATT__BBFFDD.
-        _-_l_p_t_h_r_e_a_d      If built with MMPP__TTHHRREEAADDSS__SSUUPPPPOORRTT.
 
 
 
-
-Release 1.2               30 April 2000                        11
+Release 1.2                 4 May 2000                         11
 
 
 
@@ -729,6 +729,8 @@ Release 1.2               30 April 2000                        11
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+        _-_l_p_t_h_r_e_a_d      If built with MMPP__TTHHRREEAADDSS__SSUUPPPPOORRTT.
 
        On  UNIX platforms, if there were no calls to memory allo-
        cation functions before _-_l_m_p_a_t_r_o_l appears on the link line
@@ -785,9 +787,7 @@ EENNVVIIRROONNMMEENNTT
 
 
 
-
-
-Release 1.2               30 April 2000                        12
+Release 1.2                 4 May 2000                         12
 
 
 
@@ -853,7 +853,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        13
+Release 1.2                 4 May 2000                         13
 
 
 
@@ -919,7 +919,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        14
+Release 1.2                 4 May 2000                         14
 
 
 
@@ -985,7 +985,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        15
+Release 1.2                 4 May 2000                         15
 
 
 
@@ -1051,7 +1051,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        16
+Release 1.2                 4 May 2000                         16
 
 
 
@@ -1117,7 +1117,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        17
+Release 1.2                 4 May 2000                         17
 
 
 
@@ -1183,7 +1183,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        18
+Release 1.2                 4 May 2000                         18
 
 
 
@@ -1249,7 +1249,7 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.2               30 April 2000                        19
+Release 1.2                 4 May 2000                         19
 
 
 
@@ -1315,6 +1315,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.2               30 April 2000                        20
+Release 1.2                 4 May 2000                         20
 
 

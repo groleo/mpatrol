@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.22 2000-05-01 21:57:17 graeme Exp $
+.\" $Id: mpatrol.3,v 1.23 2000-05-04 20:11:45 graeme Exp $
 .\"
-.TH MPATROL 3 "30 April 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 3 "4 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -41,7 +41,7 @@ void *realloc(void *ptr, size_t size);
 void *recalloc(void *ptr, size_t size);
 void *expand(void *ptr, size_t size);
 void free(void *ptr);
-void cfree(void *ptr);
+void cfree(void *ptr, size_t nelem, size_t size);
 
 void *operator new(size_t size);
 void *operator new[](size_t size);
@@ -282,8 +282,9 @@ will be freed.  All of the previous contents will be destroyed.
 \fBcfree\fP
 Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
 by another call to allocate memory.  If \fIptr\fP is \fBNULL\fP then no memory
-will be freed.  All of the previous contents will be destroyed.  This function
-is available for backwards compatibility with older C libraries and \fBcalloc\fP
+will be freed.  All of the previous contents will be destroyed.  The \fInelem\fP
+and \fIsize\fP parameters are ignored in this implementation.  This function is
+available for backwards compatibility with older C libraries and \fBcalloc\fP
 and should not be used in new code.
 .PP
 The following 5 functions are available as replacements for existing C++ library
