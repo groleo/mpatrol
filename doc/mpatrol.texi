@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.15 1999-11-26 14:35:45 graeme Exp $
+@c $Id: mpatrol.texi,v 1.16 1999-11-27 16:23:59 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -20,8 +20,8 @@
 
 @c Remember to change these after each revision!
 @set EDITION 1.2
-@set VERSION 1.1.0
-@set UPDATED 26th November, 1999
+@set VERSION 1.0.7
+@set UPDATED 27th November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -111,6 +111,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
 * Improving performance::       Life beyond mpatrol.
+* How it works::                Implementation details.
 * Examples::                    Examples of usage.
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
@@ -249,8 +250,6 @@ using heap memory from the system.
 Can be built as archive, shared and/or thread-safe libraries on systems that
 support them, or even as one large object file.
 
-@cindex best fit
-@cindex allocation algorithm
 @item
 Details of memory allocations and free memory are stored internally as a tree
 structure for speed and also to allow the best fit allocation algorithm to be
@@ -1532,7 +1531,7 @@ number of unfreed allocations higher than this then it will abort the program at
 termination so that it fails.  All tests that fail in this way can then be
 examined after the test suite finishes.
 
-@node Improving performance, Examples, Using mpatrol, Top
+@node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
 @cindex improving performance
 @cindex performance improvements
@@ -1682,7 +1681,55 @@ parts of your code that you would probably never expect to be called, but
 perhaps they will one day!  Who would you rather have debugging your program ---
 yourself or the user?
 
-@node Examples, Functions, Improving performance, Top
+@node How it works, Examples, Improving performance, Top
+@chapter How it works
+@cindex implementation details
+
+The mpatrol library was originally written with the intention of plugging it
+into an existing compiler so that the compiler could plant calls to it in the
+code it generated when a specific debugging option was used.  These extra calls
+would obviously slow the code down, but along with the stack checking options
+that would be provided, this would give the user an enhanced run-time debugging
+environment.  Unfortunately, this integration never happened, but the way that
+mpatrol works is still significantly different from other malloc tracing
+libraries.
+
+@cindex best fit
+@cindex first fit
+@cindex allocation algorithm
+In order to quickly determine exactly which memory allocation a heap address
+belonged to it was necessary to be able to search the heap in an efficient
+manner.  The traditional way of searching along a linked list was unfeasible,
+so an implementation based on @emph{red-black trees} was used, where every known
+memory allocation in the heap was given an entry in the tree, with their start
+addresses as the key.  Another major design decision was to also choose
+red-black trees to implement the @emph{best fit} allocation algorithm.  Although
+@emph{first fit} was considered, I decided that best fit would allow the library
+to have more control over the heap, with every free memory block in the heap
+given an entry in the free tree, with their sizes as the key.  There was a bit
+of work involved in getting the splitting and merging of free blocks to work
+efficiently, but it seems to work well now.
+
+@cindex original implementation
+My original implementation had all of the information about each memory block
+stored just before the block itself.  I eventually dropped that behaviour in
+favour of storing all of the library's internal information in a separate part
+of the heap.  I did that for two reasons.  The first was because of the problems
+that would occur due to memory allocations with different alignment
+requirements.  The second reason was that the library's internal structures
+could be write-protected on systems with virtual memory, to prevent user code
+interfering with the operation of the library.
+
+@cindex modules
+The library is written in a modular fashion so as to make it easy to add new
+functionality.  New @emph{modules} have already been added, such as the
+@emph{stack} and @emph{symbol} modules, and perhaps there might even be a
+@emph{debug} module in the future for reading debugging information from object
+files.  Extra information about each memory allocation can be added to the
+@emph{allocation information} module in @file{src/info.h} and @file{src/info.c}
+without having to change much code in any other files.
+
+@node Examples, Functions, How it works, Top
 @chapter Examples
 @cindex examples
 @cindex tutorial
