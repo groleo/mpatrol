@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.13 2000-05-15 19:49:03 graeme Exp $
+# $Id: Makefile,v 1.14 2000-09-28 08:35:58 graeme Exp $
 
 
 # Definitions
@@ -159,11 +159,11 @@ all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 
 $(DOCUMENT)_doc.tar.gz: all README
 	@ mkdir -p $(DOCUMENT)/doc
-	@ cp $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT)/doc
-	@ cp $(DOCUMENT).guide $(DOCUMENT).html $(DOCUMENT)/doc
-	@ cp $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT)/doc
-	@ cp $(DOCUMENT).pdf $(REFCARD).dvi $(DOCUMENT)/doc
-	@ cp $(REFCARD).ps $(REFCARD).pdf README $(DOCUMENT)/doc
+	@ cp $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT)/doc
+	@ cp $(DOCUMENT).html $(DOCUMENT).dvi $(DOCUMENT)/doc
+	@ cp $(DOCUMENT).ps $(DOCUMENT).pdf $(DOCUMENT)/doc
+	@ cp $(REFCARD).dvi $(REFCARD).ps $(DOCUMENT)/doc
+	@ cp $(REFCARD).pdf README $(DOCUMENT)/doc
 	@ tar cf $(DOCUMENT)_doc.tar $(DOCUMENT)
 	@ gzip $(DOCUMENT)_doc.tar
 	-@ rm -rf $(DOCUMENT) >/dev/null 2>&1
