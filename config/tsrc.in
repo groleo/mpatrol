@@ -61,7 +61,6 @@ host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
 CC = @CC@
-CPP = @CPP@
 DLLTOOL = @DLLTOOL@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
