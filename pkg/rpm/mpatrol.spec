@@ -21,10 +21,10 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.25 2000-07-12 00:16:28 graeme Exp $
+# $Id: mpatrol.spec,v 1.26 2000-07-17 23:38:08 graeme Exp $
 
 
-%define version 1.2.5
+%define version 1.2.6
 %define libversion 1.2
 
 
@@ -77,7 +77,6 @@ cp build/unix/mleak $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
-cp FAQ $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp COPYING $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp COPYING.LIB $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp NEWS $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
