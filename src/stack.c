@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.4 2000-05-14 15:00:08 graeme Exp $"
+#ident "$Id: stack.c,v 1.5 2000-05-29 16:35:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -249,7 +249,12 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
              * systems it may be overwritten by another call.
              */
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
-            p->next = (void *) *f;
+#if SYSTEM == SYSTEM_LYNXOS
+            if (!getaddr((unsigned int *) *f))
+                p->next = NULL;
+            else
+#endif /* SYSTEM */
+                p->next = (void *) *f;
 #elif ARCH == ARCH_SPARC
             if (p->addr == NULL)
                 p->next = NULL;
