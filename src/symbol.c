@@ -24,7 +24,10 @@
  * Symbol tables.  The implementation of reading symbols from executable files
  * may also interface with access libraries which support other file formats.
  * This module may also have to liaise with the dynamic linker (or equivalent)
- * in order to obtain symbols from shared objects.
+ * in order to obtain symbols from shared objects.  A very useful book on the
+ * various different object file and library formats that exist is Linkers &
+ * Loaders, First Edition by John R. Levine (Morgan Kaufmann Publishers, 2000,
+ * ISBN 1-558-60496-0).
  */
 
 
@@ -67,8 +70,7 @@
 #elif SYSTEM == SYSTEM_IRIX
 /* IRIX doesn't have a conventional SVR4 dynamic linker and so does not have the
  * same interface for accessing information about any required shared objects at
- * run-time.  However, this way of reading the dynamic linker's data structures
- * will only work for O32 ABI objects and not N32 ABI objects.
+ * run-time.
  */
 #include <obj.h>
 #include <obj_list.h>
@@ -76,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.22 2000-05-30 19:26:49 graeme Exp $"
+#ident "$Id: symbol.c,v 1.23 2000-05-31 18:23:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,6 +124,26 @@ typedef struct dynamiclink
     struct dynamiclink *next; /* pointer to next shared object */
 }
 dynamiclink;
+#elif SYSTEM == SYSTEM_IRIX
+/* This structure represents an N32 ABI shared object as opposed to an O32 ABI
+ * shared object, and is defined on IRIX 6.0 and above platforms as
+ * Elf32_Obj_Info.  In order for us to compile on earlier IRIX platforms we
+ * define this structure here, but under a different name so as to avoid a
+ * naming clash on IRIX 6.0 and later.
+ */
+
+typedef struct objectinfo
+{
+    Elf32_Word magic;  /* N32 ABI shared object */
+    Elf32_Word size;   /* size of this structure */
+    Elf32_Addr next;   /* next shared object */
+    Elf32_Addr prev;   /* previous shared object */
+    Elf32_Addr ehdr;   /* address of object file header */
+    Elf32_Addr ohdr;   /* original address of object file header */
+    Elf32_Addr name;   /* filename of shared object */
+    Elf32_Word length; /* length of filename of shared object */
+}
+objectinfo;
 #endif /* SYSTEM */
 
 
@@ -866,6 +888,8 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
 #elif SYSTEM == SYSTEM_IRIX
     struct obj_list *l;
     struct obj *o;
+    objectinfo *i;
+    char *s;
     size_t b;
 #endif /* SYSTEM */
 
@@ -901,16 +925,25 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
     if (l = __rld_obj_head)
         while (l = l->next)
         {
-            /* We should really check here for the presence of the new style
-             * object structure representing N32 objects.  However, it doesn't
-             * seem possible to obtain the base address of a shared object from
-             * it so it isn't currently supported.
+            /* Determine if the shared object we are looking at is an O32 ABI
+             * object or an N32 ABI object.
              */
-            o = (struct obj *) l->data;
-            b = (long) o->o_text_start - (long) o->o_base_address;
-            if ((o->o_path != NULL) && (*o->o_path != '\0') &&
-                !__mp_addsymbols(y, o->o_path, b))
-                return 0;
+            i = (objectinfo *) l->data;
+            if (i->magic == 0xFFFFFFFF)
+            {
+                s = (char *) i->name;
+                b = (long) i->ehdr - (long) i->ohdr;
+                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
+                    return 0;
+            }
+            else
+            {
+                o = (struct obj *) i;
+                b = (long) o->o_text_start - (long) o->o_base_address;
+                if ((o->o_path != NULL) && (*o->o_path != '\0') &&
+                    !__mp_addsymbols(y, o->o_path, b))
+                    return 0;
+            }
         }
 #endif /* SYSTEM */
     return 1;
