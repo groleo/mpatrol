@@ -38,6 +38,8 @@
 #if SYSTEM == SYSTEM_IRIX
 #include <exception.h>
 #include <ucontext.h>
+#elif SYSTEM == SYSTEM_TRU64
+#include <excpt.h>
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #include <setjmp.h>
@@ -62,9 +64,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.24 2001-02-05 22:58:34 graeme Exp $"
+#ident "$Id: stack.c,v 1.25 2001-03-03 14:45:27 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.24 2001-02-05 22:58:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.25 2001-03-03 14:45:27 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -136,10 +138,10 @@ extern "C"
  */
 
 int U_get_previous_frame(frameinfo *, frameinfo *);
-#elif SYSTEM == SYSTEM_IRIX
-/* The unwind() function in the IRIX exception-handling library (libexc) calls
- * malloc() and several memory operation functions, so we need to guard against
- * this by preventing recursive calls.
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
+/* The unwind() function in the IRIX and Tru64 exception-handling libraries
+ * (libexc) may call malloc() and several memory operation functions, so we
+ * need to guard against this by preventing recursive calls.
  */
 
 static unsigned char recursive;
@@ -173,7 +175,7 @@ __mp_newframe(stackinfo *s, void *f)
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     __mp_memset(&s->next, 0, sizeof(frameinfo));
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
     __mp_memset(&s->next, 0, sizeof(struct sigcontext));
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
@@ -426,10 +428,10 @@ __mp_getframe(stackinfo *p)
         p->index = MP_MAXSTACK;
     }
 #elif MP_LIBRARYSTACK_SUPPORT
-    /* HP/UX, IRIX and Windows platforms provide a library for traversing
-     * function call stack frames since the stack frame format does not
-     * necessarily preserve frame pointers.  On HP/UX this is done via a
-     * special section which can be read by debuggers.
+    /* HP/UX, IRIX, Tru64 and Windows platforms provide a library for
+     * traversing function call stack frames since the stack frame format
+     * does not necessarily preserve frame pointers.  On HP/UX this is done
+     * via a special section which can be read by debuggers.
      */
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
@@ -463,20 +465,24 @@ __mp_getframe(stackinfo *p)
         p->frame = NULL;
         p->addr = NULL;
     }
-#elif SYSTEM == SYSTEM_IRIX
-    /* On IRIX, the unwind() function calls malloc(), free() and some memory
-     * operation functions every time it is invoked.  Despite the fact that we
-     * guard against recursion here, it slows down execution to an unbearable
-     * pace, so it might be an idea to remove malloc.c from the mpatrol library
-     * if you have the option of recompiling all of your sources to include
-     * mpatrol.h.
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
+    /* On IRIX and Tru64, the unwind() function may call malloc(), free() and
+     * some memory operation functions every time it is invoked.  Despite the
+     * fact that we guard against recursion here, it may slow down execution to
+     * an unbearable pace, so it might be an idea to remove malloc.c from the
+     * mpatrol library if you have the option of recompiling all of your
+     * sources to include mpatrol.h.
      */
     if (!recursive)
     {
         recursive = 1;
         if (p->frame == NULL)
         {
+#if SYSTEM == SYSTEM_IRIX
             exc_setjmp(&p->next);
+#elif SYSTEM == SYSTEM_TRU64
+            exc_capture_context(&p->next);
+#endif /* SYSTEM */
             unwind(&p->next, NULL);
         }
         if (p->next.sc_pc != 0)

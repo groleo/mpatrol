@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: stack.h,v 1.12 2001-02-10 16:45:39 graeme Exp $
+ * $Id: stack.h,v 1.13 2001-03-03 14:45:27 graeme Exp $
  */
 
 
@@ -99,7 +99,7 @@ typedef struct stackinfo
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     struct frameinfo next;     /* next frame handle */
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
     struct sigcontext next;    /* next frame handle */
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
