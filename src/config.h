@@ -206,6 +206,23 @@
 #endif /* MP_PROTECT_SUPPORT */
 
 
+/* Indicates if the system supports the memalign() function call to allocate
+ * memory with a specified alignment.  This is used by mpalloc.c to implement
+ * release versions of memalign(), valloc() and pvalloc().
+ */
+
+#ifndef MP_MEMALIGN_SUPPORT
+#if SYSTEM == SYSTEM_CYGWIN || SYSTEM == SYSTEM_DGUX || \
+    SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_IRIX || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
+    SYSTEM == SYSTEM_SUNOS || SYSTEM == SYSTEM_UNIXWARE
+#define MP_MEMALIGN_SUPPORT 1
+#else /* SYSTEM */
+#define MP_MEMALIGN_SUPPORT 0
+#endif /* SYSTEM */
+#endif /* MP_MEMALIGN_SUPPORT */
+
+
 /* Indicates if a UNIX system supports the mmap() function call to allocate
  * memory as well as sbrk().  This must only be set if the system also supports
  * the allocation of zero-initialised pages from either a special device file
