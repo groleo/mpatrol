@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.53 2001-02-23 21:58:42 graeme Exp $
+# $Id: Makefile,v 1.54 2001-02-27 19:44:56 graeme Exp $
 
 
 # Definitions
@@ -50,7 +50,7 @@ ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  trace.t.o inter.t.o malloc.t.o cplus.t.o sbrk.t.o version.t.o
 ARCHIVE_MPAOBJS	= mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o \
 		  mpstrdup.o mprealloc.o
-ARCHIVE_MPLOBJS	= heapdiff.o mgauge.o mtrace.o
+ARCHIVE_MPLOBJS	= dbmalloc.o heapdiff.o mgauge.o mtrace.o
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 OBJECT_MPATROL	= lib$(MPATROL).o
@@ -319,6 +319,8 @@ graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
+dbmalloc.o: $(TOOLS)/dbmalloc.c $(TOOLS)/dbmalloc.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 heapdiff.o: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 mgauge.o: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h \

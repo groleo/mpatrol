@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.64 2001-02-23 21:58:46 graeme Exp $
+# $Id: Makefile,v 1.65 2001-02-27 19:44:58 graeme Exp $
 
 
 # Definitions
@@ -56,7 +56,7 @@ MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
-MPLOBJS	 = heapdiff.o mgauge.o mtrace.o
+MPLOBJS	 = dbmalloc.o heapdiff.o mgauge.o mtrace.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 SHARED_MPTOBJS	= $(MPTOBJS:.o=.s.o) machine.s.o
@@ -439,6 +439,8 @@ graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
+dbmalloc.o dbmalloc.n.ln: $(TOOLS)/dbmalloc.c $(TOOLS)/dbmalloc.h \
+	$(SOURCE)/mpatrol.h $(SOURCE)/config.h $(SOURCE)/target.h
 heapdiff.o heapdiff.n.ln: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h \
 	$(SOURCE)/mpatrol.h $(SOURCE)/config.h $(SOURCE)/target.h
 mgauge.o mgauge.n.ln: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h \
