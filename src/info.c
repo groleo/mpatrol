@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.20 2000-04-24 10:14:26 graeme Exp $"
+#ident "$Id: info.c,v 1.21 2000-05-08 20:18:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -181,29 +181,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
     h->count++;
     c = h->count;
     if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("ALLOC: %s (%lu, ", __mp_alloctypenames[f], c);
-        __mp_printsize(l);
-        __mp_diag(", ");
-        if (a == 0)
-            __mp_printsize(h->alloc.heap.memory.align);
-        else
-            __mp_printsize(a);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logalloc(h, l, a, f, s, t, u, v);
     if ((c == h->astop) && (h->rstop == 0))
     {
         /* Abort at the specified allocation index.
@@ -318,29 +296,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
     size_t d;
 
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
-        __mp_printsize(l);
-        __mp_diag(", ");
-        if (a == 0)
-            __mp_printsize(h->alloc.heap.memory.align);
-        else
-            __mp_printsize(a);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logrealloc(h, p, l, a, f, s, t, u, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKREALLOCS)
@@ -524,23 +480,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
     infonode *m;
 
     if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
-    {
-        /* Write an entry into the log file.
-         */
-        __mp_diag("FREE: %s (" MP_POINTER, __mp_alloctypenames[f], p);
-        __mp_diag(") [");
-#if MP_THREADS_SUPPORT
-        __mp_diag("%lu|", __mp_threadid());
-#endif /* MP_THREADS_SUPPORT */
-        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
-        if (u == 0)
-            __mp_diag("-");
-        else
-            __mp_diag("%lu", u);
-        __mp_diag("]\n");
-        __mp_printstack(&h->syms, v);
-        __mp_diag("\n");
-    }
+        __mp_logfree(h, p, f, s, t, u, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKFREES)
