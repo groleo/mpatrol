@@ -36,6 +36,9 @@
 #include <string.h>
 #if TARGET == TARGET_UNIX
 #include <unistd.h>
+#if SYSTEM == SYSTEM_LINUX
+#include <malloc.h>
+#endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #include <windows.h>
 #include <winbase.h>
@@ -46,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.3 2001-02-04 21:24:51 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.4 2001-02-04 22:01:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
