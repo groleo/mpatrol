@@ -24,10 +24,10 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.26 2000-06-29 19:24:54 graeme Exp $
+# $Id: build,v 1.27 2000-07-11 23:48:54 graeme Exp $
 
 
-version=1.2.4
+version=1.2.5
 libversion=1.2
 
 
@@ -105,7 +105,7 @@ pkgtrans -s `pwd` mpatrol-$version.pkg GSRmptrl
 rm -rf GSRmptrl
 
 
-# Clean up the build directory
+# Clean up the build directory.
 
 cd ../../build/unix
 make clobber
