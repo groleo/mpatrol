@@ -72,6 +72,8 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
+INCLUDES = $(X_CFLAGS)
+
 libmpatrol_la_LDFLAGS = -release @VERSION@
 
 libmpalloc_la_LDFLAGS = -release @VERSION@
