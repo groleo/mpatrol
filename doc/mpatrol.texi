@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.19 1999-12-20 22:06:49 graeme Exp $
+@c $Id: mpatrol.texi,v 1.20 1999-12-21 20:12:05 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.3
-@set VERSION 1.0.8
-@set UPDATED 20th December, 1999
+@set EDITION 1.4
+@set VERSION 1.1.0
+@set UPDATED 21st December, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -180,6 +180,16 @@ to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk}.  I normally only check my e-mail about
 once or twice a week, so don't expect an immediate response.  I can also be
 reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.
+
+@cindex references
+Note that this manual is not just intended to instruct readers on how to use the
+mpatrol library --- it is also written to give a detailed look at how malloc
+libraries work in general and how to improve the efficiency of existing code
+which uses them.  If this subject interests you, you may find further useful
+material at @emph{The Memory Management Reference} located at
+@uref{http://www.harlequin.com/mm/reference/}.  It has links to many documents
+and research papers in the field of memory management, and has a large glossary
+which lists and explains related terms.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -2090,7 +2100,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.0.7 (99/11/29)
+@@(#) mpatrol 1.0.8 (99/12/20)
 Copyright (C) 1997-1999 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
