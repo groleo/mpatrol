@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.55 2000-04-11 21:48:34 graeme Exp $
+@c $Id: mpatrol.texi,v 1.56 2000-04-13 18:39:35 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.1.5
-@set UPDATED 11th April, 2000
+@set UPDATED 13th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -1762,19 +1762,17 @@ Breakpoint 1, 0x80004026 in __mp_trap()
 #1  0x800027ec in __mp_getmemory()
 #2  0x80001138 in __mp_alloc()
 #3  0x80000d8e in main() at test.c:16
-(gdb) return
-Make selected stack frame return now? (y or n) y
-#0  0x800027ec in __mp_getmemory()
-(gdb) return
-Make selected stack frame return now? (y or n) y
-#0  0x80001138 in __mp_alloc()
-(gdb) return
-Make selected stack frame return now? (y or n) y
-#0  0x80000d8e in main() at test.c:16
+(gdb) finish
+Run till exit from #0  0x80004026 in __mp_trap()
+0x800027ec in __mp_getmemory()
+(gdb) finish
+Run till exit from #0  0x800027ec in __mp_getmemory()
+0x80001138 in __mp_alloc()
+(gdb) finish
+Run till exit from #0  0x80001138 in __mp_alloc()
+0x80000d8e in main() at test.c:16
 16              if (p = malloc(16))
 (gdb) step
-Single stepping until exit from function __mp_trap,
-which has no line number information.
 17                  free(p);
 (gdb) step
 15          for (i = 0; i < 1000; i++)
@@ -2128,6 +2126,19 @@ problems if the resulting shared library contains position-dependent code from
 the archive libraries you incorporated.  The only way to find out is for you to
 try it and see.
 
+@cindex embedded libraries
+In order to build a shared version of the mpatrol library with embedded object
+file format access libraries, you must first modify the @file{Makefile} you
+would normally use to build the mpatrol library.  At the lines where the linker
+is invoked to build the shared library, you must explicitly add any object file
+format access libraries that you want to use at the end of the linker command
+line.  This ensures that all references to such libraries will be resolved at
+link time rather than run time.  You must then edit the file @file{src/config.h}
+and remove all of the libraries that you embedded from the definition of the
+@code{MP_PRELOAD_LIBS} preprocessor macro.  Finally, rebuild the shared version
+of the mpatrol library and the @command{mpatrol} command and see if your efforts
+were worth it.
+
 @cindex memleak
 Another utility program that is provided is called @command{memleak} and is
 useful for detecting memory leaks in log files produced by the mpatrol library.
@@ -2186,6 +2197,7 @@ virtual memory there are less likely to be page faults if you need to access or
 traverse all of the blocks you have created.
 
 @cindex arenas
+@cindex Digital UNIX
 @cindex SGI IRIX, MIPS
 @cindex IRIX, MIPS
 @cindex amalloc
@@ -2195,8 +2207,8 @@ library functions and which associate each memory allocation with a particular
 arena.  An arena can have as many allocations added to it as required, but
 allocations cannot usually be freed until the whole arena is freed.  Note that
 there are not really any generic implementations of arenas that are available as
-everyone tends to write their own version when they require it, although SGI
-IRIX systems do come with an arena library called @emph{amalloc}.
+everyone tends to write their own version when they require it, although Digital
+UNIX and SGI IRIX systems do come with an arena library called @emph{amalloc}.
 
 @cindex slot tables
 However, what if you don't plan to free all of the blocks at the same time?  A
@@ -5961,6 +5973,23 @@ A memory allocation debugger for C which will detect memory leaks, corrupted
 memory, stores to freed memory and more.
 @end table
 
+@cindex Debug Heap
+@cindex IBM Corporation
+@item
+Debug Heap
+@table @asis
+@item Author
+IBM Corporation (@email{info@@ibm.com})
+@item License
+Commercial Software
+@item Platforms
+IBM AS/400
+@item Location
+@uref{http://www.as400.ibm.com/developer/porting/heapexternal.html}
+@item Overview
+A heap debugging environment with stack traceback for IBM AS/400 servers.
+@end table
+
 @cindex Dmalloc
 @item
 Dmalloc
@@ -6040,7 +6069,7 @@ Free Software
 @item Platforms
 AmigaOS
 @item Location
-@uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_c.html}
+@uref{http://www.geocities.com/SiliconValley/Horizon/8596/fortify.html}
 @item Overview
 Provides a fortified shell for memory allocations, trapping memory leaks,
 writes beyond and before memory blocks and writes to freed memory.
@@ -6120,6 +6149,22 @@ more.  The Inuse graphical memory usage display tool is also provided with this
 software.
 @end table
 
+@cindex JMalloc
+@item
+JMalloc
+@table @asis
+@item Author
+Jeff Dunlop
+@item License
+Free Software
+@item Platforms
+MS-DOS, Windows
+@item Location
+@uref{http://www.snippets.org/}
+@item Overview
+Provides tracing and debugging for @code{malloc()} and @code{operator new}.
+@end table
+
 @cindex LeakTracer
 @item
 LeakTracer
@@ -6152,6 +6197,22 @@ Linux
 @item Overview
 A program which helps find memory leaks and helps debug reference count problems
 with xpcom objects.
+@end table
+
+@cindex Malloc Debug
+@item
+Malloc Debug
+@table @asis
+@item Author
+Brandon S. Allbery @email{allbery@@ncoast.org}
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.leo.org/pub/comp/usenet/comp.sources.misc/malloc-debug/}
+@item Overview
+A debugging malloc package with stack traceback capability.
 @end table
 
 @cindex Malloc Debug Library
@@ -6222,6 +6283,24 @@ Provides memory management error detection, memory usage error detection, memory
 usage profiling and error simulation.
 @end table
 
+@cindex MemLeak
+@item
+MemLeak
+@table @asis
+@item Author
+Keith Packard (@email{keithp@@ncd.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{ftp://ftp.x.org/pub/R6.4/xc/util/memleak/}
+@item Overview
+Replaces the C library allocation functions and provides extensive memory
+checking, locating lost memory, detecting free memory still in use and stores
+to free memory along with stack tracebacks.
+@end table
+
 @cindex Memory Advisor
 @cindex Sentinel
 @cindex PLATINUM Technology
@@ -6243,6 +6322,24 @@ existing malloc libraries in order to provide greater error checking.  Formerly
 known as Sentinel.
 @end table
 
+@cindex Memory Sleuth
+@cindex TurboPower
+@item
+Memory Sleuth
+@table @asis
+@item Author
+TurboPower (@email{info@@turbopower.com})
+@item License
+Commercial Software
+@item Platforms
+Windows
+@item Location
+@uref{http://www.turbopower.com/}
+@item Overview
+Quickly tracks down memory leaks and resource allocation errors with C++Builder
+and Delphi.
+@end table
+
 @cindex Memprof
 @item
 Memprof
@@ -6257,6 +6354,23 @@ Linux
 @uref{http://people.redhat.com/otaylor/memprof/}
 @item Overview
 A tool for profiling memory usage and detecting memory leaks.
+@end table
+
+@cindex Memproof
+@cindex AutomatedQA
+@item
+Memproof
+@table @asis
+@item Author
+AutomatedQA (@email{info@@totalqa.com})
+@item License
+Free Software
+@item Platforms
+Windows
+@item Location
+@uref{http://www.totalqa.com/}
+@item Overview
+A memory and resource leak debugger for Borland's family of Windows compilers.
 @end table
 
 @cindex MemWatch
