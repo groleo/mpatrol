@@ -30,6 +30,8 @@
 
 
 #include "mutex.h"
+#include "inter.h"
+#include "machine.h"
 #include <stddef.h>
 #if TARGET == TARGET_UNIX
 #include <pthread.h>
@@ -46,7 +48,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.8 2000-06-01 00:05:46 graeme Exp $"
+#ident "$Id: mutex.c,v 1.9 2000-06-15 18:45:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -74,6 +76,7 @@ typedef struct recmutex
     mutex real;          /* actual mutex */
     unsigned long owner; /* owning thread */
     unsigned long count; /* recursion count */
+    char init;           /* initialisation flag */
 }
 recmutex;
 
@@ -88,13 +91,50 @@ extern "C"
  * means that we must find a way of initialising the mutexes before the
  * mpatrol library is initialised.
  */
+
 static recmutex locks[MT_MAX];
 
 
-#ifdef __cplusplus
+#if TARGET == TARGET_UNIX
+/* We can make use of the POSIX threads function pthread_once() in
+ * order to prevent the mpatrol library being initialised more than
+ * once at the same time.
+ */
+
+static pthread_once_t lockflag = PTHREAD_ONCE_INIT;
+#endif /* TARGET */
+
+
+#if MP_INIT_SUPPORT
+/* On systems with an .init section we can plant calls to initialise the
+ * mpatrol mutexes and data structures before main() is called.  However, we
+ * need to refer to a symbol within the machine module so that we can drag in
+ * the contents of the .init section when the mpatrol library is built as an
+ * archive library.
+ */
+
+static int *initsection = &__mp_initsection;
+#elif defined(__GNUC__)
+/* The GNU C compiler allows us to indicate that a function is a constructor
+ * which should be called before main().  However, this gets entered into a
+ * .ctors section which means that the final link must also be performed by
+ * the GNU C compiler.
+ */
+
+static void initmutexes(void) __attribute__((__constructor__));
+
+static void initmutexes(void)
+{
+    __mp_initmutexes();
+    __mp_init();
+}
+#elif defined(__cplusplus)
 /* C++ provides a way to initialise the array of mutex locks before main()
  * is called.  Unfortunately, that may not be early enough if a system
- * startup module allocates dynamic memory.
+ * startup module allocates dynamic memory.  Note that if the C++ compiler
+ * uses a special section for calling functions before main() that is
+ * not recognised by the system tools then the C++ compiler must also be
+ * used to perform the final link.
  */
 
 static struct initmutexes
@@ -102,6 +142,7 @@ static struct initmutexes
     initmutexes()
     {
         __mp_initmutexes();
+        __mp_init();
     }
 }
 initlocks;
@@ -117,23 +158,25 @@ MP_GLOBAL void __mp_initmutexes(void)
     unsigned long i;
 
     for (i = 0; i < MT_MAX; i++)
-    {
+        if (!locks[i].init)
+        {
+            locks[i].init = 1;
 #if TARGET == TARGET_UNIX
-        pthread_mutex_init(&locks[i].guard, NULL);
-        pthread_mutex_init(&locks[i].real, NULL);
+            pthread_mutex_init(&locks[i].guard, NULL);
+            pthread_mutex_init(&locks[i].real, NULL);
 #elif TARGET == TARGET_AMIGA
-        InitSemaphore(&locks[i].guard);
-        InitSemaphore(&locks[i].real);
+            InitSemaphore(&locks[i].guard);
+            InitSemaphore(&locks[i].real);
 #elif TARGET == TARGET_WINDOWS
-        locks[i].guard = CreateMutex(NULL, 0, NULL);
-        locks[i].real = CreateMutex(NULL, 0, NULL);
+            locks[i].guard = CreateMutex(NULL, 0, NULL);
+            locks[i].real = CreateMutex(NULL, 0, NULL);
 #elif TARGET == TARGET_NETWARE
-        locks[i].guard = OpenLocalSemaphore(1);
-        locks[i].real = OpenLocalSemaphore(1);
+            locks[i].guard = OpenLocalSemaphore(1);
+            locks[i].real = OpenLocalSemaphore(1);
 #endif /* TARGET */
-        locks[i].owner = 0;
-        locks[i].count = 0;
-    }
+            locks[i].owner = 0;
+            locks[i].count = 0;
+        }
 }
 
 
@@ -143,24 +186,25 @@ MP_GLOBAL void __mp_initmutexes(void)
 
 MP_GLOBAL void __mp_finimutexes(void)
 {
-#if TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
     unsigned long i;
-#endif /* TARGET */
 
-#if TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
     for (i = 0; i < MT_MAX; i++)
-    {
-#if TARGET == TARGET_WINDOWS
-        CloseHandle(locks[i].guard);
-        CloseHandle(locks[i].real);
+        if (locks[i].init)
+        {
+            locks[i].init = 0;
+#if TARGET == TARGET_UNIX
+            pthread_mutex_destroy(&locks[i].guard);
+            pthread_mutex_destroy(&locks[i].real);
+#elif TARGET == TARGET_WINDOWS
+            CloseHandle(locks[i].guard);
+            CloseHandle(locks[i].real);
 #elif TARGET == TARGET_NETWARE
-        CloseLocalSemaphore(locks[i].guard);
-        CloseLocalSemaphore(locks[i].real);
+            CloseLocalSemaphore(locks[i].guard);
+            CloseLocalSemaphore(locks[i].real);
 #endif /* TARGET */
-        locks[i].owner = 0;
-        locks[i].count = 0;
-    }
-#endif /* TARGET */
+            locks[i].owner = 0;
+            locks[i].count = 0;
+        }
 }
 
 
@@ -208,25 +252,24 @@ MP_GLOBAL void __mp_lockmutex(mutextype m)
 
     l = &locks[m];
     i = __mp_threadid();
-    while (1)
+#if TARGET == TARGET_UNIX
+    pthread_once(&lockflag, __mp_initmutexes);
+#else /* TARGET */
+    if (!l->init)
+        __mp_initmutexes();
+#endif /* TARGET */
+    lockmutex(&l->guard);
+    if ((l->owner == i) && (l->count > 0))
+        l->count++;
+    else
     {
-        lockmutex(&l->guard);
-        if (l->count == 0)
-        {
-            l->owner = i;
-            l->count = 1;
-            unlockmutex(&l->guard);
-            lockmutex(&l->real);
-            break;
-        }
-        else if (l->owner == i)
-        {
-            l->count++;
-            unlockmutex(&l->guard);
-            break;
-        }
         unlockmutex(&l->guard);
+        lockmutex(&l->real);
+        lockmutex(&l->guard);
+        l->owner = i;
+        l->count = 1;
     }
+    unlockmutex(&l->guard);
 }
 
 
@@ -240,12 +283,20 @@ MP_GLOBAL void __mp_unlockmutex(mutextype m)
 
     l = &locks[m];
     i = __mp_threadid();
-    lockmutex(&l->guard);
-    if (l->count > 0)
-        l->count--;
-    if ((l->owner == i) && (l->count == 0))
-        unlockmutex(&l->real);
-    unlockmutex(&l->guard);
+    if (l->init)
+    {
+        lockmutex(&l->guard);
+        if ((l->owner == i) && (l->count > 0))
+        {
+            l->count--;
+            if (l->count == 0)
+            {
+                unlockmutex(&l->real);
+                l->owner = 0;
+            }
+        }
+        unlockmutex(&l->guard);
+    }
 }
 
 
