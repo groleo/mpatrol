@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.23 2001-03-11 23:49:22 graeme Exp $
+% $Id: refcard.tex,v 1.24 2001-03-22 19:56:55 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -729,6 +729,8 @@ Displays the version number of the \command{mpatrol} command.
 Specifies that different call sites from within the same function are to be
 differentiated and that the names of all functions should be displayed with
 their call site offset in bytes.
+\item[\flag{call-graph}]
+Specifies that the allocation call graph should be displayed.
 \item[\flag{counts}]
 Specifies that certain tables should be sorted by the number of allocations or
 deallocations rather than the total number of bytes allocated or deallocated.
@@ -771,6 +773,8 @@ Specifies that a small delay of a certain length should be added after drawing
 each memory allocation event (GUI only).
 \item[\flagpar{free}{colour}]
 Specifies the colour to use for displaying free memory (GUI only).
+\item[\flag{gui}]
+Displays the GUI (if supported).
 \item[\flagpar{height}{size}]
 Specifies the height (in pixels) of the drawing area (GUI only).
 \item[\flag{help}]
@@ -791,6 +795,8 @@ Specifies the height (in pixels) of the window (GUI only).
 Specifies the width (in pixels) of the window (GUI only).
 \item[\flagpar{width}{size}]
 Specifies the width (in pixels) of the drawing area (GUI only).
+\item[\flag{verbose}]
+Specifies that the tracing table should be displayed.
 \item[\flag{version}]
 Displays the version number of the \command{mptrace} command.
 \end{description}
