@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 12th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
 December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 12th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
 December, 2000.
 
 
@@ -8987,16 +8987,13 @@ Documentation
      systems since they cannot be used on other platforms.  The
      unformatted manual pages exist in @{b}man/man1@{ub} and @{b}man/man3@{ub} and should
      be copied to your system's manual page directory.  If you don't
-     have the @{b}nroff@{ub} command installed on your system then you may also
-     need to copy the formatted manual pages, located in @{b}man/cat1@{ub} and
-     @{b}man/cat3@{ub}.  You may also need to modify your @{b}MANPATH@{ub} environment
-     variable if you installed the manual pages in a non-standard
-     place, and some systems require you to update the @{i}whatis@{ui} database
-     after installing new manual pages, by running @{b}makewhatis@{ub}, @{b}catman@{ub}
-     or equivalent.  Note that there are two manual pages for mpatrol
-     with the same name and you are likely to see the section 1 manual
-     page by default.  You must explicitly specify the section number
-     when using the @{b}man@{ub} command in order to view the other manual page.
+     have the @{b}nroff@{ub}, @{b}troff@{ub} or @{b}groff@{ub} commands installed on your system
+     then you may also need to copy the formatted manual pages, located
+     in @{b}man/cat1@{ub} and @{b}man/cat3@{ub}.  You may also need to modify your
+     @{b}MANPATH@{ub} environment variable if you installed the manual pages in
+     a non-standard place, and some systems require you to update the
+     @{i}whatis@{ui} database after installing new manual pages, by running
+     @{b}makewhatis@{ub}, @{b}catman@{ub} or equivalent.
 
 
 @endnode

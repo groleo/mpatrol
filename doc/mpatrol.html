@@ -112,7 +112,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.2 of the mpatrol manual for version
-1.3.2, 12th December, 2000.
+1.3.2, 13th December, 2000.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -8498,16 +8498,13 @@ non-standard place.
 <p>This is very system-dependent, but need only be done on UNIX systems since they
 cannot be used on other platforms.  The unformatted manual pages exist in
 <code>man/man1</code> and <code>man/man3</code> and should be copied to your system's manual
-page directory.  If you don't have the <code>nroff</code> command installed on your
-system then you may also need to copy the formatted manual pages, located in
-<code>man/cat1</code> and <code>man/cat3</code>.  You may also need to modify your
-<code>MANPATH</code> environment variable if you installed the manual pages in a
-non-standard place, and some systems require you to update the <em>whatis</em>
-database after installing new manual pages, by running <code>makewhatis</code>,
-<code>catman</code> or equivalent.  Note that there are two manual pages for
-mpatrol with the same name and you are likely to see the section 1 manual page
-by default.  You must explicitly specify the section number when using the
-<code>man</code> command in order to view the other manual page.
+page directory.  If you don't have the <code>nroff</code>, <code>troff</code> or
+<code>groff</code> commands installed on your system then you may also need to copy
+the formatted manual pages, located in <code>man/cat1</code> and <code>man/cat3</code>.  You
+may also need to modify your <code>MANPATH</code> environment variable if you installed
+the manual pages in a non-standard place, and some systems require you to update
+the <em>whatis</em> database after installing new manual pages, by running
+<code>makewhatis</code>, <code>catman</code> or equivalent.
 </ol>
 
 <p><hr>
