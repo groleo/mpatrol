@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.117 2001-03-08 20:53:14 graeme Exp $"
+#ident "$Id: inter.c,v 1.118 2001-03-08 22:07:59 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.117 2001-03-08 20:53:14 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.118 2001-03-08 22:07:59 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,13 +76,24 @@ void _Inuse_close(void);
 static infohead memhead;
 
 
-#if TARGET == TARGET_UNIX && SYSTEM == SYSTEM_LINUX
+#if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_LINUX
 /* This contains a pointer to the environment variables for a process.  If
  * it is not set up yet then we must use sbrk() to allocate all memory since
  * we can't initialise mpatrol until the environment variable can be read.
  */
 
 extern char **__environ;
+#elif SYSTEM == SYSTEM_TRU64
+/* The exception support library on Tru64 always allocates some memory from
+ * the heap in order to initialise the code address range tables.  We need
+ * to ensure that we don't initialise mpatrol before this otherwise stack
+ * unwinding will fail, so we check to ensure that the table has been set up
+ * before we proceed.
+ */
+
+extern void *__exc_crd_list_head;
+#endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS && !defined(__GNUC__)
 /* These are global variables used by the Microsoft C run-time library to
  * indicate initialisation of the environment variables, the exit function
@@ -96,7 +107,7 @@ extern char **__environ;
 extern int __env_initialized;
 extern void *__onexitbegin;
 extern void **__piob;
-#endif /* TARGET && SYSTEM && __GNUC__ */
+#endif /* TARGET && __GNUC__ */
 
 
 /* Determine if the C run-time library is initialised.
@@ -105,6 +116,8 @@ extern void **__piob;
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_LINUX
 #define crt_initialised() (__environ)
+#elif SYSTEM == SYSTEM_TRU64
+#define crt_initialised() (__exc_crd_list_head)
 #else /* SYSTEM */
 #define crt_initialised() (1)
 #endif /* SYSTEM */
