@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.35 2001-08-23 23:05:29 graeme Exp $
+# $Id: Makefile,v 1.36 2001-08-24 10:46:00 graeme Exp $
 
 
 # Definitions
@@ -226,7 +226,6 @@ ifeq ($(VERBOSE),true)
 else
 	@ texi2dvi --language=latex --pdf --batch --clean --quiet $<
 endif
-	-@ rm -rf bin src tools >/dev/null 2>&1
 ifeq ($(THUMBNAILS),true)
 ifeq ($(VERBOSE),true)
 	@ thumbpdf --verbose $@
@@ -240,6 +239,7 @@ else
 	-@ rm -f thumbdta.tex >/dev/null 2>&1
 endif
 endif
+	-@ rm -rf bin src tools >/dev/null 2>&1
 
 all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(REFCARD).dvi \
