@@ -77,12 +77,24 @@ their corresponding answers or solutions.
  A. The src/config.h and src/target.h header files attempt to obtain as much
     information from the compiler as possible, mainly from any predefined
     preprocessor macros that it defines during compilation.  If this information
-    is incorrect then you can override the TARGET, SYSTEM, ARCH and FORMAT
-    preprocessor macros defined in src/target.h to suit your particular system
-    by explicitly defining them in CFLAGS within the makefile when you build
-    mpatrol.  You could also choose to build different versions of mpatrol with
-    different settings of FORMAT on a single system if you wish to by changing
-    FORMAT for different builds.
+    is incorrect then you can override the TARGET, SYSTEM, ARCH, ENVIRON and
+    FORMAT preprocessor macros defined in src/target.h to suit your particular
+    system by explicitly defining them in CFLAGS within the makefile when you
+    build mpatrol.  You could also choose to build different versions of mpatrol
+    with different settings of ENVIRON or FORMAT on a single system if you wish
+    to by changing ENVIRON or FORMAT for different builds.
+
+ Q. The processor family I am compiling on supports both 32-bit and 64-bit
+    modes of operation.  How do I specify which I want?
+
+ A. You will have to look at the documentation for the compiler you are using
+    in order to find out how to specify which operating environment you wish
+    to target.  For example, if you are using the Sun C compiler on a SPARC V9
+    Solaris machine then you should specify the -xarch=v9 option in the Makefile
+    when you are building mpatrol in order to target the 64-bit environment.
+    If you think that you are already using the correct option, but the mpatrol
+    code is still being built to support the wrong environment then you could
+    try explicitly setting the ENVIRON preprocessor macro in the Makefile.
 
  Q. I cannot include mpatrol.h from my C++ source code as I get lots of
     compilation errors.  Why is this and what can I do to prevent them?
@@ -124,11 +136,11 @@ their corresponding answers or solutions.
 
  A. This is most likely caused by the mpatrol library requiring additional
     symbols defined in an object file access library.  If mpatrol was built with
-    FORMAT=FORMAT_ELF32 then you'll need to add -lelf (or equivalent) to the
-    compiler command line straight after -lmpatrol.  If mpatrol was built with
-    FORMAT=FORMAT_BFD then you'll need to add -lbfd -liberty (or equivalent)
-    instead.  If you are using the thread-safe version of mpatrol then you may
-    also need to link with the system threads library.
+    FORMAT=FORMAT_ELF32 or FORMAT=FORMAT_ELF64 then you'll need to add -lelf (or
+    equivalent) to the compiler command line straight after -lmpatrol.  If
+    mpatrol was built with FORMAT=FORMAT_BFD then you'll need to add -lbfd
+    -liberty (or equivalent) instead.  If you are using the thread-safe version
+    of mpatrol then you may also need to link with the system threads library.
 
  Q. Why do I still get undefined symbols on HP/UX, IRIX or Windows platforms,
     despite following the above instructions?
