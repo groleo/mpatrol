@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.244 2001-09-04 23:23:10 graeme Exp $
+@c $Id: mpatrol.texi,v 1.245 2001-09-04 23:29:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -252,7 +252,8 @@ and Andreas Schallenberg
 Tru64 and SuSE ports.  Both Aleksandar Donev (@email{donev@@pa.msu.edu}) and Van
 Snyder (@email{vsnyder@@math.jpl.nasa.gov}) provided suggestions and code for
 using mpatrol with FORTRAN.  Michael Anthony (@email{m@@xyzfind.com}) wrote the
-profdiff tool.
+profdiff tool and Jerome Marant (@email{jerome@@debian.org}) did the Debian
+GNU/Linux port.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today
@@ -12712,8 +12713,7 @@ work on systems whose dynamic linkers support the @env{LD_PRELOAD} or
 access libraries do not exist in shared form on such systems.
 
 @item
-Perhaps add files to build the mpatrol library and tools as BSD and Debian
-packages.
+Perhaps add files to build the mpatrol library and tools as BSD packages.
 @end itemize
 
 @node Amiga notes, Windows notes, UNIX notes, Notes
