@@ -33,7 +33,7 @@
 
 
 /*
- * $Id: alloc.h,v 1.7 2001-02-10 16:45:39 graeme Exp $
+ * $Id: alloc.h,v 1.8 2001-02-11 22:01:04 graeme Exp $
  */
 
 
@@ -114,6 +114,7 @@ MP_EXPORT void __mp_deleteallocs(allochead *);
 MP_EXPORT allocnode *__mp_getalloc(allochead *, size_t, size_t, void *);
 MP_EXPORT int __mp_resizealloc(allochead *, allocnode *, size_t);
 MP_EXPORT void __mp_freealloc(allochead *, allocnode *, void *);
+MP_EXPORT void __mp_recyclefreed(allochead *);
 MP_EXPORT int __mp_protectalloc(allochead *, memaccess);
 MP_EXPORT allocnode *__mp_findalloc(allochead *, void *);
 MP_EXPORT allocnode *__mp_findfreed(allochead *, void *);
