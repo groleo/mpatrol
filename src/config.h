@@ -60,6 +60,30 @@
 #endif /* MP_MACROROUTINES */
 
 
+/* Indicates if system memory should be allocated from a static array rather
+ * than the process heap.  Use this to provide support for dynamic memory
+ * allocation routines on systems that don't have a system function to allocate
+ * heap memory.
+ */
+
+#ifndef MP_ARRAY_SUPPORT
+#define MP_ARRAY_SUPPORT 0
+#endif /* MP_ARRAY_SUPPORT */
+
+
+/* The size of the static memory array in bytes.  Any attempt to allocate more
+ * system memory than this will fail, although it should be remembered that the
+ * library will also be using this array for its internal structures.  The
+ * default is 1 megabyte.
+ */
+
+#if MP_ARRAY_SUPPORT
+#ifndef MP_ARRAY_SIZE
+#define MP_ARRAY_SIZE 1048576
+#endif /* MP_ARRAY_SIZE */
+#endif /* MP_ARRAY_SUPPORT */
+
+
 /* Indicates if all of the heap memory used by the library should be
  * deleted when the process exits.  This should not be set on systems that
  * make dynamic memory allocations after exit() or reference freed memory
