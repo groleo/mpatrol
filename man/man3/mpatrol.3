@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.14 2000-03-21 21:22:19 graeme Exp $
+.\" $Id: mpatrol.3,v 1.15 2000-03-23 20:11:30 graeme Exp $
 .\"
-.TH MPATROL 3 "21 March 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 3 "23 March 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -107,8 +107,9 @@ information.
 .PP
 The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
-header files, although on UNIX platforms (and AmigaOS when using \fBgcc\fP) they
-will be used anyway, albeit with slightly less tracing information:
+header files, although on UNIX and Windows platforms (and AmigaOS when using
+\fBgcc\fP) they will be used anyway, albeit with slightly less tracing
+information:
 .TP
 \fBmalloc\fP
 Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
@@ -280,9 +281,9 @@ and should not be used in new code.
 The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in \fImpatrol.h\fP will only be used if the
 \fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  To use these you must
-include \fImpatrol.h\fP before all other header files, although on UNIX
-platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway, albeit
-with slightly less tracing information:
+include \fImpatrol.h\fP before all other header files, although on UNIX and
+Windows platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway,
+albeit with slightly less tracing information:
 .TP
 \fBoperator new\fP
 Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
@@ -329,9 +330,9 @@ function.
 .PP
 The following 9 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include \fImpatrol.h\fP
-before all other header files, although on UNIX platforms (and AmigaOS when
-using \fBgcc\fP) they will be used anyway, albeit with slightly less tracing
-information:
+before all other header files, although on UNIX and Windows platforms (and
+AmigaOS when using \fBgcc\fP) they will be used anyway, albeit with slightly
+less tracing information:
 .TP
 \fBmemset\fP
 Writes \fIsize\fP bytes of value \fIbyte\fP to the memory location beginning at
