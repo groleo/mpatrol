@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.4 2001-02-27 00:51:16 graeme Exp $
+ * $Id: dbmalloc.h,v 1.5 2001-02-27 22:04:58 graeme Exp $
  */
 
 
@@ -80,6 +80,13 @@
  * function will never return a non-zero value - it always terminates with
  * an error message in the mpatrol log file whenever it detects heap
  * corruption.  As a result, the malloc_abort() function is not used.
+ *
+ * This file is initialised via the mpatrol library's initialiser function
+ * feature, which means that if the __mp_init_dbmalloc() function is noted
+ * by the mpatrol symbol manager then it will be called when the mpatrol
+ * library is being initialised.  If this feature is not supported then the
+ * dbmallinit() function must be called as early on as possible, otherwise
+ * this file will not be initialised until one of its functions are called.
  */
 
 
@@ -149,6 +156,7 @@ union dbmalloptarg
 
 #ifndef NDEBUG
 
+#define dbmallinit() __mp_init_dbmalloc()
 #define dbmallopt(c, v) __mpt_dbmallocoption((c), (v))
 #define malloc_chain_check(f) __mpt_dbmallocchaincheck(MP_FUNCNAME, __FILE__, \
                                                        __LINE__)
@@ -174,6 +182,7 @@ void __mpt_dbmallocdump(int);
 void __mpt_dbmalloclist(int, unsigned long, unsigned long);
 unsigned long __mpt_dbmallocinuse(unsigned long *);
 size_t __mpt_dbmallocsize(MP_CONST void *);
+void __mp_init_dbmalloc(void);
 
 
 #ifdef __cplusplus
@@ -182,6 +191,7 @@ size_t __mpt_dbmallocsize(MP_CONST void *);
 
 #else /* NDEBUG */
 
+#define dbmallinit() ((void) 0)
 #define dbmallopt(c, v) ((int) 1)
 #define malloc_chain_check(f) ((int) 0)
 #define malloc_dump(f) ((void) 0)
