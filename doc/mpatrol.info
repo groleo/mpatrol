@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 21st
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 24th
 December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 21st
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 24th
 December, 2000.
 
 * Menu:
@@ -10271,6 +10271,23 @@ Netware platforms.
           attempts to validate reallocations and deallocations and
           detect memory leaks.
 
+   * Leak
+    Author
+          Josh McCormick (<jmccorm@galstar.com>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://www.galstar.com/~jmccorm/leak/'
+
+    Overview
+          A simple shell script that monitors the system looking for
+          processes which leak memory.
+
    * Leakers
     Author
           Gabriel M. Deal (<gmd@yellowleaf.org>)
@@ -10472,6 +10489,23 @@ Netware platforms.
     Overview
           Detects various run-time errors related to operating system
           resources and provides information on memory leaks.
+
+   * MemCheck
+    Author
+          IBM Corporation (<info@ibm.com>)
+
+    License
+          Commercial Software
+
+    Platforms
+          IBM OS/390
+
+    Location
+          `http://www.s390.ibm.com/oe/tools/memcheck_2_1.html'
+
+    Overview
+          Aids the discovery of memory leaks in single- and
+          multi-threaded C/C++ programs.
 
    * MemDebug
     Author
@@ -12689,10 +12723,10 @@ Node: Linking427332
 Node: Running431604
 Node: Files445754
 Node: Related software448750
-Ref: Related software-Footnote-1484351
-Node: References484592
-Node: Copying487185
-Node: Function index515074
-Node: Index517332
+Ref: Related software-Footnote-1485023
+Node: References485264
+Node: Copying487857
+Node: Function index515746
+Node: Index518004
 
 End Tag Table

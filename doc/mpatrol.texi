@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.158 2000-12-20 23:55:27 graeme Exp $
+@c $Id: mpatrol.texi,v 1.159 2000-12-24 21:03:50 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.3
 @set VERSION 1.3.3
-@set UPDATED 21st December, 2000
+@set UPDATED 24th December, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -10956,6 +10956,22 @@ the filename and line number, then attempts to validate reallocations and
 deallocations and detect memory leaks.
 @end table
 
+@item
+Leak
+@table @asis
+@item Author
+Josh McCormick (@email{jmccorm@@galstar.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.galstar.com/~jmccorm/leak/}
+@item Overview
+A simple shell script that monitors the system looking for processes which leak
+memory.
+@end table
+
 @cindex Leakers
 @item
 Leakers
@@ -11155,6 +11171,21 @@ Windows
 @item Overview
 Detects various run-time errors related to operating system resources and
 provides information on memory leaks.
+@end table
+
+@item
+MemCheck
+@table @asis
+@item Author
+IBM Corporation (@email{info@@ibm.com})
+@item License
+Commercial Software
+@item Platforms
+IBM OS/390
+@item Location
+@uref{http://www.s390.ibm.com/oe/tools/memcheck_2_1.html}
+@item Overview
+Aids the discovery of memory leaks in single- and multi-threaded C/C++ programs.
 @end table
 
 @cindex MemDebug
