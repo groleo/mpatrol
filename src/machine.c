@@ -32,9 +32,79 @@
 #include "config.h"
 
 
-#if MP_IDENT_SUPPORT
-#ident "$Id: machine.c,v 1.1 2000-06-12 21:35:32 graeme Exp $"
-#endif /* MP_IDENT_SUPPORT */
+#if MP_THREADS_SUPPORT && MP_INIT_SUPPORT
+/* Provide support for initialising the mpatrol mutexes and data structures
+ * before main() is called.  This is preferred over any other such solutions
+ * on the following systems since it means that we can link with any compiler
+ * rather than relying on linking with the same compiler that built the mutex
+ * module.
+ */
+
+
+#if ARCH == ARCH_IX86
+/* Define the __mp_initsection variable.
+ */
+
+	.section .data,"aw"
+	.align	4
+__mp_initsection:
+	.long	1
+	.globl	__mp_initsection
+	.type	__mp_initsection,@object
+	.size	__mp_initsection,4
+
+
+/* Place calls to initialise the mpatrol mutexes and data structures into
+ * the .init section.
+ */
+
+	.section .init,"ax"
+	call	__mp_initmutexes
+	call	__mp_init
+#elif ARCH == ARCH_M88K
+/* Define the __mp_initsection variable.
+ */
+
+	section	.data,"aw",#progbits
+	align	4
+___mp_initsection:
+	word	1
+	global	___mp_initsection
+	type	___mp_initsection,#object
+	size	___mp_initsection,4
+
+
+/* Place calls to initialise the mpatrol mutexes and data structures into
+ * the .init section.
+ */
+
+	section	.init,"ax",#progbits
+	bsr	___mp_initmutexes
+	bsr	___mp_init
+#elif ARCH == ARCH_SPARC
+/* Define the __mp_initsection variable.
+ */
+
+	.section ".data",#alloc,#write
+	.align	4
+__mp_initsection:
+	.word	1
+	.global	__mp_initsection
+	.type	__mp_initsection,#object
+	.size	__mp_initsection,4
+
+
+/* Place calls to initialise the mpatrol mutexes and data structures into
+ * the .init section.
+ */
+
+	.section ".init",#alloc,#execinstr
+	call	__mp_initmutexes
+	nop
+	call	__mp_init
+	nop
+#endif /* ARCH */
+#endif /* MP_THREADS_SUPPORT && MP_INIT_SUPPORT */
 
 
 #if !MP_BUILTINSTACK_SUPPORT
@@ -80,6 +150,7 @@ __mp_frameinfo
 /* Obtain the stack pointer for the current function.
  */
 
+	.text
 	.globl	__mp_stackpointer
 	.ent	__mp_stackpointer
 __mp_stackpointer:
@@ -92,6 +163,7 @@ __mp_stackpointer:
 /* Obtain the return address for the current function.
  */
 
+	.text
 	.globl	__mp_returnaddress
 	.ent	__mp_returnaddress
 __mp_returnaddress:

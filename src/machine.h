@@ -41,6 +41,11 @@ extern "C"
 #endif /* __cplusplus */
 
 
+#if MP_THREADS_SUPPORT && MP_INIT_SUPPORT
+extern int __mp_initsection;
+#endif /* MP_THREADS_SUPPORT && MP_INIT_SUPPORT */
+
+
 #if !MP_BUILTINSTACK_SUPPORT
 #if MP_LIBRARYSTACK_SUPPORT && SYSTEM == SYSTEM_HPUX
 void __mp_frameinfo(void *);
