@@ -1,3 +1,13 @@
+Changes for 1.0.5 (16th November, 1999)
+
+  * Added TeXinfo documentation which can be translated to on-line manuals in
+    ASCII, GNU Info, AmigaGuide and HTML format, and printed manuals in DVI,
+    Postscript and PDF format.
+
+  * Added support for allocating memory from a static array rather than the
+    system heap, which might be useful on embedded systems which have no heap.
+
+
 Changes for 1.0.4 (21st October, 1999)
 
   * Added the CHECK option.
