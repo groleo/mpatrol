@@ -30,8 +30,6 @@
 
 
 #include "mutex.h"
-#include "inter.h"
-#include "machine.h"
 #include <stddef.h>
 #if TARGET == TARGET_UNIX
 #include <pthread.h>
@@ -48,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.10 2000-06-16 17:43:05 graeme Exp $"
+#ident "$Id: mutex.c,v 1.11 2000-11-21 22:22:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -97,56 +95,12 @@ static recmutex locks[MT_MAX];
 
 #if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_LYNXOS
 /* We can make use of the POSIX threads function pthread_once() in
- * order to prevent the mpatrol library being initialised more than
- * once at the same time.
+ * order to prevent the mutexes being initialised more than once at
+ * the same time.
  */
 
 static pthread_once_t lockflag = PTHREAD_ONCE_INIT;
 #endif /* TARGET && SYSTEM */
-
-
-#if MP_INIT_SUPPORT
-/* On systems with an .init section we can plant calls to initialise the
- * mpatrol mutexes and data structures before main() is called.  However, we
- * need to refer to a symbol within the machine module so that we can drag in
- * the contents of the .init section when the mpatrol library is built as an
- * archive library.
- */
-
-static int *initsection = &__mp_initsection;
-#elif defined(__GNUC__)
-/* The GNU C compiler allows us to indicate that a function is a constructor
- * which should be called before main().  However, this gets entered into a
- * .ctors section which means that the final link must also be performed by
- * the GNU C compiler.
- */
-
-static void initmutexes(void) __attribute__((__constructor__));
-
-static void initmutexes(void)
-{
-    __mp_initmutexes();
-    __mp_init();
-}
-#elif defined(__cplusplus)
-/* C++ provides a way to initialise the array of mutex locks before main()
- * is called.  Unfortunately, that may not be early enough if a system
- * startup module allocates dynamic memory.  Note that if the C++ compiler
- * uses a special section for calling functions before main() that is
- * not recognised by the system tools then the C++ compiler must also be
- * used to perform the final link.
- */
-
-static struct initmutexes
-{
-    initmutexes()
-    {
-        __mp_initmutexes();
-        __mp_init();
-    }
-}
-initlocks;
-#endif /* __cplusplus */
 
 
 /* Initialise the mpatrol library mutexes.  We're up a brown smelly creek if
