@@ -471,6 +471,15 @@
 #endif /* MP_LOGFILE */
 
 
+/* The name of the file used to send memory allocation profiling information
+ * to.  This may be overridden at run-time using the PROFFILE option.
+ */
+
+#ifndef MP_PROFFILE
+#define MP_PROFFILE "mpatrol.out"
+#endif /* MP_PROFFILE */
+
+
 /* The overflow buffer size in bytes.  This may be overridden at run-time
  * using the OFLOWSIZE option.  The default is zero since this setting
  * may dramatically increase execution time if it is non-zero.
