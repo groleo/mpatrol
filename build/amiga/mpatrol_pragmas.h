@@ -37,13 +37,15 @@
 #pragma libcall MPatrolBase __mp_free 3c 21A90806
 #pragma libcall MPatrolBase __mp_setmem 42 43A9210808
 #pragma libcall MPatrolBase __mp_copymem 48 32BA109808
-#pragma libcall MPatrolBase __mp_info 4e 9802
-#pragma libcall MPatrolBase __mp_memorymap 54 001
-#pragma libcall MPatrolBase __mp_summary 5a 0
-#pragma libcall MPatrolBase __mp_check 60 0
-#pragma libcall MPatrolBase __mp_prologue 66 801
-#pragma libcall MPatrolBase __mp_epilogue 6c 801
-#pragma libcall MPatrolBase __mp_nomemory 72 801
+#pragma libcall MPatrolBase __mp_comparemem 4e 32BA109808
+#pragma libcall MPatrolBase __mp_locatemem 54 43BA2190809
+#pragma libcall MPatrolBase __mp_info 5a 9802
+#pragma libcall MPatrolBase __mp_memorymap 60 001
+#pragma libcall MPatrolBase __mp_summary 66 0
+#pragma libcall MPatrolBase __mp_check 6c 0
+#pragma libcall MPatrolBase __mp_prologue 72 801
+#pragma libcall MPatrolBase __mp_epilogue 78 801
+#pragma libcall MPatrolBase __mp_nomemory 7e 801
 
 
 #endif /* MPatrolBase_INLINE */
