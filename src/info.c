@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.24 2000-05-08 21:22:28 graeme Exp $"
+#ident "$Id: info.c,v 1.25 2000-05-08 21:53:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -217,10 +217,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                {
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                    o = 1;
-                }
                 __mp_warn(f, "alignment 0 is invalid\n");
             }
             a = h->alloc.heap.memory.page;
@@ -230,10 +227,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                {
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                    o = 1;
-                }
                 __mp_warn(f, "alignment %lu is not a power of two\n", a);
             }
             a = __mp_poweroftwo(a);
@@ -243,10 +237,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if ((o == 0) && (h->recur == 1))
-                {
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                    o = 1;
-                }
                 __mp_warn(f, "alignment %lu is greater than the system page "
                           "size\n", a);
             }
@@ -299,7 +290,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 else
                     __mp_memset(p, h->alloc.abyte, l);
                 if (h->prof.profiling && (h->recur == 1) &&
-                    __mp_profilealloc(&h->prof, l, m))
+                    __mp_profilealloc(&h->prof, n->size, m))
                     m->data.flags |= FLG_PROFILED;
 #if MP_INUSE_SUPPORT
                 _Inuse_malloc(p, l);
@@ -342,10 +333,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if ((o == 0) && (h->recur == 1))
-            {
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-                o = 1;
-            }
             __mp_warn(f, "attempt to resize a NULL pointer\n");
         }
         p = __mp_getmemory(h, l, a, f, s, t, u, v);
@@ -356,6 +344,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          * returned to the free tree.
          */
         m = (infonode *) n->info;
+        if ((o == 0) && (h->recur == 1))
+            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
         __mp_error(f, MP_POINTER " was freed with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -367,6 +357,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
     {
         /* We know nothing about this block of memory.
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
         __mp_error(f, MP_POINTER " has not been allocated\n", p);
         p = NULL;
     }
@@ -375,6 +367,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         /* The address of the block passed in does not match the start
          * address of the block we know about.
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
         __mp_error(f, MP_POINTER " does not match allocation of " MP_POINTER, p,
                    n->block);
         __mp_printalloc(&h->syms, n);
@@ -386,6 +380,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         /* The function used to allocate the block is incompatible with
          * operator new or operator new[].
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logrealloc(h, p, l, a, f, s, t, u, v);
         __mp_error(f, MP_POINTER " was allocated with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -397,10 +393,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if ((o == 0) && (h->recur == 1))
-            {
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-                o = 1;
-            }
             __mp_warn(f, "attempt to resize an allocation to size 0\n");
         }
         __mp_freememory(h, p, f, s, t, u, v);
@@ -560,6 +553,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          * returned to the free tree.
          */
         m = (infonode *) n->info;
+        if ((o == 0) && (h->recur == 1))
+            __mp_logfree(h, p, f, s, t, u, v);
         __mp_error(f, MP_POINTER " was freed with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -567,14 +562,20 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
     }
     else if (((n = __mp_findalloc(&h->alloc, p)) == NULL) ||
              ((m = (infonode *) n->info) == NULL))
+    {
         /* We know nothing about this block of memory.
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logfree(h, p, f, s, t, u, v);
         __mp_error(f, MP_POINTER " has not been allocated\n", p);
+    }
     else if (p != n->block)
     {
         /* The address of the block passed in does not match the start
          * address of the block we know about.
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logfree(h, p, f, s, t, u, v);
         __mp_error(f, MP_POINTER " does not match allocation of " MP_POINTER, p,
                    n->block);
         __mp_printalloc(&h->syms, n);
@@ -588,6 +589,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         /* The function used to allocate the block is incompatible with
          * the function used to free the block.
          */
+        if ((o == 0) && (h->recur == 1))
+            __mp_logfree(h, p, f, s, t, u, v);
         __mp_error(f, MP_POINTER " was allocated with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -671,8 +674,15 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
                                alloctype f, char *s, char *t, unsigned long u,
                                stackinfo *v)
 {
+    int o;
+
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+    {
         __mp_logmemcopy(h, p, q, l, f, s, t, u, v);
+        o = 1;
+    }
+    else
+        o = 0;
     /* We must ensure that the memory to be copied does not overlap when
      * memcpy() is called.  This does not matter when calling __mp_memcopy()
      * but it will matter when calling the normal system function, in which
@@ -681,9 +691,16 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
     if ((f == AT_MEMCPY) && (l > 0) &&
         (((p < q) && ((char *) p + l > (char *) q)) ||
          ((q < p) && ((char *) q + l > (char *) p))))
+    {
+        if ((o == 0) && (h->recur == 1))
+        {
+            __mp_logmemcopy(h, p, q, l, f, s, t, u, v);
+            o = 1;
+        }
         __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overlaps ["
                   MP_POINTER "," MP_POINTER "]\n", p, (char *) p + l - 1, q,
                   (char *) q + l - 1);
+    }
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to copy the memory.
      */
