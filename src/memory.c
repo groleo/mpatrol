@@ -40,10 +40,22 @@
 #ifndef POSIX4_D14_MEMCTL
 #define POSIX4_D14_MEMCTL 1
 #endif /* POSIX4_D14_MEMCTL */
+#elif SYSTEM == SYSTEM_SUNOS
+#ifndef _POSIX_ARG_MAX
+#define _POSIX_ARG_MAX 4096
+#endif /* _POSIX_ARG_MAX */
 #endif /* SYSTEM */
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+    SYSTEM == SYSTEM_OPENBSD
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif /* MAP_ANONYMOUS */
+#endif /* SYSTEM */
+#endif /* TARGET */
 #if MP_WATCH_SUPPORT
 #if SYSTEM == SYSTEM_SOLARIS
 #include <procfs.h>
@@ -66,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.41 2001-01-11 23:59:18 graeme Exp $"
+#ident "$Id: memory.c,v 1.42 2001-01-15 19:07:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -231,7 +243,7 @@ progname(void)
     int f;
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
       SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LYNXOS || \
-      SYSTEM == SYSTEM_SOLARIS
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS
     extern char **environ;
     char **e;
     char *t;
@@ -284,13 +296,13 @@ progname(void)
     }
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
       SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LYNXOS || \
-      SYSTEM == SYSTEM_SOLARIS
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS
     /* We can access the argument vector from the pointer to the environment
-     * array on all other UNIX systems.  On DG/UX Intel, DRS/NX, DYNIX/ptx and
-     * Solaris we stop scanning backwards along the array when we reach argc.
-     * On DG/UX M88K and LynxOS we stop scanning forwards along the array when
-     * we reach a NULL pointer.  The contents of the argument vector then
-     * follow.
+     * array on all other UNIX systems.  On DG/UX Intel, DRS/NX, DYNIX/ptx,
+     * Solaris and SunOS we stop scanning backwards along the array when we
+     * reach argc.  On DG/UX M88K and LynxOS we stop scanning forwards along
+     * the array when we reach a NULL pointer.  The contents of the argument
+     * vector then follow.
      */
 #if (SYSTEM == SYSTEM_DGUX && ARCH == ARCH_M88K) || SYSTEM == SYSTEM_LYNXOS
     for (e = environ; *e != NULL; e++);
