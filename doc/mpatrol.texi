@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.46 2000-04-02 14:28:05 graeme Exp $
+@c $Id: mpatrol.texi,v 1.47 2000-04-02 14:47:42 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -555,7 +555,8 @@ during program execution.
 
 @item
 Options exist to display all freed and unfreed memory allocations at program
-termination in order to detect memory leaks.
+termination in order to detect memory leaks.  A separate program is also
+provided for locating memory leaks in unfinished log files.
 
 @item
 An option exists to abort the program with a failure condition if there are more
@@ -663,6 +664,9 @@ then these should be recreated in the local library directory rather than simply
 copying them.
 
 @item
+Copy the memory leak program that has been built into your local bin directory.
+
+@item
 Go up two directory levels into the @file{src} directory and copy the
 @file{mpatrol.h} header file into your local include directory.
 
@@ -721,7 +725,8 @@ of all your code.
 
 @enumerate 1
 @item
-This step is currently only available on Solaris platforms.
+This step is currently only available on Solaris platforms and on DG/UX 4.20MU05
+or later platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -2067,6 +2072,27 @@ there are no dependencies on them at run-time.  However, there may well be
 problems if the resulting shared library contains position-dependent code from
 the archive libraries you incorporated.  The only way to find out is for you to
 try it and see.
+
+@cindex memleak
+Another utility program that is provided is called @command{memleak} and is
+useful for detecting memory leaks in log files produced by the mpatrol library.
+This program should be used if the mpatrol library could not finish writing the
+log file due to abnormal program termination (which would prevent the
+@option{SHOWUNFREED} option from working), but note that some of the unfreed
+allocations might have been freed if the program had terminated successfully.
+
+The @command{memleak} command scans through an mpatrol log file looking for
+lines beginning with @samp{ALLOC:} and @samp{FREE:} but ignores lines beginning
+with @samp{REALLOC:}, so only the @option{LOGALLOCS} and @option{LOGFREES}
+options are necessary when running a program linked with the mpatrol library.
+Note that as a result of this, no attempt is made to account for resizing of
+memory allocations and so the total amount of memory used by the resulting
+unfreed allocations may not be entirely accurate.
+
+The @command{memleak} command takes one optional argument which must be a valid
+mpatrol log filename but if it is omitted then it will use @file{mpatrol.log} as
+the name of the log file to use.  The @command{memleak} command makes two passes
+over the log file so the file must be randomly-accessable.
 
 @node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
@@ -4996,6 +5022,18 @@ library and tests.  The details following each system list any features of the
 library that are not (or cannot be) supported on that system.
 
 @cindex DG/UX, Intel 80x86
+@itemize @bullet
+@item
+DG/UX 4.20MU05, Intel Pentium Pro, ELF32, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@end itemize
+
 @itemize @bullet
 @item
 DG/UX 4.11, Intel Pentium Pro, ELF32, @command{gcc}
