@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.231 2001-08-01 22:44:31 graeme Exp $
+@c $Id: mpatrol.texi,v 1.232 2001-08-22 23:06:39 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 1st August, 2001
+@set UPDATED 22nd August, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -4647,8 +4647,8 @@ takes the name of the HATF trace file to be written as an argument and writes
 out the HATF version of the mpatrol tracing output file given as input when it
 is being processed.  The HATF file format is an attempt to standardise trace
 file formats for memory allocation tracing, and is being developed by Benjamin
-Zorn and Richard Jones.  There is a HATF DTD located in the @file{extra}
-directory in the mpatrol distribution.
+Zorn, Richard Jones and Trishul Chilimbi.  There is a HATF DTD located in the
+@file{extra} directory in the mpatrol distribution.
 
 @cindex GUI
 @cindex graphical user interface
