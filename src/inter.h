@@ -107,6 +107,10 @@ __asm void (*__mp_prologue(register __a0 void (*)(void *, size_t)))
            (void *, size_t);
 __asm void (*__mp_epilogue(register __a0 void (*)(void *)))(void *);
 __asm void (*__mp_nomemory(register __a0 void (*)(void)))(void);
+__asm void __mp_pushdelstack(register __a0 char *, register __a1 char *,
+                             register __d0 unsigned long);
+__asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
+                            register __a2 unsigned long *);
 
 #else /* TARGET */
 
@@ -135,6 +139,8 @@ void __mp_check(void);
 void (*__mp_prologue(void (*)(void *, size_t)))(void *, size_t);
 void (*__mp_epilogue(void (*)(void *)))(void *);
 void (*__mp_nomemory(void (*)(void)))(void);
+void __mp_pushdelstack(char *, char *, unsigned long);
+void __mp_popdelstack(char **, char **, unsigned long *);
 
 #endif /* TARGET */
 

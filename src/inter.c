@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.11 2000-01-30 20:30:38 graeme Exp $"
+#ident "$Id: inter.c,v 1.12 2000-02-22 20:50:07 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -782,6 +782,54 @@ void (*__mp_nomemory(void (*h)(void)))(void)
     memhead.nomemory = h;
     restoresignals();
     return p;
+}
+
+
+/* Push source level information onto the top of the delete stack.
+ */
+
+#if TARGET == TARGET_AMIGA
+__asm void __mp_pushdelstack(register __a0 char *s, register __a1 char *t,
+                             register __d0 unsigned long u)
+#else /* TARGET */
+void __mp_pushdelstack(char *s, char *t, unsigned long u)
+#endif /* TARGET */
+{
+    if (!memhead.init)
+        __mp_init();
+    if ((memhead.delpos >= 0) && (memhead.delpos < MP_MAXDELSTACK))
+    {
+        memhead.dels[memhead.delpos].func = s;
+        memhead.dels[memhead.delpos].file = t;
+        memhead.dels[memhead.delpos].line = u;
+    }
+    memhead.delpos++;
+}
+
+
+/* Pop source level information off the top of the delete stack.
+ */
+
+#if TARGET == TARGET_AMIGA
+__asm void __mp_popdelstack(register __a0 char **s, register __a1 char **t,
+                            register __a2 unsigned long *u)
+#else /* TARGET */
+void __mp_popdelstack(char **s, char **t, unsigned long *u)
+#endif /* TARGET */
+{
+    if (!memhead.init)
+        __mp_init();
+    if ((--memhead.delpos >= 0) && (memhead.delpos < MP_MAXDELSTACK))
+    {
+        *s = memhead.dels[memhead.delpos].func;
+        *t = memhead.dels[memhead.delpos].file;
+        *u = memhead.dels[memhead.delpos].line;
+    }
+    else
+    {
+        *s = *t = NULL;
+        *u = 0;
+    }
 }
 
 
