@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.41 2000-11-13 21:57:12 graeme Exp $"
+#ident "$Id: diag.c,v 1.42 2000-11-14 18:29:34 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -157,6 +157,12 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 };
 
 
+/* The flags used to control the diagnostics from the mpatrol library.
+ */
+
+MP_GLOBAL unsigned long __mp_diagflags = 0;
+
+
 /* Process a file name, expanding any special characters.
  */
 
@@ -209,10 +215,43 @@ static void processfile(meminfo *m, char *s, char *b, size_t l)
 MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
 {
     static char b[256];
+    char p[256];
+    char *d;
 
-    if (s == NULL)
-        s = MP_LOGFILE;
-    processfile(m, s, b, sizeof(b));
+    if ((d = getenv(MP_LOGDIR)) && (*d != '\0') && ((s == NULL) ||
+#if TARGET == TARGET_UNIX
+         !strchr(s, '/')))
+#elif TARGET == TARGET_AMIGA
+         !strpbrk(s, ":/")))
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+         !strpbrk(s, ":/\\")))
+#endif /* TARGET */
+    {
+        /* If the environment variable specified with MP_LOGDIR is set and no
+         * log file name has already been given then we use a special format
+         * for the name of the output file so that all such files will be
+         * written to that directory, which must exist.
+         */
+        if (s == NULL)
+            s = "%n.%p.log";
+#if TARGET == TARGET_UNIX
+        sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_AMIGA
+        if ((d[strlen(d) - 1] == ':') || (d[strlen(d) - 1] == '/'))
+            sprintf(p, "%s%s", d, s);
+        else
+            sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+        sprintf(p, "%s\\%s", d, s);
+#endif /* TARGET */
+        processfile(m, p, b, sizeof(b));
+    }
+    else
+    {
+        if (s == NULL)
+            s = MP_LOGFILE;
+        processfile(m, s, b, sizeof(b));
+    }
     return b;
 }
 
@@ -224,10 +263,43 @@ MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
 MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
 {
     static char b[256];
+    char p[256];
+    char *d;
 
-    if (s == NULL)
-        s = MP_PROFFILE;
-    processfile(m, s, b, sizeof(b));
+    if ((d = getenv(MP_PROFDIR)) && (*d != '\0') && ((s == NULL) ||
+#if TARGET == TARGET_UNIX
+         !strchr(s, '/')))
+#elif TARGET == TARGET_AMIGA
+         !strpbrk(s, ":/")))
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+         !strpbrk(s, ":/\\")))
+#endif /* TARGET */
+    {
+        /* If the environment variable specified with MP_PROFDIR is set and no
+         * profiling output file name has already been given then we use a
+         * special format for the name of the output file so that all such
+         * files will be written to that directory, which must exist.
+         */
+        if (s == NULL)
+            s = "%n.%p.out";
+#if TARGET == TARGET_UNIX
+        sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_AMIGA
+        if ((d[strlen(d) - 1] == ':') || (d[strlen(d) - 1] == '/'))
+            sprintf(p, "%s%s", d, s);
+        else
+            sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+        sprintf(p, "%s\\%s", d, s);
+#endif /* TARGET */
+        processfile(m, p, b, sizeof(b));
+    }
+    else
+    {
+        if (s == NULL)
+            s = MP_PROFFILE;
+        processfile(m, s, b, sizeof(b));
+    }
     return b;
 }
 
@@ -249,6 +321,7 @@ MP_GLOBAL int __mp_openlogfile(char *s)
         /* Because logfile is NULL, the __mp_error() function will open the log
          * file as stderr, which should always work.
          */
+        logfile = stderr;
         __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         return 0;
     }
@@ -293,25 +366,50 @@ MP_GLOBAL int __mp_closelogfile(void)
 /* Invokes a text editor on a given source file at a specific line.
  */
 
-static int editfile(char *f, unsigned long l)
+static int editfile(char *f, unsigned long l, int d)
 {
 #if TARGET == TARGET_UNIX
+#if MP_PRELOAD_SUPPORT
+    char s[256];
+#endif /* MP_PRELOAD_SUPPORT */
     char t[32];
-    char *v[4];
+    char *v[5];
     pid_t p;
     int r;
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
+#if MP_PRELOAD_SUPPORT
+    sprintf(s, "%s=", MP_PRELOAD_NAME);
+#endif /* MP_PRELOAD_SUPPORT */
     sprintf(t, "%lu", l);
     if ((p = fork()) < 0)
         return 0;
     if (p == 0)
     {
+#if MP_PRELOAD_SUPPORT
+        /* We have to ensure that we don't end up debugging the editor and its
+         * child processes as well!  Hopefully, if we ensure that the relevant
+         * environment variable is set then putenv() will not use malloc() to
+         * expand the environment.
+         */
+        if (getenv(MP_PRELOAD_NAME))
+            putenv(s);
+#endif /* MP_PRELOAD_SUPPORT */
         v[0] = MP_EDITOR;
-        v[1] = f;
-        v[2] = t;
-        v[3] = NULL;
+        if (d == 0)
+        {
+            v[1] = f;
+            v[2] = t;
+            v[3] = NULL;
+        }
+        else
+        {
+            v[1] = "--list";
+            v[2] = f;
+            v[3] = t;
+            v[4] = NULL;
+        }
         execvp(v[0], v);
         _exit(EXIT_FAILURE);
     }
@@ -359,6 +457,25 @@ MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *n, unsigned long l,
     vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
+    if (((__mp_diagflags & FLG_EDIT) || (__mp_diagflags & FLG_LIST)) &&
+        (n != NULL))
+    {
+        if (logfile != stderr)
+        {
+            fputs("WARNING: ", stderr);
+            if (e != ET_MAX)
+                fprintf(stderr, "[%s]: ", errornames[e]);
+            if (f != AT_MAX)
+                fprintf(stderr, "%s: ", __mp_functionnames[f]);
+            va_start(v, s);
+            vfprintf(stderr, s, v);
+            va_end(v);
+            fputc('\n', stderr);
+        }
+        if (!editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)))
+            fprintf(stderr, "ERROR: problems %sing file `%s'\n",
+                    (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
+    }
     warnings++;
 }
 
@@ -382,6 +499,25 @@ MP_GLOBAL void __mp_error(errortype e, alloctype f, char *n, unsigned long l,
     vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
+    if (((__mp_diagflags & FLG_EDIT) || (__mp_diagflags & FLG_LIST)) &&
+        (n != NULL))
+    {
+        if (logfile != stderr)
+        {
+            fputs("ERROR: ", stderr);
+            if (e != ET_MAX)
+                fprintf(stderr, "[%s]: ", errornames[e]);
+            if (f != AT_MAX)
+                fprintf(stderr, "%s: ", __mp_functionnames[f]);
+            va_start(v, s);
+            vfprintf(stderr, s, v);
+            va_end(v);
+            fputc('\n', stderr);
+        }
+        if (!editfile(n, l, ((__mp_diagflags & FLG_LIST) != 0)))
+            fprintf(stderr, "ERROR: problems %sing file `%s'\n",
+                    (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
+    }
     errors++;
 }
 

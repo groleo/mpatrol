@@ -35,10 +35,8 @@
 #include "info.h"
 
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
+#define FLG_EDIT 1 /* edit any source files associated with diagnostics */
+#define FLG_LIST 2 /* list any source files associated with diagnostics */
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
@@ -74,7 +72,14 @@ typedef enum errortype
 errortype;
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif /* __cplusplus */
+
+
 MP_EXPORT char *__mp_functionnames[AT_MAX];
+MP_EXPORT unsigned long __mp_diagflags;
 
 
 MP_EXPORT char *__mp_logfile(meminfo *, char *);
