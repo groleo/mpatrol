@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.16 2000-05-14 23:35:36 graeme Exp $"
+#ident "$Id: memory.c,v 1.17 2000-05-16 00:00:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -170,6 +170,22 @@ static size_t pagesize(void)
 }
 
 
+/* Determine the stack direction on this system.
+ */
+
+static int stackdirection(void *p)
+{
+    int n;
+
+    if (p == NULL)
+        return stackdirection(&n);
+    else if (&n < (int *) p)
+        return -1;
+    else
+        return 1;
+}
+
+
 /* Return the executable file name that the program was invoked with.
  * Note that this function will not be reentrant if the return value is
  * a pointer to a local static string buffer.
@@ -259,6 +275,7 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
 #endif /* MP_ARRAY_SUPPORT */
     i->align = minalign();
     i->page = pagesize();
+    i->stackdir = stackdirection();
     i->prog = progname();
     /* On UNIX, we initially set the memory mapped file handle to be -1 as we
      * default to using sbrk(), even on systems that support the mmap() function
