@@ -242,6 +242,7 @@ MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, alloctype,
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
 MP_EXPORT void __mp_checkinfo(infohead *);
 MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype);
+MP_EXPORT int __mp_checkstring(infohead *, char *, size_t *);
 
 
 #ifdef __cplusplus
