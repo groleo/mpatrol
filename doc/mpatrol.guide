@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
 January, 2001.
 
 
@@ -8414,6 +8414,11 @@ supported on that system.
           link instead of a dynamic link: @{b}-bnoautoimp@{ub}
           @{b}-bimport:/lib/syscalls.exp@{ub}.
 
+        * A makefile called @{b}Makefile.aix@{ub} is supplied in @{b}build/unix@{ub} which
+          will build the mpatrol library as an AIX shared library.  The
+          shared library will be embedded within the mpatrol archive
+          library as is done with the system libraries.
+
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
 
    * AIX 4.1, IBM RS/6000, XCOFF, @{b}cc@{ub}
@@ -8428,6 +8433,11 @@ supported on that system.
           the following compiler options in order to perform a static
           link instead of a dynamic link: @{b}-bnoautoimp@{ub}
           @{b}-bimport:/lib/syscalls.exp@{ub}.
+
+        * A makefile called @{b}Makefile.aix@{ub} is supplied in @{b}build/unix@{ub} which
+          will build the mpatrol library as an AIX shared library.  The
+          shared library will be embedded within the mpatrol archive
+          library as is done with the system libraries.
 
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
 
@@ -9339,8 +9349,7 @@ Notes for UNIX platforms
      that have been read via @{b}dlopen()@{ub}, @{b}shl_load()@{ub} or similar functions.
      In addition, symbols cannot currently be read from any COFF or
      XCOFF shared libraries on AIX or LynxOS and some work needs to be
-     done to build the mpatrol library as a shared library on those
-     systems.
+     done to build the mpatrol library as a shared library on LynxOS.
 
    * Perhaps add support for reading HP/UX executable files and
      libraries in the SOM object file format without needing to use the

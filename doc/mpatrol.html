@@ -115,7 +115,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.4 of the mpatrol manual for version
-1.3.4, 18th January, 2001.
+1.3.4, 22nd January, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -8064,6 +8064,10 @@ library that are not (or cannot be) supported on that system.
 You should instead link your programs with the following compiler options in
 order to perform a static link instead of a dynamic link:
 <code>-bnoautoimp</code> <code>-bimport:/lib/syscalls.exp</code>. 
+<li>A makefile called <code>Makefile.aix</code> is supplied in <code>build/unix</code> which
+will build the mpatrol library as an AIX shared library.  The shared library
+will be embedded within the mpatrol archive library as is done with the system
+libraries. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 </ul>
 
@@ -8076,6 +8080,10 @@ order to perform a static link instead of a dynamic link:
 You should instead link your programs with the following compiler options in
 order to perform a static link instead of a dynamic link:
 <code>-bnoautoimp</code> <code>-bimport:/lib/syscalls.exp</code>. 
+<li>A makefile called <code>Makefile.aix</code> is supplied in <code>build/unix</code> which
+will build the mpatrol library as an AIX shared library.  The shared library
+will be embedded within the mpatrol archive library as is done with the system
+libraries. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 </ul>
 
@@ -8879,7 +8887,7 @@ was called rather than unwinding to the top of the stack.
 read via <code>dlopen()</code>, <code>shl_load()</code> or similar functions.  In addition,
 symbols cannot currently be read from any COFF or XCOFF shared libraries on AIX
 or LynxOS and some work needs to be done to build the mpatrol library as a
-shared library on those systems.
+shared library on LynxOS.
 
 <li>Perhaps add support for reading HP/UX executable files and libraries in the SOM
 object file format without needing to use the GNU BFD library.

@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 18th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
 January, 2001.
 
 Foreword
@@ -7986,6 +7986,11 @@ supported on that system.
           link instead of a dynamic link: `-bnoautoimp'
           `-bimport:/lib/syscalls.exp'.
 
+        * A makefile called `Makefile.aix' is supplied in `build/unix'
+          which will build the mpatrol library as an AIX shared
+          library.  The shared library will be embedded within the
+          mpatrol archive library as is done with the system libraries.
+
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
    * AIX 4.1, IBM RS/6000, XCOFF, `cc'
@@ -8000,6 +8005,11 @@ supported on that system.
           the following compiler options in order to perform a static
           link instead of a dynamic link: `-bnoautoimp'
           `-bimport:/lib/syscalls.exp'.
+
+        * A makefile called `Makefile.aix' is supplied in `build/unix'
+          which will build the mpatrol library as an AIX shared
+          library.  The shared library will be embedded within the
+          mpatrol archive library as is done with the system libraries.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
@@ -8865,7 +8875,7 @@ H.2 Notes for UNIX platforms
      functions.  In addition, symbols cannot currently be read from any
      COFF or XCOFF shared libraries on AIX or LynxOS and some work
      needs to be done to build the mpatrol library as a shared library
-     on those systems.
+     on LynxOS.
 
    * Perhaps add support for reading HP/UX executable files and
      libraries in the SOM object file format without needing to use the
