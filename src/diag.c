@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.82 2001-09-25 22:59:44 graeme Exp $"
+#ident "$Id: diag.c,v 1.83 2001-09-26 22:18:21 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.82 2001-09-25 22:59:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.83 2001-09-26 22:18:21 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -492,6 +492,7 @@ __mp_openlogfile(char *s)
          * file as stderr, which should always work.
          */
         logfile = stderr;
+        __mp_diagflags &= ~FLG_HTML;
         __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         return 0;
     }
@@ -514,6 +515,13 @@ __mp_openlogfile(char *s)
 #else /* HAVE_CONFIG_H && SETVBUF_REVERSED */
         setvbuf(logfile, NULL, _IONBF, 0);
 #endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diag("<HTML>\n");
+        __mp_diag(" <HEAD>\n");
+        __mp_diag(" </HEAD>\n");
+        __mp_diag(" <BODY>\n");
+    }
     return 1;
 }
 
@@ -528,6 +536,11 @@ __mp_closelogfile(void)
     int r;
 
     r = 1;
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diag(" </BODY>\n");
+        __mp_diag("</HTML>\n");
+    }
     if ((logfile == NULL) || (logfile == stderr) || (logfile == stdout))
     {
         /* We don't want to close the stderr or stdout file streams so
@@ -1270,6 +1283,7 @@ __mp_printallocs(infohead *h, int e)
             __mp_abort();
         }
         __mp_closelogfile();
+        __mp_diagflags &= ~FLG_HTML;
         __mp_diag("\nALLOC:");
         if (h->alloc.heap.memory.prog != NULL)
             __mp_diag(" %s:", h->alloc.heap.memory.prog);
