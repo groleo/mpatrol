@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.27 2001-02-27 19:47:08 graeme Exp $
+# $Id: mpatrol.psf,v 1.28 2001-02-28 00:18:50 graeme Exp $
 
 
 product
@@ -49,6 +49,8 @@ product
 	file			README
 	file			README.DOC
 	file			README.MAN
+	file			AUTHORS
+	file			THANKS
 	file			COPYING
 	file			COPYING.LIB
 	file			NEWS

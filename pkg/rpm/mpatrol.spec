@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.63 2001-02-22 19:21:06 graeme Exp $
+# $Id: mpatrol.spec,v 1.64 2001-02-28 00:18:49 graeme Exp $
 
 
 %define libversion 1.4
@@ -110,7 +110,8 @@ install -m644 extra/mpatrol.m4 $RPM_BUILD_ROOT/usr/share/aclocal
 
 %files
 %defattr(-,root,root)
-%doc README README.DOC README.MAN COPYING COPYING.LIB NEWS ChangeLog
+%doc README README.DOC README.MAN AUTHORS THANKS
+%doc COPYING COPYING.LIB NEWS ChangeLog
 %doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
 %doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
 %doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf
