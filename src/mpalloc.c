@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.1 2001-02-01 20:19:10 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.2 2001-02-01 20:58:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -407,7 +407,8 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     if ((f != AT_FREE) && (f != AT_CFREE) && (f != AT_DEALLOCA) &&
         (f != AT_XFREE) && (f != AT_DELETE) && (f != AT_DELETEVEC))
         illegalfunction("__mp_free", s, t, u);
-    free(p);
+    if (f != AT_DEALLOCA)
+        free(p);
 }
 
 
