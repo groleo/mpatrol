@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.38 2000-12-13 23:41:55 graeme Exp $
+# $Id: build,v 1.39 2000-12-14 18:26:32 graeme Exp $
 
 
 version=1.3.1
@@ -46,8 +46,9 @@ cd ../../pkg/tar
 
 
 # Create the distribution directory structure and copy the necessary
-# files into it.  This assumes that the Texinfo manual has already been
-# processed into the different documentation formats.
+# files into it.  This assumes that the Texinfo manual, reference card
+# and manual pages have already been processed into the different
+# documentation formats.
 
 rm -rf mpatrol
 mkdir -p mpatrol
@@ -93,6 +94,24 @@ cp ../../doc/images/cc1.pdf mpatrol/doc/images
 cp ../../doc/images/collect2.jpg mpatrol/doc/images
 cp ../../doc/images/collect2.eps mpatrol/doc/images
 cp ../../doc/images/collect2.pdf mpatrol/doc/images
+mkdir -p mpatrol/doc/man
+cp ../../man/README mpatrol/doc/man
+mkdir -p mpatrol/doc/man/dvi
+cp ../../man/dvi/mpatrol.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/mprof.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/mptrace.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/mleak.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/mpsym.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/mpedit.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/libmpatrol.dvi mpatrol/doc/man/dvi
+mkdir -p mpatrol/doc/man/ps
+cp ../../man/ps/mpatrol.ps mpatrol/doc/man/ps
+cp ../../man/ps/mprof.ps mpatrol/doc/man/ps
+cp ../../man/ps/mptrace.ps mpatrol/doc/man/ps
+cp ../../man/ps/mleak.ps mpatrol/doc/man/ps
+cp ../../man/ps/mpsym.ps mpatrol/doc/man/ps
+cp ../../man/ps/mpedit.ps mpatrol/doc/man/ps
+cp ../../man/ps/libmpatrol.ps mpatrol/doc/man/ps
 mkdir -p mpatrol/extra
 cp ../../extra/.profile mpatrol/extra
 cp ../../extra/.cshrc mpatrol/extra

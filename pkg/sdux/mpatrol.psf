@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.5 2000-12-13 23:41:52 graeme Exp $
+# $Id: mpatrol.psf,v 1.6 2000-12-14 18:22:48 graeme Exp $
 
 
 product
@@ -47,6 +47,7 @@ product
 	directory		mpatrol/doc/mpatrol=/usr/local/doc/mpatrol
 	file			README
 	file			README.DOC
+	file			README.MAN
 	file			COPYING
 	file			COPYING.LIB
 	file			NEWS
@@ -80,6 +81,22 @@ product
 	file			collect2.jpg
 	file			collect2.eps
 	file			collect2.pdf
+	directory		mpatrol/doc/mpatrol/dvi=/usr/local/doc/mpatrol/dvi
+	file			mpatrol.dvi
+	file			mprof.dvi
+	file			mptrace.dvi
+	file			mleak.dvi
+	file			mpsym.dvi
+	file			mpedit.dvi
+	file			libmpatrol.dvi
+	directory		mpatrol/doc/mpatrol/ps=/usr/local/doc/mpatrol/ps
+	file			mpatrol.ps
+	file			mprof.ps
+	file			mptrace.ps
+	file			mleak.ps
+	file			mpsym.ps
+	file			mpedit.ps
+	file			libmpatrol.ps
 	directory		mpatrol/doc/mpatrol/tests=/usr/local/doc/mpatrol/tests
 	directory		mpatrol/doc/mpatrol/tests/pass=/usr/local/doc/mpatrol/tests/pass
 	file			test1.c

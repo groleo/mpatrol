@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.18 2000-12-13 23:41:57 graeme Exp $
+rem $Id: build.bat,v 1.19 2000-12-14 18:31:07 graeme Exp $
 
 
 set version=1.3.1
@@ -41,8 +41,9 @@ cd ..\..\pkg\zip
 
 
 rem Create the distribution directory structure and copy the necessary
-rem files into it.  This assumes that the Texinfo manual has already been
-rem processed into the different documentation formats.
+rem files into it.  This assumes that the Texinfo manual, reference card
+rem and manual pages have already been processed into the different
+rem documentation formats.
 
 rmdir /s /q mpatrol
 mkdir mpatrol
@@ -92,6 +93,24 @@ copy ..\..\doc\images\cc1.pdf mpatrol\doc\images
 copy ..\..\doc\images\collect2.jpg mpatrol\doc\images
 copy ..\..\doc\images\collect2.eps mpatrol\doc\images
 copy ..\..\doc\images\collect2.pdf mpatrol\doc\images
+mkdir mpatrol\doc\man
+copy ..\..\man\README mpatrol\doc\man\README.txt
+mkdir mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mpatrol.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mprof.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mptrace.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mleak.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mpsym.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\mpedit.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\libmpatrol.dvi mpatrol\doc\man\dvi
+mkdir mpatrol\doc\man\ps
+copy ..\..\man\ps\mpatrol.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\mprof.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\mptrace.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\mleak.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\mpsym.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\mpedit.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\libmpatrol.ps mpatrol\doc\man\ps
 mkdir mpatrol\include
 copy ..\..\src\mpatrol.h mpatrol\include
 mkdir mpatrol\lib

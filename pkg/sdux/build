@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.5 2000-12-13 23:41:52 graeme Exp $
+# $Id: build,v 1.6 2000-12-14 18:22:48 graeme Exp $
 
 
 version=1.3.1
@@ -44,8 +44,9 @@ cd ../../pkg/sdux
 
 
 # Create the installation directory structure and copy the necessary
-# files into it.  This assumes that the Texinfo manual has already been
-# processed into the different documentation formats.
+# files into it.  This assumes that the Texinfo manual, reference card
+# and manual pages have already been processed into the different
+# documentation formats.
 
 rm -rf mpatrol
 mkdir -p mpatrol/bin
@@ -58,6 +59,7 @@ cp ../../bin/mpedit mpatrol/bin
 mkdir -p mpatrol/doc/mpatrol/images
 cp ../../README mpatrol/doc/mpatrol
 cp ../../doc/README mpatrol/doc/mpatrol/README.DOC
+cp ../../man/README mpatrol/doc/mpatrol/README.MAN
 cp ../../COPYING mpatrol/doc/mpatrol
 cp ../../COPYING.LIB mpatrol/doc/mpatrol
 cp ../../NEWS mpatrol/doc/mpatrol
@@ -90,6 +92,22 @@ cp ../../doc/images/cc1.pdf mpatrol/doc/mpatrol/images
 cp ../../doc/images/collect2.jpg mpatrol/doc/mpatrol/images
 cp ../../doc/images/collect2.eps mpatrol/doc/mpatrol/images
 cp ../../doc/images/collect2.pdf mpatrol/doc/mpatrol/images
+mkdir -p mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mpatrol.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mprof.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mptrace.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mleak.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mpsym.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/mpedit.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/libmpatrol.dvi mpatrol/doc/mpatrol/dvi
+mkdir -p mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mpatrol.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mprof.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mptrace.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mleak.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mpsym.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/mpedit.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/libmpatrol.ps mpatrol/doc/mpatrol/ps
 mkdir -p mpatrol/doc/mpatrol/tests/pass
 cp ../../tests/pass/test*.c mpatrol/doc/mpatrol/tests/pass
 mkdir -p mpatrol/doc/mpatrol/tests/fail
