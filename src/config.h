@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.74 2001-03-06 22:10:36 graeme Exp $
+ * $Id: config.h,v 1.75 2001-03-07 23:16:58 graeme Exp $
  */
 
 
@@ -812,11 +812,12 @@
  */
 
 #ifndef MP_USE_ATEXIT
-#if MP_INIT_SUPPORT || defined(__GNUC__) || defined(__cplusplus)
+#if MP_INIT_SUPPORT || SYSTEM == SYSTEM_TRU64 || defined(__GNUC__) || \
+    defined(__cplusplus)
 #define MP_USE_ATEXIT 0
-#else /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
+#else /* MP_INIT_SUPPORT && SYSTEM && __GNUC__ && __cplusplus */
 #define MP_USE_ATEXIT 1
-#endif /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
+#endif /* MP_INIT_SUPPORT && SYSTEM && __GNUC__ && __cplusplus */
 #endif /* MP_USE_ATEXIT */
 
 
