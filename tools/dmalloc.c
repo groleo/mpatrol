@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.13 2001-07-26 15:46:13 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.14 2001-08-01 22:33:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.13 2001-07-26 15:46:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.14 2001-08-01 22:33:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -171,14 +171,15 @@ static __mp_prologuehandler old_prologue;
 static __mp_epiloguehandler old_epilogue;
 
 
-/* The pointer and size obtained each time our prologue function is called.
- * This is then used by our epilogue function, but we don't need to worry
- * about nested calls to the prologue function since the mpatrol library
+/* The pointer, size and alignment obtained each time our prologue function is
+ * called.  This is then used by our epilogue function, but we don't need to
+ * worry about nested calls to the prologue function since the mpatrol library
  * guarantees that it will never occur, even when there are multiple threads.
  */
 
 static void *malloc_pointer;
 static size_t malloc_size;
+static size_t malloc_align;
 
 
 /* The global variables which control the behaviour of the library and are
@@ -323,19 +324,21 @@ setoptions(void)
 }
 
 
-/* Record the pointer and size for later processing by the epilogue function
- * and possibly also call the old prologue function if one was installed.
+/* Record the pointer, size and alignment for later processing by the epilogue
+ * function and possibly also call the old prologue function if one was
+ * installed.
  */
 
 static
 void
-prologue(MP_CONST void *p, size_t l, MP_CONST char *s, MP_CONST char *t,
-         unsigned long u, MP_CONST void *a)
+prologue(MP_CONST void *p, size_t l, size_t m, MP_CONST char *s,
+         MP_CONST char *t, unsigned long u, MP_CONST void *a)
 {
     if (old_prologue != NULL)
-        old_prologue(p, l, s, t, u, a);
+        old_prologue(p, l, m, s, t, u, a);
     malloc_pointer = (void *) p;
     malloc_size = l;
+    malloc_align = m;
 }
 
 
@@ -359,7 +362,8 @@ epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t, unsigned long u,
     if (malloc_tracker != NULL)
     {
         if (malloc_pointer == (void *) -1)
-            malloc_tracker(t, u, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
+            malloc_tracker(t, u, DMALLOC_FUNC_MALLOC, malloc_size, malloc_align,
+                           NULL, p);
         else if (malloc_size == (size_t) -1)
             malloc_tracker(t, u, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
         else if (malloc_size == (size_t) -2)
@@ -368,15 +372,16 @@ epilogue(MP_CONST void *p, MP_CONST char *s, MP_CONST char *t, unsigned long u,
                 l = 0;
             else
                 l = strlen((char *) malloc_pointer) + 1;
-            malloc_tracker(t, u, DMALLOC_FUNC_STRDUP, l, 0, NULL, p);
+            malloc_tracker(t, u, DMALLOC_FUNC_STRDUP, l, malloc_align, NULL, p);
         }
         else if (malloc_pointer == NULL)
-            malloc_tracker(t, u, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
+            malloc_tracker(t, u, DMALLOC_FUNC_MALLOC, malloc_size, malloc_align,
+                           NULL, p);
         else if (malloc_size == 0)
             malloc_tracker(t, u, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
         else
-            malloc_tracker(t, u, DMALLOC_FUNC_REALLOC, malloc_size, 0,
-                           malloc_pointer, p);
+            malloc_tracker(t, u, DMALLOC_FUNC_REALLOC, malloc_size,
+                           malloc_align, malloc_pointer, p);
     }
     if (old_epilogue != NULL)
         old_epilogue(p, s, t, u, a);
