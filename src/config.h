@@ -687,6 +687,14 @@
 #endif /* MP_POINTER */
 
 
+/* The name of the command used to invoke a text editor on a source file.
+ */
+
+#ifndef MP_EDITOR
+#define MP_EDITOR "mpedit"
+#endif /* MP_EDITOR */
+
+
 /* The name of the environment variable which contains library options.
  */
 
