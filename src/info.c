@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.67 2001-02-27 19:59:26 graeme Exp $"
+#ident "$Id: info.c,v 1.68 2001-02-27 20:05:05 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.67 2001-02-27 19:59:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.68 2001-02-27 20:05:05 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -154,6 +154,26 @@ __mp_deleteinfo(infohead *h)
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->initcount = h->finicount = 0;
     h->delpos = 0;
+}
+
+
+/* Register an initialisation function to be called when the library is
+ * initialised.
+ */
+
+int
+__mp_atinit(void (*f)(void))
+{
+    int r;
+
+    if (memhead.initcount == MP_MAXINITS)
+        r = 0;
+    else
+    {
+        memhead.inits[memhead.initcount++] = f;
+        r = 1;
+    }
+    return r;
 }
 
 
