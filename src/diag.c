@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.90 2001-10-05 21:35:19 graeme Exp $"
+#ident "$Id: diag.c,v 1.91 2001-10-05 22:05:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.90 2001-10-05 21:35:19 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.91 2001-10-05 22:05:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1858,7 +1858,11 @@ __mp_printsummary(infohead *h)
         __mp_printsize(h->prof.lbound);
         __mp_diagtag("</TD>\n");
         __mp_diagtag("</TR>\n");
-        __mp_diagtag("</TABLE>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("lower check range");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
     }
     else
     {
@@ -1881,21 +1885,69 @@ __mp_printsummary(infohead *h)
         __mp_printsize(h->prof.mbound);
         __mp_diag("\nlarge boundary:    ");
         __mp_printsize(h->prof.lbound);
+        __mp_diag("\nlower check range: ");
     }
-    __mp_diag("\nlower check range: ");
     if (h->lrange == (size_t) -1)
         __mp_diag("-");
     else
         __mp_diag("%lu", h->lrange);
-    __mp_diag("\nupper check range: ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("upper check range");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nupper check range: ");
     if (h->urange == (size_t) -1)
         __mp_diag("-");
     else
         __mp_diag("%lu", h->urange);
-    __mp_diag("\ncheck frequency:   %lu", h->check);
-    __mp_diag("\nfailure frequency: %lu", h->ffreq);
-    __mp_diag("\nfailure seed:      %lu", h->fseed);
-    __mp_diag("\nprologue function: ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("check frequency");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->check);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("failure frequency");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->ffreq);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("failure seed");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->fseed);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("prologue function");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+    {
+        __mp_diag("\ncheck frequency:   %lu", h->check);
+        __mp_diag("\nfailure frequency: %lu", h->ffreq);
+        __mp_diag("\nfailure seed:      %lu", h->fseed);
+        __mp_diag("\nprologue function: ");
+    }
     if (h->prologue == NULL)
         __mp_diag("<unset>");
     else
@@ -1904,7 +1956,18 @@ __mp_printsummary(infohead *h)
         __mp_printsymbol(&h->syms, (void *) h->prologue);
         __mp_diag("]");
     }
-    __mp_diag("\nepilogue function: ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("epilogue function");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nepilogue function: ");
     if (h->epilogue == NULL)
         __mp_diag("<unset>");
     else
@@ -1913,7 +1976,18 @@ __mp_printsummary(infohead *h)
         __mp_printsymbol(&h->syms, (void *) h->epilogue);
         __mp_diag("]");
     }
-    __mp_diag("\nhandler function:  ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("handler function");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nhandler function:  ");
     if (h->nomemory == NULL)
         __mp_diag("<unset>");
     else
@@ -1922,26 +1996,100 @@ __mp_printsummary(infohead *h)
         __mp_printsymbol(&h->syms, (void *) h->nomemory);
         __mp_diag("]");
     }
-    __mp_diag("\nlog file:          ");
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("log file");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nlog file:          ");
     if (h->log == NULL)
         __mp_diag("<unset>");
     else
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", h->log);
-    __mp_diag("\nprofiling file:    ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("profiling file");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nprofiling file:    ");
     if (h->prof.file == NULL)
         __mp_diag("<unset>");
     else
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", h->prof.file);
-    __mp_diag("\ntracing file:      ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("tracing file");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\ntracing file:      ");
     if (h->trace.file == NULL)
         __mp_diag("<unset>");
     else
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", h->trace.file);
-    __mp_diag("\nprogram filename:  ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("program filename");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+    }
+    else
+        __mp_diag("\nprogram filename:  ");
     if (h->alloc.heap.memory.prog == NULL)
         __mp_diag("<not found>");
     else
+    {
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
         __mp_diag("%s", h->alloc.heap.memory.prog);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
+    }
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("</TABLE>\n");
+    }
     __mp_diag("\nsymbols read:      %lu", h->syms.dtree.size);
     __mp_diag("\nautosave count:    %lu", h->prof.autosave);
     __mp_diag("\nfreed queue size:  %lu", h->alloc.fmax);
