@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.73 2001-03-06 19:48:24 graeme Exp $"
+#ident "$Id: diag.c,v 1.74 2001-03-07 21:16:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.73 2001-03-06 19:48:24 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.74 2001-03-07 21:16:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1139,18 +1139,21 @@ __mp_printallocs(infohead *h, int e)
             __mp_diag(" %s:", h->alloc.heap.memory.prog);
         __mp_diag("\n");
     }
-    __mp_diag("\nunfreed allocations: %lu (", h->alloc.atree.size);
-    __mp_printsize(h->alloc.asize);
+    __mp_diag("\nunfreed allocations: %lu (", h->alloc.atree.size - h->mcount);
+    __mp_printsize(h->alloc.asize - h->mtotal);
     __mp_diag(")\n");
     for (t = __mp_minimum(h->alloc.atree.root); t != NULL;
          t = __mp_successor(t))
     {
         n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
-        if (f == 0)
-            f = 1;
-        else
-            __mp_diag("\n");
-        __mp_printalloc(&h->syms, n);
+        if (!(((infonode *) n->info)->data.flags & FLG_MARKED))
+        {
+            if (f == 0)
+                f = 1;
+            else
+                __mp_diag("\n");
+            __mp_printalloc(&h->syms, n);
+        }
     }
     if (e != 0)
     {

@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.114 2001-03-07 20:38:25 graeme Exp $"
+#ident "$Id: inter.c,v 1.115 2001-03-07 21:16:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.114 2001-03-07 20:38:25 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.115 2001-03-07 21:16:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -548,12 +548,12 @@ __mp_fini(void)
                 __mp_printfree(&memhead);
             if ((memhead.flags & FLG_SHOWFREED) && (memhead.alloc.gsize > 0))
                 __mp_printfreed(&memhead);
-            if (memhead.alloc.asize > 0)
+            if ((memhead.alloc.asize - memhead.mtotal) > 0)
             {
                 if (memhead.flags & FLG_SHOWUNFREED)
                     __mp_printallocs(&memhead, 0);
                 if ((memhead.uabort > 0) &&
-                    (memhead.alloc.asize >= memhead.uabort))
+                    ((memhead.alloc.asize - memhead.mtotal) >= memhead.uabort))
                     __mp_printallocs(&memhead, 1);
             }
             /* Next, close the tracing output file.  This will do nothing if
