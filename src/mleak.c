@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.5 2000-10-09 19:29:19 graeme Exp $"
+#ident "$Id: mleak.c,v 1.6 2000-11-17 18:05:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -391,21 +391,21 @@ int main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stderr, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
-              "under certain\n", stderr);
+              "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
-              "details.\n\n", stderr);
-        fputs("For the latest mpatrol release and documentation,\n", stderr);
-        fprintf(stderr, "visit %s.\n\n", __mp_homepage);
+              "details.\n\n", stdout);
+        fputs("For the latest mpatrol release and documentation,\n", stdout);
+        fprintf(stdout, "visit %s.\n\n", __mp_homepage);
     }
     if (argc > 1)
         e = 1;
     if ((e == 1) || (h == 1))
     {
-        fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
+        fprintf(stdout, "Usage: %s [options] [file]\n\n", progname);
         if (h == 0)
-            fprintf(stderr, "Type `%s --help' for a complete list of "
+            fprintf(stdout, "Type `%s --help' for a complete list of "
                     "options.\n", progname);
         else
             __mp_showopts(options_table);

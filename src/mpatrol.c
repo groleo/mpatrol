@@ -44,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.29 2000-11-14 18:27:25 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.30 2000-11-17 18:05:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -560,6 +560,7 @@ static char *execpath(char *s)
 int main(int argc, char **argv)
 {
     char b[256];
+    char *a;
 #if MP_PRELOAD_SUPPORT
     char *p;
 #endif /* MP_PRELOAD_SUPPORT */
@@ -577,8 +578,14 @@ int main(int argc, char **argv)
 
     d = e = h = r = t = v = w = 0;
     progname = argv[0];
-    logfile = "mpatrol.%n.log";
-    proffile = "mpatrol.%n.out";
+    if ((a = getenv(MP_LOGDIR)) && (*a != '\0'))
+        logfile = "%n.%p.log";
+    else
+        logfile = "mpatrol.%n.log";
+    if ((a = getenv(MP_PROFDIR)) && (*a != '\0'))
+        proffile = "%n.%p.out";
+    else
+        proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)
@@ -759,13 +766,13 @@ int main(int argc, char **argv)
     argv += __mp_optindex;
     if (v == 1)
     {
-        fprintf(stderr, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
+        fprintf(stdout, "%s %s\n%s\n\n", progname, VERSION, __mp_copyright);
         fputs("This is free software, and you are welcome to redistribute it "
-              "under certain\n", stderr);
+              "under certain\n", stdout);
         fputs("conditions; see the GNU Library General Public License for "
-              "details.\n\n", stderr);
-        fputs("For the latest mpatrol release and documentation,\n", stderr);
-        fprintf(stderr, "visit %s.\n\n", __mp_homepage);
+              "details.\n\n", stdout);
+        fputs("For the latest mpatrol release and documentation,\n", stdout);
+        fprintf(stdout, "visit %s.\n\n", __mp_homepage);
     }
     else if ((argc == 0) && (h == 0) && (w == 0))
         e = 1;
@@ -773,10 +780,10 @@ int main(int argc, char **argv)
     {
         if ((e == 1) || (h == 1))
         {
-            fprintf(stderr, "Usage: %s [options] <command> [arguments]\n\n",
+            fprintf(stdout, "Usage: %s [options] <command> [arguments]\n\n",
                     progname);
             if (h == 0)
-                fprintf(stderr, "Type `%s --help' for a complete list of "
+                fprintf(stdout, "Type `%s --help' for a complete list of "
                         "options.\n", progname);
             else
                 __mp_showopts(options_table);
