@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.21 2000-10-09 19:29:43 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.22 2000-10-19 18:32:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -90,7 +90,8 @@ typedef enum options_flags
     OF_PAGEALLOCUPPER = 'X',
     OF_PAGEALLOCLOWER = 'x',
     OF_FAILSEED       = 'Z',
-    OF_FAILFREQ       = 'z'
+    OF_FAILFREQ       = 'z',
+    OF_SHOWENV        = SHORTOPT_MAX + 1
 }
 options_flags;
 
@@ -241,6 +242,8 @@ static option options_table[] =
      "\tInstructs the library to save and replace certain signal handlers\n"
      "\tduring the execution of library code and to restore them\n"
      "\tafterwards.\n"},
+    {"show-env", OF_SHOWENV, NULL,
+     "\tDisplays the contents of the " MP_OPTIONS " environment variable.\n"},
     {"show-freed", OF_SHOWFREED, NULL,
      "\tSpecifies that a summary of all of the freed and unfreed memory\n"
      "\tallocations should be displayed at the end of program execution.\n"},
@@ -303,7 +306,7 @@ static void addoption(char *o, char *v, int s)
 /* Build the environment variable containing mpatrol library options.
  */
 
-static void setoptions(void)
+static void setoptions(int s)
 {
     sprintf(options, "%s=", MP_OPTIONS);
     optlen = strlen(options);
@@ -378,7 +381,9 @@ static void setoptions(void)
         addoption("USEDEBUG", NULL, 0);
     if (usemmap)
         addoption("USEMMAP", NULL, 0);
-    if (putenv(options))
+    if (s != 0)
+        fputs(strchr(options, '=') + 1, stdout);
+    else if (putenv(options))
     {
         fprintf(stderr, "%s: Cannot set environment variable `%s'\n", progname,
                 MP_OPTIONS);
@@ -407,9 +412,9 @@ int main(int argc, char **argv)
 #endif /* TARGET */
     size_t i, l;
 #endif /* TARGET */
-    int c, d, e, h, r, v;
+    int c, d, e, h, r, v, w;
 
-    d = e = h = r = v = 0;
+    d = e = h = r = v = w = 0;
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
@@ -507,6 +512,9 @@ int main(int argc, char **argv)
           case OF_SAFESIGNALS:
             safesignals = 1;
             break;
+          case OF_SHOWENV:
+            w = 1;
+            break;
           case OF_SHOWFREED:
             showfreed = 1;
             break;
@@ -544,9 +552,9 @@ int main(int argc, char **argv)
         fputs("For the latest mpatrol release and documentation,\n", stderr);
         fprintf(stderr, "visit %s.\n\n", __mp_homepage);
     }
-    else if ((argc == 0) && (h == 0))
+    else if ((argc == 0) && (h == 0) && (w == 0))
         e = 1;
-    if ((argc == 0) || (e == 1) || (h == 1))
+    if ((argc == 0) || (e == 1) || (h == 1) || (w == 1))
     {
         if ((e == 1) || (h == 1))
         {
@@ -558,11 +566,13 @@ int main(int argc, char **argv)
             else
                 __mp_showopts(options_table);
         }
+        if (w == 1)
+            setoptions(1);
         if (e == 1)
             exit(EXIT_FAILURE);
         exit(EXIT_SUCCESS);
     }
-    setoptions();
+    setoptions(0);
 #if MP_PRELOAD_SUPPORT
     /* The dynamic linker on some UNIX systems supports requests for it to
      * preload a specified list of shared libraries before running a process,
