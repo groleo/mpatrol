@@ -886,7 +886,10 @@ where each line of input produces a line of output.}
     \fi
       \ifx\empty\imagewidth\else width \imagewidth \fi
       \ifx\empty\imageheight\else height \imageheight \fi
-      {#1.pdf}%
+      % The latest version of pdftex requires a PNG file to have a .png
+      % file extension and not a .pdf file extension that was here before.
+      % Changed by Graeme Roy.
+      {#1.png}%
     \ifnum\pdftexversion < 14 \else
       \pdfrefximage \pdflastximage
     \fi}

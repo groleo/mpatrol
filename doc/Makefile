@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.15 2000-10-10 19:29:05 graeme Exp $
+# $Id: Makefile,v 1.16 2000-10-11 19:18:23 graeme Exp $
 
 
 # Definitions
@@ -98,9 +98,9 @@ endif
 $(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT).eps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ texi2dvi --batch --clean --verbose $<
+	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --verbose $<
 else
-	@ texi2dvi --batch --clean --quiet $<
+	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --quiet $<
 endif
 
 # Build the postscript file from the DVI file using dvips
@@ -118,9 +118,9 @@ endif
 $(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT).png
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ texi2dvi --pdf --batch --clean --verbose $<
+	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
 else
-	@ texi2dvi --pdf --batch --clean --quiet $<
+	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
 endif
 
 # Build the DVI reference card from the LaTeX file using texi2dvi
