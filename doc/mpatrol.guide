@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
 January, 2001.
 
 
@@ -2471,17 +2471,19 @@ add the @{b}--threads@{ub} option as well.
    Note that the @{b}mpatrol@{ub} command must be set up to use the correct
 object file format access libraries that are required for your system
 if you wish to use the @{b}--dynamic@{ub} option.  If the mpatrol library was
-built with @{b}FORMAT=FORMAT_ELF32@{ub} or @{b}FORMAT=FORMAT_ELF64@{ub} support then it
-must be told to preload the ELF access library (normally @{b}libelf.so@{ub})(1).
-If it was built with @{b}FORMAT=FORMAT_BFD@{ub} support then it must be told to
-preload the GNU BFD access libraries (normally @{b}libbfd.so@{ub} and
-@{b}libiberty.so@{ub})(2).  However, if these libraries only exist on your
-system in archive form then you must build @{b}libmpatrol.so@{ub} with these
-extra libraries incorporated into it so that there are no dependencies
-on them at run-time.  However, there may well be problems if the
-resulting shared library contains position-dependent code from the
-archive libraries you incorporated.  The only way to find out is for
-you to try it and see.
+built with @{b}FORMAT=FORMAT_COFF@{ub} or @{b}FORMAT=FORMAT_XCOFF@{ub} support then it
+must be told to preload the COFF access library (normally @{b}libld.so@{ub}).  If
+it was built with @{b}FORMAT=FORMAT_ELF32@{ub} or @{b}FORMAT=FORMAT_ELF64@{ub} support
+then it must be told to preload the ELF access library (normally
+@{b}libelf.so@{ub})(1).  If it was built with @{b}FORMAT=FORMAT_BFD@{ub} support then it
+must be told to preload the GNU BFD access libraries (normally
+@{b}libbfd.so@{ub} and @{b}libiberty.so@{ub})(2).  However, if these libraries only exist
+on your system in archive form then you must build @{b}libmpatrol.so@{ub} with
+these extra libraries incorporated into it so that there are no
+dependencies on them at run-time.  However, there may well be problems
+if the resulting shared library contains position-dependent code from
+the archive libraries you incorporated.  The only way to find out is
+for you to try it and see.
 
    If you have access to the GNU linker on your system then there may
 be a way to convert archive libraries into shared libraries if
@@ -4033,10 +4035,15 @@ development tools.
 program using the following commands:
 
    * If the mpatrol library was built with no support for any object
-     file format or was built with support for the @{b}a.out@{ub}, COFF or XCOFF
-     object file formats:
+     file format or was built with support for the @{b}a.out@{ub} object file
+     format:
 
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
+
+   * If the mpatrol library was built with support for the COFF or
+     XCOFF object file format access library:
+
+          cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lld
 
    * If the mpatrol library was built with support for the ELF32 or
      ELF64 object file format access library:
@@ -8403,24 +8410,6 @@ used to compile the library and tests.  The details following each
 system list any features of the library that are not (or cannot be)
 supported on that system.
 
-   * AIX 4.1, IBM RS/6000, BFD, @{b}cc@{ub}
-        * The thread-safe version of the library does not work.
-
-        * The @{b}OFLOWWATCH@{ub} option has no effect.
-
-        * There is currently no support for reading symbols from XCOFF
-          shared libraries.  You should instead link your programs with
-          the following compiler options in order to perform a static
-          link instead of a dynamic link: @{b}-bnoautoimp@{ub}
-          @{b}-bimport:/lib/syscalls.exp@{ub}.
-
-        * A makefile called @{b}Makefile.aix@{ub} is supplied in @{b}build/unix@{ub} which
-          will build the mpatrol library as an AIX shared library.  The
-          shared library will be embedded within the mpatrol archive
-          library as is done with the system libraries.
-
-        * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
-
    * AIX 4.1, IBM RS/6000, XCOFF, @{b}cc@{ub}
         * The thread-safe version of the library does not work.
 
@@ -8428,11 +8417,17 @@ supported on that system.
 
         * The @{b}USEDEBUG@{ub} option has no effect.
 
-        * There is currently no support for reading symbols from XCOFF
-          shared libraries.  You should instead link your programs with
-          the following compiler options in order to perform a static
-          link instead of a dynamic link: @{b}-bnoautoimp@{ub}
-          @{b}-bimport:/lib/syscalls.exp@{ub}.
+        * There is a problem obtaining the program's executable
+          filename when using the shared library version of mpatrol.
+
+        * The shared library version of mpatrol does not currently
+          override the dynamic memory allocation functions that are
+          called from other shared libraries and so will only affect
+          object files that are statically linked.  If this is a problem
+          then should link your programs with the following additional
+          compiler options in order to perform a static link instead of
+          a dynamic link: @{b}-bnoautoimp@{ub} @{b}-bimport:/lib/syscalls.exp@{ub} and
+          also @{b}-bimport:/lib/threads.exp@{ub} if linking with @{b}libmpatrolmt.a@{ub}.
 
         * A makefile called @{b}Makefile.aix@{ub} is supplied in @{b}build/unix@{ub} which
           will build the mpatrol library as an AIX shared library.  The
@@ -9041,7 +9036,7 @@ Notes for all platforms
      name may be displayed in diagnostics.
 
    * In object file formats that don't store the sizes of symbols (such
-     as basic COFF, or when using the GNU BFD library), the current
+     as basic @{b}a.out@{ub}, or when using the GNU BFD library), the current
      implementation will simply assume that the current symbol
      terminates at the beginning of the next symbol in the virtual
      address space.
@@ -9348,8 +9343,8 @@ Notes for UNIX platforms
    * The library cannot currently read any symbols from shared objects
      that have been read via @{b}dlopen()@{ub}, @{b}shl_load()@{ub} or similar functions.
      In addition, symbols cannot currently be read from any COFF or
-     XCOFF shared libraries on AIX or LynxOS and some work needs to be
-     done to build the mpatrol library as a shared library on LynxOS.
+     XCOFF shared libraries on LynxOS and some work needs to be done to
+     build the mpatrol library as a shared library on LynxOS.
 
    * Perhaps add support for reading HP/UX executable files and
      libraries in the SOM object file format without needing to use the
@@ -9825,13 +9820,15 @@ Linking
 
      This is most likely caused by the mpatrol library requiring
      additional symbols defined in an object file access library.  If
-     mpatrol was built with @{b}FORMAT=FORMAT_ELF32@{ub} or @{b}FORMAT=FORMAT_ELF64@{ub}
-     then you'll need to add @{b}-lelf@{ub} (or equivalent) to the compiler
+     mpatrol was built with @{b}FORMAT=FORMAT_COFF@{ub} or @{b}FORMAT=FORMAT_XCOFF@{ub}
+     then you'll need to add @{b}-lld@{ub} (or equivalent) to the compiler
      command line straight after @{b}-lmpatrol@{ub}.  If mpatrol was built with
-     @{b}FORMAT=FORMAT_BFD@{ub} then you'll need to add @{b}-lbfd -liberty@{ub} (or
-     equivalent) instead.  If you are using the thread-safe version of
-     mpatrol then you may also need to link with the system threads
-     library.
+     @{b}FORMAT=FORMAT_ELF32@{ub} or @{b}FORMAT=FORMAT_ELF64@{ub} then you'll need to add
+     @{b}-lelf@{ub} (or equivalent) to the compiler command line straight after
+     @{b}-lmpatrol@{ub}.  If mpatrol was built with @{b}FORMAT=FORMAT_BFD@{ub} then
+     you'll need to add @{b}-lbfd -liberty@{ub} (or equivalent) instead.  If you
+     are using the thread-safe version of mpatrol then you may also
+     need to link with the system threads library.
 
   2. Why do I still get undefined symbols on HP/UX, IRIX or Windows
      platforms, despite following the above instructions?
@@ -10566,6 +10563,23 @@ Netware platforms.
     Overview
           A heap debugging environment with stack traceback for IBM
           AS/400 servers.
+
+   * DebugObject
+    Author
+          Beniamin Cherniavsky (<cben@israel.crosswinds.net>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Various UNIX, Windows
+
+    Location
+          `http://www.crosswinds.net/~cben/objc/'
+
+    Overview
+          A set of classes for debugging dynamic memory problems in
+          Objective C.
 
    * Dmalloc
     Author
@@ -11598,6 +11612,23 @@ Netware platforms.
           Runs in the background as a control panel and detects various
           memory errors which can then be caught and run under a
           debugger.
+
+   * SBase
+    Author
+          Ben Lilburne (<blilburn@cit.nepean.uws.edu.au>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX, Windows
+
+    Location
+          `http://www.cit.uws.edu.au/~blilburn/sbase/'
+
+    Overview
+          A set of classes for debugging dynamic memory problems in
+          Objective C.
 
    * SmartAlloc
     Author
@@ -12701,6 +12732,7 @@ Index
  @{" debugger                                 " link "Using with a debugger"}   Using with a debugger
  @{" debugging                                " link "Using with a debugger"}   Using with a debugger
  @{" debugging information                    " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" DebugObject                              " link "Related software"}   Related software
  @{" decimal                                  " link "Environment"}   Environment
  @{" declarations, tentative                  " link "Static memory allocations"}   Static memory allocations
  @{" DEFALIGN                                 " link "Environment"}   Environment
@@ -13138,6 +13170,7 @@ Index
  @{" run-time errors                          " link "Overview"}   Overview
  @{" running questions                        " link "Running"}   Running
  @{" SAFESIGNALS                              " link "Environment"}   Environment
+ @{" SBase                                    " link "Related software"}   Related software
  @{" sbrk                                     " link "Library behaviour"}   Library behaviour
  @{" SD-UX package                            " link "Installation"}   Installation
  @{" sections                                 " link "Static memory allocations"}   Static memory allocations

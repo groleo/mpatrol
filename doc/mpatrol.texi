@@ -3,8 +3,23 @@
 @c mpatrol
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+@c
+@c This library is free software; you can redistribute it and/or
+@c modify it under the terms of the GNU Library General Public
+@c License as published by the Free Software Foundation; either
+@c version 2 of the License, or (at your option) any later version.
+@c
+@c This library is distributed in the hope that it will be useful,
+@c but WITHOUT ANY WARRANTY; without even the implied warranty of
+@c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+@c Library General Public License for more details.
+@c
+@c You should have received a copy of the GNU Library General Public
+@c License along with this library; if not, write to the Free
+@c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+@c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.167 2001-01-22 20:16:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.168 2001-01-24 13:21:33 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.4
 @set VERSION 1.3.4
-@set UPDATED 22nd January, 2001
+@set UPDATED 24th January, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2541,8 +2556,10 @@ multithreaded then you must add the @option{--threads} option as well.
 Note that the @command{mpatrol} command must be set up to use the correct
 object file format access libraries that are required for your system if you
 wish to use the @option{--dynamic} option.  If the mpatrol library was built
-with @code{FORMAT=FORMAT_ELF32} or @code{FORMAT=FORMAT_ELF64} support then it
-must be told to preload the ELF access library (normally
+with @code{FORMAT=FORMAT_COFF} or @code{FORMAT=FORMAT_XCOFF} support then it
+must be told to preload the COFF access library (normally @file{libld.so}).  If
+it was built with @code{FORMAT=FORMAT_ELF32} or @code{FORMAT=FORMAT_ELF64}
+support then it must be told to preload the ELF access library (normally
 @file{libelf.so})@footnote{A freely available version of the ELF access library,
 libelf, can be downloaded from @uref{ftp://sunsite.unc.edu/pub/Linux/libs/}.}.
 If it was built with @code{FORMAT=FORMAT_BFD} support then it must be told to
@@ -4237,14 +4254,22 @@ program using the following commands:
 
 @itemize @bullet
 @cindex a.out
-@cindex COFF
-@cindex XCOFF
 @item
 If the mpatrol library was built with no support for any object file format or
-was built with support for the @file{a.out}, COFF or XCOFF object file formats:
+was built with support for the @file{a.out} object file format:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
+@end smallexample
+
+@cindex COFF
+@cindex XCOFF
+@item
+If the mpatrol library was built with support for the COFF or XCOFF object file
+format access library:
+
+@smallexample
+cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lld
 @end smallexample
 
 @cindex ELF32
@@ -8740,27 +8765,6 @@ library that are not (or cannot be) supported on that system.
 @cindex AIX, IBM RS/6000
 @itemize @bullet
 @item
-AIX 4.1, IBM RS/6000, BFD, @command{cc}
-@itemize @bullet
-@item
-The thread-safe version of the library does not work.
-@item
-The @option{OFLOWWATCH} option has no effect.
-@item
-There is currently no support for reading symbols from XCOFF shared libraries.
-You should instead link your programs with the following compiler options in
-order to perform a static link instead of a dynamic link:
-@option{-bnoautoimp} @option{-bimport:/lib/syscalls.exp}.
-@item
-A makefile called @file{Makefile.aix} is supplied in @file{build/unix} which
-will build the mpatrol library as an AIX shared library.  The shared library
-will be embedded within the mpatrol archive library as is done with the system
-libraries.
-@item
-The @option{--dynamic} option to the @command{mpatrol} command has no effect.
-@end itemize
-
-@item
 AIX 4.1, IBM RS/6000, XCOFF, @command{cc}
 @itemize @bullet
 @item
@@ -8770,10 +8774,16 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-There is currently no support for reading symbols from XCOFF shared libraries.
-You should instead link your programs with the following compiler options in
-order to perform a static link instead of a dynamic link:
-@option{-bnoautoimp} @option{-bimport:/lib/syscalls.exp}.
+There is a problem obtaining the program's executable filename when using the
+shared library version of mpatrol.
+@item
+The shared library version of mpatrol does not currently override the dynamic
+memory allocation functions that are called from other shared libraries and so
+will only affect object files that are statically linked.  If this is a problem
+then should link your programs with the following additional compiler options in
+order to perform a static link instead of a dynamic link: @option{-bnoautoimp}
+@option{-bimport:/lib/syscalls.exp} and also @option{-bimport:/lib/threads.exp}
+if linking with @file{libmpatrolmt.a}.
 @item
 A makefile called @file{Makefile.aix} is supplied in @file{build/unix} which
 will build the mpatrol library as an AIX shared library.  The shared library
@@ -9518,9 +9528,9 @@ so the wrong symbol name may be displayed in diagnostics.
 
 @item
 In object file formats that don't store the sizes of symbols (such as basic
-COFF, or when using the GNU BFD library), the current implementation will simply
-assume that the current symbol terminates at the beginning of the next symbol in
-the virtual address space.
+@file{a.out}, or when using the GNU BFD library), the current implementation
+will simply assume that the current symbol terminates at the beginning of the
+next symbol in the virtual address space.
 
 @item
 Add functions to start and stop profiling, and perhaps also to clear the
@@ -9827,9 +9837,9 @@ was called rather than unwinding to the top of the stack.
 @item
 The library cannot currently read any symbols from shared objects that have been
 read via @code{dlopen()}, @code{shl_load()} or similar functions.  In addition,
-symbols cannot currently be read from any COFF or XCOFF shared libraries on AIX
-or LynxOS and some work needs to be done to build the mpatrol library as a
-shared library on LynxOS.
+symbols cannot currently be read from any COFF or XCOFF shared libraries on
+LynxOS and some work needs to be done to build the mpatrol library as a shared
+library on LynxOS.
 
 @item
 Perhaps add support for reading HP/UX executable files and libraries in the SOM
@@ -10313,12 +10323,15 @@ Why do I get undefined symbols when linking with the mpatrol library?
 
 This is most likely caused by the mpatrol library requiring additional symbols
 defined in an object file access library.  If mpatrol was built with
-@code{FORMAT=FORMAT_ELF32} or @code{FORMAT=FORMAT_ELF64} then you'll need to
-add @option{-lelf} (or equivalent) to the compiler command line straight after
-@option{-lmpatrol}.  If mpatrol was built with @code{FORMAT=FORMAT_BFD} then
-you'll need to add @option{-lbfd -liberty} (or equivalent) instead.  If you are
-using the thread-safe version of mpatrol then you may also need to link with the
-system threads library.
+@code{FORMAT=FORMAT_COFF} or @code{FORMAT=FORMAT_XCOFF} then you'll need to add
+@option{-lld} (or equivalent) to the compiler command line straight after
+@option{-lmpatrol}.  If mpatrol was built with @code{FORMAT=FORMAT_ELF32} or
+@code{FORMAT=FORMAT_ELF64} then you'll need to add @option{-lelf} (or
+equivalent) to the compiler command line straight after @option{-lmpatrol}.  If
+mpatrol was built with @code{FORMAT=FORMAT_BFD} then you'll need to add
+@option{-lbfd -liberty} (or equivalent) instead.  If you are using the
+thread-safe version of mpatrol then you may also need to link with the system
+threads library.
 
 @item
 Why do I still get undefined symbols on HP/UX, IRIX or Windows platforms,
@@ -11030,6 +11043,22 @@ IBM AS/400
 @uref{http://www.as400.ibm.com/developer/porting/heapexternal.html}
 @item Overview
 A heap debugging environment with stack traceback for IBM AS/400 servers.
+@end table
+
+@cindex DebugObject
+@item
+DebugObject
+@table @asis
+@item Author
+Beniamin Cherniavsky (@email{cben@@israel.crosswinds.net})
+@item License
+GNU General Public License
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.crosswinds.net/~cben/objc/}
+@item Overview
+A set of classes for debugging dynamic memory problems in Objective C.
 @end table
 
 @cindex Dmalloc
@@ -12031,6 +12060,22 @@ MacOS
 @item Overview
 Runs in the background as a control panel and detects various memory errors
 which can then be caught and run under a debugger.
+@end table
+
+@cindex SBase
+@item
+SBase
+@table @asis
+@item Author
+Ben Lilburne (@email{blilburn@@cit.nepean.uws.edu.au})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.cit.uws.edu.au/~blilburn/sbase/}
+@item Overview
+A set of classes for debugging dynamic memory problems in Objective C.
 @end table
 
 @cindex SmartAlloc

@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 22nd
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
 January, 2001.
 
 * Menu:
@@ -2381,8 +2381,10 @@ add the `--threads' option as well.
    Note that the `mpatrol' command must be set up to use the correct
 object file format access libraries that are required for your system
 if you wish to use the `--dynamic' option.  If the mpatrol library was
-built with `FORMAT=FORMAT_ELF32' or `FORMAT=FORMAT_ELF64' support then
-it must be told to preload the ELF access library (normally
+built with `FORMAT=FORMAT_COFF' or `FORMAT=FORMAT_XCOFF' support then it
+must be told to preload the COFF access library (normally `libld.so').
+If it was built with `FORMAT=FORMAT_ELF32' or `FORMAT=FORMAT_ELF64'
+support then it must be told to preload the ELF access library (normally
 `libelf.so')(1).  If it was built with `FORMAT=FORMAT_BFD' support then
 it must be told to preload the GNU BFD access libraries (normally
 `libbfd.so' and `libiberty.so')(2).  However, if these libraries only
@@ -3914,10 +3916,15 @@ development tools.
 program using the following commands:
 
    * If the mpatrol library was built with no support for any object
-     file format or was built with support for the `a.out', COFF or
-     XCOFF object file formats:
+     file format or was built with support for the `a.out' object file
+     format:
 
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
+
+   * If the mpatrol library was built with support for the COFF or
+     XCOFF object file format access library:
+
+          cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lld
 
    * If the mpatrol library was built with support for the ELF32 or
      ELF64 object file format access library:
@@ -8216,24 +8223,6 @@ used to compile the library and tests.  The details following each
 system list any features of the library that are not (or cannot be)
 supported on that system.
 
-   * AIX 4.1, IBM RS/6000, BFD, `cc'
-        * The thread-safe version of the library does not work.
-
-        * The `OFLOWWATCH' option has no effect.
-
-        * There is currently no support for reading symbols from XCOFF
-          shared libraries.  You should instead link your programs with
-          the following compiler options in order to perform a static
-          link instead of a dynamic link: `-bnoautoimp'
-          `-bimport:/lib/syscalls.exp'.
-
-        * A makefile called `Makefile.aix' is supplied in `build/unix'
-          which will build the mpatrol library as an AIX shared
-          library.  The shared library will be embedded within the
-          mpatrol archive library as is done with the system libraries.
-
-        * The `--dynamic' option to the `mpatrol' command has no effect.
-
    * AIX 4.1, IBM RS/6000, XCOFF, `cc'
         * The thread-safe version of the library does not work.
 
@@ -8241,11 +8230,18 @@ supported on that system.
 
         * The `USEDEBUG' option has no effect.
 
-        * There is currently no support for reading symbols from XCOFF
-          shared libraries.  You should instead link your programs with
-          the following compiler options in order to perform a static
-          link instead of a dynamic link: `-bnoautoimp'
-          `-bimport:/lib/syscalls.exp'.
+        * There is a problem obtaining the program's executable
+          filename when using the shared library version of mpatrol.
+
+        * The shared library version of mpatrol does not currently
+          override the dynamic memory allocation functions that are
+          called from other shared libraries and so will only affect
+          object files that are statically linked.  If this is a problem
+          then should link your programs with the following additional
+          compiler options in order to perform a static link instead of
+          a dynamic link: `-bnoautoimp' `-bimport:/lib/syscalls.exp'
+          and also `-bimport:/lib/threads.exp' if linking with
+          `libmpatrolmt.a'.
 
         * A makefile called `Makefile.aix' is supplied in `build/unix'
           which will build the mpatrol library as an AIX shared
@@ -8840,7 +8836,7 @@ Notes for all platforms
      name may be displayed in diagnostics.
 
    * In object file formats that don't store the sizes of symbols (such
-     as basic COFF, or when using the GNU BFD library), the current
+     as basic `a.out', or when using the GNU BFD library), the current
      implementation will simply assume that the current symbol
      terminates at the beginning of the next symbol in the virtual
      address space.
@@ -9146,9 +9142,8 @@ Notes for UNIX platforms
    * The library cannot currently read any symbols from shared objects
      that have been read via `dlopen()', `shl_load()' or similar
      functions.  In addition, symbols cannot currently be read from any
-     COFF or XCOFF shared libraries on AIX or LynxOS and some work
-     needs to be done to build the mpatrol library as a shared library
-     on LynxOS.
+     COFF or XCOFF shared libraries on LynxOS and some work needs to be
+     done to build the mpatrol library as a shared library on LynxOS.
 
    * Perhaps add support for reading HP/UX executable files and
      libraries in the SOM object file format without needing to use the
@@ -9597,7 +9592,10 @@ Linking
 
      This is most likely caused by the mpatrol library requiring
      additional symbols defined in an object file access library.  If
-     mpatrol was built with `FORMAT=FORMAT_ELF32' or
+     mpatrol was built with `FORMAT=FORMAT_COFF' or
+     `FORMAT=FORMAT_XCOFF' then you'll need to add `-lld' (or
+     equivalent) to the compiler command line straight after
+     `-lmpatrol'.  If mpatrol was built with `FORMAT=FORMAT_ELF32' or
      `FORMAT=FORMAT_ELF64' then you'll need to add `-lelf' (or
      equivalent) to the compiler command line straight after
      `-lmpatrol'.  If mpatrol was built with `FORMAT=FORMAT_BFD' then
@@ -10325,6 +10323,23 @@ Netware platforms.
     Overview
           A heap debugging environment with stack traceback for IBM
           AS/400 servers.
+
+   * DebugObject
+    Author
+          Beniamin Cherniavsky (<cben@israel.crosswinds.net>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Various UNIX, Windows
+
+    Location
+          `http://www.crosswinds.net/~cben/objc/'
+
+    Overview
+          A set of classes for debugging dynamic memory problems in
+          Objective C.
 
    * Dmalloc
     Author
@@ -11334,6 +11349,23 @@ Netware platforms.
           Runs in the background as a control panel and detects various
           memory errors which can then be caught and run under a
           debugger.
+
+   * SBase
+    Author
+          Ben Lilburne (<blilburn@cit.nepean.uws.edu.au>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX, Windows
+
+    Location
+          `http://www.cit.uws.edu.au/~blilburn/sbase/'
+
+    Overview
+          A set of classes for debugging dynamic memory problems in
+          Objective C.
 
    * SmartAlloc
     Author
@@ -12418,6 +12450,7 @@ Index
 * debugger:                              Using with a debugger.
 * debugging:                             Using with a debugger.
 * debugging information:                 Call stacks and symbol tables.
+* DebugObject:                           Related software.
 * decimal:                               Environment.
 * declarations, tentative:               Static memory allocations.
 * DEFALIGN:                              Environment.
@@ -12855,6 +12888,7 @@ Index
 * run-time errors:                       Overview.
 * running questions:                     Running.
 * SAFESIGNALS:                           Environment.
+* SBase:                                 Related software.
 * sbrk:                                  Library behaviour.
 * SD/UX package:                         Installation.
 * sections:                              Static memory allocations.
@@ -13041,75 +13075,75 @@ Ref: Testing-Footnote-2109232
 Node: Library functions109291
 Node: Utilities116172
 Node: The mpatrol command117142
-Ref: The mpatrol command-Footnote-1123682
-Ref: The mpatrol command-Footnote-2123816
-Node: The mleak command123896
-Node: The mpsym command125860
-Node: The mpedit command128428
-Node: The hexwords command131824
-Node: Profiling134966
-Ref: Profiling-Footnote-1162858
-Ref: Profiling-Footnote-2163082
-Node: Tracing163186
-Ref: Tracing-Footnote-1180376
-Ref: Tracing-Footnote-2180410
-Ref: Tracing-Footnote-3180532
-Node: Improving performance180638
-Ref: Improving performance-Footnote-1189538
-Ref: Improving performance-Footnote-2189580
-Ref: Improving performance-Footnote-3189657
-Ref: Improving performance-Footnote-4189729
-Node: How it works189773
-Node: Examples196966
-Node: Example 1200693
-Ref: Example 1-Footnote-1224809
-Node: Example 2224999
-Node: Example 3230399
-Node: Example 4237256
-Node: Example 5240761
-Node: Example 6243229
-Ref: Example 6-Footnote-1247029
-Node: Example 7247158
-Node: Example 8249016
-Node: Example 9259252
-Node: Tutorial275123
-Ref: Tutorial-Footnote-1289654
-Ref: Tutorial-Footnote-2289945
-Ref: Tutorial-Footnote-3290094
-Ref: Tutorial-Footnote-4290231
-Ref: Tutorial-Footnote-5290330
-Node: Functions290611
-Node: Environment321047
-Node: Options341815
-Node: Diagnostic messages353202
-Node: Library performance369619
-Node: File formats372112
-Ref: File formats-Footnote-1372536
-Node: Profiling file format372748
-Node: Tracing file format376010
-Node: Supported systems377877
-Node: New system support393879
-Node: New processor support395075
-Node: New file format support395758
-Node: Notes396542
-Node: Generic notes398153
-Ref: Generic notes-Footnote-1415601
-Ref: Generic notes-Footnote-2415819
-Node: UNIX notes416041
-Node: Amiga notes420632
-Node: Windows notes424296
-Node: Netware notes425716
-Node: Frequently asked questions428276
-Node: Documentation428899
-Node: Building433729
-Node: Linking441343
-Node: Running445615
-Node: Files460723
-Node: Related software463719
-Ref: Related software-Footnote-1501596
-Node: References501837
-Node: Copying504430
-Node: Function index532319
-Node: Index534577
+Ref: The mpatrol command-Footnote-1123836
+Ref: The mpatrol command-Footnote-2123970
+Node: The mleak command124050
+Node: The mpsym command126014
+Node: The mpedit command128582
+Node: The hexwords command131978
+Node: Profiling135120
+Ref: Profiling-Footnote-1163012
+Ref: Profiling-Footnote-2163236
+Node: Tracing163340
+Ref: Tracing-Footnote-1180530
+Ref: Tracing-Footnote-2180564
+Ref: Tracing-Footnote-3180686
+Node: Improving performance180792
+Ref: Improving performance-Footnote-1189692
+Ref: Improving performance-Footnote-2189734
+Ref: Improving performance-Footnote-3189811
+Ref: Improving performance-Footnote-4189883
+Node: How it works189927
+Node: Examples197120
+Node: Example 1201019
+Ref: Example 1-Footnote-1225135
+Node: Example 2225325
+Node: Example 3230725
+Node: Example 4237582
+Node: Example 5241087
+Node: Example 6243555
+Ref: Example 6-Footnote-1247355
+Node: Example 7247484
+Node: Example 8249342
+Node: Example 9259578
+Node: Tutorial275449
+Ref: Tutorial-Footnote-1289980
+Ref: Tutorial-Footnote-2290271
+Ref: Tutorial-Footnote-3290420
+Ref: Tutorial-Footnote-4290557
+Ref: Tutorial-Footnote-5290656
+Node: Functions290937
+Node: Environment321373
+Node: Options342141
+Node: Diagnostic messages353528
+Node: Library performance369945
+Node: File formats372438
+Ref: File formats-Footnote-1372862
+Node: Profiling file format373074
+Node: Tracing file format376336
+Node: Supported systems378203
+Node: New system support393799
+Node: New processor support394995
+Node: New file format support395678
+Node: Notes396462
+Node: Generic notes398073
+Ref: Generic notes-Footnote-1415524
+Ref: Generic notes-Footnote-2415742
+Node: UNIX notes415964
+Node: Amiga notes420543
+Node: Windows notes424207
+Node: Netware notes425627
+Node: Frequently asked questions428187
+Node: Documentation428810
+Node: Building433640
+Node: Linking441254
+Node: Running445718
+Node: Files460826
+Node: Related software463822
+Ref: Related software-Footnote-1502395
+Node: References502636
+Node: Copying505229
+Node: Function index533118
+Node: Index535376
 
 End Tag Table
