@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.18 2001-05-23 12:33:32 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.19 2001-05-23 20:03:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.18 2001-05-23 12:33:32 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.19 2001-05-23 20:03:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -702,9 +702,6 @@ readevent(void)
             a = (void *) getuleb128();
             l = getuleb128();
             f = newalloc(n, currentevent, a, l);
-            if (verbose)
-                fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu\n",
-                        currentevent, n, a, l);
             stats.acount++;
             stats.atotal += l;
             if (stats.pcount < stats.acount - stats.fcount)
@@ -715,6 +712,11 @@ readevent(void)
                 stats.lsize = l;
             if (stats.usize < l)
                 stats.usize = l;
+            if (verbose)
+                fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu"
+                        "          %6lu  %8lu\n", currentevent, n, a, l,
+                        stats.acount - stats.fcount,
+                        stats.atotal - stats.ftotal);
             if (hatffile != NULL)
                 fprintf(hatffile, "1 %lu 0x%lx\n", l, a);
             if (f->entry != NULL)
@@ -745,9 +747,6 @@ readevent(void)
                             "been freed\n", progname, n);
                 a = (void *) getuleb128();
                 l = getuleb128();
-                if (verbose)
-                    fprintf(stdout, "%6lu  realloc %6lu  " MP_POINTER
-                            "  %8lu\n", currentevent, n, a, l);
                 stats.acount++;
                 stats.atotal += l;
                 stats.fcount++;
@@ -760,6 +759,11 @@ readevent(void)
                     stats.lsize = l;
                 if (stats.usize < l)
                     stats.usize = l;
+                if (verbose)
+                    fprintf(stdout, "%6lu  realloc %6lu  " MP_POINTER
+                            "  %8lu          %6lu  %8lu\n", currentevent, n, a,
+                            l, stats.acount - stats.fcount,
+                            stats.atotal - stats.ftotal);
                 if (hatffile != NULL)
                     fprintf(hatffile, "4 %lu 0x%lx 0x%lx\n", l, f->addr, a);
                 if (f->entry != NULL)
@@ -796,12 +800,13 @@ readevent(void)
                     fprintf(stderr, "%s: Allocation index `%lu' has already "
                             "been freed\n", progname, n);
                 f->time = currentevent - f->event;
-                if (verbose)
-                    fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
-                            "%6lu\n", currentevent, n, f->addr, f->size,
-                            f->time);
                 stats.fcount++;
                 stats.ftotal += f->size;
+                if (verbose)
+                    fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
+                            "%6lu  %6lu  %8lu\n", currentevent, n, f->addr,
+                            f->size, f->time, stats.acount - stats.fcount,
+                            stats.atotal - stats.ftotal);
                 if (hatffile != NULL)
                     fprintf(hatffile, "2 0x%lx\n", f->addr);
                 if (f->entry != NULL)
@@ -966,14 +971,16 @@ readfile(void)
 #else /* ENVIRON */
         fputs("allocation", stdout);
 #endif /* ENVIRON */
-        fputs("      size    life\n", stdout);
+        fputs("      size    life", stdout);
+        fputs("   count     bytes\n", stdout);
         fputs("------  ------  ------  ", stdout);
 #if ENVIRON == ENVIRON_64
         fputs("------------------", stdout);
 #else /* ENVIRON */
         fputs("----------", stdout);
 #endif /* ENVIRON */
-        fputs("  --------  ------\n", stdout);
+        fputs("  --------  ------", stdout);
+        fputs("  ------  --------\n", stdout);
     }
     /* Read each allocation or deallocation entry.
      */
