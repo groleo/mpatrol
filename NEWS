@@ -1,4 +1,4 @@
-Changes for 1.4.1
+Changes for 1.4.1 (27th February, 2001)
 
   * Added the __mp_atexit() and __mp_setmark() functions.  Also added more
     fields to the information returned by __mp_info() and better source-level
@@ -13,9 +13,13 @@ Changes for 1.4.1
   * Fixed a problem when profiling memory reallocations.
 
   * Fixed a typing error which would prevent compilation on Windows platforms.
+    Also fixed std namespace problems for set_new_handler() on Windows
+    platforms.
 
   * Changed HEAPDIFFSTART() and HEAPDIFFEND() to their lowercase equivalents and
     added support in the heapdiff tool for marked memory allocations.
+
+  * Added Dbmalloc-compatible function implementations as an external package.
 
   * The trace file in the mtrace tool is now automatically closed at exit.
 

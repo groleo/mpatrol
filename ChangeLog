@@ -1,3 +1,14 @@
+2001-02-27  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/cplus.c, src/mpatrol.h:
+	Fixed std namespace problems for set_new_handler() and old libraries.
+
+	* tools/dbmalloc.h:
+	Provided documentation.  Added the settings for the MALLOC_WARN and
+	MALLOC_FATAL options.
+
+	* tools/dbmalloc.c: Added more options.
+
 2001-02-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpalloc.def, build/windows/mpatrol.def,
@@ -11,6 +22,12 @@
 
 	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
 	Reintroduced __mp_check().
+
+	* tools/heapdiff.h, tools/mgauge.h, tools/mtrace.h:
+	Added the MPT_* prefix to the inclusion-protection macros defined by the
+	header files.  Added support for NDEBUG.
+
+	* tools/dbmalloc.c, tools/dbmalloc.h: New files for Dbmalloc interface.
 
 2001-02-25  Graeme Roy  <graeme@epc.co.uk>
 
