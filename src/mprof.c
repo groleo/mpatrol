@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.18 2000-09-25 21:37:27 graeme Exp $"
+#ident "$Id: mprof.c,v 1.19 2000-10-03 16:17:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -856,13 +856,15 @@ static void leaktable(void)
 
 int main(int argc, char **argv)
 {
+    char b[256];
     char *f;
     int c, e, v;
 
     e = v = 0;
     maxstack = 1;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "acn:V", options_table)) != EOF)
+    while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
+             options_table)) != EOF)
         switch (c)
         {
           case 'a':

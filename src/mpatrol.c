@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.19 2000-09-25 21:13:02 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.20 2000-10-03 16:17:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -348,6 +348,7 @@ int main(int argc, char **argv)
 #if MP_PRELOAD_SUPPORT
     static char p[256];
 #endif /* MP_PRELOAD_SUPPORT */
+    char b[256];
 #if TARGET == TARGET_UNIX
     pid_t f;
 #else /* TARGET */
@@ -364,8 +365,7 @@ int main(int argc, char **argv)
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
-    while ((c = __mp_getopt(argc, argv,
-             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:",
+    while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)
         {
