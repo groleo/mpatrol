@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.37 2001-03-05 22:28:06 graeme Exp $"
+#ident "$Id: option.c,v 1.38 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.37 2001-03-05 22:28:06 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.38 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -236,20 +236,21 @@ static
 int
 matchoption(char *s, char *t)
 {
-#if TARGET == TARGET_UNIX
+#if TARGET != TARGET_AMIGA && TARGET != TARGET_WINDOWS && \
+    TARGET != TARGET_NETWARE
     int d;
 #endif /* TARGET */
 
-#if TARGET == TARGET_UNIX
+#if TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
+    TARGET == TARGET_NETWARE
+    return !stricmp(s, t);
+#else /* TARGET */
     while (((d = toupper(*s) - toupper(*t)) == 0) && (*s != '\0'))
     {
         s++;
         t++;
     }
     return (d == 0);
-#elif TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
-      TARGET == TARGET_NETWARE
-    return !stricmp(s, t);
 #endif /* TARGET */
 }
 

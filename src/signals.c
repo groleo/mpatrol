@@ -45,9 +45,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.23 2001-03-13 23:10:20 graeme Exp $"
+#ident "$Id: signals.c,v 1.24 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *signals_id = "$Id: signals.c,v 1.23 2001-03-13 23:10:20 graeme Exp $";
+static MP_CONST MP_VOLATILE char *signals_id = "$Id: signals.c,v 1.24 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -379,7 +379,7 @@ __mp_abort(void)
      */
     fflush(NULL);
     abort();
-#elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
+#else /* TARGET */
     /* Terminate the current process with a failure exit code.
      * Used on systems where memory will not be automatically returned
      * back to the system on process termination.

@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.55 2001-05-06 19:24:41 graeme Exp $"
+#ident "$Id: memory.c,v 1.56 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.55 2001-05-06 19:24:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.56 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -216,6 +216,11 @@ pagesize(void)
     return i.dwPageSize;
 #elif TARGET == TARGET_NETWARE
     return NXGetPageSize();
+#else /* TARGET */
+    /* We just assume that any other operating systems have no virtual
+     * memory support and so anything we return here is irrelevant.
+     */
+    return 1024;
 #endif /* TARGET */
 }
 
@@ -491,6 +496,11 @@ __mp_processid(void)
     return (unsigned long) FindTask(NULL);
 #elif TARGET == TARGET_NETWARE
     return (unsigned long) GetThreadId();
+#else /* TARGET */
+    /* We just assume that any other operating systems have no support for
+     * multiple processes and so anything we return here is irrelevant.
+     */
+    return 1;
 #endif /* TARGET */
 }
 

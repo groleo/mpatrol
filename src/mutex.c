@@ -46,9 +46,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.14 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mutex.c,v 1.15 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mutex_id = "$Id: mutex.c,v 1.14 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mutex_id = "$Id: mutex.c,v 1.15 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -63,6 +63,8 @@ typedef struct SignalSemaphore mutex; /* Amiga semaphore */
 typedef HANDLE mutex;                 /* Windows handle */
 #elif TARGET == TARGET_NETWARE
 typedef LONG mutex;                   /* Netware handle */
+#else /* TARGET */
+typedef int mutex;                    /* No threads support */
 #endif /* TARGET */
 
 
@@ -131,6 +133,9 @@ __mp_initmutexes(void)
 #elif TARGET == TARGET_NETWARE
             locks[i].guard = OpenLocalSemaphore(1);
             locks[i].real = OpenLocalSemaphore(1);
+#else /* TARGET */
+            locks[i].guard = 0;
+            locks[i].real = 0;
 #endif /* TARGET */
             locks[i].owner = 0;
             locks[i].count = 0;
@@ -161,6 +166,9 @@ __mp_finimutexes(void)
 #elif TARGET == TARGET_NETWARE
             CloseLocalSemaphore(locks[i].guard);
             CloseLocalSemaphore(locks[i].real);
+#else /* TARGET */
+            locks[i].guard = 0;
+            locks[i].real = 0;
 #endif /* TARGET */
             locks[i].owner = 0;
             locks[i].count = 0;
@@ -283,6 +291,8 @@ __mp_threadid(void)
     return (unsigned long) GetCurrentThreadId();
 #elif TARGET == TARGET_NETWARE
     return (unsigned long) GetThreadId();
+#else /* TARGET */
+    return 0;
 #endif /* TARGET */
 }
 

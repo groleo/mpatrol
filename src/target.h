@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.28 2001-03-12 20:21:15 graeme Exp $
+ * $Id: target.h,v 1.29 2001-05-17 07:38:15 graeme Exp $
  */
 
 
@@ -63,7 +63,7 @@
       defined(__NETWARE__)
 #define TARGET TARGET_NETWARE
 #else /* TARGET */
-#error unrecognised operating system
+#define TARGET TARGET_ANY
 #endif /* TARGET */
 #endif /* TARGET */
 
@@ -198,7 +198,7 @@
       defined(__sparc__)
 #define ARCH ARCH_SPARC
 #else /* ARCH */
-#error unrecognised processor architecture
+#define ARCH ARCH_ANY
 #endif /* ARCH */
 #endif /* ARCH */
 

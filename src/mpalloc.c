@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.29 2001-05-16 07:48:47 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.30 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.29 2001-05-16 07:48:47 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.30 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -164,6 +164,11 @@ pagesize(void)
         s = i.dwPageSize;
 #elif TARGET == TARGET_NETWARE
         s = NXGetPageSize();
+#else /* TARGET */
+    /* We just assume that any other operating systems have no virtual
+     * memory support and so anything we return here is irrelevant.
+     */
+    return 1024;
 #endif /* TARGET */
     }
     return s;

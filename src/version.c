@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.42 2001-03-22 21:13:45 graeme Exp $"
+#ident "$Id: version.c,v 1.43 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.42 2001-03-22 21:13:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.43 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -58,7 +58,7 @@ MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (01/03/22)";
  */
 MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (22.03.01)";
 
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
 
 /* No identification string and English date format.
  */

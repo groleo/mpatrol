@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.77 2001-05-16 07:48:47 graeme Exp $"
+#ident "$Id: diag.c,v 1.78 2001-05-17 07:38:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.77 2001-05-16 07:48:47 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.78 2001-05-17 07:38:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -253,7 +253,7 @@ processfile(meminfo *m, char *s, char *b, size_t l)
                     if (*p == '/')
 #elif TARGET == TARGET_AMIGA
                     if ((*p == ':') || (*p == '/'))
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
                     if ((*p == ':') || (*p == '/') || (*p == '\\'))
 #endif /* TARGET */
                         b[i++] = '_';
@@ -279,7 +279,7 @@ processfile(meminfo *m, char *s, char *b, size_t l)
                     while (t = strchr(p, '/'))
 #elif TARGET == TARGET_AMIGA
                     while (t = strpbrk(p, ":/"))
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
                     while (t = strpbrk(p, ":/\\"))
 #endif /* TARGET */
                         p = t + 1;
@@ -333,7 +333,7 @@ __mp_logfile(meminfo *m, char *s)
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
          !strpbrk(s, ":/")))
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
          !strpbrk(s, ":/\\")))
 #endif /* TARGET */
     {
@@ -351,7 +351,7 @@ __mp_logfile(meminfo *m, char *s)
             sprintf(p, "%s%s", d, s);
         else
             sprintf(p, "%s/%s", d, s);
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
         sprintf(p, "%s\\%s", d, s);
 #endif /* TARGET */
         processfile(m, p, b, sizeof(b));
@@ -386,7 +386,7 @@ __mp_proffile(meminfo *m, char *s)
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
          !strpbrk(s, ":/")))
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
          !strpbrk(s, ":/\\")))
 #endif /* TARGET */
     {
@@ -404,7 +404,7 @@ __mp_proffile(meminfo *m, char *s)
             sprintf(p, "%s%s", d, s);
         else
             sprintf(p, "%s/%s", d, s);
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
         sprintf(p, "%s\\%s", d, s);
 #endif /* TARGET */
         processfile(m, p, b, sizeof(b));
@@ -439,7 +439,7 @@ __mp_tracefile(meminfo *m, char *s)
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
          !strpbrk(s, ":/")))
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
          !strpbrk(s, ":/\\")))
 #endif /* TARGET */
     {
@@ -457,7 +457,7 @@ __mp_tracefile(meminfo *m, char *s)
             sprintf(p, "%s%s", d, s);
         else
             sprintf(p, "%s/%s", d, s);
-#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+#else /* TARGET */
         sprintf(p, "%s\\%s", d, s);
 #endif /* TARGET */
         processfile(m, p, b, sizeof(b));

@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.76 2001-05-14 12:15:13 graeme Exp $
+ * $Id: config.h,v 1.77 2001-05-17 07:38:15 graeme Exp $
  */
 
 
@@ -98,7 +98,11 @@
  */
 
 #ifndef MP_ARRAY_SUPPORT
+#if TARGET == TARGET_ANY
+#define MP_ARRAY_SUPPORT 1
+#else /* TARGET */
 #define MP_ARRAY_SUPPORT 0
+#endif /* TARGET */
 #endif /* MP_ARRAY_SUPPORT */
 
 
@@ -227,7 +231,7 @@
 #ifndef MP_DELETEHEAP
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
 #define MP_DELETEHEAP 0
-#elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
+#else /* TARGET */
 #define MP_DELETEHEAP 1
 #endif /* TARGET */
 #endif /* MP_DELETEHEAP */
@@ -241,7 +245,7 @@
 #ifndef MP_PROTECT_SUPPORT
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
 #define MP_PROTECT_SUPPORT 1
-#elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
+#else /* TARGET */
 #define MP_PROTECT_SUPPORT 0
 #endif /* TARGET */
 #endif /* MP_PROTECT_SUPPORT */
@@ -370,15 +374,6 @@
 #ifndef _THREAD_SAFE
 #define _THREAD_SAFE 1
 #endif /* _THREAD_SAFE */
-#elif SYSTEM == SYSTEM_CYGWIN || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_HPUX || \
-      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
-      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS || \
-      SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
-#ifndef _REENTRANT
-#define _REENTRANT 1
-#endif /* _REENTRANT */
 #elif SYSTEM == SYSTEM_DGUX
 #ifndef _POSIX4A_DRAFT6_SOURCE
 #define _POSIX4A_DRAFT6_SOURCE 1
@@ -398,6 +393,10 @@
 #ifndef __POSIX4_D9__
 #define __POSIX4_D9__ 1
 #endif /* __POSIX4_D9__ */
+#else /* SYSTEM */
+#ifndef _REENTRANT
+#define _REENTRANT 1
+#endif /* _REENTRANT */
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #ifndef _MT
@@ -494,7 +493,7 @@
 #ifndef MP_PROCFS_CTLNAME
 #if SYSTEM == SYSTEM_IRIX
 #define MP_PROCFS_CTLNAME MP_PROCFS_DIRNAME "/%05lu"
-#elif SYSTEM == SYSTEM_SOLARIS
+#else /* SYSTEM */
 #define MP_PROCFS_CTLNAME MP_PROCFS_DIRNAME "/%lu/ctl"
 #endif /* SYSTEM */
 #endif /* MP_PROCFS_CTLNAME */
