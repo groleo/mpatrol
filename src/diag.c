@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.30 2000-07-13 20:19:11 graeme Exp $"
+#ident "$Id: diag.c,v 1.31 2000-07-16 22:33:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -913,6 +913,7 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
         __mp_diag("%s", h->alloc.heap.memory.prog);
     __mp_diag("\nsymbols read:      %lu", h->syms.dtree.size);
     __mp_diag("\nautosave count:    %lu", h->prof.autosave);
+    __mp_diag("\nfreed queue size:  %lu", h->alloc.fmax);
     __mp_diag("\nallocation count:  %lu", h->count);
     __mp_diag("\nallocation peak:   ");
     __mp_printsize(h->peak);
