@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.23 2000-01-11 00:56:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.24 2000-01-12 01:08:50 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 9th January, 2000
+@set UPDATED 12th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -195,7 +195,10 @@ which uses them.  If this subject interests you, you may find further useful
 material at @emph{The Memory Management Reference} located at
 @uref{http://www.harlequin.com/mm/reference/}.  It has links to many documents
 and research papers in the field of memory management, and has a large glossary
-which lists and explains related terms.
+which lists and explains related terms.  You may also wish to look at
+@emph{A Memory Allocator} by Doug Lea for information on general memory
+allocation principles.  It is located at
+@uref{http://gee.cs.oswego.edu/dl/html/malloc.html}.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -1078,6 +1081,18 @@ However, unprotecting and then protecting the structures at every library call
 has a slight overhead so you may prefer to disable this behaviour by using the
 @option{NOPROTECT} option.  This has no effect on systems that have no virtual
 memory.
+
+Usually it is desirable for many system library routines to be protected from
+being interrupted by certain signals since they may themselves be called from
+signal handlers.  If this is not the case then it may be possible to interrupt
+the program from within such routines, perhaps causing problems if their global
+variables are left in an undefined state.  As the mpatrol library replaces some
+of these system library routines it is also possible to specify that they are
+protected from certain interrupt signals using the @option{SAFESIGNALS} option.
+However, this can sometimes result in it being hard to interrupt the program
+from the keyboard if a lot of processor time is spent in mpatrol routines,
+which is why this behaviour is disabled by default@footnote{In mpatrol release
+1.0 it was enabled by default.}.
 
 @cindex sbrk
 @cindex mmap
@@ -4998,6 +5013,22 @@ pinpoint memory corruption, memory leaks, operations on unrelated pointers and
 more.
 @end table
 
+@cindex Malloc Debug Library
+@item
+Malloc Debug Library
+@table @asis
+@item Author
+Rammi (@email{rammi@@quincunx.escape.de})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.escape.de/users/quincunx/rmdebug.html}
+@item Overview
+Implements wrappers for the normal heap handling functions.
+@end table
+
 @cindex MemCheck
 @cindex Stratosware Corporation
 @item
@@ -5082,6 +5113,23 @@ AmigaOS
 @item Overview
 Provides replacement memory allocation routines for adding lots of memory
 debugging features that you link into your program.
+@end table
+
+@cindex MM (Shared Memory Library)
+@item
+MM (Shared Memory Library)
+@table @asis
+@item Author
+Ralf S. Engelschall (@email{rse@@engelschall.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.engelschall.com/sw/mm/}
+@item Overview
+Simplifies the usage (and can help debug) the use of shared memory between
+related processes.
 @end table
 
 @cindex Mmalloc
