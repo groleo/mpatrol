@@ -338,6 +338,24 @@
 #endif /* MP_PRELOAD_SUPPORT */
 
 
+/* The list of shared libraries to preload.  These must all exist in the
+ * shared library path used by the dynamic linker, otherwise full paths to
+ * the libraries must be explicitly given.
+ */
+
+#if MP_PRELOAD_SUPPORT
+#ifndef MP_PRELOAD_LIBS
+#if FORMAT == FORMAT_NONE || FORMAT == FORMAT_COFF
+#define MP_PRELOAD_LIBS "libmpatrol.so"
+#elif FORMAT == FORMAT_ELF32
+#define MP_PRELOAD_LIBS "libmpatrol.so libelf.so"
+#elif FORMAT == FORMAT_BFD
+#define MP_PRELOAD_LIBS "libmpatrol.so libbfd.so libiberty.so"
+#endif /* FORMAT */
+#endif /* MP_PRELOAD_LIBS */
+#endif /* MP_PRELOAD_SUPPORT */
+
+
 /* Indicates if the compiler supports the __builtin_frame_address() and
  * __builtin_return_address() macros, and if they should be used instead of
  * traversing the call stack directly.  Note that this method only allows a
