@@ -34,7 +34,13 @@
 #include "utils.h"
 #include <stdio.h>
 #include <errno.h>
+#include <limits.h>
 #if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_LYNXOS
+#ifndef POSIX4_D14_MEMCTL
+#define POSIX4_D14_MEMCTL 1
+#endif /* POSIX4_D14_MEMCTL */
+#endif /* SYSTEM */
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -56,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.26 2000-06-08 18:18:39 graeme Exp $"
+#ident "$Id: memory.c,v 1.27 2000-06-16 17:43:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -209,6 +215,11 @@ static char *progname(void)
     static char c[256];
     ssize_t l;
     int f;
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LYNXOS || \
+      SYSTEM == SYSTEM_SOLARIS
+    extern char **environ;
+    char **e;
+    char *t;
 #endif /* SYSTEM */
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
@@ -256,6 +267,22 @@ static char *progname(void)
         c[l] = '\0';
         return c;
     }
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_LYNXOS || \
+      SYSTEM == SYSTEM_SOLARIS
+    /* We can access the argument vector from the pointer to the environment
+     * array on DG/UX, LynxOS and Solaris.  On DG/UX Intel and Solaris we stop
+     * scanning backwards along the array when we reach argc.  On DG/UX M88K
+     * and LynxOS we stop scanning forwards along the array when we reach a
+     * NULL pointer.  The contents of the argument vector then follow.
+     */
+#if (SYSTEM == SYSTEM_DGUX && ARCH == ARCH_M88K) || SYSTEM == SYSTEM_LYNXOS
+    for (e = environ; *e != NULL; e++);
+    t = (char *) (e + 1);
+#else /* SYSTEM && ARCH */
+    for (t = NULL, e = environ - 2; *e > (char *) _POSIX_ARG_MAX; t = *e--);
+#endif /* SYSTEM && ARCH */
+    if (t != NULL)
+        return t;
 #endif /* SYSTEM */
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
