@@ -38,18 +38,13 @@ int callback(MP_CONST void *p, void *t)
 
     if (!__mp_info(p, &d))
     {
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
-        else
-            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+        fprintf(stderr, "nothing known about address 0x%0*lX\n",
+                sizeof(void *) * 2, p);
         return -1;
     }
     if (!d.freed)
     {
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "0x%016lX", d.block);
-        else
-            fprintf(stderr, "0x%08lX", d.block);
+        fprintf(stderr, "0x%0*lX", sizeof(void *) * 2, d.block);
         fprintf(stderr, " %s", d.func ? d.func : "<unknown>");
         fprintf(stderr, " %s", d.file ? d.file : "<unknown>");
         fprintf(stderr, " %lu", d.line);
@@ -61,10 +56,8 @@ int callback(MP_CONST void *p, void *t)
                 fputs("->", stderr);
             if (s->name != NULL)
                 fprintf(stderr, "%s", s->name);
-            else if (sizeof(void *) == 8)
-                fprintf(stderr, "0x%016lX", s->addr);
             else
-                fprintf(stderr, "0x%08lX", s->addr);
+                fprintf(stderr, "0x%0*lX", sizeof(void *) * 2, s->addr);
             if (s->next == NULL)
                 fputc(')', stderr);
         }

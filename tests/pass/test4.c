@@ -38,16 +38,11 @@ void display(void *p)
 
     if (!__mp_info(p, &d))
     {
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
-        else
-            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+        fprintf(stderr, "nothing known about address 0x%0*lX\n",
+                sizeof(void *) * 2, p);
         return;
     }
-    if (sizeof(void *) == 8)
-        fprintf(stderr, "block:    0x%016lX\n", d.block);
-    else
-        fprintf(stderr, "block:    0x%08lX\n", d.block);
+    fprintf(stderr, "block:    0x%0*lX\n", sizeof(void *) * 2, d.block);
     fprintf(stderr, "size:     %lu\n", d.size);
     fprintf(stderr, "type:     %s\n", __mp_function(d.type));
     fprintf(stderr, "alloc:    %lu\n", d.alloc);
@@ -59,10 +54,7 @@ void display(void *p)
     fprintf(stderr, "line:     %lu\n", d.line);
     for (s = d.stack; s != NULL; s = s->next)
     {
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "\t0x%016lX", s->addr);
-        else
-            fprintf(stderr, "\t0x%08lX", s->addr);
+        fprintf(stderr, "\t0x%0*lX", sizeof(void *) * 2, s->addr);
         if (__mp_syminfo(s->addr, &i))
         {
             if (i.name != NULL)
@@ -80,10 +72,7 @@ void display(void *p)
     fprintf(stderr, "typestr:  %s\n",
             d.typestr ? d.typestr : "<unknown>");
     fprintf(stderr, "typesize: %lu\n", d.typesize);
-    if (sizeof(void *) == 8)
-        fprintf(stderr, "userdata: 0x%016lX\n", d.userdata);
-    else
-        fprintf(stderr, "userdata: 0x%08lX\n", d.userdata);
+    fprintf(stderr, "userdata: 0x%0*lX\n", sizeof(void *) * 2, d.userdata);
     fprintf(stderr, "freed:    %d\n", d.freed);
 }
 

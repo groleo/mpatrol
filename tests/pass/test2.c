@@ -30,31 +30,36 @@
 #include <stdio.h>
 
 
+typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
+typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
+
+
+prologue_handler old_prologue;
+epilogue_handler old_epilogue;
+
+
 void prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
 {
+    if (old_prologue != NULL)
+        old_prologue(p, l, a);
     if (p == (void *) -1)
         fprintf(stderr, "allocating %lu bytes\n", l);
     else if (l == (size_t) -1)
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "freeing allocation 0x%016lX\n", p);
-        else
-            fprintf(stderr, "freeing allocation 0x%08lX\n", p);
+        fprintf(stderr, "freeing allocation 0x%0*lX\n", sizeof(void *) * 2, p);
     else if (l == (size_t) -2)
         fprintf(stderr, "duplicating string `%s'\n", p);
-    else if (sizeof(void *) == 8)
-        fprintf(stderr, "reallocating allocation 0x%016lX to %lu bytes\n", p, l);
     else
-        fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
+        fprintf(stderr, "reallocating allocation 0x%0*lX to %lu bytes\n",
+                sizeof(void *) * 2, p, l);
 }
 
 
 void epilogue(MP_CONST void *p, MP_CONST void *a)
 {
     if (p != (void *) -1)
-        if (sizeof(void *) == 8)
-            fprintf(stderr, "allocation returns 0x%016lX\n", p);
-        else
-            fprintf(stderr, "allocation returns 0x%08lX\n", p);
+        fprintf(stderr, "allocation returns 0x%0*lX\n", sizeof(void *) * 2, p);
+    if (old_epilogue != NULL)
+        old_epilogue(p, a);
 }
 
 
@@ -62,8 +67,8 @@ int main(void)
 {
     void *p, *q;
 
-    __mp_prologue(prologue);
-    __mp_epilogue(epilogue);
+    old_prologue = __mp_prologue(prologue);
+    old_epilogue = __mp_epilogue(epilogue);
     if (p = malloc(16))
         if (q = realloc(p, 32))
             free(q);
@@ -71,5 +76,7 @@ int main(void)
             free(p);
     if (p = (char *) strdup("test"))
         free(p);
+    __mp_prologue(old_prologue);
+    __mp_epilogue(old_epilogue);
     return EXIT_SUCCESS;
 }
