@@ -81,7 +81,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.47 2001-01-24 22:19:05 graeme Exp $"
+#ident "$Id: memory.c,v 1.48 2001-01-25 13:37:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -718,9 +718,11 @@ __mp_memquery(meminfo *i, void *p)
 {
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
-    struct sigaction i;
+    struct sigaction s;
 #endif /* MP_SIGINFO_SUPPORT */
     char c;
+#elif TARGET == TARGET_WINDOWS
+    MEMORY_BASIC_INFORMATION m;
 #endif /* TARGET */
     memaccess r;
 
@@ -740,11 +742,11 @@ __mp_memquery(meminfo *i, void *p)
      * check the results using signals.
      */
 #if MP_SIGINFO_SUPPORT
-    i.sa_flags = 0;
-    (void *) i.sa_handler = (void *) memoryhandler;
-    sigfillset(&i.sa_mask);
-    sigaction(SIGBUS, &i, &bushandler);
-    sigaction(SIGSEGV, &i, &segvhandler);
+    s.sa_flags = 0;
+    (void *) s.sa_handler = (void *) memoryhandler;
+    sigfillset(&s.sa_mask);
+    sigaction(SIGBUS, &s, &bushandler);
+    sigaction(SIGSEGV, &s, &segvhandler);
 #else /* MP_SIGINFO_SUPPORT */
     bushandler = signal(SIGBUS, memoryhandler);
     segvhandler = signal(SIGSEGV, memoryhandler);
@@ -766,6 +768,16 @@ __mp_memquery(meminfo *i, void *p)
     signal(SIGBUS, bushandler);
     signal(SIGSEGV, segvhandler);
 #endif /* MP_SIGINFO_SUPPORT */
+#elif TARGET == TARGET_WINDOWS
+    /* On Windows, the VirtualQuery() function allows us to determine the
+     * access permission of the page the address belongs to.
+     */
+    if (VirtualQuery(p, &m, sizeof(m)) >= sizeof(m))
+        if (!(m.State & MEM_COMMIT) || (m.Protect & PAGE_NOACCESS) ||
+            (m.Protect & PAGE_EXECUTE))
+            r = MA_NOACCESS;
+        else if ((m.Protect & PAGE_READONLY) || (m.Protect & PAGE_EXECUTE_READ))
+            r = MA_READONLY;
 #endif /* TARGET */
     return r;
 }
