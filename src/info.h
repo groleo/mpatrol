@@ -134,6 +134,8 @@ typedef struct loginfo
     char *file;         /* file name in which call took place */
     unsigned long line; /* line number at which call took place */
     stackinfo *stack;   /* call stack details */
+    char *typestr;      /* type stored in allocation */
+    size_t typesize;    /* size of type stored in allocation */
 }
 loginfo;
 

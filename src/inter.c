@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.59 2001-01-15 21:05:36 graeme Exp $"
+#ident "$Id: inter.c,v 1.60 2001-01-15 21:28:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -410,6 +410,8 @@ __mp_fini(void)
             v.file = NULL;
             v.line = 0;
             v.stack = &i;
+            v.typestr = NULL;
+            v.typesize = 0;
             checkalloca(&v, 1);
             /* Then close any access library handles that might still be open.
              */
@@ -489,7 +491,7 @@ __mp_memhead(void)
 
 void *
 __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
-           size_t k)
+           char *g, size_t h, size_t k)
 {
     void *p;
     stackinfo i;
@@ -551,6 +553,8 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = g;
+    v.typesize = h;
     checkalloca(&v, 0);
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
@@ -665,6 +669,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = "char";
+    v.typesize = sizeof(char);
     checkalloca(&v, 0);
     if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
         j = 1;
@@ -701,7 +707,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
 
 void *
 __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
-             unsigned long u, size_t k)
+             unsigned long u, char *g, size_t h, size_t k)
 {
 #if TARGET == TARGET_WINDOWS
     void *q;
@@ -772,6 +778,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = g;
+    v.typesize = h;
     checkalloca(&v, 0);
     p = __mp_resizememory(&memhead, p, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
@@ -842,6 +850,8 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     __mp_freememory(&memhead, p, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
@@ -898,6 +908,8 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     __mp_setmemory(&memhead, p, l, c, f, &v);
     restoresignals();
@@ -965,6 +977,8 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     q = __mp_copymemory(&memhead, p, q, l, c, f, &v);
     restoresignals();
@@ -1028,6 +1042,8 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     r = __mp_locatememory(&memhead, p, l, q, m, f, &v);
     restoresignals();
@@ -1088,6 +1104,8 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     r = __mp_comparememory(&memhead, p, q, l, f, &v);
     restoresignals();
@@ -1286,6 +1304,8 @@ __mp_check(void)
     v.file = NULL;
     v.line = 0;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     checkalloca(&v, 0);
     restoresignals();
 }
@@ -1430,6 +1450,8 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
         memhead.fini = 1;
@@ -1485,6 +1507,8 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v) ||
         !__mp_checkrange(&memhead, q, l, AT_MAX, &v))
     {
@@ -1540,6 +1564,8 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
         memhead.fini = 1;
@@ -1595,6 +1621,8 @@ chkr_check_str(char *p, unsigned char a)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     if (!__mp_checkstring(&memhead, p, &l, AT_MAX, &v, 0))
     {
         memhead.fini = 1;
@@ -1649,6 +1677,8 @@ chkr_check_exec(void *p)
     v.file = t;
     v.line = u;
     v.stack = &i;
+    v.typestr = NULL;
+    v.typesize = 0;
     restoresignals();
 }
 

@@ -68,11 +68,11 @@ void __mp_init(void);
 void __mp_fini(void);
 infohead *__mp_memhead(void);
 void *__mp_alloc(size_t, size_t, alloctype, char *, char *, unsigned long,
-                 size_t);
+                 char *, size_t, size_t);
 char *__mp_strdup(char *, size_t, alloctype, char *, char *, unsigned long,
                   size_t);
 void *__mp_realloc(void *, size_t, size_t, alloctype, char *, char *,
-                   unsigned long, size_t);
+                   unsigned long, char *, size_t, size_t);
 void __mp_free(void *, alloctype, char *, char *, unsigned long, size_t);
 void *__mp_setmem(void *, size_t, unsigned char, alloctype, char *, char *,
                   unsigned long, size_t);
