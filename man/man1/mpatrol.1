@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.32 2000-12-12 20:03:45 graeme Exp $
+.\" $Id: mpatrol.1,v 1.33 2000-12-13 23:34:07 graeme Exp $
 .\"
-.TH MPATROL 1 "12 December 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 1 "13 December 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -41,8 +41,8 @@ filename is \fImpatrol.%n.trace\fP.
 .SH OPTIONS
 All of the following options (except \fB\-\-dynamic\fP, \fB\-\-help\fP,
 \fB\-\-show\-env\fP, \fB\-\-threads\fP and \fB\-\-version\fP) correspond to
-their listed mpatrol library option.  See \fBmpatrol\fP(3) for more details on
-these options.
+their listed mpatrol library option.  See \fBlibmpatrol\fP(3) for more details
+on these options.
 .TP
 \fB\-\-alloc\-byte\fP <\fIunsigned integer\fP> [\fB\-a\fP]
 [\fBALLOCBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
@@ -280,7 +280,7 @@ file should be used to obtain additional source-level information.
 Displays the version number of the \fBmpatrol\fP command.
 .SH SEE ALSO
 \fBmprof\fP(1), \fBmptrace\fP(1), \fBmleak\fP(1), \fBmpsym\fP(1),
-\fBmpedit\fP(1), \fBmpatrol\fP(3).
+\fBmpedit\fP(1), \fBlibmpatrol\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP
