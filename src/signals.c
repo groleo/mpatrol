@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.8 2000-06-26 23:02:43 graeme Exp $"
+#ident "$Id: signals.c,v 1.9 2000-06-28 23:54:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,6 +50,12 @@
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* The type of the parameter that is passed to the signal() function.
+ */
+
+typedef void (*handlerfunction)(int);
 
 
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
@@ -60,17 +66,19 @@ extern "C"
 #if MP_SIGINFO_SUPPORT
 static void signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
+#if SYSTEM == SYSTEM_AIX
+static void signalhandler(int s, int c, struct sigcontext *n)
+#else /* SYSTEM */
 static void signalhandler(int s)
+#endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
 static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
 {
     infohead *h;
-#if (TARGET == TARGET_UNIX && MP_SIGINFO_SUPPORT) || TARGET == TARGET_WINDOWS
     allocnode *t;
     void *a;
-#endif /* TARGET && MP_SIGINFO_SUPPORT */
 #if TARGET == TARGET_WINDOWS
     EXCEPTION_RECORD *r;
 #endif /* TARGET */
@@ -103,6 +111,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
     __mp_diag("\n");
 #if TARGET == TARGET_UNIX
+#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -112,6 +121,19 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
          * it will be on the same page which will suffice for our purposes.
          */
         a = (void *) n->si_addr;
+#else /* MP_SIGINFO_SUPPORT */
+    if (n != NULL)
+    {
+        /* With systems that do not contain support for passing the siginfo_t
+         * structure to a signal handler we need to use some other form of
+         * trickery.  Luckily, on most UNIX systems a sigcontext parameter
+         * is passed on the stack to all signal handlers which we can then
+         * use to decode the address that caused the illegal memory access.
+         */
+#if SYSTEM == SYSTEM_AIX
+        a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
+#endif /* SYSTEM */
+#endif /* MP_SIGINFO_SUPPORT */
         __mp_error(AT_MAX, "illegal memory access at address " MP_POINTER, a);
         if (t = __mp_findnode(&h->alloc, a, 1))
             if (t->info != NULL)
@@ -126,7 +148,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
             __mp_diag("    " MP_POINTER " not in heap\n", a);
     }
     else
-#endif /* MP_SIGINFO_SUPPORT */
+#endif /* MP_SIGINFO_SUPPORT && SYSTEM */
         __mp_error(AT_MAX, "illegal memory access");
     /* Obtain the call stack so that we can tell where the illegal memory
      * access came from.  This relies on the assumption that the stack area
@@ -214,8 +236,8 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
     sigaction(SIGTRAP, &i, NULL);
 #endif /* MP_WATCH_SUPPORT */
 #else /* MP_SIGINFO_SUPPORT */
-    signal(SIGBUS, signalhandler);
-    signal(SIGSEGV, signalhandler);
+    signal(SIGBUS, (handlerfunction) signalhandler);
+    signal(SIGSEGV, (handlerfunction) signalhandler);
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
     SetUnhandledExceptionFilter(signalhandler);
