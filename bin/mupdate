@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.10 2000-11-19 20:06:24 graeme Exp $
+# $Id: mupdate,v 1.11 2000-12-18 23:15:20 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -52,8 +52,8 @@ release="$newver.$newrev.$newcnt"
 
 
 # Change the mpatrol.h and version.h header files in order to update the
-# MPATROL_VERSION and MPATROL_VERNUM preprocessor macros with the latest
-# version of the library.
+# MPATROL_VERSION and MP_VERNUM preprocessor macros with the latest version
+# of the library.
 
 oldversion=`printf %d%02d%02d $oldver $oldrev $oldcnt`
 newversion=`printf %d%02d%02d $newver $newrev $newcnt`
@@ -63,7 +63,7 @@ sed "s/MPATROL_VERSION $oldversion/MPATROL_VERSION $newversion/" src/mpatrol.h \
 mv src/mpatrol.h.new src/mpatrol.h
 cvs commit -m "Updated to version $release" src/mpatrol.h >/dev/null 2>&1
 
-sed "s/MPATROL_VERNUM $oldversion/MPATROL_VERNUM $newversion/" src/version.h \
+sed "s/MP_VERNUM $oldversion/MP_VERNUM $newversion/" src/version.h \
     >src/version.h.new
 mv src/version.h.new src/version.h
 cvs commit -m "Updated to version $release" src/version.h >/dev/null 2>&1
