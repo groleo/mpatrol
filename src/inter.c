@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.78 2001-02-08 18:15:26 graeme Exp $"
+#ident "$Id: inter.c,v 1.79 2001-02-08 21:25:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.78 2001-02-08 18:15:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.79 2001-02-08 21:25:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -613,6 +613,8 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.typesize = h;
     checkalloca(&v, 0);
     memhead.event++;
+    if (((f == AT_XMALLOC) || (f == AT_XCALLOC)) && (l == 0) && (h != 0))
+        l = h;
     z = 0;
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
@@ -867,6 +869,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.typesize = h;
     checkalloca(&v, 0);
     memhead.event++;
+    if ((f == AT_XREALLOC) && (l == 0) && (h != 0))
+        l = h;
     z = 0;
   retry:
     p = __mp_resizememory(&memhead, p, l, a, f, &v);
