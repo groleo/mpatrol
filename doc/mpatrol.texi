@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.203 2001-03-12 20:20:30 graeme Exp $
+@c $Id: mpatrol.texi,v 1.204 2001-03-14 20:56:25 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.7
-@set VERSION 1.4.2
-@set UPDATED 12th March, 2001
+@set EDITION 2.8
+@set VERSION 1.4.3
+@set UPDATED 14th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -133,6 +133,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Using mpatrol::               Using the library.
 * Profiling::                   Memory allocation profiling.
 * Tracing::                     Memory allocation tracing.
+* Memory leaks::                Detection and identification.
 * Improving performance::       Life beyond mpatrol.
 * How it works::                Implementation details.
 * Examples::                    Examples of usage.
@@ -3237,7 +3238,7 @@ This file provides Dbmalloc-compatible functions which are built on top of the
 mpatrol library.  They are compatible with the last known public release of
 Dbmalloc (patch level 14), but only the Dbmalloc-specific functions are defined
 here, leaving the overriding of standard functions up to the mpatrol library.
-As the mpatrol library does not currrently override the C library string
+As the mpatrol library does not currently override the C library string
 functions and the X toolkit heap allocation functions, neither does this file.
 
 The @code{dbmallopt()} function does not support the setting of all of the
@@ -3289,7 +3290,7 @@ This file provides Dmalloc-compatible functions which are built on top of the
 mpatrol library.  They are compatible with the 4.8.2 release of Dmalloc, but
 only the Dmalloc-specific functions are defined here, leaving the overriding of
 standard functions up to the mpatrol library.  As the mpatrol library does not
-currrently override the C library string functions, neither does this file.  In
+currently override the C library string functions, neither does this file.  In
 addition, the Dmalloc distribution comes with definitions for
 @code{xmemalign()}, @code{xvalloc()} and @code{xrecalloc()}, neither of which
 are defined by this file or by the mpatrol library.
@@ -4489,7 +4490,7 @@ written as a research project and ran on MIPS, SPARC and VAX machines.  However,
 the profiling output files are incompatible, the tables displayed have a
 different format, and the way they are implemented is entirely different.
 
-@node Tracing, Improving performance, Profiling, Top
+@node Tracing, Memory leaks, Profiling, Top
 @chapter Tracing
 @cindex tracing
 @cindex memory allocation tracing
@@ -4903,7 +4904,131 @@ can be used to implement an allocated memory gauge which updates in real-time
 in a terminal window.  This can be used as an alternative to the window used by
 the @command{mptrace} command for a simpler display.
 
-@node Improving performance, How it works, Tracing, Top
+@node Memory leaks, Improving performance, Tracing, Top
+@chapter Memory leaks
+@cindex memory leaks
+@cindex leaks
+
+Memory leaks can be the bane of many a programmer and is the type of error that
+can typically go unnoticed in simple test cases.  It is perhaps not until an
+application has been released to the customer and is being run in real-life
+situations that memory leaks get noticed and become a serious problem.  Luckily
+the mpatrol library provides tools that can quickly help detect, identify and
+remove such errors.  Note that it's probably a good idea to fix any warnings or
+errors that appear in the mpatrol log file before starting to look at removing
+memory leaks.
+
+Surprisingly, there are no less than four different groups of mpatrol library
+run-time options that you can use to detect memory leaks in a program, all
+without having to change a single line of code!  They each employ different
+techniques in order to locate the unfreed memory allocations at program
+termination and operate independently of one another so that any combination of
+techniques can be used at any one time.  They also have differing levels of
+detail in the information they provide, so which options you use will depend on
+what your requirements are.
+
+If you wish to see a summary of the memory leaks grouped together by call site
+then the @option{PROF} or @option{LEAKTABLE} options are your best bet.  The
+output file produced by the @option{PROF} option can be displayed by the
+@command{mprof} command, which will display a list of memory leaks as one of the
+tables that it shows.  Each entry in the memory leak table will normally only
+show one level of stack depth from its call graph but this can be changed with
+the @option{--stack-depth} option in the @command{mprof} command.  The table of
+memory leaks can also be written to a graph specification file for later
+visualisation with a graph package.  Using the @option{PROF} option is probably
+the best way to summarise where memory leaks occur in a program.
+
+However, the @option{LEAKTABLE} option can generate similar information to the
+@option{PROF} option in the mpatrol log file.  The drawback to this option is
+that the entries displayed will only ever show the immediate calling functions
+and no call stack information, but in many cases this is good enough.  Another
+drawback to this option is that it is affected by calls in the code to
+manipulate the leak table.  However, if the calls aren't there then that won't
+be an issue.  The leak table should really be used from within the source code
+(see below) but it can still provide some useful information with the
+@option{LEAKTABLE} option.
+
+The third option is the @option{SHOWUNFREED} option, which will show the details
+of every unfreed memory allocation at the end of program execution.  No attempt
+is made to summarise them, but the full details of each (including the call
+stack if available) are given.  This option is really only useful if there are
+a small number of unfreed memory allocations when a program terminates, but it
+is invaluable if all of the gory details are required.
+
+The final group of options are the @option{LOGALLOCS}, @option{LOGREALLOCS} and
+@option{LOGFREES} options@footnote{Note that the @option{LOGMEMORY} option isn't
+listed which is why @option{LOGALL} wasn't listed either.}.  In some situations
+a program will abort abnormally before it can exit, in which case the
+@option{LEAKTABLE} and @option{SHOWUNFREED} options will not display anything,
+and the @option{PROF} option will not finish writing out the profiling output
+file unless you are exceptionally lucky with the @option{AUTOSAVE} option.  One
+can argue that you should be looking for the cause of the error rather than
+memory leaks in such a program, but it is still possible to detect the latter
+using the aforementioned @option{LOG*} options and the @command{mleak} command.
+
+The @command{mleak} command reads in an mpatrol log file, recording the details
+of each logged memory allocation, reallocation or deallocation and then writes
+out what the @option{SHOWUNFREED} option should have written out at the end of
+the log file.  It has a few limitations compared to the @option{SHOWUNFREED}
+option, but the details of each unfreed memory allocation that it writes out
+should be accurate, although only if the logging information in the log file was
+complete and accurate as well.
+
+Note that more information from the @option{SHOWUNFREED} and @option{LOG*}
+options can be obtained by using the @option{USEDEBUG} option.  This will
+attempt to add missing source file and line number information to the details
+recorded by these options in the mpatrol log file, but only if it is supported
+by the particular system and object file format, and then only if the program
+was compiled with debugging information from the compiler.  If the
+@option{USEDEBUG} option isn't supported then it might be possible to use the
+@command{mpsym} command to postprocess the mpatrol log file using a symbolic
+debugger to fill in such information.  You may also find that running the log
+file through a C++ encoded name demangler is useful as well if your program
+contains C++ code.
+
+Despite the plethora of automated features that the mpatrol library has for
+detecting memory leaks, the most powerful method of narrowing down such leaks
+is by modifying the source code.  The mpatrol library provides several functions
+that can be used to keep track of differences in the heap between two or more
+points in a program's execution --- such information can be invaluable when
+pinpointing where a memory leak is coming from.
+
+The first set of functions are based upon taking a snapshot of the heap at a
+certain point and then walking the heap to examine the differences at a later
+point.  The @code{__mp_snapshot()} function returns the current event identifier
+in the mpatrol library and the @code{__mp_iterate()} function traverses the
+heap calling a user-defined callback function for each memory allocation that
+has changed since a particular event identifier.  This is very useful for noting
+memory allocations that have been made since a certain point in a program but
+have not been freed when they were expected to.  The heapdiff tool
+(@pxref{heapdiff}) provided in libmptools makes use of these functions to
+provide an easy-to-use interface.
+
+The mpatrol library also provides a leak table (@pxref{Leak table}) that can be
+manipulated at any point in a program for the purpose of detecting changes in
+the heap.  The @code{__mp_clearleaktable()} function clears the leak table,
+while the @code{__mp_leaktable()} function writes the contents of the leak table
+to the mpatrol log file.  Automatic logging of memory allocations, reallocations
+and deallocations can be turned on and off using the
+@code{__mp_startleaktable()} and @code{__mp_stopleaktable()} functions
+respectively.  The main advantage to using the leak table instead of the
+functions described in the previous paragraph is that it can provide a summary
+of unfreed allocations rather than showing the details of each one individually.
+It can also summarise freed allocations without requiring the use of the
+@option{NOFREE} option.
+
+Finally, you can indicate to the mpatrol library that a particular memory
+allocation will remain allocated until program termination and that it should
+not be treated as a memory leak.  This can be done by calling the
+@code{__mp_setmark()} function, and thereafter any attempt to free the
+newly-marked allocation will result in an error, although reallocating it is
+possible.  It is normal in many programs to make several initial memory
+allocations that will remain in use throughout the program's lifetime.  On most
+systems, such allocations will be freed when the program terminates anyway so
+there will be no need to free them explicitly.  It is these allocations that
+should be marked so as to prevent them showing up as memory leaks.
+
+@node Improving performance, How it works, Memory leaks, Top
 @chapter Improving performance
 @cindex improving performance
 @cindex performance improvements
@@ -7022,7 +7147,6 @@ implemented.
 @node Example 10, , Example 9, Examples
 @section Additional useful information
 
-@cindex memory leaks
 This last example illustrates the various @option{SHOW} options that are
 available for displaying additional information from the mpatrol library at
 program termination.  It also shows how to easily detect memory leaks.  Use the
