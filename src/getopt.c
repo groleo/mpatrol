@@ -32,12 +32,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.4 2000-09-25 19:53:12 graeme Exp $"
+#ident "$Id: getopt.c,v 1.5 2000-09-25 21:01:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -244,6 +245,28 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s, option *l)
         t = NULL;
     }
     return r;
+}
+
+
+/* Display a quick-reference option summary.
+ */
+
+MP_GLOBAL void __mp_showopts(option *l)
+{
+    fputs("Options:\n", stderr);
+    while (l->name != NULL)
+    {
+        if (isalnum(l->value))
+            fprintf(stderr, "    -%c", l->value)
+        else
+            fputs("      ", stderr);
+        fprintf(stderr, "  --%s", l->name);
+        if (l->arg)
+            fprintf(stderr, "=<%s>", l->arg);
+        fputc('\n', stderr);
+        fputs(l->desc, stderr);
+        l++;
+    }
 }
 
 
