@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.212 2001-03-22 19:51:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.213 2001-03-22 21:06:13 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3897,12 +3897,6 @@ if it is only partially complete, and this behaviour can be controlled with the
 program from within a debugger, when it is necessary to analyse the profiling
 information at a certain point during program execution.
 
-Normally, the mpatrol library will perform profiling with all of its other
-features and checks enabled, but you might want to disable these if you only
-wish to profile the memory allocations.  For example, you may wish to use the
-@option{CHECK=0} and @option{NOPROTECT} options to remove the internal checking
-of the library and speed up profiling dramatically.
-
 @cindex allocation boundaries
 When profiling memory allocations, it is necessary to distinguish between small,
 medium, large and extra large memory allocations that were made by a function.
@@ -4541,12 +4535,6 @@ but the name of this file can be changed using the @option{TRACEFILE} option and
 the default directory in which to place these files can be changed by setting
 the @env{TRACEDIR} environment variable.
 
-Normally, the mpatrol library will perform tracing with all of its other
-features and checks enabled, but you might want to disable these if you only
-wish to trace the memory allocations.  For example, you may wish to use the
-@option{CHECK=0} and @option{NOPROTECT} options to remove the internal checking
-of the library and speed up tracing dramatically.
-
 @cindex mptrace
 @cindex mptrace command
 The @command{mptrace} command is a tool designed to read a tracing output file
@@ -4575,11 +4563,18 @@ change between releases of mpatrol, but also allow @command{mptrace} to cope
 with older versions.
 
 Along with the usual @option{--help} and @option{--version} options, the
-@command{mptrace} command takes one optional argument which must be a valid
-mpatrol tracing output filename but if it is omitted then it will use
-@file{mpatrol.trace} as the name of the file to use.  If the filename argument
-is given as @samp{-} then the standard input file stream will be used as the
-tracing output file.
+@command{mptrace} command accepts several other options and takes one optional
+argument which must be a valid mpatrol tracing output filename but if it is
+omitted then it will use @file{mpatrol.trace} as the name of the file to use.
+If the filename argument is given as @samp{-} then the standard input file
+stream will be used as the tracing output file.
+
+@cindex --verbose
+Normally, the @command{mptrace} command will simply read in the tracing output
+file and display any statistics it has gathered.  However, it can also be
+instructed to display a tracing table which displays useful details for every
+event in the tracing output file.  The tracing table can be displayed with the
+@option{--verbose} option.
 
 @cindex --sim-file
 A C source file containing a trace-driven memory allocation simulation program
@@ -4593,15 +4588,16 @@ specific application.
 @cindex GUI
 @cindex graphical user interface
 @cindex X Windows
+@cindex --gui
 The @command{mptrace} command will normally be built with GUI@footnote{Graphical
 User Interface.} support on UNIX platforms that are running X Windows.  This
 means that a graphical memory map display of the heap will be shown in a window
-every time @command{mptrace} is run.  This display is updated every time a new
-event is read from the tracing output file and by default uses the colour red
-for internal heap memory (used by the mpatrol library), blue for unallocated
-heap memory, black for allocated memory and white for free memory.  Options
-exist to change this colour scheme, as well as the dimensions of the drawing
-area and the window.
+every time @command{mptrace} is run with the @option{--gui} option.  This
+display is updated every time a new event is read from the tracing output file
+and by default uses the colour red for internal heap memory (used by the mpatrol
+library), blue for unallocated heap memory, black for allocated memory and white
+for free memory.  Options exist to change this colour scheme, as well as the
+dimensions of the drawing area and the window.
 
 @cindex base address
 @cindex address space
@@ -4715,10 +4711,8 @@ As mentioned above, we're not interested in the mpatrol log and tracing output
 files for @command{as} and @command{ld} so we'll delete them.  We can now use
 @command{mptrace} to decode each of the tracing output files produced and write
 their contents in tabular form to the standard output file stream, which can be
-redirected to a file for later viewing@footnote{If you are running a GUI version
-of @command{mptrace} you will need to close the window after each file has been
-decoded.}.  You can find these tracing output files in the @file{extra}
-directory in the mpatrol distribution.
+redirected to a file for later viewing.  You can find these tracing output files
+in the @file{extra} directory in the mpatrol distribution.
 
 @smallexample
 bash$ rm as.log as.trace ld.log ld.trace
@@ -4726,7 +4720,7 @@ bash$ ls *.trace
 cc1.trace      collect2.trace cpp.trace      gcc.trace
 bash$ for file in *.trace
 > do
->     mptrace $file >`basename $file .trace`.res
+>     mptrace --verbose $file >`basename $file .trace`.res
 > done
 bash$ ls *.res
 cc1.res        collect2.res   cpp.res        gcc.res
@@ -4772,11 +4766,26 @@ that the @samp{@dots{}} marks text that has been removed.
   1719  free       303  0x0035E000      5096    1424
   1720  free       653  0x00354E60       152     827
   1721  free       654  0x00354EF8       152     827
+
+memory allocation tracing statistics
+------------------------------------
+allocated: 1056 (540776 bytes)
+freed:     665 (243021 bytes)
+unfreed:   391 (297755 bytes)
+peak:      489 (375169 bytes)
+reserved:  48 (409600 bytes)
+internal:  27 (884736 bytes)
+total:     75 (1294336 bytes)
+
+smallest size: 3 bytes
+largest size:  8200 bytes
+average size:  512 bytes
 @end smallexample
 
 There are six different columns of data displayed by the @command{mptrace}
 command when it decodes the tracing output file and displays it in tabular
-format.  Here is an explanation for each of them.
+format with the @option{--verbose} option.  Here is an explanation for each of
+them.
 
 @cindex event
 @table @samp
@@ -4837,22 +4846,37 @@ allocations were made very near the beginning of the program, while the others
 were made near the middle.  None of them were very big and so would not be
 occupying much memory.
 
-As you will have noticed if you were running a GUI version of @command{mptrace},
-information about all of these events is displayed in graphical form inside the
-@command{mptrace} display window.
+The statistics that were gathered from the tracing output file are displayed
+after the tracing table.  The first group of entries summarise the heap memory
+that was used, with the @samp{allocated}, @samp{freed} and @samp{unfreed} fields
+showing the total number of memory allocations that were made, the total number
+of memory allocations that were freed, and the total number of unfreed memory
+allocations respectively.  The @samp{peak} field shows the highest number of
+memory allocations (and total number of bytes) that were in use at any one time.
+The @samp{reserved} and @samp{internal} fields show the total number of pages
+reserved from the system heap for user allocations and internal allocations
+respectively, and the @samp{total} field shows the total number of pages that
+were used from the system heap.
+
+The @samp{smallest size} and @samp{largest size} fields indicate the sizes of
+the smallest memory allocation and the largest memory allocation respectively.
+The @samp{average size} field shows the mean number of bytes that was allocated
+between each of the memory allocations.
+
+If you were running a GUI version of @command{mptrace}, information about all of
+these events can be displayed in graphical form inside a window if the
+@option{--gui} option is used.
 @ifinfo
 The HTML, DVI, postscript and PDF versions of this manual contain a screenshot
-of the @command{mptrace} display window when it is run with @file{cc1.trace} as
-input.
+of the @command{mptrace} display window when it is run with the @option{--gui}
+option and @file{cc1.trace} as input.
 @end ifinfo
 @ifnotinfo
 The following screenshot shows the @command{mptrace} display window when it is
-run with @file{cc1.trace} as input.  It was generated using the
-@option{--space 2} option.
+run with the @option{--gui} option and @file{cc1.trace} as input.  It was
+generated using the @option{--space 2} option.
 
 @image{images/trace}
-
-@page
 
 Areas coloured blue indicate heap memory that has not yet been used by the
 mpatrol library (i.e.@: it has not currently been allocated from the system, or
@@ -4891,7 +4915,7 @@ mpatrol library).
 # be written out to the tracing output file.  If stdout is not
 # suitable then stderr could be used instead if you redirect it.
 
-bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace -
+bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace --verbose -
 @end smallexample
 
 @cindex mkfifo
@@ -4904,7 +4928,7 @@ bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace -
 
 bash$ mkfifo myfifo
 bash$ mpatrol --trace-file=myfifo --trace ./testprog &
-bash$ mptrace myfifo
+bash$ mptrace --verbose myfifo
 @end smallexample
 
 @cindex xmem
@@ -4922,7 +4946,7 @@ trace files can then be processed by the GNU @command{mtrace} command.  The
 @file{tools/mgauge.c} and @file{tools/mgauge.h} files in the same directory
 can be used to implement an allocated memory gauge which updates in real-time
 in a terminal window.  This can be used as an alternative to the window used by
-the @command{mptrace} command for a simpler display.
+the @command{mptrace} command's @option{--gui} option for a simpler display.
 
 @node Heap corruption, Memory leaks, Tracing, Top
 @chapter Heap corruption
@@ -11865,13 +11889,13 @@ window systems.
 
 The @command{mptrace} command may be built as a text-only command line tool, or
 it may be built with GUI support if the @code{MP_GUI_SUPPORT} macro is defined
-in @file{src/config.h}.  If it is built with GUI support then it becomes an
-event-driven tool and the code in @file{src/mptrace.c} has been written to
-reflect that.  The @command{mptrace} command currently only has Motif GUI
-support but if you wish to add support for a new window system then it shouldn't
-be too hard to do.  Note that you will probably have to add additional libraries
-to the @file{Makefile} when building @command{mptrace} with
-@code{MP_GUI_SUPPORT} defined.
+in @file{src/config.h}.  If it is built with GUI support and the @option{--gui}
+option is specified then it becomes an event-driven tool and the code in
+@file{src/mptrace.c} has been written to reflect that.  The @command{mptrace}
+command currently only has Motif GUI support but if you wish to add support for
+a new window system then it shouldn't be too hard to do.  Note that you will
+probably have to add additional libraries to the @file{Makefile} when building
+@command{mptrace} with @code{MP_GUI_SUPPORT} defined.
 
 @item
 Make any required changes to the shell scripts in the @file{bin} directory.
