@@ -594,7 +594,7 @@ int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
 int __mp_printinfo(MP_CONST void *);
 unsigned long __mp_snapshot(void);
-size_t __mp_iterate(int (*)(void *), unsigned long);
+size_t __mp_iterate(int (*)(MP_CONST void *), unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
