@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.198 2001-03-09 00:17:22 graeme Exp $
+@c $Id: mpatrol.texi,v 1.199 2001-03-09 01:09:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -11099,6 +11099,12 @@ will simply assume that the current symbol terminates at the beginning of the
 next symbol in the virtual address space.
 
 @item
+Perhaps add an option to prevent symbols from being read from object files.
+This might be necessary if mpatrol is used in a program that loads shared
+libraries explicitly, or if there is too much memory being used by mpatrol to
+store the symbol details.
+
+@item
 Add functions to start and stop profiling, and perhaps also to clear the
 profiling tables and begin a new profiling output file.  Should also write more
 information to the profiling output file, such as the date that it was produced
@@ -11124,6 +11130,11 @@ where GUI support is enabled.  Also add widgets to the @command{mptrace} window
 to pause and quit.
 
 @item
+Handle marked memory allocations in the leak table, and also perhaps write out
+to the mpatrol log file when an allocation is marked so that the @command{mleak}
+command will work correctly.
+
+@item
 Improve the speed of watch points by setting a range of allocation indices for
 which they will be used.  This may require a lot of code changes in
 @file{alloc.c}.
@@ -11143,6 +11154,15 @@ allocations have not been corrupted when the @option{NOFREE} and
 protection.
 
 @item
+Perhaps extend the @option{NOFREE} option to prevent the mpatrol library from
+reusing freed memory allocations unless it really needs to.  This would mean
+that no freed allocations would be reused until there is no more free memory
+left and mpatrol would normally have to allocate more from the system.  It could
+then convert as many freed allocations to free memory as it needs to fulfil the
+allocation request, although it would probably still have to abide by the
+minimum number of freed allocations set by the @option{NOFREE} option.
+
+@item
 Add an option to set up a timer that will automatically check the heap after a
 certain number of clock cycles have elapsed.  This could be useful in programs
 that have long periods of time where no dynamic memory allocation functions are
@@ -11158,6 +11178,11 @@ would stop the program running after a certain number of diagnostics have been
 displayed.
 
 @item
+Add the ability to stop in a debugger when a memory allocation is made from a
+particular file and line number, and perhaps also trap when a particular address
+is allocated as part of a memory allocation.
+
+@item
 Perhaps add time information to the details stored about each memory allocation.
 This is probably not useful unless the system provides a high-resolution timer.
 
@@ -11165,9 +11190,11 @@ This is probably not useful unless the system provides a high-resolution timer.
 Add an option (perhaps @option{NOINTERNAL}) to suppress the display of internal
 (recursive) memory allocations in the mpatrol log file and also prevent
 information about such allocations being written to the profiling output and
-tracing output files.  This could also be extended to prevent memory leaks from
-being reported if the original allocations were made from a given set of
-functions.
+tracing output files.  Perhaps this could be made the default so that they
+behave in the same way as marked allocations, in which case we might want an
+option which prevents internal and marked allocations being hidden.  This could
+also be extended to prevent memory leaks from being reported if the original
+allocations were made from a given set of functions.
 
 @item
 Maybe show the contents of the @env{MPATROL_OPTIONS} environment variable in the
@@ -11288,8 +11315,7 @@ In the same vein, perhaps there should be some sort of support for
 @item
 Add an option to write the mpatrol log file in HTML format, or even better XML
 format.  Could also write the tracing output file in HATF format (Heap
-Allocation Trace Format) or the GNU @command{mtrace} format for processing by
-other utilities.
+Allocation Trace Format).
 
 @item
 The @command{mpsym} command could optionally preserve any stack traceback lines
@@ -11297,6 +11323,17 @@ that already have symbolic or debugging information associated with them.  It
 could also support more debuggers other than just @command{gdb}.  Finally, it
 could support @file{-} as the filename for reading the mpatrol log file from the
 standard input file stream.
+
+@item
+Perhaps add an option to the @command{mpatrol} command to read in the current
+value of the @env{MPATROL_OPTIONS} environment variable before adding options
+to it.
+
+@item
+Perhaps incorporate a C++ encoded name demangler into the mpatrol library.  The
+most likely candidate is the GNU demangler that comes with the libiberty
+library, but that currently allocates temporary space on the heap using
+@code{xmalloc()} which means that it will run unbearably slowly under mpatrol.
 
 @item
 Add a script to wrap around various popular C and C++ compiler drivers so that
