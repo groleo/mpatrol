@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.51 2001-07-26 17:49:52 graeme Exp $
+ * $Id: inter.h,v 1.52 2001-07-26 17:55:01 graeme Exp $
  */
 
 
@@ -150,20 +150,20 @@ MP_API int __mp_setmark(void *);
 MP_API int __mp_info(void *, allocinfo *);
 MP_API int __mp_syminfo(void *, symbolinfo *);
 MP_API int __mp_printinfo(void *);
-unsigned long __mp_snapshot(void);
-size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
-size_t __mp_iterateall(int (*)(void *, void *), void *);
-int __mp_addallocentry(char *, unsigned long, size_t);
-int __mp_addfreeentry(char *, unsigned long, size_t);
-void __mp_clearleaktable(void);
-int __mp_startleaktable(void);
-int __mp_stopleaktable(void);
-void __mp_leaktable(size_t, int, unsigned char);
-void __mp_memorymap(int);
-void __mp_summary(void);
-int __mp_stats(heapinfo *);
-void __mp_checkheap(char *, char *, unsigned long);
-void __mp_check(void);
+MP_API unsigned long __mp_snapshot(void);
+MP_API size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
+MP_API size_t __mp_iterateall(int (*)(void *, void *), void *);
+MP_API int __mp_addallocentry(char *, unsigned long, size_t);
+MP_API int __mp_addfreeentry(char *, unsigned long, size_t);
+MP_API void __mp_clearleaktable(void);
+MP_API int __mp_startleaktable(void);
+MP_API int __mp_stopleaktable(void);
+MP_API void __mp_leaktable(size_t, int, unsigned char);
+MP_API void __mp_memorymap(int);
+MP_API void __mp_summary(void);
+MP_API int __mp_stats(heapinfo *);
+MP_API void __mp_checkheap(char *, char *, unsigned long);
+MP_API void __mp_check(void);
 prologuehandler __mp_prologue(prologuehandler);
 epiloguehandler __mp_epilogue(epiloguehandler);
 nomemoryhandler __mp_nomemory(nomemoryhandler);

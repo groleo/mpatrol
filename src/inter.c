@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.136 2001-07-26 17:49:52 graeme Exp $"
+#ident "$Id: inter.c,v 1.137 2001-07-26 17:55:01 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.136 2001-07-26 17:49:52 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.137 2001-07-26 17:55:01 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1911,6 +1911,7 @@ __mp_printinfo(void *p)
  * the difference in the list of allocations between now and a future point.
  */
 
+MP_API
 unsigned long
 __mp_snapshot(void)
 {
@@ -1932,6 +1933,7 @@ __mp_snapshot(void)
  * memory blocks that have been modified since a given allocation event.
  */
 
+MP_API
 size_t
 __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
 {
@@ -1969,6 +1971,7 @@ __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
  * a user-supplied function for each one encountered.
  */
 
+MP_API
 size_t
 __mp_iterateall(int (*f)(void *, void *), void *d)
 {
@@ -2002,6 +2005,7 @@ __mp_iterateall(int (*f)(void *, void *), void *d)
 /* Add a memory allocation to the leak table.
  */
 
+MP_API
 int
 __mp_addallocentry(char *f, unsigned long l, size_t c)
 {
@@ -2025,6 +2029,7 @@ __mp_addallocentry(char *f, unsigned long l, size_t c)
 /* Remove a memory allocation from the leak table.
  */
 
+MP_API
 int
 __mp_addfreeentry(char *f, unsigned long l, size_t c)
 {
@@ -2048,6 +2053,7 @@ __mp_addfreeentry(char *f, unsigned long l, size_t c)
 /* Clear the leak table.
  */
 
+MP_API
 void
 __mp_clearleaktable(void)
 {
@@ -2068,6 +2074,7 @@ __mp_clearleaktable(void)
 /* Start recording memory allocation events in the leak table.
  */
 
+MP_API
 int
 __mp_startleaktable(void)
 {
@@ -2088,6 +2095,7 @@ __mp_startleaktable(void)
 /* Stop recording memory allocation events in the leak table.
  */
 
+MP_API
 int
 __mp_stopleaktable(void)
 {
@@ -2108,6 +2116,7 @@ __mp_stopleaktable(void)
 /* Display the leak table.
  */
 
+MP_API
 void
 __mp_leaktable(size_t l, int o, unsigned char f)
 {
@@ -2129,6 +2138,7 @@ __mp_leaktable(size_t l, int o, unsigned char f)
  * all mpatrol library settings and statistics.
  */
 
+MP_API
 void
 __mp_memorymap(int s)
 {
@@ -2152,6 +2162,7 @@ __mp_memorymap(int s)
 /* Display a summary of all mpatrol library settings and statistics.
  */
 
+MP_API
 void
 __mp_summary(void)
 {
@@ -2168,6 +2179,7 @@ __mp_summary(void)
 /* Return statistics about the current state of the heap.
  */
 
+MP_API
 int
 __mp_stats(heapinfo *d)
 {
@@ -2202,6 +2214,7 @@ __mp_stats(heapinfo *d)
  * a predefined pattern.
  */
 
+MP_API
 void
 __mp_checkheap(char *s, char *t, unsigned long u)
 {
@@ -2250,6 +2263,7 @@ __mp_checkheap(char *s, char *t, unsigned long u)
  * a predefined pattern.
  */
 
+MP_API
 void
 __mp_check(void)
 {
