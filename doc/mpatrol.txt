@@ -2010,11 +2010,9 @@ as they would normally be displayed at the end of program execution.
    A command is provided with the mpatrol distribution which can run
 programs that have been linked with the mpatrol library, using a
 combination of mpatrol options that can be set via the command line.
-All of these options but one map directly onto their equivalent
-environment variable settings and exist mainly so that the user does
-not have to manually change the `MPATROL_OPTIONS' environment variable.
-The contents of this environment variable can be shown from the
-`mpatrol' command by using the `--show-env' option.
+Most of these options map directly onto their equivalent environment
+variable settings and exist mainly so that the user does not have to
+manually change the `MPATROL_OPTIONS' environment variable.
 
    The one option that is the exception to this is the `--dynamic'
 option, which can be used to run a program under the control of the
@@ -2070,6 +2068,55 @@ the libraries that you embedded from the definition of the
 `MP_PRELOAD_LIBS' preprocessor macro.  Finally, rebuild the shared
 version of the mpatrol library and the `mpatrol' command and see if
 your efforts were worth it.
+
+   Because the `mpatrol' command sets the `MPATROL_OPTIONS' environment
+variable for each of the programs it runs, it does not affect the value
+of the environment variable for the current process (except on AmigaOS
+and Netware where all processes share the same environment).  However,
+if you wish to use the `mpatrol' command to set `MPATROL_OPTIONS' in
+the current process environment then you can use its `--show-env'
+option to help you do so.  This option will apply all of the `mpatrol'
+command line options to the `MPATROL_OPTIONS' environment variable and
+then display its value on the standard output without actually running
+any programs.  You can then manually set the environment variable with
+the output from the `mpatrol' command.
+
+   If you wish the `MPATROL_OPTIONS' environment variable to be set in
+the current shell process automatically with the `mpatrol' command then
+you must use some shell trickery.  The following script excerpts can be
+found in `extra/.profile', `extra/.cshrc' and `extra/.gdbinit' and can
+be inserted into your `ksh'/`bash', `csh'/`tcsh' and `gdb'
+configuration files respectively.  They each provide the `mallopt'
+command, which takes `mpatrol' command options and sets the
+`MPATROL_OPTIONS' environment variable in the current shell or debugger
+process.
+
+     # mallopt for ksh/bash
+     
+     function mallopt()
+     {
+         export MPATROL_OPTIONS=`mpatrol --show-env "$@"`
+         echo "$MPATROL_OPTIONS"
+     }
+     
+     # mallopt for csh/tcsh
+     
+     alias mallopt 'setenv MPATROL_OPTIONS "`mpatrol --show-env \!*`";
+                    echo "$MPATROL_OPTIONS"'
+     
+     # mallopt for gdb
+     
+     define mallopt
+     printf "Enter mpatrol library options: "
+     shell read arg; echo set environment MPATROL_OPTIONS
+                     `mpatrol --show-env $arg` >/tmp/mpatrol.gdb
+     source /tmp/mpatrol.gdb
+     shell rm -f /tmp/mpatrol.gdb
+     show environment MPATROL_OPTIONS
+     end
+     document mallopt
+     Sets mpatrol library options in the current process environment.
+     end
 
    Another utility program that is provided is called `mleak' and is
 useful for detecting memory leaks in log files produced by the mpatrol
@@ -2413,8 +2460,8 @@ allocation bin table so the new output from `mprof' with the
      --------------------------  --------------------------
      bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
      
-      2048   68.54  69               0    0.00                 256  new_pair+14
-       940   31.46  31             940  100.00  %%             256  new_pair+110
+      2048   68.54  69               0    0.00                 256  new_pair+20
+       940   31.46  31             940  100.00  %%             256  new_pair+140
      
       2988          %%             940          %%             512  total
 
@@ -2426,7 +2473,7 @@ allocation bin table so the new output from `mprof' with the
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+110
+     100.00       940  100.00     256  100.00       940     256  new_pair+140
      
                   940   31.46     256   50.00      2988     512  total
 
@@ -2458,9 +2505,9 @@ like:
      ----------------------------------------  ----------------
           %     bytes       %   count       %     bytes   count  function
      
-     100.00       940  100.00     256  100.00       940     256  new_pair+110
-                                                                 main+88
-                                                                 _start+68
+     100.00       940  100.00     256  100.00       940     256  new_pair+140
+                                                                 main+120
+                                                                 _start+100
      
                   940   31.46     256   50.00      2988     512  total
 
@@ -3366,7 +3413,11 @@ above example have been numbered and their descriptions appear below.
      freed block is an allocated block that has been freed but has not
      been returned to the free memory list for later allocation.  These
      values may be different from those expected if the mpatrol library
-     makes any memory allocations during initialisation.
+     makes any memory allocations during initialisation.  In this
+     example a large amount of memory is used by the system object file
+     access library which is used for reading the symbols from the
+     program's executable file and any shared libraries that it
+     requires.
 
  33. Internal blocks.  This value contains the total number of memory
      blocks (of varying sizes) that have been allocated from the system
@@ -9138,7 +9189,9 @@ Index
           See ``Appendix C Options''.
 -version:                                          
           See ``Appendix C Options''.
+.cshrc:                                             See 7.8.
 .gdbinit:                                           See 7.5.
+.profile:                                           See 7.8.
 32-bit:                                            
           See ``I.2 Building''.
 64-bit:                                            
@@ -9207,7 +9260,7 @@ AUTOSAVE:
           See ``Appendix B Environment''.
 backwards compatibility:                           
           See ``I.3 Linking''.
-bash:                                               See 8.
+bash:                                               See 7.8.
 BASIC:                                              See 5.
 batch testing:                                      See 7.6.
 best fit:                                           See 10.
@@ -9290,6 +9343,7 @@ contributors:
 core file:                                         
           See ``I.4 Running''.
 crash:                                              See 11.1.
+csh:                                                See 7.8.
 CSRI malloc:                                       
           See ``Appendix J Related software''.
 CVS:                                               
@@ -9498,6 +9552,7 @@ KL Group:
           See ``Appendix J Related software''.
 known bugs:                                        
           See ``Appendix H Notes''.
+ksh:                                                See 7.8.
 LARGEBOUND:                                        
           See ``Appendix B Environment''.
 LaTeX:                                              See 3.
@@ -9584,6 +9639,7 @@ Malloc_Dbg:
           See ``Appendix J Related software''.
 MallocTrace:                                       
           See ``Appendix J Related software''.
+mallopt:                                            See 7.8.
 MalTrace:                                          
           See ``Appendix J Related software''.
 mangled names:                                      See 11.1.
@@ -9933,6 +9989,7 @@ systems, embedded:                                  See 6.
 TAR archive:                                        See 3.
 TARGET:                                            
           See ``I.2 Building''.
+tcsh:                                               See 7.8.
 tentative declarations:                             See 5.1.
 test suite:                                         See 2.
 TestCenter:                                        

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.124 2000-10-31 00:54:33 graeme Exp $
+@c $Id: mpatrol.texi,v 1.125 2000-10-31 18:40:49 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2301,11 +2301,10 @@ end of program execution.
 
 A command is provided with the mpatrol distribution which can run programs that
 have been linked with the mpatrol library, using a combination of mpatrol
-options that can be set via the command line.  All of these options but one map
+options that can be set via the command line.  Most of these options map
 directly onto their equivalent environment variable settings and exist mainly
 so that the user does not have to manually change the @env{MPATROL_OPTIONS}
-environment variable.  The contents of this environment variable can be shown
-from the @command{mpatrol} command by using the @option{--show-env} option.
+environment variable.
 
 @cindex LD_PRELOAD
 @cindex _RLD_LIST
@@ -2359,6 +2358,64 @@ and remove all of the libraries that you embedded from the definition of the
 @code{MP_PRELOAD_LIBS} preprocessor macro.  Finally, rebuild the shared version
 of the mpatrol library and the @command{mpatrol} command and see if your efforts
 were worth it.
+
+Because the @command{mpatrol} command sets the @env{MPATROL_OPTIONS} environment
+variable for each of the programs it runs, it does not affect the value of the
+environment variable for the current process (except on AmigaOS and Netware
+where all processes share the same environment).  However, if you wish to use
+the @command{mpatrol} command to set @env{MPATROL_OPTIONS} in the current
+process environment then you can use its @option{--show-env} option to help you
+do so.  This option will apply all of the @command{mpatrol} command line options
+to the @env{MPATROL_OPTIONS} environment variable and then display its value on
+the standard output without actually running any programs.  You can then
+manually set the environment variable with the output from the @command{mpatrol}
+command.
+
+@cindex .profile
+@cindex ksh
+@cindex bash
+@cindex .cshrc
+@cindex csh
+@cindex tcsh
+@cindex mallopt
+If you wish the @env{MPATROL_OPTIONS} environment variable to be set in the
+current shell process automatically with the @command{mpatrol} command then you
+must use some shell trickery.  The following script excerpts can be found in
+@file{extra/.profile}, @file{extra/.cshrc} and @file{extra/.gdbinit} and can be
+inserted into your @command{ksh}/@command{bash}, @command{csh}/@command{tcsh}
+and @command{gdb} configuration files respectively.  They each provide the
+@command{mallopt} command, which takes @command{mpatrol} command options and
+sets the @env{MPATROL_OPTIONS} environment variable in the current shell or
+debugger process.
+
+@smallexample
+# mallopt for ksh/bash
+
+function mallopt()
+@{
+    export MPATROL_OPTIONS=`mpatrol --show-env "$@@"`
+    echo "$MPATROL_OPTIONS"
+@}
+
+# mallopt for csh/tcsh
+
+alias mallopt 'setenv MPATROL_OPTIONS "`mpatrol --show-env \!*`";
+               echo "$MPATROL_OPTIONS"'
+
+# mallopt for gdb
+
+define mallopt
+printf "Enter mpatrol library options: "
+shell read arg; echo set environment MPATROL_OPTIONS
+                `mpatrol --show-env $arg` >/tmp/mpatrol.gdb
+source /tmp/mpatrol.gdb
+shell rm -f /tmp/mpatrol.gdb
+show environment MPATROL_OPTIONS
+end
+document mallopt
+Sets mpatrol library options in the current process environment.
+end
+@end smallexample
 
 @cindex mleak
 Another utility program that is provided is called @command{mleak} and is
@@ -2723,8 +2780,8 @@ looks like:
 --------------------------  --------------------------
 bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
 
- 2048   68.54  69               0    0.00                 256  new_pair+14
-  940   31.46  31             940  100.00  %%             256  new_pair+110
+ 2048   68.54  69               0    0.00                 256  new_pair+20
+  940   31.46  31             940  100.00  %%             256  new_pair+140
 
  2988          %%             940          %%             512  total
 @end smallexample
@@ -2738,7 +2795,7 @@ bytes       %   s  m  l  x  bytes       %   s  m  l  x  count  function
 ----------------------------------------  ----------------
      %     bytes       %   count       %     bytes   count  function
 
-100.00       940  100.00     256  100.00       940     256  new_pair+110
+100.00       940  100.00     256  100.00       940     256  new_pair+140
 
              940   31.46     256   50.00      2988     512  total
 @end smallexample
@@ -2774,9 +2831,9 @@ options looks like:
 ----------------------------------------  ----------------
      %     bytes       %   count       %     bytes   count  function
 
-100.00       940  100.00     256  100.00       940     256  new_pair+110
-                                                            main+88
-                                                            _start+68
+100.00       940  100.00     256  100.00       940     256  new_pair+140
+                                                            main+120
+                                                            _start+100
 
              940   31.46     256   50.00      2988     512  total
 @end smallexample
@@ -2806,7 +2863,6 @@ finally the linker (well, it does in this example).  On Solaris, the
 @command{gcc} distribution uses the system assembler and linker which come with
 no symbol tables in their executable files so we will not be profiling them.
 
-@cindex bash
 For the purpose of this demonstration we will only be looking at the graph
 files produced by the @option{--graph-file} option of the @command{mprof}
 command, but ordinarily you would want to look at the tables that
@@ -3846,7 +3902,10 @@ Free blocks.  These values contain the total number of allocated, freed and
 free blocks at the time the summary was produced.  A freed block is an allocated
 block that has been freed but has not been returned to the free memory list for
 later allocation.  These values may be different from those expected if the
-mpatrol library makes any memory allocations during initialisation.
+mpatrol library makes any memory allocations during initialisation.  In this
+example a large amount of memory is used by the system object file access
+library which is used for reading the symbols from the program's executable file
+and any shared libraries that it requires.
 
 @cindex internal blocks
 @item
