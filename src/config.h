@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.67 2001-02-27 20:42:29 graeme Exp $
+ * $Id: config.h,v 1.68 2001-02-27 20:56:36 graeme Exp $
  */
 
 
@@ -772,7 +772,8 @@
  * begin with __mp_init_* when the symbols are being read should be called
  * when __mp_init() is called.  This should not be enabled on systems where
  * the address of the symbol in the object file does not represent the entry
- * point for the resulting function.
+ * point for the resulting function and will obviously not work if the symbol
+ * has been stripped from the executable or shared library at any point.
  */
 
 #ifndef MP_INITFUNC_SUPPORT
