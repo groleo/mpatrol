@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.25 2000-05-08 21:53:30 graeme Exp $"
+#ident "$Id: info.c,v 1.26 2000-05-10 20:27:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -760,7 +760,7 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
         if (r = __mp_memcompare(p, q, l))
         {
             l = (char *) r - (char *) p;
-            c = (int) ((char *) p)[l] - (int) ((char *) q)[l];
+            c = (int) ((unsigned char *) p)[l] - (int) ((unsigned char *) q)[l];
         }
     }
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
