@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.75 2001-03-04 13:50:44 graeme Exp $"
+#ident "$Id: info.c,v 1.76 2001-03-04 14:13:37 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.75 2001-03-04 13:50:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.76 2001-03-04 14:13:37 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -297,8 +297,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, v);
-                __mp_warn(ET_ZERALN, f, v->file, v->line, "alignment 0 is "
-                          "invalid");
+                __mp_warn(ET_ZERALN, f, v->file, v->line, NULL);
                 __mp_diag("\n");
             }
             a = h->alloc.heap.memory.align;
@@ -459,8 +458,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         {
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, v);
-            __mp_warn(ET_RSZNUL, f, v->file, v->line, "attempt to resize a "
-                      "NULL pointer");
+            __mp_warn(ET_RSZNUL, f, v->file, v->line, NULL);
             __mp_diag("\n");
         }
         p = __mp_getmemory(h, l, a, f, v);
@@ -473,8 +471,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, v);
-        __mp_error(ET_PRVFRD, f, v->file, v->line, MP_POINTER " was freed with "
-                   "%s", p, __mp_functionnames[m->data.type]);
+        __mp_error(ET_PRVFRD, f, v->file, v->line, NULL, p,
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -523,8 +521,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         {
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, v);
-            __mp_warn(ET_RSZZER, f, v->file, v->line, "attempt to resize an "
-                      "allocation to size 0");
+            __mp_warn(ET_RSZZER, f, v->file, v->line, NULL);
             __mp_diag("\n");
         }
         __mp_freememory(h, p, f, v);
@@ -736,8 +733,8 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, v);
-        __mp_error(ET_PRVFRD, f, v->file, v->line, MP_POINTER " was freed with "
-                   "%s", p, __mp_functionnames[m->data.type]);
+        __mp_error(ET_PRVFRD, f, v->file, v->line, NULL, p,
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -922,9 +919,8 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
             __mp_logmemcopy(h, p, q, l, c, f, v);
             o = 1;
         }
-        __mp_warn(ET_RNGOVL, f, v->file, v->line, "range [" MP_POINTER ","
-                  MP_POINTER "] overlaps [" MP_POINTER "," MP_POINTER "]", p,
-                  (char *) p + l - 1, q, (char *) q + l - 1);
+        __mp_warn(ET_RNGOVL, f, v->file, v->line, NULL, p, (char *) p + l - 1,
+                  q, (char *) q + l - 1);
         __mp_diag("\n");
     }
     /* If the pointers are not NULL and do not overflow any memory blocks then
@@ -1224,15 +1220,11 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f, loginfo *v)
             b = (char *) b - h->alloc.oflow;
             l += h->alloc.oflow << 1;
             if (h->flags & FLG_ALLOWOFLOW)
-                __mp_warn(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER
-                          "," MP_POINTER "] overflows [" MP_POINTER ","
-                          MP_POINTER "]", p, (char *) p + s - 1, b,
-                          (char *) b + l - 1);
+                __mp_warn(ET_RNGOVF, f, v->file, v->line, NULL, p,
+                          (char *) p + s - 1, b, (char *) b + l - 1);
             else
-                __mp_error(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER
-                           "," MP_POINTER "] overflows [" MP_POINTER ","
-                           MP_POINTER "]", p, (char *) p + s - 1, b,
-                           (char *) b + l - 1);
+                __mp_error(ET_RNGOVF, f, v->file, v->line, NULL, p,
+                           (char *) p + s - 1, b, (char *) b + l - 1);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = ((h->flags & FLG_ALLOWOFLOW) != 0);
@@ -1306,8 +1298,7 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
     }
     else if ((m = (infonode *) n->info) == NULL)
     {
-        __mp_error(ET_FREOPN, f, v->file, v->line, "attempt to perform "
-                   "operation on free memory\n");
+        __mp_error(ET_FREOPN, f, v->file, v->line, NULL);
         return 0;
     }
     else if (m->data.flags & FLG_FREED)
@@ -1356,13 +1347,11 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
         b = (char *) b - h->alloc.oflow;
         l += h->alloc.oflow << 1;
         if (e == 1)
-            __mp_error(ET_STROVF, f, v->file, v->line, "string " MP_POINTER
-                       " overflows [" MP_POINTER "," MP_POINTER "]", p, b,
+            __mp_error(ET_STROVF, f, v->file, v->line, NULL, p, b,
                        (char *) b + l - 1);
         else
-            __mp_warn(ET_RNGOVF, f, v->file, v->line, "range [" MP_POINTER ","
-                      MP_POINTER "] overflows [" MP_POINTER "," MP_POINTER "]",
-                      p, u - 1, b, (char *) b + l - 1);
+            __mp_warn(ET_RNGOVF, f, v->file, v->line, NULL, p, u - 1, b,
+                      (char *) b + l - 1);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         return (e == 2);
