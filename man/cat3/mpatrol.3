@@ -1096,24 +1096,24 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               ssttddoouutt  file stream.  Note that if a problem occurs
               while opening the profiling output  file  then  the
               profiling  information  will  be sent to the ssttddeerrrr
-              file stream.  Default value: PPRROOFFFFIILLEE=_m_p_a_t_r_o_l_._o_u_t
+              file stream.  Default value:  PPRROOFFFFIILLEE=_m_p_a_t_r_o_l_._o_u_t.
 
        PPRROOGGFFIILLEE=_s_t_r_i_n_g
-              Specifies an alternative  filename  with  which  to
+              Specifies  an  alternative  filename  with which to
               locate the executable file containing the program's
-              symbols.  On most systems, the library  will  auto-
-              matically  be  able to determine this filename, but
-              on a few systems this option may have  to  be  used
+              symbols.   On  most systems, the library will auto-
+              matically be able to determine this  filename,  but
+              on  a  few  systems this option may have to be used
               before any or all symbols can be read.
 
        RREEAALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies a reallocation index at which to stop the
-              program when a memory allocation is  being  reallo-
-              cated.   If  the  AALLLLOOCCSSTTOOPP option is non-zero then
-              the program will  be  halted  when  the  allocation
-              matching  that  allocation index is reallocated the
-              specified number of times.  Otherwise  the  program
-              will  be  halted  the  first time any allocation is
+              program  when  a memory allocation is being reallo-
+              cated.  If the AALLLLOOCCSSTTOOPP option  is  non-zero  then
+              the  program  will  be  halted  when the allocation
+              matching that allocation index is  reallocated  the
+              specified  number  of times.  Otherwise the program
+              will be halted the first  time  any  allocation  is
 
 
 
@@ -1126,58 +1126,58 @@ Release 1.2               30 April 2000                        17
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              reallocated the specified number  of  times.   Note
-              that  this  setting will be ignored if its value is
+              reallocated  the  specified  number of times.  Note
+              that this setting will be ignored if its  value  is
               zero.  Default value: RREEAALLLLOOCCSSTTOOPP=_0.
 
        SSAAFFEESSIIGGNNAALLSS
-              Instructs the library to save and  replace  certain
-              signal  handlers  during  the  execution of library
-              code and to restore them afterwards.  This was  the
-              default  behaviour  in  version  1.0 of the mpatrol
+              Instructs  the  library to save and replace certain
+              signal handlers during  the  execution  of  library
+              code  and to restore them afterwards.  This was the
+              default behaviour in version  1.0  of  the  mpatrol
               library and was changed since some memory-intensive
-              programs  became  very  hard to interrupt using the
-              keyboard, thus giving the impression that the  pro-
+              programs became very hard to  interrupt  using  the
+              keyboard,  thus giving the impression that the pro-
               gram or system had hung.
 
        SSHHOOWWAALLLL
-              Equivalent  to  the SSHHOOWWFFRREEEEDD, SSHHOOWWUUNNFFRREEEEDD, SSHHOOWWMMAAPP
+              Equivalent to the SSHHOOWWFFRREEEEDD,  SSHHOOWWUUNNFFRREEEEDD,  SSHHOOWWMMAAPP
               and SSHHOOWWSSYYMMBBOOLLSS options specified together.
 
        SSHHOOWWFFRREEEEDD
               Specifies that a summary of all of the freed memory
-              allocations  should be displayed at the end of pro-
-              gram execution.  This option must be used  in  con-
-              junction  with the NNOOFFRREEEE option and this step will
-              not be performed if an abnormal termination  occurs
+              allocations should be displayed at the end of  pro-
+              gram  execution.   This option must be used in con-
+              junction with the NNOOFFRREEEE option and this step  will
+              not  be performed if an abnormal termination occurs
               or if there were no freed allocations.
 
        SSHHOOWWMMAAPP
-              Specifies  that  a  memory  map  of the entire heap
-              should be displayed at the end  of  program  execu-
+              Specifies that a memory  map  of  the  entire  heap
+              should  be  displayed  at the end of program execu-
               tion.  This step will not be performed if an abnor-
               mal termination occurs or if the heap is empty.
 
        SSHHOOWWSSYYMMBBOOLLSS
-              Specifies that a summary of  all  of  the  function
-              symbols  read  from  the  program's executable file
-              should be displayed at the end  of  program  execu-
+              Specifies  that  a  summary  of all of the function
+              symbols read from  the  program's  executable  file
+              should  be  displayed  at the end of program execu-
               tion.  This step will not be performed if an abnor-
-              mal termination occurs or if no  symbols  could  be
+              mal  termination  occurs  or if no symbols could be
               read from the executable file.
 
        SSHHOOWWUUNNFFRREEEEDD
               Specifies that a summary of all of the unfreed mem-
-              ory allocations should be displayed at the  end  of
+              ory  allocations  should be displayed at the end of
               program execution.  This step will not be performed
-              if an abnormal termination occurs or if  there  are
+              if  an  abnormal termination occurs or if there are
               no unfreed allocations.
 
        SSMMAALLLLBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  the  limit  in  bytes up to which memory
-              allocations should be classified as  small  alloca-
-              tions  for  profiling purposes.  This limit must be
-              greater than zero but  less  than  the  medium  and
+              Specifies the limit in bytes  up  to  which  memory
+              allocations  should  be classified as small alloca-
+              tions for profiling purposes.  This limit  must  be
+              greater  than  zero  but  less  than the medium and
               large bounds.  Default value: SSMMAALLLLBBOOUUNNDD=_3_2.
 
 
@@ -1194,33 +1194,33 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies the minimum number of unfreed allocations
-              at which to abort the program just  before  program
+              at  which  to abort the program just before program
               termination.  A summary of all the allocations will
-              be displayed on  the  standard  error  file  stream
-              before  aborting.  This option may be handy for use
-              in batch tests as it can force  tests  to  fail  if
-              they  do  not  free  up  a minimum number of memory
-              allocations.   Note  that  this  setting  will   be
-              ignored  if  its  value  is  zero.   Default value:
+              be  displayed  on  the  standard  error file stream
+              before aborting.  This option may be handy for  use
+              in  batch  tests  as  it can force tests to fail if
+              they do not free up  a  minimum  number  of  memory
+              allocations.    Note  that  this  setting  will  be
+              ignored if  its  value  is  zero.   Default  value:
               UUNNFFRREEEEDDAABBOORRTT=_0.
 
        UUSSEEDDEEBBUUGG
-              Specifies that any  debugging  information  in  the
+              Specifies  that  any  debugging  information in the
               executable file should be used to obtain additional
-              source-level information.  This  option  will  only
-              have  an  effect  if the executable file contains a
-              compiler-generated line number table  and  will  be
+              source-level  information.   This  option will only
+              have an effect if the executable  file  contains  a
+              compiler-generated  line  number  table and will be
               ignored if the mpatrol library was built to support
               an object file access library that cannot read line
               tables from object files.
 
        UUSSEEMMMMAAPP
-              Specifies   that  the  library  should  use  mmmmaapp(())
+              Specifies  that  the  library  should  use   mmmmaapp(())
               instead of ssbbrrkk(()) to allocate system memory on UNIX
               platforms.  This option should be used if there are
               problems when using the mpatrol library in combina-
-              tion  with another malloc library which uses ssbbrrkk(())
-              to allocate its memory.  It is ignored  on  systems
+              tion with another malloc library which uses  ssbbrrkk(())
+              to  allocate  its memory.  It is ignored on systems
               that do not support the mmmmaapp(()) system call.
 
 SSEEEE AALLSSOO
@@ -1234,16 +1234,16 @@ AAUUTTHHOORR
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-       This  library  is  free  software; you can redistribute it
-       and/or modify it under the terms of the GNU  Library  Gen-
-       eral  Public  License  as  published  by the Free Software
-       Foundation; either version 2 of the License, or  (at  your
+       This library is free software;  you  can  redistribute  it
+       and/or  modify  it under the terms of the GNU Library Gen-
+       eral Public License as  published  by  the  Free  Software
+       Foundation;  either  version 2 of the License, or (at your
        option) any later version.
 
-       This  library  is  distributed in the hope that it will be
+       This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
-       PURPOSE.  See the GNU Library General Public  License  for
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the GNU Library General Public License for
        more details.
 
 
@@ -1259,7 +1259,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
        You should have received a copy of the GNU Library General
-       Public License along with this library; if not,  write  to
+       Public  License  along with this library; if not, write to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
