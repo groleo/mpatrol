@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.10 2000-04-20 00:03:12 graeme Exp $"
+#ident "$Id: profile.c,v 1.11 2000-04-20 00:55:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -107,7 +107,8 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
      * all of the current profiling information to the output file before
      * we can return.
      */
-    if ((p->autosave != 0) && (++p->autocount % p->autosave == 0))
+    p->autocount++;
+    if ((p->autosave != 0) && (p->autocount % p->autosave == 0))
         __mp_writeprofile(p);
     return 1;
 }
@@ -135,7 +136,8 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
      * all of the current profiling information to the output file before
      * we can return.
      */
-    if ((p->autosave != 0) && (++p->autocount % p->autosave == 0))
+    p->autocount++;
+    if ((p->autosave != 0) && (p->autocount % p->autosave == 0))
         __mp_writeprofile(p);
     return 1;
 }
@@ -147,6 +149,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 MP_GLOBAL int __mp_writeprofile(profhead *p)
 {
     FILE *f;
+    size_t n;
 
     p->autocount = 0;
     /* The profiling file name can also be named as stderr and stdout which
@@ -164,6 +167,25 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         p->file = NULL;
         return 0;
     }
+    /* Technically, we should check the return values from each of the calls
+     * to fwrite().  However, that would increase the complexity of this
+     * function and would make the code extremely hard to follow.  Instead,
+     * we just assume that each write to the output file succeeds and hope
+     * that if an error does occur then it will not be too drastic if we
+     * continue writing the rest of the file.
+     */
+    fwrite(&p->acount, sizeof(size_t), 1, f);
+    fwrite(&p->acountt, sizeof(size_t), 1, f);
+    fwrite(&p->dcount, sizeof(size_t), 1, f);
+    fwrite(&p->dcountt, sizeof(size_t), 1, f);
+    /* Write out the contents of the allocation and deallocation bins.
+     */
+    n = MP_BIN_SIZE;
+    fwrite(&n, sizeof(size_t), 1, f);
+    fwrite(p->acounts, sizeof(size_t), MP_BIN_SIZE, f);
+    fwrite(&p->acountl, sizeof(size_t), 1, f);
+    fwrite(p->dcounts, sizeof(size_t), MP_BIN_SIZE, f);
+    fwrite(&p->dcountl, sizeof(size_t), 1, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
     return 1;
