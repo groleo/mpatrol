@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.1.1.1 1999-10-03 11:25:23 graeme Exp $"
+#ident "$Id: signals.c,v 1.2 1999-11-25 11:11:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -185,17 +185,11 @@ MP_GLOBAL void __mp_abort(void)
 }
 
 
-/* Send the current process a TRAP signal.
+/* Provide a function which can be used as a breakpoint target in a debugger.
  */
 
 MP_GLOBAL void __mp_trap(void)
 {
-#if TARGET == TARGET_UNIX
-    /* Send the current process a TRAP signal for use in a debugger.
-     * Used on systems where this is supported.
-     */
-    raise(SIGTRAP);
-#endif /* TARGET */
 }
 
 
