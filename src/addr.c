@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: addr.c,v 1.3 2000-03-15 00:44:06 graeme Exp $"
+#ident "$Id: addr.c,v 1.4 2000-11-05 22:38:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,6 +60,8 @@ MP_GLOBAL void __mp_newaddrs(addrhead *h, heaphead *e)
     __mp_newslots(&h->table, sizeof(addrnode), __mp_poweroftwo(n));
     __mp_newlist(&h->list);
     h->size = 0;
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -76,6 +78,8 @@ MP_GLOBAL void __mp_deleteaddrs(addrhead *h)
     h->table.size = 0;
     __mp_newlist(&h->list);
     h->size = 0;
+    h->prot = MA_NOACCESS;
+    h->protrecur = 0;
 }
 
 
@@ -175,12 +179,47 @@ MP_GLOBAL int __mp_protectaddrs(addrhead *h, memaccess a)
 {
     addrnode *n;
 
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (h->prot == a)
+    {
+        h->protrecur++;
+        return 1;
+    }
+    else if (h->protrecur > 0)
+    {
+        h->protrecur--;
+        return 1;
+    }
+    h->prot = a;
     for (n = (addrnode *) h->list.head; n->index.node.next != NULL;
          n = (addrnode *) n->index.node.next)
         if (!__mp_memprotect(&h->heap->memory, n->index.block, n->index.size,
              a))
             return 0;
     return 1;
+}
+
+
+/* Recursively compare the return addresses of two call stacks.
+ */
+
+MP_GLOBAL stackcompare __mp_compareaddrs(addrnode *n, addrnode *p)
+{
+    stackcompare r;
+
+    if ((n == NULL) || (p == NULL))
+        if (n != NULL)
+            r = SC_SHALLOWER;
+        else if (p != NULL)
+            r = SC_DEEPER;
+        else
+            r = SC_SAME;
+    else if (((r = __mp_compareaddrs(n->data.next, p->data.next)) == SC_SAME) &&
+             (n->data.addr != p->data.addr))
+        r = SC_DIFFERENT;
+    return r;
 }
 
 
