@@ -629,10 +629,9 @@
 #endif /* MP_ALTFUNCNAMES */
 
 
-/* Indicates if the system supports an .init section for placing calls to
- * routines that will be called before main().  This is only likely to be
- * true for ELF systems and will only be required for initialising the
- * mpatrol mutexes and data structures for thread-safe code.
+/* Indicates if the system supports .init and .fini sections for placing
+ * calls to routines that will be called before main() and after exit().
+ * This is only likely to be true for ELF systems.
  */
 
 #ifndef MP_INIT_SUPPORT
