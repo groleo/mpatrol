@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.23 2000-11-08 01:42:44 graeme Exp $
+# $Id: Makefile,v 1.24 2000-11-13 18:40:59 graeme Exp $
 
 
 # Definitions
@@ -38,6 +38,8 @@ VERBOSE   = false
 # Rules
 
 .SUFFIXES: .texi .tex .txt .info .guide .html .dvi .ps .pdf .jpg .eps
+
+default: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html
 
 # Build the text file from the Texinfo file using makeinfo
 
