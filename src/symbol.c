@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.11 2000-03-07 00:36:49 graeme Exp $"
+#ident "$Id: symbol.c,v 1.12 2000-03-09 22:06:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -978,7 +978,9 @@ static void findsource(bfd *h, asection *p, void *d)
             s->file = s->func = NULL;
             s->line = 0;
             s->found = bfd_find_nearest_line(h, p, s->symbols, s->addr - v,
-                                             &s->file, &s->func, &s->line);
+                                             (const char **) &s->file,
+                                             (const char **) &s->func,
+                                             &s->line);
         }
     }
 }
