@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.79 2001-05-17 21:53:48 graeme Exp $"
+#ident "$Id: diag.c,v 1.80 2001-07-26 17:33:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.79 2001-05-17 21:53:48 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.80 2001-07-26 17:33:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -61,7 +61,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-extern errortype __mp_errno;
+MP_API extern errortype __mp_errno;
 
 
 /* The file pointer to the log file.  This should not really be a file scope

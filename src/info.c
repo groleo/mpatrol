@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.85 2001-06-07 17:58:42 graeme Exp $"
+#ident "$Id: info.c,v 1.86 2001-07-26 17:33:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.85 2001-06-07 17:58:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.86 2001-07-26 17:33:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,7 +49,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-void __mp_trap(void);
+MP_API void __mp_trap(void);
 
 
 #if MP_INUSE_SUPPORT
