@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.35 2001-09-19 23:51:17 graeme Exp $
+ * $Id: target.h,v 1.36 2001-09-23 21:34:14 graeme Exp $
  */
 
 
@@ -313,6 +313,15 @@
 
 
 #ifndef ENVIRON
+#if defined(HAVE_CONFIG_H) && defined(SIZEOF_VOID_P)
+#if SIZEOF_VOID_P == 4
+#define ENVIRON ENVIRON_32
+#elif SIZEOF_VOID_P == 8
+#define ENVIRON ENVIRON_64
+#else /* SIZEOF_VOID_P */
+#define ENVIRON ENVIRON_ANY
+#endif /* SIZEOF_VOID_P */
+#else /* HAVE_CONFIG_H && SIZEOF_VOID_P */
 #if ARCH == ARCH_ALPHA || ARCH == ARCH_IA64
 #define ENVIRON ENVIRON_64
 #else /* ARCH */
@@ -340,6 +349,7 @@
 #define ENVIRON ENVIRON_32
 #endif /* SYSTEM */
 #endif /* ARCH */
+#endif /* HAVE_CONFIG_H && SIZEOF_VOID_P */
 #endif /* ENVIRON */
 
 
