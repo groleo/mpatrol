@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
 December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
 December, 2000.
 
 
@@ -65,6 +65,7 @@ December, 2000.
  @{" Operating system support   " link "Operating system support"}  Additional background.
  @{" Using mpatrol              " link "Using mpatrol"}  Using the library.
  @{" Profiling                  " link "Profiling"}  Memory allocation profiling.
+ @{" Tracing                    " link "Tracing"}  Memory allocation tracing.
  @{" Improving performance      " link "Improving performance"}  Life beyond mpatrol.
  @{" How it works               " link "How it works"}  Implementation details.
  @{" Examples                   " link "Examples"}  Examples of usage.
@@ -649,13 +650,20 @@ if you perform the following steps.
      source for this manual and can be translated into a wide variety
      of documentation formats.  The @{b}refcard.tex@{ub} file contains the LaTeX
      source for the quick reference card and can be translated into
-     formats suitable for printing onto a single page.  There may
-     already be translated files in the @{b}doc@{ub} directory, but if not you
-     will either have to generate them yourself using an appropriate
-     tool or you could download an archive containing the latest
-     mpatrol manual and reference card in a variety of documentation
-     formats from the mpatrol home page.  You can then install or print
-     these documents.
+     formats suitable for printing onto a few pages.  There may already
+     be translated files in the @{b}doc@{ub} directory, but if not you will
+     either have to generate them yourself using an appropriate tool or
+     you could download an archive containing the latest mpatrol manual
+     and reference card in a variety of documentation formats from the
+     mpatrol home page.  You can then install or print these documents.
+
+     If you are not installing on a system that supports UNIX manual
+     pages then you can also check in the @{b}man@{ub} directory to see if there
+     are alternative formats for the mpatrol manual pages that you can
+     install.  If not, you may be able to generate them yourself, or
+     you can download an archive containing the latest mpatrol manual
+     pages in a variety of documentation formats from the mpatrol home
+     page.
 
    Alternatively, the @{b}pkg@{ub} directory contains files that can be used to
 automatically generate a @{i}package@{ui} in a specific format suitable for
@@ -2331,7 +2339,8 @@ of the mpatrol library.  Each command comes with its own UNIX manual
 page (although they also support the @{b}--help@{ub} and @{b}--version@{ub} options), but
 a few of the commands are written as UNIX shell scripts and so will not
 work on non-UNIX platforms.  Note that the @{b}mprof@{ub} command is documented
-in the profiling chapter (see @{"Profiling" link "Profiling"}).
+in the profiling chapter (see @{"Profiling" link "Profiling"}) and the @{b}mptrace@{ub} command is
+documented in the tracing chapter (see @{"Tracing" link "Tracing"}).
 
 
  @{" The mpatrol command        " link "The mpatrol command"}  Running with the library.
@@ -2629,7 +2638,7 @@ other mpatrol command line tools.
 @endnode
 
 @node "Profiling" "mpatrol.guide/Profiling"
-@next "Improving performance"
+@next "Tracing"
 @prev "Using mpatrol"
 @toc "Main"
 
@@ -3187,9 +3196,366 @@ relevant edges instead of solid lines.
 
 @endnode
 
+@node "Tracing" "mpatrol.guide/Tracing"
+@next "Improving performance"
+@prev "Profiling"
+@toc "Main"
+
+Tracing
+*******
+
+   In addition to profiling, the mpatrol library also has the
+capability to concisely trace the details of every dynamic memory
+allocation and deallocation over the lifetime of any program that it
+was linked and run with.  This information can then be used to
+calculate trends in a program's memory allocation behaviour and provide
+details on the lifetimes of memory allocations.  In contrast to
+profiling, it can also be used to display a program's memory allocation
+behaviour in real-time, along with some useful information that can be
+displayed in graphical or tabular form.
+
+   As with profiling, only allocations and deallocations are recorded,
+with each reallocation being treated as a deallocation immediately
+followed by an allocation.  The intention of tracing is to gather
+concise details about each memory allocation event rather than complete
+information about some or all memory allocations.  As a result, the
+mpatrol log files and profiling output files contain more detailed
+information about individual memory allocations, whereas the tracing
+output files contain a broader view of allocation behaviour throughout
+the entire program.
+
+   Memory allocation tracing is disabled by default, but can be enabled
+using the @{b}TRACE@{ub} option.  This writes all of the tracing data to a file
+called @{b}mpatrol.trace@{ub} in the current directory at the end of program
+execution, but the name of this file can be changed using the @{b}TRACEFILE@{ub}
+option and the default directory in which to place these files can be
+changed by setting the @{b}TRACEDIR@{ub} environment variable.
+
+   Normally, the mpatrol library will perform tracing with all of its
+other features and checks enabled, but you might want to disable these
+if you only wish to trace the memory allocations.  For example, you may
+wish to use the @{b}CHECK=0@{ub} and @{b}NOPROTECT@{ub} options to remove the internal
+checking of the library and speed up tracing dramatically.
+
+   The @{b}mptrace@{ub} command is a tool designed to read a tracing output file
+produced by the mpatrol library and display the tracing information
+that was obtained.  The tracing information is a concise encoded trace
+of all of the memory allocation events that occurred during a program's
+execution, and can be decoded into tabular or graphical form, along
+with any relevant statistics that can be calculated.
+
+   The @{b}mptrace@{ub} command also attempts to calculate the endianness of the
+processor that produced the tracing output file and reads the file
+accordingly.  This means that it is possible to use @{b}mptrace@{ub} on a SPARC
+machine to read a tracing output file that was produced on an Intel
+80x86 machine, for example.  However, this will only work if the
+processor that produced the tracing output file has the same word size
+as the processor that is running the @{b}mptrace@{ub} command.  For example,
+reading a 64-bit tracing output file on a 32-bit machine will not work.
+
+   In addition, the tracing output file also contains the version
+number of the mpatrol library which produced it.  If the major version
+number that is embedded in the tracing output file is newer that the
+version of mpatrol that @{b}mptrace@{ub} came with then @{b}mptrace@{ub} will refuse to
+read the file.  You should download the latest version of mpatrol in
+that case.  The reason for storing the version number is so that the
+format of the tracing output file can change between releases of
+mpatrol, but also allow @{b}mptrace@{ub} to cope with older versions.
+
+   Along with the usual @{b}--help@{ub} and @{b}--version@{ub} options, the @{b}mptrace@{ub}
+command takes one optional argument which must be a valid mpatrol
+tracing output filename but if it is omitted then it will use
+@{b}mpatrol.trace@{ub} as the name of the file to use.  If the filename argument
+is given as @{b}-@{ub} then the standard input file stream will be used as the
+tracing output file.
+
+   The @{b}mptrace@{ub} command will normally be built with GUI(1) support on
+UNIX platforms that are running X Windows.  This means that a graphical
+memory map display of the heap will be shown in a window every time
+@{b}mptrace@{ub} is run.  This display is updated every time a new event is read
+from the tracing output file and by default uses the colour red for
+internal heap memory (used by the mpatrol library), blue for unallocated
+heap memory, black for allocated memory and white for free memory.
+Options exist to change this colour scheme, as well as the dimensions
+of the drawing area and the window.
+
+   By default, it is assumed that the start address of the first event
+that appears in the tracing output file is the base address of the
+memory map displayed in the window.  If the heap grows downwards then
+this assumption will be incorrect (since nothing will be displayed) and
+so the @{b}--base@{ub} option must be used to specify a reasonable lower bound
+for the final memory map.  In addition, the visible address space
+displayed in the memory map is fixed to a certain size (4 megabytes by
+default), but this can be changed with the @{b}--space@{ub} option.  A small
+delay can also be added after drawing each memory allocation event
+through the use of the @{b}--delay@{ub} option.
+
+   The following options are specific to the GUI version of @{b}mptrace@{ub} and
+are read by the X command line parser rather than directly by @{b}mptrace@{ub}.
+As a result they are parsed according to X toolkit rules and do not
+appear in the quick-reference option summary produced by the @{b}--help@{ub}
+option.  The application class for setting @{b}mptrace@{ub} X resources is called
+@{b}MPTrace@{ub}.
+
+@{b}--alloc@{ub} <COLOUR>
+     Specifies the colour to use for displaying allocated memory.  The
+     default colour is @{b}black@{ub}.
+
+@{b}--base@{ub} <ADDRESS>
+     Specifies the base address of the visible address space displayed
+     in the memory map.  The default address is calculated at run-time
+     from the start address of the first memory allocation event in the
+     tracing output file.
+
+@{b}--delay@{ub} <LENGTH>
+     Specifies that a small delay of a certain length should be added
+     after drawing each memory allocation event.  The delay does not
+     correspond to a specific unit of time, but experimentation with
+     the length should yield satisfactory results.  The default delay
+     is @{b}0@{ub}.
+
+@{b}--free@{ub} <COLOUR>
+     Specifies the colour to use for displaying free memory.  The
+     default colour is @{b}white@{ub}.
+
+@{b}--height@{ub} <SIZE>
+     Specifies the height (in pixels) of the drawing area.  The default
+     height is @{b}512@{ub}.
+
+@{b}--internal@{ub} <COLOUR>
+     Specifies the colour to use for displaying internal heap memory.
+     The default colour is @{b}red@{ub}.
+
+@{b}--space@{ub} <SIZE>
+     Specifies the size (in megabytes) of the visible address space
+     displayed in the memory map.  The default size is @{b}4@{ub}.
+
+@{b}--unalloc@{ub} <COLOUR>
+     Specifies the colour to use for displaying unallocated heap
+     memory.  The default colour is @{b}blue@{ub}.
+
+@{b}--view-height@{ub} <SIZE>
+     Specifies the height (in pixels) of the window.  The default
+     height is @{b}256@{ub}.
+
+@{b}--view-width@{ub} <SIZE>
+     Specifies the width (in pixels) of the window.  The default width
+     is @{b}256@{ub}.
+
+@{b}--width@{ub} <SIZE>
+     Specifies the width (in pixels) of the drawing area.  The default
+     width is @{b}512@{ub}.
+
+   We'll now look at an example of using the mpatrol library to trace
+the dynamic memory allocations in a program.  As with the previous
+chapter we will attempt to trace a real application in order to examine
+its memory allocation behaviour.  Since all of the following steps were
+performed on a Solaris machine, the @{b}--dynamic@{ub} option of the @{b}mpatrol@{ub}
+command was used to allow us to replace the system memory allocation
+routines with mpatrol's routines without requiring a relink.  It also
+means that we can trace all of the child processes that were created by
+the application as well.
+
+   The application that we are going to trace is the GNU C compiler, as
+before, and we will discard the tracing information generated for the
+assembler and linker.  All of the command line examples use the @{b}bash@{ub}
+shell but in most cases these will work in other shells with a minimal
+amount of changes.
+
+   We will use @{b}tests/profile/test2.c@{ub} as the source file to compile with
+@{b}gcc@{ub} and we'll turn on optimisation in order to cause @{b}gcc@{ub} to allocate a
+bit more memory than it would normally.  When running it through the
+@{b}mpatrol@{ub} command we also use @{b}--check=0@{ub} so that we disable mpatrol's
+internal checks -- we don't need them if we are only tracing.  Note
+that use is also made of the format string feature of the @{b}--log-file@{ub}
+and @{b}--trace-file@{ub} options so that it is clear which mpatrol log and
+tracing output files belong to which processes.
+
+     bash$ mpatrol --dynamic --log-file=%p.log --trace-file=%p.trace
+                   --trace --check=0 gcc -O -o test2 test2.c
+     bash$ ls *.log *.trace
+     as.log         cc1.trace      cpp.log        gcc.trace
+     as.trace       collect2.log   cpp.trace      ld.log
+     cc1.log        collect2.trace gcc.log        ld.trace
+
+   As mentioned above, we're not interested in the mpatrol log and
+tracing output files for @{b}as@{ub} and @{b}ld@{ub} so we'll delete them.  We can now use
+@{b}mptrace@{ub} to decode each of the tracing output files produced and write
+their contents in tabular form to the standard output file stream,
+which can be redirected to a file for later viewing(2).  You can find
+these tracing output files in the @{b}extra@{ub} directory in the mpatrol
+distribution.
+
+     bash$ rm as.log as.trace ld.log ld.trace
+     bash$ ls *.trace
+     cc1.trace      collect2.trace cpp.trace      gcc.trace
+     bash$ for file in *.trace
+     > do
+     >     mptrace $file >`basename $file .trace`.res
+     > done
+     bash$ ls *.res
+     cc1.res        collect2.res   cpp.res        gcc.res
+
+   For the purposes of this example we will only be looking at the
+tracing results for the @{b}cc1@{ub} compiler which are now decoded in the file
+@{b}cc1.res@{ub}.  If you examine this file you will see something similar to
+the following.  Note that the @{b}...@{ub} marks text that has been removed.
+
+      event  type     index  allocation      size    life
+     ------  ------  ------  ----------  --------  ------
+             internal        0x0024E000     32768
+             internal        0x00256000     32768
+             internal        0x0025E000     32768
+             reserve         0x00266000      8192
+             internal        0x00268000     32768
+             internal        0x00270000     32768
+             internal        0x00278000     32768
+             internal        0x00280000     32768
+             internal        0x00288000     32768
+             internal        0x00290000     32768
+     ...
+             reserve         0x00308000     16384
+          1  alloc       19  0x00266568      4072
+          2  alloc       21  0x0030A008      4072
+          3  alloc       22  0x0030AFF0      4072
+             reserve         0x0030C000      8192
+          4  alloc       23  0x0030BFD8      4072
+          5  alloc       24  0x0030CFC0      4072
+             reserve         0x0030E000      8192
+          6  alloc       25  0x0030DFA8      4072
+          7  alloc       26  0x00267550        42
+     ...
+       1712  free       650  0x00373FF0      4072     827
+       1713  free       649  0x00376FA8      4072     829
+       1714  alloc     1074  0x00376FA8      4072
+       1715  free       233  0x0031ED18      8200    1498
+       1716  free       234  0x00320D20      8200    1498
+       1717  free       299  0x00355CC8       620    1426
+       1718  free       655  0x00353A28      1016     823
+       1719  free       303  0x0035E000      5096    1424
+       1720  free       653  0x00354E60       152     827
+       1721  free       654  0x00354EF8       152     827
+
+   There are six different columns of data displayed by the @{b}mptrace@{ub}
+command when it decodes the tracing output file and displays it in
+tabular format.  Here is an explanation for each of them.
+
+@{b}event@{ub}
+     This contains the event number (or time line) for each memory
+     allocation or deallocation (heap reservations are not considered
+     events for this purpose).  Each memory allocation or deallocation
+     increases the current event number, and this information is used
+     to calculate the lifetime of a heap allocation.
+
+@{b}type@{ub}
+     This contains the event type for each entry in the tracing output
+     file.  Memory allocations and deallocations are represented by
+     @{b}alloc@{ub} and @{b}free@{ub} respectively.  Normal heap reservations (that will
+     be used for memory allocations) are represented by @{b}reserve@{ub}, while
+     internal heap reservations (for use by the mpatrol library itself)
+     are represented by @{b}internal@{ub}.
+
+@{b}index@{ub}
+     This contains the allocation index that is used by the mpatrol
+     library to keep track of each unique memory allocation, and
+     corresponds directly to any memory allocations listed in the log
+     file.  Any memory allocation events that reuse allocation indices
+     represent a reallocation of the original allocation.
+
+@{b}allocation@{ub}
+     This contains the start address of the memory allocation.
+
+@{b}size@{ub}
+     This contains the size (in bytes) of the memory allocation.
+
+@{b}life@{ub}
+     This contains the lifetime of a memory allocation and is displayed
+     when it is is freed.  It is simply the difference between the
+     current event number and the event number at which the original
+     allocation took place, but is useful for working out how long a
+     memory allocation is valid throughout a program's execution.  If a
+     memory allocation is reallocated, its lifetime will be calculated
+     from the original time of allocation, @{i}not@{ui} the point at which it
+     was reallocated.
+
+   The first few entries in the table show that the mpatrol library
+started by allocating memory from the heap for its own purposes before
+reserving 8192 bytes for the memory allocations made by the object file
+access library for reading the symbols from the executable file and
+shared libraries(3).  Most of the further internal heap reservation
+events are due to the mpatrol library having to store details for all
+of the relevant symbols that it could read at program startup.  The
+more symbols that there are, the more memory that must be used to store
+them.  Note that the heap reservation events are not really relevant to
+the analysis of the program's memory allocations but they are used when
+displaying the heap graphically.
+
+   The first few memory allocation events in the table show that
+several memory allocations of 4072 bytes are being made along with
+several more heap reservations that are needed to store them.  The last
+events in the table are mainly all deallocation events of allocations
+that were made quite early on in the program.  The lifetime information
+for these events shows that some of these allocations were made very
+near the beginning of the program, while the others were made near the
+middle.  None of them were very big and so would not be occupying much
+memory.
+
+   As you will have noticed if you were running a GUI version of
+@{b}mptrace@{ub}, information about all of these events is displayed in
+graphical form inside the @{b}mptrace@{ub} display window.  The HTML, DVI,
+postscript and PDF versions of this manual contain a screenshot of the
+@{b}mptrace@{ub} display window when it is run with @{b}cc1.trace@{ub} as input.
+
+   Unlike memory allocation profiling which summarises all of the
+accumulated data, it is possible to trace memory allocation events in
+real-time as the program runs.  This can currently be done on UNIX
+platforms by piping the tracing output file from the program being run
+to the @{b}mptrace@{ub} command, which can be achieved in several ways depending
+on the UNIX system that you are using.  Both of the following methods
+are equivalent, where @{b}testprog@{ub} is the name of the program that is being
+traced (and has previously been linked with the mpatrol library).
+
+     # This method specifies the standard output file stream as the
+     # destination for the tracing output file and then runs both
+     # commands in a shell command pipe.  This has a disadvantage in
+     # that testprog must not write anything to stdout since that would
+     # be written out to the tracing output file.  If stdout is not
+     # suitable then stderr could be used instead if you redirect it.
+     
+     bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace -
+
+     # This method creates a named pipe called myfifo (but it could be
+     # called anything) and runs the program being traced and the mptrace
+     # command separately (perhaps in two separate windows).  If the
+     # mkfifo command is not available on your system then try mknod.
+     
+     bash$ mkfifo myfifo
+     bash$ mpatrol --trace-file=myfifo --trace ./testprog &
+     bash$ mptrace myfifo
+
+   The idea for graphically displaying a memory map of the heap comes
+from the @{b}xmem@{ub} tool supplied with the University of Toronto Computer
+Systems Research Institute malloc library, written by Mark Moraes.
+However, the documentation for that tool remarks that it was written as
+a quick and dirty hack.  The @{b}mptrace@{ub} command is hopefully more stable
+and contains a lot more functionality.
+
+   ---------- Footnotes ----------
+
+   (1) Graphical User Interface.
+
+   (2) If you are running a GUI version of @{b}mptrace@{ub} you will need to
+close the window after each file has been decoded.
+
+   (3) The actual allocation events from this do not appear since they
+were internal memory allocations.
+
+
+@endnode
+
 @node "Improving performance" "mpatrol.guide/Improving performance"
 @next "How it works"
-@prev "Profiling"
+@prev "Tracing"
 @toc "Main"
 
 Improving performance
@@ -8995,6 +9361,29 @@ Documentation
      @{i}whatis@{ui} database after installing new manual pages, by running
      @{b}makewhatis@{ub}, @{b}catman@{ub} or equivalent.
 
+     Alternatively, the mpatrol manual pages can be built in a variety
+     of different documentation formats that can be viewed or printed
+     without the need for a @{b}man@{ub} command.  If you have the correct tools
+     installed on your system then you should be able to do this by
+     examining the @{b}Makefile@{ub} in the @{b}man@{ub} directory.  If not, you can
+     always download an archive containing the latest mpatrol manual
+     pages in a variety of formats from
+     `http://www.cbmamiga.demon.co.uk/mpatrol/' and this will also
+     contain a file telling you where to get programs that can be used
+     to view or print these files.
+
+  6. Why does the @{b}libmpatrol.3@{ub} manual page not display correctly when I
+     view it with the @{b}man@{ub} command?
+
+     This is likely to be due to the @{b}tbl@{ub} command not being run to
+     process the tables when the @{b}man@{ub} command displays the manual page.
+     Many UNIX systems look at the first line of the manual page to see
+     what filters to run the page through before it is displayed, but
+     some systems do not recognise this and instead rely on an
+     environment variable such as @{b}MANROFFSEQ@{ub} to specify which filters
+     are to be run.  Look at the manual page for the @{b}man@{ub} command on
+     your system to find out more information.
+
 
 @endnode
 
@@ -11687,10 +12076,12 @@ Index
 
 
  @{" -addresses                               " link "Profiling"}   Profiling
+ @{" -alloc                                   " link "Tracing"}   Tracing
  @{" -alloc-byte                              " link "Options"}   Options
  @{" -alloc-stop                              " link "Options"}   Options
  @{" -allow-oflow                             " link "Options"}   Options
  @{" -auto-save                               " link "Options"}   Options
+ @{" -base                                    " link "Tracing"}   Tracing
  @{" -check                                   " link "Options"}   Options
  @{" -check-all                               " link "Options"}   Options
  @{" -check-allocs                            " link "Options"}   Options
@@ -11699,16 +12090,20 @@ Index
  @{" -check-reallocs                          " link "Options"}   Options
  @{" -counts                                  " link "Profiling"}   Profiling
  @{" -def-align                               " link "Options"}   Options
+ @{" -delay                                   " link "Tracing"}   Tracing
  @{" -dynamic                                 " link "Options"}   Options
  @{" -edit                                    " link "Options"}   Options
  @{" -editor                                  " link "The mpedit command"}   The mpedit command
  @{" -fail-freq                               " link "Options"}   Options
  @{" -fail-seed                               " link "Options"}   Options
+ @{" -free                                    " link "Tracing"}   Tracing
  @{" -free-byte                               " link "Options"}   Options
  @{" -free-stop                               " link "Options"}   Options
  @{" -graph-file                              " link "Profiling"}   Profiling
+ @{" -height                                  " link "Tracing"}   Tracing
  @{" -help                                    " link "Options"}   Options
  @{" -ignore                                  " link "The mleak command"}   The mleak command
+ @{" -internal                                " link "Tracing"}   Tracing
  @{" -large-bound                             " link "Options"}   Options
  @{" -leaks                                   " link "Profiling"}   Profiling
  @{" -limit                                   " link "Options"}   Options
@@ -11743,14 +12138,19 @@ Index
  @{" -show-unfreed                            " link "Options"}   Options
  @{" -small-bound                             " link "Options"}   Options
  @{" -source-dir                              " link "The mpedit command"}   The mpedit command
+ @{" -space                                   " link "Tracing"}   Tracing
  @{" -stack-depth                             " link "Profiling"}   Profiling
  @{" -threads                                 " link "Options"}   Options
  @{" -trace                                   " link "Options"}   Options
  @{" -trace-file                              " link "Options"}   Options
+ @{" -unalloc                                 " link "Tracing"}   Tracing
  @{" -unfreed-abort                           " link "Options"}   Options
  @{" -use-debug                               " link "Options"}   Options
  @{" -use-mmap                                " link "Options"}   Options
  @{" -version                                 " link "Options"}   Options
+ @{" -view-height                             " link "Tracing"}   Tracing
+ @{" -view-width                              " link "Tracing"}   Tracing
+ @{" -width                                   " link "Tracing"}   Tracing
  @{" .cshrc                                   " link "The mpatrol command"}   The mpatrol command
  @{" .gdbinit                                 " link "Using with a debugger"}   Using with a debugger
  @{" .profile                                 " link "The mpatrol command"}   The mpatrol command
@@ -11762,7 +12162,7 @@ Index
  @{" adding a new object file format          " link "New file format support"}   New file format support
  @{" adding a new operating system            " link "New system support"}   New system support
  @{" adding a new processor architecture      " link "New processor support"}   New processor support
- @{" address space                            " link "Operating system support"}   Operating system support
+ @{" address space                            " link "Tracing"}   Tracing
  @{" address, physical                        " link "Virtual memory"}   Virtual memory
  @{" address, virtual                         " link "Virtual memory"}   Virtual memory
  @{" AIX, IBM RS-6000                         " link "Supported systems"}   Supported systems
@@ -11803,6 +12203,7 @@ Index
  @{" AUTOSAVE                                 " link "Environment"}   Environment
  @{" backwards compatibility                  " link "Linking"}   Linking
  @{" BADALN                                   " link "Diagnostic messages"}   Diagnostic messages
+ @{" base address                             " link "Tracing"}   Tracing
  @{" bash                                     " link "The mpatrol command"}   The mpatrol command
  @{" BASIC                                    " link "Memory allocations"}   Memory allocations
  @{" batch testing                            " link "Testing"}   Testing
@@ -11855,6 +12256,7 @@ Index
  @{" CMEM                                     " link "Related software"}   Related software
  @{" COFF                                     " link "Examples"}   Examples
  @{" command line options                     " link "Options"}   Options
+ @{" command pipe                             " link "Tracing"}   Tracing
  @{" Commodore-Amiga, Inc.                    " link "Related software"}   Related software
  @{" common variables                         " link "Static memory allocations"}   Static memory allocations
  @{" compiler                                 " link "Installation"}   Installation
@@ -11927,6 +12329,7 @@ Index
  @{" error severity                           " link "Example 1"}   Example 1
  @{" errors                                   " link "Diagnostic messages"}   Diagnostic messages
  @{" errors, run-time                         " link "Overview"}   Overview
+ @{" event                                    " link "Tracing"}   Tracing
  @{" examples                                 " link "Examples"}   Examples
  @{" executable files                         " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" extern inline                            " link "Building"}   Building
@@ -11986,9 +12389,11 @@ Index
  @{" gprof                                    " link "Profiling"}   Profiling
  @{" graph                                    " link "Profiling"}   Profiling
  @{" graph specification file                 " link "Profiling"}   Profiling
+ @{" graphical user interface                 " link "Tracing"}   Tracing
  @{" GraphViz                                 " link "Profiling"}   Profiling
  @{" Great Circle                             " link "Related software"}   Related software
  @{" Green Hills Software, Inc.               " link "Related software"}   Related software
+ @{" GUI                                      " link "Tracing"}   Tracing
  @{" halting the library                      " link "Using with a debugger"}   Using with a debugger
  @{" handler functions                        " link "Example 1"}   Example 1
  @{" heap                                     " link "Dynamic memory allocations"}   Dynamic memory allocations
@@ -12048,6 +12453,7 @@ Index
  @{" library, shared                          " link "Features"}   Features
  @{" library, thread-safe                     " link "Features"}   Features
  @{" LibSafe                                  " link "Related software"}   Related software
+ @{" lifetime                                 " link "Tracing"}   Tracing
  @{" LIMIT                                    " link "Environment"}   Environment
  @{" limitations                              " link "Notes"}   Notes
  @{" limiting available memory                " link "Testing"}   Testing
@@ -12091,6 +12497,7 @@ Index
  @{" MalTrace                                 " link "Related software"}   Related software
  @{" mangled names                            " link "Example 1"}   Example 1
  @{" MANPATH                                  " link "Documentation"}   Documentation
+ @{" MANROFFSEQ                               " link "Documentation"}   Documentation
  @{" manual layout                            " link "Foreword"}   Foreword
  @{" manual pages                             " link "Installation"}   Installation
  @{" map of memory                            " link "Logging and tracing"}   Logging and tracing
@@ -12105,6 +12512,7 @@ Index
  @{" MemLeak                                  " link "Related software"}   Related software
  @{" Memory Advisor                           " link "Related software"}   Related software
  @{" memory allocation profiling              " link "Profiling"}   Profiling
+ @{" memory allocation tracing                " link "Tracing"}   Tracing
  @{" memory allocations                       " link "Memory allocations"}   Memory allocations
  @{" memory allocations, dynamic              " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" memory allocations, stack                " link "Stack memory allocations"}   Stack memory allocations
@@ -12134,6 +12542,8 @@ Index
  @{" misaligned data                          " link "Library behaviour"}   Library behaviour
  @{" misaligned memory accesses               " link "Virtual memory"}   Virtual memory
  @{" MISMAT                                   " link "Diagnostic messages"}   Diagnostic messages
+ @{" mkfifo                                   " link "Tracing"}   Tracing
+ @{" mknod                                    " link "Tracing"}   Tracing
  @{" ML                                       " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" mleak                                    " link "The mleak command"}   The mleak command
  @{" mleak command                            " link "The mleak command"}   The mleak command
@@ -12156,6 +12566,8 @@ Index
  @{" mpatrol library                          " link "Overview"}   Overview
  @{" mpatrol.h                                " link "Functions"}   Functions
  @{" mpatrol.log                              " link "Example 1"}   Example 1
+ @{" mpatrol.out                              " link "Profiling"}   Profiling
+ @{" mpatrol.trace                            " link "Tracing"}   Tracing
  @{" MPATROL_OPTIONS                          " link "Environment"}   Environment
  @{" MPATROL_SOURCEPATH                       " link "The mpedit command"}   The mpedit command
  @{" MPATROL_VERSION                          " link "Functions"}   Functions
@@ -12167,6 +12579,8 @@ Index
  @{" mprof command                            " link "Profiling"}   Profiling
  @{" mpsym                                    " link "The mpsym command"}   The mpsym command
  @{" mpsym command                            " link "The mpsym command"}   The mpsym command
+ @{" mptrace                                  " link "Tracing"}   Tracing
+ @{" mptrace command                          " link "Tracing"}   Tracing
  @{" MSS (Memory Supervision System)          " link "Related software"}   Related software
  @{" mtmalloc(3t)                             " link "Related software"}   Related software
  @{" MuForce                                  " link "Related software"}   Related software
@@ -12235,6 +12649,7 @@ Index
  @{" performance times                        " link "Library performance"}   Library performance
  @{" physical address                         " link "Virtual memory"}   Virtual memory
  @{" physical memory                          " link "Virtual memory"}   Virtual memory
+ @{" pipe                                     " link "Tracing"}   Tracing
  @{" PKG package                              " link "Installation"}   Installation
  @{" platform-independent notes               " link "Generic notes"}   Generic notes
  @{" platforms                                " link "Supported systems"}   Supported systems
@@ -12369,7 +12784,7 @@ Index
  @{" tracebacks                               " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" TRACEDIR                                 " link "Environment"}   Environment
  @{" TRACEFILE                                " link "Environment"}   Environment
- @{" tracing                                  " link "Logging and tracing"}   Logging and tracing
+ @{" tracing                                  " link "Tracing"}   Tracing
  @{" tracing file format                      " link "Tracing file format"}   Tracing file format
  @{" tree structure                           " link "Example 2"}   Example 2
  @{" TurboPower                               " link "Related software"}   Related software
@@ -12408,10 +12823,11 @@ Index
  @{" Windows, Intel 80x86                     " link "Supported systems"}   Supported systems
  @{" Wipeout                                  " link "Related software"}   Related software
  @{" write protection                         " link "Virtual memory"}   Virtual memory
- @{" X Windows                                " link "Building"}   Building
+ @{" X Windows                                " link "Tracing"}   Tracing
  @{" XANALYS Software Tools                   " link "References"}   References
  @{" XCOFF                                    " link "Examples"}   Examples
  @{" xemacs                                   " link "The mpedit command"}   The mpedit command
+ @{" xmem                                     " link "Tracing"}   Tracing
  @{" YaMa                                     " link "Related software"}   Related software
  @{" YAMD (Yet Another Malloc Debugger)       " link "Related software"}   Related software
  @{" ZERALN                                   " link "Diagnostic messages"}   Diagnostic messages

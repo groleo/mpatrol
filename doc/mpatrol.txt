@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
 December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.2 of the mpatrol manual for version 1.3.2, 13th
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 18th
 December, 2000.
 
 Foreword
@@ -582,13 +582,21 @@ if you perform the following steps.
      source for this manual and can be translated into a wide variety
      of documentation formats.  The `refcard.tex' file contains the
      LaTeX source for the quick reference card and can be translated
-     into formats suitable for printing onto a single page.  There may
+     into formats suitable for printing onto a few pages.  There may
      already be translated files in the `doc' directory, but if not you
      will either have to generate them yourself using an appropriate
      tool or you could download an archive containing the latest
      mpatrol manual and reference card in a variety of documentation
      formats from the mpatrol home page.  You can then install or print
      these documents.
+
+     If you are not installing on a system that supports UNIX manual
+     pages then you can also check in the `man' directory to see if
+     there are alternative formats for the mpatrol manual pages that
+     you can install.  If not, you may be able to generate them
+     yourself, or you can download an archive containing the latest
+     mpatrol manual pages in a variety of documentation formats from the
+     mpatrol home page.
 
    Alternatively, the `pkg' directory contains files that can be used to
 automatically generate a _package_ in a specific format suitable for
@@ -2112,7 +2120,9 @@ of the mpatrol library.  Each command comes with its own UNIX manual
 page (although they also support the `--help' and `--version' options),
 but a few of the commands are written as UNIX shell scripts and so will
 not work on non-UNIX platforms.  Note that the `mprof' command is
-documented in the profiling chapter (*note Profiling::).
+documented in the profiling chapter (*note Profiling::) and the
+`mptrace' command is documented in the tracing chapter (*note
+Tracing::).
 
 7.8.1 The `mpatrol' command
 ---------------------------
@@ -2930,8 +2940,360 @@ calls took place.
    (2) Cycles in the graph are marked by dashed lines along the
 relevant edges instead of solid lines.
 
-9 Improving performance
-***********************
+9 Tracing
+*********
+
+   In addition to profiling, the mpatrol library also has the
+capability to concisely trace the details of every dynamic memory
+allocation and deallocation over the lifetime of any program that it
+was linked and run with.  This information can then be used to
+calculate trends in a program's memory allocation behaviour and provide
+details on the lifetimes of memory allocations.  In contrast to
+profiling, it can also be used to display a program's memory allocation
+behaviour in real-time, along with some useful information that can be
+displayed in graphical or tabular form.
+
+   As with profiling, only allocations and deallocations are recorded,
+with each reallocation being treated as a deallocation immediately
+followed by an allocation.  The intention of tracing is to gather
+concise details about each memory allocation event rather than complete
+information about some or all memory allocations.  As a result, the
+mpatrol log files and profiling output files contain more detailed
+information about individual memory allocations, whereas the tracing
+output files contain a broader view of allocation behaviour throughout
+the entire program.
+
+   Memory allocation tracing is disabled by default, but can be enabled
+using the `TRACE' option.  This writes all of the tracing data to a
+file called `mpatrol.trace' in the current directory at the end of
+program execution, but the name of this file can be changed using the
+`TRACEFILE' option and the default directory in which to place these
+files can be changed by setting the `TRACEDIR' environment variable.
+
+   Normally, the mpatrol library will perform tracing with all of its
+other features and checks enabled, but you might want to disable these
+if you only wish to trace the memory allocations.  For example, you may
+wish to use the `CHECK=0' and `NOPROTECT' options to remove the
+internal checking of the library and speed up tracing dramatically.
+
+   The `mptrace' command is a tool designed to read a tracing output
+file produced by the mpatrol library and display the tracing
+information that was obtained.  The tracing information is a concise
+encoded trace of all of the memory allocation events that occurred
+during a program's execution, and can be decoded into tabular or
+graphical form, along with any relevant statistics that can be
+calculated.
+
+   The `mptrace' command also attempts to calculate the endianness of
+the processor that produced the tracing output file and reads the file
+accordingly.  This means that it is possible to use `mptrace' on a
+SPARC machine to read a tracing output file that was produced on an
+Intel 80x86 machine, for example.  However, this will only work if the
+processor that produced the tracing output file has the same word size
+as the processor that is running the `mptrace' command.  For example,
+reading a 64-bit tracing output file on a 32-bit machine will not work.
+
+   In addition, the tracing output file also contains the version
+number of the mpatrol library which produced it.  If the major version
+number that is embedded in the tracing output file is newer that the
+version of mpatrol that `mptrace' came with then `mptrace' will refuse
+to read the file.  You should download the latest version of mpatrol in
+that case.  The reason for storing the version number is so that the
+format of the tracing output file can change between releases of
+mpatrol, but also allow `mptrace' to cope with older versions.
+
+   Along with the usual `--help' and `--version' options, the `mptrace'
+command takes one optional argument which must be a valid mpatrol
+tracing output filename but if it is omitted then it will use
+`mpatrol.trace' as the name of the file to use.  If the filename
+argument is given as `-' then the standard input file stream will be
+used as the tracing output file.
+
+   The `mptrace' command will normally be built with GUI(1) support on
+UNIX platforms that are running X Windows.  This means that a graphical
+memory map display of the heap will be shown in a window every time
+`mptrace' is run.  This display is updated every time a new event is
+read from the tracing output file and by default uses the colour red
+for internal heap memory (used by the mpatrol library), blue for
+unallocated heap memory, black for allocated memory and white for free
+memory.  Options exist to change this colour scheme, as well as the
+dimensions of the drawing area and the window.
+
+   By default, it is assumed that the start address of the first event
+that appears in the tracing output file is the base address of the
+memory map displayed in the window.  If the heap grows downwards then
+this assumption will be incorrect (since nothing will be displayed) and
+so the `--base' option must be used to specify a reasonable lower bound
+for the final memory map.  In addition, the visible address space
+displayed in the memory map is fixed to a certain size (4 megabytes by
+default), but this can be changed with the `--space' option.  A small
+delay can also be added after drawing each memory allocation event
+through the use of the `--delay' option.
+
+   The following options are specific to the GUI version of `mptrace'
+and are read by the X command line parser rather than directly by
+`mptrace'.  As a result they are parsed according to X toolkit rules
+and do not appear in the quick-reference option summary produced by the
+`--help' option.  The application class for setting `mptrace' X
+resources is called `MPTrace'.
+
+`--alloc' <COLOUR>
+     Specifies the colour to use for displaying allocated memory.  The
+     default colour is `black'.
+
+`--base' <ADDRESS>
+     Specifies the base address of the visible address space displayed
+     in the memory map.  The default address is calculated at run-time
+     from the start address of the first memory allocation event in the
+     tracing output file.
+
+`--delay' <LENGTH>
+     Specifies that a small delay of a certain length should be added
+     after drawing each memory allocation event.  The delay does not
+     correspond to a specific unit of time, but experimentation with
+     the length should yield satisfactory results.  The default delay
+     is `0'.
+
+`--free' <COLOUR>
+     Specifies the colour to use for displaying free memory.  The
+     default colour is `white'.
+
+`--height' <SIZE>
+     Specifies the height (in pixels) of the drawing area.  The default
+     height is `512'.
+
+`--internal' <COLOUR>
+     Specifies the colour to use for displaying internal heap memory.
+     The default colour is `red'.
+
+`--space' <SIZE>
+     Specifies the size (in megabytes) of the visible address space
+     displayed in the memory map.  The default size is `4'.
+
+`--unalloc' <COLOUR>
+     Specifies the colour to use for displaying unallocated heap
+     memory.  The default colour is `blue'.
+
+`--view-height' <SIZE>
+     Specifies the height (in pixels) of the window.  The default
+     height is `256'.
+
+`--view-width' <SIZE>
+     Specifies the width (in pixels) of the window.  The default width
+     is `256'.
+
+`--width' <SIZE>
+     Specifies the width (in pixels) of the drawing area.  The default
+     width is `512'.
+
+   We'll now look at an example of using the mpatrol library to trace
+the dynamic memory allocations in a program.  As with the previous
+chapter we will attempt to trace a real application in order to examine
+its memory allocation behaviour.  Since all of the following steps were
+performed on a Solaris machine, the `--dynamic' option of the `mpatrol'
+command was used to allow us to replace the system memory allocation
+routines with mpatrol's routines without requiring a relink.  It also
+means that we can trace all of the child processes that were created by
+the application as well.
+
+   The application that we are going to trace is the GNU C compiler, as
+before, and we will discard the tracing information generated for the
+assembler and linker.  All of the command line examples use the `bash'
+shell but in most cases these will work in other shells with a minimal
+amount of changes.
+
+   We will use `tests/profile/test2.c' as the source file to compile
+with `gcc' and we'll turn on optimisation in order to cause `gcc' to
+allocate a bit more memory than it would normally.  When running it
+through the `mpatrol' command we also use `--check=0' so that we disable
+mpatrol's internal checks -- we don't need them if we are only tracing.
+Note that use is also made of the format string feature of the
+`--log-file' and `--trace-file' options so that it is clear which
+mpatrol log and tracing output files belong to which processes.
+
+     bash$ mpatrol --dynamic --log-file=%p.log --trace-file=%p.trace
+                   --trace --check=0 gcc -O -o test2 test2.c
+     bash$ ls *.log *.trace
+     as.log         cc1.trace      cpp.log        gcc.trace
+     as.trace       collect2.log   cpp.trace      ld.log
+     cc1.log        collect2.trace gcc.log        ld.trace
+
+   As mentioned above, we're not interested in the mpatrol log and
+tracing output files for `as' and `ld' so we'll delete them.  We can
+now use `mptrace' to decode each of the tracing output files produced
+and write their contents in tabular form to the standard output file
+stream, which can be redirected to a file for later viewing(2).  You
+can find these tracing output files in the `extra' directory in the
+mpatrol distribution.
+
+     bash$ rm as.log as.trace ld.log ld.trace
+     bash$ ls *.trace
+     cc1.trace      collect2.trace cpp.trace      gcc.trace
+     bash$ for file in *.trace
+     > do
+     >     mptrace $file >`basename $file .trace`.res
+     > done
+     bash$ ls *.res
+     cc1.res        collect2.res   cpp.res        gcc.res
+
+   For the purposes of this example we will only be looking at the
+tracing results for the `cc1' compiler which are now decoded in the
+file `cc1.res'.  If you examine this file you will see something
+similar to the following.  Note that the `...' marks text that has been
+removed.
+
+      event  type     index  allocation      size    life
+     ------  ------  ------  ----------  --------  ------
+             internal        0x0024E000     32768
+             internal        0x00256000     32768
+             internal        0x0025E000     32768
+             reserve         0x00266000      8192
+             internal        0x00268000     32768
+             internal        0x00270000     32768
+             internal        0x00278000     32768
+             internal        0x00280000     32768
+             internal        0x00288000     32768
+             internal        0x00290000     32768
+     ...
+             reserve         0x00308000     16384
+          1  alloc       19  0x00266568      4072
+          2  alloc       21  0x0030A008      4072
+          3  alloc       22  0x0030AFF0      4072
+             reserve         0x0030C000      8192
+          4  alloc       23  0x0030BFD8      4072
+          5  alloc       24  0x0030CFC0      4072
+             reserve         0x0030E000      8192
+          6  alloc       25  0x0030DFA8      4072
+          7  alloc       26  0x00267550        42
+     ...
+       1712  free       650  0x00373FF0      4072     827
+       1713  free       649  0x00376FA8      4072     829
+       1714  alloc     1074  0x00376FA8      4072
+       1715  free       233  0x0031ED18      8200    1498
+       1716  free       234  0x00320D20      8200    1498
+       1717  free       299  0x00355CC8       620    1426
+       1718  free       655  0x00353A28      1016     823
+       1719  free       303  0x0035E000      5096    1424
+       1720  free       653  0x00354E60       152     827
+       1721  free       654  0x00354EF8       152     827
+
+   There are six different columns of data displayed by the `mptrace'
+command when it decodes the tracing output file and displays it in
+tabular format.  Here is an explanation for each of them.
+
+`event'
+     This contains the event number (or time line) for each memory
+     allocation or deallocation (heap reservations are not considered
+     events for this purpose).  Each memory allocation or deallocation
+     increases the current event number, and this information is used
+     to calculate the lifetime of a heap allocation.
+
+`type'
+     This contains the event type for each entry in the tracing output
+     file.  Memory allocations and deallocations are represented by
+     `alloc' and `free' respectively.  Normal heap reservations (that
+     will be used for memory allocations) are represented by `reserve',
+     while internal heap reservations (for use by the mpatrol library
+     itself) are represented by `internal'.
+
+`index'
+     This contains the allocation index that is used by the mpatrol
+     library to keep track of each unique memory allocation, and
+     corresponds directly to any memory allocations listed in the log
+     file.  Any memory allocation events that reuse allocation indices
+     represent a reallocation of the original allocation.
+
+`allocation'
+     This contains the start address of the memory allocation.
+
+`size'
+     This contains the size (in bytes) of the memory allocation.
+
+`life'
+     This contains the lifetime of a memory allocation and is displayed
+     when it is is freed.  It is simply the difference between the
+     current event number and the event number at which the original
+     allocation took place, but is useful for working out how long a
+     memory allocation is valid throughout a program's execution.  If a
+     memory allocation is reallocated, its lifetime will be calculated
+     from the original time of allocation, _not_ the point at which it
+     was reallocated.
+
+   The first few entries in the table show that the mpatrol library
+started by allocating memory from the heap for its own purposes before
+reserving 8192 bytes for the memory allocations made by the object file
+access library for reading the symbols from the executable file and
+shared libraries(3).  Most of the further internal heap reservation
+events are due to the mpatrol library having to store details for all
+of the relevant symbols that it could read at program startup.  The
+more symbols that there are, the more memory that must be used to store
+them.  Note that the heap reservation events are not really relevant to
+the analysis of the program's memory allocations but they are used when
+displaying the heap graphically.
+
+   The first few memory allocation events in the table show that
+several memory allocations of 4072 bytes are being made along with
+several more heap reservations that are needed to store them.  The last
+events in the table are mainly all deallocation events of allocations
+that were made quite early on in the program.  The lifetime information
+for these events shows that some of these allocations were made very
+near the beginning of the program, while the others were made near the
+middle.  None of them were very big and so would not be occupying much
+memory.
+
+   As you will have noticed if you were running a GUI version of
+`mptrace', information about all of these events is displayed in
+graphical form inside the `mptrace' display window.  The HTML, DVI,
+postscript and PDF versions of this manual contain a screenshot of the
+`mptrace' display window when it is run with `cc1.trace' as input.
+
+   Unlike memory allocation profiling which summarises all of the
+accumulated data, it is possible to trace memory allocation events in
+real-time as the program runs.  This can currently be done on UNIX
+platforms by piping the tracing output file from the program being run
+to the `mptrace' command, which can be achieved in several ways
+depending on the UNIX system that you are using.  Both of the following
+methods are equivalent, where `testprog' is the name of the program
+that is being traced (and has previously been linked with the mpatrol
+library).
+
+     # This method specifies the standard output file stream as the
+     # destination for the tracing output file and then runs both
+     # commands in a shell command pipe.  This has a disadvantage in
+     # that testprog must not write anything to stdout since that would
+     # be written out to the tracing output file.  If stdout is not
+     # suitable then stderr could be used instead if you redirect it.
+     
+     bash$ mpatrol --trace-file=stdout --trace ./testprog | mptrace -
+
+     # This method creates a named pipe called myfifo (but it could be
+     # called anything) and runs the program being traced and the mptrace
+     # command separately (perhaps in two separate windows).  If the
+     # mkfifo command is not available on your system then try mknod.
+     
+     bash$ mkfifo myfifo
+     bash$ mpatrol --trace-file=myfifo --trace ./testprog &
+     bash$ mptrace myfifo
+
+   The idea for graphically displaying a memory map of the heap comes
+from the `xmem' tool supplied with the University of Toronto Computer
+Systems Research Institute malloc library, written by Mark Moraes.
+However, the documentation for that tool remarks that it was written as
+a quick and dirty hack.  The `mptrace' command is hopefully more stable
+and contains a lot more functionality.
+
+   ---------- Footnotes ----------
+
+   (1) Graphical User Interface.
+
+   (2) If you are running a GUI version of `mptrace' you will need to
+close the window after each file has been decoded.
+
+   (3) The actual allocation events from this do not appear since they
+were internal memory allocations.
+
+10 Improving performance
+************************
 
    Because of their need to cover every eventuality, malloc library
 implementations are very general and most do their job well when you
@@ -3089,7 +3451,7 @@ software::).
 
    (4) Whether they are documented or not.
 
-10 How it works
+11 How it works
 ***************
 
    The mpatrol library was originally written with the intention of
@@ -3210,7 +3572,7 @@ not contain as many of the useful features that the UNIX ports have,
 although sometimes not because they cannot ever support them, but
 because there would be a huge amount of work involved.
 
-11 Examples
+12 Examples
 ***********
 
    Following are a set of examples that are intended to illustrate what
@@ -3283,7 +3645,7 @@ environment variable that the mpatrol library uses is called
 this environment variable by setting it to `HELP' and then running a
 program that has been linked with the library.
 
-11.1 Getting started
+12.1 Getting started
 ====================
 
    The first example we'll look at is when the argument in a call to
@@ -3836,7 +4198,7 @@ above example have been numbered and their descriptions appear below.
 or the `mpsym' command is used and supported, and if debugging
 information about the call to `malloc()' is available.
 
-11.2 Detecting incorrect reuse of freed memory
+12.2 Detecting incorrect reuse of freed memory
 ==============================================
 
    The next example uses `tests/fail/test2.c' to illustrate how the
@@ -3968,7 +4330,7 @@ contents of such allocations can be preserved with the `PRESERVE'
 option.  This could help in situations when you need to determine
 exactly if a program is relying on the contents of freed memory.
 
-11.3 Detecting use of free memory
+12.3 Detecting use of free memory
 =================================
 
    This next example illustrates how the mpatrol library is able to
@@ -4118,7 +4480,7 @@ overflow buffer, and also means that the program would have to read six
 bytes beyond the end of the allocation before the illegal memory access
 would be detected.
 
-11.4 Using overflow buffers
+12.4 Using overflow buffers
 ===========================
 
    This example illustrates the use of overflow buffers and so the
@@ -4195,7 +4557,7 @@ checked individually by the system to see if it accesses a watch point
 area.  Slowing the program down by a factor of 10,000 is not uncommon
 on some systems when the `OFLOWWATCH' option is used.
 
-11.5 Bad memory operations
+12.5 Bad memory operations
 ==========================
 
    In C there are several basic memory operation functions that are
@@ -4286,7 +4648,7 @@ ordering of parameters than that shown.
    (1) The error can be turned into a warning with the `ALLOWOFLOW'
 option which will also force the operation to be performed.
 
-11.6 Incompatible function calls
+12.6 Incompatible function calls
 ================================
 
    This example illustrates how the mpatrol library checks for calls to
@@ -4339,7 +4701,7 @@ matched by calls to `operator delete[]' and not `operator delete'.
 Hence, the library reports this as an error and does not free the memory
 allocation.
 
-11.7 The `alloca()' functions
+12.7 The `alloca()' functions
 =============================
 
    There are two examples of using `alloca()' and its related functions
@@ -4666,7 +5028,7 @@ mpatrol library.  The only real difference between the two types of
 memory allocations is that allocations made by the `alloca()' family of
 functions will never show up in the list of unfreed memory allocations.
 
-11.8 Additional useful information
+12.8 Additional useful information
 ==================================
 
    This last example illustrates the various `SHOW' options that are
@@ -4994,7 +5356,7 @@ option is used.
      
          ...
 
-12 Tutorial
+13 Tutorial
 ***********
 
    In this chapter we'll look at a real example of using the mpatrol
@@ -8495,6 +8857,29 @@ I.1 Documentation
      to update the _whatis_ database after installing new manual pages,
      by running `makewhatis', `catman' or equivalent.
 
+     Alternatively, the mpatrol manual pages can be built in a variety
+     of different documentation formats that can be viewed or printed
+     without the need for a `man' command.  If you have the correct
+     tools installed on your system then you should be able to do this
+     by examining the `Makefile' in the `man' directory.  If not, you
+     can always download an archive containing the latest mpatrol
+     manual pages in a variety of formats from
+     `http://www.cbmamiga.demon.co.uk/mpatrol/' and this will also
+     contain a file telling you where to get programs that can be used
+     to view or print these files.
+
+  6. Why does the `libmpatrol.3' manual page not display correctly when
+     I view it with the `man' command?
+
+     This is likely to be due to the `tbl' command not being run to
+     process the tables when the `man' command displays the manual
+     page.  Many UNIX systems look at the first line of the manual page
+     to see what filters to run the page through before it is
+     displayed, but some systems do not recognise this and instead rely
+     on an environment variable such as `MANROFFSEQ' to specify which
+     filters are to be run.  Look at the manual page for the `man'
+     command on your system to find out more information.
+
 I.2 Building
 ============
 
@@ -11134,6 +11519,7 @@ Index
 *****
 
 -addresses:                                         See 8.
+-alloc:                                             See 9.
 -alloc-byte:                                       
           See ``Appendix C Options''.
 -alloc-stop:                                       
@@ -11142,6 +11528,7 @@ Index
           See ``Appendix C Options''.
 -auto-save:                                        
           See ``Appendix C Options''.
+-base:                                              See 9.
 -check:                                            
           See ``Appendix C Options''.
 -check-all:                                        
@@ -11157,6 +11544,7 @@ Index
 -counts:                                            See 8.
 -def-align:                                        
           See ``Appendix C Options''.
+-delay:                                             See 9.
 -dynamic:                                          
           See ``Appendix C Options''.
 -edit:                                             
@@ -11166,14 +11554,17 @@ Index
           See ``Appendix C Options''.
 -fail-seed:                                        
           See ``Appendix C Options''.
+-free:                                              See 9.
 -free-byte:                                        
           See ``Appendix C Options''.
 -free-stop:                                        
           See ``Appendix C Options''.
 -graph-file:                                        See 8.
+-height:                                            See 9.
 -help:                                             
           See ``Appendix C Options''.
 -ignore:                                            See 7.8.2.
+-internal:                                          See 9.
 -large-bound:                                      
           See ``Appendix C Options''.
 -leaks:                                             See 8.
@@ -11239,6 +11630,7 @@ Index
 -small-bound:                                      
           See ``Appendix C Options''.
 -source-dir:                                        See 7.8.4.
+-space:                                             See 9.
 -stack-depth:                                       See 8.
 -threads:                                          
           See ``Appendix C Options''.
@@ -11246,6 +11638,7 @@ Index
           See ``Appendix C Options''.
 -trace-file:                                       
           See ``Appendix C Options''.
+-unalloc:                                           See 9.
 -unfreed-abort:                                    
           See ``Appendix C Options''.
 -use-debug:                                        
@@ -11254,6 +11647,9 @@ Index
           See ``Appendix C Options''.
 -version:                                          
           See ``Appendix C Options''.
+-view-height:                                       See 9.
+-view-width:                                        See 9.
+-width:                                             See 9.
 .cshrc:                                             See 7.8.1.
 .gdbinit:                                           See 7.5.
 .profile:                                           See 7.8.1.
@@ -11271,7 +11667,7 @@ adding a new operating system:
           See ``G.1 Adding a new operating system''.
 adding a new processor architecture:               
           See ``G.2 Adding a new processor architecture''.
-address space:                                      See 6.
+address space:                                      See 9.
 address, physical:                                  See 6.1.
 address, virtual:                                   See 6.1.
 AIX, IBM RS/6000:                                  
@@ -11279,16 +11675,16 @@ AIX, IBM RS/6000:
 alignment:                                          See 7.1.
 all (make target):                                  See 3.
 alloca:                                             See 5.3.
-allocated blocks:                                   See 11.1.
-allocation algorithm:                               See 10.
+allocated blocks:                                   See 12.1.
+allocation algorithm:                               See 11.
 allocation bin table:                               See 8.
 allocation bins:                                    See 8.
 allocation boundaries:                              See 8.
 allocation byte:                                    See 7.3.
-allocation index:                                   See 11.1.
+allocation index:                                   See 12.1.
 allocation information:                            
           See ``Appendix A Functions''.
-allocation type:                                    See 11.1.
+allocation type:                                    See 12.1.
 ALLOCBYTE:                                         
           See ``Appendix B Environment''.
 ALLOCSTOP:                                         
@@ -11299,13 +11695,13 @@ ALLOWOFLOW:
           See ``Appendix B Environment''.
 ALLZER:                                            
           See ``Appendix D Diagnostic messages''.
-amalloc:                                            See 9.
+amalloc:                                            See 10.
 Amiga 4000/040:                                     See 3.
 Amiga notes:                                       
           See ``H.3 Notes for Amiga platforms''.
 AmigaOS, Motorola 680x0:                           
           See ``Appendix G Supported systems''.
-ANSI:                                               See 9.
+ANSI:                                               See 10.
 application binary interface:                       See 6.2.
 AProbe:                                            
           See ``Appendix J Related software''.
@@ -11315,7 +11711,7 @@ AR:                                                 See 3.
 ARCH:                                              
           See ``I.2 Building''.
 archive library:                                    See 2.
-arenas:                                             See 9.
+arenas:                                             See 10.
 articles:                                          
           See ``Appendix K References''.
 assembler:                                          See 8.
@@ -11331,18 +11727,19 @@ backwards compatibility:
           See ``I.3 Linking''.
 BADALN:                                            
           See ``Appendix D Diagnostic messages''.
+base address:                                       See 9.
 bash:                                               See 7.8.1.
 BASIC:                                              See 5.
 batch testing:                                      See 7.6.
-best fit:                                           See 10.
-BFD:                                                See 11.
+best fit:                                           See 11.
+BFD:                                                See 12.
 bin:                                                See 8.
 binary:                                            
           See ``Appendix B Environment''.
 binary file:                                        See 8.
 bit bucket:                                        
           See ``I.4 Running''.
-blocks:                                             See 11.1.
+blocks:                                             See 12.1.
 BoundsChecker:                                     
           See ``Appendix J Related software''.
 breakpoint:                                         See 7.5.
@@ -11358,17 +11755,17 @@ building questions:
           See ``I.2 Building''.
 building the library:                               See 3.
 bus errors:                                         See 7.1.
-bytes compared:                                     See 11.1.
-bytes copied:                                       See 11.1.
-bytes located:                                      See 11.1.
-bytes set:                                          See 11.1.
+bytes compared:                                     See 12.1.
+bytes copied:                                       See 12.1.
+bytes located:                                      See 12.1.
+bytes set:                                          See 12.1.
 C:                                                  See 5.
 C++:                                                See 5.
-C++ mangled names:                                  See 11.1.
+C++ mangled names:                                  See 12.1.
 call sites:                                         See 8.
 call stacks:                                        See 6.2.
 call-by-value:                                      See 5.2.
-callback functions:                                 See 11.1.
+callback functions:                                 See 12.1.
 calling convention:                                 See 6.2.
 CC:                                                 See 3.
 Ccmalloc:                                          
@@ -11400,9 +11797,10 @@ clean (make target):                                See 3.
 clobber (make target):                              See 3.
 CMEM:                                              
           See ``Appendix J Related software''.
-COFF:                                               See 11.
+COFF:                                               See 12.
 command line options:                              
           See ``Appendix C Options''.
+command pipe:                                       See 9.
 Commodore-Amiga, Inc.:                             
           See ``Appendix J Related software''.
 common variables:                                   See 5.1.
@@ -11415,7 +11813,7 @@ contributors:
           See ``Foreword''.
 core file:                                         
           See ``I.4 Running''.
-crash:                                              See 11.1.
+crash:                                              See 12.1.
 csh:                                                See 7.8.1.
 CSRI malloc:                                       
           See ``Appendix J Related software''.
@@ -11438,7 +11836,7 @@ declarations, tentative:                            See 5.1.
 DEFALIGN:                                          
           See ``Appendix B Environment''.
 Dell Inspiron 7500:                                 See 3.
-demangler:                                          See 11.1.
+demangler:                                          See 12.1.
 DG/UX, Intel 80x86:                                
           See ``Appendix G Supported systems''.
 DG/UX, Motorola 88xx0:                             
@@ -11447,7 +11845,7 @@ diagnostic messages:
           See ``Appendix D Diagnostic messages''.
 Digital Equipment Corporation:                     
           See ``Appendix J Related software''.
-Digital UNIX:                                       See 9.
+Digital UNIX:                                       See 10.
 direct allocation table:                            See 8.
 direct allocations:                                 See 8.
 DLLs:                                               See 6.2.
@@ -11465,12 +11863,12 @@ dotty:                                              See 8.
 driver:                                             See 8.
 DRS/NX, SPARC:                                     
           See ``Appendix G Supported systems''.
-dumping memory:                                     See 11.4.
+dumping memory:                                     See 12.4.
 duplicate symbols:                                 
           See ``I.3 Linking''.
 DVI:                                               
           See ``I.1 Documentation''.
-DWARF:                                              See 10.
+DWARF:                                              See 11.
 dynamic link libraries:                             See 6.2.
 dynamic linker:                                     See 6.2.
 dynamic linking:                                    See 6.2.
@@ -11485,8 +11883,8 @@ Electric Fence:
           See ``Appendix J Related software''.
 Electric Software, Inc.:                           
           See ``Appendix J Related software''.
-ELF32:                                              See 11.
-ELF64:                                              See 11.
+ELF32:                                              See 12.
+ELF64:                                              See 12.
 emacs:                                              See 7.8.4.
 embedded libraries:                                 See 7.8.1.
 embedded systems:                                   See 6.
@@ -11495,18 +11893,19 @@ Enforcer:
           See ``Appendix J Related software''.
 enhancements:                                      
           See ``Appendix H Notes''.
-entry-point:                                        See 11.1.
+entry-point:                                        See 12.1.
 ENVIRON:                                           
           See ``I.2 Building''.
 environment:                                       
           See ``Appendix B Environment''.
-epilogue function:                                  See 11.1.
-error abbreviation code:                            See 11.1.
-error severity:                                     See 11.1.
+epilogue function:                                  See 12.1.
+error abbreviation code:                            See 12.1.
+error severity:                                     See 12.1.
 errors:                                            
           See ``Appendix D Diagnostic messages''.
 errors, run-time:                                   See 1.
-examples:                                           See 11.
+event:                                              See 9.
+examples:                                           See 12.
 executable files:                                   See 6.2.
 extern inline:                                     
           See ``I.2 Building''.
@@ -11518,7 +11917,7 @@ failure frequency:                                  See 7.6.
 failure seed:                                       See 7.6.
 FAQ:                                               
           See ``Appendix I Frequently asked questions''.
-fatal errors:                                       See 11.1.
+fatal errors:                                       See 12.1.
 fault, page:                                        See 6.1.
 FDA (Free Debug Allocator):                        
           See ``Appendix J Related software''.
@@ -11530,8 +11929,8 @@ file scope variables:                               See 5.1.
 files questions:                                   
           See ``I.5 Files''.
 files, mapping:                                     See 6.1.
-first fit:                                          See 10.
-fitting allocations:                                See 11.3.
+first fit:                                          See 11.
+fitting allocations:                                See 12.3.
 foreword:                                          
           See ``Foreword''.
 FORMAT:                                            
@@ -11550,14 +11949,14 @@ FRDOVF:
           See ``Appendix D Diagnostic messages''.
 FRECOR:                                            
           See ``Appendix D Diagnostic messages''.
-free blocks:                                        See 11.1.
+free blocks:                                        See 12.1.
 free byte:                                          See 7.3.
 free memory:                                        See 7.3.
 FREEBYTE:                                          
           See ``Appendix B Environment''.
-freed blocks:                                       See 11.1.
+freed blocks:                                       See 12.1.
 freed memory:                                       See 7.3.
-freed queue:                                        See 11.1.
+freed queue:                                        See 12.1.
 FREESTOP:                                          
           See ``Appendix B Environment''.
 FRENUL:                                            
@@ -11571,15 +11970,15 @@ FreshMeat:
 function call stacks:                               See 6.2.
 functions:                                         
           See ``Appendix A Functions''.
-functions, callback:                                See 11.1.
-functions, handler:                                 See 11.1.
+functions, callback:                                See 12.1.
+functions, handler:                                 See 12.1.
 future enhancements:                               
           See ``Appendix H Notes''.
-g++:                                                See 11.1.
+g++:                                                See 12.1.
 garbage collector:                                  See 5.3.
 GC (Garbage Collector):                            
           See ``Appendix J Related software''.
-gcc:                                                See 11.1.
+gcc:                                                See 12.1.
 gdb:                                                See 7.5.
 general errors:                                     See 7.3.
 Geodesic Systems:                                  
@@ -11593,15 +11992,17 @@ GNU C library:
 gprof:                                              See 8.
 graph:                                              See 8.
 graph specification file:                           See 8.
+graphical user interface:                           See 9.
 GraphViz:                                           See 8.
 Great Circle:                                      
           See ``Appendix J Related software''.
 Green Hills Software, Inc.:                        
           See ``Appendix J Related software''.
+GUI:                                                See 9.
 halting the library:                                See 7.5.
-handler functions:                                  See 11.1.
+handler functions:                                  See 12.1.
 heap:                                               See 5.3.
-heap usage:                                         See 11.1.
+heap usage:                                         See 12.1.
 HeapAgent:                                         
           See ``Appendix J Related software''.
 HeapCheck:                                         
@@ -11612,19 +12013,19 @@ HELP:
           See ``Appendix B Environment''.
 hexadecimal:                                       
           See ``Appendix B Environment''.
-hidden memory:                                      See 10.
-hints:                                              See 9.
+hidden memory:                                      See 11.
+hints:                                              See 10.
 HP/UX, HP PA/RISC:                                 
           See ``Appendix G Supported systems''.
 Hyperlearning Center:                              
           See ``Appendix K References''.
 IBM Corporation:                                   
           See ``Appendix J Related software''.
-illegal memory accesses:                            See 11.3.
+illegal memory accesses:                            See 12.3.
 ILLMEM:                                            
           See ``Appendix D Diagnostic messages''.
-implementation details:                             See 10.
-improving performance:                              See 9.
+implementation details:                             See 11.
+improving performance:                              See 10.
 INCOMP:                                            
           See ``Appendix D Diagnostic messages''.
 INFOPATH:                                          
@@ -11639,7 +12040,7 @@ instrumentation:
 Insure++:                                          
           See ``Appendix J Related software''.
 integration:                                        See 4.
-internal blocks:                                    See 11.1.
+internal blocks:                                    See 12.1.
 Intuitive Systems, Inc.:                           
           See ``Appendix J Related software''.
 Inuse:                                              See 3.
@@ -11689,6 +12090,7 @@ library, shared:                                    See 2.
 library, thread-safe:                               See 2.
 LibSafe:                                           
           See ``Appendix J Related software''.
+lifetime:                                           See 9.
 LIMIT:                                             
           See ``Appendix B Environment''.
 limitations:                                       
@@ -11711,7 +12113,7 @@ LIST:
           See ``Appendix B Environment''.
 list:                                               See 7.8.4.
 local static variables:                             See 5.1.
-log file:                                           See 11.1.
+log file:                                           See 12.1.
 LOGALL:                                            
           See ``Appendix B Environment''.
 LOGALLOCS:                                         
@@ -11727,7 +12129,7 @@ LOGMEMORY:
           See ``Appendix B Environment''.
 LOGREALLOCS:                                       
           See ``Appendix B Environment''.
-low memory handler function:                        See 11.1.
+low memory handler function:                        See 12.1.
 LSM:                                                See 3.
 LynxOS, Intel 80x86:                               
           See ``Appendix G Supported systems''.
@@ -11754,8 +12156,10 @@ MallocTrace:
 mallopt:                                            See 7.8.1.
 MalTrace:                                          
           See ``Appendix J Related software''.
-mangled names:                                      See 11.1.
+mangled names:                                      See 12.1.
 MANPATH:                                           
+          See ``I.1 Documentation''.
+MANROFFSEQ:                                        
           See ``I.1 Documentation''.
 manual layout:                                     
           See ``Foreword''.
@@ -11781,16 +12185,17 @@ MemLeak:
 Memory Advisor:                                    
           See ``Appendix J Related software''.
 memory allocation profiling:                        See 8.
+memory allocation tracing:                          See 9.
 memory allocations:                                 See 5.
 memory allocations, dynamic:                        See 5.3.
 memory allocations, stack:                          See 5.2.
 memory allocations, static:                         See 5.1.
-memory blocks:                                      See 11.1.
+memory blocks:                                      See 12.1.
 memory debugger:                                   
           See ``Appendix J Related software''.
-memory dump:                                        See 11.4.
+memory dump:                                        See 12.4.
 memory leak table:                                  See 8.
-memory leaks:                                       See 11.8.
+memory leaks:                                       See 12.8.
 memory management interface:                        See 6.
 Memory Management Reference:                       
           See ``Appendix K References''.
@@ -11800,7 +12205,7 @@ memory mapped files:                                See 6.1.
 memory protection:                                  See 6.1.
 Memory Sleuth:                                     
           See ``Appendix J Related software''.
-memory usage:                                       See 11.1.
+memory usage:                                       See 12.1.
 memory, physical:                                   See 6.1.
 memory, virtual:                                    See 6.1.
 Memprof:                                           
@@ -11820,6 +12225,8 @@ misaligned data:                                    See 7.1.
 misaligned memory accesses:                         See 6.1.
 MISMAT:                                            
           See ``Appendix D Diagnostic messages''.
+mkfifo:                                             See 9.
+mknod:                                              See 9.
 ML:                                                 See 5.3.
 mleak:                                              See 7.8.2.
 mleak command:                                      See 7.8.2.
@@ -11829,7 +12236,7 @@ Mmalloc:
           See ``Appendix J Related software''.
 mmap:                                               See 7.1.
 MMU:                                                See 6.1.
-modules:                                            See 10.
+modules:                                            See 11.
 Motif:                                             
           See ``I.2 Building''.
 MP_BUILTINSTACK_SUPPORT:                            See 6.2.
@@ -11850,7 +12257,9 @@ mpatrol features:                                   See 2.
 mpatrol library:                                    See 1.
 mpatrol.h:                                         
           See ``Appendix A Functions''.
-mpatrol.log:                                        See 11.1.
+mpatrol.log:                                        See 12.1.
+mpatrol.out:                                        See 8.
+mpatrol.trace:                                      See 9.
 MPATROL_OPTIONS:                                   
           See ``Appendix B Environment''.
 MPATROL_SOURCEPATH:                                 See 7.8.4.
@@ -11866,6 +12275,8 @@ mprof:                                              See 8.
 mprof command:                                      See 8.
 mpsym:                                              See 7.8.3.
 mpsym command:                                      See 7.8.3.
+mptrace:                                            See 9.
+mptrace command:                                    See 9.
 MSS (Memory Supervision System):                   
           See ``Appendix J Related software''.
 mtmalloc(3t):                                      
@@ -11943,7 +12354,7 @@ option summary:
           See ``Appendix B Environment''.
 options:                                           
           See ``Appendix C Options''.
-original implementation:                            See 10.
+original implementation:                            See 11.
 other programs:                                    
           See ``Appendix J Related software''.
 OUTMEM:                                            
@@ -11968,14 +12379,15 @@ parents:                                            See 8.
 Pascal:                                             See 5.
 PATH:                                              
           See ``I.3 Linking''.
-PE:                                                 See 11.
-peak memory usage:                                  See 11.1.
-performance bottleneck:                             See 9.
-performance improvements:                           See 9.
+PE:                                                 See 12.
+peak memory usage:                                  See 12.1.
+performance bottleneck:                             See 10.
+performance improvements:                           See 10.
 performance times:                                 
           See ``Appendix E Library performance''.
 physical address:                                   See 6.1.
 physical memory:                                    See 6.1.
+pipe:                                               See 9.
 PKG package:                                        See 3.
 platform-independent notes:                        
           See ``H.1 Notes for all platforms''.
@@ -11985,7 +12397,7 @@ PLATINUM Technology:
           See ``Appendix J Related software''.
 Plumber:                                           
           See ``Appendix J Related software''.
-portability:                                        See 9.
+portability:                                        See 10.
 POSIX threads:                                      See 6.3.
 postscript:                                        
           See ``I.1 Documentation''.
@@ -12014,7 +12426,7 @@ PROGFILE:
 program counter:                                    See 6.2.
 programs:                                          
           See ``Appendix J Related software''.
-prologue function:                                  See 11.1.
+prologue function:                                  See 12.1.
 PRVFRD:                                            
           See ``Appendix D Diagnostic messages''.
 Purify:                                            
@@ -12032,7 +12444,7 @@ read protection:                                    See 6.1.
 REALLOCSTOP:                                       
           See ``Appendix B Environment''.
 recompilation:                                      See 4.
-recoverable errors:                                 See 11.1.
+recoverable errors:                                 See 12.1.
 Red Hat:                                           
           See ``Appendix G Supported systems''.
 reference card:                                     See 3.
@@ -12070,7 +12482,7 @@ semaphores:                                         See 6.3.
 Sentinel:                                          
           See ``Appendix J Related software''.
 settings:                                           See 7.2.
-severity of errors:                                 See 11.1.
+severity of errors:                                 See 12.1.
 SFLAGS:                                             See 3.
 shared libraries:                                   See 6.2.
 shared library:                                     See 2.
@@ -12087,14 +12499,14 @@ SHOWSYMBOLS:
           See ``Appendix B Environment''.
 SHOWUNFREED:                                       
           See ``Appendix B Environment''.
-signal handler:                                     See 11.3.
+signal handler:                                     See 12.3.
 signals:                                            See 2.
 similar programs:                                  
           See ``Appendix J Related software''.
 single-step:                                        See 7.5.
 SINIX, MIPS:                                       
           See ``Appendix G Supported systems''.
-slot tables:                                        See 9.
+slot tables:                                        See 10.
 SMALLBOUND:                                        
           See ``Appendix B Environment''.
 SmartAlloc:                                        
@@ -12123,7 +12535,7 @@ static memory allocations:                          See 5.1.
 statistics:                                         See 7.2.
 Stratosware Corporation:                           
           See ``Appendix J Related software''.
-stress testing:                                     See 9.
+stress testing:                                     See 10.
 stripped executable file:                           See 7.1.
 STROVF:                                            
           See ``Appendix D Diagnostic messages''.
@@ -12131,7 +12543,7 @@ summary of options:
           See ``Appendix B Environment''.
 supported systems:                                 
           See ``Appendix G Supported systems''.
-SVR4:                                               See 11.
+SVR4:                                               See 12.
 swap file:                                          See 6.1.
 swap in:                                            See 6.1.
 swap out:                                           See 6.1.
@@ -12166,7 +12578,7 @@ threads:                                            See 6.3.
 threads library:                                    See 6.3.
 times:                                             
           See ``Appendix E Library performance''.
-tips:                                               See 9.
+tips:                                               See 10.
 TRACE:                                             
           See ``Appendix B Environment''.
 tracebacks:                                         See 6.2.
@@ -12174,18 +12586,18 @@ TRACEDIR:
           See ``Appendix B Environment''.
 TRACEFILE:                                         
           See ``Appendix B Environment''.
-tracing:                                            See 7.2.
+tracing:                                            See 9.
 tracing file format:                               
           See ``F.2 Tracing file format''.
-tree structure:                                     See 11.2.
+tree structure:                                     See 12.2.
 TurboPower:                                        
           See ``Appendix J Related software''.
-tutorial:                                           See 12.
-type of allocation:                                 See 11.1.
+tutorial:                                           See 13.
+type of allocation:                                 See 12.1.
 undefined symbols:                                 
           See ``I.3 Linking''.
 underwrites:                                        See 7.4.
-unfreed allocations:                                See 11.1.
+unfreed allocations:                                See 12.1.
 UNFREEDABORT:                                      
           See ``Appendix B Environment''.
 UNIX notes:                                        
@@ -12231,12 +12643,12 @@ Windows, Intel 80x86:
 Wipeout:                                           
           See ``Appendix J Related software''.
 write protection:                                   See 6.1.
-X Windows:                                         
-          See ``I.2 Building''.
+X Windows:                                          See 9.
 XANALYS Software Tools:                            
           See ``Appendix K References''.
-XCOFF:                                              See 11.
+XCOFF:                                              See 12.
 xemacs:                                             See 7.8.4.
+xmem:                                               See 9.
 YaMa:                                              
           See ``Appendix J Related software''.
 YAMD (Yet Another Malloc Debugger):                
