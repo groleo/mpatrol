@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.58 2001-01-03 18:24:00 graeme Exp $"
+#ident "$Id: inter.c,v 1.59 2001-01-15 21:05:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1134,6 +1134,8 @@ __mp_info(void *p, allocinfo *d)
     d->file = m->data.file;
     d->line = m->data.line;
     d->stack = m->data.stack;
+    d->typestr = m->data.typestr;
+    d->typesize = m->data.typesize;
     d->freed = ((m->data.flags & FLG_FREED) != 0);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);

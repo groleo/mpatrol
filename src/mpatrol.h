@@ -257,6 +257,8 @@ typedef struct __mp_allocinfo
     char *file;             /* file name in which call took place */
     unsigned long line;     /* line number at which call took place */
     __mp_allocstack *stack; /* call stack details */
+    char *typestr;          /* type stored in allocation */
+    size_t typesize;        /* size of type stored in allocation */
     char freed;             /* allocation has been freed */
 }
 __mp_allocinfo;

@@ -51,6 +51,8 @@ typedef struct allocinfo
     char *file;            /* file name in which call took place */
     unsigned long line;    /* line number at which call took place */
     addrnode *stack;       /* call stack details */
+    char *typestr;         /* type stored in allocation */
+    size_t typesize;       /* size of type stored in allocation */
     char freed;            /* allocation has been freed */
 }
 allocinfo;
