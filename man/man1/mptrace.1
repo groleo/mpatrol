@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mptrace.1,v 1.8 2001-03-22 19:34:00 graeme Exp $
+.\" $Id: mptrace.1,v 1.9 2001-05-22 20:43:19 graeme Exp $
 .\"
-.TH MPTRACE 1 "22 March 2001" "Release 1.4" "mpatrol library"
+.TH MPTRACE 1 "22 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mptrace \- displays tracing information produced by the mpatrol library
 .SH SYNOPSIS
@@ -35,11 +35,11 @@ decoded into tabular or graphical form, along with any relevant statistics that
 can be calculated.
 .PP
 When the \fBTRACE\fP option is used with the mpatrol library, statistics for all
-dynamic memory allocations and deallocations are written to a tracing output
-file.  The name of this file can be changed with the \fBTRACEFILE\fP option.
+dynamic memory allocations, reallocations and deallocations are written to a
+tracing output file.  The name of this file can be changed with the
+\fBTRACEFILE\fP option.
 .PP
-Only allocations and deallocations are recorded, with each reallocation being
-treated as a deallocation immediately followed by an allocation.  The intention
+Only allocations, reallocations and deallocations are recorded.  The intention
 of tracing is to gather concise details about each memory allocation event
 rather than complete information about some or all memory allocations.  As a
 result, the mpatrol log files and profiling output files contain more detailed
@@ -55,10 +55,8 @@ the standard input file stream will be used as the tracing output file.
 A C source file containing a trace-driven memory allocation simulation program
 can be written with the \fB\-\-sim\-file\fP option.  This program will have the
 identical memory allocation behaviour to the program which produced the original
-trace file, although reallocations will have been converted into their
-corresponding deallocations and allocations.  This option can be useful to use
-if you wish to determine which malloc library is most suitable to use for a
-specific application.
+trace file.  This option can be useful to use if you wish to determine which
+malloc library is most suitable to use for a specific application.
 .PP
 The \fBmptrace\fP command will normally be built with GUI support on UNIX
 platforms that are running X Windows.  This means that a graphical memory map

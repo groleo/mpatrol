@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.215 2001-05-07 16:11:34 graeme Exp $
+@c $Id: mpatrol.texi,v 1.216 2001-05-22 20:42:24 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.9
 @set VERSION 1.4.4
-@set UPDATED 7th May, 2001
+@set UPDATED 22nd May, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -304,11 +304,11 @@ includes a graph of all memory allocations listed in tabular form, and an
 optional graph specification file for later processing by the @command{dot}
 graph visualisation package.
 
-A file containing a concise encoded trace of all memory allocations and
-deallocations made by a program can also be produced by the mpatrol library.
-This file can then be read by a tracing tool which will decode the trace and
-display the events in tabular or graphical form, and also display any relevant
-statistics that could be calculated.
+A file containing a concise encoded trace of all memory allocations,
+reallocations and deallocations made by a program can also be produced by the
+mpatrol library.  This file can then be read by a tracing tool which will decode
+the trace and display the events in tabular or graphical form, and also display
+any relevant statistics that could be calculated.
 
 The mpatrol library has been designed with the intention of replacing calls to
 existing C and C++ memory allocation functions as seamlessly as possible, but
@@ -2029,14 +2029,14 @@ individual unfreed memory allocation.
 Because the log file can contain verbose information about memory allocations,
 reallocations, deallocations and operations, it can end up being too large if
 all such information is being logged for a large program.  To get around this,
-it is possible to @emph{trace} all memory allocation and deallocation events in
-a concise way, to be stored in a separate file for later processing by the
-@command{mptrace} command.  By default, no such tracing is performed but it can
-be enabled with the @option{TRACE} option.  The default tracing output file is
-@file{mpatrol.trace}, but this can be changed using the @option{TRACEFILE}
-option.  As with the @option{LOGFILE} option, you can also specify a directory
-where all tracing output files from the mpatrol library will get placed by
-setting the @env{TRACEDIR} environment variable.
+it is possible to @emph{trace} all memory allocation, reallocation and
+deallocation events in a concise way, to be stored in a separate file for later
+processing by the @command{mptrace} command.  By default, no such tracing is
+performed but it can be enabled with the @option{TRACE} option.  The default
+tracing output file is @file{mpatrol.trace}, but this can be changed using the
+@option{TRACEFILE} option.  As with the @option{LOGFILE} option, you can also
+specify a directory where all tracing output files from the mpatrol library will
+get placed by setting the @env{TRACEDIR} environment variable.
 
 @node General errors, Overwrites and underwrites, Logging and tracing, Using mpatrol
 @section General errors
@@ -4518,22 +4518,21 @@ different format, and the way they are implemented is entirely different.
 @cindex memory allocation tracing
 
 In addition to profiling, the mpatrol library also has the capability to
-concisely trace the details of every dynamic memory allocation and deallocation
-over the lifetime of any program that it was linked and run with.  This
-information can then be used to calculate trends in a program's memory
+concisely trace the details of every dynamic memory allocation, reallocation and
+deallocation over the lifetime of any program that it was linked and run with.
+This information can then be used to calculate trends in a program's memory
 allocation behaviour and provide details on the lifetimes of memory allocations.
 In contrast to profiling, it can also be used to display a program's memory
 allocation behaviour in real-time, along with some useful information that can
 be displayed in graphical or tabular form.
 
-As with profiling, only allocations and deallocations are recorded, with each
-reallocation being treated as a deallocation immediately followed by an
-allocation.  The intention of tracing is to gather concise details about each
-memory allocation event rather than complete information about some or all
-memory allocations.  As a result, the mpatrol log files and profiling output
-files contain more detailed information about individual memory allocations,
-whereas the tracing output files contain a broader view of allocation behaviour
-throughout the entire program.
+Only allocations, reallocations and deallocations are recorded.  The intention
+of tracing is to gather concise details about each memory allocation event
+rather than complete information about some or all memory allocations.  As a
+result, the mpatrol log files and profiling output files contain more detailed
+information about individual memory allocations, whereas the tracing output
+files contain a broader view of allocation behaviour throughout the entire
+program.
 
 @cindex mpatrol.trace
 Memory allocation tracing is disabled by default, but can be enabled using the
@@ -4588,10 +4587,8 @@ event in the tracing output file.  The tracing table can be displayed with the
 A C source file containing a trace-driven memory allocation simulation program
 can be written with the @option{--sim-file} option.  This program will have the
 identical memory allocation behaviour to the program which produced the original
-trace file, although reallocations will have been converted into their
-corresponding deallocations and allocations.  This option can be useful to use
-if you wish to determine which malloc library is most suitable to use for a
-specific application.
+trace file.  This option can be useful to use if you wish to determine which
+malloc library is most suitable to use for a specific application.
 
 @cindex GUI
 @cindex graphical user interface
@@ -4722,6 +4719,11 @@ their contents in tabular form to the standard output file stream, which can be
 redirected to a file for later viewing.  You can find these tracing output files
 in the @file{extra} directory in the mpatrol distribution.
 
+Note that both the tracing files mentioned above and the examples below treat
+reallocations as a deallocation followed by an allocation.  This was the
+behaviour in older versions of the mpatrol library and I haven't bothered to
+update the files.  However, it shouldn't affect the final outcome in any way.
+
 @smallexample
 bash$ rm as.log as.trace ld.log ld.trace
 bash$ ls *.trace
@@ -4798,23 +4800,26 @@ them.
 @cindex event
 @table @samp
 @item event
-This contains the event number (or time line) for each memory allocation or
-deallocation (heap reservations are not considered events for this purpose).
-Each memory allocation or deallocation increases the current event number, and
-this information is used to calculate the lifetime of a heap allocation.
+This contains the event number (or time line) for each memory allocation,
+reallocation or deallocation (heap reservations are not considered events for
+this purpose).  Each memory allocation, reallocation or deallocation increases
+the current event number, and this information is used to calculate the lifetime
+of a heap allocation.
 
 @item type
 This contains the event type for each entry in the tracing output file.  Memory
-allocations and deallocations are represented by @samp{alloc} and @samp{free}
-respectively.  Normal heap reservations (that will be used for memory
-allocations) are represented by @samp{reserve}, while internal heap reservations
-(for use by the mpatrol library itself) are represented by @samp{internal}.
+allocations, reallocations and deallocations are represented by @samp{alloc},
+@samp{realloc} and @samp{free} respectively.  Normal heap reservations (that
+will be used for memory allocations) are represented by @samp{reserve}, while
+internal heap reservations (for use by the mpatrol library itself) are
+represented by @samp{internal}.
 
 @item index
 This contains the allocation index that is used by the mpatrol library to keep
 track of each unique memory allocation, and corresponds directly to any memory
-allocations listed in the log file.  Any memory allocation events that reuse
-allocation indices represent a reallocation of the original allocation.
+allocations listed in the log file.  In older tracing output files, memory
+allocation events that reuse allocation indices represent a reallocation of the
+original allocation.
 
 @item allocation
 This contains the start address of the memory allocation.
@@ -5808,7 +5813,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.4.2 (01/03/12)
+@@(#) mpatrol 1.4.4 (01/05/22)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -5818,7 +5823,7 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
-Log file generated on Mon Mar 12 23:57:23 2001
+Log file generated on Tue May 22 23:57:23 2001
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.4
 read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so
@@ -9557,7 +9562,7 @@ a memory reallocation to return a pointer to newly-allocated memory, but the
 @cindex NOPROTECT
 @item @option{NOPROTECT}
 Specifies that the mpatrol library's internal data structures should not be made
-read-only after every memory allocation reallocation or deallocation.  This may
+read-only after every memory allocation, reallocation or deallocation.  This may
 significantly speed up execution but this will be at the expense of less safety
 if the program accidentally overwrites some of the library's internal data
 structures.  Note that this option has no effect on systems that do not support
@@ -9697,9 +9702,8 @@ zero but less than the medium and large bounds.  Default value:
 
 @cindex TRACE
 @item @option{TRACE}
-Specifies that all memory allocations and deallocations are to be traced and
-sent to the tracing output file.  Memory reallocations are treated as a memory
-deallocation immediately followed by a memory allocation.
+Specifies that all memory allocations, reallocations and deallocations are to be
+traced and sent to the tracing output file.
 
 @cindex TRACEFILE
 @cindex TRACEDIR

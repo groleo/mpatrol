@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.23 2001-03-11 23:49:23 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.24 2001-05-22 20:43:22 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "11 March 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "22 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -249,9 +249,10 @@ being written to a file at program termination if the \fBPROF\fP option is
 used.  The information stored in this file can then be used by the \fBmprof\fP
 command to display various tables summarising the memory allocation behaviour
 of the program that produced it.  Memory allocation tracing is also supported,
-where a trace of all memory allocations and deallocations can be written to a
-tracing output file in a concise encoded format for later processing by the
-\fBmptrace\fP command.  This is controlled with the \fBTRACE\fP option.
+where a trace of all memory allocations, reallocations and deallocations can be
+written to a tracing output file in a concise encoded format for later
+processing by the \fBmptrace\fP command.  This is controlled with the
+\fBTRACE\fP option.
 .SH FUNCTIONS
 The following 19 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
@@ -1324,7 +1325,7 @@ a memory reallocation to return a pointer to newly-allocated memory, but the
 .TP
 \fBNOPROTECT\fP
 Specifies that the mpatrol library's internal data structures should not be made
-read-only after every memory allocation reallocation or deallocation.  This may
+read-only after every memory allocation, reallocation or deallocation.  This may
 significantly speed up execution but this will be at the expense of less safety
 if the program accidentally overwrites some of the library's internal data
 structures.  Note that this option has no effect on systems that do not support
@@ -1445,9 +1446,8 @@ zero but less than the medium and large bounds.  Default value:
 \fBSMALLBOUND\fP=\fI32\fP.
 .TP
 \fBTRACE\fP
-Specifies that all memory allocations and deallocations are to be traced and
-sent to the tracing output file.  Memory reallocations are treated as a memory
-deallocation immediately followed by a memory allocation.
+Specifies that all memory allocations, reallocations and deallocations are to be
+traced and sent to the tracing output file.
 .TP
 \fBTRACEFILE\fP=\fIstring\fP
 Specifies an alternative file in which to place all memory allocation tracing
