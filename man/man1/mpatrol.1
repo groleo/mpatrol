@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.40 2001-08-23 23:00:04 graeme Exp $
+.\" $Id: mpatrol.1,v 1.41 2001-12-05 21:03:33 graeme Exp $
 .\"
-.TH MPATROL 1 "23 August 2001" "Release 1.4" "mpatrol library"
+.TH MPATROL 1 "5 December 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -40,9 +40,9 @@ profiling output filename is \fImpatrol.%n.out\fP and the default tracing output
 filename is \fImpatrol.%n.trace\fP.
 .SH OPTIONS
 All of the following options (except \fB\-\-dynamic\fP, \fB\-\-help\fP,
-\fB\-\-show\-env\fP, \fB\-\-threads\fP and \fB\-\-version\fP) correspond to
-their listed mpatrol library option.  See \fBlibmpatrol\fP(3) for more details
-on these options.
+\fB\-\-read\-env\fP, \fB\-\-show\-env\fP, \fB\-\-threads\fP and
+\fB\-\-version\fP) correspond to their listed mpatrol library option.  See
+\fBlibmpatrol\fP(3) for more details on these options.
 .TP
 \fB\-\-alloc\-byte\fP <\fIunsigned integer\fP> [\fB\-a\fP]
 [\fBALLOCBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
@@ -215,6 +215,12 @@ allocation profiling information from the mpatrol library.
 \fB\-\-prog\-file\fP <\fIstring\fP> [\fB\-r\fP]
 [\fBPROGFILE\fP]  Specifies an alternative filename with which to locate the
 executable file containing the program's symbols.
+.TP
+\fB\-\-read\-env\fP [\fB\-I\fP]
+Reads and passes through the contents of the \fBMPATROL_OPTIONS\fP environment
+variable.  Such contents will be placed before any of the options resulting from
+\fBmpatrol\fP command line options so that they can be overridden and will only
+be parsed by the mpatrol library, \fInot\fP the \fBmpatrol\fP command.
 .TP
 \fB\-\-realloc\-stop\fP <\fIunsigned integer\fP> [\fB\-R\fP]
 [\fBREALLOCSTOP\fP]  Specifies an allocation index at which to stop the program
