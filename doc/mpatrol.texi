@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.96 2000-06-22 23:56:54 graeme Exp $
+@c $Id: mpatrol.texi,v 1.97 2000-06-23 19:52:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.12
 @set VERSION 1.2.3
-@set UPDATED 22nd June, 2000
+@set UPDATED 23rd June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -217,9 +217,7 @@ allocation principles.  It is located at
 Finally, I'd like to thank Stephan Springl (@email{springl@@bfw-online.de}) for
 his help on reading debugging information from object files via the GNU BFD
 library, and Alexander Barton (@email{abarton@@innotrac.com}) and Dave Gibson
-(@email{david@@epc.co.uk}) for their help on writing thread-safe code.  Calum
-Wilkie (@email{calum@@epc.co.uk}) also deserves a mention since the idea for
-providing stack traces comes from a similar library he wrote a few years ago.
+(@email{david@@epc.co.uk}) for their help on writing thread-safe code.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -2982,19 +2980,19 @@ library can usually be incorporated into a program using the following commands:
 @itemize @bullet
 @cindex PE
 @item
-If the program is to contain no debugging information:
-
-@smallexample
-cl -I/mpatrol/include <file> -link -libpath:/mpatrol/lib
-   -defaultlib:mpatrol -defaultlib:imagehlp
-@end smallexample
-
-@item
-If the program is to contain debugging information:
+If the program is to be linked with the archive version of the mpatrol library:
 
 @smallexample
 cl -I/mpatrol/include -Zi <file> -link -libpath:/mpatrol/lib
-   -defaultlib:mpatrol -defaultlib:imagehlp -pdb:none
+   -defaultlib:libmpatrol -defaultlib:imagehlp -pdb:none
+@end smallexample
+
+@item
+If the program is to be linked with the DLL version of the mpatrol library:
+
+@smallexample
+cl -I/mpatrol/include -MD -Zi <file> -link -libpath:/mpatrol/lib
+   -defaultlib:mpatrol -pdb:none
 @end smallexample
 @end itemize
 
@@ -6357,8 +6355,6 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-The address of an illegal memory access cannot be determined.
-@item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 @end itemize
@@ -6533,8 +6529,8 @@ allocate a new copy of the data section in a shared library or DLL when it is
 opened by a new process.
 
 @item
-The current implementation of call stack traversal is limited and will only
-likely work for unoptimised code.  A much better solution would be write the
+Some implementations of call stack traversal are limited and will only likely
+work for unoptimised code.  A much better solution would be write the
 implementation at a lower level in assembly, but this is much less portable.
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
@@ -6825,6 +6821,11 @@ in the mpatrol library.  This restriction does not exist when using
 @item
 Need to add watch point area support, possibly by using guard pages as a basis
 for an implementation.
+
+@item
+Need to add support for processors other than the Intel 80x86.  However, about
+99% of Windows platforms run on this processor family --- does anyone really use
+Windows with other processors?
 
 @item
 There seems to be a problem when mixing the archive version of the mpatrol
