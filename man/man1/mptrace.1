@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mptrace.1,v 1.6 2001-03-08 23:57:38 graeme Exp $
+.\" $Id: mptrace.1,v 1.7 2001-03-22 19:31:37 graeme Exp $
 .\"
-.TH MPTRACE 1 "8 March 2001" "Release 1.4" "mpatrol library"
+.TH MPTRACE 1 "22 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mptrace \- displays tracing information produced by the mpatrol library
 .SH SYNOPSIS
@@ -62,12 +62,13 @@ specific application.
 .PP
 The \fBmptrace\fP command will normally be built with GUI support on UNIX
 platforms that are running X Windows.  This means that a graphical memory map
-display of the heap will be shown in a window every time \fBmptrace\fP is run.
-This display is updated every time a new event is read from the tracing output
-file and by default uses the colour red for internal heap memory (used by the
-mpatrol library), blue for unallocated heap memory, black for allocated memory
-and white for free memory.  Options exist to change this colour scheme, as well
-as the dimensions of the drawing area and the window.
+display of the heap will be shown in a window every time \fBmptrace\fP is run
+with the \fB\-\-gui\fP option.  This display is updated every time a new event
+is read from the tracing output file and by default uses the colour red for
+internal heap memory (used by the mpatrol library), blue for unallocated heap
+memory, black for allocated memory and white for free memory.  Options exist to
+change this colour scheme, as well as the dimensions of the drawing area and the
+window.
 .PP
 By default, it is assumed that the start address of the first event that appears
 in the tracing output file is the base address of the memory map displayed in
@@ -92,6 +93,9 @@ documentation for that tool remarks that it was written as a quick and dirty
 hack.  The \fBmptrace\fP command is hopefully more stable and contains a lot
 more functionality.
 .SH OPTIONS
+.TP
+\fB\-\-gui\fP [\fB\-w\fP]
+Displays the GUI (if supported).
 .TP
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
