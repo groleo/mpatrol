@@ -73,18 +73,19 @@ EXPORTS
 	strdupa			@43
 	strndupa		@44
 	realloc			@45
-	recalloc		@46
-	expand			@47
-	free			@48
-	cfree			@49
-	dealloca		@50
-	memset			@51
-	bzero			@52
-	memccpy			@53
-	memcpy			@54
-	memmove			@55
-	bcopy			@56
-	memchr			@57
-	memmem			@58
-	memcmp			@59
-	bcmp			@60
+	reallocf		@46
+	recalloc		@47
+	expand			@48
+	free			@49
+	cfree			@50
+	dealloca		@51
+	memset			@52
+	bzero			@53
+	memccpy			@54
+	memcpy			@55
+	memmove			@56
+	bcopy			@57
+	memchr			@58
+	memmem			@59
+	memcmp			@60
+	bcmp			@61
