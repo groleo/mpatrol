@@ -60,6 +60,10 @@ Changes for 1.4.0
     include mpatrol.h, mpalloc.h or neither depending on whether the mpatrol
     or mpalloc libraries are available.
 
+  * Added the allocstop, reallocstop and freestop commands to the .gdbinit
+    configuration file so that it is possible to stop at specific allocations,
+    reallocations and deallocations when debugging a program.
+
   * Added new tests demonstrating the MP_MALLOC() family of functions and the
     __mp_snapshot() and __mp_iterate() functions.  Also improved some of the
     existing tests to make use of the new functions.

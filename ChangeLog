@@ -1,3 +1,40 @@
+2001-02-14  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def, build/windows/mpatrolmt.def,
+	  build/unix/mpatrol.exp:
+	Added library identifiers.
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.texi, doc/mpatrol.txt:
+	Added more things to do.
+
+	* extra/.gdbinit:
+	Added ability to set a breakpoint at __mp_trap().  Added allocstop,
+	reallocstop and freestop.
+
+	* extra/mpatrol.m4: New file for use with automake.
+
+	* man/man3/libmpatrol.3, man/html/libmpatrol.html,
+	  man/cat3/libmpatrol.3:
+	Changed the meaning of NOFREE and added an extra argument to
+	__mp_iterate().
+
+	* pkg/sdux/build, pkg/sdux/mpatrol.psf, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/zip/build.bat, pkg/tar/build, pkg/lha/build,
+	  pkg/rpm/mpatrol.spec:
+	Added mpatrol.m4 to installation.
+
+	* src/inter.c, src/mpalloc.c, src/mpatrol.h:
+	Added an extra argument to __mp_iterate().
+
+	* src/inter.c:
+	Added the __mp_lib* functions to help with autoconf configuration.
+
+	* src/mpatrol.h: Added GNU's mallopt() flags.
+
+	* tests/pass/test2.c, tests/pass/test10.c:
+	Changed const to MP_CONST.  Added a new argument to __mp_iterate().
+
 2001-02-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/alloc.c: Changed the meaning of NOFREE=0.
