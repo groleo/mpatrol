@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 25th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 25th
 January, 2001.
 
 * Menu:
@@ -9039,10 +9039,6 @@ Notes for all platforms
      are likely to be different on every new build and will certainly
      be different across different platforms.
 
-   * Perhaps include a script which will combine two or more archive
-     libraries.  This would certainly simplify linking with the mpatrol
-     library since only one library would be required.
-
    * Perhaps use GNU autoconf to automatically work out values for
      `config.h' on the platform it is being built on, and also use
      automake, libtool and install when building and installing files.
@@ -13141,23 +13137,23 @@ Node: New processor support394995
 Node: New file format support395678
 Node: Notes396462
 Node: Generic notes398073
-Ref: Generic notes-Footnote-1415524
-Ref: Generic notes-Footnote-2415742
-Node: UNIX notes415964
-Node: Amiga notes420543
-Node: Windows notes424207
-Node: Netware notes425627
-Node: Frequently asked questions428187
-Node: Documentation428810
-Node: Building433640
-Node: Linking441254
-Node: Running446475
-Node: Files461583
-Node: Related software464579
-Ref: Related software-Footnote-1503152
-Node: References503393
-Node: Copying505986
-Node: Function index533875
-Node: Index536133
+Ref: Generic notes-Footnote-1415327
+Ref: Generic notes-Footnote-2415545
+Node: UNIX notes415767
+Node: Amiga notes420346
+Node: Windows notes424010
+Node: Netware notes425430
+Node: Frequently asked questions427990
+Node: Documentation428613
+Node: Building433443
+Node: Linking441057
+Node: Running446278
+Node: Files461386
+Node: Related software464382
+Ref: Related software-Footnote-1502955
+Node: References503196
+Node: Copying505789
+Node: Function index533678
+Node: Index535936
 
 End Tag Table

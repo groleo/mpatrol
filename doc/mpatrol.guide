@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 25th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 24th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 25th
 January, 2001.
 
 
@@ -9235,10 +9235,6 @@ Notes for all platforms
      could be quite hard to verify the tests since the heap addresses
      are likely to be different on every new build and will certainly
      be different across different platforms.
-
-   * Perhaps include a script which will combine two or more archive
-     libraries.  This would certainly simplify linking with the mpatrol
-     library since only one library would be required.
 
    * Perhaps use GNU autoconf to automatically work out values for
      @{b}config.h@{ub} on the platform it is being built on, and also use
