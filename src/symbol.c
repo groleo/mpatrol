@@ -47,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.1.1.1 1999-10-03 11:25:23 graeme Exp $"
+#ident "$Id: symbol.c,v 1.2 1999-10-12 19:08:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -697,7 +697,7 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
      * dynamically linked in order to read symbols from any required shared
      * objects.
      */
-    if (d = (Elf32_Dyn *) _DYNAMIC)
+    if ((&_DYNAMIC != NULL) && (d = (Elf32_Dyn *) _DYNAMIC))
     {
         for (l = NULL; d->d_tag != DT_NULL; d++)
             if (d->d_tag == DT_DEBUG)
