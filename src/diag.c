@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.85 2001-09-26 23:16:31 graeme Exp $"
+#ident "$Id: diag.c,v 1.86 2001-09-27 00:02:02 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.85 2001-09-26 23:16:31 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.86 2001-09-27 00:02:02 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -570,13 +570,51 @@ MP_GLOBAL
 void
 __mp_diag(char *s, ...)
 {
+    char b[2048];
+    char *t;
     va_list v;
+    char c;
 
     if (logfile == NULL)
         __mp_openlogfile(NULL);
     va_start(v, s);
-    vfprintf(logfile, s, v);
+    if (__mp_diagflags & FLG_HTML)
+        vsprintf(b, s, v);
+    else
+        vfprintf(logfile, s, v);
     va_end(v);
+    /* If we are outputting HTML then we must filter the diagnostics to ensure
+     * that we replace <, >, & and " with &lt, &gt, &amp and &quot respectively.
+     */
+    if (__mp_diagflags & FLG_HTML)
+        for (s = t = b; t != NULL; s = t + 1)
+        {
+            if (t = strpbrk(s, "<>&\""))
+            {
+                c = *t;
+                *t = '\0';
+            }
+            if (*s != '\0')
+                fputs(s, logfile);
+            if (t != NULL)
+                switch (c)
+                {
+                  case '<':
+                    fputs("&lt;", logfile);
+                    break;
+                  case '>':
+                    fputs("&gt;", logfile);
+                    break;
+                  case '&':
+                    fputs("&amp;", logfile);
+                    break;
+                  case '"':
+                    fputs("&quot;", logfile);
+                    break;
+                  default:
+                    break;
+                }
+        }
 }
 
 
