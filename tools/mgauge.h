@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mgauge.h,v 1.3 2001-02-26 22:50:39 graeme Exp $
+ * $Id: mgauge.h,v 1.4 2001-02-26 23:01:55 graeme Exp $
  */
 
 
@@ -64,6 +64,8 @@
 #include <mpatrol.h>
 
 
+#ifndef NDEBUG
+
 #define mgaugestart(f, c, s, u) __mpt_mgaugestart((f), (c), (s), (u))
 #define mgaugeend() __mpt_mgaugeend()
 #define mgaugeon() __mpt_mgaugeon()
@@ -86,6 +88,15 @@ void __mpt_mgaugeoff(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#else /* NDEBUG */
+
+#define mgaugestart(f, c, s, u) ((int) 0)
+#define mgaugeend() ((void) 0)
+#define mgaugeon() ((void) 0)
+#define mgaugeoff() ((void) 0)
+
+#endif /* NDEBUG */
 
 
 #endif /* MPT_MGAUGE_H */

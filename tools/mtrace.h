@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mtrace.h,v 1.3 2001-02-26 22:50:39 graeme Exp $
+ * $Id: mtrace.h,v 1.4 2001-02-26 23:01:55 graeme Exp $
  */
 
 
@@ -48,6 +48,8 @@
 
 #include <mpatrol.h>
 
+
+#ifndef NDEBUG
 
 #define mtrace() __mpt_mtrace()
 #define muntrace() __mpt_muntrace()
@@ -66,6 +68,13 @@ void __mpt_muntrace(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#else /* NDEBUG */
+
+#define mtrace() ((void) 0)
+#define muntrace() ((void) 0)
+
+#endif /* NDEBUG */
 
 
 #endif /* MPT_MTRACE_H */
