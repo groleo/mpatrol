@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.25 2001-05-30 22:21:01 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.26 2001-05-30 22:46:46 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "30 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -176,6 +176,10 @@ int __mp_logaddr(const void *ptr);
 int __mp_edit(const char *file, unsigned long line);
 int __mp_list(const char *file, unsigned long line);
 int __mp_view(const char *file, unsigned long line);
+int __mp_readcontents(const char *file, void *ptr);
+int __mp_writecontents(const char *file, const void *ptr);
+long __mp_cmpcontents(const char *file, const void *ptr);
+int __mp_remcontents(const char *file, const void *ptr);
 
 __mp_errortype __mp_errno;
 .fi
@@ -733,7 +737,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 37 functions are available as support routines for additional
+The following 41 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -1086,6 +1090,38 @@ options are not set or if these options are not supported on the system.
 Returns \fI1\fP if the edit or listing was successfully performed, \fI-1\fP if
 there was an error, or \fI0\fP if neither of the options were set or if there is
 no support for this feature.
+.TP
+\fB__mp_readcontents\fP
+Reads the contents of a memory allocation contents file into the memory
+allocation containing \fIptr\fP.  The name of the file is composed of the
+\fIfile\fP string followed by the allocation index of the memory allocation
+separated by a dot.  If \fIfile\fP is \fBNULL\fP then it is assumed to be
+\fI.mpatrol\fP.  Returns \fI1\fP if the contents were read successfully and
+\fI0\fP otherwise.
+.TP
+\fB__mp_writecontents\fP
+Writes the contents of the memory allocation containing \fIptr\fP to an
+allocation contents file.  The name of the file is composed of the \fIfile\fP
+string followed by the allocation index of the memory allocation separated by
+a dot.  If \fIfile\fP is \fBNULL\fP then it is assumed to be \fI.mpatrol\fP.
+Returns \fI1\fP if the contents were written successfully and \fI0\fP otherwise.
+.TP
+\fB__mp_cmpcontents\fP
+Compares the contents of the memory allocation containing \fIptr\fP with the
+contents of a previously written allocation contents file.  The name of the file
+is composed of the \fIfile\fP string followed by the allocation index of the
+memory allocation separated by a dot.  If \fIfile\fP is \fBNULL\fP then it is
+assumed to be \fI.mpatrol\fP.  Any differences are written to the mpatrol log
+file.  Returns the number of differences found, or \fI-1\fP if there was an
+error.
+.TP
+\fB__mp_remcontents\fP
+Removes the memory allocation contents file that corresponds to the memory
+allocation containing \fIptr\fP.  The name of the file is composed of the
+\fIfile\fP string followed by the allocation index of the memory allocation
+separated by a dot.  If \fIfile\fP is \fBNULL\fP then it is assumed to be
+\fI.mpatrol\fP.  Returns \fI1\fP if the file was removed successfully and
+\fI0\fP otherwise.
 .PP
 The following global variable is available for additional control in the mpatrol
 library.  To use it you should include the \fImpatrol.h\fP header file:
