@@ -320,7 +320,9 @@
 #if TARGET == TARGET_UNIX
 #define _POSIX_SOURCE 1
 #define _POSIX_C_SOURCE 199506L
-#if SYSTEM == SYSTEM_SOLARIS
+#if SYSTEM == SYSTEM_LINUX
+#define _GNU_SOURCE 1
+#elif SYSTEM == SYSTEM_SOLARIS
 #define __EXTENSIONS__ 1
 #endif /* SYSTEM */
 #endif /* TARGET */
