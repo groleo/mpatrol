@@ -62,13 +62,14 @@
 #define SYSTEM_DGUX     2  /* DG/UX */
 #define SYSTEM_DRSNX    3  /* DRS/NX */
 #define SYSTEM_DYNIX    4  /* DYNIX/ptx */
-#define SYSTEM_HPUX     5  /* HP/UX */
-#define SYSTEM_IRIX     6  /* IRIX */
-#define SYSTEM_LINUX    7  /* Linux */
-#define SYSTEM_LYNXOS   8  /* LynxOS */
-#define SYSTEM_SINIX    9  /* SINIX */
-#define SYSTEM_SOLARIS  10 /* Solaris */
-#define SYSTEM_UNIXWARE 11 /* UnixWare */
+#define SYSTEM_FREEBSD  5  /* FreeBSD */
+#define SYSTEM_HPUX     6  /* HP/UX */
+#define SYSTEM_IRIX     7  /* IRIX */
+#define SYSTEM_LINUX    8  /* Linux */
+#define SYSTEM_LYNXOS   9  /* LynxOS */
+#define SYSTEM_SINIX    10 /* SINIX */
+#define SYSTEM_SOLARIS  11 /* Solaris */
+#define SYSTEM_UNIXWARE 12 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -80,6 +81,8 @@
 #elif defined(sequent) || defined(_sequent) || defined(__sequent) || \
       defined(__sequent__) || defined(SEQUENT) || defined(_SEQUENT_)
 #define SYSTEM SYSTEM_DYNIX
+#elif defined(__FreeBSD) || defined(__FreeBSD__)
+#define SYSTEM SYSTEM_FREEBSD
 #elif defined(hpux) || defined(_hpux) || defined(__hpux) || defined(__hpux__)
 #define SYSTEM SYSTEM_HPUX
 #elif defined(sgi) || defined(_sgi) || defined(__sgi) || defined(__sgi__)

@@ -71,9 +71,9 @@
  */
 #include <sys/ldr.h>
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-      SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 /* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
  * many recent distributions and so we must use the GNU BFD library to read the
  * symbols from the object files and libraries.  However, we still need the ELF
@@ -105,15 +105,15 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.39 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: symbol.c,v 1.40 2001-01-11 22:37:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 /* These definitions are not always defined in ELF header files on all
  * systems so we define them here as they are documented in most
  * System V ABI documents.
@@ -155,9 +155,9 @@ Elf32_Dyn;
 
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 /* This is a structure that is internal to the dynamic linker on ELF systems,
  * and so it is not always guaranteed to be the same.  We try to rely on this
  * definition here for portability's sake as it is not publicly declared in
@@ -266,9 +266,9 @@ extern "C"
 
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-    SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 /* The declaration of the _DYNAMIC symbol, which allows us direct access to the
  * dynamic linker's internal data structures.  We make it have weak visibility
  * so that it is always defined, even in the statically linked case.  It is
@@ -1271,9 +1271,9 @@ __mp_addextsymbols(symhead *y)
     static char b[4096];
     struct ld_info *l;
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-      SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
 #else /* ENVIRON */
@@ -1315,9 +1315,9 @@ __mp_addextsymbols(symhead *y)
                 return 0;
     }
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
-      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
-      SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 #if ENVIRON == ENVIRON_64
     if ((&_DYNAMIC != NULL) && (d = (Elf64_Dyn *) _DYNAMIC))
 #else /* ENVIRON */
