@@ -52,6 +52,7 @@ EXPORTS
 	__mp_memorymap
 	__mp_summary
 	__mp_stats
+	__mp_checkheap
 	__mp_check
 	__mp_prologue
 	__mp_epilogue
