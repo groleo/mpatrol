@@ -1,3 +1,16 @@
+Changes for 1.4.3 (22th March, 2001)
+
+  * Added the --call-graph option to the mprof command and fixed a rare bug when
+    displaying the leak table and call graph with call sites which have no
+    associated symbols.
+
+  * Added the --gui and --verbose options to the mptrace command, which now also
+    displays useful statistics.
+
+  * Added chapters on heap corruption, memory leaks and porting to the mpatrol
+    manual and moved the Tools and Utilities sections to the top level.
+
+
 Changes for 1.4.2 (12th March, 2001)
 
   * Added the LEAKTABLE option which displays a leak table at the end of program

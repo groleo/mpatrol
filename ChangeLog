@@ -1,3 +1,45 @@
+2001-03-22  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Updated the chapters on profiling and tracing.
+
+	* doc/refcard.tex: Added the --call-graph, --gui and --verbose options.
+
+	* man/man1/mprof.1: Added the --call-graph option.
+
+	* man/man1/mptrace.1: Added the --gui and --verbose options.
+
+	* src/mprof.c:
+	Added the --call-graph option and fixed a problem with the call graph
+	and leak table when call sites with no symbols were encountered.
+
+	* src/mptrace.c:
+	Added the --gui and --verbose options and added the statistics.
+
+2001-03-21  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added the porting chapter.
+
+	* man/man1/hexwords.1: Added more example constants.
+
+2001-03-19  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added the heap corruption chapter and more references.
+
+2001-03-14  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added the memory leaks chapter.  Mentioned the authors of Dbmalloc and
+	Dmalloc.  Moved the Utilities and Tools sections to the top level.
+
+	* tools/dbmalloc.h, tools/dmalloc.h:
+	Fixed a minor spelling mistake in the description.
+
+2001-03-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/signals.c:
+	Added ability to detect illegal memory access address on Linux Alpha.
+
 2001-03-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
