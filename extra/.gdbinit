@@ -21,7 +21,7 @@
 # GDB command file for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.4 2001-02-14 00:58:28 graeme Exp $
+# $Id: .gdbinit,v 1.5 2001-02-14 01:03:44 graeme Exp $
 
 
 # Set mpatrol library options in the current process environment.
@@ -59,6 +59,26 @@ call __mp_setoption(-3, $arg0)
 end
 document allocstop
 Breaks at a specific allocation index.
+end
+
+
+# Break at a specific reallocation index.
+
+define reallocstop
+call __mp_setoption(-4, $arg0)
+end
+document reallocstop
+Breaks at a specific reallocation index.
+end
+
+
+# Break when a specific allocation is freed.
+
+define freestop
+call __mp_setoption(-5, $arg0)
+end
+document freestop
+Breaks when a specific allocation is freed.
 end
 
 
