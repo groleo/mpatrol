@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.58 2001-02-11 21:00:46 graeme Exp $
+# $Id: mpatrol.spec,v 1.59 2001-02-14 22:05:40 graeme Exp $
 
 
 %define libversion 1.4
@@ -102,6 +102,8 @@ mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/*.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
 install -m644 man/man3/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
+mkdir -p $RPM_BUILD_ROOT/usr/share/aclocal
+install -m644 extra/mpatrol.m4 $RPM_BUILD_ROOT/usr/share/aclocal
 
 
 %files
@@ -117,6 +119,7 @@ install -m644 man/man3/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %{_infodir}
 %{_libdir}
 %{_mandir}
+/usr/share/aclocal
 
 
 %post

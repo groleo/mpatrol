@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.43 2001-02-11 21:00:45 graeme Exp $
+# $Id: prototype,v 1.44 2001-02-14 22:14:43 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -181,4 +181,6 @@ f none man/man1/hexwords.1 0664 bin bin
 d none man/man3 0775 bin bin
 f none man/man3/libmpatrol.3 0664 bin bin
 f none man/man3/libmpalloc.3 0664 bin bin
+d none share/aclocal 0775 bin bin
+f none share/aclocal/mpatrol.m4 0664 bin bin
 i pkginfo

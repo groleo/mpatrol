@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.21 2001-02-11 21:00:47 graeme Exp $
+# $Id: mpatrol.psf,v 1.22 2001-02-14 22:14:49 graeme Exp $
 
 
 product
@@ -185,5 +185,8 @@ product
 	directory		mpatrol/man/man3=/usr/local/man/man3
 	file			libmpatrol.3
 	file			libmpalloc.3
+	directory		mpatrol/share=/usr/local/share
+	directory		mpatrol/share/aclocal=/usr/local/share/aclocal
+	file			mpatrol.m4
     end
 end

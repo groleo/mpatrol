@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.21 2001-02-11 21:00:47 graeme Exp $
+# $Id: build,v 1.22 2001-02-14 22:14:49 graeme Exp $
 
 
 version=1.4.0
@@ -110,6 +110,8 @@ mkdir -p mpatrol/man/man1
 cp ../../man/man1/*.1 mpatrol/man/man1
 mkdir -p mpatrol/man/man3
 cp ../../man/man3/*.3 mpatrol/man/man3
+mkdir -p mpatrol/share/aclocal
+cp ../../extra/mpatrol.m4 mpatrol/share/aclocal
 
 
 # Create the package file.  You must have root permission or be able to

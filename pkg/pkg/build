@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.59 2001-02-11 21:00:45 graeme Exp $
+# $Id: build,v 1.60 2001-02-14 22:14:43 graeme Exp $
 
 
 version=1.4.0
@@ -119,6 +119,8 @@ mkdir -p man/man1
 cp ../../man/man1/*.1 man/man1
 mkdir -p man/man3
 cp ../../man/man3/*.3 man/man3
+mkdir -p share/aclocal
+cp ../../extra/mpatrol.m4 share/aclocal
 
 
 # Create the package within a package directory structure.
