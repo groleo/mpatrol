@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.104 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: diag.c,v 1.105 2002-02-05 00:46:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.104 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.105 2002-02-05 00:46:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -347,7 +347,7 @@ __mp_logfile(meminfo *m, char *s)
     if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
          (strcmp(s, "stdout") == 0)))
         return s;
-    if ((d = getenv(MP_LOGDIR)) && (*d != '\0') && ((s == NULL) ||
+    if ((d = __mp_getenv(MP_LOGDIR)) && (*d != '\0') && ((s == NULL) ||
 #if TARGET == TARGET_UNIX
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
@@ -400,7 +400,7 @@ __mp_proffile(meminfo *m, char *s)
     if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
          (strcmp(s, "stdout") == 0)))
         return s;
-    if ((d = getenv(MP_PROFDIR)) && (*d != '\0') && ((s == NULL) ||
+    if ((d = __mp_getenv(MP_PROFDIR)) && (*d != '\0') && ((s == NULL) ||
 #if TARGET == TARGET_UNIX
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
@@ -453,7 +453,7 @@ __mp_tracefile(meminfo *m, char *s)
     if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
          (strcmp(s, "stdout") == 0)))
         return s;
-    if ((d = getenv(MP_TRACEDIR)) && (*d != '\0') && ((s == NULL) ||
+    if ((d = __mp_getenv(MP_TRACEDIR)) && (*d != '\0') && ((s == NULL) ||
 #if TARGET == TARGET_UNIX
          !strchr(s, '/')))
 #elif TARGET == TARGET_AMIGA
@@ -488,6 +488,17 @@ __mp_tracefile(meminfo *m, char *s)
         processfile(m, s, b, sizeof(b));
     }
     return b;
+}
+
+
+/* Read the contents of an environment variable.
+ */
+
+MP_GLOBAL
+char *
+__mp_getenv(char *s)
+{
+    return getenv(s);
 }
 
 
@@ -786,7 +797,7 @@ __mp_editfile(char *f, unsigned long l, int d)
          * environment variable is set then putenv() will not use malloc() to
          * expand the environment.
          */
-        if (getenv(MP_PRELOAD_NAME))
+        if (__mp_getenv(MP_PRELOAD_NAME))
             putenv(s);
 #endif /* MP_PRELOAD_SUPPORT */
         v[0] = MP_EDITOR;
