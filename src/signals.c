@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.6 2000-06-23 19:30:37 graeme Exp $"
+#ident "$Id: signals.c,v 1.7 2000-06-23 20:09:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -165,7 +165,11 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
      * need to invoke the __mp_newframe() function with the proper frame
      * pointer and explicitly display the first frame as well.
      */
-    __mp_newframe(&i, (unsigned int *) e->ContextRecord->Ebp);
+#if !MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT
+    __mp_newframe(&i, (void *) e->ContextRecord);
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+    __mp_newframe(&i, (void *) e->ContextRecord->Ebp);
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     if (__mp_getframe(&i))
     {
         a = (void *) e->ContextRecord->Eip;
