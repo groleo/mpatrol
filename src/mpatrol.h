@@ -36,6 +36,84 @@
 #define MPATROL_VERSION 10008
 
 
+/* Options for backwards compatibility with other versions of mallopt().  They
+ * are all currently ignored as they have no meaning when used with mpatrol.
+ */
+
+#ifdef M_MXFAST
+#undef M_MXFAST
+#endif /* M_MXFAST */
+#ifdef M_NLBLKS
+#undef M_NLBLKS
+#endif /* M_NLBLKS */
+#ifdef M_GRAIN
+#undef M_GRAIN
+#endif /* M_GRAIN */
+#ifdef M_KEEP
+#undef M_KEEP
+#endif /* M_KEEP */
+
+#define M_MXFAST 1
+#define M_NLBLKS 2
+#define M_GRAIN  3
+#define M_KEEP   4
+
+
+/* Options that can be set using mallopt().  They all correspond to their
+ * environment variable option equivalent except for MP_OPT_SETFLAGS and
+ * MP_OPT_UNSETFLAGS.
+ */
+
+#define MP_OPT_HELP          0
+#define MP_OPT_SETFLAGS      -1
+#define MP_OPT_UNSETFLAGS    -2
+#define MP_OPT_ALLOCSTOP     -3
+#define MP_OPT_REALLOCSTOP   -4
+#define MP_OPT_FREESTOP      -5
+#define MP_OPT_ALLOCBYTE     -6
+#define MP_OPT_FREEBYTE      -7
+#define MP_OPT_OFLOWBYTE     -8
+#define MP_OPT_OFLOWSIZE     -9
+#define MP_OPT_DEFALIGN      -10
+#define MP_OPT_LIMIT         -11
+#define MP_OPT_FAILFREQ      -12
+#define MP_OPT_FAILSEED      -13
+#define MP_OPT_UNFREEDABORT  -14
+#define MP_OPT_LOGFILE       -15
+#define MP_OPT_PROGFILE      -16
+#define MP_OPT_CHECK         -17
+
+
+/* Flags that can be set or unset using mallopt() and MP_OPT_SETFLAGS or
+ * MP_OPT_UNSETFLAGS respectively.  They all correspond to their environment
+ * variable option equivalent except for MP_FLG_PAGEALLOC and MP_FLG_ALLOCUPPER.
+ */
+
+#define MP_FLG_SHOWALL       (MP_FLG_SHOWMAP | MP_FLG_SHOWSYMBOLS | \
+                              MP_FLG_SHOWFREED | MP_FLG_SHOWUNFREED)
+#define MP_FLG_SHOWMAP       0x00000001
+#define MP_FLG_SHOWSYMBOLS   0x00000002
+#define MP_FLG_SHOWFREED     0x00000004
+#define MP_FLG_SHOWUNFREED   0x00000008
+#define MP_FLG_LOGALL        (MP_FLG_LOGALLOCS | MP_FLG_LOGREALLOCS | \
+                              MP_FLG_LOGFREES)
+#define MP_FLG_LOGALLOCS     0x00000010
+#define MP_FLG_LOGREALLOCS   0x00000020
+#define MP_FLG_LOGFREES      0x00000040
+#define MP_FLG_CHECKALL      (MP_FLG_CHECKALLOCS | MP_FLG_CHECKREALLOCS | \
+                              MP_FLG_CHECKFREES)
+#define MP_FLG_CHECKALLOCS   0x00000080
+#define MP_FLG_CHECKREALLOCS 0x00000100
+#define MP_FLG_CHECKFREES    0x00000200
+#define MP_FLG_NOPROTECT     0x00000400
+#define MP_FLG_NOFREE        0x00000800
+#define MP_FLG_PRESERVE      0x00001000
+#define MP_FLG_OFLOWWATCH    0x00002000
+#define MP_FLG_PAGEALLOC     0x00004000
+#define MP_FLG_ALLOCUPPER    0x00008000
+#define MP_FLG_USEMMAP       0x00010000
+
+
 /* The different types of memory allocation functions.
  */
 
