@@ -21,8 +21,8 @@
 
 
 /*
- * This file includes all of the library source files in order to build
- * one large object file instead of a library of object files.
+ * This file includes all of the mpatrol library source files in order
+ * to build one large object file instead of a library of object files.
  */
 
 
@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: library.c,v 1.5 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: library.c,v 1.6 2001-02-05 21:06:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -62,6 +62,7 @@
 #if TARGET == TARGET_UNIX || (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
     TARGET == TARGET_WINDOWS
 #include "malloc.c"
+#include "cplus.c"
 #if TARGET != TARGET_UNIX
 #include "sbrk.c"
 #endif /* TARGET */
