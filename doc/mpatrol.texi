@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.43 2000-03-20 20:06:43 graeme Exp $
+@c $Id: mpatrol.texi,v 1.44 2000-03-21 21:56:06 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.7
 @set VERSION 1.1.3
-@set UPDATED 20th March, 2000
+@set UPDATED 21st March, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -245,10 +245,10 @@ Along with providing a comprehensive and configurable log of all dynamic memory
 operations that occurred during the lifetime of a program, the mpatrol library
 performs extensive checking to detect any misuse of dynamically allocated
 memory.  All of this functionality can be integrated into existing code through
-the inclusion of a single header file at compile-time.  On UNIX platforms this
-may not even be necessary as the mpatrol library can be linked with existing
-object files at link-time or, on some platforms, even dynamically linked with
-existing programs at run-time.
+the inclusion of a single header file at compile-time.  On UNIX platforms (and
+AmigaOS when using @command{gcc}) this may not even be necessary as the mpatrol
+library can be linked with existing object files at link-time or, on some
+platforms, even dynamically linked with existing programs at run-time.
 
 All logging and tracing output from the mpatrol library is sent to a separate
 log file in order to keep its diagnostics separate from any that the program
@@ -572,8 +572,9 @@ thread identifier will be stored if using the thread-safe library.
 @item
 The library uses a header file to redefine the memory allocation functions as
 macros in order to obtain more information about where they were called from.
-This is not strictly required on UNIX platforms, since the library automatically
-redefines the default system memory allocation functions.
+This is not strictly required on UNIX platforms (and AmigaOS when using
+@command{gcc}), since the library automatically redefines the default system
+memory allocation functions.
 
 @item
 A shell script is supplied for UNIX platforms to run a program that was linked
@@ -735,7 +736,8 @@ the run-time linking of mpatrol functions to your program and you will have to
 proceed to the next step.
 
 @item
-This step is currently only available on UNIX platforms.
+This step is currently only available on UNIX platforms (and AmigaOS when using
+@command{gcc}).
 
 You should be able to link in the mpatrol library when linking your program
 without having to recompile any of your object files or libraries, but this will
@@ -3640,10 +3642,11 @@ solution across different platforms.}.
 
 First, add the inclusion of @file{mpatrol.h} to line 34 so that we can replace
 calls to @code{malloc()} and @code{free()} with their mpatrol
-equivalents@footnote{This is not strictly necessary on UNIX platforms, but it
-does give us more debugging information.}.  Then, recompile the program and link
-it with the mpatrol library.  This time, running it with even the simplest of
-non-empty input lines should cause it to abort!
+equivalents@footnote{This is not strictly necessary on UNIX platforms (and
+AmigaOS when using @command{gcc}), but it does give us more debugging
+information.}.  Then, recompile the program and link it with the mpatrol
+library.  This time, running it with even the simplest of non-empty input lines
+should cause it to abort!
 
 If you look at the @file{mpatrol.log} file produced, you should see something
 along the lines of the following at the end of the log file.
@@ -3923,8 +3926,8 @@ preprocessor macro.
 
 The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include @file{mpatrol.h} before all other
-header files, although on UNIX platforms they will be used anyway, albeit with
-slightly less tracing information.
+header files, although on UNIX platforms (and AmigaOS when using @command{gcc})
+they will be used anyway, albeit with slightly less tracing information.
 
 @table @asis
 @findex malloc
@@ -4118,8 +4121,8 @@ The following 5 functions are available as replacements for existing C++ library
 functions, but the replacements in @file{mpatrol.h} will only be used if the
 @code{MP_NOCPLUSPLUS} preprocessor macro is not defined.  To use these you must
 include @file{mpatrol.h} before all other header files, although on UNIX
-platforms they will be used anyway, albeit with slightly less tracing
-information.
+platforms (and AmigaOS when using @command{gcc}) they will be used anyway,
+albeit with slightly less tracing information.
 
 @table @asis
 @findex operator new
@@ -4173,8 +4176,9 @@ handler installed by that function.
 
 The following 9 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include @file{mpatrol.h}
-before all other header files, although on UNIX platforms they will be used
-anyway, albeit with slightly less tracing information.
+before all other header files, although on UNIX platforms (and AmigaOS when
+using @command{gcc}) they will be used anyway, albeit with slightly less tracing
+information.
 
 @table @asis
 @findex memset
@@ -5149,6 +5153,23 @@ The @option{USEDEBUG} option has no effect.
 
 @cindex AmigaOS, Motorola 680x0
 @item
+AmigaOS 3.1, Motorola 68040, BFD, @command{gcc}
+@itemize @bullet
+@item
+No memory protection so the @option{PAGEALLOC} option has no effect.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEMMAP} option has no effect.
+@item
+Limited support for call stack traversal.
+@item
+Limited support for reading symbols.
+@item
+No detection of illegal memory accesses.
+@end itemize
+
+@item
 AmigaOS 3.1, Motorola 68040, n/a, SAS/C
 @itemize @bullet
 @item
@@ -5531,16 +5552,19 @@ involved too many source changes to get working fully.  Perhaps it's not even
 worth implementing as the archive library works fine.
 
 @item
-Need to add support for call stack traversal for both the Motorola 680x0 and
-PowerPC processor architectures.  At first glance, this doesn't seem to be very
-easy, or perhaps even impossible.
+Need to add proper support for call stack traversal for both the Motorola 680x0
+and PowerPC processor architectures.  When @command{gcc} is being used then
+up to two stack frames can be traversed, but this should really be extended
+without requiring @code{MP_BUILTINSTACK_SUPPORT}.  When SAS/C is being used then
+there is no support for call stack traversal.
 
 @item
-Need to add support for reading symbols from Amiga executable files.  Also need
-to add support for reading symbols from any shared libraries that are required
-by the program.  The Amiga executable file format doesn't seem to contain enough
-information for this to be worthwhile, and even then it would only be worth
-doing if call stack traversal worked.
+Need to add proper support for reading symbols from Amiga executable files.
+When @command{gcc} is being used then the BFD library routines will be called
+to determine the symbols from the executable file, but this will only work for
+objects compiled with @command{gcc}.  When SAS/C is being used then there is no
+support for reading symbols from executable files.  Also need to add support for
+reading symbols from any shared libraries that are required by the program.
 
 @item
 Possibly make use of other software such as Enforcer, Mungwall or MuLib in order
@@ -5549,12 +5573,13 @@ also be put to good use so that the file and hunk location of entries on the
 call stack could be determined.
 
 @item
-It is currently not possible to override the definition of @code{malloc()},
-etc., without including the @file{mpatrol.h} header file first.  This is because
-the compiler startup code and libraries call @code{malloc()} before everything
-is set up, and so the library cannot properly initialise itself if the
-@code{malloc()} that the startup code finds is the @code{malloc()} in the
-mpatrol library.
+When using SAS/C it is currently not possible to override the definition of
+@code{malloc()}, etc., without including the @file{mpatrol.h} header file first.
+This is because the compiler startup code and libraries call @code{malloc()}
+before everything is set up, and so the library cannot properly initialise
+itself if the @code{malloc()} that the startup code finds is the @code{malloc()}
+in the mpatrol library.  This restriction does not exist when using
+@command{gcc}.
 @end itemize
 
 @node Windows notes, Netware notes, Amiga notes, Notes
