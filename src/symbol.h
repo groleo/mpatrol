@@ -79,6 +79,7 @@ typedef struct symhead
     treeroot dtree;  /* symbol node allocation tree */
     size_t size;     /* number of symbol nodes in table */
     void *handle;    /* access library handle */
+    void *syms;      /* access library symbols */
 }
 symhead;
 
