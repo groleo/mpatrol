@@ -1,3 +1,37 @@
+Wed Jul 12 00:16:32 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Include the tests in the packages.
+
+Tue Jul 11 23:49:00 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/alloc.c:
+	Fixed a bug within __mp_resizealloc() when allocations are pages and
+	an allocation is increased in size using space from a free block.
+
+Fri Jul  7 10:45:32 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/README: Changed mpatrol.doc to mpatrol.txt.
+
+	* doc/mpatrol.texi:
+	Added the ZIP distribution build script and information about more
+	related software.
+
+	* extra/magic: New file for use with the file command.
+
+	* pkg/zip/build.bat: New build script for ZIP distributions.
+
+Sun Jul  2 22:40:52 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Documented that the address of an illegal memory access can now be
+	detected on LynxOS.
+
+	* src/signals.c:
+	Added a way of determining the address of an illegal memory access on
+	LynxOS.
+
 Thu Jun 29 19:24:58 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/unix/Makefile:

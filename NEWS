@@ -1,3 +1,18 @@
+Changes for 1.2.5 (12th July, 2000)
+
+  * Can now determine the address of an illegal memory access on LynxOS
+    platforms.
+
+  * Fixed a bug when allocations are pages and an allocation is increased in
+    size using space from a free block.
+
+  * Added a new magic file excerpt for use with the file command.
+
+  * Added a new build script for building Windows ZIP distributions.
+
+  * The tests are now included when building packages.
+
+
 Changes for 1.2.4 (29th June, 2000)
 
   * Added support for the USEMMAP option on HP/UX.
