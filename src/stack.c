@@ -52,7 +52,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.10 2000-06-07 20:10:25 graeme Exp $"
+#ident "$Id: stack.c,v 1.11 2000-06-07 21:10:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,10 +103,10 @@
  * certain instructions are seen.
  */
 
-#define SP_OFFSET   1 /* stack pointer offset has been set */
-#define PC_OFFSET   2 /* program counter offset has been set */
-#define CONST_LOWER 4 /* lower part of stack pointer offset has been set */
-#define CONST_UPPER 8 /* upper part of stack pointer offset has been set */
+#define RA_OFFSET 1 /* return address offset has been set */
+#define SP_OFFSET 2 /* stack pointer offset has been set */
+#define SP_LOWER  4 /* lower part of stack pointer offset has been set */
+#define SP_UPPER  8 /* upper part of stack pointer offset has been set */
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 
@@ -159,7 +159,7 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
 #endif /* SYSTEM */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
-    s->next.sp = s->next.pc = 0;
+    s->next.sp = s->next.ra = 0;
 #else /* TARGET && ARCH */
     s->next = NULL;
 #endif /* TARGET && ARCH */
@@ -213,7 +213,8 @@ static unsigned int *getaddr(unsigned int *p)
 
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
-/* Determine the stack pointer and return address of the previous stack frame.
+/* Determine the stack pointer and return address of the previous stack frame
+ * by performing code reading.
  */
 
 static int unwind(frameinfo *f)
@@ -227,15 +228,15 @@ static int unwind(frameinfo *f)
     q = 0xFFFFFFFF;
     l = u = 0;
     a = 0;
-    /* Search for the program counter offset in the stack frame.
+    /* Search for the return address offset in the stack frame.
      */
-    while (!((a & SP_OFFSET) && (a & PC_OFFSET)) && (f->pc < q))
+    while (!((a & RA_OFFSET) && (a & SP_OFFSET)) && (f->ra < q))
     {
-        i = *((unsigned long *) f->pc);
+        i = *((unsigned long *) f->ra);
         if (i == 0x03E00008)
         {
             /* jr ra */
-            q = f->pc + 8;
+            q = f->ra + 8;
         }
         else if (i == 0x03A1E821)
         {
@@ -255,37 +256,38 @@ static int unwind(frameinfo *f)
                 /* ori at,zero,?? */
                 l = i & 0xFFFF;
                 u = 0;
-                a |= CONST_LOWER;
+                a |= SP_LOWER;
                 break;
               case 0x3421:
                 /* ori at,at,?? */
                 l = i & 0xFFFF;
-                a |= CONST_LOWER;
+                a |= SP_LOWER;
                 break;
               case 0x3C01:
                 /* lui at,?? */
                 l = 0;
                 u = i & 0xFFFF;
-                a |= CONST_UPPER;
+                a |= SP_UPPER;
                 break;
               case 0x8FBF:
                 /* lw ra,??(sp) */
                 p = i & 0xFFFF;
-                a |= PC_OFFSET;
+                a |= RA_OFFSET;
                 break;
             }
-        f->pc += 4;
+        f->ra += 4;
     }
-    if ((s == 0) && ((a & CONST_LOWER) || (a & CONST_UPPER)))
+    if ((s == 0) && ((a & SP_LOWER) || (a & SP_UPPER)))
         s = (u << 16) | l;
     if ((s > 0) && (i = ((unsigned long *) f->sp)[p >> 2]) &&
         (*((unsigned long *) (i - 8)) == 0x0320F809))
     {
         /* jalr ra,t9 */
         f->sp += s;
-        f->pc = i;
+        f->ra = i;
         return 1;
     }
+    f->sp = f->ra = 0;
     return 0;
 }
 #endif /* TARGET && ARCH */
@@ -305,7 +307,7 @@ static int getframe(frameinfo *f)
     if (getcontext(&c) == -1)
         return 0;
     f->sp = c.uc_mcontext.gregs[CTX_SP];
-    f->pc = c.uc_mcontext.gregs[CTX_RA];
+    f->ra = c.uc_mcontext.gregs[CTX_RA];
     return 1;
 }
 #elif ARCH == ARCH_SPARC
@@ -499,6 +501,32 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     signal(SIGBUS, bushandler);
     signal(SIGSEGV, segvhandler);
 #endif /* TARGET */
+#elif TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
+    /* For the MIPS architecture we perform code reading to determine the
+     * frame pointers and the return addresses.
+     */
+    bushandler = signal(SIGBUS, stackhandler);
+    segvhandler = signal(SIGSEGV, stackhandler);
+    if (setjmp(environment))
+        __mp_newframe(p);
+    else
+    {
+        if ((p->frame == NULL) && getframe(&p->next))
+            unwind(&p->next);
+        if ((p->next.ra) && unwind(&p->next))
+        {
+            p->frame = (void *) p->next.sp;
+            p->addr = (void *) (p->next.ra - 8);
+            r = 1;
+        }
+        else
+        {
+            p->frame = NULL;
+            p->addr = NULL;
+        }
+    }
+    signal(SIGBUS, bushandler);
+    signal(SIGSEGV, segvhandler);
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     return r;

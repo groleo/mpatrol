@@ -64,7 +64,7 @@ frameinfo;
 typedef struct frameinfo
 {
     unsigned int sp; /* stack pointer */
-    unsigned int pc; /* program counter */
+    unsigned int ra; /* return address */
 }
 frameinfo;
 #endif /* TARGET && ARCH */
