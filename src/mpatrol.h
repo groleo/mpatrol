@@ -62,6 +62,20 @@
 #endif /* MP_FUNCNAME */
 
 
+/* A macro for defining the visibility of the inline C++ operators.  This
+ * should be extern inline so that there is no non-inline definition, but
+ * most compilers do not support this concept yet.
+ */
+
+#ifndef MP_INLINE
+#ifdef __GNUC__
+#define MP_INLINE extern inline
+#else /* __GNUC__ */
+#define MP_INLINE static inline
+#endif /* __GNUC__ */
+#endif /* MP_INLINE */
+
+
 /* A macro for disabling the definition of replacement C++ operators.
  */
 
@@ -479,7 +493,7 @@ extern "C"
 /* Set the low-memory handler.
  */
 
-static inline new_handler set_new_handler(new_handler h)
+MP_INLINE new_handler set_new_handler(new_handler h)
 {
     return __mp_nomemory(h);
 }
@@ -493,46 +507,46 @@ static inline new_handler set_new_handler(new_handler h)
 /* Override operator new.
  */
 
-static inline void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
-                                 unsigned long u)
+MP_INLINE void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
+                             unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 1);
+    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
 }
 
 
 /* Override operator new[].
  */
 
-static inline void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
-                                   unsigned long u)
+MP_INLINE void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
+                               unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 1);
+    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
 }
 
 
 /* Override operator delete.
  */
 
-static inline void operator delete(void *p)
+MP_INLINE void operator delete(void *p)
 {
     char *s, *t;
     unsigned long u;
 
     __mp_popdelstack(&s, &t, &u);
-    __mp_free(p, MP_AT_DELETE, s, t, u, 1);
+    __mp_free(p, MP_AT_DELETE, s, t, u, 0);
 }
 
 
 /* Override operator delete[].
  */
 
-static inline void operator delete[](void *p)
+MP_INLINE void operator delete[](void *p)
 {
     char *s, *t;
     unsigned long u;
 
     __mp_popdelstack(&s, &t, &u);
-    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 1);
+    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 0);
 }
 
 
