@@ -3177,7 +3177,7 @@
 
 	* src/option.c, src/option.h, src/mpatrol.h: Added the USEDEBUG option.
 
-2000-04-29  Graeme Roy  <graeme@epc.co.uk>
+2000-02-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c:
 	Added __mp_closesymbols() and support for caching BFD library handles.
@@ -3190,13 +3190,13 @@
 
 	* src/inter.c: Added a call to __mp_closesymbols().
 
-2000-04-24  Graeme Roy  <graeme@epc.co.uk>
+2000-02-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Fixed problem when the allocation count gets incremented more than once
 	before being stored in an infonode if internal allocations are made.
 
-2000-04-22  Graeme Roy  <graeme@epc.co.uk>
+2000-02-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	The C++ operators now have source level information associated with
@@ -3221,13 +3221,13 @@
 
 	* tests/pass/test7.c: New C++ test for operators new and delete.
 
-2000-04-18  Graeme Roy  <graeme@epc.co.uk>
+2000-02-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added some information on the Amiga version of mpatrol.
 
 	* doc/mpatrol.texi: Added information on contributors.
 
-2000-04-10  Graeme Roy  <graeme@epc.co.uk>
+2000-02-10  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Changed order of deletion of symbols, addrs and allocs since we may need
@@ -3236,7 +3236,7 @@
 
 	* src/symbol.c, src/symbol.h: Added the __mp_findsource() function.
 
-2000-04-07  Graeme Roy  <graeme@epc.co.uk>
+2000-02-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added more related software.
 
