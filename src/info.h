@@ -80,6 +80,7 @@ typedef enum alloctype
     AT_STRDUPA,   /* strdupa() */
     AT_STRNDUPA,  /* strndupa() */
     AT_REALLOC,   /* realloc() */
+    AT_REALLOCF,  /* reallocf() */
     AT_RECALLOC,  /* recalloc() */
     AT_EXPAND,    /* expand() */
     AT_FREE,      /* free() */

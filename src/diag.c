@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.56 2001-02-06 19:54:15 graeme Exp $"
+#ident "$Id: diag.c,v 1.57 2001-02-06 21:38:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.56 2001-02-06 19:54:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.57 2001-02-06 21:38:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -145,6 +145,7 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "strdupa",
     "strndupa",
     "realloc",
+    "reallocf",
     "recalloc",
     "expand",
     "free",

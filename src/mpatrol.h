@@ -229,6 +229,7 @@ typedef enum __mp_alloctype
     MP_AT_STRDUPA,   /* strdupa() */
     MP_AT_STRNDUPA,  /* strndupa() */
     MP_AT_REALLOC,   /* realloc() */
+    MP_AT_REALLOCF,  /* reallocf() */
     MP_AT_RECALLOC,  /* recalloc() */
     MP_AT_EXPAND,    /* expand() */
     MP_AT_FREE,      /* free() */
