@@ -59,15 +59,19 @@ typedef void (*__mp_failhandler)(size_t, MP_CONST char *, MP_CONST char *,
 
 #if !defined(MP_MPATROL_H) || defined(NDEBUG)
 
-#define MP_MALLOC(l, t) (t *) __mp_xmalloc((l) * sizeof(t), MP_FUNCNAME, \
-                                           __FILE__, __LINE__, #t, sizeof(t))
-#define MP_CALLOC(l, t) (t *) __mp_xcalloc((l) * sizeof(t), MP_FUNCNAME, \
-                                           __FILE__, __LINE__, #t, sizeof(t))
-#define MP_STRDUP(p) __mp_xstrdup((p), MP_FUNCNAME, __FILE__, __LINE__)
-#define MP_REALLOC(p, l, t) (t *) __mp_xrealloc((p), (l) * sizeof(t), \
-                                                MP_FUNCNAME, __FILE__, \
-                                                __LINE__, #t, sizeof(t))
-#define MP_FREE(p) do { if (p) { free(p); p = NULL; } } while (0)
+#define MP_MALLOC(p, l, t) \
+    (p = (t *) __mp_xmalloc((l) * sizeof(t), MP_FUNCNAME, __FILE__, __LINE__, \
+                            #t, sizeof(t)))
+#define MP_CALLOC(p, l, t) \
+    (p = (t *) __mp_xcalloc((l) * sizeof(t), MP_FUNCNAME, __FILE__, __LINE__, \
+                            #t, sizeof(t)))
+#define MP_STRDUP(p, s) \
+    (p = __mp_xstrdup((s), MP_FUNCNAME, __FILE__, __LINE__))
+#define MP_REALLOC(p, l, t) \
+    (p = (t *) __mp_xrealloc((p), (l) * sizeof(t), MP_FUNCNAME, __FILE__, \
+                             __LINE__, #t, sizeof(t)))
+#define MP_FREE(p) \
+    do { if (p) { free(p); p = NULL; } } while (0)
 #define MP_FAILURE(f) __mp_setfailhandler(f)
 
 #endif /* MP_MPATROL_H && NDEBUG */
