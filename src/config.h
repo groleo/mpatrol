@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.85 2001-09-23 21:37:37 graeme Exp $
+ * $Id: config.h,v 1.86 2001-09-25 23:43:06 graeme Exp $
  */
 
 
@@ -757,7 +757,11 @@
  */
 
 #ifndef MP_GUI_SUPPORT
+#if defined(HAVE_CONFIG_H) && !defined(X_DISPLAY_MISSING)
+#define MP_GUI_SUPPORT 1
+#else /* HAVE_CONFIG_H && X_DISPLAY_MISSING */
 #define MP_GUI_SUPPORT 0
+#endif /* HAVE_CONFIG_H && X_DISPLAY_MISSING */
 #endif /* MP_GUI_SUPPORT */
 
 
