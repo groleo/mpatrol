@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.101 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: info.c,v 1.102 2005-03-09 23:32:05 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.101 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.102 2005-03-09 23:32:05 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1259,8 +1259,14 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
     }
     e = 1;
     if (s == 0)
-        s = 1;
-    if (n = __mp_findnode(&h->alloc, p, s))
+    {
+        if (h->flags & FLG_CHECKMEMORY)
+        {
+            __mp_log(h, v);
+            __mp_warn(ET_ZEROPN, v->type, v->file, v->line, NULL);
+        }
+    }
+    else if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
             __mp_log(h, v);
