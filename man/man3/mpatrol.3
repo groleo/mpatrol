@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.11 2000-01-30 21:04:17 graeme Exp $
+.\" $Id: mpatrol.3,v 1.12 2000-03-07 21:23:40 graeme Exp $
 .\"
-.TH MPATROL 3 "30 January 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 3 "7 March 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -33,10 +33,10 @@ void *calloc(size_t nelem, size_t size);
 void *memalign(size_t align, size_t size);
 void *valloc(size_t size);
 void *pvalloc(size_t size);
-char *strdup(char *str);
-char *strndup(char *str, size_t size);
-char *strsave(char *str);
-char *strnsave(char *str, size_t size);
+char *strdup(const char *str);
+char *strndup(const char *str, size_t size);
+char *strsave(const char *str);
+char *strnsave(const char *str, size_t size);
 void *realloc(void *ptr, size_t size);
 void *recalloc(void *ptr, size_t size);
 void *expand(void *ptr, size_t size);
@@ -51,22 +51,24 @@ void (*set_new_handler(void (*func)(void)))(void);
 
 void *memset(void *ptr, int byte, size_t size);
 void bzero(void *ptr, size_t size);
-void *memcpy(void *dest, void *src, size_t size);
-void *memmove(void *dest, void *src, size_t size);
-void bcopy(void *src, void *dest, size_t size);
-int memcmp(void *ptr1, void *ptr2, size_t size);
-int bcmp(void *ptr1, void *ptr2, size_t size);
-void *memchr(void *ptr, int byte, size_t size);
-void *memmem(void *ptr1, size_t size1, void *ptr2,
-             size_t size2);
+void *memcpy(void *dest, const void *src, size_t size);
+void *memmove(void *dest, const void *src, size_t size);
+void bcopy(const void *src, void *dest, size_t size);
+int memcmp(const void *ptr1, const void *ptr2,
+           size_t size);
+int bcmp(const void *ptr1, const void *ptr2, size_t size);
+void *memchr(const void *ptr, int byte, size_t size);
+void *memmem(const void *ptr1, size_t size1,
+             const void *ptr2, size_t size2);
 
-int __mp_info(void *ptr, __mp_allocinfo *info);
+int __mp_info(const void *ptr, __mp_allocinfo *info);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*func)(void *, size_t)))
-     (void *, size_t);
-void (*__mp_epilogue(void (*func)(void *)))(void *);
+void (*__mp_prologue(void (*func)(const void *, size_t)))
+     (const void *, size_t);
+void (*__mp_epilogue(void (*func)(const void *)))
+     (const void *);
 void (*__mp_nomemory(void (*func)(void)))(void);
 .fi
 .SH DESCRIPTION
@@ -99,7 +101,9 @@ Stack traceback information for every memory allocation is available on some
 supported platforms, which is useful for determining exactly where a memory
 allocation was performed or for adding meaning to tracing.  Symbol names are
 read from the executable file and also possibly from any required shared
-libraries.
+libraries, and if the \fBUSEDEBUG\fP is used and is available then the debugging
+section in the executable file will be read to determine additional source-level
+information.
 .PP
 The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
@@ -274,9 +278,11 @@ is available for backwards compatibility with older C libraries and \fBcalloc\fP
 and should not be used in new code.
 .PP
 The following 5 functions are available as replacements for existing C++ library
-functions.  To use these you must include \fImpatrol.h\fP before all other
-header files, although on UNIX platforms they will be used anyway, albeit with
-slightly less tracing information:
+functions, but the replacements in \fImpatrol.h\fP will only be used if the
+\fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  To use these you must
+include \fImpatrol.h\fP before all other header files, although on UNIX
+platforms they will be used anyway, albeit with slightly less tracing
+information:
 .TP
 \fBoperator new\fP
 Allocates \fIsize\fP uninitialized bytes from the heap and returns a pointer to
@@ -749,6 +755,13 @@ be displayed on the standard error file stream before aborting.  This option may
 be handy for use in batch tests as it can force tests to fail if they do not
 free up a minimum number of memory allocations.  Note that this setting will be
 ignored if its value is zero.  Default value: \fBUNFREEDABORT\fP=\fI0\fP.
+.TP
+\fBUSEDEBUG\fP
+Specifies that any debugging information in the executable file should be used
+to obtain additional source-level information.  This option will only have an
+effect if the executable file contains a compiler-generated line number table
+and will be ignored if the mpatrol library was built to support an object file
+access library that cannot read line tables from object files.
 .TP
 \fBUSEMMAP\fP
 Specifies that the library should use \fBmmap()\fP instead of \fBsbrk()\fP to
