@@ -78,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.43 2001-01-16 22:00:01 graeme Exp $"
+#ident "$Id: memory.c,v 1.44 2001-01-22 19:58:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -273,13 +273,17 @@ progname(void)
      * program was invoked with.
      */
 #if SYSTEM == SYSTEM_AIX
-    return p_xargv[0];
+    if (p_xargv[0] != NULL)
+        return p_xargv[0];
 #elif SYSTEM == SYSTEM_HPUX
-    return __argv_value[0];
+    if (__argv_value[0] != NULL)
+        return __argv_value[0];
 #elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_SINIX
-    return __Argv[0];
+    if (__Argv[0] != NULL)
+        return __Argv[0];
 #elif SYSTEM == SYSTEM_UNIXWARE
-    return ___Argv[0];
+    if (___Argv[0] != NULL)
+        return ___Argv[0];
 #elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
       SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
     /* The BSD variants and Linux have a file in the /proc filesystem which
@@ -329,6 +333,7 @@ progname(void)
     __mp_newframe(&s, NULL);
     for (p = NULL; __mp_getframe(&s); p = (unsigned long *) s.frame);
     if (p != NULL)
+    {
 #if ARCH == ARCH_IX86
 #if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
@@ -348,8 +353,15 @@ progname(void)
         if (p = (unsigned long *) p[7])
             return (char *) p;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
+#if SYSTEM == SYSTEM_AIX
+        p += 4;
+        while (*p < (unsigned long) p)
+            p++;
+        return (char *) *p;
+#else /* SYSTEM */
         if (p = (unsigned long *) p[23])
             return (char *) *p;
+#endif /* SYSTEM */
 #elif ARCH == ARCH_SPARC
 #if ENVIRON == ENVIRON_64
         if (p = (unsigned long *) *(((unsigned long *) (*p + 0x7FF)) + 1))
@@ -358,6 +370,7 @@ progname(void)
 #endif /* ENVIRON */
             return (char *) *p;
 #endif /* ARCH */
+    }
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
 #ifdef MP_PROCFS_EXENAME
     /* If the /proc filesystem is supported then we can usually access the
