@@ -81,6 +81,7 @@
 /* The shared libraries that an AIX executable has loaded can be obtained via
  * the loadquery() function.
  */
+#include <sys/types.h>
 #include <sys/ldr.h>
 #elif DYNLINK == DYNLINK_BSD
 /* The BSD a.out dynamic linker is based on the original SunOS implementation
@@ -120,7 +121,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.48 2001-01-31 23:00:29 graeme Exp $"
+#ident "$Id: symbol.c,v 1.49 2001-02-01 18:50:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1622,9 +1623,13 @@ __mp_addextsymbols(symhead *y, meminfo *e)
     if (loadquery(L_GETINFO, b, sizeof(b)) != -1)
     {
         /* We skip past the first item on the list since it represents the
-         * executable file.
+         * executable file, but we may wish to record the name of the file
+         * if we haven't already determined it.
          */
         l = (struct ld_info *) b;
+        s = l->ldinfo_filename;
+        if ((e->prog == NULL) && (*s != '\0'))
+            e->prog = __mp_addstring(&y->strings, s);
         while (l = l->ldinfo_next ? (struct ld_info *)
                                     ((char *) l + l->ldinfo_next) : NULL)
             if (*l->ldinfo_filename != '\0')
@@ -1659,12 +1664,10 @@ __mp_addextsymbols(symhead *y, meminfo *e)
         while (l != NULL)
         {
 #if SYSTEM == SYSTEM_SUNOS
-            if ((l->lm_addr != 0) && (l->lm_name != NULL) &&
-                (*l->lm_name != '\0') &&
+            if ((l->lm_name != NULL) && (*l->lm_name != '\0') &&
                 !__mp_addsymbols(y, l->lm_name, NULL, l->lm_addr))
 #else /* SYSTEM */
-            if ((l->som_addr != 0) && (l->som_path != NULL) &&
-                (*l->som_path != '\0') &&
+            if ((l->som_path != NULL) && (*l->som_path != '\0') &&
                 !__mp_addsymbols(y, l->som_path, NULL, l->som_addr))
 #endif /* SYSTEM */
                 return 0;
@@ -1678,8 +1681,12 @@ __mp_addextsymbols(symhead *y, meminfo *e)
 #elif DYNLINK == DYNLINK_HPUX
     /* An index of -1 indicates the dynamic linker and an index of 0 indicates
      * the main executable program.  We are interested in all other object files
-     * that the program depends on.
+     * that the program depends on, but we may wish to record the name of the
+     * executable file if we haven't already determined it.
      */
+    if ((e->prog == NULL) && (shl_get_r(0, &d) != -1) &&
+        (d.filename[0] != '\0'))
+        e->prog = __mp_addstring(&y->strings, d.filename);
     for (i = 1; shl_get_r(i, &d) != -1; i++)
     {
         /* Determine the offset of the first text symbol in the library.  This
@@ -1702,7 +1709,14 @@ __mp_addextsymbols(symhead *y, meminfo *e)
          */
         if (l->data == 0xFFFFFFFF)
         {
+            /* We skip past the first item on the list since it represents the
+             * executable file, but we may wish to record the name of the file
+             * if we haven't already determined it.
+             */
             i = (objectinfo *) l;
+            s = (char *) i->name;
+            if ((e->prog == NULL) && (s != NULL) && (*s != '\0'))
+                e->prog = __mp_addstring(&y->strings, s);
             while (i = (objectinfo *) i->next)
             {
                 s = (char *) i->name;
@@ -1713,6 +1727,15 @@ __mp_addextsymbols(symhead *y, meminfo *e)
             }
         }
         else
+        {
+            /* We skip past the first item on the list since it represents the
+             * executable file, but we may wish to record the name of the file
+             * if we haven't already determined it.
+             */
+            o = (struct obj *) l->data;
+            s = o->o_path;
+            if ((e->prog == NULL) && (s != NULL) && (*s != '\0'))
+                e->prog = __mp_addstring(&y->strings, s);
             while (l = l->next)
             {
                 o = (struct obj *) l->data;
@@ -1722,6 +1745,7 @@ __mp_addextsymbols(symhead *y, meminfo *e)
                     !__mp_addsymbols(y, s, NULL, b))
                     return 0;
             }
+        }
 #elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
     if ((&_DYNAMIC != NULL) && (d = (Elf64_Dyn *) _DYNAMIC))
@@ -1736,14 +1760,23 @@ __mp_addextsymbols(symhead *y, meminfo *e)
             {
                 if (!d->d_un.d_ptr)
                     l = NULL;
-                else if (l = (dynamiclink *) *((unsigned long *) d->d_un.d_ptr +
-                          1))
-                    l = l->next;
+                else
+                    l = (dynamiclink *) *((unsigned long *) d->d_un.d_ptr + 1);
                 break;
             }
+        /* We skip past the first item on the list since it represents the
+         * executable file, but we may wish to record the name of the file
+         * if we haven't already determined it.
+         */
+        if (l != NULL)
+        {
+            if ((e->prog == NULL) && (l->name != NULL) && (*l->name != '\0'))
+                e->prog = __mp_addstring(&y->strings, l->name);
+            l = l->next;
+        }
         while (l != NULL)
         {
-            if ((l->base != 0) && (l->name != NULL) && (*l->name != '\0') &&
+            if ((l->name != NULL) && (*l->name != '\0') &&
                 !__mp_addsymbols(y, l->name, NULL, l->base))
                 return 0;
             l = l->next;
