@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.204 2001-03-14 20:56:25 graeme Exp $
+@c $Id: mpatrol.texi,v 1.205 2001-03-14 21:16:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3234,7 +3234,8 @@ should also be written in the associated header file.
 @subsection Dbmalloc-compatible functions
 @cindex Dbmalloc
 
-This file provides Dbmalloc-compatible functions which are built on top of the
+This file provides Dbmalloc@footnote{Dbmalloc is copyright @copyright{}
+1990-1992 Conor P. Cahill.}-compatible functions which are built on top of the
 mpatrol library.  They are compatible with the last known public release of
 Dbmalloc (patch level 14), but only the Dbmalloc-specific functions are defined
 here, leaving the overriding of standard functions up to the mpatrol library.
@@ -3286,7 +3287,8 @@ initialised until one of its functions are called.
 @subsection Dmalloc-compatible functions
 @cindex Dmalloc
 
-This file provides Dmalloc-compatible functions which are built on top of the
+This file provides Dmalloc@footnote{Dmalloc is copyright @copyright{}
+1992-2001 Gray Watson.}-compatible functions which are built on top of the
 mpatrol library.  They are compatible with the 4.8.2 release of Dmalloc, but
 only the Dmalloc-specific functions are defined here, leaving the overriding of
 standard functions up to the mpatrol library.  As the mpatrol library does not
