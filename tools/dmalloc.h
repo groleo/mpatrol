@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.5 2001-03-03 14:43:14 graeme Exp $
+ * $Id: dmalloc.h,v 1.6 2001-03-04 18:03:38 graeme Exp $
  */
 
 
@@ -51,12 +51,12 @@
  * according to any specified command-line options.  The four documented
  * Dmalloc global variables are also defined, although the two address
  * variables are not acted upon and changing the dmalloc_logpath variable
- * has no effect yet.  The dmalloc_errno variable is not used and so the
- * dmalloc_strerror() function always returns a constant string.  Note
- * that unlike the actual Dmalloc library, this file is not threadsafe,
- * and the lockon option has no effect.  In addition, the start option
- * ignores the file:line syntax and uses allocation indices rather than
- * events.
+ * has no effect yet.  The dmalloc_errno variable is mapped onto the
+ * __mp_errno variable and so the dmalloc_strerror() function always
+ * returns strings that are specific to the mpatrol library.  Note that
+ * unlike the actual Dmalloc library, this file is not threadsafe, and the
+ * lockon option has no effect.  In addition, the start option ignores the
+ * file:line syntax and uses allocation indices rather than events.
  *
  * The dmalloc_debug() function does not support the setting of all of the
  * Dmalloc flags, although this file defines preprocessor macros for each
@@ -179,6 +179,8 @@ typedef void (*dmalloc_track_t)(MP_CONST char *, unsigned long, int, size_t,
 
 #ifndef NDEBUG
 
+#define dmalloc_errno __mp_errno
+
 #define dmalloc_init() __mp_init_dmalloc()
 #define dmalloc_shutdown() __mpt_dmallocshutdown()
 #define dmalloc_log_heap_map() __mp_memorymap(0)
@@ -196,7 +198,7 @@ typedef void (*dmalloc_track_t)(MP_CONST char *, unsigned long, int, size_t,
 #define dmalloc_mark() __mp_snapshot()
 #define dmalloc_log_changed(m, u, f, d) __mpt_dmalloclogchanged((m), (u), (f), \
                                                                 (d))
-#define dmalloc_strerror(e) "errno value is not valid"
+#define dmalloc_strerror(e) __mpt_dmallocstrerror(e)
 
 
 #ifdef __cplusplus
@@ -206,7 +208,6 @@ extern "C"
 
 
 extern char *dmalloc_logpath;
-extern int dmalloc_errno;
 extern void *dmalloc_address;
 extern unsigned long dmalloc_address_count;
 
@@ -222,6 +223,7 @@ void __mpt_dmallocmessage(MP_CONST char *, ...);
 void __mpt_dmallocvmessage(MP_CONST char *, va_list);
 void __mpt_dmalloctrack(dmalloc_track_t);
 void __mpt_dmalloclogchanged(unsigned long, int, int, int);
+MP_CONST char *__mpt_dmallocstrerror(__mp_errortype);
 void __mp_init_dmalloc(void);
 
 
@@ -233,6 +235,8 @@ static MP_VOLATILE void *__mpt_init_dmalloc = (void *) __mp_init_dmalloc;
 #endif /* __cplusplus */
 
 #else /* NDEBUG */
+
+#define dmalloc_errno __mp_errno
 
 #define dmalloc_init() ((void) 0)
 #define dmalloc_shutdown() ((void) 0)
