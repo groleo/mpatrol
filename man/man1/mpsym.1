@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpsym.1,v 1.10 2001-08-23 23:00:04 graeme Exp $
+.\" $Id: mpsym.1,v 1.11 2001-09-25 22:17:28 graeme Exp $
 .\"
-.TH MPSYM 1 "23 August 2001" "Release 1.4" "mpatrol library"
+.TH MPSYM 1 "25 September 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mpsym \- locates missing symbolic information in an mpatrol log file
 .SH SYNOPSIS
@@ -58,9 +58,7 @@ file.  It also makes use of several UNIX text processing commands, including
 \fBperl\fP if it is installed, in order to extract information from the
 debugger's output and from the log file.  As a result, the \fBmpsym\fP command
 is only likely to work on UNIX platforms or on systems which have the necessary
-commands installed.  By default, it is set up to work on 32-bit platforms, but
-this can be changed by altering the \fIPOINTER\fP definition in the \fBmpsym\fP
-file itself (this is only necessary if \fBperl is not installed).
+commands installed.
 .SH OPTIONS
 .TP
 \fB\-\-help\fP [\fB\-h\fP]
