@@ -42,6 +42,7 @@ __mp_snapshot
 __mp_iterate
 __mp_memorymap
 __mp_summary
+__mp_stats
 __mp_check
 __mp_prologue
 __mp_epilogue
