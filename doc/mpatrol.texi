@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.119 2000-10-19 20:44:06 graeme Exp $
+@c $Id: mpatrol.texi,v 1.120 2000-10-25 22:40:00 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 19th October, 2000
+@set UPDATED 25th October, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2781,6 +2781,16 @@ is based upon @command{mprof} by Benjamin Zorn and Paul Hilfinger, which was
 written as a research project and ran on MIPS, SPARC and VAX machines.  However,
 the profiling output files are incompatible, the tables displayed have a
 different format, and the way they are implemented is entirely different.
+
+@ifnotinfo
+@image{images/gcc}
+
+@image{images/cpp}
+
+@image{images/cc1}
+
+@image{images/collect2}
+@end ifnotinfo
 
 @node Improving performance, How it works, Profiling, Top
 @chapter Improving performance
