@@ -57,7 +57,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.14 2000-06-23 19:30:01 graeme Exp $"
+#ident "$Id: stack.c,v 1.15 2000-06-23 20:17:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -148,7 +148,7 @@ static void (*segvhandler)(int);
 /* Initialise the fields of a stackinfo structure.
  */
 
-MP_GLOBAL void __mp_newframe(stackinfo *s, unsigned int *f)
+MP_GLOBAL void __mp_newframe(stackinfo *s, void *f)
 {
     s->frame = s->addr = NULL;
 #if MP_BUILTINSTACK_SUPPORT
@@ -456,12 +456,21 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #elif TARGET == TARGET_WINDOWS
     if (p->frame == NULL)
     {
-        setjmp(j);
-        p->next.AddrPC.Offset = ((_JUMP_BUFFER *) &j)->Eip;
+        if (p->first == NULL)
+        {
+            setjmp(j);
+            p->next.AddrPC.Offset = ((_JUMP_BUFFER *) &j)->Eip;
+            p->next.AddrFrame.Offset = ((_JUMP_BUFFER *) &j)->Ebp;
+            p->next.AddrStack.Offset = ((_JUMP_BUFFER *) &j)->Esp;
+        }
+        else
+        {
+            p->next.AddrPC.Offset = ((CONTEXT *) p->first)->Eip;
+            p->next.AddrFrame.Offset = ((CONTEXT *) p->first)->Ebp;
+            p->next.AddrStack.Offset = ((CONTEXT *) p->first)->Esp;
+        }
         p->next.AddrPC.Mode = AddrModeFlat;
-        p->next.AddrFrame.Offset = ((_JUMP_BUFFER *) &j)->Ebp;
         p->next.AddrFrame.Mode = AddrModeFlat;
-        p->next.AddrStack.Offset = ((_JUMP_BUFFER *) &j)->Esp;
         p->next.AddrStack.Mode = AddrModeFlat;
     }
     if (StackWalk(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(),
@@ -509,7 +518,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
                 f = getframe();
 #endif /* ARCH */
             else
-                f = p->first;
+                f = (unsigned int *) p->first;
         else
             f = (unsigned int *) p->next;
         if (p->frame = f)
