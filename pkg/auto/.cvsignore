@@ -19,6 +19,7 @@ ltconfig
 ltmain.sh
 libtool
 aclocal.m4
+acconfig.h
 configure.in
 configure
 configure.h.in
