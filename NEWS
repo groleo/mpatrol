@@ -1,4 +1,4 @@
-Changes for 1.2.0 (10th May, 2000)
+Changes for 1.2.0 (16th May, 2000)
 
   * Added memory allocation profiling, which behaves in a similar way to mprof.
 
@@ -14,6 +14,9 @@ Changes for 1.2.0 (10th May, 2000)
 
   * The CHECK* options now display the calling function details even when the
     LOG* options are not used.
+
+  * Added the ALLOWOFLOW option for allowing memory operations which overflow
+    allocation boundaries to continue rather than being ignored.
 
   * The log file and profiling output file can now contain %p in their names
     which will be expanded to the name of the executable program file.

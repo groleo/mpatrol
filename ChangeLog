@@ -1,6 +1,49 @@
-Mon May 15 00:04:33 2000  Graeme Roy  <graeme@epc.co.uk>
+Tue May 16 01:21:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented the ALLOWOFLOW option.
+
+	* doc/refcard.tex: Added the ALLOWOFLOW and -M options.
+
+	* man/man1/mpatrol.1, man/cat1/mpatrol.1: Added the -M option.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Added the ALLOWOFLOW option.
+
+	* src/memory.h, src/memory.c:
+	Added determination of the system stack direction.
+
+	* src/info.c, src/info.h: Added support for the ALLOWOFLOW option.
+
+	* src/option.c, src/option.h, src/mpatrol.h:
+	Added the ALLOWOFLOW option.
+
+	* src/mpatrol.c: Added the -M option.
+
+Mon May 15 23:37:48 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added information about frame pointers.
+
+	* doc/README: Added the PDF version of the reference card.
+
+	* doc/Makefile: Added ability to build PDF reference card.
+
+	* doc/mpatrol.texi:
+	Added background information on memory allocation profiling.  Documented
+	the mprof command.
+
+	* doc/refcard.tex: Added PDF support and a second page.
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
+	  pkg/lha/build:
+	Added the PDF quick reference card.
+
+	* src/profile.c:
+	Added information about the endianness of the host machine in the
+	profiling output file.
+
+	* src/mprof.c: Added support for reading byte-swapped data.
+
+	* src/library.c:
+	Added the sbrk module for AmigaOS with GCC and Windows platforms.
 
 Sun May 14 23:48:46 2000  Graeme Roy  <graeme@epc.co.uk>
 
