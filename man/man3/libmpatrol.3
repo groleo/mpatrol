@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.5 2001-01-04 21:58:33 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.6 2001-01-24 13:20:41 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "4 January 2001" "Release 1.3" "mpatrol library"
+.TH LIBMPATROL 3 "24 January 2001" "Release 1.3" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -638,10 +638,12 @@ l l.
 
 \fI\-lmpatrol\fP	To use this library.
 \fI\-lmpatrolmt\fP	To use the thread-safe mpatrol library.
+\fI\-lld\fP	If built with COFF or XCOFF support.
 \fI\-lelf\fP	If built with ELF support.
 \fI\-lbfd\fP & \fI\-liberty\fP	If built with BFD support.
 \fI\-lcl\fP	If built on HP/UX.
 \fI\-lexc\fP	If built on IRIX with library stack support.
+\fI\-lpthreads\fP	If built on AIX with threads support.
 \fI\-lthread\fP	If built on DG/UX with threads support.
 \fI\-lpthread\fP	If built on UNIX with threads support.
 .TE
