@@ -121,9 +121,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.53 2001-02-27 20:55:09 graeme Exp $"
+#ident "$Id: symbol.c,v 1.54 2001-03-06 22:08:19 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.53 2001-02-27 20:55:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.54 2001-03-06 22:08:19 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -456,10 +456,12 @@ addsymbol(symhead *y, struct nlist *p, char *f, char *s, size_t b)
         n->data.flags = p->n_type;
 #if MP_INITFUNC_SUPPORT
         /* Check to see if this function should be called when the mpatrol
-         * library is initialised.
+         * library is initialised or terminated.
          */
         if ((strncmp(r, "__mp_init_", 10) == 0) && (r[10] != '\0'))
             __mp_atinit((infohead *) y->inits, (void (*)(void)) a);
+        else if ((strncmp(r, "__mp_fini_", 10) == 0) && (r[10] != '\0'))
+            __mp_atfini((infohead *) y->inits, (void (*)(void)) a);
 #endif /* MP_INITFUNC_SUPPORT */
     }
     return 1;
@@ -529,10 +531,12 @@ addsymbol(symhead *y, SYMENT *p, char *f, char *s, size_t b)
         n->data.flags = p->n_sclass;
 #if MP_INITFUNC_SUPPORT
         /* Check to see if this function should be called when the mpatrol
-         * library is initialised.
+         * library is initialised or terminated.
          */
         if ((strncmp(r, "__mp_init_", 10) == 0) && (r[10] != '\0'))
             __mp_atinit((infohead *) y->inits, (void (*)(void)) a);
+        else if ((strncmp(r, "__mp_fini_", 10) == 0) && (r[10] != '\0'))
+            __mp_atfini((infohead *) y->inits, (void (*)(void)) a);
 #endif /* MP_INITFUNC_SUPPORT */
     }
     return 1;
@@ -579,10 +583,12 @@ addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
         n->data.flags = ELF32_ST_BIND(p->st_info);
 #if MP_INITFUNC_SUPPORT
         /* Check to see if this function should be called when the mpatrol
-         * library is initialised.
+         * library is initialised or terminated.
          */
         if ((strncmp(r, "__mp_init_", 10) == 0) && (r[10] != '\0'))
             __mp_atinit((infohead *) y->inits, (void (*)(void)) a);
+        else if ((strncmp(r, "__mp_fini_", 10) == 0) && (r[10] != '\0'))
+            __mp_atfini((infohead *) y->inits, (void (*)(void)) a);
 #endif /* MP_INITFUNC_SUPPORT */
     }
     return 1;
@@ -629,10 +635,12 @@ addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
         n->data.flags = ELF64_ST_BIND(p->st_info);
 #if MP_INITFUNC_SUPPORT
         /* Check to see if this function should be called when the mpatrol
-         * library is initialised.
+         * library is initialised or terminated.
          */
         if ((strncmp(r, "__mp_init_", 10) == 0) && (r[10] != '\0'))
             __mp_atinit((infohead *) y->inits, (void (*)(void)) a);
+        else if ((strncmp(r, "__mp_fini_", 10) == 0) && (r[10] != '\0'))
+            __mp_atfini((infohead *) y->inits, (void (*)(void)) a);
 #endif /* MP_INITFUNC_SUPPORT */
     }
     return 1;
@@ -699,10 +707,12 @@ addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
         n->data.flags = p->flags;
 #if MP_INITFUNC_SUPPORT
         /* Check to see if this function should be called when the mpatrol
-         * library is initialised.
+         * library is initialised or terminated.
          */
         if ((strncmp(r, "__mp_init_", 10) == 0) && (r[10] != '\0'))
             __mp_atinit((infohead *) y->inits, (void (*)(void)) a);
+        else if ((strncmp(r, "__mp_fini_", 10) == 0) && (r[10] != '\0'))
+            __mp_atfini((infohead *) y->inits, (void (*)(void)) a);
 #endif /* MP_INITFUNC_SUPPORT */
     }
     return 1;
