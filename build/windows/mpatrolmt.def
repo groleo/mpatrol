@@ -30,6 +30,7 @@ DESCRIPTION "controls and traces dynamic memory allocations"
 EXPORTS
 	__mp_init
 	__mp_fini
+	__mp_trap
 	__mp_atexit
 	__mp_setoption
 	__mp_getoption
@@ -61,6 +62,8 @@ EXPORTS
 	__mp_popdelstack
 	__mp_printf
 	__mp_vprintf
+	__mp_printfwithloc
+	__mp_vprintfwithloc
 	__mp_logmemory
 	__mp_logstack
 	__mp_logaddr
