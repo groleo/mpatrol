@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.31 2000-07-16 22:29:27 graeme Exp $"
+#ident "$Id: info.c,v 1.32 2000-08-31 20:20:48 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -949,15 +949,16 @@ int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
     infonode *m;
     int e;
 
+    if (p == NULL)
+    {
+        if ((s > 0) || (h->flags & FLG_CHECKMEMORY))
+            __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+        return 0;
+    }
     e = 1;
     if (s == 0)
         s = 1;
-    if (p == NULL)
-    {
-        __mp_error(f, "attempt to perform operation on a NULL pointer\n");
-        e = 0;
-    }
-    else if (n = __mp_findnode(&h->alloc, p, s))
+    if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
             __mp_error(f, "attempt to perform operation on free memory\n");
