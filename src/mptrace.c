@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.20 2001-06-07 18:01:52 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.21 2001-06-07 21:12:21 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.20 2001-06-07 18:01:52 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.21 2001-06-07 21:12:21 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -139,6 +139,13 @@ static size_t bufferlen;
 static slottable table;
 static void *tableslots[4096];
 static size_t maxslots;
+
+
+/* The name caches for the function names and the file names.
+ */
+
+static char *funcnames[MP_NAMECACHE_SIZE];
+static char *filenames[MP_NAMECACHE_SIZE];
 
 
 /* The statistics gathered from the tracing output file.
@@ -568,6 +575,84 @@ getstring(void)
 }
 
 
+/* Read a (possibly cached) function name from the tracing output file.
+ */
+
+static
+char *
+getfuncname(void)
+{
+    char *s;
+    int d;
+    unsigned char i;
+
+    if (!refill(1))
+    {
+        fprintf(stderr, "%s: Error reading file\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    i = (unsigned char) *bufferpos;
+    bufferpos++;
+    bufferlen--;
+    if (i == 0)
+        return NULL;
+    d = ((i & 0x80) != 0);
+    i = (i & 0x7F) - 1;
+    if (d != 0)
+    {
+        s = getstring();
+        if (funcnames[i] != NULL)
+            free(funcnames[i]);
+        if ((funcnames[i] = (char *) malloc(strlen(s) + 1)) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        strcpy(funcnames[i], s);
+    }
+    return funcnames[i];
+}
+
+
+/* Read a (possibly cached) file name from the tracing output file.
+ */
+
+static
+char *
+getfilename(void)
+{
+    char *s;
+    int d;
+    unsigned char i;
+
+    if (!refill(1))
+    {
+        fprintf(stderr, "%s: Error reading file\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    i = (unsigned char) *bufferpos;
+    bufferpos++;
+    bufferlen--;
+    if (i == 0)
+        return NULL;
+    d = ((i & 0x80) != 0);
+    i = (i & 0x7F) - 1;
+    if (d != 0)
+    {
+        s = getstring();
+        if (filenames[i] != NULL)
+            free(filenames[i]);
+        if ((filenames[i] = (char *) malloc(strlen(s) + 1)) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        strcpy(filenames[i], s);
+    }
+    return filenames[i];
+}
+
+
 /* Read the current event's thread id, source function name, file name and line
  * number from the tracing output file.
  */
@@ -587,24 +672,8 @@ getsource(unsigned long *i, char **s, char **t, unsigned long *u)
     if (version >= 10405)
     {
         *i = getuleb128();
-        if (*(a = getstring()) != '\0')
-        {
-            if ((*s = (char *) malloc(strlen(a) + 1)) == NULL)
-            {
-                fprintf(stderr, "%s: Out of memory\n", progname);
-                exit(EXIT_FAILURE);
-            }
-            strcpy(*s, a);
-        }
-        if (*(a = getstring()) != '\0')
-        {
-            if ((*t = (char *) malloc(strlen(a) + 1)) == NULL)
-            {
-                fprintf(stderr, "%s: Out of memory\n", progname);
-                exit(EXIT_FAILURE);
-            }
-            strcpy(*t, a);
-        }
+        *s = getfuncname();
+        *t = getfilename();
         *u = getuleb128();
     }
 }
@@ -760,7 +829,7 @@ readevent(void)
     allocation *f;
     char *g, *h;
     void *a;
-    size_t l, m;
+    size_t i, l, m;
     unsigned long n, t, u;
 
     if (refill(1))
@@ -798,10 +867,6 @@ readevent(void)
                     maxslots = m;
                 fprintf(simfile, "    {%lu, %lu, 0},\n", m, l);
             }
-            if (g != NULL)
-                free(g);
-            if (h != NULL)
-                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
             {
@@ -862,10 +927,6 @@ readevent(void)
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
-            if (g != NULL)
-                free(g);
-            if (h != NULL)
-                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
                 return 0;
@@ -906,10 +967,6 @@ readevent(void)
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
-            if (g != NULL)
-                free(g);
-            if (h != NULL)
-                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
                 return 0;
@@ -996,6 +1053,13 @@ readevent(void)
     if (verbose)
         fputc('\n', stdout);
     showstats();
+    for (i = 0; i < MP_NAMECACHE_SIZE; i++)
+    {
+        if (funcnames[i] != NULL)
+            free(funcnames[i]);
+        if (filenames[i] != NULL)
+            free(filenames[i]);
+    }
     freeallocs();
     fclose(tracefile);
 #if MP_GUI_SUPPORT
