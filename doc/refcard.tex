@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.3 2000-05-16 01:00:22 graeme Exp $
+% $Id: refcard.tex,v 1.4 2000-07-16 23:53:27 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -165,9 +165,9 @@ Equivalent to the \option{CHECKALLOCS}, \option{CHECKREALLOCS} and
 Specifies an 8-bit byte pattern with which to prefill newly-allocated memory.
 \item[\optionpar{FREEBYTE}{unsigned integer}]
 Specifies an 8-bit byte pattern with which to prefill newly-freed memory.
-\item[\option{NOFREE}]
-Specifies that the mpatrol library should keep all reallocated and freed memory
-allocations.
+\item[\optionpar{NOFREE}{unsigned integer}]
+Specifies that a number of recently-freed memory allocations should be prevented
+from being returned to the free memory pool.
 \item[\option{PRESERVE}]
 Specifies that any reallocated or freed memory allocations should preserve their
 original contents.
@@ -425,7 +425,7 @@ also be traced, but only if they were dynamically linked.
 \hfill See \option{USEMMAP}.
 \item[\flag{N}]
 \hfill See \option{NOPROTECT}.
-\item[\flag{n}]
+\item[\flagpar{n}{unsigned integer}]
 \hfill See \option{NOFREE}.
 \item[\flagpar{O}{unsigned integer}]
 \hfill See \option{OFLOWSIZE}.
