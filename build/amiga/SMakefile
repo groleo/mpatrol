@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.8 2000-04-05 18:01:06 graeme Exp $
+# $Id: SMakefile,v 1.9 2000-04-06 00:31:04 graeme Exp $
 
 
 # Definitions
@@ -73,19 +73,22 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/library.c
 
+mpatrol: mpatrol.o getopt.o
+	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mpatrol.o getopt.o
+
 memleak: memleak.o getopt.o tree.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ memleak.o getopt.o tree.o
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) memleak
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol memleak
 
 clean:
 	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
-	-@ Delete memleak.o getopt.o FORCE >NIL:
+	-@ Delete mpatrol.o memleak.o getopt.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
 	-@ Delete $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) FORCE >NIL:
-	-@ Delete memleak memleak.lnk FORCE >NIL:
+	-@ Delete mpatrol mpatrol.lnk memleak memleak.lnk FORCE >NIL:
 
 
 # Dependencies
@@ -190,6 +193,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
+mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
 memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \

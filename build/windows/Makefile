@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.9 2000-04-05 18:01:11 graeme Exp $
+# $Id: Makefile,v 1.10 2000-04-06 00:38:41 graeme Exp $
 
 
 # Definitions
@@ -96,16 +96,19 @@ $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
+mpatrol.exe: mpatrol.obj getopt.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj
+
 memleak.exe: memleak.obj getopt.obj tree.obj
 	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
-	memleak.exe
+	mpatrol.exe memleak.exe
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f memleak.obj getopt.obj 2>&1 >/dev/null
+	-@ rm -f mpatrol.obj memleak.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -113,7 +116,7 @@ clobber: clean
 	-@ rm -f $(LIBRARY).lib $(LIBRARY).exp 2>&1 >/dev/null
 	-@ rm -f $(LIBRARY)mt.lib $(LIBRARY)mt.exp 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f memleak.exe 2>&1 >/dev/null
+	-@ rm -f mpatrol.exe memleak.exe 2>&1 >/dev/null
 
 
 # Dependencies
@@ -234,6 +237,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
+mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
 memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
