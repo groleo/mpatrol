@@ -102,6 +102,11 @@
  */
 #include <obj.h>
 #include <obj_list.h>
+#elif DYNLINK == DYNLINK_OSF
+/* The shared libraries that an OSF executable has loaded can be obtained via
+ * the ldr_inq_module() and ldr_inq_region() functions.
+ */
+#include <loader.h>
 #elif DYNLINK == DYNLINK_SVR4
 /* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
  * many recent distributions and so we must use the GNU BFD library to read the
@@ -121,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.54 2001-03-06 22:08:19 graeme Exp $"
+#ident "$Id: symbol.c,v 1.55 2001-03-07 01:12:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.54 2001-03-06 22:08:19 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.55 2001-03-07 01:12:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1660,6 +1665,12 @@ __mp_addextsymbols(symhead *y, meminfo *e)
     objectinfo *i;
     char *s;
     size_t b;
+#elif DYNLINK == DYNLINK_OSF
+    ldr_region_info_t r;
+    ldr_module_info_t i;
+    ldr_module_t m;
+    ldr_process_t p;
+    size_t c, l, n;
 #elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
@@ -1801,6 +1812,33 @@ __mp_addextsymbols(symhead *y, meminfo *e)
                     !__mp_addsymbols(y, s, NULL, b))
                     return 0;
             }
+        }
+#elif DYNLINK == DYNLINK_OSF
+    c = 0;
+    p = ldr_my_process();
+    m = LDR_NULL_MODULE;
+    while ((ldr_next_module(p, &m) == 0) && (m != LDR_NULL_MODULE))
+        if (ldr_inq_module(p, m, &i, sizeof(i), &l) == 0)
+        {
+            /* We skip past the first item on the list since it represents the
+             * executable file, but we may wish to record the name of the file
+             * if we haven't already determined it.
+             */
+            if (c++ == 0)
+            {
+                if ((e->prog == NULL) && (i.lmi_name[0] != '\0'))
+                    e->prog = __mp_addstring(&y->strings, i.lmi_name);
+                continue;
+            }
+            for (n = 0; n < (size_t) i.lmi_nregion; n++)
+                if ((ldr_inq_region(p, m, (ldr_region_t) n, &r, sizeof(r),
+                      &l) == 0) && (strcmp(r.lri_name, ".text") == 0))
+                {
+                    if ((i.lmi_name[0] != '\0') && !__mp_addsymbols(y,
+                         i.lmi_name, NULL, (size_t) r.lri_mapaddr))
+                        return 0;
+                    break;
+                }
         }
 #elif DYNLINK == DYNLINK_SVR4
 #if ENVIRON == ENVIRON_64
