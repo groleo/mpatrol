@@ -188,6 +188,16 @@ their corresponding answers or solutions.
     is logged and what is not.  Note that the mpatrol command will always log
     all calls to allocate, reallocate and free memory by default.
 
+ Q. I linked my program with the mpatrol library to trace all of its memory
+    operations, such as memcpy() and memcmp(), but I get nothing in the log
+    file.  Why is this?
+
+ A. The memory operation functions do not automatically initialise the mpatrol
+    library since on many systems the startup routines call them very early on.
+    If your program does not call any memory allocation functions to initialise
+    the mpatrol library then you must explicitly call the __mp_init() function.
+    All memory operation functions following that call with then be traced.
+
  Q. Why does the USEDEBUG option not work for me?
 
  A. Firstly, you have to ensure that you have built the mpatrol library with
@@ -198,6 +208,17 @@ their corresponding answers or solutions.
     line), although the mpatrol library does not need to be compiled this way.
     The file and line number information will hopefully then appear in the
     log file for all symbols that have associated debugging information.
+
+ Q. Why do some mpatrol log file entries only contain a partial call stack
+    rather than following the function call stack back to the call to main()?
+
+ A. This could be because the mpatrol library was compiled with limited call
+    stack traversal support via the MP_BUILTINSTACK_SUPPORT configuration macro.
+    However, it could also mean that the mpatrol library encountered a corrupt
+    frame pointer when traversing the call stack and had to terminate the
+    recursion.  The frame pointer MUST be preserved from function to function
+    on most platforms, otherwise the stack cannot be traversed.  See your
+    compiler manual for further details.
 
  Q. I am trying to use the mpatrol command to debug an executable file that was
     not originally compiled with the mpatrol library.  However, even though it
@@ -321,16 +342,6 @@ their corresponding answers or solutions.
  A. You can do this by setting the mpatrol log file to be your system's "bit
     bucket", which is /dev/null on UNIX platforms and NIL: on AmigaOS.  There
     doesn't appear to be an equivalent way to do this on Windows or Netware.
-
- Q. I linked my program with the mpatrol library to trace all of its memory
-    operations, such as memcpy() and memcmp(), but I get nothing in the log
-    file.  Why is this?
-
- A. The memory operation functions do not automatically initialise the mpatrol
-    library since on many systems the startup routines call them very early on.
-    If your program does not call any memory allocation functions to initialise
-    the mpatrol library then you must explicitly call the __mp_init() function.
-    All memory operation functions following that call with then be traced.
 
 
  5. FILES
