@@ -46,7 +46,7 @@
  */
 
 	.section .data,"aw"
-	.align	4
+	.align	2
 __mp_initsection:
 	.long	1
 	.globl	__mp_initsection
@@ -61,6 +61,26 @@ __mp_initsection:
 	.section .init,"ax"
 	call	__mp_initmutexes
 	call	__mp_init
+#elif ARCH == ARCH_M68K
+/* Define the __mp_initsection variable.
+ */
+
+	.section .data,"aw",@progbits
+	.align	2
+__mp_initsection:
+	.long	1
+	.globl	__mp_initsection
+	.type	__mp_initsection,@object
+	.size	__mp_initsection,4
+
+
+/* Place calls to initialise the mpatrol mutexes and data structures into
+ * the .init section.
+ */
+
+	.section .init,"ax",@progbits
+	jbsr	__mp_initmutexes
+	jbsr	__mp_init
 #elif ARCH == ARCH_M88K
 /* Define the __mp_initsection variable.
  */
