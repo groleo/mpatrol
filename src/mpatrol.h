@@ -260,6 +260,24 @@ typedef struct __mp_allocinfo
 __mp_allocinfo;
 
 
+/* The structure filled by mallinfo().
+ */
+
+struct mallinfo
+{
+    unsigned long arena;    /* total space in arena */
+    unsigned long ordblks;  /* number of ordinary blocks */
+    unsigned long smblks;   /* number of small blocks */
+    unsigned long hblks;    /* number of holding blocks */
+    unsigned long hblkhd;   /* space in holding block headers */
+    unsigned long usmblks;  /* space in small blocks in use */
+    unsigned long fsmblks;  /* space in free small blocks */
+    unsigned long uordblks; /* space in ordinary blocks in use */
+    unsigned long fordblks; /* space in free ordinary blocks */
+    unsigned long keepcost; /* cost of enabling keep option */
+};
+
+
 #ifndef NDEBUG
 
 #ifdef malloc
