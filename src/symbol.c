@@ -104,7 +104,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.28 2000-06-22 23:04:28 graeme Exp $"
+#ident "$Id: symbol.c,v 1.29 2000-06-26 22:57:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -311,9 +311,6 @@ MP_GLOBAL void __mp_closesymbols(symhead *y)
         free(n);
     }
 #endif /* FORMAT */
-#if TARGET == TARGET_WINDOWS
-    SymCleanup(GetCurrentProcess());
-#endif /* TARGET */
     y->hhead = y->htail = NULL;
 }
 
@@ -996,6 +993,20 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
     int r;
 
     r = 1;
+#if TARGET == TARGET_WINDOWS
+    /* We always want to initialise the imagehlp library here since we will
+     * be using it to obtain the symbols from any loaded DLLs later on and
+     * possibly also from the executable file if we are not using any other
+     * object file access library.  In any case we can set the demangling
+     * option in the imagehlp library and also instruct it to load line number
+     * information if the USEDEBUG option is given.
+     */
+    if (y->lineinfo)
+        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES);
+    else
+        SymSetOptions(SYMOPT_UNDNAME);
+    SymInitialize(GetCurrentProcess(), NULL, 1);
+#endif /* TARGET */
 #if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
     /* This is a very simple, yet portable, way to read symbols from COFF
      * and XCOFF executable files.
@@ -1154,32 +1165,16 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
             bfd_close(h);
         }
     }
-#endif /* FORMAT */
-#if TARGET == TARGET_WINDOWS
+#elif FORMAT == FORMAT_PE
     /* We only want to obtain the symbols from the executable file using the
      * imagehlp library if we are not using another object file access library,
-     * such as GNU BFD.  On the other hand, we always want to initialise the
-     * imagehlp library here since we will be using it to obtain the symbols
-     * from any loaded DLLs later on.  In any case we can set the demangling
-     * option in the imagehlp library and also instruct it to load line number
-     * information if the USEDEBUG option is given.
+     * such as GNU BFD.
      */
-    if (y->lineinfo)
-        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES);
-    else
-        SymSetOptions(SYMOPT_UNDNAME);
-    if (!SymInitialize(GetCurrentProcess(), NULL, 1))
-        r = 0;
-#if FORMAT == FORMAT_PE
-    else
-    {
-        m.syms = y;
-        m.index = 0;
-        m.libs = 0;
-        r = SymEnumerateModules(GetCurrentProcess(), addsyms, &m);
-    }
+    m.syms = y;
+    m.index = 0;
+    m.libs = 0;
+    r = SymEnumerateModules(GetCurrentProcess(), addsyms, &m);
 #endif /* FORMAT */
-#endif /* TARGET */
     return r;
 }
 
