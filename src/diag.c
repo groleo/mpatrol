@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.11 2000-03-03 01:14:36 graeme Exp $"
+#ident "$Id: diag.c,v 1.12 2000-03-13 21:56:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -722,7 +722,8 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag(")\nfree blocks:       %lu (", h->alloc.ftree.size);
     __mp_printsize(h->alloc.fsize);
     n = h->alloc.heap.itree.size + h->alloc.itree.size + h->addr.list.size +
-        h->syms.strings.tree.size + h->syms.itree.size + h->list.size;
+        h->syms.strings.list.size + h->syms.strings.tree.size +
+        h->syms.itree.size + h->list.size;
     __mp_diag(")\ninternal blocks:   %lu (", n);
     n = h->alloc.heap.isize + h->alloc.isize + h->addr.size +
         h->syms.strings.size + h->syms.size + h->size;

@@ -72,17 +72,19 @@ typedef struct strnode
 strnode;
 
 
-/* A strtab holds the tree of strnodes that comprise the string table.
- * A new strnode is added to the string table if there is not enough
- * space to store a particular string.
+/* A strtab holds the hash table of strings and the tree of strnodes
+ * that comprise the string table.  A new strnode is added to the string
+ * table if there is not enough space to store a particular string.
  */
 
 typedef struct strtab
 {
-    heaphead *heap; /* pointer to heap */
-    treeroot tree;  /* allocation tree */
-    size_t size;    /* allocation total */
-    size_t align;   /* alignment for each strnode */
+    heaphead *heap;  /* pointer to heap */
+    slottable table; /* table of hash entries */
+    listhead list;   /* internal list of memory blocks */
+    treeroot tree;   /* allocation tree */
+    size_t size;     /* allocation total */
+    size_t align;    /* alignment for each strnode */
 }
 strtab;
 

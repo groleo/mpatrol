@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.4 2000-03-13 21:09:43 graeme Exp $"
+#ident "$Id: strtab.c,v 1.5 2000-03-13 21:56:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -51,10 +51,14 @@ extern "C"
 
 MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
 {
+    struct { char x; hashentry y; } w;
     struct { char x; strnode y; } z;
     long n;
 
     t->heap = h;
+    n = (char *) &w.y - &w.x;
+    __mp_newslots(&t->table, sizeof(hashentry), __mp_poweroftwo(n));
+    __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
     t->size = 0;
     /* Determine the minimum alignment for a strnode on this system
@@ -74,6 +78,9 @@ MP_GLOBAL void __mp_deletestrtab(strtab *t)
      * at a lower level by the heap manager.
      */
     t->heap = NULL;
+    t->table.free = NULL;
+    t->table.size = 0;
+    __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
     t->size = 0;
 }
@@ -96,6 +103,35 @@ static unsigned long hash(char *s)
         }
     }
     return h % MP_HASHTABSIZE;
+}
+
+
+/* Allocate a new hash entry.
+ */
+
+static hashentry *gethashentry(strtab *t)
+{
+    hashentry *e;
+    heapnode *p;
+
+    /* If we have no more hash entry slots left then we must allocate
+     * some more memory for them.  An extra page of memory should
+     * suffice.
+     */
+    if ((e = (hashentry *) __mp_getslot(&t->table)) == NULL)
+    {
+        if ((p = __mp_heapalloc(t->heap, t->heap->memory.page,
+              t->table.entalign)) == NULL)
+            return NULL;
+        __mp_initslots(&t->table, p->block, p->size);
+        e = (hashentry *) __mp_getslot(&t->table);
+        __mp_addtail(&t->list, &e->node);
+        e->data.block = p->block;
+        e->size = p->size;
+        t->size += p->size;
+        e = (hashentry *) __mp_getslot(&t->table);
+    }
+    return e;
 }
 
 
@@ -148,11 +184,16 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
 
 MP_GLOBAL int __mp_protectstrtab(strtab *t, memaccess a)
 {
+    hashentry *e;
     strnode *n;
 
     for (n = (strnode *) __mp_minimum(t->tree.root); n != NULL;
          n = (strnode *) __mp_successor(&n->node))
         if (!__mp_memprotect(&t->heap->memory, n->block, n->size, a))
+            return 0;
+    for (e = (hashentry *) t->list.head; e->node.next != NULL;
+         e = (hashentry *) e->node.next)
+        if (!__mp_memprotect(&t->heap->memory, e->data.block, e->size, a))
             return 0;
     return 1;
 }
