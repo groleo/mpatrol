@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.105 2001-03-05 00:08:54 graeme Exp $"
+#ident "$Id: inter.c,v 1.106 2001-03-05 00:13:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.105 2001-03-05 00:08:54 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.106 2001-03-05 00:13:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1458,7 +1458,8 @@ __mp_info(void *p, allocinfo *d)
         d->typestr = NULL;
         d->typesize = 0;
         d->userdata = NULL;
-        d->freed = 1;
+        d->allocated = 0;
+        d->freed = 0;
         d->marked = 0;
         d->profiled = 0;
         d->traced = 0;
@@ -1486,6 +1487,7 @@ __mp_info(void *p, allocinfo *d)
     d->typestr = m->data.typestr;
     d->typesize = m->data.typesize;
     d->userdata = m->data.userdata;
+    d->allocated = 1;
     d->freed = ((m->data.flags & FLG_FREED) != 0);
     d->marked = ((m->data.flags & FLG_MARKED) != 0);
     d->profiled = ((m->data.flags & FLG_PROFILED) != 0);
