@@ -37,6 +37,12 @@
 <li><a href="#Testing">7.6 Testing</a>
 <li><a href="#Library%20functions">7.7 Library functions</a>
 <li><a href="#Utilities">7.8 Utilities</a>
+<ul>
+<li><a href="#The%20mpatrol%20command">7.8.1 The <code>mpatrol</code> command</a>
+<li><a href="#The%20mleak%20command">7.8.2 The <code>mleak</code> command</a>
+<li><a href="#The%20mpsym%20command">7.8.3 The <code>mpsym</code> command</a>
+<li><a href="#The%20mpedit%20command">7.8.4 The <code>mpedit</code> command</a>
+</ul>
 </ul>
 <li><a href="#Profiling">8 Profiling</a>
 <li><a href="#Improving%20performance">9 Improving performance</a>
@@ -668,8 +674,8 @@ copying them.
 
 <li>Copy the <code>mpatrol</code>, <code>mprof</code> and <code>mleak</code> programs that
 have been built into your local bin directory.  You may also wish to copy the
-<code>mpsym</code> command to your local bin directory as well if your system
-supports it.
+<code>mpsym</code> and <code>mpedit</code> commands to your local bin directory as
+well if your system supports it.
 
 <li>Go up two directory levels into the <code>src</code> directory and copy the
 <code>mpatrol.h</code> header file into your local include directory.
@@ -1390,6 +1396,15 @@ You can therefore use the <code>CHECK</code> option to specify a range of memory
 allocations at which the mpatrol library will automatically check the freed
 memory and overflow buffers.  All other allocations that fall outside this range
 will not be checked.
+
+<p>On UNIX systems, the mpatrol library can also invoke the <code>mpedit</code>
+command to edit source files that show up in any warnings or error messages that
+it generates.  This can only happen if the diagnostic message can be traced back
+to a specific source line in the program; in many cases this is not possible. 
+If editing the files is not required, a context listing of the appropriate
+source line can be generated instead.  The <code>EDIT</code> option specifies that
+files are to be edited and the <code>LIST</code> option specifies that a context
+listing is to be generated.  These options are mutually exclusive.
 
 <p>If the mpatrol library that was built for your system supports reading symbolic
 information from a program's executable file, but it cannot locate the
@@ -2134,6 +2149,29 @@ Up:<a rel=up href="#Using%20mpatrol">Using mpatrol</a>
 
 <h2>7.8 Utilities</h2>
 
+<p>Several external programs are supplied with the mpatrol distribution in the
+form of commands that can be used to enhance the functionality of the mpatrol
+library.  Each command comes with its own UNIX manual page (although they also
+support the <code>--help</code> and <code>--version</code> options), but a few of the
+commands are written as UNIX shell scripts and so will not work on non-UNIX
+platforms.  Note that the <code>mprof</code> command is documented in the profiling
+chapter (see <a href="#Profiling">Profiling</a>).
+
+<ul>
+<li><a href="#The%20mpatrol%20command">The mpatrol command</a>:          Running with the library. 
+<li><a href="#The%20mleak%20command">The mleak command</a>:            Detecting memory leaks. 
+<li><a href="#The%20mpsym%20command">The mpsym command</a>:            Obtaining symbolic information. 
+<li><a href="#The%20mpedit%20command">The mpedit command</a>:           Editing and listing files. 
+</ul>
+
+<p><hr>
+Node:<a name="The%20mpatrol%20command">The mpatrol command</a>,
+Next:<a rel=next href="#The%20mleak%20command">The mleak command</a>,
+Up:<a rel=up href="#Utilities">Utilities</a>
+<br>
+
+<h3>7.8.1 The <code>mpatrol</code> command</h3>
+
 <p>A command is provided with the mpatrol distribution which can run programs that
 have been linked with the mpatrol library, using a combination of mpatrol
 options that can be set via the command line.  Most of these options map
@@ -2141,7 +2179,7 @@ directly onto their equivalent environment variable settings and exist mainly
 so that the user does not have to manually change the <code>MPATROL_OPTIONS</code>
 environment variable.
 
-<p>The one option that is the exception to this is the <code>--dynamic</code> option,
+<p>The main option that is the exception to this is the <code>--dynamic</code> option,
 which can be used to run a program under the control of the mpatrol library,
 even if it wasn't originally linked with the mpatrol library.  This can only be
 done on systems that support dynamic linking and where the dynamic linker
@@ -2242,6 +2280,15 @@ Sets mpatrol library options in the current process environment.
 end
 </pre>
 
+<p><hr>
+Node:<a name="The%20mleak%20command">The mleak command</a>,
+Next:<a rel=next href="#The%20mpsym%20command">The mpsym command</a>,
+Previous:<a rel=previous href="#The%20mpatrol%20command">The mpatrol command</a>,
+Up:<a rel=up href="#Utilities">Utilities</a>
+<br>
+
+<h3>7.8.2 The <code>mleak</code> command</h3>
+
 <p>Another utility program that is provided is called <code>mleak</code> and is
 useful for detecting memory leaks in log files produced by the mpatrol library. 
 This program should be used if the mpatrol library could not finish writing the
@@ -2272,7 +2319,16 @@ as the log file.  Note also that the <code>mleak</code> command supports the
 <code>--help</code> and <code>--version</code> options in common with the other mpatrol
 command line tools.
 
-<p>The final utility program that is provided is called <code>mpsym</code>, which is
+<p><hr>
+Node:<a name="The%20mpsym%20command">The mpsym command</a>,
+Next:<a rel=next href="#The%20mpedit%20command">The mpedit command</a>,
+Previous:<a rel=previous href="#The%20mleak%20command">The mleak command</a>,
+Up:<a rel=up href="#Utilities">Utilities</a>
+<br>
+
+<h3>7.8.3 The <code>mpsym</code> command</h3>
+
+<p>Another utility program that is provided is called <code>mpsym</code>, which is
 used to parse a log file produced by the mpatrol library and uses a debugger to
 append symbol names and source level information to code addresses in stack
 tracebacks.  This should be used if the <code>USEDEBUG</code> option is not
@@ -2308,6 +2364,65 @@ As a result, the <code>mpsym</code> command is only likely to work on UNIX
 platforms or on systems which have the necessary commands installed.  By
 default, it is set up to work on 32-bit platforms, but this can be changed by
 altering the <code>POINTER</code> definition in the <code>mpsym</code> file itself.
+
+<p><hr>
+Node:<a name="The%20mpedit%20command">The mpedit command</a>,
+Previous:<a rel=previous href="#The%20mpsym%20command">The mpsym command</a>,
+Up:<a rel=up href="#Utilities">Utilities</a>
+<br>
+
+<h3>7.8.4 The <code>mpedit</code> command</h3>
+
+<p>The final utility program that is provided is called <code>mpedit</code>, which is
+used to invoke a text editor on a given source file and optionally jump to a
+specific line number.  It is used as a support command by the mpatrol library
+when the <code>EDIT</code> or <code>LIST</code> options are used but it can quite easily
+be used as a command in its own right if properly configured.  Because it is a
+shell script it can be easily configured to support other editors, but this
+unfortunately limits it to UNIX platforms at the moment.
+
+<p>The first argument to <code>mpedit</code> must be the filename of the source file
+to be edited or listed.  If the source file does not exist then the contents of
+the <code>MPATROL_SOURCEPATH</code> environment variable will be used to help locate
+the source file, even if the filename contained an absolute or relative path
+component.  This environment variable should consist of a colon-separated list
+of directory names which may contain absolute paths or be relative to the
+current directory; the first directory in the list will be searched first.  If
+the <code>MPATROL_SOURCEPATH</code> environment variable is not set then only the
+current directory will be searched.  You can also use the <code>--source-dir</code>
+option to add directories to the search path used to locate the source file. 
+Multiple <code>--source-dir</code> options may be given, and each will be prepended
+to the <code>MPATROL_SOURCEPATH</code> environment variable in the order given on the
+command line.
+
+<p>If the second argument specifying the line number is omitted then it is assumed
+to be <code>1</code>.  The text editor will attempt to jump to the specified line
+after opening the source file.  The text editor that <code>mpedit</code> uses is
+controlled by setting the <code>EDITOR</code> environment variable.  This can be set to
+the full pathname of the text editor to use or it can be set to the command that
+would normally be used to invoke the text editor, but it cannot also contain
+command line options.  You can also use the <code>--editor</code> option to specify
+the text editor on the command line instead of using the value in the
+<code>EDITOR</code> environment variable.
+
+<p>The currently supported editors are <code>vi</code>, <code>vim</code>, <code>emacs</code>
+and <code>xemacs</code>, and if the <code>EDITOR</code> environment variable is not set
+then the default will be <code>vi</code>.  Selecting an unsupported text editor
+will result in an error.  However, you can edit the <code>mpedit</code> file to add
+support for your own favourite text editor as long as it supports a way to
+immediately jump to a specific line number when it is first started up.  Note
+that the text editor must also open a new window to edit the source file so that
+it does not obscure any mpatrol diagnostic messages, and if it does not support
+this then a new terminal window must be opened for it to use.
+
+<p>If the <code>--list</code> option is given on the command line then the
+<code>mpedit</code> command will display a context listing of the source file at
+the specified line number to the standard error output stream instead of
+invoking the text editor.  The listing will be annotated with line numbers and
+will also show the contents of the five lines before and after the specified
+line if possible.  Note also that the <code>mpedit</code> command supports the
+<code>--help</code> and <code>--version</code> options in common with the other mpatrol
+command line tools.
 
 <p><hr>
 Node:<a name="Profiling">Profiling</a>,
@@ -5832,6 +5947,14 @@ must be a power of two (and will be rounded up to the nearest power of two if it
 is not).  The default alignment for a particular system is calculated at
 run-time.
 
+<br><dt><code>EDIT</code>
+<dd>Specifies that a text editor should be invoked to edit any relevant source files
+that are associated with any warnings or errors when they occur.  Only
+diagnostics which occur at source lines in the program will be affected and only
+then if they contain source-level information.  This option is currently only
+available on UNIX platforms as it makes use of the <code>mpedit</code> command.  It
+also overrides the behaviour of the <code>LIST</code> option.
+
 <br><dt><code>FAILFREQ</code>=&lt;<var>unsigned-integer</var>&gt;
 <dd>Specifies the frequency at which all memory allocations will randomly fail.  For
 example, a value of <code>10</code> will mean that roughly 1 in 10 memory allocations
@@ -5877,6 +6000,14 @@ internal memory used by the library itself will not be counted as part of the
 total heap size, but on some systems there may be a small amount of memory
 required to initialise the library itself.  Note that this setting will be
 ignored if its value is zero.  Default value: <code>LIMIT=0</code>.
+
+<br><dt><code>LIST</code>
+<dd>Specifies that a context listing should be shown for any relevant source files
+that are associated with any warnings or errors when they occur.  Only
+diagnostics which occur at source lines in the program will be affected and only
+then if they contain source-level information.  This option is currently only
+available on UNIX platforms as it makes use of the <code>mpedit</code> command.  It
+also overrides the behaviour of the <code>EDIT</code> option.
 
 <br><dt><code>LOGALL</code>
 <dd>Equivalent to the <code>LOGALLOCS</code>, <code>LOGREALLOCS</code>, <code>LOGFREES</code>
@@ -6162,6 +6293,11 @@ also be traced, but only if they were dynamically linked.  This option will
 only work if the system dynamic linker has the ability to preload a set of
 user-specified shared libraries via a special environment variable.
 
+<br><dt><code>--edit</code>
+<dd>[<code>EDIT</code>]  Specifies that a text editor should be invoked to edit any
+relevant source files that are associated with any warnings or errors when they
+occur.
+
 <br><dt><code>--fail-freq</code> &lt;<var>unsigned-integer</var>&gt;
 <dd>[<code>FAILFREQ</code>]  Specifies the frequency at which all memory allocations
 will randomly fail.
@@ -6188,6 +6324,11 @@ allocations should be classified as large allocations for profiling purposes.
 <br><dt><code>--limit</code> &lt;<var>unsigned-integer</var>&gt;
 <dd>[<code>LIMIT</code>]  Specifies the limit in bytes at which all memory allocations
 should fail if the total allocated memory should increase beyond this.
+
+<br><dt><code>--list</code>
+<dd>[<code>LIST</code>]  Specifies that a context listing should be shown for any
+relevant source files that are associated with any warnings or errors when they
+occur.
 
 <br><dt><code>--log-all</code>
 <dd>[<code>LOGALL</code>]  Equivalent to the <code>--log-allocs</code>,
@@ -6339,6 +6480,11 @@ the mpatrol log file when problems with dynamic memory allocations and memory
 operations occur.  Other types of warnings and errors may also appear in the log
 file, but they are likely to be associated with parsing options and reading
 symbols from executable files and so should be self-explanatory.
+
+<p>Note that on UNIX platforms, if the diagnostic message is caused by a line in
+the program source then the <code>EDIT</code> and <code>LIST</code> options can be used
+to illustrate more clearly where in the source code the warning or error
+occurred.
 
 <ul>
 <li><code>ALLOVF</code>
@@ -7259,6 +7405,7 @@ section in the <code>Makefile</code> before building the library.
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work unless <code>gdb</code> and the GNU text
 processing tools are installed. 
+<li>The <code>mpedit</code> command does not work. 
 </ul>
 
 <li>AmigaOS 3.1, Motorola 68040, n/a, SAS/C
@@ -7274,6 +7421,7 @@ processing tools are installed.
 <li>No detection of illegal memory accesses. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work. 
+<li>The <code>mpedit</code> command does not work. 
 </ul>
 
 <li>Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C/C++
@@ -7284,6 +7432,7 @@ processing tools are installed.
 mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work. 
+<li>The <code>mpedit</code> command does not work. 
 </ul>
 </ul>
 
@@ -8512,6 +8661,14 @@ in the log file for all symbols that have associated debugging information when
 you run the <code>mpsym</code> command on the log file.  Alternatively, it could be
 that your system does not have <code>gdb</code> or any of the required UNIX text
 processing tools installed, in which case you might want to try installing them.
+
+</p><li>How can I customise the <code>mpedit</code> command if I do not have the
+appropriate permissions to edit the file that was installed on my system?
+
+<p>You just need to take a copy of the installed <code>mpedit</code> command and place
+it somewhere that will be picked up earlier on your command search path.  You
+can then edit your copy of the file and add support for your favourite text
+editor.
 
 </p><li>What does the <code>mupdate</code> shell script do?
 
@@ -10407,16 +10564,19 @@ Up:<a rel=up href="#Top">Top</a>
 <li>-counts: <a href="#Profiling">Profiling</a>
 <li>-def-align: <a href="#Options">Options</a>
 <li>-dynamic: <a href="#Options">Options</a>
+<li>-edit: <a href="#Options">Options</a>
+<li>-editor: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>-fail-freq: <a href="#Options">Options</a>
 <li>-fail-seed: <a href="#Options">Options</a>
 <li>-free-byte: <a href="#Options">Options</a>
 <li>-free-stop: <a href="#Options">Options</a>
 <li>-graph-file: <a href="#Profiling">Profiling</a>
 <li>-help: <a href="#Options">Options</a>
-<li>-ignore: <a href="#Utilities">Utilities</a>
+<li>-ignore: <a href="#The%20mleak%20command">The mleak command</a>
 <li>-large-bound: <a href="#Options">Options</a>
 <li>-leaks: <a href="#Profiling">Profiling</a>
 <li>-limit: <a href="#Options">Options</a>
+<li>-list: <a href="#Options">Options</a>
 <li>-log-all: <a href="#Options">Options</a>
 <li>-log-allocs: <a href="#Options">Options</a>
 <li>-log-file: <a href="#Options">Options</a>
@@ -10444,18 +10604,19 @@ Up:<a rel=up href="#Top">Top</a>
 <li>-show-symbols: <a href="#Options">Options</a>
 <li>-show-unfreed: <a href="#Options">Options</a>
 <li>-small-bound: <a href="#Options">Options</a>
+<li>-source-dir: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>-stack-depth: <a href="#Profiling">Profiling</a>
 <li>-threads: <a href="#Options">Options</a>
 <li>-unfreed-abort: <a href="#Options">Options</a>
 <li>-use-debug: <a href="#Options">Options</a>
 <li>-use-mmap: <a href="#Options">Options</a>
 <li>-version: <a href="#Options">Options</a>
-<li>.cshrc: <a href="#Utilities">Utilities</a>
+<li>.cshrc: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>.gdbinit: <a href="#Using%20with%20a%20debugger">Using with a debugger</a>
-<li>.profile: <a href="#Utilities">Utilities</a>
+<li>.profile: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>32-bit: <a href="#Building">Building</a>
 <li>64-bit: <a href="#Building">Building</a>
-<li>_RLD_LIST: <a href="#Utilities">Utilities</a>
+<li>_RLD_LIST: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>ABI: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>acknowledgements: <a href="#Foreword">Foreword</a>
 <li>adding a new object file format: <a href="#New%20file%20format%20support">New file format support</a>
@@ -10502,7 +10663,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>AUTOSAVE: <a href="#Environment">Environment</a>
 <li>backwards compatibility: <a href="#Linking">Linking</a>
 <li>BADALN: <a href="#Diagnostic%20messages">Diagnostic messages</a>
-<li>bash: <a href="#Utilities">Utilities</a>
+<li>bash: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>BASIC: <a href="#Memory%20allocations">Memory allocations</a>
 <li>batch testing: <a href="#Testing">Testing</a>
 <li>best fit: <a href="#How%20it%20works">How it works</a>
@@ -10558,10 +10719,11 @@ Up:<a rel=up href="#Top">Top</a>
 <li>compiler: <a href="#Installation">Installation</a>
 <li>compiling: <a href="#Installation">Installation</a>
 <li>contacting the author: <a href="#Foreword">Foreword</a>
+<li>context listing: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>contributors: <a href="#Foreword">Foreword</a>
 <li>core file: <a href="#Running">Running</a>
 <li>crash: <a href="#Example%201">Example 1</a>
-<li>csh: <a href="#Utilities">Utilities</a>
+<li>csh: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>CSRI malloc: <a href="#Related%20software">Related software</a>
 <li>CVS: <a href="#Files">Files</a>
 <li>data sections: <a href="#Static%20memory%20allocations">Static memory allocations</a>
@@ -10601,11 +10763,15 @@ Up:<a rel=up href="#Top">Top</a>
 <li>dynamic linking: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>dynamic memory allocations: <a href="#Dynamic%20memory%20allocations">Dynamic memory allocations</a>
 <li>DYNIX/ptx, Intel 80x86: <a href="#Supported%20systems">Supported systems</a>
+<li>EDIT: <a href="#Environment">Environment</a>
+<li>EDITOR: <a href="#The%20mpedit%20command">The mpedit command</a>
+<li>editor: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>Electric Fence: <a href="#Related%20software">Related software</a>
 <li>Electric Software, Inc.: <a href="#Related%20software">Related software</a>
 <li>ELF32: <a href="#Examples">Examples</a>
 <li>ELF64: <a href="#Examples">Examples</a>
-<li>embedded libraries: <a href="#Utilities">Utilities</a>
+<li>emacs: <a href="#The%20mpedit%20command">The mpedit command</a>
+<li>embedded libraries: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>embedded systems: <a href="#Operating%20system%20support">Operating system support</a>
 <li>endianness: <a href="#Profiling">Profiling</a>
 <li>Enforcer: <a href="#Related%20software">Related software</a>
@@ -10713,12 +10879,12 @@ Up:<a rel=up href="#Top">Top</a>
 <li>Kernel Group, The: <a href="#Related%20software">Related software</a>
 <li>KL Group: <a href="#Related%20software">Related software</a>
 <li>known bugs: <a href="#Notes">Notes</a>
-<li>ksh: <a href="#Utilities">Utilities</a>
+<li>ksh: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>LARGEBOUND: <a href="#Environment">Environment</a>
 <li>LaTeX: <a href="#Installation">Installation</a>
 <li>LD: <a href="#Installation">Installation</a>
 <li>LD_LIBRARY_PATH: <a href="#Linking">Linking</a>
-<li>LD_PRELOAD: <a href="#Utilities">Utilities</a>
+<li>LD_PRELOAD: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>LD_RUN_PATH: <a href="#Linking">Linking</a>
 <li>Leak: <a href="#Related%20software">Related software</a>
 <li>Leakers: <a href="#Related%20software">Related software</a>
@@ -10749,6 +10915,8 @@ Up:<a rel=up href="#Top">Top</a>
 <li>Linux Software Map: <a href="#Installation">Installation</a>
 <li>Linux, Intel 80x86: <a href="#Supported%20systems">Supported systems</a>
 <li>Linux, Motorola 680x0: <a href="#Supported%20systems">Supported systems</a>
+<li>LIST: <a href="#Environment">Environment</a>
+<li>list: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>local static variables: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>log file: <a href="#Example%201">Example 1</a>
 <li>LOGALL: <a href="#Environment">Environment</a>
@@ -10772,7 +10940,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>malloc(3x): <a href="#Related%20software">Related software</a>
 <li>Malloc_Dbg: <a href="#Related%20software">Related software</a>
 <li>MallocTrace: <a href="#Related%20software">Related software</a>
-<li>mallopt: <a href="#Utilities">Utilities</a>
+<li>mallopt: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>MalTrace: <a href="#Related%20software">Related software</a>
 <li>mangled names: <a href="#Example%201">Example 1</a>
 <li>MANPATH: <a href="#Documentation">Documentation</a>
@@ -10819,7 +10987,8 @@ Up:<a rel=up href="#Top">Top</a>
 <li>misaligned memory accesses: <a href="#Virtual%20memory">Virtual memory</a>
 <li>MISMAT: <a href="#Diagnostic%20messages">Diagnostic messages</a>
 <li>ML: <a href="#Dynamic%20memory%20allocations">Dynamic memory allocations</a>
-<li>mleak: <a href="#Utilities">Utilities</a>
+<li>mleak: <a href="#The%20mleak%20command">The mleak command</a>
+<li>mleak command: <a href="#The%20mleak%20command">The mleak command</a>
 <li>MM (Shared Memory Library): <a href="#Related%20software">Related software</a>
 <li>Mmalloc: <a href="#Related%20software">Related software</a>
 <li>mmap: <a href="#Library%20behaviour">Library behaviour</a>
@@ -10834,17 +11003,22 @@ Up:<a rel=up href="#Top">Top</a>
 <li>MP_NOCPLUSPLUS: <a href="#Functions">Functions</a>
 <li>MP_NONEWDELETE: <a href="#Functions">Functions</a>
 <li>mpatrol: <a href="#Overview">Overview</a>
-<li>mpatrol command: <a href="#Options">Options</a>
+<li>mpatrol command: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>mpatrol features: <a href="#Features">Features</a>
 <li>mpatrol library: <a href="#Overview">Overview</a>
 <li>mpatrol.h: <a href="#Functions">Functions</a>
 <li>mpatrol.log: <a href="#Example%201">Example 1</a>
 <li>MPATROL_OPTIONS: <a href="#Environment">Environment</a>
+<li>MPATROL_SOURCEPATH: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>MPATROL_VERSION: <a href="#Functions">Functions</a>
+<li>mpedit: <a href="#The%20mpedit%20command">The mpedit command</a>
+<li>mpedit command: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>MPR: <a href="#Related%20software">Related software</a>
 <li>Mprof: <a href="#Related%20software">Related software</a>
 <li>mprof: <a href="#Profiling">Profiling</a>
-<li>mpsym: <a href="#Utilities">Utilities</a>
+<li>mprof command: <a href="#Profiling">Profiling</a>
+<li>mpsym: <a href="#The%20mpsym%20command">The mpsym command</a>
+<li>mpsym command: <a href="#The%20mpsym%20command">The mpsym command</a>
 <li>MSS (Memory Supervision System): <a href="#Related%20software">Related software</a>
 <li>mtmalloc(3t): <a href="#Related%20software">Related software</a>
 <li>MuForce: <a href="#Related%20software">Related software</a>
@@ -11024,12 +11198,13 @@ Up:<a rel=up href="#Top">Top</a>
 <li>systems, embedded: <a href="#Operating%20system%20support">Operating system support</a>
 <li>TAR archive: <a href="#Installation">Installation</a>
 <li>TARGET: <a href="#Building">Building</a>
-<li>tcsh: <a href="#Utilities">Utilities</a>
+<li>tcsh: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>tentative declarations: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>test suite: <a href="#Features">Features</a>
 <li>TestCenter: <a href="#Related%20software">Related software</a>
 <li>testing: <a href="#Testing">Testing</a>
 <li>TeXinfo: <a href="#Installation">Installation</a>
+<li>text editor: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>TFLAGS: <a href="#Installation">Installation</a>
 <li>Third Degree: <a href="#Related%20software">Related software</a>
 <li>thrashing: <a href="#Virtual%20memory">Virtual memory</a>
@@ -11063,6 +11238,8 @@ Up:<a rel=up href="#Top">Top</a>
 <li>variables, parameter: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>VAX: <a href="#Profiling">Profiling</a>
 <li>VERSION: <a href="#Files">Files</a>
+<li>vi: <a href="#The%20mpedit%20command">The mpedit command</a>
+<li>vim: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>virtual address: <a href="#Virtual%20memory">Virtual memory</a>
 <li>virtual memory: <a href="#Virtual%20memory">Virtual memory</a>
 <li>Virtual Memory Tutorial: <a href="#References">References</a>
@@ -11078,6 +11255,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>X Windows: <a href="#References">References</a>
 <li>XANALYS Software Tools: <a href="#References">References</a>
 <li>XCOFF: <a href="#Examples">Examples</a>
+<li>xemacs: <a href="#The%20mpedit%20command">The mpedit command</a>
 <li>YaMa: <a href="#Related%20software">Related software</a>
 <li>YAMD (Yet Another Malloc Debugger): <a href="#Related%20software">Related software</a>
 <li>ZERALN: <a href="#Diagnostic%20messages">Diagnostic messages</a>

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.139 2000-11-16 18:37:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.140 2000-11-16 20:09:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -762,8 +762,8 @@ copying them.
 @item
 Copy the @command{mpatrol}, @command{mprof} and @command{mleak} programs that
 have been built into your local bin directory.  You may also wish to copy the
-@command{mpsym} command to your local bin directory as well if your system
-supports it.
+@command{mpsym} and @command{mpedit} commands to your local bin directory as
+well if your system supports it.
 
 @item
 Go up two directory levels into the @file{src} directory and copy the
@@ -1577,6 +1577,15 @@ allocations at which the mpatrol library will automatically check the freed
 memory and overflow buffers.  All other allocations that fall outside this range
 will not be checked.
 
+On UNIX systems, the mpatrol library can also invoke the @command{mpedit}
+command to edit source files that show up in any warnings or error messages that
+it generates.  This can only happen if the diagnostic message can be traced back
+to a specific source line in the program; in many cases this is not possible.
+If editing the files is not required, a context listing of the appropriate
+source line can be generated instead.  The @option{EDIT} option specifies that
+files are to be edited and the @option{LIST} option specifies that a context
+listing is to be generated.  These options are mutually exclusive.
+
 @cindex stripped executable file
 If the mpatrol library that was built for your system supports reading symbolic
 information from a program's executable file, but it cannot locate the
@@ -2349,6 +2358,25 @@ would normally be displayed at the end of program execution.
 @section Utilities
 @cindex utilities
 
+Several external programs are supplied with the mpatrol distribution in the
+form of commands that can be used to enhance the functionality of the mpatrol
+library.  Each command comes with its own UNIX manual page (although they also
+support the @option{--help} and @option{--version} options), but a few of the
+commands are written as UNIX shell scripts and so will not work on non-UNIX
+platforms.  Note that the @command{mprof} command is documented in the profiling
+chapter (@pxref{Profiling}).
+
+@menu
+* The mpatrol command::         Running with the library.
+* The mleak command::           Detecting memory leaks.
+* The mpsym command::           Obtaining symbolic information.
+* The mpedit command::          Editing and listing files.
+@end menu
+
+@node The mpatrol command, The mleak command, , Utilities
+@subsection The @command{mpatrol} command
+@cindex mpatrol command
+
 A command is provided with the mpatrol distribution which can run programs that
 have been linked with the mpatrol library, using a combination of mpatrol
 options that can be set via the command line.  Most of these options map
@@ -2358,7 +2386,7 @@ environment variable.
 
 @cindex LD_PRELOAD
 @cindex _RLD_LIST
-The one option that is the exception to this is the @option{--dynamic} option,
+The main option that is the exception to this is the @option{--dynamic} option,
 which can be used to run a program under the control of the mpatrol library,
 even if it wasn't originally linked with the mpatrol library.  This can only be
 done on systems that support dynamic linking and where the dynamic linker
@@ -2468,7 +2496,11 @@ Sets mpatrol library options in the current process environment.
 end
 @end smallexample
 
+@node The mleak command, The mpsym command, The mpatrol command, Utilities
+@subsection The @command{mleak} command
+@cindex mleak command
 @cindex mleak
+
 Another utility program that is provided is called @command{mleak} and is
 useful for detecting memory leaks in log files produced by the mpatrol library.
 This program should be used if the mpatrol library could not finish writing the
@@ -2500,8 +2532,12 @@ as the log file.  Note also that the @command{mleak} command supports the
 @option{--help} and @option{--version} options in common with the other mpatrol
 command line tools.
 
+@node The mpsym command, The mpedit command, The mleak command, Utilities
+@subsection The @command{mpsym} command
+@cindex mpsym command
 @cindex mpsym
-The final utility program that is provided is called @command{mpsym}, which is
+
+Another utility program that is provided is called @command{mpsym}, which is
 used to parse a log file produced by the mpatrol library and uses a debugger to
 append symbol names and source level information to code addresses in stack
 tracebacks.  This should be used if the @option{USEDEBUG} option is not
@@ -2537,6 +2573,74 @@ As a result, the @command{mpsym} command is only likely to work on UNIX
 platforms or on systems which have the necessary commands installed.  By
 default, it is set up to work on 32-bit platforms, but this can be changed by
 altering the @code{POINTER} definition in the @file{mpsym} file itself.
+
+@node The mpedit command, , The mpsym command, Utilities
+@subsection The @command{mpedit} command
+@cindex mpedit command
+@cindex mpedit
+
+@cindex editor
+@cindex text editor
+The final utility program that is provided is called @command{mpedit}, which is
+used to invoke a text editor on a given source file and optionally jump to a
+specific line number.  It is used as a support command by the mpatrol library
+when the @option{EDIT} or @option{LIST} options are used but it can quite easily
+be used as a command in its own right if properly configured.  Because it is a
+shell script it can be easily configured to support other editors, but this
+unfortunately limits it to UNIX platforms at the moment.
+
+@cindex --source-dir
+@cindex MPATROL_SOURCEPATH
+The first argument to @command{mpedit} must be the filename of the source file
+to be edited or listed.  If the source file does not exist then the contents of
+the @env{MPATROL_SOURCEPATH} environment variable will be used to help locate
+the source file, even if the filename contained an absolute or relative path
+component.  This environment variable should consist of a colon-separated list
+of directory names which may contain absolute paths or be relative to the
+current directory; the first directory in the list will be searched first.  If
+the @env{MPATROL_SOURCEPATH} environment variable is not set then only the
+current directory will be searched.  You can also use the @option{--source-dir}
+option to add directories to the search path used to locate the source file.
+Multiple @option{--source-dir} options may be given, and each will be prepended
+to the @env{MPATROL_SOURCEPATH} environment variable in the order given on the
+command line.
+
+@cindex --editor
+@cindex EDITOR
+If the second argument specifying the line number is omitted then it is assumed
+to be @samp{1}.  The text editor will attempt to jump to the specified line
+after opening the source file.  The text editor that @command{mpedit} uses is
+controlled by setting the @env{EDITOR} environment variable.  This can be set to
+the full pathname of the text editor to use or it can be set to the command that
+would normally be used to invoke the text editor, but it cannot also contain
+command line options.  You can also use the @option{--editor} option to specify
+the text editor on the command line instead of using the value in the
+@env{EDITOR} environment variable.
+
+@cindex vi
+@cindex vim
+@cindex emacs
+@cindex xemacs
+The currently supported editors are @command{vi}, @command{vim}, @command{emacs}
+and @command{xemacs}, and if the @env{EDITOR} environment variable is not set
+then the default will be @command{vi}.  Selecting an unsupported text editor
+will result in an error.  However, you can edit the @command{mpedit} file to add
+support for your own favourite text editor as long as it supports a way to
+immediately jump to a specific line number when it is first started up.  Note
+that the text editor must also open a new window to edit the source file so that
+it does not obscure any mpatrol diagnostic messages, and if it does not support
+this then a new terminal window must be opened for it to use.
+
+@cindex list
+@cindex context listing
+If the @option{--list} option is given on the command line then the
+@command{mpedit} command will display a context listing of the source file at
+the specified line number to the standard error output stream instead of
+invoking the text editor.  The listing will be annotated with line numbers and
+will also show the contents of the five lines before and after the specified
+line if possible.  Note also that the @command{mpedit} command supports the
+@option{--help} and @option{--version} options in common with the other mpatrol
+command line tools.
 
 @node Profiling, Improving performance, Using mpatrol, Top
 @chapter Profiling
@@ -2608,6 +2712,7 @@ controlled via the @option{SMALLBOUND}, @option{MEDIUMBOUND} and
 respectively, which should suffice for most circumstances.
 
 @cindex mprof
+@cindex mprof command
 The @command{mprof} command is a tool designed to read a profiling output file
 produced by the mpatrol library and display the profiling information that was
 obtained.  The profiling information includes summaries of all of the memory
@@ -6306,6 +6411,15 @@ must be a power of two (and will be rounded up to the nearest power of two if it
 is not).  The default alignment for a particular system is calculated at
 run-time.
 
+@cindex EDIT
+@item @option{EDIT}
+Specifies that a text editor should be invoked to edit any relevant source files
+that are associated with any warnings or errors when they occur.  Only
+diagnostics which occur at source lines in the program will be affected and only
+then if they contain source-level information.  This option is currently only
+available on UNIX platforms as it makes use of the @command{mpedit} command.  It
+also overrides the behaviour of the @option{LIST} option.
+
 @cindex FAILFREQ
 @item @option{FAILFREQ}=<@var{unsigned-integer}>
 Specifies the frequency at which all memory allocations will randomly fail.  For
@@ -6360,6 +6474,15 @@ internal memory used by the library itself will not be counted as part of the
 total heap size, but on some systems there may be a small amount of memory
 required to initialise the library itself.  Note that this setting will be
 ignored if its value is zero.  Default value: @option{LIMIT=0}.
+
+@cindex LIST
+@item @option{LIST}
+Specifies that a context listing should be shown for any relevant source files
+that are associated with any warnings or errors when they occur.  Only
+diagnostics which occur at source lines in the program will be affected and only
+then if they contain source-level information.  This option is currently only
+available on UNIX platforms as it makes use of the @command{mpedit} command.  It
+also overrides the behaviour of the @option{EDIT} option.
 
 @cindex LOGALL
 @item @option{LOGALL}
@@ -6584,7 +6707,6 @@ perform memory protection with the @code{mprotect()} system call.
 @appendix Options
 @cindex options
 @cindex command line options
-@cindex mpatrol command
 
 A utility program called @command{mpatrol} is provided to run commands that have
 been linked with the mpatrol library.
@@ -6684,6 +6806,12 @@ also be traced, but only if they were dynamically linked.  This option will
 only work if the system dynamic linker has the ability to preload a set of
 user-specified shared libraries via a special environment variable.
 
+@cindex --edit
+@item @option{--edit}
+[@option{EDIT}]  Specifies that a text editor should be invoked to edit any
+relevant source files that are associated with any warnings or errors when they
+occur.
+
 @cindex --fail-freq
 @item @option{--fail-freq} <@var{unsigned-integer}>
 [@option{FAILFREQ}]  Specifies the frequency at which all memory allocations
@@ -6717,6 +6845,12 @@ allocations should be classified as large allocations for profiling purposes.
 @item @option{--limit} <@var{unsigned-integer}>
 [@option{LIMIT}]  Specifies the limit in bytes at which all memory allocations
 should fail if the total allocated memory should increase beyond this.
+
+@cindex --list
+@item @option{--list}
+[@option{LIST}]  Specifies that a context listing should be shown for any
+relevant source files that are associated with any warnings or errors when they
+occur.
 
 @cindex --log-all
 @item @option{--log-all}
@@ -6897,6 +7031,11 @@ the mpatrol log file when problems with dynamic memory allocations and memory
 operations occur.  Other types of warnings and errors may also appear in the log
 file, but they are likely to be associated with parsing options and reading
 symbols from executable files and so should be self-explanatory.
+
+Note that on UNIX platforms, if the diagnostic message is caused by a line in
+the program source then the @option{EDIT} and @option{LIST} options can be used
+to illustrate more clearly where in the source code the warning or error
+occurred.
 
 @cindex ALLOVF
 @itemize @bullet
@@ -8033,6 +8172,8 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work unless @command{gdb} and the GNU text
 processing tools are installed.
+@item
+The @command{mpedit} command does not work.
 @end itemize
 
 @item
@@ -8059,6 +8200,8 @@ No detection of illegal memory accesses.
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work.
+@item
+The @command{mpedit} command does not work.
 @end itemize
 
 @cindex Microsoft
@@ -8077,6 +8220,8 @@ mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa.
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work.
+@item
+The @command{mpedit} command does not work.
 @end itemize
 @end itemize
 
@@ -9432,6 +9577,15 @@ in the log file for all symbols that have associated debugging information when
 you run the @command{mpsym} command on the log file.  Alternatively, it could be
 that your system does not have @command{gdb} or any of the required UNIX text
 processing tools installed, in which case you might want to try installing them.
+
+@item
+How can I customise the @command{mpedit} command if I do not have the
+appropriate permissions to edit the file that was installed on my system?
+
+You just need to take a copy of the installed @command{mpedit} command and place
+it somewhere that will be picked up earlier on your command search path.  You
+can then edit your copy of the file and add support for your favourite text
+editor.
 
 @cindex mupdate
 @cindex ChangeLog

@@ -587,8 +587,8 @@ if you perform the following steps.
 
   6. Copy the `mpatrol', `mprof' and `mleak' programs that have been
      built into your local bin directory.  You may also wish to copy the
-     `mpsym' command to your local bin directory as well if your system
-     supports it.
+     `mpsym' and `mpedit' commands to your local bin directory as well
+     if your system supports it.
 
   7. Go up two directory levels into the `src' directory and copy the
      `mpatrol.h' header file into your local include directory.
@@ -1389,6 +1389,16 @@ mpatrol library will automatically check the freed memory and overflow
 buffers.  All other allocations that fall outside this range will not
 be checked.
 
+   On UNIX systems, the mpatrol library can also invoke the `mpedit'
+command to edit source files that show up in any warnings or error
+messages that it generates.  This can only happen if the diagnostic
+message can be traced back to a specific source line in the program; in
+many cases this is not possible.  If editing the files is not required,
+a context listing of the appropriate source line can be generated
+instead.  The `EDIT' option specifies that files are to be edited and
+the `LIST' option specifies that a context listing is to be generated.
+These options are mutually exclusive.
+
    If the mpatrol library that was built for your system supports
 reading symbolic information from a program's executable file, but it
 cannot locate the executable file, or you wish to specify an
@@ -2176,6 +2186,27 @@ File: mpatrol.info,  Node: Utilities,  Prev: Library functions,  Up: Using mpatr
 Utilities
 =========
 
+   Several external programs are supplied with the mpatrol distribution
+in the form of commands that can be used to enhance the functionality
+of the mpatrol library.  Each command comes with its own UNIX manual
+page (although they also support the `--help' and `--version' options),
+but a few of the commands are written as UNIX shell scripts and so will
+not work on non-UNIX platforms.  Note that the `mprof' command is
+documented in the profiling chapter (*note Profiling::).
+
+* Menu:
+
+* The mpatrol command::         Running with the library.
+* The mleak command::           Detecting memory leaks.
+* The mpsym command::           Obtaining symbolic information.
+* The mpedit command::          Editing and listing files.
+
+
+File: mpatrol.info,  Node: The mpatrol command,  Next: The mleak command,  Up: Utilities
+
+The `mpatrol' command
+---------------------
+
    A command is provided with the mpatrol distribution which can run
 programs that have been linked with the mpatrol library, using a
 combination of mpatrol options that can be set via the command line.
@@ -2183,7 +2214,7 @@ Most of these options map directly onto their equivalent environment
 variable settings and exist mainly so that the user does not have to
 manually change the `MPATROL_OPTIONS' environment variable.
 
-   The one option that is the exception to this is the `--dynamic'
+   The main option that is the exception to this is the `--dynamic'
 option, which can be used to run a program under the control of the
 mpatrol library, even if it wasn't originally linked with the mpatrol
 library.  This can only be done on systems that support dynamic linking
@@ -2288,6 +2319,12 @@ process.
      Sets mpatrol library options in the current process environment.
      end
 
+
+File: mpatrol.info,  Node: The mleak command,  Next: The mpsym command,  Prev: The mpatrol command,  Up: Utilities
+
+The `mleak' command
+-------------------
+
    Another utility program that is provided is called `mleak' and is
 useful for detecting memory leaks in log files produced by the mpatrol
 library.  This program should be used if the mpatrol library could not
@@ -2320,8 +2357,14 @@ standard input file stream will be used as the log file.  Note also
 that the `mleak' command supports the `--help' and `--version' options
 in common with the other mpatrol command line tools.
 
-   The final utility program that is provided is called `mpsym', which
-is used to parse a log file produced by the mpatrol library and uses a
+
+File: mpatrol.info,  Node: The mpsym command,  Next: The mpedit command,  Prev: The mleak command,  Up: Utilities
+
+The `mpsym' command
+-------------------
+
+   Another utility program that is provided is called `mpsym', which is
+used to parse a log file produced by the mpatrol library and uses a
 debugger to append symbol names and source level information to code
 addresses in stack tracebacks.  This should be used if the `USEDEBUG'
 option is not supported on a particular platform or does not work
@@ -2358,6 +2401,67 @@ work on UNIX platforms or on systems which have the necessary commands
 installed.  By default, it is set up to work on 32-bit platforms, but
 this can be changed by altering the `POINTER' definition in the `mpsym'
 file itself.
+
+
+File: mpatrol.info,  Node: The mpedit command,  Prev: The mpsym command,  Up: Utilities
+
+The `mpedit' command
+--------------------
+
+   The final utility program that is provided is called `mpedit', which
+is used to invoke a text editor on a given source file and optionally
+jump to a specific line number.  It is used as a support command by the
+mpatrol library when the `EDIT' or `LIST' options are used but it can
+quite easily be used as a command in its own right if properly
+configured.  Because it is a shell script it can be easily configured
+to support other editors, but this unfortunately limits it to UNIX
+platforms at the moment.
+
+   The first argument to `mpedit' must be the filename of the source
+file to be edited or listed.  If the source file does not exist then
+the contents of the `MPATROL_SOURCEPATH' environment variable will be
+used to help locate the source file, even if the filename contained an
+absolute or relative path component.  This environment variable should
+consist of a colon-separated list of directory names which may contain
+absolute paths or be relative to the current directory; the first
+directory in the list will be searched first.  If the
+`MPATROL_SOURCEPATH' environment variable is not set then only the
+current directory will be searched.  You can also use the `--source-dir'
+option to add directories to the search path used to locate the source
+file.  Multiple `--source-dir' options may be given, and each will be
+prepended to the `MPATROL_SOURCEPATH' environment variable in the order
+given on the command line.
+
+   If the second argument specifying the line number is omitted then it
+is assumed to be `1'.  The text editor will attempt to jump to the
+specified line after opening the source file.  The text editor that
+`mpedit' uses is controlled by setting the `EDITOR' environment
+variable.  This can be set to the full pathname of the text editor to
+use or it can be set to the command that would normally be used to
+invoke the text editor, but it cannot also contain command line
+options.  You can also use the `--editor' option to specify the text
+editor on the command line instead of using the value in the `EDITOR'
+environment variable.
+
+   The currently supported editors are `vi', `vim', `emacs' and
+`xemacs', and if the `EDITOR' environment variable is not set then the
+default will be `vi'.  Selecting an unsupported text editor will result
+in an error.  However, you can edit the `mpedit' file to add support
+for your own favourite text editor as long as it supports a way to
+immediately jump to a specific line number when it is first started up.
+Note that the text editor must also open a new window to edit the
+source file so that it does not obscure any mpatrol diagnostic
+messages, and if it does not support this then a new terminal window
+must be opened for it to use.
+
+   If the `--list' option is given on the command line then the
+`mpedit' command will display a context listing of the source file at
+the specified line number to the standard error output stream instead of
+invoking the text editor.  The listing will be annotated with line
+numbers and will also show the contents of the five lines before and
+after the specified line if possible.  Note also that the `mpedit'
+command supports the `--help' and `--version' options in common with
+the other mpatrol command line tools.
 
 
 File: mpatrol.info,  Node: Profiling,  Next: Improving performance,  Prev: Using mpatrol,  Up: Top
@@ -5907,6 +6011,15 @@ as well as uppercase, or a mixture of both.
      to the nearest power of two if it is not).  The default alignment
      for a particular system is calculated at run-time.
 
+`EDIT'
+     Specifies that a text editor should be invoked to edit any
+     relevant source files that are associated with any warnings or
+     errors when they occur.  Only diagnostics which occur at source
+     lines in the program will be affected and only then if they
+     contain source-level information.  This option is currently only
+     available on UNIX platforms as it makes use of the `mpedit'
+     command.  It also overrides the behaviour of the `LIST' option.
+
 `FAILFREQ'=<UNSIGNED-INTEGER>
      Specifies the frequency at which all memory allocations will
      randomly fail.  For example, a value of `10' will mean that
@@ -5959,6 +6072,15 @@ as well as uppercase, or a mixture of both.
      but on some systems there may be a small amount of memory required
      to initialise the library itself.  Note that this setting will be
      ignored if its value is zero.  Default value: `LIMIT=0'.
+
+`LIST'
+     Specifies that a context listing should be shown for any relevant
+     source files that are associated with any warnings or errors when
+     they occur.  Only diagnostics which occur at source lines in the
+     program will be affected and only then if they contain
+     source-level information.  This option is currently only available
+     on UNIX platforms as it makes use of the `mpedit' command.  It
+     also overrides the behaviour of the `EDIT' option.
 
 `LOGALL'
      Equivalent to the `LOGALLOCS', `LOGREALLOCS', `LOGFREES' and
@@ -6262,6 +6384,11 @@ parsed on the command line in a similar way to the UNIX function
      has the ability to preload a set of user-specified shared
      libraries via a special environment variable.
 
+`--edit'
+     [`EDIT']  Specifies that a text editor should be invoked to edit
+     any relevant source files that are associated with any warnings or
+     errors when they occur.
+
 `--fail-freq' <UNSIGNED-INTEGER>
      [`FAILFREQ']  Specifies the frequency at which all memory
      allocations will randomly fail.
@@ -6290,6 +6417,11 @@ parsed on the command line in a similar way to the UNIX function
      [`LIMIT']  Specifies the limit in bytes at which all memory
      allocations should fail if the total allocated memory should
      increase beyond this.
+
+`--list'
+     [`LIST']  Specifies that a context listing should be shown for any
+     relevant source files that are associated with any warnings or
+     errors when they occur.
 
 `--log-all'
      [`LOGALL']  Equivalent to the `--log-allocs', `--log-reallocs',
@@ -6445,6 +6577,11 @@ allocations and memory operations occur.  Other types of warnings and
 errors may also appear in the log file, but they are likely to be
 associated with parsing options and reading symbols from executable
 files and so should be self-explanatory.
+
+   Note that on UNIX platforms, if the diagnostic message is caused by
+a line in the program source then the `EDIT' and `LIST' options can be
+used to illustrate more clearly where in the source code the warning or
+error occurred.
 
    * `ALLOVF'
     Message
@@ -7476,6 +7613,8 @@ supported on that system.
         * The `mpsym' command does not work unless `gdb' and the GNU
           text processing tools are installed.
 
+        * The `mpedit' command does not work.
+
    * AmigaOS 3.1, Motorola 68040, n/a, SAS/C
         * No automatic override of `malloc()', etc., without inclusion
           of `mpatrol.h'.
@@ -7498,6 +7637,8 @@ supported on that system.
 
         * The `mpsym' command does not work.
 
+        * The `mpedit' command does not work.
+
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
         * The `OFLOWWATCH' option has no effect.
@@ -7511,6 +7652,8 @@ supported on that system.
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
         * The `mpsym' command does not work.
+
+        * The `mpedit' command does not work.
 
 * Menu:
 
@@ -8822,7 +8965,16 @@ Files
      text processing tools installed, in which case you might want to
      try installing them.
 
-  4. What does the `mupdate' shell script do?
+  4. How can I customise the `mpedit' command if I do not have the
+     appropriate permissions to edit the file that was installed on my
+     system?
+
+     You just need to take a copy of the installed `mpedit' command and
+     place it somewhere that will be picked up earlier on your command
+     search path.  You can then edit your copy of the file and add
+     support for your favourite text editor.
+
+  5. What does the `mupdate' shell script do?
 
      This is for my use in order to automate every new release of
      mpatrol.  You should never need to run this script and it should
@@ -10898,16 +11050,19 @@ Index
 * -counts:                               Profiling.
 * -def-align:                            Options.
 * -dynamic:                              Options.
+* -edit:                                 Options.
+* -editor:                               The mpedit command.
 * -fail-freq:                            Options.
 * -fail-seed:                            Options.
 * -free-byte:                            Options.
 * -free-stop:                            Options.
 * -graph-file:                           Profiling.
 * -help:                                 Options.
-* -ignore:                               Utilities.
+* -ignore:                               The mleak command.
 * -large-bound:                          Options.
 * -leaks:                                Profiling.
 * -limit:                                Options.
+* -list:                                 Options.
 * -log-all:                              Options.
 * -log-allocs:                           Options.
 * -log-file:                             Options.
@@ -10935,18 +11090,19 @@ Index
 * -show-symbols:                         Options.
 * -show-unfreed:                         Options.
 * -small-bound:                          Options.
+* -source-dir:                           The mpedit command.
 * -stack-depth:                          Profiling.
 * -threads:                              Options.
 * -unfreed-abort:                        Options.
 * -use-debug:                            Options.
 * -use-mmap:                             Options.
 * -version:                              Options.
-* .cshrc:                                Utilities.
+* .cshrc:                                The mpatrol command.
 * .gdbinit:                              Using with a debugger.
-* .profile:                              Utilities.
+* .profile:                              The mpatrol command.
 * 32-bit:                                Building.
 * 64-bit:                                Building.
-* _RLD_LIST:                             Utilities.
+* _RLD_LIST:                             The mpatrol command.
 * ABI:                                   Call stacks and symbol tables.
 * acknowledgements:                      Foreword.
 * adding a new object file format:       New file format support.
@@ -10993,7 +11149,7 @@ Index
 * AUTOSAVE:                              Environment.
 * backwards compatibility:               Linking.
 * BADALN:                                Diagnostic messages.
-* bash:                                  Utilities.
+* bash:                                  The mpatrol command.
 * BASIC:                                 Memory allocations.
 * batch testing:                         Testing.
 * best fit:                              How it works.
@@ -11049,10 +11205,11 @@ Index
 * compiler:                              Installation.
 * compiling:                             Installation.
 * contacting the author:                 Foreword.
+* context listing:                       The mpedit command.
 * contributors:                          Foreword.
 * core file:                             Running.
 * crash:                                 Example 1.
-* csh:                                   Utilities.
+* csh:                                   The mpatrol command.
 * CSRI malloc:                           Related software.
 * CVS:                                   Files.
 * data sections:                         Static memory allocations.
@@ -11092,11 +11249,15 @@ Index
 * dynamic linking:                       Call stacks and symbol tables.
 * dynamic memory allocations:            Dynamic memory allocations.
 * DYNIX/ptx, Intel 80x86:                Supported systems.
+* EDIT:                                  Environment.
+* EDITOR:                                The mpedit command.
+* editor:                                The mpedit command.
 * Electric Fence:                        Related software.
 * Electric Software, Inc.:               Related software.
 * ELF32:                                 Examples.
 * ELF64:                                 Examples.
-* embedded libraries:                    Utilities.
+* emacs:                                 The mpedit command.
+* embedded libraries:                    The mpatrol command.
 * embedded systems:                      Operating system support.
 * endianness:                            Profiling.
 * Enforcer:                              Related software.
@@ -11204,12 +11365,12 @@ Index
 * Kernel Group, The:                     Related software.
 * KL Group:                              Related software.
 * known bugs:                            Notes.
-* ksh:                                   Utilities.
+* ksh:                                   The mpatrol command.
 * LARGEBOUND:                            Environment.
 * LaTeX:                                 Installation.
 * LD:                                    Installation.
 * LD_LIBRARY_PATH:                       Linking.
-* LD_PRELOAD:                            Utilities.
+* LD_PRELOAD:                            The mpatrol command.
 * LD_RUN_PATH:                           Linking.
 * Leak:                                  Related software.
 * Leakers:                               Related software.
@@ -11240,6 +11401,8 @@ Index
 * Linux Software Map:                    Installation.
 * Linux, Intel 80x86:                    Supported systems.
 * Linux, Motorola 680x0:                 Supported systems.
+* LIST:                                  Environment.
+* list:                                  The mpedit command.
 * local static variables:                Static memory allocations.
 * log file:                              Example 1.
 * LOGALL:                                Environment.
@@ -11263,7 +11426,7 @@ Index
 * malloc(3x):                            Related software.
 * Malloc_Dbg:                            Related software.
 * MallocTrace:                           Related software.
-* mallopt:                               Utilities.
+* mallopt:                               The mpatrol command.
 * MalTrace:                              Related software.
 * mangled names:                         Example 1.
 * MANPATH:                               Documentation.
@@ -11310,7 +11473,8 @@ Index
 * misaligned memory accesses:            Virtual memory.
 * MISMAT:                                Diagnostic messages.
 * ML:                                    Dynamic memory allocations.
-* mleak:                                 Utilities.
+* mleak:                                 The mleak command.
+* mleak command:                         The mleak command.
 * MM (Shared Memory Library):            Related software.
 * Mmalloc:                               Related software.
 * mmap:                                  Library behaviour.
@@ -11325,17 +11489,22 @@ Index
 * MP_NOCPLUSPLUS:                        Functions.
 * MP_NONEWDELETE:                        Functions.
 * mpatrol:                               Overview.
-* mpatrol command:                       Options.
+* mpatrol command:                       The mpatrol command.
 * mpatrol features:                      Features.
 * mpatrol library:                       Overview.
 * mpatrol.h:                             Functions.
 * mpatrol.log:                           Example 1.
 * MPATROL_OPTIONS:                       Environment.
+* MPATROL_SOURCEPATH:                    The mpedit command.
 * MPATROL_VERSION:                       Functions.
+* mpedit:                                The mpedit command.
+* mpedit command:                        The mpedit command.
 * MPR:                                   Related software.
 * Mprof:                                 Related software.
 * mprof:                                 Profiling.
-* mpsym:                                 Utilities.
+* mprof command:                         Profiling.
+* mpsym:                                 The mpsym command.
+* mpsym command:                         The mpsym command.
 * MSS (Memory Supervision System):       Related software.
 * mtmalloc(3t):                          Related software.
 * MuForce:                               Related software.
@@ -11515,12 +11684,13 @@ Index
 * systems, embedded:                     Operating system support.
 * TAR archive:                           Installation.
 * TARGET:                                Building.
-* tcsh:                                  Utilities.
+* tcsh:                                  The mpatrol command.
 * tentative declarations:                Static memory allocations.
 * test suite:                            Features.
 * TestCenter:                            Related software.
 * testing:                               Testing.
 * TeXinfo:                               Installation.
+* text editor:                           The mpedit command.
 * TFLAGS:                                Installation.
 * Third Degree:                          Related software.
 * thrashing:                             Virtual memory.
@@ -11554,6 +11724,8 @@ Index
 * variables, parameter:                  Stack memory allocations.
 * VAX:                                   Profiling.
 * VERSION:                               Files.
+* vi:                                    The mpedit command.
+* vim:                                   The mpedit command.
 * virtual address:                       Virtual memory.
 * virtual memory:                        Virtual memory.
 * Virtual Memory Tutorial:               References.
@@ -11569,6 +11741,7 @@ Index
 * X Windows:                             References.
 * XANALYS Software Tools:                References.
 * XCOFF:                                 Examples.
+* xemacs:                                The mpedit command.
 * YaMa:                                  Related software.
 * YAMD (Yet Another Malloc Debugger):    Related software.
 * ZERALN:                                Diagnostic messages.
@@ -11583,107 +11756,111 @@ Node: Foreword3479
 Node: Overview7963
 Node: Features10593
 Node: Installation26389
-Node: Integration31988
-Ref: Integration-Footnote-137023
-Node: Memory allocations37144
-Node: Static memory allocations37821
-Ref: Static memory allocations-Footnote-140282
-Node: Stack memory allocations40324
-Ref: Stack memory allocations-Footnote-142188
-Node: Dynamic memory allocations42227
-Ref: Dynamic memory allocations-Footnote-145649
-Ref: Dynamic memory allocations-Footnote-245768
-Node: Operating system support45872
-Node: Virtual memory47832
-Ref: Virtual memory-Footnote-153860
-Ref: Virtual memory-Footnote-254116
-Ref: Virtual memory-Footnote-354292
-Ref: Virtual memory-Footnote-454327
-Ref: Virtual memory-Footnote-554386
-Node: Call stacks and symbol tables54610
-Ref: Call stacks and symbol tables-Footnote-160288
-Ref: Call stacks and symbol tables-Footnote-260356
-Ref: Call stacks and symbol tables-Footnote-360407
-Ref: Call stacks and symbol tables-Footnote-460451
-Ref: Call stacks and symbol tables-Footnote-560493
-Ref: Call stacks and symbol tables-Footnote-660535
-Ref: Call stacks and symbol tables-Footnote-760583
-Node: Threads60689
-Ref: Threads-Footnote-166695
-Node: Using mpatrol66790
-Node: Library behaviour67656
-Ref: Library behaviour-Footnote-172458
-Node: Logging and tracing72516
-Node: General errors76348
-Ref: General errors-Footnote-180486
-Ref: General errors-Footnote-280642
-Node: Overwrites and underwrites80810
-Ref: Overwrites and underwrites-Footnote-188329
-Ref: Overwrites and underwrites-Footnote-288392
-Node: Using with a debugger88516
-Ref: Using with a debugger-Footnote-197570
-Ref: Using with a debugger-Footnote-297638
-Ref: Using with a debugger-Footnote-397894
-Node: Testing97983
-Ref: Testing-Footnote-1100720
-Ref: Testing-Footnote-2100901
-Node: Library functions100960
-Node: Utilities107841
-Node: Profiling117897
-Ref: Profiling-Footnote-1140352
-Node: Improving performance140576
-Ref: Improving performance-Footnote-1149270
-Ref: Improving performance-Footnote-2149312
-Ref: Improving performance-Footnote-3149389
-Ref: Improving performance-Footnote-4149461
-Node: How it works149505
-Node: Examples156150
-Node: Example 1159810
-Ref: Example 1-Footnote-1183406
-Node: Example 2183596
-Node: Example 3188996
-Node: Example 4195853
-Node: Example 5199358
-Ref: Example 5-Footnote-1203158
-Node: Example 6203287
-Node: Example 7205145
-Node: Example 8215381
-Node: Tutorial230537
-Ref: Tutorial-Footnote-1245068
-Ref: Tutorial-Footnote-2245359
-Ref: Tutorial-Footnote-3245508
-Ref: Tutorial-Footnote-4245645
-Ref: Tutorial-Footnote-5245744
-Node: Functions246025
-Node: Environment276461
-Node: Options294204
-Node: Diagnostic messages304137
-Node: Library performance319848
-Node: Profiling file format322350
-Ref: Profiling file format-Footnote-1325762
-Node: Supported systems325942
-Node: New system support339171
-Node: New processor support340367
-Node: New file format support341050
-Node: Notes341440
-Node: Generic notes343051
-Ref: Generic notes-Footnote-1361407
-Ref: Generic notes-Footnote-2361625
-Node: UNIX notes361847
-Node: Amiga notes366600
-Node: Windows notes370215
-Node: Netware notes371586
-Node: Frequently asked questions374097
-Node: Documentation374720
-Node: Building378513
-Node: Linking385116
-Node: Running389388
-Node: Files403024
-Node: Related software405612
-Ref: Related software-Footnote-1440187
-Node: References440428
-Node: Copying443021
-Node: Function index470910
-Node: Index473168
+Node: Integration32002
+Ref: Integration-Footnote-137037
+Node: Memory allocations37158
+Node: Static memory allocations37835
+Ref: Static memory allocations-Footnote-140296
+Node: Stack memory allocations40338
+Ref: Stack memory allocations-Footnote-142202
+Node: Dynamic memory allocations42241
+Ref: Dynamic memory allocations-Footnote-145663
+Ref: Dynamic memory allocations-Footnote-245782
+Node: Operating system support45886
+Node: Virtual memory47846
+Ref: Virtual memory-Footnote-153874
+Ref: Virtual memory-Footnote-254130
+Ref: Virtual memory-Footnote-354306
+Ref: Virtual memory-Footnote-454341
+Ref: Virtual memory-Footnote-554400
+Node: Call stacks and symbol tables54624
+Ref: Call stacks and symbol tables-Footnote-160302
+Ref: Call stacks and symbol tables-Footnote-260370
+Ref: Call stacks and symbol tables-Footnote-360421
+Ref: Call stacks and symbol tables-Footnote-460465
+Ref: Call stacks and symbol tables-Footnote-560507
+Ref: Call stacks and symbol tables-Footnote-660549
+Ref: Call stacks and symbol tables-Footnote-760597
+Node: Threads60703
+Ref: Threads-Footnote-166709
+Node: Using mpatrol66804
+Node: Library behaviour67670
+Ref: Library behaviour-Footnote-173066
+Node: Logging and tracing73124
+Node: General errors76956
+Ref: General errors-Footnote-181094
+Ref: General errors-Footnote-281250
+Node: Overwrites and underwrites81418
+Ref: Overwrites and underwrites-Footnote-188937
+Ref: Overwrites and underwrites-Footnote-289000
+Node: Using with a debugger89124
+Ref: Using with a debugger-Footnote-198178
+Ref: Using with a debugger-Footnote-298246
+Ref: Using with a debugger-Footnote-398502
+Node: Testing98591
+Ref: Testing-Footnote-1101328
+Ref: Testing-Footnote-2101509
+Node: Library functions101568
+Node: Utilities108449
+Node: The mpatrol command109282
+Node: The mleak command115242
+Node: The mpsym command117206
+Node: The mpedit command119684
+Node: Profiling123046
+Ref: Profiling-Footnote-1145501
+Node: Improving performance145725
+Ref: Improving performance-Footnote-1154419
+Ref: Improving performance-Footnote-2154461
+Ref: Improving performance-Footnote-3154538
+Ref: Improving performance-Footnote-4154610
+Node: How it works154654
+Node: Examples161299
+Node: Example 1164959
+Ref: Example 1-Footnote-1188555
+Node: Example 2188745
+Node: Example 3194145
+Node: Example 4201002
+Node: Example 5204507
+Ref: Example 5-Footnote-1208307
+Node: Example 6208436
+Node: Example 7210294
+Node: Example 8220530
+Node: Tutorial235686
+Ref: Tutorial-Footnote-1250217
+Ref: Tutorial-Footnote-2250508
+Ref: Tutorial-Footnote-3250657
+Ref: Tutorial-Footnote-4250794
+Ref: Tutorial-Footnote-5250893
+Node: Functions251174
+Node: Environment281610
+Node: Options300307
+Node: Diagnostic messages310600
+Node: Library performance326542
+Node: Profiling file format329044
+Ref: Profiling file format-Footnote-1332456
+Node: Supported systems332636
+Node: New system support346006
+Node: New processor support347202
+Node: New file format support347885
+Node: Notes348275
+Node: Generic notes349886
+Ref: Generic notes-Footnote-1368242
+Ref: Generic notes-Footnote-2368460
+Node: UNIX notes368682
+Node: Amiga notes373435
+Node: Windows notes377050
+Node: Netware notes378421
+Node: Frequently asked questions380932
+Node: Documentation381555
+Node: Building385348
+Node: Linking391951
+Node: Running396223
+Node: Files409859
+Node: Related software412855
+Ref: Related software-Footnote-1447430
+Node: References447671
+Node: Copying450264
+Node: Function index478153
+Node: Index480411
 
 End Tag Table

@@ -603,8 +603,8 @@ if you perform the following steps.
 
   6. Copy the @{b}mpatrol@{ub}, @{b}mprof@{ub} and @{b}mleak@{ub} programs that have been built
      into your local bin directory.  You may also wish to copy the
-     @{b}mpsym@{ub} command to your local bin directory as well if your system
-     supports it.
+     @{b}mpsym@{ub} and @{b}mpedit@{ub} commands to your local bin directory as well if
+     your system supports it.
 
   7. Go up two directory levels into the @{b}src@{ub} directory and copy the
      @{b}mpatrol.h@{ub} header file into your local include directory.
@@ -1449,6 +1449,16 @@ option to specify a range of memory allocations at which the mpatrol
 library will automatically check the freed memory and overflow buffers.
 All other allocations that fall outside this range will not be checked.
 
+   On UNIX systems, the mpatrol library can also invoke the @{b}mpedit@{ub}
+command to edit source files that show up in any warnings or error
+messages that it generates.  This can only happen if the diagnostic
+message can be traced back to a specific source line in the program; in
+many cases this is not possible.  If editing the files is not required,
+a context listing of the appropriate source line can be generated
+instead.  The @{b}EDIT@{ub} option specifies that files are to be edited and the
+@{b}LIST@{ub} option specifies that a context listing is to be generated.  These
+options are mutually exclusive.
+
    If the mpatrol library that was built for your system supports
 reading symbolic information from a program's executable file, but it
 cannot locate the executable file, or you wish to specify an
@@ -2267,6 +2277,30 @@ the end of program execution.
 Utilities
 =========
 
+   Several external programs are supplied with the mpatrol distribution
+in the form of commands that can be used to enhance the functionality
+of the mpatrol library.  Each command comes with its own UNIX manual
+page (although they also support the @{b}--help@{ub} and @{b}--version@{ub} options), but
+a few of the commands are written as UNIX shell scripts and so will not
+work on non-UNIX platforms.  Note that the @{b}mprof@{ub} command is documented
+in the profiling chapter (see @{"Profiling" link "Profiling"}).
+
+
+ @{" The mpatrol command        " link "The mpatrol command"}  Running with the library.
+ @{" The mleak command          " link "The mleak command"}  Detecting memory leaks.
+ @{" The mpsym command          " link "The mpsym command"}  Obtaining symbolic information.
+ @{" The mpedit command         " link "The mpedit command"}  Editing and listing files.
+
+
+@endnode
+
+@node "The mpatrol command" "mpatrol.guide/The mpatrol command"
+@next "The mleak command"
+@toc "Utilities"
+
+The @{b}mpatrol@{ub} command
+-------------------
+
    A command is provided with the mpatrol distribution which can run
 programs that have been linked with the mpatrol library, using a
 combination of mpatrol options that can be set via the command line.
@@ -2274,14 +2308,14 @@ Most of these options map directly onto their equivalent environment
 variable settings and exist mainly so that the user does not have to
 manually change the @{b}MPATROL_OPTIONS@{ub} environment variable.
 
-   The one option that is the exception to this is the @{b}--dynamic@{ub} option,
-which can be used to run a program under the control of the mpatrol
-library, even if it wasn't originally linked with the mpatrol library.
-This can only be done on systems that support dynamic linking and where
-the dynamic linker recognises the @{b}LD_PRELOAD@{ub} or @{b}_RLD_LIST@{ub} environment
-variables.  Even then, it can only be used when the program that is
-being run has been dynamically linked with the system C library, rather
-than statically linked.
+   The main option that is the exception to this is the @{b}--dynamic@{ub}
+option, which can be used to run a program under the control of the
+mpatrol library, even if it wasn't originally linked with the mpatrol
+library.  This can only be done on systems that support dynamic linking
+and where the dynamic linker recognises the @{b}LD_PRELOAD@{ub} or @{b}_RLD_LIST@{ub}
+environment variables.  Even then, it can only be used when the program
+that is being run has been dynamically linked with the system C
+library, rather than statically linked.
 
    The reason for all of these limitations is that some SVR4 UNIX
 platforms have a special feature in the dynamic linker which can be
@@ -2378,6 +2412,17 @@ variable in the current shell or debugger process.
      Sets mpatrol library options in the current process environment.
      end
 
+
+@endnode
+
+@node "The mleak command" "mpatrol.guide/The mleak command"
+@next "The mpsym command"
+@prev "The mpatrol command"
+@toc "Utilities"
+
+The @{b}mleak@{ub} command
+-----------------
+
    Another utility program that is provided is called @{b}mleak@{ub} and is
 useful for detecting memory leaks in log files produced by the mpatrol
 library.  This program should be used if the mpatrol library could not
@@ -2410,7 +2455,18 @@ will be used as the log file.  Note also that the @{b}mleak@{ub} command
 supports the @{b}--help@{ub} and @{b}--version@{ub} options in common with the other
 mpatrol command line tools.
 
-   The final utility program that is provided is called @{b}mpsym@{ub}, which is
+
+@endnode
+
+@node "The mpsym command" "mpatrol.guide/The mpsym command"
+@next "The mpedit command"
+@prev "The mleak command"
+@toc "Utilities"
+
+The @{b}mpsym@{ub} command
+-----------------
+
+   Another utility program that is provided is called @{b}mpsym@{ub}, which is
 used to parse a log file produced by the mpatrol library and uses a
 debugger to append symbol names and source level information to code
 addresses in stack tracebacks.  This should be used if the @{b}USEDEBUG@{ub}
@@ -2448,6 +2504,69 @@ work on UNIX platforms or on systems which have the necessary commands
 installed.  By default, it is set up to work on 32-bit platforms, but
 this can be changed by altering the @{b}POINTER@{ub} definition in the @{b}mpsym@{ub}
 file itself.
+
+
+@endnode
+
+@node "The mpedit command" "mpatrol.guide/The mpedit command"
+@prev "The mpsym command"
+@toc "Utilities"
+
+The @{b}mpedit@{ub} command
+------------------
+
+   The final utility program that is provided is called @{b}mpedit@{ub}, which is
+used to invoke a text editor on a given source file and optionally jump
+to a specific line number.  It is used as a support command by the
+mpatrol library when the @{b}EDIT@{ub} or @{b}LIST@{ub} options are used but it can quite
+easily be used as a command in its own right if properly configured.
+Because it is a shell script it can be easily configured to support
+other editors, but this unfortunately limits it to UNIX platforms at
+the moment.
+
+   The first argument to @{b}mpedit@{ub} must be the filename of the source file
+to be edited or listed.  If the source file does not exist then the
+contents of the @{b}MPATROL_SOURCEPATH@{ub} environment variable will be used to
+help locate the source file, even if the filename contained an absolute
+or relative path component.  This environment variable should consist
+of a colon-separated list of directory names which may contain absolute
+paths or be relative to the current directory; the first directory in
+the list will be searched first.  If the @{b}MPATROL_SOURCEPATH@{ub} environment
+variable is not set then only the current directory will be searched.
+You can also use the @{b}--source-dir@{ub} option to add directories to the
+search path used to locate the source file.  Multiple @{b}--source-dir@{ub}
+options may be given, and each will be prepended to the
+@{b}MPATROL_SOURCEPATH@{ub} environment variable in the order given on the
+command line.
+
+   If the second argument specifying the line number is omitted then it
+is assumed to be @{b}1@{ub}.  The text editor will attempt to jump to the
+specified line after opening the source file.  The text editor that
+@{b}mpedit@{ub} uses is controlled by setting the @{b}EDITOR@{ub} environment variable.
+This can be set to the full pathname of the text editor to use or it
+can be set to the command that would normally be used to invoke the
+text editor, but it cannot also contain command line options.  You can
+also use the @{b}--editor@{ub} option to specify the text editor on the command
+line instead of using the value in the @{b}EDITOR@{ub} environment variable.
+
+   The currently supported editors are @{b}vi@{ub}, @{b}vim@{ub}, @{b}emacs@{ub} and @{b}xemacs@{ub}, and
+if the @{b}EDITOR@{ub} environment variable is not set then the default will be
+@{b}vi@{ub}.  Selecting an unsupported text editor will result in an error.
+However, you can edit the @{b}mpedit@{ub} file to add support for your own
+favourite text editor as long as it supports a way to immediately jump
+to a specific line number when it is first started up.  Note that the
+text editor must also open a new window to edit the source file so that
+it does not obscure any mpatrol diagnostic messages, and if it does not
+support this then a new terminal window must be opened for it to use.
+
+   If the @{b}--list@{ub} option is given on the command line then the @{b}mpedit@{ub}
+command will display a context listing of the source file at the
+specified line number to the standard error output stream instead of
+invoking the text editor.  The listing will be annotated with line
+numbers and will also show the contents of the five lines before and
+after the specified line if possible.  Note also that the @{b}mpedit@{ub}
+command supports the @{b}--help@{ub} and @{b}--version@{ub} options in common with the
+other mpatrol command line tools.
 
 
 @endnode
@@ -6048,6 +6167,15 @@ a mixture of both.
      to the nearest power of two if it is not).  The default alignment
      for a particular system is calculated at run-time.
 
+@{b}EDIT@{ub}
+     Specifies that a text editor should be invoked to edit any
+     relevant source files that are associated with any warnings or
+     errors when they occur.  Only diagnostics which occur at source
+     lines in the program will be affected and only then if they
+     contain source-level information.  This option is currently only
+     available on UNIX platforms as it makes use of the @{b}mpedit@{ub} command.
+     It also overrides the behaviour of the @{b}LIST@{ub} option.
+
 @{b}FAILFREQ@{ub}=<UNSIGNED-INTEGER>
      Specifies the frequency at which all memory allocations will
      randomly fail.  For example, a value of @{b}10@{ub} will mean that roughly
@@ -6100,6 +6228,15 @@ a mixture of both.
      but on some systems there may be a small amount of memory required
      to initialise the library itself.  Note that this setting will be
      ignored if its value is zero.  Default value: @{b}LIMIT=0@{ub}.
+
+@{b}LIST@{ub}
+     Specifies that a context listing should be shown for any relevant
+     source files that are associated with any warnings or errors when
+     they occur.  Only diagnostics which occur at source lines in the
+     program will be affected and only then if they contain
+     source-level information.  This option is currently only available
+     on UNIX platforms as it makes use of the @{b}mpedit@{ub} command.  It also
+     overrides the behaviour of the @{b}EDIT@{ub} option.
 
 @{b}LOGALL@{ub}
      Equivalent to the @{b}LOGALLOCS@{ub}, @{b}LOGREALLOCS@{ub}, @{b}LOGFREES@{ub} and @{b}LOGMEMORY@{ub}
@@ -6404,6 +6541,11 @@ a similar way to the UNIX function @{b}getopt()@{ub}.
      has the ability to preload a set of user-specified shared
      libraries via a special environment variable.
 
+@{b}--edit@{ub}
+     [@{b}EDIT@{ub}]  Specifies that a text editor should be invoked to edit any
+     relevant source files that are associated with any warnings or
+     errors when they occur.
+
 @{b}--fail-freq@{ub} <UNSIGNED-INTEGER>
      [@{b}FAILFREQ@{ub}]  Specifies the frequency at which all memory allocations
      will randomly fail.
@@ -6432,6 +6574,11 @@ a similar way to the UNIX function @{b}getopt()@{ub}.
      [@{b}LIMIT@{ub}]  Specifies the limit in bytes at which all memory
      allocations should fail if the total allocated memory should
      increase beyond this.
+
+@{b}--list@{ub}
+     [@{b}LIST@{ub}]  Specifies that a context listing should be shown for any
+     relevant source files that are associated with any warnings or
+     errors when they occur.
 
 @{b}--log-all@{ub}
      [@{b}LOGALL@{ub}]  Equivalent to the @{b}--log-allocs@{ub}, @{b}--log-reallocs@{ub},
@@ -6592,6 +6739,11 @@ allocations and memory operations occur.  Other types of warnings and
 errors may also appear in the log file, but they are likely to be
 associated with parsing options and reading symbols from executable
 files and so should be self-explanatory.
+
+   Note that on UNIX platforms, if the diagnostic message is caused by
+a line in the program source then the @{b}EDIT@{ub} and @{b}LIST@{ub} options can be used
+to illustrate more clearly where in the source code the warning or error
+occurred.
 
    * @{b}ALLOVF@{ub}
     Message
@@ -7635,6 +7787,8 @@ supported on that system.
         * The @{b}mpsym@{ub} command does not work unless @{b}gdb@{ub} and the GNU text
           processing tools are installed.
 
+        * The @{b}mpedit@{ub} command does not work.
+
    * AmigaOS 3.1, Motorola 68040, n/a, SAS/C
         * No automatic override of @{b}malloc()@{ub}, etc., without inclusion of
           @{b}mpatrol.h@{ub}.
@@ -7657,6 +7811,8 @@ supported on that system.
 
         * The @{b}mpsym@{ub} command does not work.
 
+        * The @{b}mpedit@{ub} command does not work.
+
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
         * The @{b}OFLOWWATCH@{ub} option has no effect.
@@ -7670,6 +7826,8 @@ supported on that system.
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
 
         * The @{b}mpsym@{ub} command does not work.
+
+        * The @{b}mpedit@{ub} command does not work.
 
 
  @{" New system support         " link "New system support"}  Adding a new operating system.
@@ -9035,7 +9193,16 @@ Files
      processing tools installed, in which case you might want to try
      installing them.
 
-  4. What does the @{b}mupdate@{ub} shell script do?
+  4. How can I customise the @{b}mpedit@{ub} command if I do not have the
+     appropriate permissions to edit the file that was installed on my
+     system?
+
+     You just need to take a copy of the installed @{b}mpedit@{ub} command and
+     place it somewhere that will be picked up earlier on your command
+     search path.  You can then edit your copy of the file and add
+     support for your favourite text editor.
+
+  5. What does the @{b}mupdate@{ub} shell script do?
 
      This is for my use in order to automate every new release of
      mpatrol.  You should never need to run this script and it should
@@ -11158,16 +11325,19 @@ Index
  @{" -counts                                  " link "Profiling"}   Profiling
  @{" -def-align                               " link "Options"}   Options
  @{" -dynamic                                 " link "Options"}   Options
+ @{" -edit                                    " link "Options"}   Options
+ @{" -editor                                  " link "The mpedit command"}   The mpedit command
  @{" -fail-freq                               " link "Options"}   Options
  @{" -fail-seed                               " link "Options"}   Options
  @{" -free-byte                               " link "Options"}   Options
  @{" -free-stop                               " link "Options"}   Options
  @{" -graph-file                              " link "Profiling"}   Profiling
  @{" -help                                    " link "Options"}   Options
- @{" -ignore                                  " link "Utilities"}   Utilities
+ @{" -ignore                                  " link "The mleak command"}   The mleak command
  @{" -large-bound                             " link "Options"}   Options
  @{" -leaks                                   " link "Profiling"}   Profiling
  @{" -limit                                   " link "Options"}   Options
+ @{" -list                                    " link "Options"}   Options
  @{" -log-all                                 " link "Options"}   Options
  @{" -log-allocs                              " link "Options"}   Options
  @{" -log-file                                " link "Options"}   Options
@@ -11195,18 +11365,19 @@ Index
  @{" -show-symbols                            " link "Options"}   Options
  @{" -show-unfreed                            " link "Options"}   Options
  @{" -small-bound                             " link "Options"}   Options
+ @{" -source-dir                              " link "The mpedit command"}   The mpedit command
  @{" -stack-depth                             " link "Profiling"}   Profiling
  @{" -threads                                 " link "Options"}   Options
  @{" -unfreed-abort                           " link "Options"}   Options
  @{" -use-debug                               " link "Options"}   Options
  @{" -use-mmap                                " link "Options"}   Options
  @{" -version                                 " link "Options"}   Options
- @{" .cshrc                                   " link "Utilities"}   Utilities
+ @{" .cshrc                                   " link "The mpatrol command"}   The mpatrol command
  @{" .gdbinit                                 " link "Using with a debugger"}   Using with a debugger
- @{" .profile                                 " link "Utilities"}   Utilities
+ @{" .profile                                 " link "The mpatrol command"}   The mpatrol command
  @{" 32-bit                                   " link "Building"}   Building
  @{" 64-bit                                   " link "Building"}   Building
- @{" _RLD_LIST                                " link "Utilities"}   Utilities
+ @{" _RLD_LIST                                " link "The mpatrol command"}   The mpatrol command
  @{" ABI                                      " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" acknowledgements                         " link "Foreword"}   Foreword
  @{" adding a new object file format          " link "New file format support"}   New file format support
@@ -11253,7 +11424,7 @@ Index
  @{" AUTOSAVE                                 " link "Environment"}   Environment
  @{" backwards compatibility                  " link "Linking"}   Linking
  @{" BADALN                                   " link "Diagnostic messages"}   Diagnostic messages
- @{" bash                                     " link "Utilities"}   Utilities
+ @{" bash                                     " link "The mpatrol command"}   The mpatrol command
  @{" BASIC                                    " link "Memory allocations"}   Memory allocations
  @{" batch testing                            " link "Testing"}   Testing
  @{" best fit                                 " link "How it works"}   How it works
@@ -11309,10 +11480,11 @@ Index
  @{" compiler                                 " link "Installation"}   Installation
  @{" compiling                                " link "Installation"}   Installation
  @{" contacting the author                    " link "Foreword"}   Foreword
+ @{" context listing                          " link "The mpedit command"}   The mpedit command
  @{" contributors                             " link "Foreword"}   Foreword
  @{" core file                                " link "Running"}   Running
  @{" crash                                    " link "Example 1"}   Example 1
- @{" csh                                      " link "Utilities"}   Utilities
+ @{" csh                                      " link "The mpatrol command"}   The mpatrol command
  @{" CSRI malloc                              " link "Related software"}   Related software
  @{" CVS                                      " link "Files"}   Files
  @{" data sections                            " link "Static memory allocations"}   Static memory allocations
@@ -11352,11 +11524,15 @@ Index
  @{" dynamic linking                          " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" dynamic memory allocations               " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" DYNIX-ptx, Intel 80x86                   " link "Supported systems"}   Supported systems
+ @{" EDIT                                     " link "Environment"}   Environment
+ @{" EDITOR                                   " link "The mpedit command"}   The mpedit command
+ @{" editor                                   " link "The mpedit command"}   The mpedit command
  @{" Electric Fence                           " link "Related software"}   Related software
  @{" Electric Software, Inc.                  " link "Related software"}   Related software
  @{" ELF32                                    " link "Examples"}   Examples
  @{" ELF64                                    " link "Examples"}   Examples
- @{" embedded libraries                       " link "Utilities"}   Utilities
+ @{" emacs                                    " link "The mpedit command"}   The mpedit command
+ @{" embedded libraries                       " link "The mpatrol command"}   The mpatrol command
  @{" embedded systems                         " link "Operating system support"}   Operating system support
  @{" endianness                               " link "Profiling"}   Profiling
  @{" Enforcer                                 " link "Related software"}   Related software
@@ -11464,12 +11640,12 @@ Index
  @{" Kernel Group, The                        " link "Related software"}   Related software
  @{" KL Group                                 " link "Related software"}   Related software
  @{" known bugs                               " link "Notes"}   Notes
- @{" ksh                                      " link "Utilities"}   Utilities
+ @{" ksh                                      " link "The mpatrol command"}   The mpatrol command
  @{" LARGEBOUND                               " link "Environment"}   Environment
  @{" LaTeX                                    " link "Installation"}   Installation
  @{" LD                                       " link "Installation"}   Installation
  @{" LD_LIBRARY_PATH                          " link "Linking"}   Linking
- @{" LD_PRELOAD                               " link "Utilities"}   Utilities
+ @{" LD_PRELOAD                               " link "The mpatrol command"}   The mpatrol command
  @{" LD_RUN_PATH                              " link "Linking"}   Linking
  @{" Leak                                     " link "Related software"}   Related software
  @{" Leakers                                  " link "Related software"}   Related software
@@ -11500,6 +11676,8 @@ Index
  @{" Linux Software Map                       " link "Installation"}   Installation
  @{" Linux, Intel 80x86                       " link "Supported systems"}   Supported systems
  @{" Linux, Motorola 680x0                    " link "Supported systems"}   Supported systems
+ @{" LIST                                     " link "Environment"}   Environment
+ @{" list                                     " link "The mpedit command"}   The mpedit command
  @{" local static variables                   " link "Static memory allocations"}   Static memory allocations
  @{" log file                                 " link "Example 1"}   Example 1
  @{" LOGALL                                   " link "Environment"}   Environment
@@ -11523,7 +11701,7 @@ Index
  @{" malloc(3x)                               " link "Related software"}   Related software
  @{" Malloc_Dbg                               " link "Related software"}   Related software
  @{" MallocTrace                              " link "Related software"}   Related software
- @{" mallopt                                  " link "Utilities"}   Utilities
+ @{" mallopt                                  " link "The mpatrol command"}   The mpatrol command
  @{" MalTrace                                 " link "Related software"}   Related software
  @{" mangled names                            " link "Example 1"}   Example 1
  @{" MANPATH                                  " link "Documentation"}   Documentation
@@ -11570,7 +11748,8 @@ Index
  @{" misaligned memory accesses               " link "Virtual memory"}   Virtual memory
  @{" MISMAT                                   " link "Diagnostic messages"}   Diagnostic messages
  @{" ML                                       " link "Dynamic memory allocations"}   Dynamic memory allocations
- @{" mleak                                    " link "Utilities"}   Utilities
+ @{" mleak                                    " link "The mleak command"}   The mleak command
+ @{" mleak command                            " link "The mleak command"}   The mleak command
  @{" MM (Shared Memory Library)               " link "Related software"}   Related software
  @{" Mmalloc                                  " link "Related software"}   Related software
  @{" mmap                                     " link "Library behaviour"}   Library behaviour
@@ -11585,17 +11764,22 @@ Index
  @{" MP_NOCPLUSPLUS                           " link "Functions"}   Functions
  @{" MP_NONEWDELETE                           " link "Functions"}   Functions
  @{" mpatrol                                  " link "Overview"}   Overview
- @{" mpatrol command                          " link "Options"}   Options
+ @{" mpatrol command                          " link "The mpatrol command"}   The mpatrol command
  @{" mpatrol features                         " link "Features"}   Features
  @{" mpatrol library                          " link "Overview"}   Overview
  @{" mpatrol.h                                " link "Functions"}   Functions
  @{" mpatrol.log                              " link "Example 1"}   Example 1
  @{" MPATROL_OPTIONS                          " link "Environment"}   Environment
+ @{" MPATROL_SOURCEPATH                       " link "The mpedit command"}   The mpedit command
  @{" MPATROL_VERSION                          " link "Functions"}   Functions
+ @{" mpedit                                   " link "The mpedit command"}   The mpedit command
+ @{" mpedit command                           " link "The mpedit command"}   The mpedit command
  @{" MPR                                      " link "Related software"}   Related software
  @{" Mprof                                    " link "Related software"}   Related software
  @{" mprof                                    " link "Profiling"}   Profiling
- @{" mpsym                                    " link "Utilities"}   Utilities
+ @{" mprof command                            " link "Profiling"}   Profiling
+ @{" mpsym                                    " link "The mpsym command"}   The mpsym command
+ @{" mpsym command                            " link "The mpsym command"}   The mpsym command
  @{" MSS (Memory Supervision System)          " link "Related software"}   Related software
  @{" mtmalloc(3t)                             " link "Related software"}   Related software
  @{" MuForce                                  " link "Related software"}   Related software
@@ -11775,12 +11959,13 @@ Index
  @{" systems, embedded                        " link "Operating system support"}   Operating system support
  @{" TAR archive                              " link "Installation"}   Installation
  @{" TARGET                                   " link "Building"}   Building
- @{" tcsh                                     " link "Utilities"}   Utilities
+ @{" tcsh                                     " link "The mpatrol command"}   The mpatrol command
  @{" tentative declarations                   " link "Static memory allocations"}   Static memory allocations
  @{" test suite                               " link "Features"}   Features
  @{" TestCenter                               " link "Related software"}   Related software
  @{" testing                                  " link "Testing"}   Testing
  @{" TeXinfo                                  " link "Installation"}   Installation
+ @{" text editor                              " link "The mpedit command"}   The mpedit command
  @{" TFLAGS                                   " link "Installation"}   Installation
  @{" Third Degree                             " link "Related software"}   Related software
  @{" thrashing                                " link "Virtual memory"}   Virtual memory
@@ -11814,6 +11999,8 @@ Index
  @{" variables, parameter                     " link "Stack memory allocations"}   Stack memory allocations
  @{" VAX                                      " link "Profiling"}   Profiling
  @{" VERSION                                  " link "Files"}   Files
+ @{" vi                                       " link "The mpedit command"}   The mpedit command
+ @{" vim                                      " link "The mpedit command"}   The mpedit command
  @{" virtual address                          " link "Virtual memory"}   Virtual memory
  @{" virtual memory                           " link "Virtual memory"}   Virtual memory
  @{" Virtual Memory Tutorial                  " link "References"}   References
@@ -11829,6 +12016,7 @@ Index
  @{" X Windows                                " link "References"}   References
  @{" XANALYS Software Tools                   " link "References"}   References
  @{" XCOFF                                    " link "Examples"}   Examples
+ @{" xemacs                                   " link "The mpedit command"}   The mpedit command
  @{" YaMa                                     " link "Related software"}   Related software
  @{" YAMD (Yet Another Malloc Debugger)       " link "Related software"}   Related software
  @{" ZERALN                                   " link "Diagnostic messages"}   Diagnostic messages

@@ -536,8 +536,8 @@ if you perform the following steps.
 
   6. Copy the `mpatrol', `mprof' and `mleak' programs that have been
      built into your local bin directory.  You may also wish to copy the
-     `mpsym' command to your local bin directory as well if your system
-     supports it.
+     `mpsym' and `mpedit' commands to your local bin directory as well
+     if your system supports it.
 
   7. Go up two directory levels into the `src' directory and copy the
      `mpatrol.h' header file into your local include directory.
@@ -1281,6 +1281,16 @@ especially if you suspect the error you are looking for occurs at the
 mpatrol library will automatically check the freed memory and overflow
 buffers.  All other allocations that fall outside this range will not
 be checked.
+
+   On UNIX systems, the mpatrol library can also invoke the `mpedit'
+command to edit source files that show up in any warnings or error
+messages that it generates.  This can only happen if the diagnostic
+message can be traced back to a specific source line in the program; in
+many cases this is not possible.  If editing the files is not required,
+a context listing of the appropriate source line can be generated
+instead.  The `EDIT' option specifies that files are to be edited and
+the `LIST' option specifies that a context listing is to be generated.
+These options are mutually exclusive.
 
    If the mpatrol library that was built for your system supports
 reading symbolic information from a program's executable file, but it
@@ -2048,6 +2058,17 @@ at the end of program execution.
 7.8 Utilities
 =============
 
+   Several external programs are supplied with the mpatrol distribution
+in the form of commands that can be used to enhance the functionality
+of the mpatrol library.  Each command comes with its own UNIX manual
+page (although they also support the `--help' and `--version' options),
+but a few of the commands are written as UNIX shell scripts and so will
+not work on non-UNIX platforms.  Note that the `mprof' command is
+documented in the profiling chapter (*note Profiling::).
+
+7.8.1 The `mpatrol' command
+---------------------------
+
    A command is provided with the mpatrol distribution which can run
 programs that have been linked with the mpatrol library, using a
 combination of mpatrol options that can be set via the command line.
@@ -2055,7 +2076,7 @@ Most of these options map directly onto their equivalent environment
 variable settings and exist mainly so that the user does not have to
 manually change the `MPATROL_OPTIONS' environment variable.
 
-   The one option that is the exception to this is the `--dynamic'
+   The main option that is the exception to this is the `--dynamic'
 option, which can be used to run a program under the control of the
 mpatrol library, even if it wasn't originally linked with the mpatrol
 library.  This can only be done on systems that support dynamic linking
@@ -2160,6 +2181,9 @@ process.
      Sets mpatrol library options in the current process environment.
      end
 
+7.8.2 The `mleak' command
+-------------------------
+
    Another utility program that is provided is called `mleak' and is
 useful for detecting memory leaks in log files produced by the mpatrol
 library.  This program should be used if the mpatrol library could not
@@ -2192,8 +2216,11 @@ standard input file stream will be used as the log file.  Note also
 that the `mleak' command supports the `--help' and `--version' options
 in common with the other mpatrol command line tools.
 
-   The final utility program that is provided is called `mpsym', which
-is used to parse a log file produced by the mpatrol library and uses a
+7.8.3 The `mpsym' command
+-------------------------
+
+   Another utility program that is provided is called `mpsym', which is
+used to parse a log file produced by the mpatrol library and uses a
 debugger to append symbol names and source level information to code
 addresses in stack tracebacks.  This should be used if the `USEDEBUG'
 option is not supported on a particular platform or does not work
@@ -2230,6 +2257,64 @@ work on UNIX platforms or on systems which have the necessary commands
 installed.  By default, it is set up to work on 32-bit platforms, but
 this can be changed by altering the `POINTER' definition in the `mpsym'
 file itself.
+
+7.8.4 The `mpedit' command
+--------------------------
+
+   The final utility program that is provided is called `mpedit', which
+is used to invoke a text editor on a given source file and optionally
+jump to a specific line number.  It is used as a support command by the
+mpatrol library when the `EDIT' or `LIST' options are used but it can
+quite easily be used as a command in its own right if properly
+configured.  Because it is a shell script it can be easily configured
+to support other editors, but this unfortunately limits it to UNIX
+platforms at the moment.
+
+   The first argument to `mpedit' must be the filename of the source
+file to be edited or listed.  If the source file does not exist then
+the contents of the `MPATROL_SOURCEPATH' environment variable will be
+used to help locate the source file, even if the filename contained an
+absolute or relative path component.  This environment variable should
+consist of a colon-separated list of directory names which may contain
+absolute paths or be relative to the current directory; the first
+directory in the list will be searched first.  If the
+`MPATROL_SOURCEPATH' environment variable is not set then only the
+current directory will be searched.  You can also use the `--source-dir'
+option to add directories to the search path used to locate the source
+file.  Multiple `--source-dir' options may be given, and each will be
+prepended to the `MPATROL_SOURCEPATH' environment variable in the order
+given on the command line.
+
+   If the second argument specifying the line number is omitted then it
+is assumed to be `1'.  The text editor will attempt to jump to the
+specified line after opening the source file.  The text editor that
+`mpedit' uses is controlled by setting the `EDITOR' environment
+variable.  This can be set to the full pathname of the text editor to
+use or it can be set to the command that would normally be used to
+invoke the text editor, but it cannot also contain command line
+options.  You can also use the `--editor' option to specify the text
+editor on the command line instead of using the value in the `EDITOR'
+environment variable.
+
+   The currently supported editors are `vi', `vim', `emacs' and
+`xemacs', and if the `EDITOR' environment variable is not set then the
+default will be `vi'.  Selecting an unsupported text editor will result
+in an error.  However, you can edit the `mpedit' file to add support
+for your own favourite text editor as long as it supports a way to
+immediately jump to a specific line number when it is first started up.
+Note that the text editor must also open a new window to edit the
+source file so that it does not obscure any mpatrol diagnostic
+messages, and if it does not support this then a new terminal window
+must be opened for it to use.
+
+   If the `--list' option is given on the command line then the
+`mpedit' command will display a context listing of the source file at
+the specified line number to the standard error output stream instead of
+invoking the text editor.  The listing will be annotated with line
+numbers and will also show the contents of the five lines before and
+after the specified line if possible.  Note also that the `mpedit'
+command supports the `--help' and `--version' options in common with
+the other mpatrol command line tools.
 
 8 Profiling
 ***********
@@ -5723,6 +5808,15 @@ as well as uppercase, or a mixture of both.
      to the nearest power of two if it is not).  The default alignment
      for a particular system is calculated at run-time.
 
+`EDIT'
+     Specifies that a text editor should be invoked to edit any
+     relevant source files that are associated with any warnings or
+     errors when they occur.  Only diagnostics which occur at source
+     lines in the program will be affected and only then if they
+     contain source-level information.  This option is currently only
+     available on UNIX platforms as it makes use of the `mpedit'
+     command.  It also overrides the behaviour of the `LIST' option.
+
 `FAILFREQ'=<UNSIGNED-INTEGER>
      Specifies the frequency at which all memory allocations will
      randomly fail.  For example, a value of `10' will mean that
@@ -5775,6 +5869,15 @@ as well as uppercase, or a mixture of both.
      but on some systems there may be a small amount of memory required
      to initialise the library itself.  Note that this setting will be
      ignored if its value is zero.  Default value: `LIMIT=0'.
+
+`LIST'
+     Specifies that a context listing should be shown for any relevant
+     source files that are associated with any warnings or errors when
+     they occur.  Only diagnostics which occur at source lines in the
+     program will be affected and only then if they contain
+     source-level information.  This option is currently only available
+     on UNIX platforms as it makes use of the `mpedit' command.  It
+     also overrides the behaviour of the `EDIT' option.
 
 `LOGALL'
      Equivalent to the `LOGALLOCS', `LOGREALLOCS', `LOGFREES' and
@@ -6075,6 +6178,11 @@ parsed on the command line in a similar way to the UNIX function
      has the ability to preload a set of user-specified shared
      libraries via a special environment variable.
 
+`--edit'
+     [`EDIT']  Specifies that a text editor should be invoked to edit
+     any relevant source files that are associated with any warnings or
+     errors when they occur.
+
 `--fail-freq' <UNSIGNED-INTEGER>
      [`FAILFREQ']  Specifies the frequency at which all memory
      allocations will randomly fail.
@@ -6103,6 +6211,11 @@ parsed on the command line in a similar way to the UNIX function
      [`LIMIT']  Specifies the limit in bytes at which all memory
      allocations should fail if the total allocated memory should
      increase beyond this.
+
+`--list'
+     [`LIST']  Specifies that a context listing should be shown for any
+     relevant source files that are associated with any warnings or
+     errors when they occur.
 
 `--log-all'
      [`LOGALL']  Equivalent to the `--log-allocs', `--log-reallocs',
@@ -6255,6 +6368,11 @@ allocations and memory operations occur.  Other types of warnings and
 errors may also appear in the log file, but they are likely to be
 associated with parsing options and reading symbols from executable
 files and so should be self-explanatory.
+
+   Note that on UNIX platforms, if the diagnostic message is caused by
+a line in the program source then the `EDIT' and `LIST' options can be
+used to illustrate more clearly where in the source code the warning or
+error occurred.
 
    * `ALLOVF'
     Message
@@ -7277,6 +7395,8 @@ supported on that system.
         * The `mpsym' command does not work unless `gdb' and the GNU
           text processing tools are installed.
 
+        * The `mpedit' command does not work.
+
    * AmigaOS 3.1, Motorola 68040, n/a, SAS/C
         * No automatic override of `malloc()', etc., without inclusion
           of `mpatrol.h'.
@@ -7299,6 +7419,8 @@ supported on that system.
 
         * The `mpsym' command does not work.
 
+        * The `mpedit' command does not work.
+
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
         * The `OFLOWWATCH' option has no effect.
@@ -7312,6 +7434,8 @@ supported on that system.
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
         * The `mpsym' command does not work.
+
+        * The `mpedit' command does not work.
 
 G.1 Adding a new operating system
 =================================
@@ -8556,7 +8680,16 @@ I.5 Files
      text processing tools installed, in which case you might want to
      try installing them.
 
-  4. What does the `mupdate' shell script do?
+  4. How can I customise the `mpedit' command if I do not have the
+     appropriate permissions to edit the file that was installed on my
+     system?
+
+     You just need to take a copy of the installed `mpedit' command and
+     place it somewhere that will be picked up earlier on your command
+     search path.  You can then edit your copy of the file and add
+     support for your favourite text editor.
+
+  5. What does the `mupdate' shell script do?
 
      This is for my use in order to automate every new release of
      mpatrol.  You should never need to run this script and it should
@@ -10665,6 +10798,9 @@ Index
           See ``Appendix C Options''.
 -dynamic:                                          
           See ``Appendix C Options''.
+-edit:                                             
+          See ``Appendix C Options''.
+-editor:                                            See 7.8.4.
 -fail-freq:                                        
           See ``Appendix C Options''.
 -fail-seed:                                        
@@ -10676,11 +10812,13 @@ Index
 -graph-file:                                        See 8.
 -help:                                             
           See ``Appendix C Options''.
--ignore:                                            See 7.8.
+-ignore:                                            See 7.8.2.
 -large-bound:                                      
           See ``Appendix C Options''.
 -leaks:                                             See 8.
 -limit:                                            
+          See ``Appendix C Options''.
+-list:                                             
           See ``Appendix C Options''.
 -log-all:                                          
           See ``Appendix C Options''.
@@ -10736,6 +10874,7 @@ Index
           See ``Appendix C Options''.
 -small-bound:                                      
           See ``Appendix C Options''.
+-source-dir:                                        See 7.8.4.
 -stack-depth:                                       See 8.
 -threads:                                          
           See ``Appendix C Options''.
@@ -10747,14 +10886,14 @@ Index
           See ``Appendix C Options''.
 -version:                                          
           See ``Appendix C Options''.
-.cshrc:                                             See 7.8.
+.cshrc:                                             See 7.8.1.
 .gdbinit:                                           See 7.5.
-.profile:                                           See 7.8.
+.profile:                                           See 7.8.1.
 32-bit:                                            
           See ``I.2 Building''.
 64-bit:                                            
           See ``I.2 Building''.
-_RLD_LIST:                                          See 7.8.
+_RLD_LIST:                                          See 7.8.1.
 ABI:                                                See 6.2.
 acknowledgements:                                  
           See ``Foreword''.
@@ -10824,7 +10963,7 @@ backwards compatibility:
           See ``I.3 Linking''.
 BADALN:                                            
           See ``Appendix D Diagnostic messages''.
-bash:                                               See 7.8.
+bash:                                               See 7.8.1.
 BASIC:                                              See 5.
 batch testing:                                      See 7.6.
 best fit:                                           See 10.
@@ -10902,12 +11041,13 @@ compiler:                                           See 3.
 compiling:                                          See 3.
 contacting the author:                             
           See ``Foreword''.
+context listing:                                    See 7.8.4.
 contributors:                                      
           See ``Foreword''.
 core file:                                         
           See ``I.4 Running''.
 crash:                                              See 11.1.
-csh:                                                See 7.8.
+csh:                                                See 7.8.1.
 CSRI malloc:                                       
           See ``Appendix J Related software''.
 CVS:                                               
@@ -10966,13 +11106,18 @@ dynamic linking:                                    See 6.2.
 dynamic memory allocations:                         See 5.3.
 DYNIX/ptx, Intel 80x86:                            
           See ``Appendix G Supported systems''.
+EDIT:                                              
+          See ``Appendix B Environment''.
+EDITOR:                                             See 7.8.4.
+editor:                                             See 7.8.4.
 Electric Fence:                                    
           See ``Appendix J Related software''.
 Electric Software, Inc.:                           
           See ``Appendix J Related software''.
 ELF32:                                              See 11.
 ELF64:                                              See 11.
-embedded libraries:                                 See 7.8.
+emacs:                                              See 7.8.4.
+embedded libraries:                                 See 7.8.1.
 embedded systems:                                   See 6.
 endianness:                                         See 8.
 Enforcer:                                          
@@ -11135,14 +11280,14 @@ KL Group:
           See ``Appendix J Related software''.
 known bugs:                                        
           See ``Appendix H Notes''.
-ksh:                                                See 7.8.
+ksh:                                                See 7.8.1.
 LARGEBOUND:                                        
           See ``Appendix B Environment''.
 LaTeX:                                              See 3.
 LD:                                                 See 3.
 LD_LIBRARY_PATH:                                   
           See ``I.3 Linking''.
-LD_PRELOAD:                                         See 7.8.
+LD_PRELOAD:                                         See 7.8.1.
 LD_RUN_PATH:                                       
           See ``I.3 Linking''.
 Leak:                                              
@@ -11185,6 +11330,9 @@ Linux, Intel 80x86:
           See ``Appendix G Supported systems''.
 Linux, Motorola 680x0:                             
           See ``Appendix G Supported systems''.
+LIST:                                              
+          See ``Appendix B Environment''.
+list:                                               See 7.8.4.
 local static variables:                             See 5.1.
 log file:                                           See 11.1.
 LOGALL:                                            
@@ -11224,7 +11372,7 @@ Malloc_Dbg:
           See ``Appendix J Related software''.
 MallocTrace:                                       
           See ``Appendix J Related software''.
-mallopt:                                            See 7.8.
+mallopt:                                            See 7.8.1.
 MalTrace:                                          
           See ``Appendix J Related software''.
 mangled names:                                      See 11.1.
@@ -11292,7 +11440,8 @@ misaligned memory accesses:                         See 6.1.
 MISMAT:                                            
           See ``Appendix D Diagnostic messages''.
 ML:                                                 See 5.3.
-mleak:                                              See 7.8.
+mleak:                                              See 7.8.2.
+mleak command:                                      See 7.8.2.
 MM (Shared Memory Library):                        
           See ``Appendix J Related software''.
 Mmalloc:                                           
@@ -11315,8 +11464,7 @@ MP_NOCPLUSPLUS:
 MP_NONEWDELETE:                                    
           See ``Appendix A Functions''.
 mpatrol:                                            See 1.
-mpatrol command:                                   
-          See ``Appendix C Options''.
+mpatrol command:                                    See 7.8.1.
 mpatrol features:                                   See 2.
 mpatrol library:                                    See 1.
 mpatrol.h:                                         
@@ -11324,14 +11472,19 @@ mpatrol.h:
 mpatrol.log:                                        See 11.1.
 MPATROL_OPTIONS:                                   
           See ``Appendix B Environment''.
+MPATROL_SOURCEPATH:                                 See 7.8.4.
 MPATROL_VERSION:                                   
           See ``Appendix A Functions''.
+mpedit:                                             See 7.8.4.
+mpedit command:                                     See 7.8.4.
 MPR:                                               
           See ``Appendix J Related software''.
 Mprof:                                             
           See ``Appendix J Related software''.
 mprof:                                              See 8.
-mpsym:                                              See 7.8.
+mprof command:                                      See 8.
+mpsym:                                              See 7.8.3.
+mpsym command:                                      See 7.8.3.
 MSS (Memory Supervision System):                   
           See ``Appendix J Related software''.
 mtmalloc(3t):                                      
@@ -11609,13 +11762,14 @@ systems, embedded:                                  See 6.
 TAR archive:                                        See 3.
 TARGET:                                            
           See ``I.2 Building''.
-tcsh:                                               See 7.8.
+tcsh:                                               See 7.8.1.
 tentative declarations:                             See 5.1.
 test suite:                                         See 2.
 TestCenter:                                        
           See ``Appendix J Related software''.
 testing:                                            See 7.6.
 TeXinfo:                                            See 3.
+text editor:                                        See 7.8.4.
 TFLAGS:                                             See 3.
 Third Degree:                                      
           See ``Appendix J Related software''.
@@ -11660,6 +11814,8 @@ variables, parameter:                               See 5.2.
 VAX:                                                See 8.
 VERSION:                                           
           See ``I.5 Files''.
+vi:                                                 See 7.8.4.
+vim:                                                See 7.8.4.
 virtual address:                                    See 6.1.
 virtual memory:                                     See 6.1.
 Virtual Memory Tutorial:                           
@@ -11685,6 +11841,7 @@ X Windows:
 XANALYS Software Tools:                            
           See ``Appendix K References''.
 XCOFF:                                              See 11.
+xemacs:                                             See 7.8.4.
 YaMa:                                              
           See ``Appendix J Related software''.
 YAMD (Yet Another Malloc Debugger):                
