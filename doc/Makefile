@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.6 2000-01-09 21:07:29 graeme Exp $
+# $Id: Makefile,v 1.7 2000-01-11 00:15:04 graeme Exp $
 
 
 # Definitions
@@ -36,11 +36,11 @@ VERBOSE   = false
 
 # Rules
 
-.SUFFIXES: .texi .doc .info .guide .html .dvi .ps .pdf .jpg .eps
+.SUFFIXES: .texi .txt .info .guide .html .dvi .ps .pdf .jpg .eps
 
 # Build the text file from the Texinfo file using makeinfo
 
-$(DOCUMENT).doc: $(DOCUMENT).texi
+$(DOCUMENT).txt: $(DOCUMENT).texi
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeinfo --no-headers --number-sections --verbose $< >$@
@@ -122,11 +122,11 @@ else
 	@ texi2dvi --pdf --batch --clean --quiet $<
 endif
 
-all: $(DOCUMENT).doc $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
+all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf
 
 clean:
-	-@ rm -f $(DOCUMENT).doc $(DOCUMENT).info >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
 ifeq ($(SPLITHTML),true)
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
