@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.68 2001-02-27 20:05:05 graeme Exp $"
+#ident "$Id: info.c,v 1.69 2001-02-27 20:06:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.68 2001-02-27 20:05:05 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.69 2001-02-27 20:06:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -161,6 +161,7 @@ __mp_deleteinfo(infohead *h)
  * initialised.
  */
 
+MP_GLOBAL
 int
 __mp_atinit(void (*f)(void))
 {
