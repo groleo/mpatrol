@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.84 2001-02-13 22:07:14 graeme Exp $
+ * $Id: mpatrol.h,v 1.85 2001-02-13 23:57:56 graeme Exp $
  */
 
 
@@ -640,7 +640,7 @@ int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
 int __mp_printinfo(MP_CONST void *);
 unsigned long __mp_snapshot(void);
-size_t __mp_iterate(int (*)(MP_CONST void *), unsigned long);
+size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
