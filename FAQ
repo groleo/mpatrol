@@ -93,6 +93,17 @@ their corresponding answers or solutions.
     compiler option to enable support for these operators, but if not you will
     probably have to edit mpatrol.h to temporarily allow your files to compile.
 
+ Q. Why do some of the makefiles contain the -fno-inline-functions option as
+    part of OFLAGS?
+
+ A. The -fno-inline-functions option is a GCC-specific option which instructs
+    the compiler not to inline any functions.  This is necessary on some
+    platforms where function call stack traversal is supported, since function
+    inlining may significantly alter the layout of a program's stack.  Normally
+    this option is only required when building the mpatrol library, but on some
+    platforms function call stack traversal may not work properly unless this
+    option (or equivalent) is used for all compiled code.
+
 
  3. LINKING
 
@@ -291,6 +302,12 @@ their corresponding answers or solutions.
     that uses the ixemul library.  However, the env command that comes with
     most GNU software distributions allows you to set an environment variable
     that the GNU getenv() function can read when you are running in AmigaDOS.
+
+ Q. How do I suppress all diagnostic output from the mpatrol library?
+
+ A. You can do this by setting the mpatrol log file to be your system's "bit
+    bucket", which is /dev/null on UNIX platforms and NIL: on AmigaOS.  There
+    doesn't appear to be an equivalent way to do this on Windows or Netware.
 
 
  5. FILES
