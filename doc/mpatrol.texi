@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.257 2002-02-04 23:34:48 graeme Exp $
+@c $Id: mpatrol.texi,v 1.258 2002-03-11 23:57:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.14
 @set VERSION 1.4.8
-@set UPDATED 4th February, 2002
+@set UPDATED 11th March, 2002
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -13230,8 +13230,9 @@ It is a preprocessor macro function that is used to return the minimum alignment
 in bytes required for a specified type at compile-time.  It is used in the
 @code{MP_MALLOC} family of functions to specify the required alignment of the
 memory allocation that is to be used to store the specified type.  Some
-compilers provide a feature that can be used to determine the minimum alignment
-of a type at compile-time.  For all others, this macro evaluates to @samp{0}.
+compilers provide a built-in function that can be used to determine the minimum
+alignment of a type at compile-time.  For all others, this macro makes use of
+some structure trickery in combination with the @code{offsetof} macro.
 
 @cindex MP_INLINE
 @cindex extern inline
