@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.19 2000-10-25 23:00:23 graeme Exp $
+# $Id: Makefile,v 1.20 2000-10-26 23:21:36 graeme Exp $
 
 
 # Definitions
@@ -111,9 +111,9 @@ endif
 $(DOCUMENT).ps: $(DOCUMENT).dvi
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ dvips -r0 -o $@ $<
+	@ dvips -Pcmz -o $@ $<
 else
-	@ dvips -r0 -q -o $@ $<
+	@ dvips -Pcmz -q -o $@ $<
 endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
@@ -142,9 +142,9 @@ endif
 $(REFCARD).ps: $(REFCARD).dvi
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ dvips -t landscape -r0 -o $@ $<
+	@ dvips -t landscape -Pcmz -o $@ $<
 else
-	@ dvips -t landscape -r0 -q -o $@ $<
+	@ dvips -t landscape -Pcmz -q -o $@ $<
 endif
 
 # Build the PDF reference card from the LaTeX file using texi2dvi
