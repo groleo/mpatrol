@@ -47,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.69 2001-02-01 19:03:03 graeme Exp $"
+#ident "$Id: inter.c,v 1.70 2001-02-04 21:23:26 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -587,32 +587,17 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         memhead.epilogue(p);
     if (p == NULL)
     {
-        if (z == 0)
-            if (memhead.nomemory)
-            {
-                /* Call the low-memory handler if no memory block was allocated.
-                 */
-                memhead.nomemory();
-                if (memhead.prologue && (memhead.recur == 1))
-                    memhead.prologue((void *) -1, l);
-                if ((f != AT_NEW) && (f != AT_NEWVEC))
-                    z = 1;
-                goto retry;
-            }
-            else if ((f == AT_NEW) || (f == AT_NEWVEC))
-            {
-                /* The C++ standard specifies that operators new and new[]
-                 * should always return non-NULL pointers.  Since we have
-                 * ascertained that we have no low-memory handler, this either
-                 * means throwing an exception or aborting.  Since this is a
-                 * no-throw version of new we'll opt for the latter.
-                 */
-                __mp_printsummary(&memhead);
-                __mp_diag("\n");
-                __mp_error(ET_OUTMEM, f, t, u, "out of memory");
-                memhead.fini = 1;
-                __mp_abort();
-            }
+        if ((z == 0) && (memhead.nomemory))
+        {
+            /* Call the low-memory handler if no memory block was allocated.
+             */
+            memhead.nomemory();
+            if (memhead.prologue && (memhead.recur == 1))
+                memhead.prologue((void *) -1, l);
+            if ((f != AT_NEW) && (f != AT_NEWVEC))
+                z = 1;
+            goto retry;
+        }
         if ((f == AT_ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
         {
             /* The alloca(), xmalloc() and xcalloc() functions should always
