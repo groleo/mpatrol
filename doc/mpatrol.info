@@ -11,8 +11,8 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 26th
-December, 2000.
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 4th
+January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -50,8 +50,8 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 26th
-December, 2000.
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 4th
+January, 2001.
 
 * Menu:
 
@@ -159,6 +159,8 @@ before you can send mail to it.
 for his help on reading debugging information from object files via the
 GNU BFD library, and Alexander Barton (<abarton@innotrac.com>) and Dave
 Gibson (<david@epc.co.uk>) for their help on writing thread-safe code.
+Roger Keane (<rgr@bcs-inc.com>) provided the perl code in the `mpsym'
+command and also the idea for the `MP_USE_ATEXIT' feature macro.
 
    Oh, and always remember to do final release builds without the
 mpatrol library as the library is much slower than normal malloc
@@ -615,8 +617,9 @@ if you perform the following steps.
 
   6. Copy the `mpatrol', `mprof', `mptrace' and `mleak' programs that
      have been built into your local bin directory.  You may also wish
-     to copy the `mpsym' and `mpedit' commands to your local bin
-     directory as well if your system supports Bourne shell scripts.
+     to copy the `mpsym', `mpedit' and `hexwords' commands to your
+     local bin directory as well if your system supports Bourne shell
+     scripts.
 
   7. Go up two directory levels into the `src' directory and copy the
      `mpatrol.h' header file into your local include directory.
@@ -12610,123 +12613,123 @@ Index
 
 
 Tag Table:
-Node: Top1257
-Node: Foreword3529
-Node: Overview8013
-Node: Features10990
-Node: Installation27990
-Node: Integration34113
-Ref: Integration-Footnote-139276
-Node: Memory allocations39397
-Node: Static memory allocations40074
-Ref: Static memory allocations-Footnote-142535
-Node: Stack memory allocations42577
-Ref: Stack memory allocations-Footnote-144441
-Node: Dynamic memory allocations44480
-Ref: Dynamic memory allocations-Footnote-147902
-Ref: Dynamic memory allocations-Footnote-248021
-Node: Operating system support48125
-Node: Virtual memory50085
-Ref: Virtual memory-Footnote-156113
-Ref: Virtual memory-Footnote-256369
-Ref: Virtual memory-Footnote-356545
-Ref: Virtual memory-Footnote-456580
-Ref: Virtual memory-Footnote-556639
-Node: Call stacks and symbol tables56863
-Ref: Call stacks and symbol tables-Footnote-162541
-Ref: Call stacks and symbol tables-Footnote-262609
-Ref: Call stacks and symbol tables-Footnote-362660
-Ref: Call stacks and symbol tables-Footnote-462704
-Ref: Call stacks and symbol tables-Footnote-562746
-Ref: Call stacks and symbol tables-Footnote-662788
-Ref: Call stacks and symbol tables-Footnote-762836
-Node: Threads62942
-Ref: Threads-Footnote-168948
-Node: Using mpatrol69043
-Node: Library behaviour69909
-Ref: Library behaviour-Footnote-175305
-Node: Logging and tracing75363
-Node: General errors80229
-Ref: General errors-Footnote-184367
-Ref: General errors-Footnote-284523
-Node: Overwrites and underwrites84691
-Ref: Overwrites and underwrites-Footnote-192210
-Ref: Overwrites and underwrites-Footnote-292273
-Node: Using with a debugger92397
-Ref: Using with a debugger-Footnote-1101451
-Ref: Using with a debugger-Footnote-2101519
-Ref: Using with a debugger-Footnote-3101775
-Node: Testing101864
-Ref: Testing-Footnote-1104601
-Ref: Testing-Footnote-2104782
-Node: Library functions104841
-Node: Utilities111722
-Node: The mpatrol command112636
-Node: The mleak command119134
-Node: The mpsym command121098
-Node: The mpedit command123576
-Node: Profiling126941
-Ref: Profiling-Footnote-1154833
-Ref: Profiling-Footnote-2155057
-Node: Tracing155161
-Ref: Tracing-Footnote-1172351
-Ref: Tracing-Footnote-2172385
-Ref: Tracing-Footnote-3172507
-Node: Improving performance172613
-Ref: Improving performance-Footnote-1181513
-Ref: Improving performance-Footnote-2181555
-Ref: Improving performance-Footnote-3181632
-Ref: Improving performance-Footnote-4181704
-Node: How it works181748
-Node: Examples188941
-Node: Example 1192601
-Ref: Example 1-Footnote-1216717
-Node: Example 2216907
-Node: Example 3222307
-Node: Example 4229164
-Node: Example 5232669
-Ref: Example 5-Footnote-1236469
-Node: Example 6236598
-Node: Example 7238456
-Node: Example 8248692
-Node: Tutorial264563
-Ref: Tutorial-Footnote-1279094
-Ref: Tutorial-Footnote-2279385
-Ref: Tutorial-Footnote-3279534
-Ref: Tutorial-Footnote-4279671
-Ref: Tutorial-Footnote-5279770
-Node: Functions280051
-Node: Environment310487
-Node: Options331041
-Node: Diagnostic messages342430
-Node: Library performance358372
-Node: File formats360865
-Ref: File formats-Footnote-1361289
-Node: Profiling file format361501
-Node: Tracing file format364763
-Node: Supported systems366630
-Node: New system support380889
-Node: New processor support382085
-Node: New file format support382768
-Node: Notes383158
-Node: Generic notes384769
-Ref: Generic notes-Footnote-1402258
-Ref: Generic notes-Footnote-2402476
-Node: UNIX notes402698
-Node: Amiga notes407210
-Node: Windows notes410874
-Node: Netware notes412294
-Node: Frequently asked questions414854
-Node: Documentation415477
-Node: Building420307
-Node: Linking427332
-Node: Running431604
-Node: Files445754
-Node: Related software448750
-Ref: Related software-Footnote-1485023
-Node: References485264
-Node: Copying487857
-Node: Function index515746
-Node: Index518004
+Node: Top1255
+Node: Foreword3525
+Node: Overview8144
+Node: Features11121
+Node: Installation28121
+Node: Integration34261
+Ref: Integration-Footnote-139424
+Node: Memory allocations39545
+Node: Static memory allocations40222
+Ref: Static memory allocations-Footnote-142683
+Node: Stack memory allocations42725
+Ref: Stack memory allocations-Footnote-144589
+Node: Dynamic memory allocations44628
+Ref: Dynamic memory allocations-Footnote-148050
+Ref: Dynamic memory allocations-Footnote-248169
+Node: Operating system support48273
+Node: Virtual memory50233
+Ref: Virtual memory-Footnote-156261
+Ref: Virtual memory-Footnote-256517
+Ref: Virtual memory-Footnote-356693
+Ref: Virtual memory-Footnote-456728
+Ref: Virtual memory-Footnote-556787
+Node: Call stacks and symbol tables57011
+Ref: Call stacks and symbol tables-Footnote-162689
+Ref: Call stacks and symbol tables-Footnote-262757
+Ref: Call stacks and symbol tables-Footnote-362808
+Ref: Call stacks and symbol tables-Footnote-462852
+Ref: Call stacks and symbol tables-Footnote-562894
+Ref: Call stacks and symbol tables-Footnote-662936
+Ref: Call stacks and symbol tables-Footnote-762984
+Node: Threads63090
+Ref: Threads-Footnote-169096
+Node: Using mpatrol69191
+Node: Library behaviour70057
+Ref: Library behaviour-Footnote-175453
+Node: Logging and tracing75511
+Node: General errors80377
+Ref: General errors-Footnote-184515
+Ref: General errors-Footnote-284671
+Node: Overwrites and underwrites84839
+Ref: Overwrites and underwrites-Footnote-192358
+Ref: Overwrites and underwrites-Footnote-292421
+Node: Using with a debugger92545
+Ref: Using with a debugger-Footnote-1101599
+Ref: Using with a debugger-Footnote-2101667
+Ref: Using with a debugger-Footnote-3101923
+Node: Testing102012
+Ref: Testing-Footnote-1104749
+Ref: Testing-Footnote-2104930
+Node: Library functions104989
+Node: Utilities111870
+Node: The mpatrol command112784
+Node: The mleak command119282
+Node: The mpsym command121246
+Node: The mpedit command123724
+Node: Profiling127089
+Ref: Profiling-Footnote-1154981
+Ref: Profiling-Footnote-2155205
+Node: Tracing155309
+Ref: Tracing-Footnote-1172499
+Ref: Tracing-Footnote-2172533
+Ref: Tracing-Footnote-3172655
+Node: Improving performance172761
+Ref: Improving performance-Footnote-1181661
+Ref: Improving performance-Footnote-2181703
+Ref: Improving performance-Footnote-3181780
+Ref: Improving performance-Footnote-4181852
+Node: How it works181896
+Node: Examples189089
+Node: Example 1192749
+Ref: Example 1-Footnote-1216865
+Node: Example 2217055
+Node: Example 3222455
+Node: Example 4229312
+Node: Example 5232817
+Ref: Example 5-Footnote-1236617
+Node: Example 6236746
+Node: Example 7238604
+Node: Example 8248840
+Node: Tutorial264711
+Ref: Tutorial-Footnote-1279242
+Ref: Tutorial-Footnote-2279533
+Ref: Tutorial-Footnote-3279682
+Ref: Tutorial-Footnote-4279819
+Ref: Tutorial-Footnote-5279918
+Node: Functions280199
+Node: Environment310635
+Node: Options331189
+Node: Diagnostic messages342578
+Node: Library performance358520
+Node: File formats361013
+Ref: File formats-Footnote-1361437
+Node: Profiling file format361649
+Node: Tracing file format364911
+Node: Supported systems366778
+Node: New system support381037
+Node: New processor support382233
+Node: New file format support382916
+Node: Notes383306
+Node: Generic notes384917
+Ref: Generic notes-Footnote-1402406
+Ref: Generic notes-Footnote-2402624
+Node: UNIX notes402846
+Node: Amiga notes407358
+Node: Windows notes411022
+Node: Netware notes412442
+Node: Frequently asked questions415002
+Node: Documentation415625
+Node: Building420455
+Node: Linking427480
+Node: Running431752
+Node: Files445902
+Node: Related software448898
+Ref: Related software-Footnote-1485171
+Node: References485412
+Node: Copying488005
+Node: Function index515894
+Node: Index518152
 
 End Tag Table

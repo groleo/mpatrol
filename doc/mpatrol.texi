@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.160 2000-12-26 10:35:18 graeme Exp $
+@c $Id: mpatrol.texi,v 1.161 2001-01-04 22:24:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.3
 @set VERSION 1.3.3
-@set UPDATED 26th December, 2000
+@set UPDATED 4th January, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -215,7 +215,9 @@ it.
 Finally, I'd like to thank Stephan Springl (@email{springl@@bfw-online.de}) for
 his help on reading debugging information from object files via the GNU BFD
 library, and Alexander Barton (@email{abarton@@innotrac.com}) and Dave Gibson
-(@email{david@@epc.co.uk}) for their help on writing thread-safe code.
+(@email{david@@epc.co.uk}) for their help on writing thread-safe code.  Roger
+Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
+command and also the idea for the @code{MP_USE_ATEXIT} feature macro.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -791,8 +793,9 @@ copying them.
 @item
 Copy the @command{mpatrol}, @command{mprof}, @command{mptrace} and
 @command{mleak} programs that have been built into your local bin directory.
-You may also wish to copy the @command{mpsym} and @command{mpedit} commands to
-your local bin directory as well if your system supports Bourne shell scripts.
+You may also wish to copy the @command{mpsym}, @command{mpedit} and
+@command{hexwords} commands to your local bin directory as well if your system
+supports Bourne shell scripts.
 
 @item
 Go up two directory levels into the @file{src} directory and copy the

@@ -113,7 +113,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.3 of the mpatrol manual for version
-1.3.3, 26th December, 2000.
+1.3.3, 4th January, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -217,7 +217,9 @@ it.
 <p>Finally, I'd like to thank Stephan Springl (<a href="mailto:springl@bfw-online.de">springl@bfw-online.de</a>) for
 his help on reading debugging information from object files via the GNU BFD
 library, and Alexander Barton (<a href="mailto:abarton@innotrac.com">abarton@innotrac.com</a>) and Dave Gibson
-(<a href="mailto:david@epc.co.uk">david@epc.co.uk</a>) for their help on writing thread-safe code.
+(<a href="mailto:david@epc.co.uk">david@epc.co.uk</a>) for their help on writing thread-safe code.  Roger
+Keane (<a href="mailto:rgr@bcs-inc.com">rgr@bcs-inc.com</a>) provided the perl code in the <code>mpsym</code>
+command and also the idea for the <code>MP_USE_ATEXIT</code> feature macro.
 
 <p>Oh, and always remember to do final release builds without the mpatrol library
 as the library is much slower than normal malloc implementations and uses much
@@ -705,8 +707,9 @@ copying them.
 
 <li>Copy the <code>mpatrol</code>, <code>mprof</code>, <code>mptrace</code> and
 <code>mleak</code> programs that have been built into your local bin directory. 
-You may also wish to copy the <code>mpsym</code> and <code>mpedit</code> commands to
-your local bin directory as well if your system supports Bourne shell scripts.
+You may also wish to copy the <code>mpsym</code>, <code>mpedit</code> and
+<code>hexwords</code> commands to your local bin directory as well if your system
+supports Bourne shell scripts.
 
 <li>Go up two directory levels into the <code>src</code> directory and copy the
 <code>mpatrol.h</code> header file into your local include directory.
