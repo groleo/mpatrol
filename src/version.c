@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.2 1999-10-06 00:10:34 graeme Exp $"
+#ident "$Id: version.c,v 1.3 1999-10-09 23:10:17 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,7 +60,7 @@ MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (11.10.99)";
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (11th October 1999)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (11 October 1999)";
 
 #endif /* TARGET */
 
