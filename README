@@ -1,10 +1,11 @@
 README FOR THE MPATROL LIBRARY
 
 
-This document contains an overview of the mpatrol library.  For instructions on
-how to build and install the mpatrol library, see INSTALL.  The documentation
-for the library currently exists as a set of UNIX manual pages located in the
-man directory or in Texinfo format located in the doc directory.
+This file contains an overview of the mpatrol library.  The documentation for
+the library currently exists as a manual in TeXinfo format located in the doc
+directory or as a set of UNIX manual pages located in the man directory.  For
+instructions on how to build and install the mpatrol library see the manual.
+For a table of performance figures, see the file NOTES.
 
 
 Introduction
@@ -16,229 +17,24 @@ Introduction
     amount of programming expertise and a knowledge of how to run a command
     line compiler and linker before you should attempt to use this.
 
+    Along with providing a comprehensive and configurable log of all dynamic
+    memory operations that occurred during the lifetime of a program, the
+    mpatrol library performs extensive checking to detect any misuse of
+    dynamically allocated memory.  All of this functionality can be integrated
+    into existing code through the inclusion of a single header file at
+    compile-time.  On UNIX platforms this may not even be necessary as the
+    mpatrol library can be linked with existing object files at link-time or,
+    on some platforms, even dynamically linked with existing programs at
+    run-time.
 
-Overview of features
-
-    An overall list of features contained in the mpatrol library is given below.
-    This is not intended to be exhaustive since the best way to see what the
-    library does is to read the documentation and try it out.
-
-      * Written for UNIX, AmigaOS, Windows and Netware platforms.
-
-      * Can be built as archive, shared and/or thread-safe libraries on systems
-        that support them, or even as one large object file.
-
-      * Details of memory allocations and free memory are stored internally as
-        a tree structure for speed and also to allow the best fit allocation
-        algorithm to be used.  This also enables the library to perform
-        intelligent resizing of memory allocations and can be used to quickly
-        determine if an address has been allocated on the heap.
-
-      * Contains 13 replacement C dynamic memory allocation functions:
-
-            malloc()   - ANSI - Allocates memory.
-            calloc()   - ANSI - Allocates zero-filled memory.
-            memalign() - UNIX - Allocates memory with a specified alignment.
-            valloc()   - UNIX - Allocates page-aligned memory.
-            pvalloc()  - UNIX - Allocates a number of pages.
-            strdup()   - UNIX - Duplicates a string.
-            strndup()  - OLD  - Duplicates a string with a maximum length.
-            strsave()  - OLD  - Duplicates a string.
-            strnsave() - OLD  - Duplicates a string with a maximum length.
-            realloc()  - ANSI - Resizes memory.
-            recalloc() - OLD  - Resizes memory allocated by calloc().
-            free()     - ANSI - Frees memory.
-            cfree()    - OLD  - Frees memory allocated by calloc().
-
-      * Contains 4 replacement C++ dynamic memory allocation functions:
-
-            operator new      - Allocates memory.
-            operator new[]    - Allocates memory for an array.
-            operator delete   - Frees memory.
-            operator delete[] - Frees memory allocated by operator new[].
-
-      * Contains support for a user-defined low-memory handler function,
-        including a replacement for the C++ function, set_new_handler().
-
-      * Contains support for user-defined prologue and epilogue callback
-        functions, which get called before and after every memory allocation,
-        reallocation or deallocation.
-
-      * A function is provided to return as much information as possible about
-        a given memory allocation, and can be called at any time during program
-        execution.
-
-      * A function is provided to display library settings and heap usage
-        statistics, including peak memory usage.  This information is also
-        displayed at program termination.
-
-      * The library reads any user-controllable options at run-time from an
-        environment variable, but this does not have to be set as defaults will
-        then be used.  This prevents having to recompile anything in order to
-        change any library settings.  An option exists to display a quick-
-        reference summary of all of the recognised options to the standard error
-        file stream.
-
-      * All diagnostics and logging are sent to a file in the current directory,
-        but this can be overridden, including forcing the log file to be the
-        standard output or standard error file streams.
-
-      * Options exist to log details of every memory allocation, reallocation or
-        deallocation when they occur.
-
-      * Options exist to halt the program at a specific memory allocation,
-        reallocation or deallocation on systems that support the trap signal.
-        This can be extremely useful when running the program under a debugger.
-
-      * On UNIX platforms, the mmap() function can optionally be used to
-        allocate memory instead of the sbrk() function, but only if the system
-        supports it.  This can be useful if the mpatrol library clashes with
-        another malloc library that uses sbrk() to allocate heap memory.
-
-      * All newly-allocated memory that is not allocated by the calloc() or
-        recalloc() functions will be pre-filled with a non-zero value in order
-        to catch out programs that wrongly assume that all newly-allocated
-        memory is zeroed.  This value can be modified at run-time.
-
-      * Can automatically check to see if there have been any illegal writes to
-        bytes located just before and after every memory allocation through the
-        use of overflow buffers.  The size of such overflow buffers and the
-        value to pre-fill them with can be modified at run-time.  The checks
-        will be performed before every memory allocation call to ensure that
-        nothing has overwritten the overflow buffers, but a function is also
-        provided to perform additional checks under the programmer's control
-        and an option exists to specify a range in which checks will be
-        performed.
-
-      * On systems that support them, watch point areas can be used instead of
-        overflow buffers so that every read and write to memory is checked to
-        ensure that it is not within an overflow buffer.
-
-      * Can automatically check to see if there have been any illegal writes to
-        free memory blocks.  The value to pre-fill free memory blocks with can
-        be modified at run-time.  The check will be performed before every
-        memory allocation call to ensure that nothing has overwritten the free
-        memory block, but a function is also provided to perform additional
-        checks under the programmer's control and an option exists to specify a
-        range in which checks will be performed.
-
-      * On systems that support memory protection, every memory allocation can
-        optionally be allocated at least one page of memory.  That way, any
-        free memory blocks can be made read and write protected so that nothing
-        can access free memory on the heap.  An option is provided to specify
-        whether all memory allocations should be allocated at the start or at
-        the end of such pages, and the bytes left over within the pages become
-        overflow buffers.
-
-      * All freed memory allocations can optionally be prevented from being
-        returned to the free memory pool.  This is useful for detecting if use
-        is being made of freed memory just after a memory allocation has been
-        freed.  The contents of the memory allocation can either be preserved
-        or can be pre-filled with a value in order to detect illegal writes to
-        the freed memory allocation.
-
-      * The internal data structures used by the library are kept separate from
-        the rest of the memory allocations.  On systems that support memory
-        protection, all of these internal data structures will be
-        write-protected in order to prevent corruption by the calling program.
-        This feature can be overridden at run-time as it can slow the program
-        down.
-
-      * Signals are always saved and restored on entry to each library function
-        and errno is set to ENOMEM if memory cannot be allocated.
-
-      * On systems that support memory protection, the library attempts to
-        detect any illegal memory accesses and display as much information
-        as it can obtain about the address in question and where the illegal
-        memory access occurred.
-
-      * A call stack traceback from any function performing a memory allocation
-        is stored if the library supports this feature on the system it is being
-        run on.  This information can then be displayed when information about a
-        specific memory allocation is required.  Two different call stack
-        traceback implementations are provided.
-
-      * Symbol table details from executable files and shared libraries are
-        automatically read on systems that support this feature in order to make
-        the call stack tracebacks more meaningful.  An option also exists to
-        display a complete list of the symbols that were read by the library at
-        program termination.
-
-      * If the library is unable to automatically determine a program's
-        executable filename to read symbols from then an option exists to
-        specify the full path to the program's executable file.
-
-      * An option exists to change the default alignment used for general-
-        purpose memory allocations.
-
-      * Contains support for a user-defined limit to available memory which can
-        be useful for stress-testing a program in simulated low memory
-        conditions.
-
-      * An option exists to display a complete memory map of the heap at program
-        termination.  A function to do this is also available to call at any
-        point during program execution.
-
-      * Options exist to display all freed and unfreed memory allocations at
-        program termination in order to detect memory leaks.
-
-      * An option exists to abort the program with a failure condition if there
-        are more than a specified number of unfreed memory allocations at
-        program termination.  This could be useful for batch testing in order to
-        check that all tests free up most of their allocated memory.
-
-      * Functions always report if their arguments are illegal in order to
-        pinpoint any errors, and options exist to perform rigorous checking of
-        arguments when allocating, reallocating and freeing memory.  In
-        addition, checking is performed to ensure that memory allocated by
-        operator new[] is not freed with free() for example.
-
-      * The type of function performing a memory allocation is always stored
-        along with the allocation, as well as the file and line number it was
-        called from.  If compiled with gcc, the function name will also be
-        stored and the thread identifier will be stored if using the thread-safe
-        library.
-
-      * The library uses a header file to redefine the memory allocation
-        functions as macros in order to obtain more information about where they
-        were called from.  This is not strictly required on UNIX platforms,
-        since the library automatically redefines the default system memory
-        allocation functions.
-
-      * A shell script is supplied for UNIX platforms to run a program that
-        was linked with the mpatrol library with any specified options on the
-        command line.  On some UNIX platforms, an option also exists to override
-        the default memory allocation routines for any dynamically-linked
-        program that was not previously linked with the mpatrol library.
-
-      * A small test suite is provided in order to test basic features.
-
-      * User documentation is currently available in Texinfo format as well as
-        UNIX manual pages.
+    All logging and tracing output from the mpatrol library is sent to a
+    separate log file in order to keep its diagnostics separate from any that
+    the program being tested might generate.  A wide variety of library settings
+    can also be changed at run-time via an environment variable, thus removing
+    the need to recompile or relink in order to change the library's behaviour.
 
 
 Further information
-
-    I first started writing this library a few years ago when the company I work
-    for sent me out to a customer who had reported a memory leak, which he
-    expected was coming from the code generated by our C++ compiler.  A few
-    years on and the library has changed dramatically from its first beginnings,
-    but I thought I'd release it publicly in case anyone else found it useful.
-
-    When writing the library, I placed more emphasis on the quantity and quality
-    of information about allocated memory rather than the speed and efficiency
-    of allocating the actual memory.  This means that the library will use
-    dramatically more memory than normal dynamic memory allocation libraries and
-    can slow down to a crawl depending on which options you use.  However, the
-    end results are likely to be accurate and reliable, and in most cases the
-    library will run quite happily at a sane speed.
-
-    The mpatrol library is by no means the only library of its kind.  Solaris
-    7 has no less that 6 different malloc libraries, and there are plenty
-    available as freeware or as commercial products.  Try to keep in mind that
-    mpatrol comes with absolutely no warranty and so if it doesn't work for you
-    and you need a fast solution, try some of the other libraries or products
-    available.
 
     Due to their very nature, problems with dynamic memory allocations are
     notoriously difficult to reproduce and debug, and this is likely to be the
@@ -255,12 +51,11 @@ Further information
     about once or twice a week, so don't expect an immediate response.  I can
     also be reached at <graeme@epc.co.uk> but that is my work e-mail address.
 
+    Oh, and always remember to do final release builds without the mpatrol
+    library as the library is much slower than normal malloc implementations and
+    uses much more memory.
+
     Happy debugging!
 
     Graeme Roy, 11th October, 1999.
     Edinburgh, Scotland.
-
-    ---
-
-    All product names mentioned in the documentation and source code for this
-    library are the trademarks of their respective owners.
