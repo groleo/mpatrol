@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.23 2001-02-26 00:32:19 graeme Exp $
+ * $Id: diag.h,v 1.24 2001-03-04 12:17:37 graeme Exp $
  */
 
 
@@ -49,6 +49,7 @@
 
 typedef enum errortype
 {
+    ET_NONE,   /* no error has occurred */
     ET_ALLOVF, /* allocation %1 has a corrupted overflow buffer at %2 */
     ET_ALLZER, /* attempt to create an allocation of size 0 */
     ET_BADALN, /* alignment %1 is not a power of two */
