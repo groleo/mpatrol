@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.51 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: diag.c,v 1.52 2001-01-15 23:14:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -760,6 +760,21 @@ __mp_printloc(infonode *n)
 }
 
 
+/* Display the type of data that is stored in the memory allocation along
+ * with the number of objects stored.
+ */
+
+MP_GLOBAL
+void
+__mp_printtypeinfo(infonode *n, size_t s)
+{
+    __mp_diag("(%s", n->data.typestr);
+    if ((s /= n->data.typesize) > 1)
+        __mp_diag(" x %lu", s);
+    __mp_diag(")");
+}
+
+
 /* Display the name of a symbol associated with a particular address.
  */
 
@@ -879,6 +894,11 @@ __mp_printalloc(symhead *y, allocnode *n)
     __mp_printtype(m);
     __mp_diag(" ");
     __mp_printloc(m);
+    if ((m->data.typestr != NULL) && (m->data.typesize != 0))
+    {
+        __mp_diag(" ");
+        __mp_printtypeinfo(m, n->size);
+    }
     __mp_diag("\n");
     __mp_printaddrs(y, m->data.stack);
 }
@@ -1207,6 +1227,11 @@ __mp_printmap(infohead *h)
             __mp_printtype(m);
             __mp_diag(" ");
             __mp_printloc(m);
+            if ((m->data.typestr != NULL) && (m->data.typesize != 0))
+            {
+                __mp_diag(" ");
+                __mp_printtypeinfo(m, n->size);
+            }
             if (h->alloc.oflow > 0)
             {
                 s = l - n->size - s;

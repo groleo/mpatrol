@@ -96,6 +96,7 @@ MP_EXPORT void __mp_printmemory(void *, size_t);
 MP_EXPORT void __mp_printsize(size_t);
 MP_EXPORT void __mp_printtype(infonode *);
 MP_EXPORT void __mp_printloc(infonode *);
+MP_EXPORT void __mp_printtypeinfo(infonode *, size_t);
 MP_EXPORT void __mp_printsymbol(symhead *, void *);
 MP_EXPORT void __mp_printsymbols(symhead *);
 MP_EXPORT void __mp_printaddrs(symhead *, addrnode *);
