@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.250 2001-09-17 22:25:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.251 2001-09-25 22:16:22 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.13
 @set VERSION 1.4.8
-@set UPDATED 17th September, 2001
+@set UPDATED 25th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -3743,10 +3743,7 @@ mpatrol log file.  It also makes use of several UNIX text processing commands,
 including @command{perl} if it is installed, in order to extract information
 from the debugger's output and from the log file.  As a result, the
 @command{mpsym} command is only likely to work on UNIX platforms or on systems
-which have the necessary commands installed.  By default, it is set up to work
-on 32-bit platforms, but this can be changed by altering the @code{POINTER}
-definition in the @file{mpsym} file itself (this is only necessary if
-@command{perl} is not installed).
+which have the necessary commands installed.
 
 @node The mpedit command, The hexwords command, The mpsym command, Utilities
 @section The @command{mpedit} command
