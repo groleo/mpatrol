@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.39 2000-06-23 19:29:11 graeme Exp $"
+#ident "$Id: inter.c,v 1.40 2000-07-13 23:42:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -168,7 +168,7 @@ void __mp_init(void)
          */
         if (memhead.fseed == 0)
             memhead.fseed = (unsigned long) time(NULL);
-        srand(memhead.fseed);
+        srand((unsigned int) memhead.fseed);
         /* Attempt to open the log file.
          */
         if (!__mp_openlogfile(memhead.log))
