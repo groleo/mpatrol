@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.8 2000-01-09 20:35:16 graeme Exp $"
+#ident "$Id: memory.c,v 1.9 2000-01-27 21:33:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -608,6 +608,79 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
     for (p = (char *) t, t = (char *) t + l; p < (char *) t; p++)
         if (*p != c)
             return p;
+    return NULL;
+}
+
+
+/* Compare two blocks of memory.
+ */
+
+MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
+{
+    char *p;
+    size_t n;
+
+    /* This used to be a simple loop to compare each byte individually, but
+     * that is less efficient than attempting to compare words at a time.
+     * Therefore, if the number of bytes to compare is larger than a certain
+     * number then this routine will attempt to compare as many words as
+     * possible.
+     */
+    if ((s == t) || (l == 0))
+        return NULL;
+    n = (unsigned long) s & (sizeof(int) - 1);
+    if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
+        (l > sizeof(int) * sizeof(int)))
+    {
+        /* We can only compare words if the two blocks have the same alignment.
+         * This also guarantees that there is at least one word of difference
+         * between the two pointers.
+         */
+        if ((n > 0) && ((n = sizeof(int) - n) > l))
+            n = l;
+        /* Compare all bytes that occur before the first word.
+         */
+        while (n > 0)
+        {
+            if (*((char *) t) != *((char *) s))
+                return t;
+            s = (char *) s + 1;
+            t = (char *) t + 1;
+            n--;
+            l--;
+        }
+        /* Compare all words that occur in the memory blocks.
+         */
+        while (l >= sizeof(int))
+        {
+            if (*((int *) t) != *((int *) s))
+            {
+                /* Locate the exact byte that caused the test to fail.
+                 */
+                for (p = (char *) t, n = 0; n < sizeof(int); p++, n++)
+                    if (*p != ((char *) s)[n])
+                        return p;
+                /* The above loop should never exit, but just in case it
+                 * does, return the address of the word that caused the test
+                 * to fail.
+                 */
+                return t;
+            }
+            s = (int *) s + 1;
+            t = (int *) t + 1;
+            l -= sizeof(int);
+        }
+    }
+    /* Compare all remaining bytes.
+     */
+    while (l > 0)
+    {
+        if (*((char *) t) != *((char *) s))
+            return t;
+        s = (char *) s + 1;
+        t = (char *) t + 1;
+        l--;
+    }
     return NULL;
 }
 
