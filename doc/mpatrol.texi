@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.216 2001-05-22 20:42:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.217 2001-05-22 21:02:18 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -241,10 +241,15 @@ dynamic linker support functions for loading shared libraries.  Both Alexander
 Barton (@email{abarton@@innotrac.com}) and Dave Gibson
 (@email{david@@epc.co.uk}) helped to make mpatrol thread-safe.  Roger Keane
 (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym} command
-and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris Makushkin
+and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve McIntyre
+(@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the @code{fork()}
+problem and provided example code on how to fix it.  Boris Makushkin
 (@email{oberon@@antibiotic.ru}) requested, helped with, and provided initial
-testing for the FreeBSD port and Ivan Finch (@email{i.finch@@rl.ac.uk}) did the
-same for the Tru64 port.
+testing for the FreeBSD port, and Ivan Finch (@email{i.finch@@rl.ac.uk}) and
+Andreas Schallenberg (@email{andreas.schallenberg@@informatik.uni-oldenburg.de})
+did the same for the Tru64 and SuSE ports.  Both Aleksandar Donev
+(@email{donev@@pa.msu.edu}) and Van Snyder (@email{vsnyder@@math.jpl.nasa.gov})
+provided suggestions and code for using mpatrol with FORTRAN.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today
@@ -5823,6 +5828,13 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
+operating system:       UNIX
+system variant:         Linux
+processor architecture: Intel 80x86
+processor word size:    32-bit
+object file format:     BFD
+dynamic linker type:    SVR4
+
 Log file generated on Tue May 22 23:57:23 2001
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.4
@@ -5896,9 +5908,10 @@ total warnings:    0
 total errors:      1
 @end smallexample
 
-Ignoring the copyright blurb at the top, let's first take a look at the initial
-log message from the library.  I've annotated each of the items with a number
-that corresponds to the descriptions below.
+Ignoring the copyright blurb and target environment information at the top of
+the file, let's first take a look at the initial log message from the library.
+I've annotated each of the items with a number that corresponds to the
+descriptions below.
 
 @smallexample
  (1)    (2)   (3)    (4)       (5)     (6)    (7)  (8)
@@ -11154,6 +11167,17 @@ The @option{--dynamic} option to the @command{mpatrol} command does not work
 unless @file{libelf.so} is available.
 @end itemize
 
+@cindex SuSE
+@item
+SuSE Linux 7.1, Intel Pentium II, BFD, @command{g++}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{--dynamic} option to the @command{mpatrol} command does not work
+unless @file{libiberty.so} is available.
+@end itemize
+
 @cindex LynxOS, Intel 80x86
 @item
 LynxOS 3.0.0, Intel Pentium Pro, BFD, @command{gcc}
@@ -11558,6 +11582,11 @@ significant differences.  For example, the dynamic linker used on BSD systems is
 slightly different from the dynamic linker used on SunOS, but they both use
 @code{DYNLINK=DYNLINK_BSD} because the underlying dynamic linker uses the same
 data structures --- they are just named differently on the two systems.
+
+Note that there are also corresponding @code{*_STR} macros for all six of the
+above target macros.  These are used when displaying the target environment
+information in the mpatrol log file so they should be as accurate as possible
+so as to avoid misleading users.
 
 Finally, you should determine if it is necessary to define any special macros
 in order to obtain all of the required definitions from the system header files.
