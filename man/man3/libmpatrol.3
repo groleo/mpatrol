@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.19 2001-03-05 18:55:32 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.20 2001-03-06 19:33:09 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "5 March 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "6 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -130,6 +130,24 @@ unsigned long __mp_snapshot(void);
 \}
 .if t \{size_t __mp_iterateall(int (*func)(const void *, void *), void *data);
 \}
+.if n \{int __mp_addallocentry(const char *file, unsigned long line,
+                       size_t size);
+\}
+.if t \{int __mp_addallocentry(const char *file, unsigned long line, size_t size);
+\}
+.if n \{int __mp_addfreeentry(const char *file, unsigned long line,
+                      size_t size);
+\}
+.if t \{int __mp_addfreeentry(const char *file, unsigned long line, size_t size);
+\}
+void __mp_clearleaktable(void);
+int __mp_startleaktable(void);
+int __mp_stopleaktable(void);
+.if n \{void __mp_leaktable(size_t size, int opt,
+                    unsigned char flags);
+\}
+.if t \{void __mp_leaktable(size_t size, int opt, unsigned char flags);
+\}
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 int __mp_stats(__mp_heapinfo *info);
@@ -209,6 +227,16 @@ read from the executable file and also possibly from any required shared
 libraries, and if the \fBUSEDEBUG\fP option is used and is available then the
 debugging section in the executable file will be read to determine additional
 source-level information.
+.PP
+On systems that support it, global functions (with C linkage) in an executable
+file or shared library whose names begin with \fB__mp_init_\fP will be noted
+when the mpatrol library first starts up and is reading the symbols.  Such
+functions will then be called as soon as the mpatrol library is initialised,
+which can be useful if the initialisation occurs before \fBmain\fP is called.
+These functions must accept no arguments and must return no value.  Note that
+this feature will have no effect if the symbol table is stripped from the
+executable file or shared library before the program is run, and the order in
+which such functions will be called if there are more than one is unspecified.
 .PP
 Memory allocation profiling is supported, with statistics about every memory
 allocation and deallocation that was made during the execution of a program
@@ -686,7 +714,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 30 functions are available as support routines for additional
+The following 36 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -835,6 +863,58 @@ stopped.  The \fIdata\fP argument is passed directly to \fIfunc\fP as its second
 argument and is not read by the mpatrol library.  Note that unlike
 \fB__mp_iterate\fP, this function will also include internal memory allocations
 made by the mpatrol library and is intended for walking the entire heap.
+.TP
+\fB__mp_addallocentry\fP
+Adds an entry representing an allocation of size \fIsize\fP to the leak table.
+The allocation will be associated with a source filename of \fIfile\fP and a
+line number of \fIline\fP if the former is non-\fBNULL\fP and the latter is
+non-zero.  If \fIfile\fP is non-\fBNULL\fP and \fIline\fP is \fI0\fP then
+\fIfile\fP represents the name of the function that made the allocation.  If
+\fIfile\fP is \fBNULL\fP and \fIline\fP is non-zero then \fIline\fP represents
+the code address at which the allocation was made.  If \fIfile\fP is \fBNULL\fP
+and \fIline\fP is \fI0\fP then the location of the allocation is unknown.
+Returns \fI1\fP on success and \fI0\fP if there was no more memory available to
+add another entry to the leak table.
+.TP
+\fB__mp_addfreeentry\fP
+Adds an entry representing a deallocation of size \fIsize\fP to the leak table.
+The deallocation will be associated with a source filename of \fIfile\fP and a
+line number of \fIline\fP if the former is non-\fBNULL\fP and the latter is
+non-zero.  If \fIfile\fP is non-\fBNULL\fP and \fIline\fP is \fI0\fP then
+\fIfile\fP represents the name of the function that made the deallocation.  If
+\fIfile\fP is \fBNULL\fP and \fIline\fP is non-zero then \fIline\fP represents
+the code address at which the deallocation was made.  If \fIfile\fP is
+\fBNULL\fP and \fIline\fP is \fI0\fP then the location of the deallocation is
+unknown.  Returns \fI1\fP on success and \fI0\fP if there was no existing
+allocation from the same location in the leak table.
+.TP
+\fB__mp_clearleaktable\fP
+Deletes all of the existing entries in the leak table, making it empty.  This
+will also affect the behaviour of the \fBLEAKTABLE\fP option since that option
+will then only be able to show a summary of the entries in the leak table that
+were collected after the last call to this function rather than from the start
+of program execution.
+.TP
+\fB__mp_startleaktable\fP
+Starts the automatic logging of all memory allocations, reallocations and
+deallocations to the leak table.  Returns \fI1\fP if such logging was already
+being performed and \fI0\fP otherwise.
+.TP
+\fB__mp_stopleaktable\fP
+Stops the automatic logging of all memory allocations, reallocations and
+deallocations to the leak table.  Returns \fI1\fP if such logging was already
+being performed and \fI0\fP otherwise.
+.TP
+\fB__mp_leaktable\fP
+Displays a summary of up to \fIsize\fP entries from the leak table, or all
+entries if \fIsize\fP is \fI0\fP.  If \fIopt\fP is \fIMP_LT_ALLOCATED\fP then
+all allocated entries will be displayed, if \fIopt\fP is \fIMP_LT_FREED\fP then
+all freed entries will be displayed and if \fIopt\fP is \fIMP_LT_UNFREED\fP then
+all unfreed entries will be displayed.  The summary is normally sorted in
+descending order of total bytes from each entry, but this can be changed by
+setting \fIflags\fP to any combination of \fIMP_LT_COUNTS\fP (to sort by the
+number of occurrences in each entry) and \fIMP_LT_BOTTOM\fP (to sort in
+ascending order).
 .TP
 \fB__mp_memorymap\fP
 If \fIstats\fP is non-zero then the current statistics of the mpatrol library
@@ -1145,6 +1225,12 @@ Displays a quick-reference option summary to the \fBstderr\fP file stream.
 Specifies the limit in bytes up to which memory allocations should be classified
 as large allocations for profiling purposes.  This limit must be greater than
 the small and medium bounds.  Default value: \fBLARGEBOUND\fP=\fI2048\fP.
+.TP
+\fBLEAKTABLE\fP
+Specifies that the leak table should be automatically used and a leak table
+summary should be displayed at the end of program execution.  The summary shows
+a flat profile of all unfreed memory allocations since the start of the program,
+or since the last call to \fB__mp_clearleaktable\fP if that function was called.
 .TP
 \fBLIMIT\fP=\fIunsigned integer\fP
 Specifies the limit in bytes at which all memory allocations should fail if the
