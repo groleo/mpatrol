@@ -51,6 +51,7 @@ void display(void *p)
     fprintf(stderr, "type:     %lu\n", d.type);
     fprintf(stderr, "alloc:    %lu\n", d.alloc);
     fprintf(stderr, "realloc:  %lu\n", d.realloc);
+    fprintf(stderr, "event:    %lu\n", d.event);
     fprintf(stderr, "func:     %s\n", d.func ? d.func : "NULL");
     fprintf(stderr, "file:     %s\n", d.file ? d.file : "NULL");
     fprintf(stderr, "line:     %lu\n", d.line);
