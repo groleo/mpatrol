@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.6 2000-01-28 00:56:03 graeme Exp $"
+#ident "$Id: malloc.c,v 1.7 2000-01-30 20:31:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -221,6 +221,24 @@ void *memmove(void *q, void *p, size_t l)
 void bcopy(void *p, void *q, size_t l)
 {
     __mp_copymem(p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
+}
+
+
+/* Look for the first occurrence of a character in a block of memory.
+ */
+
+void *memchr(void *p, int c, size_t l)
+{
+    return __mp_locatemem(p, l, NULL, c, AT_MEMCHR, NULL, NULL, 0, 1);
+}
+
+
+/* Attempt to locate the position of one block of memory in another block.
+ */
+
+void *memmem(void *p, size_t l, void *q, size_t m)
+{
+    return __mp_locatemem(p, l, q, m, AT_MEMMEM, NULL, NULL, 0, 1);
 }
 
 

@@ -144,6 +144,8 @@ typedef enum __mp_alloctype
     MP_AT_MEMCPY,    /* memcpy() */
     MP_AT_MEMMOVE,   /* memmove() */
     MP_AT_BCOPY,     /* bcopy() */
+    MP_AT_MEMCHR,    /* memchr() */
+    MP_AT_MEMMEM,    /* memmem() */
     MP_AT_MEMCMP,    /* memcmp() */
     MP_AT_BCMP,      /* bcmp() */
     MP_AT_MAX
@@ -240,6 +242,12 @@ __mp_allocinfo;
 #ifdef bcopy
 #undef bcopy
 #endif /* bcopy */
+#ifdef memchr
+#undef memchr
+#endif /* memchr */
+#ifdef memmem
+#undef memmem
+#endif /* memmem */
 #ifdef memcmp
 #undef memcmp
 #endif /* memcmp */
@@ -291,6 +299,12 @@ __mp_allocinfo;
 #define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
                                            __PRETTY_FUNCTION__, __FILE__, \
                                            __LINE__, 0)
+#define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (c), MP_AT_MEMCHR, \
+                                       __PRETTY_FUNCTION__, __FILE__, \
+                                       __LINE__, 0)
+#define memmem(p, l, q, m) __mp_locatemem((p), (l), (q), (m), MP_AT_MEMMEM, \
+                                          __PRETTY_FUNCTION__, __FILE__, \
+                                          __LINE__, 0)
 #define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, \
                                         __PRETTY_FUNCTION__, __FILE__, \
                                         __LINE__, 0)
@@ -335,6 +349,10 @@ __mp_allocinfo;
                                       __FILE__, __LINE__, 0)
 #define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, NULL, \
                                            __FILE__, __LINE__, 0)
+#define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (c), MP_AT_MEMCHR, \
+                                       NULL, __FILE__, __LINE__, 0)
+#define memmem(p, l, q, m) __mp_locatemem((p), (l), (q), (m), MP_AT_MEMMEM, \
+                                          NULL, __FILE__, __LINE__, 0)
 #define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, NULL, \
                                         __FILE__, __LINE__, 0)
 #define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, NULL, \
@@ -377,6 +395,11 @@ __asm void *__mp_copymem(register __a0 void *, register __a1 void *,
                          register __d0 size_t, register __d1 __mp_alloctype,
                          register __a2 char *, register __a3 char *,
                          register __d2 unsigned long, register __d3 size_t);
+__asm void *__mp_locatemem(register __a0 void *, register __d0 size_t,
+                           register __a1 void *, register __d1 size_t,
+                           register __d2 __mp_alloctype, register __a2 char *,
+                           register __a3 char *, register __d3 unsigned long,
+                           register __d4 size_t);
 __asm int __mp_comparemem(register __a0 void *, register __a1 void *,
                           register __d0 size_t, register __d1 __mp_alloctype,
                           register __a2 char *, register __a3 char *,
@@ -405,6 +428,8 @@ void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype, char *, char *,
                   unsigned long, size_t);
 void *__mp_copymem(void *, void *, size_t, __mp_alloctype, char *, char *,
                    unsigned long, size_t);
+void *__mp_locatemem(void *, size_t, void *, size_t, __mp_alloctype, char *,
+                     char *, unsigned long, size_t);
 int __mp_comparemem(void *, void *, size_t, __mp_alloctype, char *, char *,
                     unsigned long, size_t);
 int __mp_info(void *, __mp_allocinfo *);
