@@ -32,13 +32,18 @@
 #include "stack.h"
 #include "memory.h"
 #include "machine.h"
-#if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if !MP_BUILTINSTACK_SUPPORT
 #if MP_LIBRARYSTACK_SUPPORT
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_IRIX
 #include <exception.h>
 #include <ucontext.h>
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+#include <setjmp.h>
+#endif /* TARGET */
 #else /* MP_LIBRARYSTACK_SUPPORT */
+#if TARGET == TARGET_UNIX
 #include <setjmp.h>
 #if ARCH == ARCH_SPARC
 #include <ucontext.h>
@@ -46,12 +51,13 @@
 #define R_SP REG_SP
 #endif /* R_SP */
 #endif /* ARCH */
+#endif /* TARGET */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
-#endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
+#endif /* MP_BUILTINSTACK_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.13 2000-06-12 21:39:10 graeme Exp $"
+#ident "$Id: stack.c,v 1.14 2000-06-23 19:30:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -142,7 +148,7 @@ static void (*segvhandler)(int);
 /* Initialise the fields of a stackinfo structure.
  */
 
-MP_GLOBAL void __mp_newframe(stackinfo *s)
+MP_GLOBAL void __mp_newframe(stackinfo *s, unsigned int *f)
 {
     s->frame = s->addr = NULL;
 #if MP_BUILTINSTACK_SUPPORT
@@ -150,17 +156,22 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
         s->frames[s->index] = s->addrs[s->index] = NULL;
     s->index = 0;
 #elif MP_LIBRARYSTACK_SUPPORT
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     __mp_memset(&s->next, 0, sizeof(frameinfo));
 #elif SYSTEM == SYSTEM_IRIX
     __mp_memset(&s->next, 0, sizeof(struct sigcontext));
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    __mp_memset(&s->next, 0, sizeof(STACKFRAME));
+#endif /* TARGET */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
     s->next.sp = s->next.ra = 0;
 #else /* TARGET && ARCH */
     s->next = NULL;
 #endif /* TARGET && ARCH */
+    s->first = f;
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 }
 
@@ -328,9 +339,13 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #if MP_BUILTINSTACK_SUPPORT
     void *f;
 #elif MP_LIBRARYSTACK_SUPPORT
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     frameinfo f;
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    jmp_buf j;
+#endif /* TARGET */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
@@ -366,11 +381,12 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->index = MP_MAXSTACK;
     }
 #elif MP_LIBRARYSTACK_SUPPORT
-    /* HP/UX and IRIX provide a library for traversing function call stack
-     * frames since the stack frame format does not preserve frame pointers.
-     * On HP/UX this is done via a special section which can be read by
-     * debuggers.
+    /* HP/UX, IRIX and Windows platforms provide a library for traversing
+     * function call stack frames since the stack frame format does not
+     * necessarily preserve frame pointers.  On HP/UX this is done via a
+     * special section which can be read by debuggers.
      */
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     if (p->frame == NULL)
     {
@@ -437,6 +453,32 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         recursive = 0;
     }
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    if (p->frame == NULL)
+    {
+        setjmp(j);
+        p->next.AddrPC.Offset = ((_JUMP_BUFFER *) &j)->Eip;
+        p->next.AddrPC.Mode = AddrModeFlat;
+        p->next.AddrFrame.Offset = ((_JUMP_BUFFER *) &j)->Ebp;
+        p->next.AddrFrame.Mode = AddrModeFlat;
+        p->next.AddrStack.Offset = ((_JUMP_BUFFER *) &j)->Esp;
+        p->next.AddrStack.Mode = AddrModeFlat;
+    }
+    if (StackWalk(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(),
+        GetCurrentThread(), &p->next, NULL, NULL, SymFunctionTableAccess,
+        SymGetModuleBase, NULL) && p->next.AddrReturn.Offset)
+    {
+        p->frame = (void *) p->next.AddrFrame.Offset;
+        p->addr = (void *) p->next.AddrReturn.Offset;
+        r = 1;
+    }
+    else
+    {
+        p->frame = NULL;
+        p->addr = NULL;
+        __mp_memset(&p->next, 0, sizeof(STACKFRAME));
+    }
+#endif /* TARGET */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
@@ -451,20 +493,23 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     bushandler = signal(SIGBUS, stackhandler);
     segvhandler = signal(SIGSEGV, stackhandler);
     if (setjmp(environment))
-        __mp_newframe(p);
+        __mp_newframe(p, p->first);
     else
 #endif /* TARGET */
     {
         if (p->frame == NULL)
+            if (p->first == NULL)
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K
-            f = (unsigned int *) &p - 2;
+                f = (unsigned int *) &p - 2;
 #elif ARCH == ARCH_M88K
-            f = (unsigned int *) &p - 4;
+                f = (unsigned int *) &p - 4;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
-            f = (unsigned int *) &p - 6;
+                f = (unsigned int *) &p - 6;
 #elif ARCH == ARCH_SPARC
-            f = getframe();
+                f = getframe();
 #endif /* ARCH */
+            else
+                f = p->first;
         else
             f = (unsigned int *) p->next;
         if (p->frame = f)
@@ -501,7 +546,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     bushandler = signal(SIGBUS, stackhandler);
     segvhandler = signal(SIGSEGV, stackhandler);
     if (setjmp(environment))
-        __mp_newframe(p);
+        __mp_newframe(p, p->first);
     else
     {
         if (p->frame == NULL)

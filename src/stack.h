@@ -33,6 +33,12 @@
 #include "config.h"
 #include <stddef.h>
 #include <signal.h>
+#if !MP_BUILTINSTACK_SUPPORT
+#if MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_WINDOWS
+#include <windows.h>
+#include <imagehlp.h>
+#endif /* MP_LIBRARYSTACK_SUPPORT && TARGET */
+#endif /* MP_BUILTINSTACK_SUPPORT */
 
 
 #if !MP_BUILTINSTACK_SUPPORT
@@ -85,17 +91,22 @@ typedef struct stackinfo
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
     size_t index;              /* current stack index */
 #elif MP_LIBRARYSTACK_SUPPORT
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     struct frameinfo next;     /* next frame handle */
 #elif SYSTEM == SYSTEM_IRIX
     struct sigcontext next;    /* next frame handle */
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+    STACKFRAME next;           /* next frame handle */
+#endif /* TARGET */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
     struct frameinfo next;     /* next frame handle */
 #else /* TARGET && ARCH */
     void *next;                /* next frame handle */
 #endif /* TARGET && ARCH */
+    unsigned int *first;       /* first frame pointer */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 }
 stackinfo;
@@ -107,7 +118,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newframe(stackinfo *);
+MP_EXPORT void __mp_newframe(stackinfo *, unsigned int *);
 MP_EXPORT int __mp_getframe(stackinfo *);
 
 
