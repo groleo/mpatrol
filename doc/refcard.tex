@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.7 2000-10-19 17:24:57 graeme Exp $
+% $Id: refcard.tex,v 1.8 2000-10-19 20:54:58 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -265,16 +265,6 @@ as large allocations for profiling purposes.
 \begin{multicols}{3}
 
 \vskip 12pt
-
-All of the function definitions in \texttt{mpatrol.h} can be disabled by
-defining the \texttt{NDEBUG} preprocessor macro, which is the same macro used
-to control the behaviour of the \function{assert} function.  If \texttt{NDEBUG}
-is defined then no macro redefinition of functions will take place and all
-special mpatrol library functions will evaluate to empty statements.  It is
-intended that the \texttt{NDEBUG} preprocessor macro be defined in release
-builds.
-
-\vskip 12pt
 \heading{C dynamic memory allocation functions}
 \vskip 6pt
 
@@ -421,8 +411,18 @@ Displays a quick-reference option summary.
 \hfill See \option{LARGEBOUND}.
 \item[\flagpar{limit}{unsigned integer}]
 \hfill See \option{LIMIT}.
+\item[\flag{log-all}]
+\hfill See \option{LOGALL}.
+\item[\flag{log-allocs}]
+\hfill See \option{LOGALLOCS}.
 \item[\flagpar{log-file}{string}]
 \hfill See \option{LOGFILE}.
+\item[\flag{log-frees}]
+\hfill See \option{LOGFREES}.
+\item[\flag{log-memory}]
+\hfill See \option{LOGMEMORY}.
+\item[\flag{log-reallocs}]
+\hfill See \option{LOGREALLOCS}.
 \item[\flagpar{medium-bound}{unsigned integer}]
 \hfill See \option{MEDIUMBOUND}.
 \item[\flagpar{no-free}{unsigned integer}]
@@ -451,10 +451,18 @@ Displays a quick-reference option summary.
 \hfill See \option{REALLOCSTOP}.
 \item[\flag{safe-signals}]
 \hfill See \option{SAFESIGNALS}.
+\item[\flag{show-all}]
+\hfill See \option{SHOWALL}.
+\item[\flag{show-env}]
+Displays the contents of the \texttt{MPATROL\_OPTIONS} environment variable.
 \item[\flag{show-freed}]
-\hfill See \option{SHOWFREED} and \option{SHOWUNFREED}.
+\hfill See \option{SHOWFREED}.
 \item[\flag{show-map}]
-\hfill See \option{SHOWMAP} and \option{SHOWSYMBOLS}.
+\hfill See \option{SHOWMAP}.
+\item[\flag{show-symbols}]
+\hfill See \option{SHOWSYMBOLS}.
+\item[\flag{show-unfreed}]
+\hfill See \option{SHOWUNFREED}.
 \item[\flagpar{small-bound}{unsigned integer}]
 \hfill See \option{SMALLBOUND}.
 \item[\flagpar{unfreed-abort}{unsigned integer}]
@@ -479,8 +487,14 @@ their call site offset in bytes.
 \item[\flag{counts}]
 Specifies that certain tables should be sorted by the number of allocations or
 deallocations rather than the total number of bytes allocated or deallocated.
+\item[\flagpar{graph-file}{file}]
+Specifies that the allocation call graph should also be written to a graph
+specification file for later visualisation with \command{dot}.
 \item[\flag{help}]
 Displays a quick-reference option summary.
+\item[\flag{leaks}]
+Specifies that memory leaks rather than memory allocations are to be written to
+the graph specification file.
 \item[\flagpar{stack-depth}{depth}]
 Specifies the maximum stack depth to use when calculating if one call site has
 the same call stack as another call site.  This also specifies the maximum
