@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.36 2001-02-13 22:30:25 graeme Exp $"
+#ident "$Id: option.c,v 1.37 2001-03-05 22:28:06 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.36 2001-02-13 22:30:25 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.37 2001-03-05 22:28:06 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -119,6 +119,9 @@ static char *options_help[] =
     "LARGEBOUND", "unsigned integer",
     "", "Specifies the limit in bytes up to which memory allocations should be",
     "", "classified as large allocations for profiling purposes.",
+    "LEAKTABLE", NULL,
+    "", "Specifies that the leak table should be automatically used and a leak",
+    "", "table summary should be displayed at the end of program execution.",
     "LIMIT", "unsigned integer",
     "", "Specifies the limit in bytes at which all memory allocations should",
     "", "fail if the total allocated memory should increase beyond this.",
@@ -680,6 +683,14 @@ __mp_parseoptions(infohead *h)
                             h->prof.lbound = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "LEAKTABLE"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_LEAKTABLE;
+                }
                 else if (matchoption(o, "LIMIT"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
@@ -1200,6 +1211,18 @@ setflags(infohead *h, unsigned long f, int u)
                 else
                     h->flags &= ~FLG_SHOWUNFREED;
                 break;
+              case OPT_LEAKTABLE:
+                if (u == 0)
+                {
+                    h->flags |= FLG_LEAKTABLE;
+                    h->ltable.tracing = 1;
+                }
+                else
+                {
+                    h->flags &= ~FLG_LEAKTABLE;
+                    h->ltable.tracing = 0;
+                }
+                break;
               case OPT_ALLOWOFLOW:
                 if (u == 0)
                     h->flags |= FLG_ALLOWOFLOW;
@@ -1369,6 +1392,8 @@ getflags(infohead *h)
         f |= OPT_SHOWFREED;
     if (h->flags & FLG_SHOWUNFREED)
         f |= OPT_SHOWUNFREED;
+    if (h->flags & FLG_LEAKTABLE)
+        f |= OPT_LEAKTABLE;
     if (h->flags & FLG_ALLOWOFLOW)
         f |= OPT_ALLOWOFLOW;
     if (h->prof.profiling)
