@@ -1,0 +1,243 @@
+NOTES FOR THE MPATROL LIBRARY
+
+
+This document contains information about known bugs and limitations in the
+mpatrol library as well as listing potential future enhancements.  Guidelines
+on how to add support for new operating systems, processor architectures and
+object file formats to the library source code appear at the bottom of this
+file.
+
+Bugs should be reported to <mpatrol@cbmamiga.demon.co.uk> along with the
+details of the operating system, processor architecture and object file format
+that the mpatrol library is being used with - and don't forget to include the
+version of the mpatrol library you are using!  Keep in mind that I only have
+access to an Amiga running RedHat Linux/m68k 5.1 and AmigaOS 3.1, so I will be
+most likely unable to reproduce most of the system-specific bugs.  A bug report
+that comes with an associated fix will be most welcome.
+
+Enhancement requests and source code containing enhancements should also be sent
+to <mpatrol@cbmamiga.demon.co.uk>.  If you are planning to implement an
+enhancement, let me know first in case I am (or someone else is) working towards
+the same goal - that way, work won't be wasted.  If you wish to send me source
+code changes please send the changes as context diffs or in an e-mail attachment
+as a compressed tar archive.
+
+
+Notes for all platforms
+
+  * C++ support is very limited, and will only really work for old C++ code
+    due to the way the operators are overridden (i.e. there are no
+    exceptions versions of the functions and they are not defined in a
+    namespace).  There are also likely to be problems with the macros which
+    redefine malloc(), etc., since there may be member functions in code that
+    will mistakenly be redefined if their names match the macro definitions.
+    Note also that I haven't yet figured out a way to pass down the function,
+    filename and line number from a call to operator new, for example.  Perhaps
+    there isn't one and it would have to be done from within the compiler.
+
+  * The thread-safe code in the library doesn't yet work properly, probably
+    because of the recursion flag which is incremented or decremented before
+    the mutex is locked.  Hence, the threads test (tests/pass/test5.c) doesn't
+    work yet.
+
+  * Need to make the library re-entrant.  This could be achieved by moving the
+    static variables in memory.c, mutex.c, diag.c and option.c into the infohead
+    structure and then having an array of infohead structures from which to
+    allocate new memory headers when a new one is required.  This is only
+    necessary for Amiga shared libraries and Netware NLMs since UNIX and Windows
+    platforms allocate a new copy of the data section in a shared library or DLL
+    when it is opened by a new process.
+
+  * The current implementation of call stack traversal is limited and will only
+    likely work for unoptimised code.  A much better solution would be write the
+    implementation at a lower level in assembly, but this is much less portable.
+    Perhaps there is a library which can be used to perform this across many
+    operating systems and processor architectures, or maybe someone would like
+    to write one?  I can think of many applications that would benefit from such
+    a library besides this one.
+
+  * An alternative implementation for call stack traversal uses the functions
+    __builtin_frame_address() and __builtin_return_address() that are available
+    when the library is compiled with GCC.  However, they can only traverse a
+    number of stack frames at compile-time, not run-time so there is a maximum
+    number of stack frames that can be traversed at any one time.  The
+    implementation depends on both of these builtin functions returning NULL
+    when the top of stack is reached.  If this is not the case then this method
+    cannot be used.
+
+  * In object file formats that support nested symbols (such as ELF), the
+    current implementation will tend to show some shortcomings.  This is because
+    there is currently no nesting count in the function that deals with symbol
+    name lookup, so the wrong symbol name may be displayed in diagnostics.
+
+  * In object file formats that don't store the sizes of symbols (such as basic
+    COFF, or when using the GNU BFD library), the current implementation will
+    simply assume that the current symbol terminates at the beginning of the
+    next symbol in the virtual address space.
+
+  * Perhaps debugging information could be utilised when the library is reading
+    the symbol table from an executable file.  This could be used to add line
+    number information to the call stack, but could also be used to extend the
+    library to monitor static and stack variables.
+
+  * Script files similar to the mpatrol shell script provided for UNIX platforms
+    could be added for the other operating systems that the mpatrol library is
+    available on.  Perhaps this could even be extended to a common executable
+    command that is written in C.
+
+
+Notes for UNIX platforms
+
+  * Need to add watch point area support for non-Solaris operating systems.
+    This may be a case of preventing all heap memory from being accessed and
+    providing a signal handler that is called when a read from or write to such
+    memory triggers a signal.  The handler could then determine if the address
+    is in a watch point, and if it is not it could unprotect the memory and
+    return.
+
+  * Need to add advanced signal information for operating systems that do not
+    support the siginfo() system call.  This information is used by the signal
+    handler that handles the SIGSEGV signal in order to provide useful
+    information about where an illegal memory access occurred.  However, there
+    is currently a problem in that the call stack displayed from within that
+    handler is not necessarily accurate with respect to the function at the top
+    of the stack.  Also, signal handlers shouldn't technically call I/O
+    functions in case of additional signals being caught so this may need to be
+    improved.
+
+  * Need to add a portable way of initialising the thread-safe version of the
+    library when it is compiled by a C compiler.  There is already a solution to
+    this problem when it is compiled by a C++ compiler.
+
+  * Need to add support for call stack traversal for at least the MIPS, PA/RISC
+    and PowerPC processor architectures.  The current implementation of call
+    stack traversal for the Motorola 88xx0 family is also a bit flaky and so
+    should only be used when the library and program are built unoptimised.
+
+  * Need to add support for obtaining the program name from the stack for at
+    least the Motorola 88xx0, MIPS, PA/RISC and PowerPC processor architectures.
+    Also need to add support for reading the program symbols from a suitable
+    file in /proc for other operating systems that support it.  If there is no
+    support for either of these methods then the PROGFILE option can currently
+    be used to specify the program name at run-time.
+
+  * The -d option to the mpatrol shell script does not always work on systems
+    whose dynamic linkers support the LD_PRELOAD environment variable.  This
+    needs to be looked into in order to find out the cause.
+
+
+Notes for Amiga platforms
+
+  * The supplied SAS/C Makefile contains support for building the mpatrol
+    library as a shared library, but this is incomplete and will result in link
+    errors.  The reason for this is that an Amiga shared library is a separate
+    task and would need to build itself a process structure before being able
+    to make any calls to the DOS library.  Perhaps it's not even worth
+    implementing as the archive library works fine.
+
+  * Need to add support for call stack traversal for both the Motorola 680x0 and
+    PowerPC processor architectures.  At first glance, this doesn't seem to be
+    very easy, or perhaps even impossible.
+
+  * Need to add support for reading symbols from Amiga executable files.  Also
+    need to add support for reading symbols from any shared libraries that are
+    required by the program.  The Amiga executable file format doesn't seem to
+    contain enough information for this to be worthwhile, and even then it would
+    only be worth doing if call stack traversal worked.
+
+  * It is currently not possible to override the definition of malloc(), etc.,
+    without including the mpatrol.h header file first.  This is because the
+    compiler startup code and libraries call malloc() before everything is set
+    up, and so the library cannot properly initialise itself if the malloc()
+    that the startup code finds is the malloc() in the mpatrol library.
+
+
+Notes for Windows platforms
+
+  * Need to add watch point area support, possibly by using guard pages as a
+    basis for an implementation.
+
+  * Need to add support for reading symbols from Windows executable files.  Also
+    need to add support for reading symbols from any DLLs that are required by
+    the program.  This may be possible in a limited fashion by using the GNU BFD
+    library, but may only work with code compiled with GCC.
+
+  * It is currently not possible to override the definitions of malloc(), etc.,
+    without including the mpatrol.h header file first.  This is because the
+    system startup code calls malloc() before anything is set up, such as
+    streams, and so the library cannot properly initialise itself if the
+    malloc() that the startup code finds is the malloc() in the mpatrol library.
+
+
+Notes for Netware platforms
+
+  * The library has not yet been built (let alone tested) on Netware platforms.
+    The names of the system functions that the library calls for Netware were
+    obtained by looking at Novell's developer documentation, so they may not
+    even compile correctly without modification.
+
+  * Need to add support for building the mpatrol library as an NLM.  This is not
+    currently a high priority requirement as the archive library should suffice
+    for most purposes.
+
+  * Need to add way to determine when the base of the stack has been reached
+    during call stack traversal, since on Netware every application is really a
+    thread running under one large process.
+
+  * Need to add support for reading symbols from Netware load modules.  Also
+    need to add support for reading symbols from any NLMs that are required by
+    the program.  This may be possible in a limited fashion by using the GNU BFD
+    library, but may only work with code compiled with GCC.
+
+  * Need to investigate if it is safe (or even possible) to override the
+    definitions of malloc(), etc., without including the mpatrol.h header file
+    first.  Currently, non-macro definitions for these functions have been
+    disabled in the Netware version of the library in case they affect other
+    NLMs that are currently running.
+
+
+Adding support for a new operating system
+
+  * Add a new TARGET and/or SYSTEM definition in target.h.  The TARGET macro is
+    for fundamentally different operating systems, whereas the SYSTEM macro is
+    for differentiating variations of a particular operating system.
+
+  * Make any necessary modifications to config.h.
+
+  * Add any support for memory allocation in memory.c.
+
+  * Add any support for stack traversal in stack.c.
+
+  * Add any support for signals in signals.c.
+
+  * Add any support for threads in mutex.c.
+
+  * Add a new version and date format (or use an existing one) in version.c.
+
+  * Decide if the malloc() replacements should be used from mpatrol.c.
+
+  * Add a new subdirectory in the build directory that contains a Makefile
+    and any other files that are required to build the library on the new
+    operating system.
+
+
+Adding support for a new processor architecture
+
+  * Add a new ARCH definition in target.h.
+
+  * Make any necessary modifications to config.h.
+
+  * Add any support for memory allocation in memory.c.
+
+  * Add any support for stack traversal in stack.c.
+
+
+Adding support for a new object file format
+
+  * Add a new FORMAT definition in target.h.
+
+  * Make any necessary modifications to config.h.
+
+  * Add any support for stack traversal in stack.c.
+
+  * Add any support for symbol reading in symbol.c.
