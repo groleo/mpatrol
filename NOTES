@@ -5,7 +5,7 @@ This document contains information about known bugs and limitations in the
 mpatrol library as well as listing potential future enhancements.  Guidelines
 on how to add support for new operating systems, processor architectures and
 object file formats to the library source code appear at the bottom of this
-file, as well as a list of related software.
+file, as well as performance figures and a list of related software.
 
 Bugs should be reported to <mpatrol@cbmamiga.demon.co.uk> along with the
 details of the operating system, processor architecture and object file format
@@ -86,6 +86,10 @@ Notes for all platforms
     number information to the call stack, but could also be used to extend the
     library to monitor static and stack variables.
 
+  * Possibly add ability to interface with various debuggers, including gdb,
+    which could be used to provide reliable stack traces and symbolic
+    information as well as complete debugging information if available.
+
   * Add a SHOWFREE option to display a list of all free memory blocks at program
     termination for debugging purposes to view memory fragmentation.  If that
     option is added then perhaps SHOWALL should only be equivalent to SHOWFREE,
@@ -105,6 +109,7 @@ Notes for all platforms
   * TeXinfo documentation should be written, containing most of the information
     from the UNIX manual pages as well most of the text from EXAMPLES.  TeXinfo
     documentation can be converted to wide variety of documentation formats.
+    Also add an FAQ.
 
   * Perhaps use a configure script to automatically work out values for config.h
     on the platform it is being built on, and provide locations for installing
@@ -119,6 +124,10 @@ Notes for UNIX platforms
     memory triggers a signal.  The handler could then determine if the address
     is in a watch point, and if it is not it could unprotect the memory and
     return.
+
+  * Need to improve watch point facility in order to speed it up by an order of
+    magnitudes.  This will most likely involve removing all watch points when
+    entering the library and replacing them when returning to user code.
 
   * Need to add advanced signal information for operating systems that do not
     support the siginfo() system call.  This information is used by the signal
@@ -273,6 +282,65 @@ Adding support for a new object file format
   * Add any support for symbol reading in symbol.c.
 
 
+Library performance
+
+    The following times were obtained on a Sun Ultra 5 with an UltraSPARC IIi
+    processor running at 333MHz and running Solaris 7.  The test performed was
+    the one in tests/pass/test1.c and all tests were run on a lightly loaded
+    system, but were run several times to obtain an average result.  Obviously,
+    these times can only be an approximation, but should serve to illustrate the
+    effects on performance that each option can have.  All times are given in
+    seconds, and the second time on each line was obtained with the same
+    options plus the NOPROTECT option.
+
+      * [no options]
+            0.748   0.396
+      * OFLOWSIZE=2
+            0.795   0.423
+      * OFLOWSIZE=8
+            0.824   0.454
+      * PAGEALLOC=LOWER
+           20.179  19.860
+      * PAGEALLOC=UPPER
+           20.296  19.946
+
+      * NOFREE
+            1.346   0.915
+      * NOFREE OFLOWSIZE=2
+            1.411   0.991
+      * NOFREE OFLOWSIZE=8
+            1.482   1.042
+      * NOFREE PAGEALLOC=LOWER
+           20.467  20.130
+      * NOFREE PAGEALLOC=UPPER
+           20.570  20.227
+
+      * NOFREE PRESERVE
+            0.732   0.330
+      * NOFREE PRESERVE OFLOWSIZE=2
+            0.820   0.389
+      * NOFREE PRESERVE OFLOWSIZE=8
+            0.876   0.460
+      * NOFREE PRESERVE PAGEALLOC=LOWER
+           20.539  20.156
+      * NOFREE PRESERVE PAGEALLOC=UPPER
+           20.641  20.243
+
+      * OFLOWSIZE=2 OFLOWWATCH
+            Interrupted after half an hour as it still hadn't finished.
+
+      * [Solaris 7 malloc(3c) library]
+            0.033
+      * [Solaris 7 malloc(3x) library]
+            0.036
+      * [Solaris 7 bsdmalloc(3x) library]
+            0.028
+      * [Solaris 7 mapmalloc(3x) library]
+            0.033
+      * [Solaris 7 watchmalloc(3x) library]
+           40.845
+
+
 Related software
 
     A list of software which helps in debugging dynamic memory allocation
@@ -300,6 +368,16 @@ Related software
             Overview:  Can interface with gdb to find memory leaks, multiple
                        deallocations and memory corruptions in C or C++
                        programs.
+
+      * Checker
+            Author:    Tristan Gingold <bug-checker@gnu.org>
+            License:   GNU General Public License
+            Platforms: Various UNIX
+            Location:  http://www.gnu.org/
+            Overview:  Detects illegal memory accesses when reading from
+                       uninitialised memory, writing to freed memory or outside
+                       memory blocks.  Also contains a garbage detector for
+                       detecting memory leaks.
 
       * Dbmalloc
             Author:    Conor P. Cahill <cpcahil@virtech.vti.com>
@@ -336,6 +414,24 @@ Related software
             Overview:  Provides routines that can be plugged in to replace
                        malloc(), calloc(), realloc() and free().
 
+      * GC (Garbage Collector)
+            Author:    Hans-J. Boehm <boehm@acm.org>
+            License:   Free Software
+            Platforms: Various UNIX, AmigaOS, MS-DOS, Windows, MacOS
+            Location:  http://www.hpl.hp.com/personal/Hans_Boehm/gc/
+            Overview:  A general-purpose, garbage-collecting storage allocator
+                       that is intended to be used as a plug-in replacement for
+                       malloc(), but can also be used to detect memory leaks.
+
+      * Great Circle
+            Author:    Geodesic Systems <info@geodesic.com>
+            License:   Commercial Software
+            Platforms: Various UNIX, Windows
+            Location:  http://www.geodesic.com/
+            Overview:  Provides complete heap profiling, allowing programmers to
+                       see what parts of a program are using the most memory
+                       with symbolic stack tracing.
+
       * HeapAgent
             Author:    MicroQuill <info@microquill.com>
             License:   Commercial Software
@@ -353,7 +449,16 @@ Related software
                        Tracking technologies to pinpoint memory corruption,
                        memory leaks, operations on unrelated pointers and more.
 
-      * MEMDEBUG
+      * MemCheck
+            Author:    Stratosware Corporation <info@stratosware.com>
+            License:   Commercial Software
+            Platforms: Windows
+            Location:  http://www.stratosware.com/
+            Overview:  Detects various run-time errors related to operating
+                       system resources and provides information on memory
+                       leaks.
+
+      * MemDebug
             Author:    Rene Schmit <rene.schmit@crpht.lu>
             License:   Free Software
             Platforms: Various UNIX, MS-DOS, Windows, MacOS
@@ -371,6 +476,15 @@ Related software
             Overview:  Uses mmap() to allocate separate pools of memory which
                        can be mapped onto files for later reuse.
 
+      * Mprof
+            Author:    Ben Zorn <zorn@cs.colorado.edu>
+            License:   Free Software
+            Platforms: Various UNIX
+            Location:  ftp://gatekeeper.dec.com/pub/misc/mprof-3.0.tar.Z
+            Overview:  Profiles the dynamic memory allocation behaviour of
+                       programs by logging details for each function than makes
+                       a memory allocation, including call stack tracebacks.
+
       * Purify
             Author:    Rational Software <info@rational.com>
             License:   Commercial Software
@@ -379,10 +493,19 @@ Related software
             Overview:  Uses Object Code Insertion technology to provide run-time
                        error checking and memory leak detection.
 
+      * QC
+            Author:    Onyx Technology <sales@onyx-tech.com>
+            License:   Commercial Software
+            Platforms: MacOS
+            Location:  http://www.onyx-tech.com/
+            Overview:  Runs in the background as a control panel and detects
+                       various memory errors which can then be caught and run
+                       under a debugger.
+
     However, before you try out any of the above software, there may already be
     a malloc library with debugging support on your system that might be
-    suitable for solving your problem.  For example, on Solaris 2.7 the
-    following libraries are available:
+    suitable for solving your problem.  For example, on Solaris 7 the following
+    libraries are available:
 
         malloc(3c)      - Trade-off between performance and efficiency.
         malloc(3x)      - Slower performance, space-efficient.
