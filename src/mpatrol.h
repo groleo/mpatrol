@@ -378,7 +378,7 @@ __asm void *__mp_copymem(register __a0 void *, register __a1 void *,
                          register __a2 char *, register __a3 char *,
                          register __d2 unsigned long, register __d3 size_t);
 __asm int __mp_comparemem(register __a0 void *, register __a1 void *,
-                          register __d0 size_t, register __d1 alloctype,
+                          register __d0 size_t, register __d1 __mp_alloctype,
                           register __a2 char *, register __a3 char *,
                           register __d2 unsigned long, register __d3 size_t);
 __asm int __mp_info(register __a0 void *, register __a1 __mp_allocinfo *);
@@ -405,7 +405,7 @@ void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype, char *, char *,
                   unsigned long, size_t);
 void *__mp_copymem(void *, void *, size_t, __mp_alloctype, char *, char *,
                    unsigned long, size_t);
-int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
+int __mp_comparemem(void *, void *, size_t, __mp_alloctype, char *, char *,
                     unsigned long, size_t);
 int __mp_info(void *, __mp_allocinfo *);
 void __mp_memorymap(int);
