@@ -24,26 +24,30 @@
  * Call stacks.  The method for traversing a function call stack is
  * dependent on both the operating system and processor architecture.
  * The most correct way of doing this would be to perform code-reading
- * in order to ascertain the return address for a function.
+ * in order to ascertain the return address for a function.  However,
+ * some operating systems provide support functions for doing this.
  */
 
 
 #include "stack.h"
 #include "memory.h"
-#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#if SYSTEM == SYSTEM_IRIX
+#include <exception.h>
+#elif SYSTEM != SYSTEM_HPUX
 #include <setjmp.h>
-#include <signal.h>
 #if ARCH == ARCH_SPARC
 #include <ucontext.h>
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
 #endif /* ARCH */
-#endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
+#endif /* SYSTEM */
+#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.8 2000-06-01 20:40:35 graeme Exp $"
+#ident "$Id: stack.c,v 1.9 2000-06-05 20:10:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,7 +107,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX && \
+    !MP_BUILTINSTACK_SUPPORT
 static jmp_buf environment;
 static void (*bushandler)(int);
 static void (*segvhandler)(int);
@@ -122,13 +127,16 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
     s->index = 0;
 #elif SYSTEM == SYSTEM_HPUX
     __mp_memset(&s->next, 0, sizeof(frameinfo));
+#elif SYSTEM == SYSTEM_IRIX
+    __mp_memset(&s->next, 0, sizeof(struct sigcontext));
 #else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     s->next = NULL;
 #endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 }
 
 
-#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX && \
+    !MP_BUILTINSTACK_SUPPORT
 /* Handles any signals that result from illegal memory accesses whilst
  * traversing the call stack.
  */
@@ -140,7 +148,7 @@ static void stackhandler(int s)
 #endif /* TARGET && SYSTEM && MP_BUILTINSTACK_SUPPORT */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && SYSTEM != SYSTEM_HPUX
+#if !MP_BUILTINSTACK_SUPPORT && SYSTEM != SYSTEM_HPUX && SYSTEM != SYSTEM_IRIX
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -154,7 +162,8 @@ static unsigned int *getaddr(unsigned int *p)
 
     /* This function relies heavily on the stack frame format of supported
      * OS / processor combinations.  A better way to determine the return
-     * address would be to perform code reading.
+     * address would be to perform code reading, but on CISC processors this
+     * could be a nightmare.
      */
 #if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
     a = (unsigned int *) *(p + 1);
@@ -195,7 +204,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     void *f;
 #elif SYSTEM == SYSTEM_HPUX
     frameinfo f;
-#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#elif SYSTEM != SYSTEM_IRIX
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -229,11 +238,12 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->addr = NULL;
         p->index = MP_MAXSTACK;
     }
-#elif SYSTEM == SYSTEM_HPUX
-    /* HP/UX provides a library for traversing function call stack frames since
-     * the stack frame format does not preserve frame pointers - this is done
-     * via a special section which can be read by debuggers.
+    /* HP/UX and IRIX provide a library for traversing function call stack
+     * frames since the stack frame format does not preserve frame pointers.
+     * On HP/UX this is done via a special section which can be read by
+     * debuggers.
      */
+#elif SYSTEM == SYSTEM_HPUX
     if (p->frame == NULL)
     {
         p->next = U_get_current_frame();
@@ -264,12 +274,33 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         p->frame = NULL;
         p->addr = NULL;
     }
+#elif SYSTEM == SYSTEM_IRIX
+    if (p->frame == NULL)
+    {
+        exc_setjmp(&p->next);
+        unwind(&p->next, NULL);
+    }
+    if (p->next.sc_pc != 0)
+    {
+        /* On IRIX, the sigcontext structure stores registers in 64-bit format
+         * so we must be careful when converting them to 32-bit quantities.
+         */
+        p->frame = (void *) p->next.sc_regs[29];
+        p->addr = (void *) p->next.sc_pc;
+        unwind(&p->next, NULL);
+        r = 1;
+    }
+    else
+    {
+        p->frame = NULL;
+        p->addr = NULL;
+    }
 #else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
       TARGET == NETWARE) && ARCH == ARCH_IX86)
-    /* This function is not complete in any way for the OS / processor
+    /* This section is not complete in any way for the OS / processor
      * combinations it supports, as it is intended to be as portable as possible
      * without writing in assembler.  In particular, optimised code is likely
      * to cause major problems for stack traversal on some platforms.

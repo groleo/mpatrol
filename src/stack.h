@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include <stddef.h>
+#include <signal.h>
 
 
 #if SYSTEM == SYSTEM_HPUX && !MP_BUILTINSTACK_SUPPORT
@@ -67,6 +68,8 @@ typedef struct stackinfo
     size_t index;              /* current stack index */
 #elif SYSTEM == SYSTEM_HPUX
     struct frameinfo next;     /* next frame handle */
+#elif SYSTEM == SYSTEM_IRIX
+    struct sigcontext next;    /* next frame handle */
 #else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     void *next;                /* next frame handle */
 #endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
