@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.87 2001-02-22 20:26:06 graeme Exp $"
+#ident "$Id: inter.c,v 1.88 2001-02-23 22:41:18 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.87 2001-02-22 20:26:06 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.88 2001-02-23 22:41:18 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1309,7 +1309,7 @@ __mp_setuser(void *p, void *d)
         __mp_init();
     /* Check that we know something about the address that was supplied.
      */
-    if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
         ((m = (infonode *) n->info) == NULL))
         r = 0;
     else
@@ -1317,6 +1317,38 @@ __mp_setuser(void *p, void *d)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READWRITE);
         m->data.userdata = d;
+        if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READONLY);
+        r = 1;
+    }
+    restoresignals();
+    return r;
+}
+
+
+/* Set the marked flag for a given memory allocation.
+ */
+
+int
+__mp_setmark(void *p)
+{
+    allocnode *n;
+    infonode *m;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = 0;
+    else
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectinfo(&memhead, MA_READWRITE);
+        m->data.flags |= FLG_MARKED;
         if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READONLY);
         r = 1;

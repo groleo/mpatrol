@@ -43,6 +43,7 @@ EXPORTS
 	__mp_locatemem
 	__mp_function
 	__mp_setuser
+	__mp_setmark
 	__mp_info
 	__mp_syminfo
 	__mp_printinfo

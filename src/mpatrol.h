@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.93 2001-02-22 20:10:01 graeme Exp $
+ * $Id: mpatrol.h,v 1.94 2001-02-23 22:42:26 graeme Exp $
  */
 
 
@@ -674,6 +674,7 @@ int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
 char *__mp_function(__mp_alloctype);
 int __mp_setuser(MP_CONST void *, MP_CONST void *);
+int __mp_setmark(MP_CONST void *);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
 int __mp_printinfo(MP_CONST void *);

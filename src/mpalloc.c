@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.15 2001-02-22 20:17:56 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.16 2001-02-23 22:41:18 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.15 2001-02-22 20:17:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.16 2001-02-23 22:41:18 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -567,6 +567,16 @@ __mp_function(alloctype f)
 
 int
 __mp_setuser(void *p, void *d)
+{
+    return 0;
+}
+
+
+/* Set the marked flag for a given memory allocation.
+ */
+
+int
+__mp_setmark(void *p)
 {
     return 0;
 }
