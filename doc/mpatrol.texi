@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.242 2001-09-03 23:38:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.243 2001-09-04 22:56:09 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -9135,6 +9135,12 @@ symbol then @samp{0} will be returned, otherwise @samp{1} will be returned and
 @item @code{line}
 @tab Line number corresponding to address.
 @end multitable
+
+@findex __mp_symbol
+@item @code{const char *__mp_symbol(const void *ptr)}
+Obtains the name of a function symbol containing the code address specified in
+@var{ptr}.  If @var{ptr} does not belong to a function symbol then @samp{NULL}
+will be returned.
 
 @findex __mp_printinfo
 @item @code{int __mp_printinfo(const void *ptr)}

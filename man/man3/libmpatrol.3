@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.34 2001-08-23 23:00:05 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.35 2001-09-04 22:52:58 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "23 August 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "4 September 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -119,6 +119,7 @@ int __mp_setuser(const void *ptr, const void *data);
 int __mp_setmark(const void *ptr);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
+const char *__mp_symbol(const void *ptr);
 int __mp_printinfo(const void *ptr);
 unsigned long __mp_snapshot(void);
 .if n \{size_t __mp_iterate(int (*func)(const void *, void *),
@@ -861,6 +862,11 @@ l l.
 \fBfile\fP	Filename corresponding to address.
 \fBline\fP	Line number corresponding to address.
 .TE
+.TP
+\fB__mp_symbol\fP
+Obtains the name of a function symbol containing the code address specified in
+\fIptr\fP.  If \fIptr\fP does not belong to a function symbol then \fBNULL\fP
+will be returned.
 .TP
 \fB__mp_printinfo\fP
 Displays information about a specific memory allocation containing \fIptr\fP to
