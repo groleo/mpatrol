@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 4th
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.3 of the mpatrol manual for version 1.3.3, 4th
+   This is edition 2.3 of the mpatrol manual for version 1.3.3, 5th
 January, 2001.
 
 Foreword
@@ -327,10 +327,11 @@ out.
      relevant statistics that could be calculated.
 
    * On UNIX platforms, the `mmap()' function can optionally be used to
-     allocate memory instead of the `sbrk()' function, but only if the
-     system supports it.  This can be useful if the mpatrol library
-     clashes with another malloc library that uses `sbrk()' to allocate
-     heap memory.
+     allocate user memory instead of the `sbrk()' function, but only if
+     the system supports it.  If `mmap()' is supported then internal
+     mpatrol library memory is normally allocated with this function in
+     order to segregate it from user memory but this behaviour can be
+     swapped around.
 
    * On non-UNIX platforms where the mpatrol library overrides
      `malloc()' without requiring the inclusion of `mpatrol.h',
@@ -357,6 +358,13 @@ out.
    * On systems that support them, watch point areas can be used
      instead of overflow buffers so that every read and write to memory
      is checked to ensure that it is not within an overflow buffer.
+
+   * Supports the `-fcheck-memory-usage' option of `gcc' to check all
+     heap memory accesses in programs that were compiled with that
+     option.  Currently this only supports checking that memory
+     accesses do not overflow heap allocations or access free memory,
+     rather than keeping records of individual memory accesses that GNU
+     Checker does.
 
    * Can automatically check to see if there have been any illegal
      writes to free memory blocks.  The value to pre-fill free memory
@@ -503,6 +511,11 @@ out.
      commercial graphical memory usage tool that can display the
      current memory map of a running process.  Inuse is supplied with
      Parasoft Insure++.
+
+   * A small tool is provided to read a dictionary file and display all
+     of the words that can be represented in hexadecimal form.  Such
+     hexadecimal constants can be used to initialise variables in user
+     programs in order to aid debugging.
 
    * Build scripts are supplied to build both installation packages and
      binary distributions.  A Linux Software Map file is also provided.
@@ -683,7 +696,29 @@ will require a complete recompilation of all your code.
      functions from the mpatrol library rather than the system C
      library.
 
-     For this step, if you have a rough idea of where the function
+     This first step is only available when using `gcc'.
+
+     You can make use of the `gcc' option `-fcheck-memory-usage' which
+     instructs the compiler to place calls to error-checking functions
+     before each access to memory.  This can result in a dramatic
+     slowdown of your code so you may wish to limit the use of this
+     option to a few source files, but it does provide a very thorough
+     method of ensuring that you do not access memory beyond the bounds
+     of a memory allocation or attempt to access free memory.  However,
+     be aware that the checks are only placed in the bodies of
+     functions that have been compiled with this option and are missing
+     from all functions that have not.  You must link in the mpatrol
+     library when using this option, otherwise you will get linker
+     errors.
+
+     The `-fcheck-memory-usage' option was added to `gcc' to support
+     GNU Checker, which can be considered to be the run-time system for
+     this option.  GNU Checker also includes the ability to detect
+     reads from uninitialised memory, something that mpatrol does not
+     currently support, and deals with stack objects as well.  GNU
+     Checker cannot be used in conjunction with mpatrol.
+
+  4. For this step, if you have a rough idea of where the function
      calls lie that you would like to trace or test, you need only
      recompile the relevant source files.  You should modify these
      source files to include the `mpatrol.h' header file before any
@@ -697,7 +732,7 @@ will require a complete recompilation of all your code.
      free unknown allocations, or warnings about unfreed memory
      allocations at the end of execution.
 
-  4. This step requires you to recompile all of your source files to
+  5. This step requires you to recompile all of your source files to
      include the `mpatrol.h' header file.  Obviously, this will take
      the longest amount of time to integrate, but need not require you
      to change any source files if the compiler you are using has a
@@ -1313,6 +1348,15 @@ unrelated to that returned by the previous call).  It may also be
 required on some systems in order for the mpatrol library to implement
 memory protection.
 
+   Beginning with release 1.3.3, the mpatrol library now allocates its
+internal memory in the opposite way to user memory on UNIX systems that
+support the `mmap()' system call.  This means that by default, user
+memory is allocated with `sbrk()' whereas internal memory is allocated
+with `mmap()', and this behaviour is reversed when the `USEMMAP' option
+is used.  This was done to segregate user memory from internal memory,
+and was especially required for the `mptrace' command's graphical
+display.
+
    By default, every time an mpatrol library function is called the
 library will automatically check the freed memory and overflow buffers
 of every memory allocation, which can slow program execution down,
@@ -1626,10 +1670,24 @@ This behaviour can be desirable in certain cases where third-party
 libraries are being used that make such calls but the end result does
 not overflow the allocation boundary.
 
+   From release 1.3.3 of mpatrol, the library comes with functions that
+interface to the `-fcheck-memory-usage' option of the GNU compiler.
+This option instructs the compiler to place error-checking calls before
+each read or write to memory.  The functions that are called then check
+to ensure that the memory access does not overflow a heap memory
+allocation or access free memory.  This can be a very useful way to go
+through your code looking for errors with a fine tooth-comb, but be
+aware that it does slow down execution by a large factor.  It also only
+affects functions that were compiled with this option, so if the
+problem lies in a function that was not recompiled with
+`-fcheck-memory-usage' then it won't do much good.
+
    To conclude, if you suspect your program has a piece of code which
 is performing illegal memory underwrites or overwrites to a memory
 allocation you should use each of the following options in sequence,
-but only if your system supports them.
+but only if your system supports them.  If all else fails and you are
+using the GNU compiler then you could try recompiling some or all of
+your code with the `-fcheck-memory-usage' option.
 
   1. `OFLOWSIZE=8'
 
@@ -2321,24 +2379,25 @@ with the other mpatrol command line tools.
    The `mpsym' command currently uses `gdb' as the debugger with which
 to obtain the additional information about the code addresses in the
 mpatrol log file.  It also makes use of several UNIX text processing
-commands in order to extract information from the debugger's output and
-from the log file.  As a result, the `mpsym' command is only likely to
-work on UNIX platforms or on systems which have the necessary commands
-installed.  By default, it is set up to work on 32-bit platforms, but
-this can be changed by altering the `POINTER' definition in the `mpsym'
-file itself.
+commands, including `perl' if it is installed, in order to extract
+information from the debugger's output and from the log file.  As a
+result, the `mpsym' command is only likely to work on UNIX platforms or
+on systems which have the necessary commands installed.  By default, it
+is set up to work on 32-bit platforms, but this can be changed by
+altering the `POINTER' definition in the `mpsym' file itself (this is
+only necessary if `perl' is not installed).
 
 7.8.4 The `mpedit' command
 --------------------------
 
-   The final utility program that is provided is called `mpedit', which
-is used to invoke a text editor on a given source file and optionally
-jump to a specific line number.  It is used as a support command by the
-mpatrol library when the `EDIT' or `LIST' options are used but it can
-quite easily be used as a command in its own right if properly
-configured.  Because it is a shell script it can be easily configured
-to support other editors, but this unfortunately limits it to UNIX
-platforms at the moment.
+   Yet another utility program that is provided is called `mpedit',
+which is used to invoke a text editor on a given source file and
+optionally jump to a specific line number.  It is used as a support
+command by the mpatrol library when the `EDIT' or `LIST' options are
+used but it can quite easily be used as a command in its own right if
+properly configured.  Because it is a shell script it can be easily
+configured to support other editors, but this unfortunately limits it
+to UNIX platforms at the moment.
 
    The first argument to `mpedit' must be the filename of the source
 file to be edited or listed.  If the source file does not exist then
@@ -2385,6 +2444,78 @@ numbers and will also show the contents of the five lines before and
 after the specified line if possible.  Note also that the `mpedit'
 command supports the `--help' and `--version' options in common with
 the other mpatrol command line tools.
+
+7.8.5 The `hexwords' command
+----------------------------
+
+   The final utility program that is provided is called `hexwords',
+which is used to generate hexadecimal constants from a dictionary of
+known words.  Such numerical constants can be used in source files for
+a variety of debugging problems, and problems with uninitialised
+variables are especially relevant since these special numbers will
+stand out if seen from within a debugger.  For example, here are some
+common (and some not-so-common) 32-bit hexadecimal constants that can
+be used as debugging aids:
+
+_word_         _hex constant_
+addedbad       `0xaddedbad'
+allocate       `0xa110ca7e'
+badlabel       `0xbad1abe1'
+codebabe       `0xc0debabe'
+deadbeef       `0xdeadbeef'
+failsafe       `0xfa115afe'
+feedface       `0xfeedface'
+freedata       `0xf4eeda7a'
+
+   As can be seen above, many decimal digits can be used to represent
+the letters that they most closely resemble, along with the hexadecimal
+digits `A' through `F'.  This provides a much larger selection of words
+that can be matched, although the digits `3' and `8' cannot be used due
+to the lack of any similar-looking letters.  The digits and their
+corresponding letters are given in the following table.
+
+_digit_        _letter_
+`0'            O, o or Q
+`1'            I, i or l
+`2'            Z or z
+`3'            -
+`4'            q or R
+`5'            S or s
+`6'            G
+`7'            J or T
+`8'            -
+`9'            g
+`A-F'          A-F
+`a-f'          a-f
+
+   The argument to `hexwords' must be a valid dictionary filename but
+if it is omitted then `hexwords' will use `/usr/dict/words' as the name
+of the dictionary file to use.  The dictionary file must be a plain
+text file that contains one word per line, otherwise few to no words
+will be matched.
+
+   The words that are matched from the dictionary file can be
+controlled by using the `--match' option, which sets the type of
+case-sensitivity to use.  A setting of `exact' performs a
+case-sensitive comparison of all of the words in the dictionary file
+and the hexadecimal digits, whereas a setting of `any' does not.  The
+`lower' and `upper' settings convert the words in the dictionary file
+to lower and upper case respectively before performing a case-sensitive
+comparison.  The default case-sensitivity is `exact'.
+
+   The minimum and maximum number of letters that are matched are
+controlled by the `--minimum' and `--maximum' options.  None of the
+hexadecimal numbers displayed will have any less or more digits that
+those specified with these options.  The default minimum is `4' digits
+and the default maximum is `8' digits.  Note also that the `hexwords'
+command supports the `--help' and `--version' options in common with
+the other mpatrol command line tools.
+
+   The `hexwords' command currently makes use of several UNIX text
+processing commands in order to extract the words and their hexadecimal
+equivalents.  As a result, the `hexwords' command is only likely to
+work on UNIX platforms or on systems which have the necessary commands
+installed.
 
 8 Profiling
 ***********
@@ -4560,7 +4691,67 @@ checked individually by the system to see if it accesses a watch point
 area.  Slowing the program down by a factor of 10,000 is not uncommon
 on some systems when the `OFLOWWATCH' option is used.
 
-12.5 Bad memory operations
+12.5 Checking memory accesses
+=============================
+
+   For the ultimate in heap checking, if you are using the GNU compiler
+you can use the `-fcheck-memory-usage' option.  This instructs the
+compiler to place error-checking calls before each read or write to
+memory.  The functions that are called then check to ensure that the
+memory access does not overflow a heap memory allocation or access free
+memory.
+
+   The following test (which can be found in `tests/fail/test17.c') has
+an example of a read from memory which overflows a memory allocation's
+boundaries.
+
+         23  /*
+         24   * Allocates a single byte of memory and then attempts to read the
+         25   * byte as a word, resulting in some uninitialised bytes being read.
+         26   * This can sometimes be detected with PAGEALLOC=UPPER but can always
+         27   * be detected with OFLOWWATCH or by using the -fcheck-memory-usage
+         28   * option of gcc.
+         29   */
+     
+     
+         32  #include "mpatrol.h"
+     
+     
+         35  int main(void)
+         36  {
+         37      int *p;
+         38      int r;
+     
+         40      if (p = (int *) calloc(1, 1))
+         41      {
+         42          r = p[0];
+         43          free(p);
+         44      }
+         45      return EXIT_SUCCESS;
+         46  }
+
+   For this example, the above test must be compiled with `gcc' with the
+`-fcheck-memory-usage' option on the compiler command line and linked
+with the mpatrol library.  Normally, the test will pass and not cause
+any problems, since most malloc libraries will allocate at least one
+word anyway.  However, there are some instances where that will not be
+the case, especially on systems where misaligned memory accesses are
+legal.  Also, if the implementation of `calloc()' only initialised the
+number of bytes requested then the number read back might not be zero.
+
+   If you now run the program it should abort and produce something
+similar to the following in the resulting `mpatrol.log'.
+
+     ERROR: [RNGOVF]: range [0x00022568,0x0002256B] overflows
+                      [0x00022568,0x00022568]
+         0x00022568 (1 byte) {calloc:19:0} [main|test17.c|40]
+             0x00010A0C main+96
+             0x0001087C _start+100
+
+   As you can see, the mpatrol library detected a read beyond the
+boundaries of the one byte memory allocation starting at `0x00022568'.
+
+12.6 Bad memory operations
 ==========================
 
    In C there are several basic memory operation functions that are
@@ -4651,7 +4842,7 @@ ordering of parameters than that shown.
    (1) The error can be turned into a warning with the `ALLOWOFLOW'
 option which will also force the operation to be performed.
 
-12.6 Incompatible function calls
+12.7 Incompatible function calls
 ================================
 
    This example illustrates how the mpatrol library checks for calls to
@@ -4704,7 +4895,7 @@ matched by calls to `operator delete[]' and not `operator delete'.
 Hence, the library reports this as an error and does not free the memory
 allocation.
 
-12.7 The `alloca()' functions
+12.8 The `alloca()' functions
 =============================
 
    There are two examples of using `alloca()' and its related functions
@@ -5031,7 +5222,7 @@ mpatrol library.  The only real difference between the two types of
 memory allocations is that allocations made by the `alloca()' family of
 functions will never show up in the list of unfreed memory allocations.
 
-12.8 Additional useful information
+12.9 Additional useful information
 ==================================
 
    This last example illustrates the various `SHOW' options that are
@@ -6676,13 +6867,16 @@ as well as uppercase, or a mixture of both.
 
 `USEMMAP'
      Specifies that the library should use `mmap()' instead of `sbrk()'
-     to allocate system memory on UNIX platforms.  This option should
-     be used if there are problems when using the mpatrol library in
+     to allocate user memory on UNIX platforms.  This option should be
+     used if there are problems when using the mpatrol library in
      combination with another malloc library which uses `sbrk()' to
-     allocate its memory.  It is ignored on systems that do not support
-     the `mmap()' system call.  Note that some UNIX systems require
-     this option in order for the mpatrol library to be able to perform
-     memory protection with the `mprotect()' system call.
+     allocate its memory.  Memory internal to the mpatrol library is
+     allocated with `mmap()' on systems where it is supported in order
+     to segregate it from user memory, and this behaviour is reversed
+     with the `USEMMAP' option.  It is ignored on systems that do not
+     support the `mmap()' system call.  Note that some UNIX systems
+     require this option in order for the mpatrol library to be able to
+     perform memory protection with the `mprotect()' system call.
 
 Appendix C Options
 ******************
@@ -6973,7 +7167,7 @@ parsed on the command line in a similar way to the UNIX function
 
 `--use-mmap'
      [`USEMMAP']  Specifies that the library should use `mmap()' instead
-     of `sbrk()' to allocate system memory.
+     of `sbrk()' to allocate user memory.
 
 `--version'
      Displays the version number of the `mpatrol' command.
@@ -6987,6 +7181,12 @@ allocations and memory operations occur.  Other types of warnings and
 errors may also appear in the log file, but they are likely to be
 associated with parsing options and reading symbols from executable
 files and so should be self-explanatory.
+
+   In all cases, if a warning or error is caused by one of the memory
+access checking functions (invoked through the use of the
+`-fcheck-memory-usage' option to the GNU compiler) then execution will
+halt regardless, despite what the description of the diagnostic message
+says.
 
    Note that on UNIX platforms, if the diagnostic message is caused by
 a line in the program source then the `EDIT' and `LIST' options can be
@@ -7909,8 +8109,8 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
-        * The `mpsym' command does not work due to the lack of a
-          `printf' command on the system.
+        * The `mpsym' command does not work if `perl' is not installed
+          due to the lack of a `printf' command on the system.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -7932,8 +8132,8 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
-        * The `mpsym' command does not work due to the lack of a
-          `printf' command on the system.
+        * The `mpsym' command does not work if `perl' is not installed
+          due to the lack of a `printf' command on the system.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -7953,8 +8153,8 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
-        * The `mpsym' command does not work due to the lack of a
-          `printf' command on the system.
+        * The `mpsym' command does not work if `perl' is not installed
+          due to the lack of a `printf' command on the system.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -7976,8 +8176,8 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
-        * The `mpsym' command does not work due to the lack of a
-          `printf' command on the system.
+        * The `mpsym' command does not work if `perl' is not installed
+          due to the lack of a `printf' command on the system.
 
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
@@ -8073,8 +8273,8 @@ supported on that system.
 
         * The `mptrace' command has no GUI.
 
-        * The `mpsym' command does not work unless `gdb' and the GNU
-          text processing tools are installed.
+        * The `mpsym' and `hexwords' commands do not work unless `gdb'
+          and the GNU text processing tools are installed.
 
         * The `mpedit' command does not work.
 
@@ -8102,9 +8302,7 @@ supported on that system.
 
         * The `mptrace' command has no GUI.
 
-        * The `mpsym' command does not work.
-
-        * The `mpedit' command does not work.
+        * The `mpsym', `mpedit' and `hexwords' commands do not work.
 
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
@@ -8122,9 +8320,7 @@ supported on that system.
 
         * The `mptrace' command has no GUI.
 
-        * The `mpsym' command does not work.
-
-        * The `mpedit' command does not work.
+        * The `mpsym', `mpedit' and `hexwords' commands do not work.
 
 G.1 Adding a new operating system
 =================================
@@ -8449,13 +8645,13 @@ H.1 Notes for all platforms
      to certain memory allocations and to return the current number of
      memory allocations or bytes allocated.
 
-   * Write a set of functions that are compatible with those
-     implemented by Checker, the `gcc' run-time memory access checker.
-     This would allow every memory access to be checked in object files
-     compiled with `gcc', not just pointers into the heap, and would
-     provide error checking as effective as source code
-     instrumentation.  Could also make use of the `etext', `edata' and
-     `end' pointers that are set at run-time on most UNIX systems.
+   * Extend the Checker-support functions to store and check
+     information about access permissions within heap memory and
+     perhaps also in the stack as well.  Currently, the Checker-support
+     functions only ensure that no memory accesses cross allocation
+     boundaries or access free memory.  Could also make use of the
+     `etext', `edata' and `end' pointers that are set at run-time on
+     most UNIX systems.
 
    * Details of the segments which make up the executable file and any
      shared libraries could be made use of in order to detect
@@ -9113,7 +9309,24 @@ I.4 Running
      and what is not.  Note that the `mpatrol' command will always log
      all calls to allocate, reallocate and free memory by default.
 
-  2. I linked my program with the mpatrol library to trace all of its
+  2. Why does my C++ program crash at program termination when it is
+     linked with the mpatrol library and it appears to be doing nothing
+     wrong?
+
+     If your program contains file-scope objects whose constructors get
+     called before `main()' and whose destructors get called after
+     `main()' then it is likely that one of these destructors is
+     allocating memory after the mpatrol library has terminated.  This
+     should already be resolved if you built the mpatrol library on a
+     platform that supports `.init' and `.fini' sections or if you
+     built it with the GNU compiler or a C++ compiler.  However, in
+     certain circumstances this may not work so you may wish to try
+     terminating the mpatrol library by getting it to register itself
+     with `atexit()' instead, which will hopefully resolve the problem.
+     You can do this by rebuilding the mpatrol library with the
+     `MP_USE_ATEXIT' preprocessor macro defined.
+
+  3. I linked my program with the mpatrol library to trace all of its
      memory operations, such as `memcpy()' and `memcmp()', but I get
      nothing in the log file.  Why is this?
 
@@ -9126,7 +9339,7 @@ I.4 Running
      `__mp_init()' function.  All memory operation functions following
      that call with then be traced.
 
-  3. Why does the `USEDEBUG' option not work for me?
+  4. Why does the `USEDEBUG' option not work for me?
 
      Firstly, you have to ensure that you have built the mpatrol
      library with support for the GNU BFD object file access library by
@@ -9141,7 +9354,7 @@ I.4 Running
      the above suggestions work, you may still be able to get this
      information with the `mpsym' command.
 
-  4. Why does the `mpatrol' command ignore the current value of the
+  5. Why does the `mpatrol' command ignore the current value of the
      `MPATROL_OPTIONS' environment variable?
 
      Because I would most likely get lots of bug reports or queries
@@ -9149,7 +9362,7 @@ I.4 Running
      the environment variable and had then not seen the expected
      behaviour from the options they specified to the `mpatrol' command.
 
-  5. Why does the mpatrol library not read the symbols in my executable
+  6. Why does the mpatrol library not read the symbols in my executable
      file on Windows platforms?
 
      If the mpatrol library was compiled with the `FORMAT=FORMAT_PE'
@@ -9162,7 +9375,7 @@ I.4 Running
      executable file will not have a symbol table and so the mpatrol
      library cannot give symbolic stack tracebacks.
 
-  6. Why do some mpatrol log file entries only contain a partial call
+  7. Why do some mpatrol log file entries only contain a partial call
      stack rather than following the function call stack back to the
      call to `main()'?
 
@@ -9175,7 +9388,7 @@ I.4 Running
      function on most platforms, otherwise the stack cannot be
      traversed.  See your compiler manual for further details.
 
-  7. I am trying to use the `mpatrol' command to debug an executable
+  8. I am trying to use the `mpatrol' command to debug an executable
      file that was not originally compiled with the mpatrol library.
      However, even though it runs successfully, no mpatrol log file is
      produced.  Why is this?
@@ -9190,7 +9403,7 @@ I.4 Running
      specified in a special environment variable, in which case you
      can't use this feature.
 
-  8. I am attempting to run a multithreaded C++ program with the
+  9. I am attempting to run a multithreaded C++ program with the
      mpatrol library on Linux.  However, my program crashes before
      `main()' and the debugger shows that the failure is in
      `__sigaction()' which is called from `__mp_initsignals()'.  Is the
@@ -9208,7 +9421,7 @@ I.4 Running
      `libpthread.so'.  You can verify this by running the `ldd' command
      on them.
 
-  9. I know that there's a definite heap corruption problem in my
+ 10. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
      corruption, and when I link with the mpatrol library it stops
      crashing.  What can I do?
@@ -9225,7 +9438,7 @@ I.4 Running
      through your program in a debugger until something unusual or
      unexpected happens.
 
- 10. If I link my program to version 1.0 of the mpatrol library then I
+ 11. If I link my program to version 1.0 of the mpatrol library then I
      cannot interrupt it using the keyboard, which I would normally be
      able to do without using mpatrol.  Is this a bug?
 
@@ -9240,7 +9453,7 @@ I.4 Running
      which is why the behaviour was moved to an option for those that
      needed it.
 
- 11. Why does mpatrol not report an illegal memory access when it can
+ 12. Why does mpatrol not report an illegal memory access when it can
      be detected by a debugger?
 
      First of all, illegal memory accesses can only be detected on
@@ -9254,7 +9467,7 @@ I.4 Running
      either try to live with that, or you could try disabling the
      overriding handlers.
 
- 12. I've linked and run my program with mpatrol under UNIX and it uses
+ 13. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -9274,7 +9487,7 @@ I.4 Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 13. Why does my program run so slowly after I link it with the mpatrol
+ 14. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -9288,7 +9501,7 @@ I.4 Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 14. My program is written in C++ and is linked to the mpatrol library,
+ 15. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -9305,7 +9518,7 @@ I.4 Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 15. Why does my program not stop when the mpatrol library notices an
+ 16. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -9317,7 +9530,7 @@ I.4 Running
      of program execution, and then search backwards in the log file for
      `WARNING' or `ERROR'.
 
- 16. I have linked my program with the mpatrol library on an Amiga or
+ 17. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -9331,7 +9544,7 @@ I.4 Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 17. I have built the mpatrol library with `gcc' on AmigaOS and have
+ 18. I have built the mpatrol library with `gcc' on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the `MPATROL_OPTIONS' environment variable
      recognised when I run it?
@@ -9344,7 +9557,7 @@ I.4 Running
      allows you to set an environment variable that the GNU `getenv()'
      function can read when you are running in AmigaDOS.
 
- 18. How do I suppress all diagnostic output from the mpatrol library?
+ 19. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's _bit bucket_, which is `/dev/null' on UNIX platforms and
@@ -9484,7 +9697,7 @@ runs in the background and detects many common memory access errors in
 running applications, whilst on the Macintosh, QC by Onyx Technology
 provides roughly the same functionality.
 
-   A list of over seventy different items of software which help in
+   A list of over eighty different items of software which help in
 debugging dynamic memory allocation problems is given below(1).  They
 all provide some of the features that mpatrol contains and you may wish
 to use one of them to solve your problem if you have trouble using
@@ -10312,6 +10525,24 @@ Netware platforms.
     Overview
           A memory and resource leak debugger for Borland's family of
           Windows compilers.
+
+   * MemTest
+    Author
+          Jim Buchanan (<jbuchana@iquest.net>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX
+
+    Location
+          `ftp://ftp.loxinfo.co.th/pub/unix/utils/mem_test-0_10_tar.gz'
+
+    Overview
+          Helps locate memory leaks in a program under development by
+          creating a log file that records most memory allocations and
+          deallocations.
 
    * MemTrace
     Author
@@ -11638,8 +11869,11 @@ Index
           See ``Appendix C Options''.
 -log-reallocs:                                     
           See ``Appendix C Options''.
+-match:                                             See 7.8.5.
+-maximum:                                           See 7.8.5.
 -medium-bound:                                     
           See ``Appendix C Options''.
+-minimum:                                           See 7.8.5.
 -no-free:                                          
           See ``Appendix C Options''.
 -no-protect:                                       
@@ -12066,6 +12300,8 @@ HELP:
           See ``Appendix B Environment''.
 hexadecimal:                                       
           See ``Appendix B Environment''.
+hexwords:                                           See 7.8.5.
+hexwords command:                                   See 7.8.5.
 hidden memory:                                      See 11.
 hints:                                              See 10.
 HP/UX, HP PA/RISC:                                 
@@ -12248,7 +12484,7 @@ memory debugger:
           See ``Appendix J Related software''.
 memory dump:                                        See 12.4.
 memory leak table:                                  See 8.
-memory leaks:                                       See 12.8.
+memory leaks:                                       See 12.9.
 memory management interface:                        See 6.
 Memory Management Reference:                       
           See ``Appendix K References''.
@@ -12264,6 +12500,8 @@ memory, virtual:                                    See 6.1.
 Memprof:                                           
           See ``Appendix J Related software''.
 Memproof:                                          
+          See ``Appendix J Related software''.
+MemTest:                                           
           See ``Appendix J Related software''.
 MemTrace:                                          
           See ``Appendix J Related software''.
@@ -12304,6 +12542,8 @@ MP_NOCPLUSPLUS:
           See ``Appendix A Functions''.
 MP_NONEWDELETE:                                    
           See ``Appendix A Functions''.
+MP_USE_ATEXIT:                                     
+          See ``I.4 Running''.
 mpatrol:                                            See 1.
 mpatrol command:                                    See 7.8.1.
 mpatrol features:                                   See 2.
