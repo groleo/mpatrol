@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.2 2000-04-24 15:56:51 graeme Exp $"
+#ident "$Id: mprof.c,v 1.3 2000-04-24 19:24:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -67,6 +67,18 @@ typedef struct profilenode
     unsigned long data;   /* profiling data */
 }
 profilenode;
+
+
+/* The total number of allocations and deallocations.
+ */
+
+static size_t acount, dcount;
+
+
+/* The total bytes of allocations and deallocations.
+ */
+
+static size_t atotal, dtotal;
 
 
 /* The allocation and deallocation bins.
@@ -191,6 +203,21 @@ static void readfile(void)
         getentry(&atotals, sizeof(size_t), 1);
         getentry(dcounts, sizeof(size_t), binsize);
         getentry(&dtotals, sizeof(size_t), 1);
+        for (i = 0; i < binsize; i++)
+        {
+            acount += acounts[i];
+            dcount += dcounts[i];
+            if (i == binsize - 1)
+            {
+                atotal += atotals;
+                dtotal += dtotals;
+            }
+            else
+            {
+                atotal += acounts[i] * (i + 1);
+                dtotal += dcounts[i] * (i + 1);
+            }
+        }
     }
     /* Read the profiling data structures.
      */
@@ -255,6 +282,74 @@ static void readfile(void)
 }
 
 
+/* Display a character a specified number of times.
+ */
+
+static void printchar(char c, size_t n)
+{
+    size_t i;
+
+    for (i = 0; i < n; i++)
+        fputc(c, stdout);
+}
+
+
+/* Display the allocation bin table.
+ */
+
+static void bintable(void)
+{
+    size_t i;
+    unsigned long a, b, c, d;
+    double e, f, g, h;
+    int p;
+
+    p = 0;
+    printchar(' ', 30);
+    fputs("ALLOCATION BINS\n\n", stdout);
+    printchar(' ', 21);
+    fputs("allocated", stdout);
+    printchar(' ', 26);
+    fputs("unfreed\n", stdout);
+    printchar(' ', 10);
+    printchar('-', 32);
+    fputs("  ", stdout);
+    printchar('-', 32);
+    fputs("\n    size   count       %     bytes       %   "
+          "count       %     bytes       %\n\n", stdout);
+    for (i = 0; i < binsize; i++)
+        if (acounts[i] != 0)
+        {
+            a = acounts[i];
+            b = a - dcounts[i];
+            if (i == binsize - 1)
+            {
+                c = atotals;
+                d = c - dtotals;
+            }
+            else
+            {
+                c = a * (i + 1);
+                d = b * (i + 1);
+            }
+            e = ((double) a / (double) acount) * 100.0;
+            f = ((double) b / (double) (acount - dcount)) * 100.0;
+            g = ((double) c / (double) atotal) * 100.0;
+            h = ((double) d / (double) (atotal - dtotal)) * 100.0;
+            fprintf(stdout, " %s %4lu  %6lu  %6.2f  %8lu  %6.2f  "
+                    "%6lu  %6.2f  %8lu  %6.2f\n",
+                    (i == binsize - 1) ? ">=" : "  ",
+                    i + 1, a, e, c, g, b, f, d, h);
+            p = 1;
+        }
+    if (p == 1)
+        fputc('\n', stdout);
+    fprintf(stdout, "   total  %6lu          %8lu          "
+            "%6lu          %8lu\n", acount, atotal,
+            acount - dcount, atotal - dtotal);
+}
+
+
 /* Read the profiling output file and display all specified information.
  */
 
@@ -296,6 +391,8 @@ int main(int argc, char **argv)
         f = argv[0];
     else
         f = MP_PROFFILE;
+    acount = dcount = 0;
+    atotal = dtotal = 0;
     acounts = dcounts = NULL;
     atotals = dtotals = 0;
     binsize = 0;
@@ -314,6 +411,7 @@ int main(int argc, char **argv)
     }
     readfile();
     fclose(proffile);
+    bintable();
     if (acounts != NULL)
         free(acounts);
     if (dcounts != NULL)
