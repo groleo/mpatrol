@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.35 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: profile.c,v 1.36 2001-12-05 22:29:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *profile_id = "$Id: profile.c,v 1.35 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *profile_id = "$Id: profile.c,v 1.36 2001-12-05 22:29:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -480,6 +480,14 @@ __mp_writeprofile(profhead *p, int w)
     fwrite(s, sizeof(char), 4, f);
     if (w != 0)
         __mp_protectsymbols(p->syms, MA_READONLY);
+    if (ferror(f))
+    {
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: problem writing profiling "
+                   "file\n", p->file);
+        p->file = NULL;
+        fclose(f);
+        return 0;
+    }
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
     return 1;
