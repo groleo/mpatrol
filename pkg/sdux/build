@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.15 2001-01-25 22:00:30 graeme Exp $
+# $Id: build,v 1.16 2001-01-25 22:27:33 graeme Exp $
 
 
 version=1.3.3
@@ -35,6 +35,7 @@ version=1.3.3
 cd ../../build/unix
 make clobber
 make libmpatrol.a libmpatrol.sl
+make libmpalloc.a libmpalloc.sl
 make mpatrol mprof mptrace mleak
 strip mpatrol
 strip mprof
@@ -148,6 +149,8 @@ cp ../../doc/mpatrol.info mpatrol/info
 mkdir -p mpatrol/lib
 cp ../../build/unix/libmpatrol.a mpatrol/lib
 cp ../../build/unix/libmpatrol.sl mpatrol/lib
+cp ../../build/unix/libmpalloc.a mpatrol/lib
+cp ../../build/unix/libmpalloc.sl mpatrol/lib
 mkdir -p mpatrol/man/man1
 cp ../../man/man1/mpatrol.1 mpatrol/man/man1
 cp ../../man/man1/mprof.1 mpatrol/man/man1

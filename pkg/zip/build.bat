@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.28 2001-01-25 22:00:32 graeme Exp $
+rem $Id: build.bat,v 1.29 2001-01-25 22:27:35 graeme Exp $
 
 
 set version=1.3.3
@@ -36,6 +36,7 @@ cd ..\..\build\windows
 nmake -f NMakefile clobber
 nmake -f NMakefile libmpatrol.lib mpatrol.dll
 nmake -f NMakefile libmpatrolmt.lib mpatrolmt.dll
+nmake -f NMakefile libmpalloc.lib
 nmake -f NMakefile mpatrol.exe mprof.exe mptrace.exe mleak.exe
 cd ..\..\pkg\zip
 
@@ -141,6 +142,7 @@ copy ..\..\src\mpalloc.h mpatrol\include
 mkdir mpatrol\lib
 copy ..\..\build\windows\libmpatrol.lib mpatrol\lib
 copy ..\..\build\windows\libmpatrolmt.lib mpatrol\lib
+copy ..\..\build\windows\libmpalloc.lib mpatrol\lib
 copy ..\..\build\windows\mpatrol.lib mpatrol\lib
 copy ..\..\build\windows\mpatrol.exp mpatrol\lib
 copy ..\..\build\windows\mpatrolmt.lib mpatrol\lib

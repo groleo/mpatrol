@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.53 2001-01-25 22:00:29 graeme Exp $
+# $Id: mpatrol.spec,v 1.54 2001-01-25 22:27:32 graeme Exp $
 
 
 %define libversion 1.3
@@ -65,6 +65,7 @@ to recompile or relink in order to change the library's behaviour.
 cd build/unix
 make libmpatrol.a libmpatrol.so.%{libversion}
 make libmpatrolmt.a libmpatrolmt.so.%{libversion}
+make libmpalloc.a libmpalloc.so.%{libversion}
 make mpatrol mprof mptrace mleak
 
 
@@ -94,6 +95,8 @@ install -m644 build/unix/libmpatrol.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmpatrolmt.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+install -m644 build/unix/libmpalloc.a $RPM_BUILD_ROOT/%{_libdir}
+install -m755 build/unix/libmpalloc.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpatrol.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mprof.1 $RPM_BUILD_ROOT/%{_mandir}/man1
