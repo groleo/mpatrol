@@ -74,6 +74,7 @@ SUBDIRS = images
 
 info_TEXINFOS = mpatrol.texi
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 TEXI2DVI = texi2dvi
 INFO_DEPS = mpatrol.info

@@ -75,6 +75,7 @@ man_MANS = mpatrol.1 mprof.1 mptrace.1 mleak.1 mpsym.1 mpedit.1 hexwords.1 	   l
 
 EXTRA_DIST = $(man_MANS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 man1dir = $(mandir)/man1
 man3dir = $(mandir)/man3

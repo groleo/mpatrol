@@ -99,11 +99,12 @@ libmpatrol_la_SOURCES = list.c tree.c slots.c utils.c memory.c heap.c alloc.c 		
 libmpalloc_la_SOURCES = mpalloc.c mpfailure.c mpsetfail.c mpmalloc.c 			mpcalloc.c mpstrdup.c mprealloc.c $(include_HEADERS) 			$(noinst_HEADERS)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) 
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@

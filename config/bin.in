@@ -74,6 +74,7 @@ bin_SCRIPTS = mpsym mpedit hexwords
 
 EXTRA_DIST = $(bin_SCRIPTS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 SCRIPTS =  $(bin_SCRIPTS)
 

@@ -73,6 +73,7 @@ VERSION = @VERSION@
 EXTRA_DIST = mpatrol.eps test.eps gcc.eps cpp.eps cc1.eps collect2.eps 	     trace.eps mpatrol.txt
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../../configure.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  Makefile.am Makefile.in
 

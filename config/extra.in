@@ -60,9 +60,7 @@ POST_UNINSTALL = :
 host_alias = @host_alias@
 host_triplet = @host@
 AS = @AS@
-AWK = @AWK@
 CC = @CC@
-CXX = @CXX@
 DLLTOOL = @DLLTOOL@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -78,6 +76,7 @@ aclocal_DATA = mpatrol.m4
 
 EXTRA_DIST = $(aclocal_DATA)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 DATA =  $(aclocal_DATA)
 

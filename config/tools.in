@@ -81,11 +81,12 @@ pkginclude_HEADERS = dbmalloc.h dmalloc.h heapdiff.h mgauge.h mtrace.h
 libmptools_la_SOURCES = dbmalloc.c dmalloc.c heapdiff.c mgauge.c mtrace.c 			$(pkginclude_HEADERS)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) 
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@

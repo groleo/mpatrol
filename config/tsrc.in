@@ -82,11 +82,12 @@ noinst_HEADERS = config.h target.h list.h tree.h slots.h utils.h memory.h 		 hea
 libmpatrolmt_la_SOURCES = list.c tree.c slots.c utils.c memory.c heap.c 			  alloc.c info.c stack.c addr.c strtab.c symbol.c 			  signals.c mutex.c diag.c option.c leaktab.c 			  profile.c trace.c inter.c malloc.c cplus.c 			  machine.c version.c $(noinst_HEADERS)
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../configure.h
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) 
+DEFS = @DEFS@ -I. -I$(srcdir) -I..
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
