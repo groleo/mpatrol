@@ -71,7 +71,8 @@
 #define SYSTEM_OPENBSD  11 /* OpenBSD */
 #define SYSTEM_SINIX    12 /* SINIX */
 #define SYSTEM_SOLARIS  13 /* Solaris */
-#define SYSTEM_UNIXWARE 14 /* UnixWare */
+#define SYSTEM_SUNOS    14 /* SunOS */
+#define SYSTEM_UNIXWARE 15 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -102,11 +103,13 @@
       defined(__sinix__) || defined(SNI) || defined(_SNI) || defined(__SNI) || \
       defined(__SNI__)
 #define SYSTEM SYSTEM_SINIX
-#elif (defined(sun) || defined(_sun) || defined(__sun) || defined(__sun__)) && \
-      (defined(svr4) || defined(_svr4) || defined(__svr4) || \
-       defined(__svr4__) || defined(SVR4) || defined(_SVR4) || \
-       defined(__SVR4) || defined(__SVR4__))
+#elif defined(sun) || defined(_sun) || defined(__sun) || defined(__sun__)
+#if defined(svr4) || defined(_svr4) || defined(__svr4) || defined(__svr4__) || \
+    defined(SVR4) || defined(_SVR4) || defined(__SVR4) || defined(__SVR4__)
 #define SYSTEM SYSTEM_SOLARIS
+#else /* svr4 */
+#define SYSTEM SYSTEM_SUNOS
+#endif /* svr4 */
 #else /* SYSTEM */
 #define SYSTEM SYSTEM_ANY
 #endif /* SYSTEM */
@@ -202,6 +205,17 @@
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_LYNXOS
 #define FORMAT FORMAT_BFD
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+#ifdef __ELF__
+#if ENVIRON == ENVIRON_64
+#define FORMAT FORMAT_ELF64
+#else /* ENVIRON */
+#define FORMAT FORMAT_ELF32
+#endif /* ENVIRON */
+#else /* __ELF__ */
+#define FORMAT FORMAT_COFF
+#endif /* __ELF__ */
 #else /* SYSTEM */
 #if ENVIRON == ENVIRON_64
 #define FORMAT FORMAT_ELF64
@@ -219,6 +233,46 @@
 #endif /* TARGET && __GNUC__ */
 #endif /* TARGET */
 #endif /* FORMAT */
+
+
+#define DYNLINK_NONE    0 /* no dynamic linker support */
+#define DYNLINK_AIX     1 /* AIX dynamic linker */
+#define DYNLINK_BSD     2 /* BSD dynamic linker */
+#define DYNLINK_HPUX    3 /* HP/UX dynamic linker */
+#define DYNLINK_IRIX    4 /* IRIX dynamic linker */
+#define DYNLINK_SVR4    5 /* SVR4 dynamic linker */
+#define DYNLINK_WINDOWS 6 /* Windows dynamic linker */
+
+
+#ifndef DYNLINK
+#if TARGET == TARGET_UNIX
+#if SYSTEM == SYSTEM_AIX
+#define DYNLINK DYNLINK_AIX
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
+      SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_LINUX || \
+      SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
+      SYSTEM == SYSTEM_UNIXWARE
+#define DYNLINK DYNLINK_SVR4
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+#ifdef __ELF__
+#define DYNLINK DYNLINK_SVR4
+#else /* __ELF__ */
+#define DYNLINK DYNLINK_BSD
+#endif /* __ELF__ */
+#elif SYSTEM == SYSTEM_HPUX
+#define DYNLINK DYNLINK_HPUX
+#elif SYSTEM == SYSTEM_IRIX
+#define DYNLINK DYNLINK_IRIX
+#else /* SYSTEM */
+#define DYNLINK DYNLINK_NONE
+#endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+#define DYNLINK DYNLINK_WINDOWS
+#else /* TARGET */
+#define DYNLINK DYNLINK_NONE
+#endif /* TARGET */
+#endif /* DYNLINK */
 
 
 #endif /* MP_TARGET_H */
