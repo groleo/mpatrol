@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.2 2001-03-01 19:42:11 graeme Exp $
+ * $Id: dmalloc.h,v 1.3 2001-03-01 23:14:01 graeme Exp $
  */
 
 
@@ -45,6 +45,16 @@
  * distribution comes with definitions for xmemalign(), xvalloc() and
  * xrecalloc(), neither of which are defined by this file or by the
  * mpatrol library.
+ *
+ * This module is intended to work with the existing dmalloc command,
+ * which sets the contents of the DMALLOC_OPTIONS environment variable
+ * according to any specified command-line options.  The four documented
+ * Dmalloc global variables are also defined, although the two address
+ * variables are not acted upon and changing the dmalloc_logpath variable
+ * has no effect yet.  The dmalloc_errno variable is not used and so the
+ * dmalloc_strerror() function always returns a constant string.  Note
+ * that unlike the actual Dmalloc library, this file is not threadsafe,
+ * and the lockon option has no effect.
  *
  * The dmalloc_debug() function does not support the setting of all of the
  * Dmalloc flags, although this file defines preprocessor macros for each
@@ -65,6 +75,17 @@
  * null and is invalid - it always terminates with an error message in the
  * mpatrol log file whenever the pointer to be checked is null and it has
  * detected heap corruption.
+ *
+ * The dmalloc_log_heap_map() and dmalloc_log_stats() functions map on to
+ * the __mp_memorymap() and __mp_summary() functions and so have entirely
+ * different display formats.  The dmalloc_log_unfreed() and
+ * dmalloc_log_changed() functions have similar display formats to the
+ * original Dmalloc library, but do not display summary tables and will
+ * display symbol names if they are available and filename and line number
+ * information isn't.  The dmalloc_message() and dmalloc_vmessage()
+ * functions write tracing to the mpatrol log file prefixed by three
+ * fields of optional information, which can be controlled by the LOG_*
+ * macros when building this module.
  *
  * This file is initialised via the mpatrol library's initialiser function
  * feature, which means that if the __mp_init_dmalloc() function is noted
