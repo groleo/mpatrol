@@ -37,13 +37,13 @@ int main(void)
     int *i;
     char *s;
 
-    f = MP_MALLOC(16, float);
-    f = MP_REALLOC(f, 8, float);
+    MP_MALLOC(f, 16, float);
+    MP_REALLOC(f, 8, float);
     MP_FREE(f);
-    i = MP_CALLOC(16, int);
-    i = MP_REALLOC(i, 32, int);
+    MP_CALLOC(i, 16, int);
+    MP_REALLOC(i, 32, int);
     MP_FREE(i);
-    s = MP_STRDUP("test");
+    MP_STRDUP(s, "test");
     MP_FREE(s);
     return EXIT_SUCCESS;
 }
