@@ -39,6 +39,7 @@
 
 #ifndef TARGET
 #if defined(unix) || defined(_unix) || defined(__unix) || defined(__unix__) || \
+    defined(AIX) || defined(_AIX) || defined(__AIX) || defined(__AIX__) || \
     defined(__Lynx) || defined(__Lynx__)
 #define TARGET TARGET_UNIX
 #elif defined(AMIGA) || defined(_AMIGA) || defined(__AMIGA) || \
@@ -57,17 +58,20 @@
 
 
 #define SYSTEM_ANY     1 /* no specific system */
-#define SYSTEM_DGUX    2 /* DG/UX */
-#define SYSTEM_DYNIX   3 /* DYNIX/ptx */
-#define SYSTEM_HPUX    4 /* HP/UX */
-#define SYSTEM_LINUX   5 /* Linux */
-#define SYSTEM_LYNXOS  6 /* LynxOS */
-#define SYSTEM_SOLARIS 7 /* Solaris */
+#define SYSTEM_AIX     2 /* AIX */
+#define SYSTEM_DGUX    3 /* DG/UX */
+#define SYSTEM_DYNIX   4 /* DYNIX/ptx */
+#define SYSTEM_HPUX    5 /* HP/UX */
+#define SYSTEM_LINUX   6 /* Linux */
+#define SYSTEM_LYNXOS  7 /* LynxOS */
+#define SYSTEM_SOLARIS 8 /* Solaris */
 
 
 #ifndef SYSTEM
 #if TARGET == TARGET_UNIX
-#if defined(DGUX) || defined(_DGUX) || defined(__DGUX) || defined(__DGUX__)
+#if defined(AIX) || defined(_AIX) || defined(__AIX) || defined(__AIX__)
+#define SYSTEM SYSTEM_AIX
+#elif defined(DGUX) || defined(_DGUX) || defined(__DGUX) || defined(__DGUX__)
 #define SYSTEM SYSTEM_DGUX
 #elif defined(sequent) || defined(_sequent) || defined(__sequent) || \
       defined(__sequent__) || defined(SEQUENT) || defined(_SEQUENT_)
@@ -93,13 +97,14 @@
 #endif /* SYSTEM */
 
 
-#define ARCH_IX86   1 /* Intel 80x86 */
-#define ARCH_M68K   2 /* Motorola 680x0 */
-#define ARCH_M88K   3 /* Motorola 88xx0 */
-#define ARCH_MIPS   4 /* MIPS */
-#define ARCH_PARISC 5 /* HP PA/RISC */
-#define ARCH_PPC    6 /* PowerPC */
-#define ARCH_SPARC  7 /* SPARC */
+#define ARCH_IX86    1 /* Intel 80x86 */
+#define ARCH_M68K    2 /* Motorola 680x0 */
+#define ARCH_M88K    3 /* Motorola 88xx0 */
+#define ARCH_MIPS    4 /* MIPS */
+#define ARCH_PARISC  5 /* HP PA/RISC */
+#define ARCH_POWER   6 /* IBM RS/6000 */
+#define ARCH_POWERPC 7 /* PowerPC */
+#define ARCH_SPARC   8 /* SPARC */
 
 
 #ifndef ARCH
@@ -123,11 +128,14 @@
 #define ARCH ARCH_MIPS
 #elif defined(hppa) || defined(_hppa) || defined(__hppa) || defined(__hppa__)
 #define ARCH ARCH_PARISC
+#elif defined(POWER) || defined(_POWER) || defined(__POWER) || \
+      defined(__POWER__)
+#define ARCH ARCH_POWER
 #elif defined(ppc) || defined(_ppc) || defined(__ppc) || defined(__ppc__) || \
       defined(powerpc) || defined(_powerpc) || defined(__powerpc) || \
       defined(__powerpc__) || defined(POWERPC) || defined(_POWERPC) || \
       defined(__POWERPC) || defined(__POWERPC__) || defined(_M_PPC)
-#define ARCH ARCH_PPC
+#define ARCH ARCH_POWERPC
 #elif defined(sparc) || defined(_sparc) || defined(__sparc) || \
       defined(__sparc__)
 #define ARCH ARCH_SPARC
@@ -145,18 +153,19 @@
 
 #ifndef FORMAT
 #if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_LYNXOS
 #define FORMAT FORMAT_BFD
 #else /* SYSTEM */
 #define FORMAT FORMAT_ELF32
 #endif /* SYSTEM */
-#else /* FORMAT */
+#else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define FORMAT FORMAT_BFD
 #else /* TARGET && __GNUC__ */
 #define FORMAT FORMAT_NONE
 #endif /* TARGET && __GNUC__ */
-#endif /* FORMAT */
+#endif /* TARGET */
 #endif /* FORMAT */
 
 
