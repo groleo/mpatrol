@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.44 2003-11-25 16:20:06 graeme Exp $
+# $Id: Makefile,v 1.45 2003-11-25 17:47:23 graeme Exp $
 
 
 # Definitions
@@ -39,7 +39,7 @@ VERBOSE    = false
 
 # Rules
 
-.SUFFIXES: .texi .tex .txt .info .guide .html .dvi .ps .pdf .jpg .eps
+.SUFFIXES: .texi .tex .txt .info .guide .xml .html .dvi .ps .pdf .jpg .eps
 
 default: $(DOCUMENT).txt
 
@@ -79,6 +79,16 @@ ifeq ($(VERBOSE),true)
 	@ makeguide --amiga --verbose $<
 else
 	@ makeguide --amiga $<
+endif
+
+# Build the DocBook file from the Texinfo file using makeinfo
+
+$(DOCUMENT).xml: $(DOCUMENT).texi images/$(DOCUMENT).txt
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ makeinfo --docbook --ifinfo --verbose $<
+else
+	@ makeinfo --docbook --ifinfo $<
 endif
 
 ifeq ($(SPLIT),true)
@@ -239,17 +249,17 @@ endif
 endif
 	-@ rm -rf bin src tools >/dev/null 2>&1
 
-all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
-	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(REFCARD).dvi \
-	$(REFCARD).ps $(REFCARD).pdf
+all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).xml \
+	$(DOCUMENT).html $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf \
+	$(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf
 
 source: $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf
 
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).info-* >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).xml >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).html $(DOCUMENT)_*.html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
 	-@ rm -f $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf >/dev/null 2>&1
