@@ -48,7 +48,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.9 2000-06-15 18:45:22 graeme Exp $"
+#ident "$Id: mutex.c,v 1.10 2000-06-16 17:43:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -95,14 +95,14 @@ extern "C"
 static recmutex locks[MT_MAX];
 
 
-#if TARGET == TARGET_UNIX
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_LYNXOS
 /* We can make use of the POSIX threads function pthread_once() in
  * order to prevent the mpatrol library being initialised more than
  * once at the same time.
  */
 
 static pthread_once_t lockflag = PTHREAD_ONCE_INIT;
-#endif /* TARGET */
+#endif /* TARGET && SYSTEM */
 
 
 #if MP_INIT_SUPPORT
@@ -252,12 +252,12 @@ MP_GLOBAL void __mp_lockmutex(mutextype m)
 
     l = &locks[m];
     i = __mp_threadid();
-#if TARGET == TARGET_UNIX
+#if TARGET == TARGET_UNIX && SYSTEM != SYSTEM_LYNXOS
     pthread_once(&lockflag, __mp_initmutexes);
-#else /* TARGET */
+#else /* TARGET && SYSTEM */
     if (!l->init)
         __mp_initmutexes();
-#endif /* TARGET */
+#endif /* TARGET && SYSTEM */
     lockmutex(&l->guard);
     if ((l->owner == i) && (l->count > 0))
         l->count++;
