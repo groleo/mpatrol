@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.35 2000-12-26 10:29:24 graeme Exp $
+# $Id: Makefile,v 1.36 2001-01-22 20:25:49 graeme Exp $
 
 
 # Definitions
@@ -36,7 +36,7 @@ CFLAGS = -I$(SOURCE)
 OFLAGS = -O3 -fno-inline-functions
 TFLAGS = -DMP_THREADS_SUPPORT
 
-LIBRARY	= mpatrol
+MPATROL	= mpatrol
 
 ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -46,10 +46,10 @@ ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
 
-ARCHIVE_LIBRARY	= lib$(LIBRARY).a
-OBJECT_LIBRARY	= lib$(LIBRARY).o
-ARCHTS_LIBRARY	= lib$(LIBRARY)mt.a
-OBJTS_LIBRARY	= lib$(LIBRARY)mt.o
+ARCHIVE_LIBRARY	= lib$(MPATROL).a
+OBJECT_LIBRARY	= lib$(MPATROL).o
+ARCHTS_LIBRARY	= lib$(MPATROL)mt.a
+OBJTS_LIBRARY	= lib$(MPATROL)mt.o
 
 
 # Rules

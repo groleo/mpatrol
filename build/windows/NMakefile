@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.30 2000-12-26 10:30:52 graeme Exp $
+# $Id: NMakefile,v 1.31 2001-01-22 20:25:52 graeme Exp $
 
 
 # Definitions
@@ -36,7 +36,7 @@ CFLAGS = -nologo -I$(SOURCE)
 OFLAGS = -Ogt
 TFLAGS = -DMP_THREADS_SUPPORT
 
-LIBRARY	= mpatrol
+MPATROL	= mpatrol
 
 ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
@@ -59,12 +59,12 @@ SHARTS_OBJECTS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
 		  sbrk.ts_obj main.ts_obj version.ts_obj
 
-ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
-SHARED_LIBRARY	= $(LIBRARY).dll
-OBJECT_LIBRARY	= lib$(LIBRARY).obj
-ARCHTS_LIBRARY	= lib$(LIBRARY)mt.lib
-SHARTS_LIBRARY	= $(LIBRARY)mt.dll
-OBJTS_LIBRARY	= lib$(LIBRARY)mt.obj
+ARCHIVE_LIBRARY	= lib$(MPATROL).lib
+SHARED_LIBRARY	= $(MPATROL).dll
+OBJECT_LIBRARY	= lib$(MPATROL).obj
+ARCHTS_LIBRARY	= lib$(MPATROL)mt.lib
+SHARTS_LIBRARY	= $(MPATROL)mt.dll
+OBJTS_LIBRARY	= lib$(MPATROL)mt.obj
 
 
 # Rules
@@ -86,8 +86,8 @@ OBJTS_LIBRARY	= lib$(LIBRARY)mt.obj
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
 
-$(SHARED_LIBRARY): $(SHARED_OBJECTS) $(LIBRARY).def
-	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS) -defaultlib:imagehlp
+$(SHARED_LIBRARY): $(SHARED_OBJECTS) $(MPATROL).def
+	$(LD) -dll -nologo -def:$(MPATROL).def -out:$@ $(SHARED_OBJECTS) -defaultlib:imagehlp
 
 $(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
@@ -95,8 +95,8 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY)mt.def
-	$(LD) -dll -nologo -def:$(LIBRARY)mt.def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
+$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(MPATROL)mt.def
+	$(LD) -dll -nologo -def:$(MPATROL)mt.def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
 
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
@@ -124,8 +124,8 @@ clean:
 clobber: clean
 	-@ del /f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) >nul 2>&1
 	-@ del /f $(SHARED_LIBRARY) $(SHARTS_LIBRARY) >nul 2>&1
-	-@ del /f $(LIBRARY).lib $(LIBRARY).exp >nul 2>&1
-	-@ del /f $(LIBRARY)mt.lib $(LIBRARY)mt.exp >nul 2>&1
+	-@ del /f $(MPATROL).lib $(MPATROL).exp >nul 2>&1
+	-@ del /f $(MPATROL)mt.lib $(MPATROL)mt.exp >nul 2>&1
 	-@ del /f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) >nul 2>&1
 	-@ del /f mpatrol.exe mprof.exe mptrace.exe mleak.exe >nul 2>&1
 

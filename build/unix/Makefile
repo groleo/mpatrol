@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.44 2001-01-22 20:02:52 graeme Exp $
+# $Id: Makefile,v 1.45 2001-01-22 20:25:51 graeme Exp $
 
 
 # Definitions
@@ -41,7 +41,7 @@ SFLAGS	= -fPIC
 TFLAGS	= -DMP_THREADS_SUPPORT
 LDFLAGS	= -shared
 
-LIBRARY	 = mpatrol
+MPATROL	 = mpatrol
 VERSION	 = 1
 REVISION = 3
 
@@ -59,14 +59,14 @@ ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
 SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o) machine.s.t.o
 LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
 
-ARCHIVE_LIBRARY	= lib$(LIBRARY).a
-SHARED_LIBRARY	= lib$(LIBRARY).so
-OBJECT_LIBRARY	= lib$(LIBRARY).o
-LINT_LIBRARY	= llib-l$(LIBRARY).ln
-ARCHTS_LIBRARY	= lib$(LIBRARY)mt.a
-SHARTS_LIBRARY	= lib$(LIBRARY)mt.so
-OBJTS_LIBRARY	= lib$(LIBRARY)mt.o
-LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
+ARCHIVE_LIBRARY	= lib$(MPATROL).a
+SHARED_LIBRARY	= lib$(MPATROL).so
+OBJECT_LIBRARY	= lib$(MPATROL).o
+LINT_LIBRARY	= llib-l$(MPATROL).ln
+ARCHTS_LIBRARY	= lib$(MPATROL)mt.a
+SHARTS_LIBRARY	= lib$(MPATROL)mt.so
+OBJTS_LIBRARY	= lib$(MPATROL)mt.o
+LINTTS_LIBRARY	= llib-l$(MPATROL)mt.ln
 
 
 # Rules
@@ -106,7 +106,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
 $(LINT_LIBRARY): $(LINT_OBJECTS)
-	$(LINT) -o $(LIBRARY) $(LINT_OBJECTS)
+	$(LINT) -o $(MPATROL) $(LINT_OBJECTS)
 
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) cr $@ $(ARCHTS_OBJECTS)
@@ -121,7 +121,7 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 $(LINTTS_LIBRARY): $(LINTTS_OBJECTS)
-	$(LINT) -o $(LIBRARY)mt $(LINTTS_OBJECTS)
+	$(LINT) -o $(MPATROL)mt $(LINTTS_OBJECTS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s

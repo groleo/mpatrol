@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.2 2001-01-22 20:02:52 graeme Exp $
+# $Id: Makefile.aix,v 1.3 2001-01-22 20:25:51 graeme Exp $
 
 
 # Definitions
@@ -39,7 +39,7 @@ CFLAGS	= -I$(SOURCE)
 OFLAGS	= -O2 -Q!
 TFLAGS	= -DMP_THREADS_SUPPORT
 
-LIBRARY	 = mpatrol
+MPATROL	 = mpatrol
 
 OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -53,14 +53,14 @@ LINT_OBJECTS	= $(OBJECTS:.o=.n.ln)
 ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
 LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
 
-ARCHIVE_LIBRARY	= lib$(LIBRARY).a
+ARCHIVE_LIBRARY	= lib$(MPATROL).a
 SHARED_LIBRARY	= shr.o
-OBJECT_LIBRARY	= lib$(LIBRARY).o
-LINT_LIBRARY	= llib-l$(LIBRARY).ln
-ARCHTS_LIBRARY	= lib$(LIBRARY)mt.a
+OBJECT_LIBRARY	= lib$(MPATROL).o
+LINT_LIBRARY	= llib-l$(MPATROL).ln
+ARCHTS_LIBRARY	= lib$(MPATROL)mt.a
 SHARTS_LIBRARY	= shrmt.so
-OBJTS_LIBRARY	= lib$(LIBRARY)mt.o
-LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
+OBJTS_LIBRARY	= lib$(MPATROL)mt.o
+LINTTS_LIBRARY	= llib-l$(MPATROL)mt.ln
 
 
 # Rules
@@ -85,27 +85,27 @@ $(ARCHIVE_LIBRARY): $(SHARED_LIBRARY) $(ARCHIVE_OBJECTS)
 	-@ rm -f $@ 2>&1 >/dev/null
 	$(AR) cr $@ $(SHARED_LIBRARY) $(ARCHIVE_OBJECTS)
 
-$(SHARED_LIBRARY): $(ARCHIVE_OBJECTS) $(LIBRARY).exp
-	$(LD) -bmodtype:SRE -bexport:$(LIBRARY).exp -bnoentry -o $@ $(ARCHIVE_OBJECTS)
+$(SHARED_LIBRARY): $(ARCHIVE_OBJECTS) $(MPATROL).exp
+	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHIVE_OBJECTS)
 
 $(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
 $(LINT_LIBRARY): $(LINT_OBJECTS)
-	$(LINT) -o $(LIBRARY) $(LINT_OBJECTS)
+	$(LINT) -o $(MPATROL) $(LINT_OBJECTS)
 
 $(ARCHTS_LIBRARY): $(SHARTS_LIBRARY) $(ARCHTS_OBJECTS)
 	-@ rm -f $@ 2>&1 >/dev/null
 	$(AR) cr $@ $(SHARTS_LIBRARY) $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(ARCHTS_OBJECTS) $(LIBRARY).exp
-	$(LD) -bmodtype:SRE -bexport:$(LIBRARY).exp -bnoentry -o $@ $(ARCHTS_OBJECTS) -lpthreads
+$(SHARTS_LIBRARY): $(ARCHTS_OBJECTS) $(MPATROL).exp
+	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHTS_OBJECTS) -lpthreads
 
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 $(LINTTS_LIBRARY): $(LINTTS_OBJECTS)
-	$(LINT) -o $(LIBRARY)mt $(LINTTS_OBJECTS)
+	$(LINT) -o $(MPATROL)mt $(LINTTS_OBJECTS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s

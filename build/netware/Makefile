@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.34 2000-12-26 10:29:43 graeme Exp $
+# $Id: Makefile,v 1.35 2001-01-22 20:25:50 graeme Exp $
 
 
 # Definitions
@@ -37,7 +37,7 @@ CFLAGS = -I$(SOURCE)
 OFLAGS = -O
 TFLAGS = -DMP_THREADS_SUPPORT
 
-LIBRARY	= mpatrol
+MPATROL	= mpatrol
 
 OBJECTS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
@@ -47,10 +47,10 @@ TOBJECTS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
 	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
 
-ARCHIVE_LIBRARY	= $(LIBRARY).lib
-OBJECT_LIBRARY	= lib$(LIBRARY).obj
-ARCHTS_LIBRARY	= $(LIBRARY)mt.lib
-OBJTS_LIBRARY	= lib$(LIBRARY)mt.obj
+ARCHIVE_LIBRARY	= $(MPATROL).lib
+OBJECT_LIBRARY	= lib$(MPATROL).obj
+ARCHTS_LIBRARY	= $(MPATROL)mt.lib
+OBJTS_LIBRARY	= lib$(MPATROL)mt.obj
 
 
 # Rules
