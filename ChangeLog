@@ -1,3 +1,24 @@
+Thu Jun  1 21:29:46 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Documented potential problems on HP/UX.
+
+	* doc/mpatrol.texi:
+	Documented HP/UX stack traversal and shared library symbol support.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Documented that -lcl must be used when linking on HP/UX.
+
+	* src/memory.c: Added ability to determine program name on HP/UX.
+
+	* src/stack.c, src/stack.h: Fixed problem with HP/UX stack tracebacks.
+
+	* src/symbol.c:
+	Added support for reading symbols from shared libraries on HP/UX.
+
+	* src/mutex.c:
+	Recursive mutexes were working after all - it was just the mutex
+	initialisation code that wasn't working as expected!
+
 Wed May 31 20:48:47 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,

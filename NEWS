@@ -1,14 +1,14 @@
-Changes for 1.2.1
+Changes for 1.2.1 (1st June, 2000)
 
   * Intel LynxOS is now supported.
 
   * Added stack traversal support for PA/RISC, RS/6000 and PowerPC.
 
-  * Added ability to determine the program name on AIX and LynxOS.
+  * Added ability to determine the program name on AIX, HP/UX and LynxOS.
 
   * Added a better way of determining the program name under Linux.
 
-  * Symbols can now be read from IRIX shared libraries.
+  * Symbols can now be read from HP/UX and IRIX shared libraries.
 
   * Added a Linux Software Map index file.
 
