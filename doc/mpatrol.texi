@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.206 2001-03-14 23:15:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.207 2001-03-14 23:21:24 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -131,6 +131,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
+* Tools::                       Additional tools.
 * Utilities::                   External programs.
 * Profiling::                   Memory allocation profiling.
 * Tracing::                     Memory allocation tracing.
@@ -1817,7 +1818,7 @@ be initialised too early, possibly before the environment or file streams have
 been set up.  You may find that if one of the above methods does not work for
 you then perhaps another one will.
 
-@node Using mpatrol, Utilities, Operating system support, Top
+@node Using mpatrol, Tools, Operating system support, Top
 @chapter Using mpatrol
 @cindex using mpatrol
 
@@ -1835,7 +1836,6 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Testing::                     Additional checks.
 * Library functions::           What's provided.
 * Leak table::                  Memory leak table.
-* Tools::                       Additional tools.
 @end menu
 
 @node Library behaviour, Logging and tracing, , Using mpatrol
@@ -3040,7 +3040,7 @@ library statistics to the mpatrol log file, while the @code{__mp_stats()}
 function fills in a data structure with selected statistics for examination in
 user code.
 
-@node Leak table, Tools, Library functions, Using mpatrol
+@node Leak table, , Library functions, Using mpatrol
 @section Leak table
 @cindex leak table
 
@@ -3194,8 +3194,8 @@ if the @option{NOFREE} option is used.  The leak table will provide less details
 on freed memory allocations but its advantage is that it does not require the
 use of the @option{NOFREE} option.
 
-@node Tools, , Leak table, Using mpatrol
-@section Tools
+@node Tools, Utilities, Using mpatrol, Top
+@chapter Tools
 @cindex tools
 @cindex extensions
 
@@ -3231,7 +3231,7 @@ should also be written in the associated header file.
 @end menu
 
 @node dbmalloc, dmalloc, , Tools
-@subsection Dbmalloc-compatible functions
+@section Dbmalloc-compatible functions
 @cindex Dbmalloc
 
 This file provides Dbmalloc@footnote{Dbmalloc is copyright @copyright{}
@@ -3284,7 +3284,7 @@ function must be called as early on as possible, otherwise this file will not be
 initialised until one of its functions are called.
 
 @node dmalloc, heapdiff, dbmalloc, Tools
-@subsection Dmalloc-compatible functions
+@section Dmalloc-compatible functions
 @cindex Dmalloc
 
 This file provides Dmalloc@footnote{Dmalloc is copyright @copyright{}
@@ -3348,7 +3348,7 @@ function must be called as early on as possible, otherwise this file will not be
 initialised until one of its functions are called.
 
 @node heapdiff, mgauge, dmalloc, Tools
-@subsection Determining heap differences
+@section Determining heap differences
 @cindex heapdiff
 
 This file defines @code{heapdiffstart()} and @code{heapdiffend()}, which must be
@@ -3379,7 +3379,7 @@ will edit or list the relevant source file at the correct line number, but only
 if the @option{EDIT} or @option{LIST} options are supported.
 
 @node mgauge, mtrace, heapdiff, Tools
-@subsection Memory allocation gauge
+@section Memory allocation gauge
 @cindex mgauge
 
 This file defines @code{mgaugestart()}, @code{mgaugeend()}, @code{mgaugeon()}
@@ -3405,7 +3405,7 @@ updated.  If it is specified as zero then all events will cause the gauge to be
 updated.
 
 @node mtrace, , mgauge, Tools
-@subsection Memory allocation tracing
+@section Memory allocation tracing
 @cindex mtrace
 
 This file defines @code{mtrace()} and @code{muntrace()}, two functions which
@@ -3415,7 +3415,7 @@ environment variable is set to the filename of the trace file to use.  The
 resulting trace files can be processed by the @command{mtrace} perl script which
 is distributed with the GNU C library.
 
-@node Utilities, Profiling, Using mpatrol, Top
+@node Utilities, Profiling, Tools, Top
 @chapter Utilities
 @cindex utilities
 
