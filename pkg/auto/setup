@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.2 2001-08-02 21:55:06 graeme Exp $
+# $Id: setup,v 1.3 2001-08-02 22:12:15 graeme Exp $
 
 
 uselinks=1
@@ -52,6 +52,7 @@ copyfile()
     then
         if [ $uselinks = 1 ]
         then
+            rm -f "$2"
             ln -s "$1" "$2"
         else
             cp -p "$1" "$2"
@@ -134,3 +135,14 @@ do
 done
 copyfile ../../../config/tools.am Makefile.am
 cd ..
+
+
+# Regenerate the configure script and associated files if this is required.
+
+if [ $generate = 1 ]
+then
+    echo "Regenerating configuration files" >&2
+    aclocal
+    automake --add-missing
+    autoconf
+fi
