@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.25 2000-06-15 20:27:03 graeme Exp $
+# $Id: Makefile,v 1.26 2000-06-29 00:49:46 graeme Exp $
 
 
 # Definitions
@@ -53,7 +53,7 @@ TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 
 ARCHIVE_OBJECTS	= $(OBJECTS) machine.o
 SHARED_OBJECTS	= $(OBJECTS:.o=.s.o) machine.s.o
-LINT_OBJECTS	= $(OBJECTS:.o=.ln)
+LINT_OBJECTS	= $(OBJECTS:.o=.n.ln)
 ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
 SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o) machine.s.t.o
 LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
@@ -70,7 +70,7 @@ LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
 
 # Rules
 
-.SUFFIXES: .c .s .o .s.o .ln .t.o .s.t.o .t.ln
+.SUFFIXES: .c .s .o .s.o .n.ln .t.o .s.t.o .t.ln
 
 .c.o:
 	$(CC) $(CFLAGS) $(OFLAGS) -c $<
@@ -78,8 +78,9 @@ LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
 .c.s.o:
 	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) -c -o $@ $<
 
-.c.ln:
+.c.n.ln:
 	$(LINT) $(CFLAGS) -y -c $<
+	-@ mv -f `basename $@ .n.ln`.ln $@
 
 .c.t.o:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
@@ -88,7 +89,8 @@ LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
 	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) $(TFLAGS) -c -o $@ $<
 
 .c.t.ln:
-	$(LINT) $(CFLAGS) $(TFLAGS) -y -C `basename $@ .ln` $<
+	$(LINT) $(CFLAGS) $(TFLAGS) -y -c $<
+	-@ mv -f `basename $@ .t.ln`.ln $@
 
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
@@ -172,56 +174,57 @@ clobber: clean
 
 # Dependencies
 
-list.o list.s.o list.ln list.t.o list.s.t.o list.t.ln: $(SOURCE)/list.c \
+list.o list.s.o list.n.ln list.t.o list.s.t.o list.t.ln: $(SOURCE)/list.c \
 	$(SOURCE)/list.h $(SOURCE)/config.h $(SOURCE)/target.h
-tree.o tree.s.o tree.ln tree.t.o tree.s.t.o tree.t.ln: $(SOURCE)/tree.c \
+tree.o tree.s.o tree.n.ln tree.t.o tree.s.t.o tree.t.ln: $(SOURCE)/tree.c \
 	$(SOURCE)/tree.h $(SOURCE)/config.h $(SOURCE)/target.h
-slots.o slots.s.o slots.ln slots.t.o slots.s.t.o slots.t.ln: $(SOURCE)/slots.c \
-	$(SOURCE)/slots.h $(SOURCE)/config.h $(SOURCE)/target.h \
-	$(SOURCE)/utils.h
-utils.o utils.s.o utils.ln utils.t.o utils.s.t.o utils.t.ln: $(SOURCE)/utils.c \
-	$(SOURCE)/utils.h $(SOURCE)/config.h $(SOURCE)/target.h
-memory.o memory.s.o memory.ln memory.t.o memory.s.t.o memory.t.ln: \
+slots.o slots.s.o slots.n.ln slots.t.o slots.s.t.o slots.t.ln: \
+	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/utils.h
+utils.o utils.s.o utils.n.ln utils.t.o utils.s.t.o utils.t.ln: \
+	$(SOURCE)/utils.c $(SOURCE)/utils.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
+memory.o memory.s.o memory.n.ln memory.t.o memory.s.t.o memory.t.ln: \
 	$(SOURCE)/memory.c $(SOURCE)/memory.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/stack.h $(SOURCE)/utils.h
-heap.o heap.s.o heap.ln heap.t.o heap.s.t.o heap.t.ln: $(SOURCE)/heap.c \
+heap.o heap.s.o heap.n.ln heap.t.o heap.s.t.o heap.t.ln: $(SOURCE)/heap.c \
 	$(SOURCE)/heap.h $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/utils.h
-alloc.o alloc.s.o alloc.ln alloc.t.o alloc.s.t.o alloc.t.ln: $(SOURCE)/alloc.c \
-	$(SOURCE)/alloc.h $(SOURCE)/config.h $(SOURCE)/target.h \
+alloc.o alloc.s.o alloc.n.ln alloc.t.o alloc.s.t.o alloc.t.ln: \
+	$(SOURCE)/alloc.c $(SOURCE)/alloc.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/utils.h
+info.o info.s.o info.n.ln: $(SOURCE)/info.c $(SOURCE)/info.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/addr.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
-	$(SOURCE)/list.h $(SOURCE)/utils.h
-info.o info.s.o info.ln: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
-	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
-	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
-	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
-	$(SOURCE)/utils.h $(SOURCE)/profile.h
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/profile.h
 info.t.o info.s.t.o info.t.ln: $(SOURCE)/info.c $(SOURCE)/info.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/addr.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/mutex.h $(SOURCE)/utils.h $(SOURCE)/profile.h
-stack.o stack.s.o stack.ln stack.t.o stack.s.t.o stack.t.ln: $(SOURCE)/stack.c \
-	$(SOURCE)/stack.h $(SOURCE)/memory.h $(SOURCE)/machine.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h
-addr.o addr.s.o addr.ln addr.t.o addr.s.t.o addr.t.ln: $(SOURCE)/addr.c \
+stack.o stack.s.o stack.n.ln stack.t.o stack.s.t.o stack.t.ln: \
+	$(SOURCE)/stack.c $(SOURCE)/stack.h $(SOURCE)/memory.h \
+	$(SOURCE)/machine.h $(SOURCE)/config.h $(SOURCE)/target.h
+addr.o addr.s.o addr.n.ln addr.t.o addr.s.t.o addr.t.ln: $(SOURCE)/addr.c \
 	$(SOURCE)/addr.h $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/utils.h
-strtab.o strtab.s.o strtab.ln strtab.t.o strtab.s.t.o strtab.t.ln: \
+strtab.o strtab.s.o strtab.n.ln strtab.t.o strtab.s.t.o strtab.t.ln: \
 	$(SOURCE)/strtab.c $(SOURCE)/strtab.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/utils.h
-symbol.o symbol.s.o symbol.ln symbol.t.o symbol.s.t.o symbol.t.ln: \
+symbol.o symbol.s.o symbol.n.ln symbol.t.o symbol.s.t.o symbol.t.ln: \
 	$(SOURCE)/symbol.c $(SOURCE)/symbol.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/utils.h \
 	$(SOURCE)/profile.h
-signals.o signals.s.o signals.ln signals.t.o signals.s.t.o signals.t.ln: \
+signals.o signals.s.o signals.n.ln signals.t.o signals.s.t.o signals.t.ln: \
 	$(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
@@ -234,12 +237,12 @@ mutex.t.o mutex.s.t.o mutex.t.ln: $(SOURCE)/mutex.c $(SOURCE)/mutex.h \
 	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/signals.h \
 	$(SOURCE)/machine.h $(SOURCE)/config.h $(SOURCE)/target.h
-diag.o diag.s.o diag.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
-	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
-	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
-	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/utils.h \
-	$(SOURCE)/profile.h $(SOURCE)/version.h
+diag.o diag.s.o diag.n.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/utils.h $(SOURCE)/profile.h $(SOURCE)/version.h
 diag.t.o diag.s.t.o diag.t.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
@@ -247,21 +250,21 @@ diag.t.o diag.s.t.o diag.t.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/mutex.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/utils.h \
 	$(SOURCE)/profile.h $(SOURCE)/version.h
-option.o option.s.o option.ln option.t.o option.s.t.o option.t.ln: \
+option.o option.s.o option.n.ln option.t.o option.s.t.o option.t.ln: \
 	$(SOURCE)/option.c $(SOURCE)/option.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/utils.h $(SOURCE)/profile.h
-profile.o profile.s.o profile.ln profile.t.o profile.s.t.o profile.t.ln: \
+profile.o profile.s.o profile.n.ln profile.t.o profile.s.t.o profile.t.ln: \
 	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h
-inter.o inter.s.o inter.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
+inter.o inter.s.o inter.n.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
@@ -274,13 +277,13 @@ inter.t.o inter.s.t.o inter.t.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/mutex.h $(SOURCE)/option.h \
 	$(SOURCE)/profile.h
-malloc.o malloc.s.o malloc.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
+malloc.o malloc.s.o malloc.n.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
 	$(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h
-version.o version.s.o version.ln version.t.o version.s.t.o version.t.ln: \
+version.o version.s.o version.n.ln version.t.o version.s.t.o version.t.ln: \
 	$(SOURCE)/version.c $(SOURCE)/version.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 machine.o machine.s.o machine.t.o machine.s.t.o: $(SOURCE)/machine.c \
