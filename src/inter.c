@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.98 2001-03-02 01:36:38 graeme Exp $"
+#ident "$Id: inter.c,v 1.99 2001-03-03 14:46:27 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.98 2001-03-02 01:36:38 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.99 2001-03-03 14:46:27 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -112,6 +112,30 @@ msvcrt_initialised(void)
  */
 
 static int *initsection = &__mp_initsection;
+#elif SYSTEM == SYSTEM_TRU64
+/* Tru64 has an interesting feature in that any functions whose names begin
+ * with __init_* and __fini_* will be called before and after main()
+ * respectively.
+ */
+
+static
+void
+__init_mpatrol(void)
+{
+#if MP_THREADS_SUPPORT
+    __mp_initmutexes();
+#endif /* MP_THREADS_SUPPORT */
+    __mp_init();
+}
+
+#if !MP_USE_ATEXIT
+static
+void
+__fini_mpatrol(void)
+{
+    __mp_fini();
+}
+#endif /* MP_USE_ATEXIT */
 #elif defined(__GNUC__)
 /* The GNU C compiler allows us to indicate that a function is a constructor
  * which should be called before main() or that a function is a destructor
@@ -1973,6 +1997,24 @@ __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
     }
     if (*r != '\0')
         __mp_diag("%s%s\n", MP_PRINTPREFIX, r);
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     if ((s != NULL) || (t != NULL))
     {
         __mp_diag("   ");
@@ -1982,8 +2024,7 @@ __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
             __mp_diag(" in file `%s' at line %lu", t, u);
         __mp_diag("\n");
     }
-    __mp_newframe(&i, NULL);
-    if (__mp_getframe(&i) && __mp_getframe(&i))
+    if (i.addr != NULL)
     {
         __mp_printstack(&memhead.syms, &i);
         __mp_diag("\n");
@@ -2015,6 +2056,24 @@ __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
     }
     if (*r != '\0')
         __mp_diag("%s%s\n", MP_PRINTPREFIX, r);
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    /* If no filename was passed through then attempt to read any debugging
+     * information to determine the source location of the call.
+     */
+    if ((memhead.recur == 1) && (t == NULL) && (i.addr != NULL) &&
+        __mp_findsource(&memhead.syms, (char *) i.addr - 1, &s, &t, &u))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if (s != NULL)
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
     if ((s != NULL) || (t != NULL))
     {
         __mp_diag("   ");
@@ -2024,8 +2083,7 @@ __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
             __mp_diag(" in file `%s' at line %lu", t, u);
         __mp_diag("\n");
     }
-    __mp_newframe(&i, NULL);
-    if (__mp_getframe(&i) && __mp_getframe(&i))
+    if (i.addr != NULL)
     {
         __mp_printstack(&memhead.syms, &i);
         __mp_diag("\n");
@@ -2179,7 +2237,7 @@ void __mp_libimagehlp(void) {}
 #if MP_LIBRARYSTACK_SUPPORT
 void __mp_libcl(void) {}
 #endif /* MP_LIBRARYSTACK_SUPPORT */
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
 #if MP_LIBRARYSTACK_SUPPORT
 void __mp_libexc(void) {}
 #endif /* MP_LIBRARYSTACK_SUPPORT */
