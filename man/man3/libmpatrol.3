@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.18 2001-02-26 00:23:52 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.19 2001-03-05 18:55:32 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "26 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "5 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -112,7 +112,8 @@ void *memchr(const void *ptr, int byte, size_t size);
 int __mp_atexit(void (*func)(void));
 unsigned long __mp_setoption(long opt, unsigned long val);
 int __mp_getoption(long opt, unsigned long *val);
-char *__mp_function(__mp_alloctype func);
+const char *__mp_strerror(__mp_errortype err);
+const char *__mp_function(__mp_alloctype func);
 int __mp_setuser(const void *ptr, const void *data);
 int __mp_setmark(const void *ptr);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
@@ -123,6 +124,11 @@ unsigned long __mp_snapshot(void);
                     void *data, unsigned long event);
 \}
 .if t \{size_t __mp_iterate(int (*func)(const void *, void *), void *data, unsigned long event);
+\}
+.if n \{size_t __mp_iterateall(int (*func)(const void *, void *),
+                       void *data);
+\}
+.if t \{size_t __mp_iterateall(int (*func)(const void *, void *), void *data);
 \}
 void __mp_memorymap(int stats);
 void __mp_summary(void);
@@ -143,6 +149,8 @@ void __mp_check(void);
 void (*__mp_nomemory(void (*func)(void)))(void);
 int __mp_printf(const char *fmt, ...);
 int __mp_vprintf(const char *fmt, va_list args);
+void __mp_locprintf(const char *fmt, ...);
+void __mp_vlocprintf(const char *fmt, va_list args);
 void __mp_logmemory(const void *ptr, size_t size);
 int __mp_logstack(size_t frames);
 int __mp_logaddr(const void *ptr);
@@ -678,7 +686,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 26 functions are available as support routines for additional
+The following 30 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -710,6 +718,11 @@ unsigned integer, otherwise \fI0\fP will be returned.  If \fIopt\fP is
 returned in \fIval\fP.  If \fIopt\fP is \fIMP_OPT_UNSETFLAGS\fP then all of the
 mpatrol library flags that are not set will be returned in \fIval\fP.
 .TP
+\fB__mp_strerror\fP
+Returns the error message corresponding to the error code \fIerr\fP or
+\fBNULL\fP if no such error code exists.  The most recent error code recorded by
+the mpatrol library can be obtained by examining \fB__mp_errno\fP.
+.TP
 \fB__mp_function\fP
 Returns the name of the function corresponding to the allocation type \fIfunc\fP
 or \fBNULL\fP if no such allocation type exists.
@@ -729,13 +742,18 @@ otherwise.
 Sets the marked flag for the memory allocation containing \fIptr\fP, indicating
 that the memory allocation cannot be freed (but can be reallocated) and thus
 will not be listed as a memory leak.  This function returns \fI1\fP if there is
-an allocated memory block containing \fIptr\fP, and \fI0\fP otherwise.
+an allocated memory block containing \fIptr\fP, and \fI0\fP otherwise.  Note
+that a memory allocation made by \fBalloca\fP, \fBstrdupa\fP or \fBstrndupa\fP
+may not be marked.
 .TP
 \fB__mp_info\fP
 Obtains information about a specific memory allocation by placing statistics
 about \fIptr\fP in \fIinfo\fP.  If \fIptr\fP does not belong to a previously
-allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
-will be returned and \fIinfo\fP will contain the following information:
+allocated memory allocation or free memory block then \fI0\fP will be returned,
+otherwise \fI1\fP will be returned and \fIinfo\fP will contain the following
+information (note that a free memory block will only contain the \fIblock\fP and
+\fIsize\fP fields and can be identified by not having the \fIallocated\fP flag
+set):
 
 .TS
 l l.
@@ -755,6 +773,7 @@ l l.
 \fBtypestr\fP	Type stored in allocation.
 \fBtypesize\fP	Size of type stored in allocation.
 \fBuserdata\fP	User data associated with allocation.
+\fBallocated\fP	Indicates if alloc was allocated.
 \fBfreed\fP	Indicates if alloc has been freed.
 \fBmarked\fP	Indicates if alloc has been marked.
 \fBprofiled\fP	Indicates if alloc has been profiled.
@@ -783,9 +802,9 @@ l l.
 \fB__mp_printinfo\fP
 Displays information about a specific memory allocation containing \fIptr\fP to
 the standard error file stream.  If \fIptr\fP does not belong to a previously
-allocated memory allocation then \fI0\fP will be returned, otherwise \fI1\fP
-will be returned.  This function is intended to be called from within a
-debugger.
+allocated memory allocation or free memory block then \fI0\fP will be returned,
+otherwise \fI1\fP will be returned.  This function is intended to be called from
+within a debugger.
 .TP
 \fB__mp_snapshot\fP
 Returns the current event number, effectively taking a snapshot of the heap.
@@ -803,6 +822,19 @@ then \fB__mp_iterate\fP will return the number of times \fIfunc\fP returned a
 non-zero number after the iteration process has stopped.  The \fIdata\fP
 argument is passed directly to \fIfunc\fP as its second argument and is not
 read by the mpatrol library.
+.TP
+\fB__mp_iterateall\fP
+Iterates over all of the current allocated and freed memory allocations and any
+free memory blocks, calling \fIfunc\fP with the start address of every memory
+allocation or free block.  If \fIfunc\fP is \fBNULL\fP then \fB__mp_printinfo\fP
+will be used as the callback function.  If \fIfunc\fP returns a negative number
+then the iteration process will be stopped immediately.  If \fIfunc\fP returns a
+positive number above zero then \fB__mp_iterate\fP will return the number of
+times \fIfunc\fP returned a non-zero number after the iteration process has
+stopped.  The \fIdata\fP argument is passed directly to \fIfunc\fP as its second
+argument and is not read by the mpatrol library.  Note that unlike
+\fB__mp_iterate\fP, this function will also include internal memory allocations
+made by the mpatrol library and is intended for walking the entire heap.
 .TP
 \fB__mp_memorymap\fP
 If \fIstats\fP is non-zero then the current statistics of the mpatrol library
@@ -895,6 +927,21 @@ file, with each line prefixed by \fI>\fP.  The final length of the string that
 is written to the log file must not exceed 1024 characters.  Returns the number
 of characters written, or a negative number upon error.
 .TP
+\fB__mp_locprintf\fP
+Writes format string \fIfmt\fP with variable arguments to the log file, with
+each line prefixed by \fI>\fP.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  It also writes information to
+the log file about where the call to this function was made, which includes the
+source file location and the call stack if they are available.
+.TP
+\fB__mp_vlocprintf\fP
+Writes format string \fIfmt\fP with variable argument list \fIargs\fP to the log
+file, with each line prefixed by \fI>\fP.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  It also writes
+information to the log file about where the call to this function was made,
+which includes the source file location and the call stack if they are
+available.
+.TP
 \fB__mp_logmemory\fP
 Displays the contents of a block of memory beginning at \fIptr\fP, dumping
 \fIsize\fP consecutive bytes to the log file in hexadecimal format.
@@ -950,7 +997,7 @@ l l.
 \fI\-lelf\fP	If built with ELF support.
 \fI\-lbfd\fP & \fI\-liberty\fP	If built with BFD support.
 \fI\-lcl\fP	If built on HP/UX.
-\fI\-lexc\fP	If built on IRIX with library stack support.
+\fI\-lexc\fP	If built on IRIX or Tru64.
 \fI\-limagehlp\fP	If built on Windows.
 \fI\-lpthreads\fP	If built on AIX with threads support.
 \fI\-lthread\fP	If built on DG/UX with threads support.
