@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.8 2000-01-31 20:56:24 graeme Exp $
+# $Id: Makefile,v 1.9 2000-04-03 18:17:44 graeme Exp $
 
 
 # Definitions
@@ -133,7 +133,7 @@ $(DOCUMENT)_doc.tar.gz: all README
 	@ cp $(DOCUMENT).pdf README $(DOCUMENT)/doc
 	@ tar cf $(DOCUMENT)_doc.tar $(DOCUMENT)
 	@ gzip $(DOCUMENT)_doc.tar
-	-@ rm -rf $(DOCUMENT) 2>&1
+	-@ rm -rf $(DOCUMENT) >/dev/null 2>&1
 
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
@@ -142,5 +142,6 @@ ifeq ($(SPLITHTML),true)
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
 endif
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT)_doc.tar.gz >/dev/null 2>&1
 
 clobber: clean
