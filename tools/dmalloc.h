@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.4 2001-03-01 23:18:58 graeme Exp $
+ * $Id: dmalloc.h,v 1.5 2001-03-03 14:43:14 graeme Exp $
  */
 
 
@@ -250,9 +250,9 @@ static MP_VOLATILE void *__mpt_init_dmalloc = (void *) __mp_init_dmalloc;
 #define dmalloc_strerror(e) "errno value is not valid"
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
-#define dmalloc_message(s, ...) ((void) 0)
+#define dmalloc_message(...) ((void) 0)
 #elif defined(__GNUC__)
-#define dmalloc_message(s, a...) ((void) 0)
+#define dmalloc_message(a...) ((void) 0)
 #else /* __STDC_VERSION__ && __GNUC__ */
 static
 void
