@@ -26,18 +26,19 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.12 2001-09-25 22:13:12 graeme Exp $
+# $Id: mpsym,v 1.13 2001-09-30 23:44:22 graeme Exp $
 
 
 # Program version.
 
-VERSION="1.4"
+VERSION="1.5"
 
 
 # Parse the command line options.
 
 error=0
 help=0
+skip=0
 version=0
 progname=`basename "$0"`
 
@@ -46,6 +47,9 @@ do
     case "$option" in
       -h|--help)
         help=1
+        shift;;
+      -s|--skip)
+        skip=1
         shift;;
       -V|--version)
         version=1
@@ -123,6 +127,8 @@ cat <<EOF
 Options:
   -h  --help
         Displays this quick-reference option summary.
+  -s  --skip
+        Skip symbols marked as ??? in the log file.
   -V  --version
         Displays the version number of this program.
 EOF
@@ -204,8 +210,14 @@ echo "set print symbol-filename on" >"$dbtemp"
 echo "set width 0" >>"$dbtemp"
 echo "break main" >>"$dbtemp"
 echo "run" >>"$dbtemp"
-awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("x %s\n", $1); }' "$logfile" |
-    sort -u >>"$dbtemp"
+if [ $skip = 1 ]
+then
+    awk '/^\t0x[0-9A-F]+ [^ ]/ && ! /\?\?\?/ { printf("x %s\n", $1); }' "$logfile" |
+        sort -u >>"$dbtemp"
+else
+    awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("x %s\n", $1); }' "$logfile" |
+        sort -u >>"$dbtemp"
+fi
 echo "quit" >>"$dbtemp"
 
 
