@@ -44,15 +44,16 @@
 #define FLG_LOGALLOCS     8    /* log all memory allocations */
 #define FLG_LOGREALLOCS   16   /* log all memory reallocations */
 #define FLG_LOGFREES      32   /* log all memory deallocations */
-#define FLG_SHOWFREED     64   /* show all freed allocations */
-#define FLG_SHOWUNFREED   128  /* show all unfreed allocations */
-#define FLG_SHOWMAP       256  /* show memory map of heap */
-#define FLG_SHOWSYMBOLS   512  /* show all symbols read */
-#define FLG_SAFESIGNALS   1024 /* save and restore signal handlers */
-#define FLG_NOPROTECT     2048 /* do not protect internal structures */
+#define FLG_LOGMEMORY     64   /* log all memory operations */
+#define FLG_SHOWFREED     128  /* show all freed allocations */
+#define FLG_SHOWUNFREED   256  /* show all unfreed allocations */
+#define FLG_SHOWMAP       512  /* show memory map of heap */
+#define FLG_SHOWSYMBOLS   1024 /* show all symbols read */
+#define FLG_SAFESIGNALS   2048 /* save and restore signal handlers */
+#define FLG_NOPROTECT     4096 /* do not protect internal structures */
 
 
-/* The different types of memory allocation functions.
+/* The different types of memory allocation and operation functions.
  */
 
 typedef enum alloctype
@@ -74,6 +75,11 @@ typedef enum alloctype
     AT_NEWVEC,    /* operator new[] */
     AT_DELETE,    /* operator delete */
     AT_DELETEVEC, /* operator delete[] */
+    AT_MEMSET,    /* memset() */
+    AT_BZERO,     /* bzero() */
+    AT_MEMCPY,    /* memcpy() */
+    AT_MEMMOVE,   /* memmove() */
+    AT_BCOPY,     /* bcopy() */
     AT_MAX
 }
 alloctype;
@@ -163,8 +169,14 @@ MP_EXPORT void *__mp_resizememory(infohead *, void *, size_t, size_t, alloctype,
                                   char *, char *, unsigned long, stackinfo *);
 MP_EXPORT void __mp_freememory(infohead *, void *, alloctype, char *, char *,
                                unsigned long, stackinfo *);
+MP_GLOBAL void __mp_setmemory(infohead *, void *, size_t, unsigned char,
+                              alloctype, char *, char *, unsigned long,
+                              stackinfo *);
+MP_GLOBAL void __mp_copymemory(infohead *, void *, void *, size_t, alloctype,
+                               char *, char *, unsigned long, stackinfo *);
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
 MP_EXPORT void __mp_checkinfo(infohead *);
+MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype);
 
 
 #ifdef __cplusplus

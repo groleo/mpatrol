@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.6 2000-01-09 20:35:13 graeme Exp $"
+#ident "$Id: info.c,v 1.7 2000-01-21 00:51:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -593,6 +593,87 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
 }
 
 
+/* Set a block of memory to contain a specific byte.
+ */
+
+MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
+                              alloctype f, char *s, char *t, unsigned long u,
+                              stackinfo *v)
+{
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+    {
+        /* Write an entry into the log file.
+         */
+        __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+        __mp_printsize(l);
+        __mp_diag(", 0x%02lX", c);
+        __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+        __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+        if (u == 0)
+            __mp_diag("-");
+        else
+            __mp_diag("%lu", u);
+        __mp_diag("]\n");
+        __mp_printstack(&h->syms, v);
+        __mp_diag("\n");
+    }
+    /* If the pointer is not NULL and does not overflow any memory blocks then
+     * proceed to set the memory.
+     */
+    if (__mp_checkrange(h, p, l, f))
+        __mp_memset(p, c, l);
+}
+
+
+/* Copy a block of memory from one address to another.
+ */
+
+MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
+                               alloctype f, char *s, char *t, unsigned long u,
+                               stackinfo *v)
+{
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+    {
+        /* Write an entry into the log file.
+         */
+        __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
+                  __mp_alloctypenames[f], p, q);
+        __mp_printsize(l);
+        __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+        __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+        if (u == 0)
+            __mp_diag("-");
+        else
+            __mp_diag("%lu", u);
+        __mp_diag("]\n");
+        __mp_printstack(&h->syms, v);
+        __mp_diag("\n");
+    }
+    /* We must ensure that the memory to be copied does not overlap when
+     * memcpy() is called.  This does not matter when calling __mp_memcopy()
+     * but it will matter when calling the normal system function, in which
+     * case memmove() should be used instead.
+     */
+    if ((f == AT_MEMCPY) && (l > 0) &&
+        (((p < q) && ((char *) p + l > (char *) q)) ||
+         ((q < p) && ((char *) q + l > (char *) p))))
+        __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overlaps ["
+                  MP_POINTER "," MP_POINTER "]\n", p, (char *) p + l - 1, q,
+                  (char *) q + l - 1);
+    /* If the pointers are not NULL and do not overflow any memory blocks then
+     * proceed to copy the memory.
+     */
+    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
+        __mp_memcopy(q, p, l);
+}
+
+
 /* Protect the internal memory blocks used by the mpatrol library
  * with the supplied access permission.
  */
@@ -744,6 +825,35 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
                 __mp_abort();
             }
     }
+}
+
+
+/* Check that a memory operation does not overflow the boundaries of a
+ * memory block.
+ */
+
+int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
+{
+    allocnode *n;
+
+    if (s == 0)
+        s = 1;
+    if (p == NULL)
+    {
+        __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+        return 0;
+    }
+    else if ((n = __mp_findnode(&h->alloc, p, s)) &&
+             ((p < n->block) || ((char *) p + s > (char *) n->block + n->size)))
+    {
+        __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
+                   MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
+                   n->block, (char *) n->block + n->size - 1);
+        __mp_printalloc(&h->syms, n);
+        __mp_diag("\n");
+        return 0;
+    }
+    return 1;
 }
 
 
