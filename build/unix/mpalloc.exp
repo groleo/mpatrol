@@ -21,6 +21,7 @@
 * AIX Shared Library Exports
 
 
+__mp_errno
 __mp_init
 __mp_fini
 __mp_trap
@@ -35,6 +36,7 @@ __mp_setmem
 __mp_copymem
 __mp_comparemem
 __mp_locatemem
+__mp_strerror
 __mp_function
 __mp_setuser
 __mp_setmark
