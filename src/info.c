@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.42 2000-11-13 22:17:05 graeme Exp $"
+#ident "$Id: info.c,v 1.43 2000-11-14 18:16:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -244,7 +244,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             o = 1;
         }
         __mp_warn(ET_ALLZER, f, t, u, "attempt to create an allocation of size "
-                  "0\n");
+                  "0");
+        __mp_diag("\n");
     }
     if (f == AT_MEMALIGN)
     {
@@ -258,7 +259,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(ET_ZERALN, f, t, u, "alignment 0 is invalid\n");
+                __mp_warn(ET_ZERALN, f, t, u, "alignment 0 is invalid");
+                __mp_diag("\n");
             }
             a = h->alloc.heap.memory.page;
         }
@@ -269,7 +271,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
                 __mp_warn(ET_BADALN, f, t, u, "alignment %lu is not a power of "
-                          "two\n", a);
+                          "two", a);
+                __mp_diag("\n");
             }
             a = __mp_poweroftwo(a);
         }
@@ -280,7 +283,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
                 __mp_warn(ET_MAXALN, f, t, u, "alignment %lu is greater than "
-                          "the system page size\n", a);
+                          "the system page size", a);
+                __mp_diag("\n");
             }
             a = h->alloc.heap.memory.page;
         }
@@ -403,7 +407,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         {
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-            __mp_warn(ET_RSZNUL, f, t, u, "attempt to resize a NULL pointer\n");
+            __mp_warn(ET_RSZNUL, f, t, u, "attempt to resize a NULL pointer");
+            __mp_diag("\n");
         }
         p = __mp_getmemory(h, l, a, f, s, t, u, v);
     }
@@ -428,8 +433,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated\n",
-                   p);
+        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated", p);
+        __mp_diag("\n");
         p = NULL;
     }
     else if (p != n->block)
@@ -467,7 +472,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
             __mp_warn(ET_RSZZER, f, t, u, "attempt to resize an allocation to "
-                      "size 0\n");
+                      "size 0");
+            __mp_diag("\n");
         }
         __mp_freememory(h, p, f, s, t, u, v);
         p = NULL;
@@ -617,7 +623,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
                 __mp_logfree(h, p, f, s, t, u, v);
                 o = 1;
             }
-            __mp_warn(ET_FRENUL, f, t, u, "attempt to free a NULL pointer\n");
+            __mp_warn(ET_FRENUL, f, t, u, "attempt to free a NULL pointer");
+            __mp_diag("\n");
         }
         return;
     }
@@ -641,8 +648,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated\n",
-                   p);
+        __mp_error(ET_NOTALL, f, t, u, MP_POINTER " has not been allocated", p);
+        __mp_diag("\n");
     }
     else if (p != n->block)
     {
@@ -802,8 +809,9 @@ MP_GLOBAL void *__mp_copymemory(infohead *h, void *p, void *q, size_t l,
             o = 1;
         }
         __mp_warn(ET_RNGOVL, f, t, u, "range [" MP_POINTER "," MP_POINTER "] "
-                  "overlaps [" MP_POINTER "," MP_POINTER "]\n", p,
+                  "overlaps [" MP_POINTER "," MP_POINTER "]", p,
                   (char *) p + l - 1, q, (char *) q + l - 1);
+        __mp_diag("\n");
     }
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to copy the memory.
