@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.11 2000-06-29 18:02:37 graeme Exp $"
+#ident "$Id: signals.c,v 1.12 2000-07-02 22:16:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,7 +66,7 @@ typedef void (*handlerfunction)(int);
 #if MP_SIGINFO_SUPPORT
 static void signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
-#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
 #if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
 static void signalhandler(int s, struct sigcontext n)
 #else /* SYSTEM && ARCH */
@@ -115,7 +115,8 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
     __mp_diag("\n");
 #if TARGET == TARGET_UNIX
-#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX
+#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX || \
+    SYSTEM == SYSTEM_LYNXOS
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -138,6 +139,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
          * is passed on the stack to all signal handlers which we can then
          * use to decode the address that caused the illegal memory access.
          */
+        a = NULL;
 #if SYSTEM == SYSTEM_AIX
         a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
 #elif SYSTEM == SYSTEM_LINUX
@@ -161,8 +163,15 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
             a = (void *) ((unsigned long *) (n + 1))[2];
             break;
         }
-#else /* ARCH */
-        a = NULL;
+#endif /* ARCH */
+#elif SYSTEM == SYSTEM_LYNXOS
+#if ARCH == ARCH_IX86
+        a = (void *) n->eax;
+#elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
+        if (n->fpscr < 0x4000)
+            a = (void *) n->fpscr;
+        else
+            a = (void *) (n->fpscr - ((n->fpscr & 7) << 1) + 7);
 #endif /* ARCH */
 #endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
