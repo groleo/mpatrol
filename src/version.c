@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+ * Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.11 1999-12-20 22:27:36 graeme Exp $"
+#ident "$Id: version.c,v 1.12 2000-01-09 20:35:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,24 +48,24 @@ extern "C"
 
 /* SCCS identification string and American date format.
  */
-MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (99/12/20)";
+MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (00/12/20)";
 
 #elif TARGET == TARGET_AMIGA
 
 /* Amiga identification string and European date format.
  */
-MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (20.12.99)";
+MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (20.12.00)";
 
 #elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (20 December 1999)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (20 December 2000)";
 
 #endif /* TARGET */
 
 
-MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-1999 Graeme S. Roy";
+MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2000 Graeme S. Roy";
 
 
 #ifdef __cplusplus

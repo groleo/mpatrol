@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.3 1999-12-23 18:50:55 graeme Exp $
+# $Id: mpatrol.spec,v 1.4 2000-01-09 20:46:38 graeme Exp $
 
 
 %define version 1.1.0
