@@ -42,11 +42,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.15 2000-05-16 00:49:09 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.16 2000-07-16 23:14:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "2.1" /* the current version of this program */
+#define VERSION "2.2" /* the current version of this program */
 
 
 /* The buffer used to build up the environment variable containing options
@@ -78,7 +78,8 @@ static char *oflowbyte, *oflowsize;
 static char *defalign, *limit;
 static char *failfreq, *failseed, *unfreedabort;
 static char *logfile, *proffile, *progfile;
-static char *autosave, *check, *pagealloc;
+static char *autosave, *check;
+static char *nofree, *pagealloc;
 static char *smallbound, *mediumbound, *largebound;
 
 
@@ -89,8 +90,7 @@ static char *smallbound, *mediumbound, *largebound;
 static int showmap, showfreed;
 static int checkall, prof;
 static int safesignals, noprotect;
-static int nofree, preserve;
-static int oflowwatch;
+static int preserve, oflowwatch;
 static int usemmap, usedebug;
 static int allowoflow;
 
@@ -160,9 +160,9 @@ static char *options_help[] =
     "", "Specifies that the mpatrol library's internal data structures should",
     "", "not be made read-only after every memory allocation, reallocation or",
     "", "deallocation.",
-    "n", NULL,
-    "", "Specifies that the mpatrol library should keep all reallocated and",
-    "", "freed memory allocations.",
+    "n", "unsigned integer",
+    "", "Specifies that a number of recently-freed memory allocations should",
+    "", "be prevented from being returned to the free memory pool.",
     "O", "unsigned integer",
     "", "Specifies the size in bytes to use for all overflow buffers, which",
     "", "must be a power of two.",
@@ -310,7 +310,7 @@ static void setoptions(void)
     if (mediumbound)
         addoption("MEDIUMBOUND", mediumbound, 0);
     if (nofree)
-        addoption("NOFREE", NULL, 0);
+        addoption("NOFREE", nofree, 0);
     if (noprotect)
         addoption("NOPROTECT", NULL, 0);
     if (oflowbyte)
@@ -385,7 +385,7 @@ int main(int argc, char **argv)
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv,
-             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNnO:o:P:pQ:R:SsU:VvwXxZ:z:")) !=
+             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:")) !=
            EOF)
         switch (c)
         {
@@ -447,7 +447,7 @@ int main(int argc, char **argv)
             noprotect = 1;
             break;
           case 'n':
-            nofree = 1;
+            nofree = __mp_optarg;
             break;
           case 'O':
             oflowsize = __mp_optarg;
