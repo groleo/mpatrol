@@ -106,8 +106,8 @@ typedef struct stackinfo
 #else /* TARGET && ARCH */
     void *next;                /* next frame handle */
 #endif /* TARGET && ARCH */
-    unsigned int *first;       /* first frame pointer */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+    void *first;               /* first frame information */
 }
 stackinfo;
 
@@ -118,7 +118,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newframe(stackinfo *, unsigned int *);
+MP_EXPORT void __mp_newframe(stackinfo *, void *);
 MP_EXPORT int __mp_getframe(stackinfo *);
 
 
