@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.6 1999-11-18 19:19:48 graeme Exp $
+@c $Id: mpatrol.texi,v 1.7 1999-11-18 20:04:12 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -161,8 +161,8 @@ Due to their very nature, problems with dynamic memory allocations are
 notoriously difficult to reproduce and debug, and this is likely to be the case
 if you find a bug in the mpatrol library as it might be extremely hard to
 reproduce on another system.  Details on how to report bugs are given elsewhere
-in this document (@pxref{Notes}), but would be very useful if you could try to
-provide as much information as possible when reporting a problem, and that
+in this document (@pxref{Notes}), but it would be very useful if you could try
+to provide as much information as possible when reporting a problem, and that
 includes having a look in the library source code to see if it's obvious what is
 wrong.
 
@@ -176,6 +176,11 @@ to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk}.  I normally only check my e-mail about
 once or twice a week, so don't expect an immediate response.  I can also be
 reached at @email{graeme@@epc.co.uk} but that is my work e-mail address.
+
+@cindex release builds
+Oh, and always remember to do final release builds without the mpatrol library
+as the library is much slower than normal malloc implementations and uses much
+more memory.
 
 Happy debugging!
 
