@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.104 2001-03-04 23:54:22 graeme Exp $"
+#ident "$Id: inter.c,v 1.105 2001-03-05 00:08:54 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.104 2001-03-04 23:54:22 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.105 2001-03-05 00:08:54 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1435,11 +1435,36 @@ __mp_info(void *p, allocinfo *d)
         __mp_init();
     /* Check that we know something about the address that was supplied.
      */
-    if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
-        ((m = (infonode *) n->info) == NULL))
+    if ((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL)
     {
         restoresignals();
         return 0;
+    }
+    /* Return mostly empty fields if the pointer is in free memory.
+     */
+    if ((m = (infonode *) n->info) == NULL)
+    {
+        d->block = n->block;
+        d->size = n->size;
+        d->type = AT_MAX;
+        d->alloc = 0;
+        d->realloc = 0;
+        d->thread = 0;
+        d->event = 0;
+        d->func = NULL;
+        d->file = NULL;
+        d->line = 0;
+        d->stack = NULL;
+        d->typestr = NULL;
+        d->typesize = 0;
+        d->userdata = NULL;
+        d->freed = 1;
+        d->marked = 0;
+        d->profiled = 0;
+        d->traced = 0;
+        d->internal = 0;
+        restoresignals();
+        return 1;
     }
     /* We now fill in the details for the supplied structure.
      */
