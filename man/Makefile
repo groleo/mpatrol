@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.13 2001-02-21 10:06:15 graeme Exp $
+# $Id: Makefile,v 1.14 2001-02-21 10:07:38 graeme Exp $
 
 
 # Definitions
@@ -191,21 +191,8 @@ pdf/libmpalloc.pdf: ps/libmpalloc.ps
 
 all: $(CATPAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
-mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
-	@ mkdir -p mpatrol/man/dvi
-	@ cp $(DVIPAGES) mpatrol/man/dvi
-	@ mkdir -p mpatrol/man/ps
-	@ cp $(PSPAGES) mpatrol/man/ps
-	@ mkdir -p mpatrol/man/pdf
-	@ cp $(PDFPAGES) mpatrol/man/pdf
-	@ cp README mpatrol/man
-	@ tar cf mpatrol_man.tar mpatrol
-	@ gzip mpatrol_man.tar
-	-@ rm -rf mpatrol >/dev/null 2>&1
-
 clean:
 	-@ rm -f $(CATPAGES) $(HTMLPAGES) >/dev/null 2>&1
 	-@ rm -f $(DVIPAGES) $(PSPAGES) $(PDFPAGES) >/dev/null 2>&1
-	-@ rm -f mpatrol_man.tar.gz >/dev/null 2>&1
 
 clobber: clean
