@@ -41,13 +41,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.10 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mleak.c,v 1.11 2001-04-26 22:57:46 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.10 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.11 2001-04-26 22:57:46 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.2" /* the current version of this program */
+#define VERSION "1.3" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -55,9 +55,10 @@ static MP_CONST MP_VOLATILE char *mleak_id = "$Id: mleak.c,v 1.10 2001-02-05 22:
 
 typedef enum options_flags
 {
-    OF_HELP    = 'h',
-    OF_IGNORE  = 'i',
-    OF_VERSION = 'V'
+    OF_HELP     = 'h',
+    OF_IGNORE   = 'i',
+    OF_MAXSTACK = 'n',
+    OF_VERSION  = 'V'
 }
 options_flags;
 
@@ -113,6 +114,12 @@ static char *progname;
 static int ignorelist;
 
 
+/* Indicates the maximum stack depth to display.
+ */
+
+static unsigned long maxstack;
+
+
 /* The table describing all recognised options.
  */
 
@@ -123,6 +130,8 @@ static option options_table[] =
     {"ignore", OF_IGNORE, NULL,
      "\tSpecifies that the list of unfreed allocations in the log file\n"
      "\tshould be ignored.\n"},
+    {"max-stack", OF_MAXSTACK, "depth",
+     "\tSpecifies the maximum stack depth to display.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
@@ -322,6 +331,7 @@ printallocs(void)
 {
     allocation *n, *p;
     char *r, *s, *t;
+    size_t i;
 
     printf("unfreed allocations: %lu (%lu byte%s)\n", alloctree.size,
            alloctotal, (alloctotal == 1) ? "" : "s");
@@ -348,21 +358,25 @@ printallocs(void)
                 r = s + 7;
                 if (s = strchr(t + 2, '['))
                 {
+                    i = 0;
                     printf("    " MP_POINTER " (%lu byte%s) {%s:%lu:0} %s\n",
                            n->addr, n->size, (n->size == 1) ? "" : "s", r,
                            n->node.key, s);
                     while ((s = getnextline()) && (*s != '\0'))
-                        puts(s);
-                    if (alloctree.size > 1)
+                        if (i++ < maxstack)
+                            puts(s);
+                    if ((alloctree.size > 1) && (maxstack != 0))
                         putchar('\n');
                 }
             }
             else
             {
+                i = 0;
                 puts(s);
                 while ((s = getnextline()) && (*s != '\0'))
-                    puts(s);
-                if (alloctree.size > 1)
+                    if (i++ < maxstack)
+                        puts(s);
+                if ((alloctree.size > 1) && (maxstack != 0))
                     putchar('\n');
             }
         __mp_treeremove(&alloctree, &n->node);
@@ -382,6 +396,7 @@ main(int argc, char **argv)
     int c, e, h, v;
 
     e = h = v = 0;
+    maxstack = ~0;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
@@ -392,6 +407,10 @@ main(int argc, char **argv)
             break;
           case OF_IGNORE:
             ignorelist = 1;
+            break;
+          case OF_MAXSTACK:
+            if (!__mp_getnum(progname, __mp_optarg, (long *) &maxstack, 1))
+                e = 1;
             break;
           case OF_VERSION:
             v = 1;
