@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.18 2000-04-24 00:56:41 graeme Exp $"
+#ident "$Id: profile.c,v 1.19 2000-04-24 09:30:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -362,6 +362,9 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
      */
     __mp_memcopy(s, (char *) MP_PROFMAGIC, 4);
     fwrite(s, sizeof(char), 4, f);
+    fwrite(&p->sbound, sizeof(size_t), 1, f);
+    fwrite(&p->mbound, sizeof(size_t), 1, f);
+    fwrite(&p->lbound, sizeof(size_t), 1, f);
     /* Write out the allocation and deallocation bins.
      */
     i = MP_BIN_SIZE;
@@ -372,9 +375,6 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     fwrite(&p->dtotals, sizeof(size_t), 1, f);
     /* Write out the profiling data structures.
      */
-    fwrite(&p->sbound, sizeof(size_t), 1, f);
-    fwrite(&p->mbound, sizeof(size_t), 1, f);
-    fwrite(&p->lbound, sizeof(size_t), 1, f);
     fwrite(&p->list.size, sizeof(size_t), 1, f);
     for (d = (profdata *) p->list.head; d->data.node.next != NULL;
          d = (profdata *) d->data.node.next)
@@ -396,12 +396,12 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         if (n->data.parent != NULL)
             fwrite(&n->data.parent->data.index, sizeof(unsigned long), 1, f);
         else
-            fwrite(&i, sizeof(size_t), 1, f);
+            fwrite(&i, sizeof(unsigned long), 1, f);
         fwrite(&n->data.addr, sizeof(void *), 1, f);
         if (n->data.data != NULL)
             fwrite(&n->data.data->data.index, sizeof(unsigned long), 1, f);
         else
-            fwrite(&i, sizeof(size_t), 1, f);
+            fwrite(&i, sizeof(unsigned long), 1, f);
     }
     fwrite(s, sizeof(char), 4, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
