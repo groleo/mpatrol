@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.24 2000-06-01 20:41:04 graeme Exp $"
+#ident "$Id: memory.c,v 1.25 2000-06-07 20:09:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -208,11 +208,12 @@ static char *progname(void)
     ssize_t l;
     int f;
 #endif /* SYSTEM */
-#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
-     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC) && !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
+     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     unsigned int *p;
     stackinfo s;
-#endif /* ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
 #if MP_PROCFS_SUPPORT
     static char b[64];
 #endif /* MP_PROCFS_SUPPORT */
@@ -252,8 +253,9 @@ static char *progname(void)
         return c;
     }
 #endif /* SYSTEM */
-#if (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
-     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC) && !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+    (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_POWER || \
+     ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     /* Because there is no function to return the executable filename
      * of a process on UNIX, we need to cheat and rely on the ABI by walking
      * up the process stack till we reach the startup code and then find
@@ -284,7 +286,7 @@ static char *progname(void)
         if (p = (unsigned int *) *(((unsigned int *) *p) + 1))
             return (char *) *p;
 #endif /* ARCH */
-#endif /* ARCH && MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
 #if MP_PROCFS_SUPPORT
     /* If the /proc filesystem is supported then we can usually access the
      * actual executable file that contains the current program through a
