@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.13 2000-05-01 10:11:05 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.14 2000-05-10 20:35:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -124,9 +124,9 @@ static char *options_help[] =
     "", "Specifies the default alignment for general-purpose memory",
     "", "allocations, which must be a power of two.",
     "d", NULL,
-    "", "Specifies that the LD_PRELOAD environment variable should be set so",
-    "", "that even programs that were not compiled with the mpatrol library",
-    "", "can be traced, but only if they were dynamically linked.",
+    "", "Specifies that programs which were not linked with the mpatrol",
+    "", "library should also be traced, but only if they were dynamically",
+    "", "linked.",
     "e", "string",
     "", "Specifies an alternative filename with which to locate the executable",
     "", "file containing the program's symbols.",
@@ -516,7 +516,7 @@ int main(int argc, char **argv)
 #if MP_PRELOAD_SUPPORT
     /* The dynamic linker on some UNIX systems supports requests for it to
      * preload a specified list of shared libraries before running a process,
-     * via the LD_PRELOAD environment variable.  If any of the specified
+     * via the MP_PRELOAD_NAME environment variable.  If any of the specified
      * libraries only exist as archive libraries then the mpatrol library
      * should be built to contain them since there is no way to preload an
      * archive library.  However, this may have repercussions when building a

@@ -183,8 +183,9 @@ their corresponding answers or solutions.
     If that doesn't work then check that the executable file has been
     dynamically linked; statically linked executables cannot be forced to use
     the mpatrol library.  If it still doesn't work then it may be that the
-    dynamic linker on your system doesn't recognise the LD_PRELOAD environment
-    variable, in which case you can't use this feature.
+    dynamic linker on your system doesn't have the ability to preload any shared
+    libraries that have been specified in a special environment variable, in
+    which case you can't use this feature.
 
  Q. I know that there's a definite heap corruption problem in my program as it
     keeps crashing in unrelated code due to pointer corruption, and when I link

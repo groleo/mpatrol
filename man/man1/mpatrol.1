@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.16 2000-05-01 10:14:53 graeme Exp $
+.\" $Id: mpatrol.1,v 1.17 2000-05-10 20:39:01 graeme Exp $
 .\"
-.TH MPATROL 1 "1 May 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 1 "10 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -76,10 +76,10 @@ reallocate and deallocate memory have rigorous checks performed on them.
 allocations, which must be a power of two.
 .TP
 \fB\-d\fP
-Specifies that the \fBLD_PRELOAD\fP environment variable should be set so that
-even programs that were not compiled with the mpatrol library can be traced, but
-only if they were dynamically linked.  This option will only work if the dynamic
-linker recognises the \fBLD_PRELOAD\fP environment variable.
+Specifies that programs which were not linked with the mpatrol library should
+also be traced, but only if they were dynamically linked.  This option will
+only work if the system dynamic linker has the ability to preload a set of
+user-specified shared libraries via a special environment variable.
 .TP
 \fB\-e\fP <\fIstring\fP>
 [\fBPROGFILE\fP]  Specifies an alternative filename with which to locate the

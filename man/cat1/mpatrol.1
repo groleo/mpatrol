@@ -61,7 +61,7 @@ OOPPTTIIOONNSS
 
 
 
-Release 1.2                 1 May 2000                          1
+Release 1.2                10 May 2000                          1
 
 
 
@@ -79,12 +79,12 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               general-purpose memory allocations, which must be a
               power of two.
 
-       --dd     Specifies  that the LLDD__PPRREELLOOAADD environment variable
-              should be set so that even programs that  were  not
-              compiled  with  the  mpatrol library can be traced,
-              but only if they  were  dynamically  linked.   This
-              option  will only work if the dynamic linker recog-
-              nises the LLDD__PPRREELLOOAADD environment variable.
+       --dd     Specifies  that programs which were not linked with
+              the mpatrol library should also be traced, but only
+              if  they were dynamically linked.  This option will
+              only work if the  system  dynamic  linker  has  the
+              ability  to  preload a set of user-specified shared
+              libraries via a special environment variable.
 
        --ee <_s_t_r_i_n_g>
               [PPRROOGGFFIILLEE]  Specifies an alternative filename  with
@@ -127,7 +127,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-Release 1.2                 1 May 2000                          2
+Release 1.2                10 May 2000                          2
 
 
 
@@ -193,7 +193,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-Release 1.2                 1 May 2000                          3
+Release 1.2                10 May 2000                          3
 
 
 
@@ -259,6 +259,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.2                 1 May 2000                          4
+Release 1.2                10 May 2000                          4
 
 
