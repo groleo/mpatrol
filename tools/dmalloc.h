@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.7 2001-03-06 01:45:24 graeme Exp $
+ * $Id: dmalloc.h,v 1.8 2001-03-14 21:10:24 graeme Exp $
  */
 
 
@@ -40,7 +40,7 @@
  * of the mpatrol library.  They are compatible with the 4.8.2 release of
  * Dmalloc, but only the Dmalloc-specific functions are defined here,
  * leaving the overriding of standard functions up to the mpatrol library.
- * As the mpatrol library does not currrently override the C library
+ * As the mpatrol library does not currently override the C library
  * string functions, neither does this file.  In addition, the Dmalloc
  * distribution comes with definitions for xmemalign(), xvalloc() and
  * xrecalloc(), neither of which are defined by this file or by the

@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.12 2001-03-08 22:46:47 graeme Exp $
+ * $Id: dbmalloc.h,v 1.13 2001-03-14 21:10:24 graeme Exp $
  */
 
 
@@ -40,7 +40,7 @@
  * of the mpatrol library.  They are compatible with the last known public
  * release of Dbmalloc (patch level 14), but only the Dbmalloc-specific
  * functions are defined here, leaving the overriding of standard functions
- * up to the mpatrol library.  As the mpatrol library does not currrently
+ * up to the mpatrol library.  As the mpatrol library does not currently
  * override the C library string functions and the X toolkit heap allocation
  * functions, neither does this file.
  *
