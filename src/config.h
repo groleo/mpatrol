@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.70 2001-03-01 00:54:16 graeme Exp $
+ * $Id: config.h,v 1.71 2001-03-03 14:49:54 graeme Exp $
  */
 
 
@@ -271,7 +271,7 @@
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
     SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
     SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #define MP_MMAP_SUPPORT 1
 #else /* SYSTEM */
 #define MP_MMAP_SUPPORT 0
@@ -290,7 +290,7 @@
     SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_FREEBSD || \
     SYSTEM == SYSTEM_HPUX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #define MP_MMAP_ANONYMOUS 1
 #else /* SYSTEM */
 #define MP_MMAP_ANONYMOUS 0
@@ -366,7 +366,7 @@
       SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
       SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SINIX || \
       SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_SUNOS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #ifndef _REENTRANT
 #define _REENTRANT 1
 #endif /* _REENTRANT */
@@ -407,7 +407,7 @@
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
     SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_HPUX || \
     SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #define MP_SIGINFO_SUPPORT 1
 #else /* SYSTEM */
 #define MP_SIGINFO_SUPPORT 0
@@ -424,7 +424,8 @@
 #if SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_FREEBSD || \
     SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_TRU64 || \
+    SYSTEM == SYSTEM_UNIXWARE
 #define MP_PROCFS_SUPPORT 1
 #else /* SYSTEM */
 #define MP_PROCFS_SUPPORT 0
@@ -524,15 +525,17 @@
 
 /* Indicates if the operating system provides support routines for traversing
  * call stacks in an external library.  This is currently only available for
- * HP/UX, IRIX and Windows, but the IRIX unwind() library routine calls malloc()
- * and free() so the non-library method of call stack traversal is used instead
- * as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
+ * HP/UX, IRIX, Tru64 and Windows, but the IRIX unwind() library routine calls
+ * malloc() and free() so the non-library method of call stack traversal is
+ * used instead as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes
+ * precedence.
  */
 
 #ifndef MP_LIBRARYSTACK_SUPPORT
 #if !MP_BUILTINSTACK_SUPPORT
-#if (TARGET == TARGET_UNIX && SYSTEM == SYSTEM_HPUX) || \
-    (TARGET == TARGET_WINDOWS && !defined(__GNUC__))
+#if (TARGET == TARGET_UNIX && (SYSTEM == SYSTEM_HPUX || \
+      SYSTEM == SYSTEM_TRU64)) || (TARGET == TARGET_WINDOWS && \
+     !defined(__GNUC__))
 #define MP_LIBRARYSTACK_SUPPORT 1
 #else /* TARGET && SYSTEM */
 #define MP_LIBRARYSTACK_SUPPORT 0
@@ -573,7 +576,8 @@
 #if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
     SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_IRIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SOLARIS
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SOLARIS || \
+    SYSTEM == SYSTEM_TRU64
 #define MP_PRELOAD_SUPPORT 1
 #else /* SYSTEM */
 #define MP_PRELOAD_SUPPORT 0
@@ -588,7 +592,7 @@
 
 #if MP_PRELOAD_SUPPORT
 #ifndef MP_PRELOAD_NAME
-#if SYSTEM == SYSTEM_IRIX
+#if SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
 #define MP_PRELOAD_NAME "_RLD_LIST"
 #else /* SYSTEM */
 #define MP_PRELOAD_NAME "LD_PRELOAD"
@@ -596,7 +600,7 @@
 #endif /* MP_PRELOAD_NAME */
 
 #ifndef MP_PRELOAD_SEP
-#if SYSTEM == SYSTEM_IRIX
+#if SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
 #define MP_PRELOAD_SEP ":"
 #else /* SYSTEM */
 #define MP_PRELOAD_SEP " "
@@ -653,7 +657,7 @@
 #elif SYSTEM == SYSTEM_DGUX
 #define MP_THREADS_LIBS , MP_LIBNAME(thread)
 #elif SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #define MP_THREADS_LIBS , MP_LIBNAME(pthread)
 #else /* SYSTEM */
 #define MP_THREADS_LIBS
@@ -667,7 +671,7 @@
 #else /* MP_LIBRARYSTACK_SUPPORT */
 #define MP_SYSTEM_LIBS
 #endif /* MP_LIBRARYSTACK_SUPPORT */
-#elif SYSTEM == SYSTEM_IRIX
+#elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
 #if MP_LIBRARYSTACK_SUPPORT
 #define MP_SYSTEM_LIBS , MP_LIBNAME(exc), "DEFAULT"
 #else /* MP_LIBRARYSTACK_SUPPORT */
@@ -815,7 +819,7 @@
     SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_DYNIX || \
     SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-    SYSTEM == SYSTEM_UNIXWARE
+    SYSTEM == SYSTEM_TRU64 || SYSTEM == SYSTEM_UNIXWARE
 #define MP_IDENT_SUPPORT 1
 #elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
       SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
@@ -835,11 +839,11 @@
  */
 
 #ifndef MP_LONGLONG_SUPPORT
-#ifdef __GNUC__
+#if ENVIRON == ENVIRON_64 || defined(__GNUC__)
 #define MP_LONGLONG_SUPPORT 1
-#else /* __GNUC__ */
+#else /* ENVIRON && __GNUC__ */
 #define MP_LONGLONG_SUPPORT 0
-#endif /* __GNUC__ */
+#endif /* ENVIRON && __GNUC__ */
 #endif /* MP_LONGLONG_SUPPORT */
 
 

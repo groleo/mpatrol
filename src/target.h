@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.24 2001-02-10 16:45:39 graeme Exp $
+ * $Id: target.h,v 1.25 2001-03-03 14:49:54 graeme Exp $
  */
 
 
@@ -89,7 +89,8 @@
 #define SYSTEM_SINIX    13 /* SINIX */
 #define SYSTEM_SOLARIS  14 /* Solaris */
 #define SYSTEM_SUNOS    15 /* SunOS */
-#define SYSTEM_UNIXWARE 16 /* UnixWare */
+#define SYSTEM_TRU64    16 /* Compaq Tru64 / Digital UNIX / OSF/1 */
+#define SYSTEM_UNIXWARE 17 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -130,6 +131,10 @@
 #else /* svr4 */
 #define SYSTEM SYSTEM_SUNOS
 #endif /* svr4 */
+#elif defined(digital) || defined(_digital) || defined(__digital) || \
+      defined(__digital__) || defined(osf) || defined(_osf) || \
+      defined(__osf) || defined(__osf__)
+#define SYSTEM SYSTEM_TRU64
 #else /* SYSTEM */
 #define SYSTEM SYSTEM_ANY
 #endif /* SYSTEM */
@@ -144,22 +149,28 @@
  */
 
 #define ARCH_ANY     0 /* no specific architecture */
-#define ARCH_IX86    1 /* Intel 80x86 */
-#define ARCH_M68K    2 /* Motorola 680x0 */
-#define ARCH_M88K    3 /* Motorola 88xx0 */
-#define ARCH_MIPS    4 /* MIPS */
-#define ARCH_PARISC  5 /* HP PA/RISC */
-#define ARCH_POWER   6 /* IBM RS/6000 */
-#define ARCH_POWERPC 7 /* PowerPC */
-#define ARCH_SPARC   8 /* SPARC */
+#define ARCH_ALPHA   1 /* DEC Alpha */
+#define ARCH_IX86    2 /* Intel 80x86 */
+#define ARCH_M68K    3 /* Motorola 680x0 */
+#define ARCH_M88K    4 /* Motorola 88xx0 */
+#define ARCH_MIPS    5 /* MIPS */
+#define ARCH_PARISC  6 /* HP PA/RISC */
+#define ARCH_POWER   7 /* IBM RS/6000 */
+#define ARCH_POWERPC 8 /* PowerPC */
+#define ARCH_SPARC   9 /* SPARC */
 
 
 #ifndef ARCH
-#if defined(i386) || defined(_i386) || defined(__i386) || defined(__i386__) || \
-    defined(I386) || defined(_I386) || defined(__I386) || defined(__I386__) || \
-    defined(ix86) || defined(_ix86) || defined(__ix86) || defined(__ix86__) || \
-    defined(x86) || defined(_x86) || defined(__x86) || defined(__x86__) || \
-    defined(_M_IX86)
+#if defined(ALPHA) || defined(_ALPHA) || defined(__ALPHA) || \
+    defined(__ALPHA__) || defined(alpha) || defined(_alpha) || \
+    defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
+#define ARCH ARCH_ALPHA
+#elif defined(i386) || defined(_i386) || defined(__i386) || \
+      defined(__i386__) || defined(I386) || defined(_I386) || \
+      defined(__I386) || defined(__I386__) || defined(ix86) || \
+      defined(_ix86) || defined(__ix86) || defined(__ix86__) || \
+      defined(x86) || defined(_x86) || defined(__x86) || defined(__x86__) || \
+      defined(_M_IX86)
 #define ARCH ARCH_IX86
 #elif defined(m68k) || defined(_m68k) || defined(__m68k) || \
       defined(__m68k__) || defined(mc68000) || defined(_mc68000) || \
@@ -215,6 +226,13 @@
 #else /* sparcv9 */
 #define ENVIRON ENVIRON_32
 #endif /* sparcv9 */
+#elif SYSTEM == SYSTEM_TRU64
+#if defined(arch64) || defined(_arch64) || defined(__arch64) || \
+    defined(__arch64__)
+#define ENVIRON ENVIRON_64
+#else /* arch64 */
+#define ENVIRON ENVIRON_32
+#endif /* arch64 */
 #else /* SYSTEM */
 #define ENVIRON ENVIRON_32
 #endif /* SYSTEM */
@@ -349,6 +367,8 @@
 #define _GNU_SOURCE 1
 #elif SYSTEM == SYSTEM_SOLARIS
 #define __EXTENSIONS__ 1
+#elif SYSTEM == SYSTEM_TRU64
+#define _OSF_SOURCE 1
 #endif /* SYSTEM */
 #endif /* TARGET */
 
