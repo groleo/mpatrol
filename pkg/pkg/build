@@ -24,10 +24,10 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.25 2000-06-29 00:35:01 graeme Exp $
+# $Id: build,v 1.26 2000-06-29 19:24:54 graeme Exp $
 
 
-version=1.2.3
+version=1.2.4
 libversion=1.2
 
 
@@ -101,7 +101,7 @@ rm -rf bin doc include info lib man
 # Convert the package directory structure to a package file.
 
 rm -f mpatrol-$version.pkg
-pkgtrans -s`pwd` mpatrol-$version.pkg GSRmptrl
+pkgtrans -s `pwd` mpatrol-$version.pkg GSRmptrl
 rm -rf GSRmptrl
 
 
