@@ -1,3 +1,18 @@
+Wed Oct 13 21:22:30 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* EXAMPLES: New file for illustrating how to use the library.
+
+Tue Oct 12 19:18:30 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/alloc.c:
+	Fixed the problem in splitnode() whereby the free node would be lost if
+	there was no more system memory to allocate the leftmost or rightmost
+	nodes.
+
+	* src/symbol.c:
+	Don't attempt to read from _DYNAMIC if its address is NULL, since that
+	will be the case if the program is statically linked.
+
 Sun Oct 10 10:21:00 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate:
@@ -7,8 +22,8 @@ Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Fixed a bug in __mp_checkinfo() when all allocations are pages and no
-	freed allocations are being reused, since we don't need to check overflow
-	buffers if the allocation has been freed.
+	freed allocations are being reused, since we don't need to check
+	overflow buffers if the allocation has been freed.
 
 	* src/stack.c:
 	Fixed a bug in __mp_newframe() if using MP_BUILTINSTACK_SUPPORT when the
@@ -17,5 +32,5 @@ Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
 Sun Oct  3 22:50:22 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/inter.c:
-	Fixed problem in __mp_info() where the check for a known memory block was
-	doing an || instead of an && in the test.
+	Fixed problem in __mp_info() where the check for a known memory block
+	was doing an || instead of an && in the test.
