@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.96 2001-03-02 00:48:20 graeme Exp $"
+#ident "$Id: inter.c,v 1.97 2001-03-02 01:25:09 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.96 2001-03-02 00:48:20 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.97 2001-03-02 01:25:09 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1935,6 +1935,93 @@ __mp_vprintf(char *s, va_list v)
     }
     restoresignals();
     return r;
+}
+
+
+/* Write user data to the mpatrol log file along with location information.
+ */
+
+void
+__mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
+{
+    char b[1024];
+    char *p, *r;
+    stackinfo i;
+    va_list v;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    va_start(v, m);
+    vsprintf(b, m, v);
+    va_end(v);
+    for (r = b; p = strchr(r, '\n'); r = p + 1)
+    {
+        *p = '\0';
+        if (*r != '\0')
+            __mp_diag("%s%s", MP_PRINTPREFIX, r);
+        __mp_diag("\n");
+    }
+    if (*r != '\0')
+        __mp_diag("%s%s\n", MP_PRINTPREFIX, r);
+    if ((s != NULL) || (t != NULL))
+    {
+        __mp_diag("   ");
+        if (s != NULL)
+            __mp_diag(" in function `%s'", s);
+        if (t != NULL)
+            __mp_diag(" in file `%s' at line %lu", t, u);
+        __mp_diag("\n");
+    }
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i) && __mp_getframe(&i))
+    {
+        __mp_printstack(&memhead.syms, &i);
+        __mp_diag("\n");
+    }
+    restoresignals();
+}
+
+
+/* Write user data to the mpatrol log file along with location information.
+ */
+
+void
+__mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
+{
+    char b[1024];
+    char *p, *r;
+    stackinfo i;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    vsprintf(b, m, v);
+    for (r = b; p = strchr(r, '\n'); r = p + 1)
+    {
+        *p = '\0';
+        if (*r != '\0')
+            __mp_diag("%s%s", MP_PRINTPREFIX, r);
+        __mp_diag("\n");
+    }
+    if (*r != '\0')
+        __mp_diag("%s%s\n", MP_PRINTPREFIX, r);
+    if ((s != NULL) || (t != NULL))
+    {
+        __mp_diag("   ");
+        if (s != NULL)
+            __mp_diag(" in function `%s'", s);
+        if (t != NULL)
+            __mp_diag(" in file `%s' at line %lu", t, u);
+        __mp_diag("\n");
+    }
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i) && __mp_getframe(&i))
+    {
+        __mp_printstack(&memhead.syms, &i);
+        __mp_diag("\n");
+    }
+    restoresignals();
 }
 
 

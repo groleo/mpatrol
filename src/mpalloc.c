@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.18 2001-02-26 00:01:58 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.19 2001-03-02 01:25:09 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.18 2001-02-26 00:01:58 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.19 2001-03-02 01:25:09 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -752,6 +752,24 @@ int
 __mp_vprintf(char *s, va_list v)
 {
     return 0;
+}
+
+
+/* Write user data to the mpatrol log file along with location information.
+ */
+
+void
+__mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
+{
+}
+
+
+/* Write user data to the mpatrol log file along with location information.
+ */
+
+void
+__mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
+{
 }
 
 
