@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.24 2000-11-17 18:06:20 graeme Exp $"
+#ident "$Id: mprof.c,v 1.25 2000-12-20 23:17:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -300,7 +300,9 @@ static option options_table[] =
 /* Clear the statistics for a set of profiling data.
  */
 
-static void cleardata(profiledata *a)
+static
+void
+cleardata(profiledata *a)
 {
     size_t i;
 
@@ -317,7 +319,9 @@ static void cleardata(profiledata *a)
 /* Sum the statistics from two sets of profiling data.
  */
 
-static void sumdata(profiledata *a, profiledata *b)
+static
+void
+sumdata(profiledata *a, profiledata *b)
 {
     size_t i;
 
@@ -334,7 +338,9 @@ static void sumdata(profiledata *a, profiledata *b)
 /* Compare two function call stacks.
  */
 
-static int comparestack(profilenode *n, profilenode *p, int c)
+static
+int
+comparestack(profilenode *n, profilenode *p, int c)
 {
     size_t i;
 
@@ -354,7 +360,9 @@ static int comparestack(profilenode *n, profilenode *p, int c)
 /* Byte-swap a block of memory.
  */
 
-static void byteswap(void *b, size_t n)
+static
+void
+byteswap(void *b, size_t n)
 {
     char *s, *t;
     char c;
@@ -373,7 +381,9 @@ static void byteswap(void *b, size_t n)
 /* Read an entry from the profiling output file.
  */
 
-static void getentry(void *d, size_t l, size_t n, int b)
+static
+void
+getentry(void *d, size_t l, size_t n, int b)
 {
     size_t i;
 
@@ -396,7 +406,9 @@ static void getentry(void *d, size_t l, size_t n, int b)
 /* Read all of the data from the profiling output file.
  */
 
-static void readfile(void)
+static
+void
+readfile(void)
 {
     char s[4];
     profiledata *d;
@@ -560,7 +572,9 @@ static void readfile(void)
 /* Count the number of decimal digits in a number.
  */
 
-static unsigned char countdigits(unsigned long n)
+static
+unsigned char
+countdigits(unsigned long n)
 {
     unsigned char d;
 
@@ -572,7 +586,9 @@ static unsigned char countdigits(unsigned long n)
 /* Display a character a specified number of times.
  */
 
-static void printchar(char c, size_t n)
+static
+void
+printchar(char c, size_t n)
 {
     size_t i;
 
@@ -584,7 +600,9 @@ static void printchar(char c, size_t n)
 /* Display a set of profiling data.
  */
 
-static void printdata(size_t *d, size_t t)
+static
+void
+printdata(size_t *d, size_t t)
 {
     size_t i;
     double n;
@@ -608,7 +626,9 @@ static void printdata(size_t *d, size_t t)
 /* Display the symbol associated with a particular call site.
  */
 
-static void printsymbol(FILE *f, profilenode *n)
+static
+void
+printsymbol(FILE *f, profilenode *n)
 {
     ptrdiff_t o;
 
@@ -627,7 +647,9 @@ static void printsymbol(FILE *f, profilenode *n)
 /* Add a new vertex to the allocation call graph.
  */
 
-static vertex *addvertex(profilenode *n)
+static
+vertex *
+addvertex(profilenode *n)
 {
     vertex *v;
 
@@ -650,7 +672,9 @@ static vertex *addvertex(profilenode *n)
 /* Add a new edge to the allocation call graph.
  */
 
-static edge *addedge(graphnode *p, graphnode *c)
+static
+edge *
+addedge(graphnode *p, graphnode *c)
 {
     edge *e;
 
@@ -670,7 +694,9 @@ static edge *addedge(graphnode *p, graphnode *c)
 /* Build the allocation call graph.
  */
 
-static void buildgraph(void)
+static
+void
+buildgraph(void)
 {
     profilenode *n, *p;
     vertex *u, *v;
@@ -770,7 +796,9 @@ static void buildgraph(void)
 /* Delete the allocation call graph.
  */
 
-static void deletegraph(void)
+static
+void
+deletegraph(void)
 {
     vertex *n, *v;
     edge *e, *m;
@@ -802,7 +830,9 @@ static void deletegraph(void)
 /* Display the allocation bin table.
  */
 
-static void bintable(void)
+static
+void
+bintable(void)
 {
     size_t i;
     unsigned long a, b, c, d;
@@ -866,7 +896,9 @@ static void bintable(void)
 /* Display the direct allocation table.
  */
 
-static void directtable(void)
+static
+void
+directtable(void)
 {
     profiledata *d;
     profilenode *n, *p;
@@ -1012,7 +1044,9 @@ static void directtable(void)
 /* Display the memory leak table.
  */
 
-static void leaktable(void)
+static
+void
+leaktable(void)
 {
     profiledata *d;
     profilenode *n, *p;
@@ -1140,7 +1174,9 @@ static void leaktable(void)
 /* Display the allocation call graph.
  */
 
-static void callgraph(void)
+static
+void
+callgraph(void)
 {
     size_t d[4];
     listnode *l;
@@ -1311,7 +1347,9 @@ static void callgraph(void)
 /* Write out the graph specification file in dot format.
  */
 
-static void writegraph(profilenode *p, graphnode *n)
+static
+void
+writegraph(profilenode *p, graphnode *n)
 {
     listnode *l;
     vertex *v;
@@ -1375,7 +1413,8 @@ static void writegraph(profilenode *p, graphnode *n)
 /* Read the profiling output file and display all specified information.
  */
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     char b[256];
     char *f, *g;

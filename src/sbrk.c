@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.5 2000-07-13 23:57:25 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.6 2000-12-20 23:26:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -69,7 +69,9 @@ static brkinfo brkhead;
 /* Finalise the break header structure so that the heap becomes empty.
  */
 
-static void finibrk(void)
+static
+void
+finibrk(void)
 {
     if (brkhead.block != NULL)
         __mp_memfree(&brkhead.memory, brkhead.block, brkhead.size);
@@ -84,7 +86,9 @@ static void finibrk(void)
  * becomes empty.
  */
 
-static int initbrk(void)
+static
+int
+initbrk(void)
 {
     size_t l;
 
@@ -105,7 +109,8 @@ static int initbrk(void)
 /* Set the address of the first byte beyond the end of the heap.
  */
 
-int brk(void *p)
+int
+brk(void *p)
 {
     if ((brkhead.block != NULL) || initbrk())
     {
@@ -125,7 +130,8 @@ int brk(void *p)
 /* Increase or decrease the amount of available heap space.
  */
 
-void *sbrk(long l)
+void *
+sbrk(long l)
 {
     void *p;
     unsigned long s;

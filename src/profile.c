@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.31 2000-12-06 22:53:38 graeme Exp $"
+#ident "$Id: profile.c,v 1.32 2000-12-20 23:26:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -51,7 +51,9 @@ extern "C"
  * is ready to profile memory allocations.
  */
 
-MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h, symhead *s)
+MP_GLOBAL
+void
+__mp_newprofile(profhead *p, heaphead *h, symhead *s)
 {
     struct { char x; profdata y; } w;
     struct { char x; profnode y; } z;
@@ -90,7 +92,9 @@ MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h, symhead *s)
 /* Forget all existing profiling information.
  */
 
-MP_GLOBAL void __mp_deleteprofile(profhead *p)
+MP_GLOBAL
+void
+__mp_deleteprofile(profhead *p)
 {
     size_t i;
 
@@ -121,7 +125,9 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
 /* Allocate a new profiling data structure.
  */
 
-static profdata *getprofdata(profhead *p)
+static
+profdata *
+getprofdata(profhead *p)
 {
     profdata *d;
     heapnode *h;
@@ -158,7 +164,9 @@ static profdata *getprofdata(profhead *p)
 /* Allocate a new profiling node.
  */
 
-static profnode *getprofnode(profhead *p)
+static
+profnode *
+getprofnode(profhead *p)
 {
     profnode *n;
     heapnode *h;
@@ -187,7 +195,9 @@ static profnode *getprofnode(profhead *p)
 /* Locate or create a call site associated with a specified return address.
  */
 
-static profnode *getcallsite(profhead *p, addrnode *a)
+static
+profnode *
+getcallsite(profhead *p, addrnode *a)
 {
     profnode *n, *t;
     addrnode *d;
@@ -231,7 +241,9 @@ static profnode *getcallsite(profhead *p, addrnode *a)
 /* Record a memory allocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d, int w)
+MP_GLOBAL
+int
+__mp_profilealloc(profhead *p, size_t l, void *d, int w)
 {
     profnode *n;
     infonode *m;
@@ -284,7 +296,9 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d, int w)
 /* Record a memory deallocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d, int w)
+MP_GLOBAL
+int
+__mp_profilefree(profhead *p, size_t l, void *d, int w)
 {
     profnode *n;
     infonode *m;
@@ -337,7 +351,9 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d, int w)
 /* Write the profiling information to the output file.
  */
 
-MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
+MP_GLOBAL
+int
+__mp_writeprofile(profhead *p, int w)
 {
     char s[4];
     profdata *d;
@@ -472,7 +488,9 @@ MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
  * access permission.
  */
 
-MP_GLOBAL int __mp_protectprofile(profhead *p, memaccess a)
+MP_GLOBAL
+int
+__mp_protectprofile(profhead *p, memaccess a)
 {
     profnode *n;
 

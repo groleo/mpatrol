@@ -45,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.17 2000-11-13 21:42:51 graeme Exp $"
+#ident "$Id: signals.c,v 1.18 2000-12-20 23:28:47 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -67,21 +67,31 @@ typedef void (*handlerfunction)(int);
 
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
-static void signalhandler(int s, siginfo_t *n, void *p)
+static
+void
+signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_LYNXOS
 #if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
-static void signalhandler(int s, struct sigcontext n)
+static
+void
+signalhandler(int s, struct sigcontext n)
 #else /* SYSTEM && ARCH */
-static void signalhandler(int s, int c, struct sigcontext *n)
+static
+void
+signalhandler(int s, int c, struct sigcontext *n)
 #endif /* SYSTEM && ARCH */
 #else /* SYSTEM */
-static void signalhandler(int s)
+static
+void
+signalhandler(int s)
 #endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
-static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
+static
+long __stdcall
+signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
 {
     infohead *h;
@@ -275,7 +285,9 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 /* Initialise a sighead structure.
  */
 
-MP_GLOBAL void __mp_initsignals(sighead *s)
+MP_GLOBAL
+void
+__mp_initsignals(sighead *s)
 {
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
@@ -311,7 +323,9 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
 /* Save the current signal handlers and set them to ignore.
  */
 
-MP_GLOBAL void __mp_savesignals(sighead *s)
+MP_GLOBAL
+void
+__mp_savesignals(sighead *s)
 {
     s->sigint = signal(SIGINT, SIG_IGN);
     s->sigterm = signal(SIGTERM, SIG_IGN);
@@ -322,7 +336,9 @@ MP_GLOBAL void __mp_savesignals(sighead *s)
 /* Restore the previous signal handlers.
  */
 
-MP_GLOBAL void __mp_restoresignals(sighead *s)
+MP_GLOBAL
+void
+__mp_restoresignals(sighead *s)
 {
     if (s->saved)
     {
@@ -336,7 +352,9 @@ MP_GLOBAL void __mp_restoresignals(sighead *s)
 /* Send the current process an ABORT signal.
  */
 
-MP_GLOBAL void __mp_abort(void)
+MP_GLOBAL
+void
+__mp_abort(void)
 {
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
     /* Send the current process an ABORT signal for use in a debugger.
@@ -357,7 +375,9 @@ MP_GLOBAL void __mp_abort(void)
 /* Provide a function which can be used as a breakpoint target in a debugger.
  */
 
-MP_GLOBAL void __mp_trap(void)
+MP_GLOBAL
+void
+__mp_trap(void)
 {
 }
 

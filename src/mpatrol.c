@@ -44,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.32 2000-12-10 22:36:03 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.33 2000-12-20 23:12:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -353,7 +353,9 @@ static option options_table[] =
 /* Add an option and possibly an associated value to the options buffer.
  */
 
-static void addoption(char *o, char *v, int s)
+static
+void
+addoption(char *o, char *v, int s)
 {
     size_t l;
     int q;
@@ -387,7 +389,9 @@ static void addoption(char *o, char *v, int s)
 /* Build the environment variable containing mpatrol library options.
  */
 
-static void setoptions(int s)
+static
+void
+setoptions(int s)
 {
     sprintf(options, "%s=", MP_OPTIONS);
     optlen = strlen(options);
@@ -514,7 +518,9 @@ static void setoptions(int s)
 /* Build the environment variable containing the list of libraries to preload.
  */
 
-static char *addlibraries(char *v, ...)
+static
+char *
+addlibraries(char *v, ...)
 {
     static char p[256];
     char *s, *t;
@@ -539,7 +545,9 @@ static char *addlibraries(char *v, ...)
 /* Search for an executable file in the current search path.
  */
 
-static char *execpath(char *s)
+static
+char *
+execpath(char *s)
 {
     static char t[MAXPATHLEN];
     char *p, *x, *y;
@@ -576,7 +584,8 @@ static char *execpath(char *s)
  * specified command and arguments.
  */
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     char b[256];
     char *a;

@@ -538,7 +538,9 @@ extern "C"
 /* Set the low-memory handler.
  */
 
-MP_INLINE new_handler set_new_handler(new_handler h)
+MP_INLINE
+new_handler
+set_new_handler(new_handler h)
 {
     return __mp_nomemory(h);
 }
@@ -552,8 +554,9 @@ MP_INLINE new_handler set_new_handler(new_handler h)
 /* Override operator new.
  */
 
-MP_INLINE void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
-                             unsigned long u)
+MP_INLINE
+void *
+operator new(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 {
     return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
 }
@@ -562,8 +565,9 @@ MP_INLINE void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
 /* Override operator new[].
  */
 
-MP_INLINE void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
-                               unsigned long u)
+MP_INLINE
+void *
+operator new[](size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 {
     return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
 }
@@ -572,7 +576,9 @@ MP_INLINE void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
 /* Override operator delete.
  */
 
-MP_INLINE void operator delete(void *p)
+MP_INLINE
+void
+operator delete(void *p)
 {
     char *s, *t;
     unsigned long u;
@@ -585,7 +591,9 @@ MP_INLINE void operator delete(void *p)
 /* Override operator delete[].
  */
 
-MP_INLINE void operator delete[](void *p)
+MP_INLINE
+void
+operator delete[](void *p)
 {
     char *s, *t;
     unsigned long u;

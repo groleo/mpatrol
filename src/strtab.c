@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.12 2000-12-08 00:15:06 graeme Exp $"
+#ident "$Id: strtab.c,v 1.13 2000-12-20 23:34:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,7 +49,9 @@ extern "C"
 /* Initialise the fields of a strtab so that the string table becomes empty.
  */
 
-MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
+MP_GLOBAL
+void
+__mp_newstrtab(strtab *t, heaphead *h)
 {
     struct { char x; hashentry y; } w;
     struct { char x; strnode y; } z;
@@ -77,7 +79,9 @@ MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
 /* Forget all data currently in the string table.
  */
 
-MP_GLOBAL void __mp_deletestrtab(strtab *t)
+MP_GLOBAL
+void
+__mp_deletestrtab(strtab *t)
 {
     size_t i;
 
@@ -100,7 +104,9 @@ MP_GLOBAL void __mp_deletestrtab(strtab *t)
 /* Calculate the hash bucket a string should be placed in.
  */
 
-static unsigned long hash(char *s)
+static
+unsigned long
+hash(char *s)
 {
     unsigned long g, h;
 
@@ -120,7 +126,9 @@ static unsigned long hash(char *s)
 /* Allocate a new hash entry.
  */
 
-static hashentry *gethashentry(strtab *t)
+static
+hashentry *
+gethashentry(strtab *t)
 {
     hashentry *e;
     heapnode *p;
@@ -149,7 +157,9 @@ static hashentry *gethashentry(strtab *t)
 /* Add a new string to the string table.
  */
 
-MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
+MP_GLOBAL
+char *
+__mp_addstring(strtab *t, char *s)
 {
     hashentry *e;
     strnode *n;
@@ -213,7 +223,9 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
  * supplied access permission.
  */
 
-MP_GLOBAL int __mp_protectstrtab(strtab *t, memaccess a)
+MP_GLOBAL
+int
+__mp_protectstrtab(strtab *t, memaccess a)
 {
     hashentry *e;
     strnode *n;

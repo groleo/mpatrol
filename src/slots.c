@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: slots.c,v 1.3 2000-04-23 15:40:53 graeme Exp $"
+#ident "$Id: slots.c,v 1.4 2000-12-20 23:29:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,7 +49,9 @@ extern "C"
  * and there are no free slots.
  */
 
-MP_GLOBAL void __mp_newslots(slottable *t, size_t s, size_t a)
+MP_GLOBAL
+void
+__mp_newslots(slottable *t, size_t s, size_t a)
 {
     struct { char x; slotentry y; } z;
     long n;
@@ -76,7 +78,9 @@ MP_GLOBAL void __mp_newslots(slottable *t, size_t s, size_t a)
 /* Add a new block of memory to be used for free slots to a slot table.
  */
 
-MP_GLOBAL size_t __mp_initslots(slottable *t, void *p, size_t s)
+MP_GLOBAL
+size_t
+__mp_initslots(slottable *t, void *p, size_t s)
 {
     slotentry *e;
     char *b;
@@ -103,7 +107,9 @@ MP_GLOBAL size_t __mp_initslots(slottable *t, void *p, size_t s)
 /* Return a free slot entry from a slot table, or NULL if the table is full.
  */
 
-MP_GLOBAL void *__mp_getslot(slottable *t)
+MP_GLOBAL
+void *
+__mp_getslot(slottable *t)
 {
     slotentry *e;
 
@@ -120,7 +126,9 @@ MP_GLOBAL void *__mp_getslot(slottable *t)
  * slot table.
  */
 
-MP_GLOBAL void __mp_freeslot(slottable *t, void *p)
+MP_GLOBAL
+void
+__mp_freeslot(slottable *t, void *p)
 {
     slotentry *e;
 

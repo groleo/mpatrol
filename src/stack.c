@@ -60,7 +60,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.20 2000-11-06 00:23:21 graeme Exp $"
+#ident "$Id: stack.c,v 1.21 2000-12-20 23:32:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -156,7 +156,9 @@ static void (*segvhandler)(int);
 /* Initialise the fields of a stackinfo structure.
  */
 
-MP_GLOBAL void __mp_newframe(stackinfo *s, void *f)
+MP_GLOBAL
+void
+__mp_newframe(stackinfo *s, void *f)
 {
     s->frame = s->addr = NULL;
 #if MP_BUILTINSTACK_SUPPORT
@@ -190,7 +192,9 @@ MP_GLOBAL void __mp_newframe(stackinfo *s, void *f)
  * traversing the call stack.
  */
 
-static void stackhandler(int s)
+static
+void
+stackhandler(int s)
 {
     longjmp(environment, 1);
 }
@@ -205,7 +209,9 @@ static void stackhandler(int s)
 /* Obtain the return address for the specified stack frame handle.
  */
 
-static unsigned long *getaddr(unsigned long *p)
+static
+unsigned long *
+getaddr(unsigned long *p)
 {
     unsigned long *a;
 
@@ -240,7 +246,9 @@ static unsigned long *getaddr(unsigned long *p)
  * by performing code reading.
  */
 
-static int unwind(frameinfo *f)
+static
+int
+unwind(frameinfo *f)
 {
     long p, s;
     unsigned long a, i, q;
@@ -332,7 +340,9 @@ static int unwind(frameinfo *f)
 /* Return a handle for the frame pointer at the current point in execution.
  */
 
-static unsigned long *getframe(void)
+static
+unsigned long *
+getframe(void)
 {
     ucontext_t c;
 
@@ -352,7 +362,9 @@ static unsigned long *getframe(void)
  * or the next stack frame in the call stack.
  */
 
-MP_GLOBAL int __mp_getframe(stackinfo *p)
+MP_GLOBAL
+int
+__mp_getframe(stackinfo *p)
 {
 #if MP_BUILTINSTACK_SUPPORT
     void *f;

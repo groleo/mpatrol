@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.6 2000-11-17 18:05:51 graeme Exp $"
+#ident "$Id: mleak.c,v 1.7 2000-12-20 23:10:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -130,8 +130,9 @@ static option options_table[] =
 /* Create a new memory allocation and record its log file offset.
  */
 
-static void newalloc(unsigned long i, unsigned long a, unsigned long l,
-                     unsigned long o)
+static
+void
+newalloc(unsigned long i, unsigned long a, unsigned long l, unsigned long o)
 {
     allocation *n;
 
@@ -151,7 +152,9 @@ static void newalloc(unsigned long i, unsigned long a, unsigned long l,
 /* Free an existing memory allocation.
  */
 
-static void freealloc(unsigned long i)
+static
+void
+freealloc(unsigned long i)
 {
     allocation *n;
 
@@ -167,7 +170,9 @@ static void freealloc(unsigned long i)
 /* Read an input line from the log file.
  */
 
-static char *getline(void)
+static
+char *
+getline(void)
 {
     static char s[MP_BUFFER_SIZE + 1];
     unsigned long i;
@@ -201,7 +206,9 @@ static char *getline(void)
 /* Log the allocations and deallocations from the log file.
  */
 
-static void readfile(void)
+static
+void
+readfile(void)
 {
     char *s, *t;
     unsigned long a, l, n, o;
@@ -306,7 +313,9 @@ static void readfile(void)
 /* Display all remaining memory allocations.
  */
 
-static void printallocs(void)
+static
+void
+printallocs(void)
 {
     allocation *n, *p;
     char *r, *s, *t;
@@ -362,7 +371,8 @@ static void printallocs(void)
 /* Read the log file and display all unfreed memory allocations.
  */
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     char b[256];
     char *f;

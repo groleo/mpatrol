@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.11 2000-11-21 22:22:09 graeme Exp $"
+#ident "$Id: mutex.c,v 1.12 2000-12-20 23:22:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -107,7 +107,9 @@ static pthread_once_t lockflag = PTHREAD_ONCE_INIT;
  * any of these functions dynamically allocate memory.
  */
 
-MP_GLOBAL void __mp_initmutexes(void)
+MP_GLOBAL
+void
+__mp_initmutexes(void)
 {
     unsigned long i;
 
@@ -138,7 +140,9 @@ MP_GLOBAL void __mp_initmutexes(void)
  * if the mutexes are still locked or are likely to be used in the future.
  */
 
-MP_GLOBAL void __mp_finimutexes(void)
+MP_GLOBAL
+void
+__mp_finimutexes(void)
 {
     unsigned long i;
 
@@ -165,7 +169,9 @@ MP_GLOBAL void __mp_finimutexes(void)
 /* Lock an mpatrol library mutex.
  */
 
-static void lockmutex(mutex *m)
+static
+void
+lockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
     pthread_mutex_lock(m);
@@ -182,7 +188,9 @@ static void lockmutex(mutex *m)
 /* Unlock an mpatrol library mutex.
  */
 
-static void unlockmutex(mutex *m)
+static
+void
+unlockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
     pthread_mutex_unlock(m);
@@ -199,7 +207,9 @@ static void unlockmutex(mutex *m)
 /* Lock an mpatrol library recursive mutex.
  */
 
-MP_GLOBAL void __mp_lockmutex(mutextype m)
+MP_GLOBAL
+void
+__mp_lockmutex(mutextype m)
 {
     recmutex *l;
     unsigned long i;
@@ -230,7 +240,9 @@ MP_GLOBAL void __mp_lockmutex(mutextype m)
 /* Unlock an mpatrol library recursive mutex.
  */
 
-MP_GLOBAL void __mp_unlockmutex(mutextype m)
+MP_GLOBAL
+void
+__mp_unlockmutex(mutextype m)
 {
     recmutex *l;
     unsigned long i;
@@ -257,7 +269,9 @@ MP_GLOBAL void __mp_unlockmutex(mutextype m)
 /* Return the identifier of the currently running thread.
  */
 
-MP_GLOBAL unsigned long __mp_threadid(void)
+MP_GLOBAL
+unsigned long
+__mp_threadid(void)
 {
 #if TARGET == TARGET_UNIX
     return (unsigned long) pthread_self();

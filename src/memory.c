@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.34 2000-11-02 22:34:21 graeme Exp $"
+#ident "$Id: memory.c,v 1.35 2000-12-20 23:09:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -111,7 +111,9 @@ static size_t memorysize;
  * on this system.
  */
 
-static size_t minalign(void)
+static
+size_t
+minalign(void)
 {
     size_t a;
     long n;
@@ -157,7 +159,9 @@ static size_t minalign(void)
 /* Return the system page size.
  */
 
-static size_t pagesize(void)
+static
+size_t
+pagesize(void)
 {
 #if TARGET == TARGET_WINDOWS
     SYSTEM_INFO i;
@@ -186,7 +190,9 @@ static size_t pagesize(void)
 /* Determine the stack direction on this system.
  */
 
-static int stackdirection(void *p)
+static
+int
+stackdirection(void *p)
 {
     unsigned long n;
 
@@ -205,7 +211,9 @@ static int stackdirection(void *p)
  * a pointer to a local static string buffer.
  */
 
-static char *progname(void)
+static
+char *
+progname(void)
 {
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
@@ -358,7 +366,9 @@ static char *progname(void)
  * of the underlying memory architecture.
  */
 
-MP_GLOBAL void __mp_newmemory(meminfo *i)
+MP_GLOBAL
+void
+__mp_newmemory(meminfo *i)
 {
 #if MP_WATCH_SUPPORT
     char b[64];
@@ -392,7 +402,9 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
 /* Free up any resources used by the meminfo structure.
  */
 
-MP_GLOBAL void __mp_endmemory(meminfo *i)
+MP_GLOBAL
+void
+__mp_endmemory(meminfo *i)
 {
 #if MP_MMAP_SUPPORT
     if (i->mfile != -1)
@@ -416,7 +428,9 @@ MP_GLOBAL void __mp_endmemory(meminfo *i)
 /* Return the process identifier.
  */
 
-MP_GLOBAL unsigned long __mp_processid(void)
+MP_GLOBAL
+unsigned long
+__mp_processid(void)
 {
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
     return (unsigned long) getpid();
@@ -434,7 +448,9 @@ MP_GLOBAL unsigned long __mp_processid(void)
  * implementation.
  */
 
-static void *getmemory(long l)
+static
+void *
+getmemory(long l)
 {
     void *p;
 
@@ -460,7 +476,9 @@ static void *getmemory(long l)
  * with a required alignment.
  */
 
-MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
+MP_GLOBAL
+void *
+__mp_memalloc(meminfo *i, size_t *l, size_t a)
 {
     void *p;
 #if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX
@@ -573,7 +591,9 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
 /* Return a block of allocated memory back to the system.
  */
 
-MP_GLOBAL void __mp_memfree(meminfo *i, void *p, size_t l)
+MP_GLOBAL
+void
+__mp_memfree(meminfo *i, void *p, size_t l)
 {
 #if !MP_ARRAY_SUPPORT
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
@@ -619,7 +639,9 @@ MP_GLOBAL void __mp_memfree(meminfo *i, void *p, size_t l)
 /* Protect a block of allocated memory with the supplied access permission.
  */
 
-MP_GLOBAL int __mp_memprotect(meminfo *i, void *p, size_t l, memaccess a)
+MP_GLOBAL
+int
+__mp_memprotect(meminfo *i, void *p, size_t l, memaccess a)
 {
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
     void *t;
@@ -659,7 +681,9 @@ MP_GLOBAL int __mp_memprotect(meminfo *i, void *p, size_t l, memaccess a)
  * supplied access permission.
  */
 
-MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
+MP_GLOBAL
+int
+__mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
 {
 #if MP_WATCH_SUPPORT
     watchcmd w;
@@ -710,7 +734,9 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
 /* Check that a block of memory only contains a specific byte.
  */
 
-MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
+MP_GLOBAL
+void *
+__mp_memcheck(void *t, char c, size_t l)
 {
     long *w;
     char *p;
@@ -777,7 +803,9 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
 /* Compare two blocks of memory.
  */
 
-MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
+MP_GLOBAL
+void *
+__mp_memcompare(void *t, void *s, size_t l)
 {
     char *p;
     size_t n;
@@ -850,7 +878,9 @@ MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-MP_GLOBAL void *__mp_memfind(void *t, size_t l, void *s, size_t m)
+MP_GLOBAL
+void *
+__mp_memfind(void *t, size_t l, void *s, size_t m)
 {
     if (m > 0)
         while (l >= m)
@@ -868,7 +898,9 @@ MP_GLOBAL void *__mp_memfind(void *t, size_t l, void *s, size_t m)
 /* Set a block of memory to contain a specific byte.
  */
 
-MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
+MP_GLOBAL
+void
+__mp_memset(void *t, char c, size_t l)
 {
     long *w;
     char *p;
@@ -916,7 +948,9 @@ MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
 /* Copy a block of memory from one address to another.
  */
 
-MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
+MP_GLOBAL
+void
+__mp_memcopy(void *t, void *s, size_t l)
 {
     size_t n;
 

@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.25 2000-12-10 22:34:35 graeme Exp $"
+#ident "$Id: option.c,v 1.26 2000-12-20 23:23:47 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -229,7 +229,9 @@ static char *options_help[] =
 /* Perform a case-insensitive comparison between two option keywords.
  */
 
-static int matchoption(char *s, char *t)
+static
+int
+matchoption(char *s, char *t)
 {
 #if TARGET == TARGET_UNIX
     int d;
@@ -253,7 +255,9 @@ static int matchoption(char *s, char *t)
  * reporting any errors that occur during the conversion.
  */
 
-static size_t readnumber(char *s, long *n, int u)
+static
+size_t
+readnumber(char *s, long *n, int u)
 {
     char *t;
     int e;
@@ -302,7 +306,9 @@ static size_t readnumber(char *s, long *n, int u)
  * open range at either end is represented by -1.
  */
 
-static int readrange(char *s, unsigned long *l, unsigned long *u)
+static
+int
+readrange(char *s, unsigned long *l, unsigned long *u)
 {
     char *t;
     unsigned long n;
@@ -358,7 +364,9 @@ static int readrange(char *s, unsigned long *l, unsigned long *u)
 /* Display the quick-reference help summary.
  */
 
-static void showoptions(void)
+static
+void
+showoptions(void)
 {
     char **s, **t;
 
@@ -380,7 +388,9 @@ static void showoptions(void)
 /* The main option parsing routine.
  */
 
-MP_GLOBAL void __mp_parseoptions(infohead *h)
+MP_GLOBAL
+void
+__mp_parseoptions(infohead *h)
 {
     char *a, *f, *o, *p, *s, *t;
     unsigned long m, n;

@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.8 2000-12-14 17:46:32 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.9 2000-12-20 23:20:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -241,7 +241,9 @@ static option options_table[] =
 /* Create a new memory allocation.
  */
 
-static void newalloc(unsigned long i, unsigned long e, void *a, size_t l)
+static
+void
+newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
@@ -270,7 +272,9 @@ static void newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 /* Free all existing memory allocations.
  */
 
-static void freeallocs(void)
+static
+void
+freeallocs(void)
 {
     allocation *n, *p;
 
@@ -286,7 +290,9 @@ static void freeallocs(void)
 /* Byte-swap a block of memory.
  */
 
-static void byteswap(void *b, size_t n)
+static
+void
+byteswap(void *b, size_t n)
 {
     char *s, *t;
     char c;
@@ -307,7 +313,9 @@ static void byteswap(void *b, size_t n)
  * file.
  */
 
-static size_t refill(size_t s)
+static
+size_t
+refill(size_t s)
 {
     static int e;
     size_t l, n;
@@ -355,7 +363,9 @@ static size_t refill(size_t s)
 /* Read an entry from the tracing output file.
  */
 
-static void getentry(void *d, size_t l, size_t n, int b)
+static
+void
+getentry(void *d, size_t l, size_t n, int b)
 {
     size_t i, s;
 
@@ -382,7 +392,9 @@ static void getentry(void *d, size_t l, size_t n, int b)
 /* Read a signed LEB128 number from the tracing output file.
  */
 
-static long getsleb128(void)
+static
+long
+getsleb128(void)
 {
     size_t s;
     long n;
@@ -406,7 +418,9 @@ static long getsleb128(void)
 /* Read an unsigned LEB128 number from the tracing output file.
  */
 
-static unsigned long getuleb128(void)
+static
+unsigned long
+getuleb128(void)
 {
     size_t s;
     unsigned long n;
@@ -431,7 +445,9 @@ static unsigned long getuleb128(void)
 /* Refresh the memory display window.
  */
 
-static void redrawmemory(Widget w, XtPointer d, XmDrawingAreaCallbackStruct *s)
+static
+void
+redrawmemory(Widget w, XtPointer d, XmDrawingAreaCallbackStruct *s)
 {
     XCopyArea(appdisplay, pixmap, s->window, ungc, 0, 0, width - 1, height - 1,
               0, 0);
@@ -443,7 +459,9 @@ static void redrawmemory(Widget w, XtPointer d, XmDrawingAreaCallbackStruct *s)
 /* Update the memory display window.
  */
 
-static void drawmemory(void *a, size_t s, GC g)
+static
+void
+drawmemory(void *a, size_t s, GC g)
 {
     unsigned long i, j, l, u, x1, x2, y1, y2;
 
@@ -493,9 +511,13 @@ static void drawmemory(void *a, size_t s, GC g)
  */
 
 #if MP_GUI_SUPPORT
-static int readevent(XtPointer p)
+static
+int
+readevent(XtPointer p)
 #else /* MP_GUI_SUPPORT */
-static int readevent(void)
+static
+int
+readevent(void)
 #endif /* MP_GUI_SUPPORT */
 {
     char s[4];
@@ -602,7 +624,9 @@ static int readevent(void)
 /* Log the allocations and deallocations from the tracing output file.
  */
 
-static void readfile(void)
+static
+void
+readfile(void)
 {
     char s[4];
     size_t i;
@@ -667,7 +691,8 @@ static void readfile(void)
 /* Read the tracing output file and display all specified information.
  */
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     char b[256];
     char *f;
