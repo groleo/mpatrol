@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.20 2001-03-02 01:38:25 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.21 2001-03-04 15:57:19 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.20 2001-03-02 01:38:25 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.21 2001-03-04 15:57:19 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -558,6 +558,16 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     if ((f != AT_MEMCMP) && (f != AT_BCMP))
         illegalfunction("__mp_comparemem", s, t, u);
     return memcmp(p, q, l);
+}
+
+
+/* Return an error message corresponding to a given error type.
+ */
+
+char *
+__mp_strerror(errortype e)
+{
+    return NULL;
 }
 
 

@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.100 2001-03-04 13:57:20 graeme Exp $"
+#ident "$Id: inter.c,v 1.101 2001-03-04 15:57:19 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.100 2001-03-04 13:57:20 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.101 2001-03-04 15:57:19 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1321,6 +1321,18 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     r = __mp_comparememory(&memhead, p, q, l, f, &v);
     restoresignals();
     return r;
+}
+
+
+/* Return an error message corresponding to a given error type.
+ */
+
+char *
+__mp_strerror(errortype e)
+{
+    if ((e >= (errortype) 0) && (e <= ET_MAX))
+        return __mp_errordetails[e].string;
+    return NULL;
 }
 
 
