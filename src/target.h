@@ -158,8 +158,10 @@
 
 #define FORMAT_NONE  1 /* no symbol support */
 #define FORMAT_COFF  2 /* COFF */
-#define FORMAT_ELF32 3 /* ELF32 */
-#define FORMAT_BFD   4 /* GNU BFD */
+#define FORMAT_XCOFF 3 /* XCOFF */
+#define FORMAT_ELF32 4 /* ELF32 */
+#define FORMAT_ELF64 5 /* ELF64 */
+#define FORMAT_BFD   6 /* GNU BFD */
 
 
 #ifndef FORMAT
