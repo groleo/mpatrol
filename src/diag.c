@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.38 2000-11-11 15:51:05 graeme Exp $"
+#ident "$Id: diag.c,v 1.39 2000-11-12 12:18:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -446,7 +446,7 @@ MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
     char *s, *t;
     unsigned long u;
 
-    __mp_findsource(y, a, &s, &t, &u);
+    __mp_findsource(y, (char *) a - 1, &s, &t, &u);
     if (n = __mp_findsymbol(y, a))
     {
         __mp_diag("%s", n->data.name);
