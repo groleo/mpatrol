@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.16 2000-04-23 22:45:36 graeme Exp $"
+#ident "$Id: profile.c,v 1.17 2000-04-24 00:14:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -52,18 +52,23 @@ extern "C"
 
 MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h)
 {
+    struct { char x; profdata y; } w;
     struct { char x; profnode y; } z;
     size_t i;
     long n;
 
     p->heap = h;
-    /* Determine the minimum alignment for a profnode on this system
-     * and force the alignment to be a power of two.  This information
-     * is used when initialising the slot table.
+    /* Determine the minimum alignment for a profdata structure and a
+     * profnode on this system and force the alignments to be a power
+     * of two.  This information is used when initialising the slot
+     * tables.
      */
+    n = (char *) &w.y - &w.x;
+    __mp_newslots(&p->dtable, sizeof(profdata), __mp_poweroftwo(n));
     n = (char *) &z.y - &z.x;
-    __mp_newslots(&p->table, sizeof(profnode), __mp_poweroftwo(n));
+    __mp_newslots(&p->ntable, sizeof(profnode), __mp_poweroftwo(n));
     __mp_newlist(&p->ilist);
+    __mp_newlist(&p->list);
     __mp_newtree(&p->tree);
     p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
@@ -89,9 +94,12 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
      * at a lower level by the heap manager.
      */
     p->heap = NULL;
-    p->table.free = NULL;
-    p->table.size = 0;
+    p->dtable.free = NULL;
+    p->dtable.size = 0;
+    p->ntable.free = NULL;
+    p->ntable.size = 0;
     __mp_newlist(&p->ilist);
+    __mp_newlist(&p->list);
     __mp_newtree(&p->tree);
     p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
@@ -100,6 +108,43 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
     p->autocount = 0;
     p->file = NULL;
     p->profiling = 0;
+}
+
+
+/* Allocate a new profiling data structure.
+ */
+
+static profdata *getprofdata(profhead *p)
+{
+    profdata *d;
+    heapnode *h;
+    size_t i;
+
+    /* If we have no more profiling data structure slots left then we must
+     * allocate some more memory for them.  An extra MP_ALLOCFACTOR pages
+     * of memory should suffice.
+     */
+    if ((d = (profdata *) __mp_getslot(&p->dtable)) == NULL)
+    {
+        if ((h = __mp_heapalloc(p->heap, p->heap->memory.page * MP_ALLOCFACTOR,
+              p->dtable.entalign)) == NULL)
+            return NULL;
+        __mp_initslots(&p->dtable, h->block, h->size);
+        d = (profdata *) __mp_getslot(&p->dtable);
+        __mp_addtail(&p->ilist, &d->index.node);
+        d->index.block = h->block;
+        d->index.size = h->size;
+        p->size += h->size;
+        d = (profdata *) __mp_getslot(&p->dtable);
+        __mp_addtail(&p->list, &d->data.node);
+        d->data.index = p->list.size;
+        for (i = 0; i < 4; i++)
+        {
+            d->data.acount[i] = d->data.dcount[i] = 0;
+            d->data.atotal[i] = d->data.dtotal[i] = 0;
+        }
+    }
+    return d;
 }
 
 
@@ -115,18 +160,18 @@ static profnode *getprofnode(profhead *p)
      * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
      * should suffice.
      */
-    if ((n = (profnode *) __mp_getslot(&p->table)) == NULL)
+    if ((n = (profnode *) __mp_getslot(&p->ntable)) == NULL)
     {
         if ((h = __mp_heapalloc(p->heap, p->heap->memory.page * MP_ALLOCFACTOR,
-              p->table.entalign)) == NULL)
+              p->ntable.entalign)) == NULL)
             return NULL;
-        __mp_initslots(&p->table, h->block, h->size);
-        n = (profnode *) __mp_getslot(&p->table);
+        __mp_initslots(&p->ntable, h->block, h->size);
+        n = (profnode *) __mp_getslot(&p->ntable);
         __mp_addtail(&p->ilist, &n->index.node);
         n->index.block = h->block;
         n->index.size = h->size;
         p->size += h->size;
-        n = (profnode *) __mp_getslot(&p->table);
+        n = (profnode *) __mp_getslot(&p->ntable);
     }
     return n;
 }
@@ -139,7 +184,6 @@ static profnode *getcallsite(profhead *p, addrnode *a)
 {
     profnode *n, *t;
     addrnode *d;
-    size_t i;
 
     if (n = (profnode *) __mp_search(p->tree.root,
         (unsigned long) a->data.addr))
@@ -164,18 +208,14 @@ static profnode *getcallsite(profhead *p, addrnode *a)
          ((t = getcallsite(p, a->data.next)) == NULL)))
     {
         if (n != NULL)
-            __mp_freeslot(&p->table, n);
+            __mp_freeslot(&p->ntable, n);
         return NULL;
     }
     __mp_treeinsert(&p->tree, &n->data.node, (unsigned long) a->data.addr);
     n->data.parent = t;
     n->data.index = p->tree.size;
     n->data.addr = a->data.addr;
-    for (i = 0; i < 4; i++)
-    {
-        n->data.data.acount[i] = n->data.data.dcount[i] = 0;
-        n->data.data.atotal[i] = n->data.data.dtotal[i] = 0;
-    }
+    n->data.data = NULL;
     return n;
 }
 
@@ -196,7 +236,9 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
     m = (infonode *) d;
     if ((m->data.stack != NULL) && (m->data.stack->data.addr != NULL))
     {
-        if ((n = getcallsite(p, m->data.stack)) == NULL)
+        if (((n = getcallsite(p, m->data.stack)) == NULL) ||
+            ((n->data.data == NULL) &&
+             ((n->data.data = getprofdata(p)) == NULL)))
             return 0;
         if (l <= p->sbound)
             i = 0;
@@ -206,8 +248,8 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
             i = 2;
         else
             i = 3;
-        n->data.data.acount[i]++;
-        n->data.data.atotal[i] += l;
+        n->data.data->data.acount[i]++;
+        n->data.data->data.atotal[i] += l;
     }
     /* Note the size of the allocation in one of the allocation bins.
      * The highest allocation bin stores a count of all the allocations
@@ -247,7 +289,9 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
     m = (infonode *) d;
     if ((m->data.stack != NULL) && (m->data.stack->data.addr != NULL))
     {
-        if ((n = getcallsite(p, m->data.stack)) == NULL)
+        if (((n = getcallsite(p, m->data.stack)) == NULL) ||
+            ((n->data.data == NULL) &&
+             ((n->data.data = getprofdata(p)) == NULL)))
             return 0;
         if (l <= p->sbound)
             i = 0;
@@ -257,8 +301,8 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
             i = 2;
         else
             i = 3;
-        n->data.data.dcount[i]++;
-        n->data.data.dtotal[i] += l;
+        n->data.data->data.dcount[i]++;
+        n->data.data->data.dtotal[i] += l;
     }
     /* Note the size of the deallocation in one of the deallocation bins.
      * The highest deallocation bin stores a count of all the deallocations
@@ -288,6 +332,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 MP_GLOBAL int __mp_writeprofile(profhead *p)
 {
     char s[4];
+    profdata *d;
     profnode *n;
     FILE *f;
     size_t i;
@@ -325,12 +370,24 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     fwrite(&p->atotals, sizeof(size_t), 1, f);
     fwrite(p->dcounts, sizeof(size_t), MP_BIN_SIZE, f);
     fwrite(&p->dtotals, sizeof(size_t), 1, f);
-    /* Write out the statistics from every call site.
+    /* Write out the profiling data structures.
      */
-    i = 0;
     fwrite(&p->sbound, sizeof(size_t), 1, f);
     fwrite(&p->mbound, sizeof(size_t), 1, f);
     fwrite(&p->lbound, sizeof(size_t), 1, f);
+    fwrite(&p->list.size, sizeof(size_t), 1, f);
+    for (d = (profdata *) p->list.head; d->data.node.next != NULL;
+         d = (profdata *) d->data.node.next)
+    {
+        fwrite(&d->data.index, sizeof(unsigned long), 1, f);
+        fwrite(d->data.acount, sizeof(size_t), 4, f);
+        fwrite(d->data.atotal, sizeof(size_t), 4, f);
+        fwrite(d->data.dcount, sizeof(size_t), 4, f);
+        fwrite(d->data.dtotal, sizeof(size_t), 4, f);
+    }
+    /* Write out the statistics from every call site.
+     */
+    i = 0;
     fwrite(&p->tree.size, sizeof(size_t), 1, f);
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
          n = (profnode *) __mp_successor(&n->data.node))
@@ -341,10 +398,10 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         else
             fwrite(&i, sizeof(size_t), 1, f);
         fwrite(&n->data.addr, sizeof(void *), 1, f);
-        fwrite(n->data.data.acount, sizeof(size_t), 4, f);
-        fwrite(n->data.data.atotal, sizeof(size_t), 4, f);
-        fwrite(n->data.data.dcount, sizeof(size_t), 4, f);
-        fwrite(n->data.data.dtotal, sizeof(size_t), 4, f);
+        if (n->data.data != NULL)
+            fwrite(&n->data.data->data.index, sizeof(unsigned long), 1, f);
+        else
+            fwrite(&i, sizeof(size_t), 1, f);
     }
     fwrite(s, sizeof(char), 4, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
@@ -361,6 +418,10 @@ MP_GLOBAL int __mp_protectprofile(profhead *p, memaccess a)
 {
     profnode *n;
 
+    /* Even though there are likely to be profdata and profnode data structures
+     * on the list of internal data blocks, it is safe to assume one or the
+     * other since they both share the same internal data members.
+     */
     for (n = (profnode *) p->ilist.head; n->index.node.next != NULL;
          n = (profnode *) n->index.node.next)
         if (!__mp_memprotect(&p->heap->memory, n->index.block, n->index.size,
