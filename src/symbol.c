@@ -67,6 +67,11 @@
  * definitions for reading the internal structures of the dynamic linker.
  */
 #include <elf.h>
+#elif SYSTEM == SYSTEM_HPUX
+/* The HP/UX dynamic linker support routines are available for use even by
+ * statically linked programs.
+ */
+#include <dl.h>
 #elif SYSTEM == SYSTEM_IRIX
 /* IRIX doesn't have a conventional SVR4 dynamic linker and so does not have the
  * same interface for accessing information about any required shared objects at
@@ -78,7 +83,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.23 2000-05-31 18:23:20 graeme Exp $"
+#ident "$Id: symbol.c,v 1.24 2000-06-01 20:41:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -405,8 +410,10 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
     /* We don't bother storing a symbol which has no name or whose name
      * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
      * likely to be the name of a CSECT beginning with a '.' and not the
-     * original name of the function, so we skip the first character.  We
-     * also don't allocate a symbol node for symbols which have a virtual
+     * original name of the function, so we skip the first character.  In
+     * addition, the HP/UX $START$ symbol contains dollar characters but we
+     * don't want to bother allowing any other symbols containing dollars.
+     * We also don't allocate a symbol node for symbols which have a virtual
      * address of zero and we only remember symbols that are declared
      * statically, externally or weakly visible.
      */
@@ -417,8 +424,12 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 #else /* SYSTEM && ARCH */
         (*s != '\0') &&
 #endif /* SYSTEM && ARCH */
-        !strpbrk(s, "$@.") && (a > 0) &&
-        (p->flags & (BSF_LOCAL | BSF_GLOBAL | BSF_WEAK)))
+#if SYSTEM == SYSTEM_HPUX
+        ((strcmp(s, "$START$") == 0) || !strpbrk(s, "$@.")) &&
+#else /* SYSTEM */
+        !strpbrk(s, "$@.") &&
+#endif /* SYSTEM */
+        (a > 0) && (p->flags & (BSF_LOCAL | BSF_GLOBAL | BSF_WEAK)))
     {
         if ((n = getsymnode(y)) == NULL)
             return 0;
@@ -885,6 +896,9 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
     Elf32_Dyn *d;
     dynamiclink *l;
+#elif SYSTEM == SYSTEM_HPUX
+    struct shl_descriptor d;
+    size_t i;
 #elif SYSTEM == SYSTEM_IRIX
     struct obj_list *l;
     struct obj *o;
@@ -921,6 +935,15 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
             l = l->next;
         }
     }
+#elif SYSTEM == SYSTEM_HPUX
+    /* An index of -1 indicates the dynamic linker and an index of 0 indicates
+     * the main executable program.  We are interested in all other object files
+     * that the program depends on.
+     */
+    for (i = 1; shl_get_r(i, &d) != -1; i++)
+        if ((d.filename[0] != '\0') &&
+            !__mp_addsymbols(y, d.filename, d.tstart))
+            return 0;
 #elif SYSTEM == SYSTEM_IRIX
     if (l = __rld_obj_head)
         while (l = l->next)
