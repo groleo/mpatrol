@@ -44,11 +44,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.30 2000-11-17 18:05:51 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.31 2000-11-30 22:03:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "2.3" /* the current version of this program */
+#define VERSION "2.4" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -72,6 +72,7 @@ typedef enum options_flags
     OF_USEDEBUG       = 'g',
     OF_HELP           = 'h',
     OF_LIST           = 'i',
+    OF_THREADS        = 'j',
     OF_LOGALL         = 'L',
     OF_LOGFILE        = 'l',
     OF_ALLOWOFLOW     = 'M',
@@ -88,7 +89,8 @@ typedef enum options_flags
     OF_PROGFILE       = 'r',
     OF_SHOWALL        = 'S',
     OF_AUTOSAVE       = 's',
-    OF_THREADS        = 't',
+    OF_TRACEFILE      = 'T',
+    OF_TRACE          = 't',
     OF_UNFREEDABORT   = 'U',
     OF_LIMIT          = 'u',
     OF_VERSION        = 'V',
@@ -141,7 +143,8 @@ static char *allocbyte, *freebyte;
 static char *oflowbyte, *oflowsize;
 static char *defalign, *limit;
 static char *failfreq, *failseed, *unfreedabort;
-static char *logfile, *proffile, *progfile;
+static char *logfile, *proffile;
+static char *tracefile, *progfile;
 static char *autosave, *check;
 static char *nofree, *pagealloc;
 static char *smallbound, *mediumbound, *largebound;
@@ -157,11 +160,11 @@ static int showmap, showsymbols;
 static int showfreed, showunfreed;
 static int checkallocs, checkreallocs;
 static int checkfrees, checkmemory;
-static int prof, safesignals;
-static int noprotect, preserve;
-static int oflowwatch, usemmap;
-static int usedebug, allowoflow;
-static int editlist;
+static int prof, trace;
+static int safesignals, noprotect;
+static int preserve, oflowwatch;
+static int usemmap, usedebug;
+static int editlist, allowoflow;
 
 
 /* The table describing all recognised options.
@@ -322,6 +325,12 @@ static option options_table[] =
     {"threads", OF_THREADS, NULL,
      "\tSpecifies that the program to be run is multithreaded if the\n"
      "\t--dynamic option is used.\n"},
+    {"trace", OF_TRACE, NULL,
+     "\tSpecifies that all memory allocations are to be traced and sent to\n"
+     "\tthe tracing output file.\n"},
+    {"trace-file", OF_TRACEFILE, "string",
+     "\tSpecifies an alternative file in which to place all memory allocation\n"
+     "\ttracing information from the mpatrol library.\n"},
     {"unfreed-abort", OF_UNFREEDABORT, "unsigned integer",
      "\tSpecifies the minimum number of unfreed allocations at which to abort\n"
      "\tthe program just before program termination.\n"},
@@ -474,6 +483,10 @@ static void setoptions(int s)
     }
     if (smallbound)
         addoption("SMALLBOUND", smallbound, 0);
+    if (trace)
+        addoption("TRACE", NULL, 0);
+    if (tracefile)
+        addoption("TRACEFILE", tracefile, 0);
     if (unfreedabort)
         addoption("UNFREEDABORT", unfreedabort, 0);
     if (usedebug)
@@ -586,6 +599,10 @@ int main(int argc, char **argv)
         proffile = "%n.%p.out";
     else
         proffile = "mpatrol.%n.out";
+    if ((a = getenv(MP_TRACEDIR)) && (*a != '\0'))
+        tracefile = "%n.%p.trace";
+    else
+        tracefile = "mpatrol.%n.trace";
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)
@@ -745,6 +762,12 @@ int main(int argc, char **argv)
             break;
           case OF_THREADS:
             t = 1;
+            break;
+          case OF_TRACE:
+            trace = 1;
+            break;
+          case OF_TRACEFILE:
+            tracefile = __mp_optarg;
             break;
           case OF_UNFREEDABORT:
             unfreedabort = __mp_optarg;
