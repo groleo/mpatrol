@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.7 2000-06-23 20:09:02 graeme Exp $"
+#ident "$Id: signals.c,v 1.8 2000-06-26 23:02:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -208,11 +208,13 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
     i.sa_flags = SA_SIGINFO;
     (void *) i.sa_handler = (void *) signalhandler;
     sigfillset(&i.sa_mask);
+    sigaction(SIGBUS, &i, NULL);
     sigaction(SIGSEGV, &i, NULL);
 #if MP_WATCH_SUPPORT
     sigaction(SIGTRAP, &i, NULL);
 #endif /* MP_WATCH_SUPPORT */
 #else /* MP_SIGINFO_SUPPORT */
+    signal(SIGBUS, signalhandler);
     signal(SIGSEGV, signalhandler);
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
