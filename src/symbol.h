@@ -78,8 +78,8 @@ typedef struct symhead
     treeroot itree;  /* internal allocation tree */
     treeroot dtree;  /* symbol node allocation tree */
     size_t size;     /* number of symbol nodes in table */
-    void *handle;    /* access library handle */
-    void *syms;      /* access library symbols */
+    void *hhead;     /* access library handle list head */
+    void *htail;     /* access library handle list tail */
 }
 symhead;
 
@@ -91,6 +91,7 @@ extern "C"
 
 
 MP_EXPORT void __mp_newsymbols(symhead *, heaphead *);
+MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
 MP_EXPORT int __mp_addsymbols(symhead *, char *, size_t);
 MP_EXPORT int __mp_addextsymbols(symhead *);
