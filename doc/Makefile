@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.31 2000-12-26 10:34:27 graeme Exp $
+# $Id: Makefile,v 1.32 2001-02-21 10:27:01 graeme Exp $
 
 
 # Definitions
@@ -40,7 +40,7 @@ VERBOSE    = false
 
 .SUFFIXES: .texi .tex .txt .info .guide .html .dvi .ps .pdf .jpg .eps
 
-default: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html
+default: $(DOCUMENT).txt
 
 # Build the text file from the Texinfo file using makeinfo
 
@@ -189,16 +189,6 @@ all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(REFCARD).dvi \
 	$(REFCARD).ps $(REFCARD).pdf
 
-$(DOCUMENT)_doc.tar.gz: $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf \
-	$(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf README
-	@ mkdir -p $(DOCUMENT)/doc
-	@ cp $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(DOCUMENT)/doc
-	@ cp $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf $(DOCUMENT)/doc
-	@ cp README $(DOCUMENT)/doc
-	@ tar cf $(DOCUMENT)_doc.tar $(DOCUMENT)
-	@ gzip $(DOCUMENT)_doc.tar
-	-@ rm -rf $(DOCUMENT) >/dev/null 2>&1
-
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).info-* >/dev/null 2>&1
@@ -206,6 +196,5 @@ clean:
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
-	-@ rm -f $(DOCUMENT)_doc.tar.gz >/dev/null 2>&1
 
 clobber: clean
