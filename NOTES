@@ -135,6 +135,11 @@ Notes for Amiga platforms
     to make any calls to the DOS library.  Perhaps it's not even worth
     implementing as the archive library works fine.
 
+  * All source code that uses the mpatrol library currently needs to be compiled
+    using the PARMS=BOTH SAS/C compiler option (or equivalent) in order to
+    correctly pass arguments to the library.  This is a side-effect of
+    supporting the shared library as well as the archive library.
+
   * Need to add support for call stack traversal for both the Motorola 680x0 and
     PowerPC processor architectures.  At first glance, this doesn't seem to be
     very easy, or perhaps even impossible.
@@ -339,3 +344,15 @@ Related software
             Location:  http://www.rational.com/
             Overview:  Uses Object Code Insertion technology to provide run-time
                        error checking and memory leak detection.
+
+    However, before you try out any of the above software, there may already be
+    a malloc library with debugging support on your system that might be
+    suitable for solving your problem.  For example, on Solaris 2.7 the
+    following libraries are available:
+
+        malloc(3c)      - Trade-off between performance and efficiency.
+        malloc(3x)      - Slower performance, space-efficient.
+        bsdmalloc(3x)   - Better performance, space-inefficient.
+        mtmalloc(3t)    - Thread-safe memory allocator.
+        mapmalloc(3x)   - Uses mmap() instead of sbrk() to allocate heap space.
+        watchmalloc(3x) - Uses watch point areas to check for overflows.
