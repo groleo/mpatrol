@@ -36,7 +36,6 @@
 #include "addr.h"
 #include "profile.h"
 #include "signals.h"
-#include "symbol.h"
 
 
 #define FLG_CHECKALLOCS   1    /* check all memory allocations */
