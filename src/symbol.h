@@ -91,7 +91,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newsymbols(symhead *, heaphead *, char);
+MP_EXPORT void __mp_newsymbols(symhead *, heaphead *);
 MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
 MP_EXPORT int __mp_addsymbols(symhead *, char *, size_t);
