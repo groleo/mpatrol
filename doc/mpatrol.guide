@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
 
@@ -166,7 +166,9 @@ for his help on reading debugging information from object files via the
 GNU BFD library, and Alexander Barton (<abarton@innotrac.com>) and Dave
 Gibson (<david@epc.co.uk>) for their help on writing thread-safe code.
 Roger Keane (<rgr@bcs-inc.com>) provided the perl code in the @{b}mpsym@{ub}
-command and also the idea for the @{b}MP_USE_ATEXIT@{ub} feature macro.
+command and also the idea for the @{b}MP_USE_ATEXIT@{ub} feature macro.  Boris
+Makushkin (<oberon@antibiotic.ru>) requested, helped with, and provided
+initial testing for the FreeBSD port.
 
    Oh, and always remember to do final release builds without the
 mpatrol library as the library is much slower than normal malloc
@@ -8462,6 +8464,27 @@ supported on that system.
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command does not work
           unless @{b}libelf.so@{ub} is available.
 
+   * FreeBSD 4.2, Intel Celeron, ELF32, @{b}gcc@{ub}
+        * The @{b}OFLOWWATCH@{ub} option has no effect.
+
+        * The @{b}USEDEBUG@{ub} option has no effect.
+
+        * The @{b}LIST@{ub} option does not work since the @{b}--listing@{ub} option does
+          not work in the @{b}mpedit@{ub} command.
+
+        * The mpatrol library requires either the ELF access library or
+          the GNU BFD library to be installed on the system, otherwise
+          no symbols can be read from executable files or shared
+          libraries and the library must be built with the
+          @{b}-DFORMAT=FORMAT_NONE@{ub} option.
+
+        * The @{b}mpedit@{ub} command does not support the @{b}--listing@{ub} option due
+          to the lack of an @{b}nl@{ub} command on the system.
+
+        * The @{b}hexwords@{ub} command needs to be changed to use
+          @{b}/usr/share/dict/words@{ub} instead of @{b}/usr/dict/words@{ub} as the
+          default dictionary.
+
    * HP/UX 10.20, HP PA/RISC 9000, BFD, @{b}gcc@{ub}
         * The thread-safe version of the library does not work.  This
           is because there does not appear to be any evidence that this
@@ -8835,7 +8858,13 @@ Adding a new processor architecture
 Adding a new object file format
 ===============================
 
-   * Add a new @{b}FORMAT@{ub} definition in @{b}target.h@{ub}.
+   * Add a new @{b}FORMAT@{ub} and/or @{b}DYNLINK@{ub} definition in @{b}target.h@{ub}.  The
+     @{b}FORMAT@{ub} macro specifies the object file format, or in some cases,
+     the type of access library that is to be used to read the object
+     file format.  The @{b}DYNLINK@{ub} macro specifies the type of dynamic
+     linker that is used on a specific platform, and is used when
+     obtaining information about the shared libraries that a program
+     needs or has loaded.
 
    * Make any necessary modifications to @{b}config.h@{ub}.
 
@@ -9301,8 +9330,8 @@ Notes for UNIX platforms
      command.  Also add a way to specify editor options to the @{b}mpedit@{ub}
      command.
 
-   * Add support for Digital UNIX, SunOS and other non-System V UNIX
-     operating systems.
+   * Add support for Digital UNIX and other non-System V UNIX operating
+     systems.
 
    * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command does not always work
      on systems whose dynamic linkers support the @{b}LD_PRELOAD@{ub} or
@@ -9624,13 +9653,13 @@ Building
      as much information from the compiler as possible, mainly from any
      predefined preprocessor macros that it defines during compilation.
      If this information is incorrect then you can override the
-     @{b}TARGET@{ub}, @{b}SYSTEM@{ub}, @{b}ARCH@{ub}, @{b}ENVIRON@{ub} and @{b}FORMAT@{ub} preprocessor macros
-     defined in @{b}src/target.h@{ub} to suit your particular system by
+     @{b}TARGET@{ub}, @{b}SYSTEM@{ub}, @{b}ARCH@{ub}, @{b}ENVIRON@{ub}, @{b}FORMAT@{ub} and @{b}DYNLINK@{ub} preprocessor
+     macros defined in @{b}src/target.h@{ub} to suit your particular system by
      explicitly defining them in @{b}CFLAGS@{ub} within the @{b}Makefile@{ub} when you
      build mpatrol.  You could also choose to build different versions
-     of mpatrol with different settings of @{b}ENVIRON@{ub} or @{b}FORMAT@{ub} on a
-     single system if you wish to by changing @{b}ENVIRON@{ub} or @{b}FORMAT@{ub} for
-     different builds.
+     of mpatrol with different settings of @{b}ENVIRON@{ub}, @{b}FORMAT@{ub} or @{b}DYNLINK@{ub}
+     on a single system if you wish to by changing @{b}ENVIRON@{ub}, @{b}FORMAT@{ub} or
+     @{b}DYNLINK@{ub} for different builds.
 
   2. The processor family I am compiling on supports both 32-bit and
      64-bit modes of operation.  How do I specify which I want?
@@ -10321,6 +10350,23 @@ Netware platforms.
           Detects and diagnoses errors in static, stack and heap memory
           and in memory and resource leaks.
 
+   * C++ Debugging Support Library (libcwd)
+    Author
+          Carlo Wood <carlo@alinoe.com>
+
+    License
+          Q Public License
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://sourceforge.net/projects/libcw/'
+
+    Overview
+          A C++ debugging library that can also detect memory
+          corruption and memory leaks.
+
    * Ccmalloc
     Author
           Armin Biere (<biere@inf.ethz.ch>)
@@ -10572,6 +10618,23 @@ Netware platforms.
           Provides a fortified shell for memory allocations, trapping
           memory leaks, writes beyond and before memory blocks and
           writes to freed memory.
+
+   * Gabe's Debug Library
+    Author
+          Gabriel Sechan <gsechan@hotmail.com>
+
+    License
+          Free Software
+
+    Platforms
+          Windows
+
+    Location
+          `http://sourceforge.net/projects/debuglib/'
+
+    Overview
+          A debugging library for C++ which performs dynamic memory
+          management and looks for potential problems and memory leaks.
 
    * GC (Garbage Collector)
     Author
@@ -12540,6 +12603,7 @@ Index
  @{" bytes set                                " link "Example 1"}   Example 1
  @{" C                                        " link "Memory allocations"}   Memory allocations
  @{" C++                                      " link "Memory allocations"}   Memory allocations
+ @{" C++ Debugging Support Library (libcwd)   " link "Related software"}   Related software
  @{" C++ mangled names                        " link "Example 1"}   Example 1
  @{" call sites                               " link "Profiling"}   Profiling
  @{" call stacks                              " link "Call stacks and symbol tables"}   Call stacks and symbol tables
@@ -12618,6 +12682,7 @@ Index
  @{" dynamic linking                          " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" dynamic memory allocations               " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" DYNIX-ptx, Intel 80x86                   " link "Supported systems"}   Supported systems
+ @{" DYNLINK                                  " link "Building"}   Building
  @{" EDIT                                     " link "Environment"}   Environment
  @{" EDITOR                                   " link "The mpedit command"}   The mpedit command
  @{" editor                                   " link "The mpedit command"}   The mpedit command
@@ -12672,6 +12737,7 @@ Index
  @{" free blocks                              " link "Example 1"}   Example 1
  @{" free byte                                " link "General errors"}   General errors
  @{" free memory                              " link "General errors"}   General errors
+ @{" FreeBSD, Intel 80x86                     " link "Supported systems"}   Supported systems
  @{" FREEBYTE                                 " link "Environment"}   Environment
  @{" freed blocks                             " link "Example 1"}   Example 1
  @{" freed memory                             " link "General errors"}   General errors
@@ -12687,6 +12753,7 @@ Index
  @{" functions, handler                       " link "Example 1"}   Example 1
  @{" future enhancements                      " link "Notes"}   Notes
  @{" g++                                      " link "Example 1"}   Example 1
+ @{" Gabe's Debug Library                     " link "Related software"}   Related software
  @{" garbage collector                        " link "Dynamic memory allocations"}   Dynamic memory allocations
  @{" GC (Garbage Collector)                   " link "Related software"}   Related software
  @{" gcc                                      " link "Example 1"}   Example 1

@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
 * Menu:
@@ -160,7 +160,9 @@ for his help on reading debugging information from object files via the
 GNU BFD library, and Alexander Barton (<abarton@innotrac.com>) and Dave
 Gibson (<david@epc.co.uk>) for their help on writing thread-safe code.
 Roger Keane (<rgr@bcs-inc.com>) provided the perl code in the `mpsym'
-command and also the idea for the `MP_USE_ATEXIT' feature macro.
+command and also the idea for the `MP_USE_ATEXIT' feature macro.  Boris
+Makushkin (<oberon@antibiotic.ru>) requested, helped with, and provided
+initial testing for the FreeBSD port.
 
    Oh, and always remember to do final release builds without the
 mpatrol library as the library is much slower than normal malloc
@@ -8276,6 +8278,27 @@ supported on that system.
         * The `--dynamic' option to the `mpatrol' command does not work
           unless `libelf.so' is available.
 
+   * FreeBSD 4.2, Intel Celeron, ELF32, `gcc'
+        * The `OFLOWWATCH' option has no effect.
+
+        * The `USEDEBUG' option has no effect.
+
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
+
+        * The mpatrol library requires either the ELF access library or
+          the GNU BFD library to be installed on the system, otherwise
+          no symbols can be read from executable files or shared
+          libraries and the library must be built with the
+          `-DFORMAT=FORMAT_NONE' option.
+
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
+
+        * The `hexwords' command needs to be changed to use
+          `/usr/share/dict/words' instead of `/usr/dict/words' as the
+          default dictionary.
+
    * HP/UX 10.20, HP PA/RISC 9000, BFD, `gcc'
         * The thread-safe version of the library does not work.  This
           is because there does not appear to be any evidence that this
@@ -8639,7 +8662,13 @@ File: mpatrol.info,  Node: New file format support,  Prev: New processor support
 Adding a new object file format
 ===============================
 
-   * Add a new `FORMAT' definition in `target.h'.
+   * Add a new `FORMAT' and/or `DYNLINK' definition in `target.h'.  The
+     `FORMAT' macro specifies the object file format, or in some cases,
+     the type of access library that is to be used to read the object
+     file format.  The `DYNLINK' macro specifies the type of dynamic
+     linker that is used on a specific platform, and is used when
+     obtaining information about the shared libraries that a program
+     needs or has loaded.
 
    * Make any necessary modifications to `config.h'.
 
@@ -9098,8 +9127,8 @@ Notes for UNIX platforms
      command.  Also add a way to specify editor options to the `mpedit'
      command.
 
-   * Add support for Digital UNIX, SunOS and other non-System V UNIX
-     operating systems.
+   * Add support for Digital UNIX and other non-System V UNIX operating
+     systems.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
@@ -9395,13 +9424,14 @@ Building
      obtain as much information from the compiler as possible, mainly
      from any predefined preprocessor macros that it defines during
      compilation.  If this information is incorrect then you can
-     override the `TARGET', `SYSTEM', `ARCH', `ENVIRON' and `FORMAT'
-     preprocessor macros defined in `src/target.h' to suit your
-     particular system by explicitly defining them in `CFLAGS' within
-     the `Makefile' when you build mpatrol.  You could also choose to
-     build different versions of mpatrol with different settings of
-     `ENVIRON' or `FORMAT' on a single system if you wish to by changing
-     `ENVIRON' or `FORMAT' for different builds.
+     override the `TARGET', `SYSTEM', `ARCH', `ENVIRON', `FORMAT' and
+     `DYNLINK' preprocessor macros defined in `src/target.h' to suit
+     your particular system by explicitly defining them in `CFLAGS'
+     within the `Makefile' when you build mpatrol.  You could also
+     choose to build different versions of mpatrol with different
+     settings of `ENVIRON', `FORMAT' or `DYNLINK' on a single system if
+     you wish to by changing `ENVIRON', `FORMAT' or `DYNLINK' for
+     different builds.
 
   2. The processor family I am compiling on supports both 32-bit and
      64-bit modes of operation.  How do I specify which I want?
@@ -10077,6 +10107,23 @@ Netware platforms.
           Detects and diagnoses errors in static, stack and heap memory
           and in memory and resource leaks.
 
+   * C++ Debugging Support Library (libcwd)
+    Author
+          Carlo Wood <carlo@alinoe.com>
+
+    License
+          Q Public License
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://sourceforge.net/projects/libcw/'
+
+    Overview
+          A C++ debugging library that can also detect memory
+          corruption and memory leaks.
+
    * Ccmalloc
     Author
           Armin Biere (<biere@inf.ethz.ch>)
@@ -10322,6 +10369,23 @@ Netware platforms.
           Provides a fortified shell for memory allocations, trapping
           memory leaks, writes beyond and before memory blocks and
           writes to freed memory.
+
+   * Gabe's Debug Library
+    Author
+          Gabriel Sechan <gsechan@hotmail.com>
+
+    License
+          Free Software
+
+    Platforms
+          Windows
+
+    Location
+          `http://sourceforge.net/projects/debuglib/'
+
+    Overview
+          A debugging library for C++ which performs dynamic memory
+          management and looks for potential problems and memory leaks.
 
    * GC (Garbage Collector)
     Author
@@ -12254,6 +12318,7 @@ Index
 * bytes set:                             Example 1.
 * C:                                     Memory allocations.
 * C++:                                   Memory allocations.
+* C++ Debugging Support Library (libcwd): Related software.
 * C++ mangled names:                     Example 1.
 * call sites:                            Profiling.
 * call stacks:                           Call stacks and symbol tables.
@@ -12332,6 +12397,7 @@ Index
 * dynamic linking:                       Call stacks and symbol tables.
 * dynamic memory allocations:            Dynamic memory allocations.
 * DYNIX/ptx, Intel 80x86:                Supported systems.
+* DYNLINK:                               Building.
 * EDIT:                                  Environment.
 * EDITOR:                                The mpedit command.
 * editor:                                The mpedit command.
@@ -12386,6 +12452,7 @@ Index
 * free blocks:                           Example 1.
 * free byte:                             General errors.
 * free memory:                           General errors.
+* FreeBSD, Intel 80x86:                  Supported systems.
 * FREEBYTE:                              Environment.
 * freed blocks:                          Example 1.
 * freed memory:                          General errors.
@@ -12401,6 +12468,7 @@ Index
 * functions, handler:                    Example 1.
 * future enhancements:                   Notes.
 * g++:                                   Example 1.
+* Gabe's Debug Library:                  Related software.
 * garbage collector:                     Dynamic memory allocations.
 * GC (Garbage Collector):                Related software.
 * gcc:                                   Example 1.
@@ -12868,125 +12936,125 @@ Index
 Tag Table:
 Node: Top1256
 Node: Foreword3527
-Node: Overview8146
-Node: Features11123
-Node: Installation28815
-Node: Integration34955
-Ref: Integration-Footnote-141355
-Node: Memory allocations41476
-Node: Static memory allocations42153
-Ref: Static memory allocations-Footnote-144614
-Node: Stack memory allocations44656
-Ref: Stack memory allocations-Footnote-146520
-Node: Dynamic memory allocations46559
-Ref: Dynamic memory allocations-Footnote-149981
-Ref: Dynamic memory allocations-Footnote-250100
-Node: Operating system support50204
-Node: Virtual memory52164
-Ref: Virtual memory-Footnote-158192
-Ref: Virtual memory-Footnote-258448
-Ref: Virtual memory-Footnote-358624
-Ref: Virtual memory-Footnote-458659
-Ref: Virtual memory-Footnote-558718
-Node: Call stacks and symbol tables58942
-Ref: Call stacks and symbol tables-Footnote-164620
-Ref: Call stacks and symbol tables-Footnote-264688
-Ref: Call stacks and symbol tables-Footnote-364739
-Ref: Call stacks and symbol tables-Footnote-464783
-Ref: Call stacks and symbol tables-Footnote-564825
-Ref: Call stacks and symbol tables-Footnote-664867
-Ref: Call stacks and symbol tables-Footnote-764915
-Node: Threads65021
-Ref: Threads-Footnote-171027
-Node: Using mpatrol71122
-Node: Library behaviour71988
-Ref: Library behaviour-Footnote-177885
-Node: Logging and tracing77943
-Node: General errors82809
-Ref: General errors-Footnote-186947
-Ref: General errors-Footnote-287103
-Node: Overwrites and underwrites87271
-Ref: Overwrites and underwrites-Footnote-195673
-Ref: Overwrites and underwrites-Footnote-295736
-Node: Using with a debugger95860
-Ref: Using with a debugger-Footnote-1104914
-Ref: Using with a debugger-Footnote-2104982
-Ref: Using with a debugger-Footnote-3105238
-Node: Testing105327
-Ref: Testing-Footnote-1108064
-Ref: Testing-Footnote-2108245
-Node: Library functions108304
-Node: Utilities115185
-Node: The mpatrol command116155
-Ref: The mpatrol command-Footnote-1122695
-Ref: The mpatrol command-Footnote-2122829
-Node: The mleak command122909
-Node: The mpsym command124873
-Node: The mpedit command127441
-Node: The hexwords command130837
-Node: Profiling133979
-Ref: Profiling-Footnote-1161871
-Ref: Profiling-Footnote-2162095
-Node: Tracing162199
-Ref: Tracing-Footnote-1179389
-Ref: Tracing-Footnote-2179423
-Ref: Tracing-Footnote-3179545
-Node: Improving performance179651
-Ref: Improving performance-Footnote-1188551
-Ref: Improving performance-Footnote-2188593
-Ref: Improving performance-Footnote-3188670
-Ref: Improving performance-Footnote-4188742
-Node: How it works188786
-Node: Examples195979
-Node: Example 1199697
-Ref: Example 1-Footnote-1223813
-Node: Example 2224003
-Node: Example 3229403
-Node: Example 4236260
-Node: Example 5239765
-Node: Example 6242233
-Ref: Example 6-Footnote-1246033
-Node: Example 7246162
-Node: Example 8248020
-Node: Example 9258256
-Node: Tutorial274127
-Ref: Tutorial-Footnote-1288658
-Ref: Tutorial-Footnote-2288949
-Ref: Tutorial-Footnote-3289098
-Ref: Tutorial-Footnote-4289235
-Ref: Tutorial-Footnote-5289334
-Node: Functions289615
-Node: Environment320051
-Node: Options340819
-Node: Diagnostic messages352206
-Node: Library performance368426
-Node: File formats370919
-Ref: File formats-Footnote-1371343
-Node: Profiling file format371555
-Node: Tracing file format374817
-Node: Supported systems376684
-Node: New system support391019
-Node: New processor support392215
-Node: New file format support392898
-Node: Notes393288
-Node: Generic notes394899
-Ref: Generic notes-Footnote-1412347
-Ref: Generic notes-Footnote-2412565
-Node: UNIX notes412787
-Node: Amiga notes417226
-Node: Windows notes420890
-Node: Netware notes422310
-Node: Frequently asked questions424870
-Node: Documentation425493
-Node: Building430323
-Node: Linking437348
-Node: Running441620
-Node: Files456728
-Node: Related software459724
-Ref: Related software-Footnote-1496409
-Node: References496650
-Node: Copying499243
-Node: Function index527132
-Node: Index529390
+Node: Overview8263
+Node: Features11240
+Node: Installation28932
+Node: Integration35072
+Ref: Integration-Footnote-141472
+Node: Memory allocations41593
+Node: Static memory allocations42270
+Ref: Static memory allocations-Footnote-144731
+Node: Stack memory allocations44773
+Ref: Stack memory allocations-Footnote-146637
+Node: Dynamic memory allocations46676
+Ref: Dynamic memory allocations-Footnote-150098
+Ref: Dynamic memory allocations-Footnote-250217
+Node: Operating system support50321
+Node: Virtual memory52281
+Ref: Virtual memory-Footnote-158309
+Ref: Virtual memory-Footnote-258565
+Ref: Virtual memory-Footnote-358741
+Ref: Virtual memory-Footnote-458776
+Ref: Virtual memory-Footnote-558835
+Node: Call stacks and symbol tables59059
+Ref: Call stacks and symbol tables-Footnote-164737
+Ref: Call stacks and symbol tables-Footnote-264805
+Ref: Call stacks and symbol tables-Footnote-364856
+Ref: Call stacks and symbol tables-Footnote-464900
+Ref: Call stacks and symbol tables-Footnote-564942
+Ref: Call stacks and symbol tables-Footnote-664984
+Ref: Call stacks and symbol tables-Footnote-765032
+Node: Threads65138
+Ref: Threads-Footnote-171144
+Node: Using mpatrol71239
+Node: Library behaviour72105
+Ref: Library behaviour-Footnote-178002
+Node: Logging and tracing78060
+Node: General errors82926
+Ref: General errors-Footnote-187064
+Ref: General errors-Footnote-287220
+Node: Overwrites and underwrites87388
+Ref: Overwrites and underwrites-Footnote-195790
+Ref: Overwrites and underwrites-Footnote-295853
+Node: Using with a debugger95977
+Ref: Using with a debugger-Footnote-1105031
+Ref: Using with a debugger-Footnote-2105099
+Ref: Using with a debugger-Footnote-3105355
+Node: Testing105444
+Ref: Testing-Footnote-1108181
+Ref: Testing-Footnote-2108362
+Node: Library functions108421
+Node: Utilities115302
+Node: The mpatrol command116272
+Ref: The mpatrol command-Footnote-1122812
+Ref: The mpatrol command-Footnote-2122946
+Node: The mleak command123026
+Node: The mpsym command124990
+Node: The mpedit command127558
+Node: The hexwords command130954
+Node: Profiling134096
+Ref: Profiling-Footnote-1161988
+Ref: Profiling-Footnote-2162212
+Node: Tracing162316
+Ref: Tracing-Footnote-1179506
+Ref: Tracing-Footnote-2179540
+Ref: Tracing-Footnote-3179662
+Node: Improving performance179768
+Ref: Improving performance-Footnote-1188668
+Ref: Improving performance-Footnote-2188710
+Ref: Improving performance-Footnote-3188787
+Ref: Improving performance-Footnote-4188859
+Node: How it works188903
+Node: Examples196096
+Node: Example 1199814
+Ref: Example 1-Footnote-1223930
+Node: Example 2224120
+Node: Example 3229520
+Node: Example 4236377
+Node: Example 5239882
+Node: Example 6242350
+Ref: Example 6-Footnote-1246150
+Node: Example 7246279
+Node: Example 8248137
+Node: Example 9258373
+Node: Tutorial274244
+Ref: Tutorial-Footnote-1288775
+Ref: Tutorial-Footnote-2289066
+Ref: Tutorial-Footnote-3289215
+Ref: Tutorial-Footnote-4289352
+Ref: Tutorial-Footnote-5289451
+Node: Functions289732
+Node: Environment320168
+Node: Options340936
+Node: Diagnostic messages352323
+Node: Library performance368543
+Node: File formats371036
+Ref: File formats-Footnote-1371460
+Node: Profiling file format371672
+Node: Tracing file format374934
+Node: Supported systems376801
+Node: New system support392003
+Node: New processor support393199
+Node: New file format support393882
+Node: Notes394666
+Node: Generic notes396277
+Ref: Generic notes-Footnote-1413725
+Ref: Generic notes-Footnote-2413943
+Node: UNIX notes414165
+Node: Amiga notes418597
+Node: Windows notes422261
+Node: Netware notes423681
+Node: Frequently asked questions426241
+Node: Documentation426864
+Node: Building431694
+Node: Linking438757
+Node: Running443029
+Node: Files458137
+Node: Related software461133
+Ref: Related software-Footnote-1498549
+Node: References498790
+Node: Copying501383
+Node: Function index529272
+Node: Index531530
 
 End Tag Table

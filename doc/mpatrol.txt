@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.4 of the mpatrol manual for version 1.3.4, 12th
+   This is edition 2.4 of the mpatrol manual for version 1.3.4, 15th
 January, 2001.
 
 Foreword
@@ -117,7 +117,9 @@ for his help on reading debugging information from object files via the
 GNU BFD library, and Alexander Barton (<abarton@innotrac.com>) and Dave
 Gibson (<david@epc.co.uk>) for their help on writing thread-safe code.
 Roger Keane (<rgr@bcs-inc.com>) provided the perl code in the `mpsym'
-command and also the idea for the `MP_USE_ATEXIT' feature macro.
+command and also the idea for the `MP_USE_ATEXIT' feature macro.  Boris
+Makushkin (<oberon@antibiotic.ru>) requested, helped with, and provided
+initial testing for the FreeBSD port.
 
    Oh, and always remember to do final release builds without the
 mpatrol library as the library is much slower than normal malloc
@@ -8035,6 +8037,27 @@ supported on that system.
         * The `--dynamic' option to the `mpatrol' command does not work
           unless `libelf.so' is available.
 
+   * FreeBSD 4.2, Intel Celeron, ELF32, `gcc'
+        * The `OFLOWWATCH' option has no effect.
+
+        * The `USEDEBUG' option has no effect.
+
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
+
+        * The mpatrol library requires either the ELF access library or
+          the GNU BFD library to be installed on the system, otherwise
+          no symbols can be read from executable files or shared
+          libraries and the library must be built with the
+          `-DFORMAT=FORMAT_NONE' option.
+
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
+
+        * The `hexwords' command needs to be changed to use
+          `/usr/share/dict/words' instead of `/usr/dict/words' as the
+          default dictionary.
+
    * HP/UX 10.20, HP PA/RISC 9000, BFD, `gcc'
         * The thread-safe version of the library does not work.  This
           is because there does not appear to be any evidence that this
@@ -8383,7 +8406,13 @@ G.2 Adding a new processor architecture
 G.3 Adding a new object file format
 ===================================
 
-   * Add a new `FORMAT' definition in `target.h'.
+   * Add a new `FORMAT' and/or `DYNLINK' definition in `target.h'.  The
+     `FORMAT' macro specifies the object file format, or in some cases,
+     the type of access library that is to be used to read the object
+     file format.  The `DYNLINK' macro specifies the type of dynamic
+     linker that is used on a specific platform, and is used when
+     obtaining information about the shared libraries that a program
+     needs or has loaded.
 
    * Make any necessary modifications to `config.h'.
 
@@ -8825,8 +8854,8 @@ H.2 Notes for UNIX platforms
      command.  Also add a way to specify editor options to the `mpedit'
      command.
 
-   * Add support for Digital UNIX, SunOS and other non-System V UNIX
-     operating systems.
+   * Add support for Digital UNIX and other non-System V UNIX operating
+     systems.
 
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
@@ -9096,13 +9125,14 @@ I.2 Building
      obtain as much information from the compiler as possible, mainly
      from any predefined preprocessor macros that it defines during
      compilation.  If this information is incorrect then you can
-     override the `TARGET', `SYSTEM', `ARCH', `ENVIRON' and `FORMAT'
-     preprocessor macros defined in `src/target.h' to suit your
-     particular system by explicitly defining them in `CFLAGS' within
-     the `Makefile' when you build mpatrol.  You could also choose to
-     build different versions of mpatrol with different settings of
-     `ENVIRON' or `FORMAT' on a single system if you wish to by changing
-     `ENVIRON' or `FORMAT' for different builds.
+     override the `TARGET', `SYSTEM', `ARCH', `ENVIRON', `FORMAT' and
+     `DYNLINK' preprocessor macros defined in `src/target.h' to suit
+     your particular system by explicitly defining them in `CFLAGS'
+     within the `Makefile' when you build mpatrol.  You could also
+     choose to build different versions of mpatrol with different
+     settings of `ENVIRON', `FORMAT' or `DYNLINK' on a single system if
+     you wish to by changing `ENVIRON', `FORMAT' or `DYNLINK' for
+     different builds.
 
   2. The processor family I am compiling on supports both 32-bit and
      64-bit modes of operation.  How do I specify which I want?
@@ -9766,6 +9796,23 @@ Netware platforms.
           Detects and diagnoses errors in static, stack and heap memory
           and in memory and resource leaks.
 
+   * C++ Debugging Support Library (libcwd)
+    Author
+          Carlo Wood <carlo@alinoe.com>
+
+    License
+          Q Public License
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://sourceforge.net/projects/libcw/'
+
+    Overview
+          A C++ debugging library that can also detect memory
+          corruption and memory leaks.
+
    * Ccmalloc
     Author
           Armin Biere (<biere@inf.ethz.ch>)
@@ -10011,6 +10058,23 @@ Netware platforms.
           Provides a fortified shell for memory allocations, trapping
           memory leaks, writes beyond and before memory blocks and
           writes to freed memory.
+
+   * Gabe's Debug Library
+    Author
+          Gabriel Sechan <gsechan@hotmail.com>
+
+    License
+          Free Software
+
+    Platforms
+          Windows
+
+    Location
+          `http://sourceforge.net/projects/debuglib/'
+
+    Overview
+          A debugging library for C++ which performs dynamic memory
+          management and looks for potential problems and memory leaks.
 
    * GC (Garbage Collector)
     Author
@@ -12055,6 +12119,8 @@ bytes located:                                      See 12.1.
 bytes set:                                          See 12.1.
 C:                                                  See 5.
 C++:                                                See 5.
+C++ Debugging Support Library (libcwd):            
+          See ``Appendix J Related software''.
 C++ mangled names:                                  See 12.1.
 call sites:                                         See 8.
 call stacks:                                        See 6.2.
@@ -12169,6 +12235,8 @@ dynamic linking:                                    See 6.2.
 dynamic memory allocations:                         See 5.3.
 DYNIX/ptx, Intel 80x86:                            
           See ``Appendix G Supported systems''.
+DYNLINK:                                           
+          See ``I.2 Building''.
 EDIT:                                              
           See ``Appendix B Environment''.
 EDITOR:                                             See 7.8.4.
@@ -12246,6 +12314,8 @@ FRECOR:
 free blocks:                                        See 12.1.
 free byte:                                          See 7.3.
 free memory:                                        See 7.3.
+FreeBSD, Intel 80x86:                              
+          See ``Appendix G Supported systems''.
 FREEBYTE:                                          
           See ``Appendix B Environment''.
 freed blocks:                                       See 12.1.
@@ -12269,6 +12339,8 @@ functions, handler:                                 See 12.1.
 future enhancements:                               
           See ``Appendix H Notes''.
 g++:                                                See 12.1.
+Gabe's Debug Library:                              
+          See ``Appendix J Related software''.
 garbage collector:                                  See 5.3.
 GC (Garbage Collector):                            
           See ``Appendix J Related software''.
