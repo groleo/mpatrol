@@ -30,7 +30,6 @@
 #include "stack.h"
 #include "utils.h"
 #include <stdio.h>
-#include <string.h>
 #include <errno.h>
 #if TARGET == TARGET_UNIX
 #include <fcntl.h>
@@ -54,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.6 1999-12-20 20:00:17 graeme Exp $"
+#ident "$Id: memory.c,v 1.7 1999-12-21 20:25:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -423,7 +422,7 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
      * case if we are using a simulated heap.
      */
     if ((i->mfile == -1) && (p != NULL))
-        memset(p, 0, *l);
+        __mp_memset(p, 0, *l);
 #endif /* MP_ARRAY_SUPPORT && TARGET */
     if (p == NULL)
         errno = ENOMEM;
