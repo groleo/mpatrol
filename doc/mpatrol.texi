@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.262 2003-11-25 21:32:29 graeme Exp $
+@c $Id: mpatrol.texi,v 1.263 2003-11-25 23:59:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -41,13 +41,10 @@
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
+@ifnottex
+@set TITLEIMAGES
+@end ifnottex
 @clear EXAMPLEIMAGES
-@ifinfo
-@set TITLEIMAGES
-@end ifinfo
-@ifhtml
-@set TITLEIMAGES
-@end ifhtml
 @ifnotinfo
 @set EXAMPLEIMAGES
 @end ifnotinfo
