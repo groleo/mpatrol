@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.4 2000-04-19 18:58:37 graeme Exp $"
+#ident "$Id: profile.c,v 1.5 2000-04-19 19:33:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,6 +48,14 @@ extern "C"
 
 MP_GLOBAL void __mp_newprofile(profhead *p)
 {
+    unsigned long i;
+
+    for (i = 0; i < MP_BIN_SIZE; i++)
+        p->acounts[i] = p->dcounts[i] = 0;
+    p->acountl = p->dcountl = 0;
+    p->sbound = MP_SMALLBOUND;
+    p->mbound = MP_MEDIUMBOUND;
+    p->lbound = MP_LARGEBOUND;
     p->file = MP_PROFFILE;
     p->profiling = 0;
 }
@@ -58,6 +66,11 @@ MP_GLOBAL void __mp_newprofile(profhead *p)
 
 MP_GLOBAL void __mp_deleteprofile(profhead *p)
 {
+    unsigned long i;
+
+    for (i = 0; i < MP_BIN_SIZE; i++)
+        p->acounts[i] = p->dcounts[i] = 0;
+    p->acountl = p->dcountl = 0;
     p->file = NULL;
     p->profiling = 0;
 }

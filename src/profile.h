@@ -45,6 +45,9 @@ typedef struct profhead
     unsigned long dcounts[MP_BIN_SIZE]; /* deallocation bins */
     unsigned long acountl;              /* total bytes of large allocations */
     unsigned long dcountl;              /* total bytes of large deallocations */
+    unsigned long sbound;               /* small allocation boundary */
+    unsigned long mbound;               /* medium allocation boundary */
+    unsigned long lbound;               /* large allocation boundary */
     char *file;                         /* profiling filename */
     char profiling;                     /* profiling status */
 }
