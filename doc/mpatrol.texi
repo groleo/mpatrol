@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.248 2001-09-06 23:03:00 graeme Exp $
+@c $Id: mpatrol.texi,v 1.249 2001-09-13 19:32:51 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.13
 @set VERSION 1.4.8
-@set UPDATED 6th September, 2001
+@set UPDATED 13th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -5929,7 +5929,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.4.6 (01/08/28)
+@@(#) mpatrol 1.4.7 (01/09/05)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -8998,7 +8998,7 @@ and no bytes will be searched.
 @node Functions 6, , Functions 5, Functions
 @section mpatrol library functions
 
-The following 41 functions are available as support routines for additional
+The following 42 functions are available as support routines for additional
 control and tracing in the mpatrol library.  Although they are documented here
 as being prefixed by @samp{__mp_}, their equivalent functions that are prefixed
 by @samp{mpatrol_} are also defined as aliases in the @file{mpatrol.h} header
@@ -12612,11 +12612,9 @@ hard to verify the tests since the heap addresses are likely to be different on
 every new build and will certainly be different across different platforms.
 
 @item
-Perhaps use GNU Autoconf to automatically work out values for @file{config.h} on
-the platform it is being built on, and also use Automake, libtool and install
-when building and installing files.  Also update the @command{mupdate} shell
-script to automatically update the version numbers contained in the files in the
-@file{pkg} directory.
+Improve the Autoconf, Automake and Libtool support.  Also update the
+@command{mupdate} shell script to automatically update the version numbers
+contained in the files in the @file{pkg} directory.
 
 @item
 The postscript version of the quick reference card seems to print at an unusual
@@ -13263,6 +13261,20 @@ this library at a much later date from the original release so if you want the
 @code{USEDEBUG} option to work you should try to get an updated library from
 Microsoft.  Alternatively, you can disable the call to it in
 @code{__mp_findsource()} but the @option{USEDEBUG} option will no longer work.
+
+@cindex Windows symbols setup
+@item
+Why is the mpatrol library unable to read any symbols from DLLs despite the fact
+that my program uses them?
+
+Windows executable files and DLLs only contain a list of symbol names which are
+imported and exported but do not contain details of such symbols at the same
+level as object files.  To do this requires the symbolic information to be
+retained by the linker, but this has not been done for the system DLLs.  The
+mpatrol library uses the imagehlp system library to read symbols from DLLs but
+this will only work if the required system debugging symbols are installed on
+your machine.  In Visual C++, this can be done by selecting the @samp{Windows
+NT Symbols Setup} start menu item.
 
 @cindex duplicate symbols
 @item
