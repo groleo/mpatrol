@@ -24,7 +24,7 @@
 # UNIX shell script to run programs using the mpatrol library
 
 
-# $Id: mpatrol,v 1.5 2000-01-09 21:36:16 graeme Exp $
+# $Id: mpatrol,v 1.6 2000-03-07 20:55:24 graeme Exp $
 
 
 # Display a command usage message.
@@ -68,9 +68,12 @@ Options:
     -f <unsigned integer>
         Specifies an 8-bit byte pattern with which to prefill newly-freed
         memory.
-    -g
+    -G
         Instructs the library to save and replace certain signal handlers
         during the execution of library code and to restore them afterwards.
+    -g
+        Specifies that any debugging information in the executable file
+        should be used to obtain additional source-level information.
     -L <unsigned integer>
         Specifies the limit in bytes at which all memory allocations should
         fail if the total allocated memory should increase beyond this.
@@ -134,8 +137,8 @@ ENDUSAGE
 # Set up command and option variables.
 
 command=`basename "$0"`
-version="1.4"
-options="A:a:C:cD:de:F:f:gL:l:mNnO:o:PpR:SsU:vwZ:z:"
+version="1.5"
+options="A:a:C:cD:de:F:f:GgL:l:mNnO:o:PpR:SsU:vwZ:z:"
 preload="false"
 format="elf"
 
@@ -167,6 +170,7 @@ safesignals="false"
 showfreed="false" # also includes showunfreed
 showmap="false"   # also includes showsymbols
 unfreedabort=""
+usedebug="false"
 usemmap="false"
 
 
@@ -204,8 +208,11 @@ do
         f)
             freebyte="$OPTARG"
             ;;
-        g)
+        G)
             safesignals="true"
+            ;;
+        g)
+            usedebug="true"
             ;;
         L)
             limit="$OPTARG"
@@ -382,6 +389,10 @@ fi
 if [ "$unfreedabort" != "" ]
 then
     MPATROL_OPTIONS="$MPATROL_OPTIONS UNFREEDABORT=\"$unfreedabort\""
+fi
+if [ "$usedebug" = "true" ]
+then
+    MPATROL_OPTIONS="$MPATROL_OPTIONS USEDEBUG"
 fi
 if [ "$usemmap" = "true" ]
 then
