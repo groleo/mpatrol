@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.69 2001-02-27 20:06:13 graeme Exp $"
+#ident "$Id: info.c,v 1.70 2001-02-27 20:17:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.69 2001-02-27 20:06:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.70 2001-02-27 20:17:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -163,15 +163,15 @@ __mp_deleteinfo(infohead *h)
 
 MP_GLOBAL
 int
-__mp_atinit(void (*f)(void))
+__mp_atinit(infohead *h, void (*f)(void))
 {
     int r;
 
-    if (memhead.initcount == MP_MAXINITS)
+    if (h->initcount == MP_MAXINITS)
         r = 0;
     else
     {
-        memhead.inits[memhead.initcount++] = f;
+        h->inits[h->initcount++] = f;
         r = 1;
     }
     return r;
