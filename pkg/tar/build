@@ -24,10 +24,10 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.18 2000-06-18 09:43:06 graeme Exp $
+# $Id: build,v 1.19 2000-06-26 23:18:40 graeme Exp $
 
 
-version=1.2.2
+version=1.2.3
 libversion=1.2
 
 
