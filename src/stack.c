@@ -29,16 +29,20 @@
 
 
 #include "stack.h"
-#if TARGET == TARGET_UNIX && ARCH == ARCH_SPARC && !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+#include <setjmp.h>
+#include <signal.h>
+#if ARCH == ARCH_SPARC
 #include <ucontext.h>
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
-#endif /* TARGET && ARCH && MP_BUILTINSTACK_SUPPORT */
+#endif /* ARCH */
+#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.3 2000-01-09 20:35:21 graeme Exp $"
+#ident "$Id: stack.c,v 1.4 2000-05-14 15:00:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -93,6 +97,13 @@ extern "C"
 #endif /* __cplusplus */
 
 
+#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+static jmp_buf environment;
+static void (*bushandler)(int);
+static void (*segvhandler)(int);
+#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
+
+
 /* Initialise the fields of a stackinfo structure.
  */
 
@@ -107,6 +118,18 @@ MP_GLOBAL void __mp_newframe(stackinfo *s)
     s->next = NULL;
 #endif /* MP_BUILTINSTACK_SUPPORT */
 }
+
+
+#if TARGET == TARGET_UNIX && !MP_BUILTINSTACK_SUPPORT
+/* Handles any signals that result from illegal memory accesses whilst
+ * traversing the call stack.
+ */
+
+static void stackhandler(int s)
+{
+    longjmp(environment, 1);
+}
+#endif /* TARGET && MP_BUILTINSTACK_SUPPORT */
 
 
 #if !MP_BUILTINSTACK_SUPPORT
@@ -166,7 +189,9 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     unsigned int *f;
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT */
+    int r;
 
+    r = 0;
 #if MP_BUILTINSTACK_SUPPORT
     if (p->index == 0)
     {
@@ -182,11 +207,14 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     if ((p->index++ < MP_MAXSTACK) && (p->frame = p->frames[p->index - 1]))
     {
         p->addr = p->addrs[p->index - 1];
-        return 1;
+        r = 1;
     }
-    p->frame = NULL;
-    p->addr = NULL;
-    p->index = MP_MAXSTACK;
+    else
+    {
+        p->frame = NULL;
+        p->addr = NULL;
+        p->index = MP_MAXSTACK;
+    }
 #else /* MP_BUILTINSTACK_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_SPARC)) || \
@@ -196,35 +224,48 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
      * without writing in assembler.  In particular, optimised code is likely
      * to cause major problems for stack traversal on some platforms.
      */
-    if (p->frame == NULL)
-#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K
-        f = (unsigned int *) &p - 2;
-#elif ARCH == ARCH_M88K
-        f = (unsigned int *) &p - 4;
-#elif ARCH == ARCH_SPARC
-        f = getframe();
-#endif /* ARCH */
+#if TARGET == TARGET_UNIX
+    bushandler = signal(SIGBUS, stackhandler);
+    segvhandler = signal(SIGSEGV, stackhandler);
+    if (setjmp(environment))
+        __mp_newframe(p);
     else
-        f = (unsigned int *) p->next;
-    if (p->frame = f)
+#endif /* TARGET */
     {
-        p->addr = getaddr(f);
-        /* We cache the next frame pointer in the call stack since on some
-         * systems it may be overwritten by another call.
-         */
-#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
-        p->next = (void *) *f;
+        if (p->frame == NULL)
+#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K
+            f = (unsigned int *) &p - 2;
+#elif ARCH == ARCH_M88K
+            f = (unsigned int *) &p - 4;
 #elif ARCH == ARCH_SPARC
-        if (p->addr == NULL)
-            p->next = NULL;
-        else
-            p->next = (void *) ((unsigned int *) *f + 14);
+            f = getframe();
 #endif /* ARCH */
-        return 1;
+        else
+            f = (unsigned int *) p->next;
+        if (p->frame = f)
+        {
+            p->addr = getaddr(f);
+            /* We cache the next frame pointer in the call stack since on some
+             * systems it may be overwritten by another call.
+             */
+#if ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K
+            p->next = (void *) *f;
+#elif ARCH == ARCH_SPARC
+            if (p->addr == NULL)
+                p->next = NULL;
+            else
+                p->next = (void *) ((unsigned int *) *f + 14);
+#endif /* ARCH */
+            r = 1;
+        }
     }
+#if TARGET == TARGET_UNIX
+    signal(SIGBUS, bushandler);
+    signal(SIGSEGV, segvhandler);
+#endif /* TARGET */
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT */
-    return 0;
+    return r;
 }
 
 
