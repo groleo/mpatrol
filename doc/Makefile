@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.26 2000-11-15 22:36:12 graeme Exp $
+# $Id: Makefile,v 1.27 2000-11-15 22:58:33 graeme Exp $
 
 
 # Definitions
@@ -31,7 +31,7 @@ SHELL = /bin/sh
 DOCUMENT = mpatrol
 REFCARD  = refcard
 
-SPLITHTML  = false
+SPLIT      = false
 THUMBNAILS = true
 VERBOSE    = false
 
@@ -56,10 +56,18 @@ endif
 
 $(DOCUMENT).info: $(DOCUMENT).texi images/$(DOCUMENT).txt
 	@ echo creating $@ from $<...
+ifeq ($(SPLIT),true)
+ifeq ($(VERBOSE),true)
+	@ makeinfo --verbose $<
+else
+	@ makeinfo $<
+endif
+else
 ifeq ($(VERBOSE),true)
 	@ makeinfo --no-split --verbose $<
 else
 	@ makeinfo --no-split $<
+endif
 endif
 
 # Build the AmigaGuide file from the Texinfo file using makeguide
@@ -72,7 +80,7 @@ else
 	@ makeguide --amiga $<
 endif
 
-ifeq ($(SPLITHTML),true)
+ifeq ($(SPLIT),true)
 # Build the HTML files from the Texinfo file using texi2html
 
 $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/gcc.jpg \
@@ -132,12 +140,12 @@ endif
 ifeq ($(THUMBNAILS),true)
 ifeq ($(VERBOSE),true)
 	@ thumbpdf --verbose $@
-	-@ rm -f $@ >/dev/null 2>&1
+	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
 	-@ rm -f thumbdta.tex >/dev/null 2>&1
 else
 	@ thumbpdf --quiet $@
-	-@ rm -f $@ >/dev/null 2>&1
+	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
 	-@ rm -f thumbdta.tex >/dev/null 2>&1
 endif
