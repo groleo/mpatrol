@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.70 2001-02-27 20:17:28 graeme Exp $"
+#ident "$Id: info.c,v 1.71 2001-02-27 20:42:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.70 2001-02-27 20:17:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.71 2001-02-27 20:42:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -75,7 +75,7 @@ __mp_newinfo(infohead *h)
     __mp_newallocs(&h->alloc, 0, MP_OVERFLOW, MP_OVERBYTE, MP_ALLOCBYTE,
                    MP_FREEBYTE, 0);
     __mp_newaddrs(&h->addr, &h->alloc.heap);
-    __mp_newsymbols(&h->syms, &h->alloc.heap);
+    __mp_newsymbols(&h->syms, &h->alloc.heap, h);
     __mp_newprofile(&h->prof, &h->alloc.heap, &h->syms);
     __mp_newtrace(&h->trace, &h->alloc.heap.memory);
     /* Determine the minimum alignment for an allocation information node
