@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.23 2000-05-08 21:31:52 graeme Exp $"
+#ident "$Id: diag.c,v 1.24 2000-05-10 19:50:48 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -501,7 +501,8 @@ MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
 /* Log the details of where a function call came from.
  */
 
-static logcall(infohead *h, char *s, char *t, unsigned long u, stackinfo *v)
+static void logcall(infohead *h, char *s, char *t, unsigned long u,
+                    stackinfo *v)
 {
     __mp_diag("[");
 #if MP_THREADS_SUPPORT
