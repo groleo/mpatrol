@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.151 2001-12-05 23:35:39 graeme Exp $"
+#ident "$Id: inter.c,v 1.152 2001-12-05 23:42:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.151 2001-12-05 23:35:39 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.152 2001-12-05 23:42:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1340,7 +1340,7 @@ __mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
     v.typestr = NULL;
     v.typesize = 0;
     checkalloca(&v, 0);
-    __mp_setmemory(&memhead, p, l, c, f, &v);
+    __mp_setmemory(&memhead, p, l, c, &v);
     restoresignals();
     return p;
 }
@@ -1413,7 +1413,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     v.typestr = NULL;
     v.typesize = 0;
     checkalloca(&v, 0);
-    q = __mp_copymemory(&memhead, p, q, l, c, f, &v);
+    q = __mp_copymemory(&memhead, p, q, l, c, &v);
     restoresignals();
     return q;
 }
@@ -1482,7 +1482,7 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     v.typestr = NULL;
     v.typesize = 0;
     checkalloca(&v, 0);
-    r = __mp_locatememory(&memhead, p, l, q, m, f, &v);
+    r = __mp_locatememory(&memhead, p, l, q, m, &v);
     restoresignals();
     return r;
 }
@@ -1548,7 +1548,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     v.typestr = NULL;
     v.typesize = 0;
     checkalloca(&v, 0);
-    r = __mp_comparememory(&memhead, p, q, l, f, &v);
+    r = __mp_comparememory(&memhead, p, q, l, &v);
     restoresignals();
     return r;
 }

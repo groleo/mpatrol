@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.91 2001-12-05 23:29:45 graeme Exp $"
+#ident "$Id: info.c,v 1.92 2001-12-05 23:42:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.91 2001-12-05 23:29:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.92 2001-12-05 23:42:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -958,15 +958,14 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
 
 MP_GLOBAL
 void
-__mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
-               loginfo *v)
+__mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, loginfo *v)
 {
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemset(h, p, l, c, f, v);
+        __mp_logmemset(h, p, l, c, v->type, v);
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
-    if (__mp_checkrange(h, p, l, f, v))
+    if (__mp_checkrange(h, p, l, v->type, v))
     {
         __mp_memset(p, c, l);
         h->stotal += l;
@@ -980,14 +979,14 @@ __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, alloctype f,
 MP_GLOBAL
 void *
 __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
-                alloctype f, loginfo *v)
+                loginfo *v)
 {
     void *r;
     int o;
 
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
     {
-        __mp_logmemcopy(h, p, q, l, c, f, v);
+        __mp_logmemcopy(h, p, q, l, c, v->type, v);
         o = 1;
     }
     else
@@ -997,25 +996,26 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
      * __mp_memcopy() but it will matter when calling the normal system
      * functions, in which case memmove() should be used instead.
      */
-    if (((f == AT_MEMCPY) || (f == AT_MEMCCPY)) && (l > 0) &&
+    if (((v->type == AT_MEMCPY) || (v->type == AT_MEMCCPY)) && (l > 0) &&
         (((p < q) && ((char *) p + l > (char *) q)) ||
          ((q < p) && ((char *) q + l > (char *) p))))
     {
         if ((o == 0) && (h->recur == 1))
         {
-            __mp_logmemcopy(h, p, q, l, c, f, v);
+            __mp_logmemcopy(h, p, q, l, c, v->type, v);
             o = 1;
         }
-        __mp_warn(ET_RNGOVL, f, v->file, v->line, NULL, p, (char *) p + l - 1,
-                  q, (char *) q + l - 1);
+        __mp_warn(ET_RNGOVL, v->type, v->file, v->line, NULL, p,
+                  (char *) p + l - 1, q, (char *) q + l - 1);
         __mp_diag("\n");
     }
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to copy the memory.
      */
-    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, l, f, v))
+    if (__mp_checkrange(h, p, l, v->type, v) &&
+        __mp_checkrange(h, q, l, v->type, v))
     {
-        if (f == AT_MEMCCPY)
+        if (v->type == AT_MEMCCPY)
         {
             if (r = __mp_memfind(p, l, &c, 1))
                 l = (size_t) ((char *) r - (char *) p) + 1;
@@ -1040,18 +1040,18 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
 
 MP_GLOBAL
 void *
-__mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
-                  alloctype f, loginfo *v)
+__mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m, loginfo *v)
 {
     void *r;
 
     r = NULL;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemlocate(h, p, l, q, m, f, v);
+        __mp_logmemlocate(h, p, l, q, m, v->type, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
-    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, m, f, v))
+    if (__mp_checkrange(h, p, l, v->type, v) &&
+        __mp_checkrange(h, q, m, v->type, v))
     {
         r = __mp_memfind(p, l, q, m);
         h->ltotal += m;
@@ -1067,19 +1067,19 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m,
 
 MP_GLOBAL
 int
-__mp_comparememory(infohead *h, void *p, void *q, size_t l, alloctype f,
-                   loginfo *v)
+__mp_comparememory(infohead *h, void *p, void *q, size_t l, loginfo *v)
 {
     void *r;
     int c;
 
     c = 0;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcompare(h, p, q, l, f, v);
+        __mp_logmemcompare(h, p, q, l, v->type, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */
-    if (__mp_checkrange(h, p, l, f, v) && __mp_checkrange(h, q, l, f, v))
+    if (__mp_checkrange(h, p, l, v->type, v) &&
+        __mp_checkrange(h, q, l, v->type, v))
     {
         h->dtotal += l;
         if (r = __mp_memcompare(p, q, l))
