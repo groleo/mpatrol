@@ -913,6 +913,15 @@
 #endif /* MP_TRACEMAGIC */
 
 
+/* The prefix string to print at the start of each line in the mpatrol log
+ * file when writing user data with __mp_printf().
+ */
+
+#ifndef MP_PRINTPREFIX
+#define MP_PRINTPREFIX "> "
+#endif /* MP_PRINTPREFIX */
+
+
 /* The overflow buffer size in bytes.  This may be overridden at run-time
  * using the OFLOWSIZE option.  The default is zero since this setting
  * may dramatically increase execution time if it is non-zero.
