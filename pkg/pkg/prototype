@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.38 2001-01-18 22:01:14 graeme Exp $
+# $Id: prototype,v 1.39 2001-01-25 13:41:55 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -150,6 +150,10 @@ f none lib/libmpatrolmt.so.1.3 0775 bin bin
 s none lib/libmpatrolmt.so=libmpatrolmt.so.1.3
 f none lib/llib-lmpatrol.ln 0664 bin bin
 f none lib/llib-lmpatrolmt.ln 0664 bin bin
+f none lib/libmpalloc.a 0664 bin bin
+f none lib/libmpalloc.so.1.3 0775 bin bin
+s none lib/libmpalloc.so=libmpalloc.so.1.3
+f none lib/llib-lmpalloc.ln 0664 bin bin
 d none man 0775 bin bin
 d none man/man1 0775 bin bin
 f none man/man1/mpatrol.1 0664 bin bin
