@@ -33,8 +33,8 @@ the preformatted files.
   * images/mpatrol.txt
         Format:    ASCII text
                    http://www.bbsinc.com/iso8859.html
-        Notes:     The mpatrol logo required by the ASCII text, GNU Info and
-                   AmigaGuide versions of the mpatrol manual.
+        Notes:     The mpatrol logo required by the ASCII text, GNU Info,
+                   AmigaGuide and DocBook versions of the mpatrol manual.
 
   * images/mpatrol.jpg, images/test.jpg, images/gcc.jpg, images/cpp.jpg,
     images/cc1.jpg, images/collect2.jpg & images/trace.jpg
@@ -85,6 +85,14 @@ viewer program.
                    http://www.aminet.org/~aminet/dirs/aminet/dev/gg/
         Viewer:    AmigaGuide or MultiView
         Notes:     Contains hypertext links with basic formatting codes.
+
+  * mpatrol.xml
+        Format:    DocBook
+                   http://www.oasis-open.org/docbook/
+        Generator: GNU MakeInfo
+                   http://texinfo.org/
+        Viewer:    Any web browser with a DocBook DTD
+        Notes:     Contains hypertext links with formatting codes.
 
   * mpatrol.html
         Format:    Hypertext Markup Language (HTML)
