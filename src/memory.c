@@ -78,7 +78,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.42 2001-01-15 19:07:23 graeme Exp $"
+#ident "$Id: memory.c,v 1.43 2001-01-16 22:00:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -181,9 +181,13 @@ pagesize(void)
 
 #if TARGET == TARGET_UNIX
     /* This call could also be getpagesize() but it is more POSIX-conforming
-     * to call sysconf().
+     * to call sysconf().  Unfortunately, SunOS only has getpagesize().
      */
+#if SYSTEM == SYSTEM_SUNOS
+    return getpagesize();
+#else /* SYSTEM */
     return sysconf(_SC_PAGESIZE);
+#endif /* SYSTEM */
 #elif TARGET == TARGET_AMIGA
     /* The Amiga has no virtual memory system (at least not supplied with
      * AmigaOS), so we return a fixed value here because it doesn't really
