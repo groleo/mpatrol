@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.93 2000-06-20 18:07:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.94 2000-06-21 13:08:51 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.12
 @set VERSION 1.2.3
-@set UPDATED 20th June, 2000
+@set UPDATED 21st June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -151,7 +151,7 @@ to be accurate and reliable, and in most cases the library will run quite
 happily at a sane speed.
 
 @cindex warranty
-The mpatrol library is by no means the only library of its kind.  Solaris 7 has
+The mpatrol library is by no means the only library of its kind.  Solaris has
 no less that 6 different malloc libraries, and there are plenty available as
 freeware or as commercial products.  Try to keep in mind that mpatrol comes with
 absolutely no warranty and so if it doesn't work for you and you need a fast
@@ -2981,7 +2981,9 @@ definitions of @code{malloc()}, etc., or if they do then you must ensure that
 the mpatrol library appears before them on the link line.  Note also that if the
 mpatrol library was built on IRIX with the @code{MP_LIBRARYSTACK_SUPPORT}
 preprocessor macro defined, then the @file{libexc} library must be linked in as
-well.
+well.  You should also check the section on supported systems
+(@pxref{Supported Systems}) to see if there are any other issues on the platform
+that you are using.
 
 You should also know how to set an environment variable on your specific system.
 Again, this varies from system to system and also depends on the command line
@@ -5807,18 +5809,18 @@ Running using watch points to check the overflow buffers:
 @tab Interrupted after half an hour as it still hadn't finished.
 @end multitable
 
-Running using the Solaris 7 malloc libraries:
+Running using the Solaris malloc libraries:
 
 @multitable @columnfractions .6 .3
-@item Solaris 7 malloc(3c) library
+@item Solaris malloc(3c) library
 @tab 0.033
-@item Solaris 7 malloc(3x) library
+@item Solaris malloc(3x) library
 @tab 0.036
-@item Solaris 7 bsdmalloc(3x) library
+@item Solaris bsdmalloc(3x) library
 @tab 0.028
-@item Solaris 7 mapmalloc(3x) library
+@item Solaris mapmalloc(3x) library
 @tab 0.033
-@item Solaris 7 watchmalloc(3x) library
+@item Solaris watchmalloc(3x) library
 @tab 40.845
 @end multitable
 
@@ -5940,7 +5942,27 @@ The @option{OFLOWWATCH} option has no effect.
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should instead link your programs with the following compiler options in
 order to perform a static link instead of a dynamic link:
-@option{-Wl,-bnoautoimp,-bimport:/lib/syscalls.exp}.
+@option{-bnoautoimp} @option{-bimport:/lib/syscalls.exp}.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
+@item
+AIX 4.1, IBM RS/6000, XCOFF, @command{cc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+There is currently no support for reading symbols from XCOFF shared libraries.
+You should instead link your programs with the following compiler options in
+order to perform a static link instead of a dynamic link:
+@option{-bnoautoimp} @option{-bimport:/lib/syscalls.exp}.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6091,6 +6113,8 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEMMAP} option has no effect.
 @item
 There is currently no support for reading symbols from COFF shared libraries.
+You should currently always perform a static link instead of a dynamic link
+when linking your program, but that is the default on LynxOS anyway.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6108,6 +6132,8 @@ The @option{USEDEBUG} option has no effect.
 The @option{USEMMAP} option has no effect.
 @item
 There is currently no support for reading symbols from COFF shared libraries.
+You should currently always perform a static link instead of a dynamic link
+when linking your program, but that is the default on LynxOS anyway.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6124,6 +6150,27 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEMMAP} option has no effect.
 @item
 There is currently no support for reading symbols from XCOFF shared libraries.
+You should currently always perform a static link instead of a dynamic link
+when linking your program, but that is the default on LynxOS anyway.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
+@item
+LynxOS 3.0.0, PowerPC, XCOFF, @command{gcc}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{USEMMAP} option has no effect.
+@item
+There is currently no support for reading symbols from XCOFF shared libraries.
+You should currently always perform a static link instead of a dynamic link
+when linking your program, but that is the default on LynxOS anyway.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6199,6 +6246,20 @@ No known issues.
 
 @item
 Solaris 7, SPARC V9, ELF32, @command{gcc}
+@itemize @bullet
+@item
+The @option{USEDEBUG} option has no effect.
+@end itemize
+
+@item
+Solaris 8, SPARC V9, BFD, @command{gcc}
+@itemize @bullet
+@item
+No known issues.
+@end itemize
+
+@item
+Solaris 8, SPARC V9, ELF32, @command{gcc}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
@@ -6680,7 +6741,8 @@ was called rather than unwinding to the top of the stack.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
-read via @code{dlopen()} or @code{shl_load()}.
+read via @code{dlopen()} or @code{shl_load()}.  In addition, symbols cannot
+currently be read from any COFF or XCOFF shared libraries on AIX or LynxOS.
 
 @item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
@@ -7810,11 +7872,11 @@ leak detection.
 @end table
 @end itemize
 
-@cindex Solaris 7 malloc libraries
-@cindex malloc libraries for Solaris 7
+@cindex Solaris malloc libraries
+@cindex malloc libraries for Solaris
 However, before you try out any of the above software, there may already be a
 malloc library with debugging support on your system that might be suitable for
-solving your problem.  For example, on Solaris 7 the following libraries are
+solving your problem.  For example, on Solaris the following libraries are
 available:
 
 @table @cite
