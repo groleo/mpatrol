@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.18 2000-10-25 20:13:33 graeme Exp $
+# $Id: Makefile,v 1.19 2000-10-25 23:00:23 graeme Exp $
 
 
 # Definitions
@@ -72,7 +72,8 @@ endif
 ifeq ($(SPLITHTML),true)
 # Build the HTML files from the Texinfo file using texi2html
 
-$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg
+$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/gcc.jpg \
+	images/cpp.jpg images/cc1.jpg images/collect2.jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ texi2html -top_file $@ -split node -menu -number -verbose $<
@@ -82,7 +83,8 @@ endif
 else
 # Build the HTML file from the Texinfo file using makeinfo
 
-$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg
+$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/gcc.jpg \
+	images/cpp.jpg images/cc1.jpg images/collect2.jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeinfo --html --number-sections --verbose $<
@@ -95,7 +97,8 @@ endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).dvi: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).eps
+$(DOCUMENT).dvi: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).eps \
+	images/gcc.eps images/cpp.eps images/cc1.eps images/collect2.eps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --verbose $<
@@ -115,7 +118,8 @@ endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).pdf
+$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).pdf \
+	images/gcc.pdf images/cpp.pdf images/cc1.pdf images/collect2.pdf
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
