@@ -1,3 +1,54 @@
+2001-03-11  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/refcard.tex, man/man3/libmpatrol.3:
+	Documented __mp_errno.  Documented the __mp_fini_ functions.
+
+2001-03-10  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added the leak table chapter.
+
+	* src/inter.c:
+	Made the __init and __fini functions for Tru64 global since they cannot
+	be static in order to work.
+
+	* src/mpatrol.h: Fixed the values of MP_LT_*.
+
+2001-03-09  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added more items to do.
+
+	* man/man3/libmpatrol.3:
+	Documented that the SHOWUNFREED and UNFREEDABORT options will not
+	consider marked allocations as unfreed.
+
+2001-03-08  Graeme Roy  <graeme@epc.co.uk>
+
+	* THANKS: Added Adam Zell and Per Winkvist.
+
+	* bin/mpsym: Now also check %p.log if mpatrol.log does not exist.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added slots module to mptrace.
+
+	* man/man1/mptrace.1: Document the --sim-file option.
+
+	* man/man1/mpsym.1:
+	Document use progfile.log if mpatrol.log cannot be found.
+
+	* src/symbol.c:
+	Improved the virtual address mapping of symbols for the OSF dynamic
+	linker.
+
+	* src/inter.c:
+	Revised crt_initialised() to be a macro.  Ensure that the C run-time
+	library is initialised on Tru64.
+
+	* src/mptrace.c: Added trace-driven simulation generation support.
+
+	* tools/dbmalloc.h: Fixed an error in the last change.
+
 2001-03-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* THANKS:

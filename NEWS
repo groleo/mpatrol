@@ -30,8 +30,11 @@ Changes for 1.4.2
   * Fixed a problem building the shared version of the mpatrol library with some
     versions of GNU C++.
 
+  * Added the --sim-file option to the mptrace command to provide trace-driven
+    memory allocation simulation support.
+
   * Fixed the mpsym command which had problems when GDB displayed lines that
-    were too long.
+    were too long.  Also now uses progfile.log if mpatrol.log cannot be found.
 
   * Added Dmalloc-compatible function implementations as an external package.
 
@@ -40,7 +43,8 @@ Changes for 1.4.2
     on initialisation and mapped all Dbmalloc error codes onto mpatrol errors.
     Fixed the malloc_inuse() function for marked allocations.
 
-  * Added a chapter to the mpatrol manual describing the tools supplied.
+  * Added chapters to the mpatrol manual describing the tools supplied and the
+    leak table.
 
   * Added the AUTHORS, CHECKSUMS and THANKS files.
 
