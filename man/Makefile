@@ -21,13 +21,14 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.6 2000-12-14 17:43:34 graeme Exp $
+# $Id: Makefile,v 1.7 2000-12-18 21:37:35 graeme Exp $
 
 
 # Definitions
 
-SHELL = /bin/sh
-ROFF  = groff
+SHELL  = /bin/sh
+ROFF   = groff
+PSTILL = pstill
 
 PAGES	 = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
 	   cat1/mpsym.1 cat1/mpedit.1 cat3/libmpatrol.3
@@ -35,11 +36,13 @@ DVIPAGES = dvi/mpatrol.dvi dvi/mprof.dvi dvi/mptrace.dvi dvi/mleak.dvi \
 	   dvi/mpsym.dvi dvi/mpedit.dvi dvi/libmpatrol.dvi
 PSPAGES	 = ps/mpatrol.ps ps/mprof.ps ps/mptrace.ps ps/mleak.ps \
 	   ps/mpsym.ps ps/mpedit.ps ps/libmpatrol.ps
+PDFPAGES = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
+	   pdf/mpsym.pdf pdf/mpedit.pdf pdf/libmpatrol.pdf
 
 
 # Rules
 
-.SUFFIXES: .1 .3 .dvi .ps
+.SUFFIXES: .1 .3 .dvi .ps .pdf
 
 default: $(PAGES)
 
@@ -106,20 +109,43 @@ ps/mpedit.ps: man1/mpedit.1
 ps/libmpatrol.ps: man3/libmpatrol.3
 	$(ROFF) -Tps -man -t $< >$@
 
-all: $(PAGES) $(DVIPAGES) $(PSPAGES)
+pdf/mpatrol.pdf: ps/mpatrol.ps
+	$(PSTILL) -c -o $@ $<
 
-mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) README
+pdf/mprof.pdf: ps/mprof.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/mptrace.pdf: ps/mptrace.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/mleak.pdf: ps/mleak.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/mpsym.pdf: ps/mpsym.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/mpedit.pdf: ps/mpedit.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/libmpatrol.pdf: ps/libmpatrol.ps
+	$(PSTILL) -c -o $@ $<
+
+all: $(PAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
+
+mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
 	@ mkdir -p mpatrol/man/dvi
 	@ cp $(DVIPAGES) mpatrol/man/dvi
 	@ mkdir -p mpatrol/man/ps
 	@ cp $(PSPAGES) mpatrol/man/ps
+	@ mkdir -p mpatrol/man/pdf
+	@ cp $(PDFPAGES) mpatrol/man/pdf
 	@ cp README mpatrol/man
 	@ tar cf mpatrol_man.tar mpatrol
 	@ gzip mpatrol_man.tar
 	-@ rm -rf mpatrol >/dev/null 2>&1
 
 clean:
-	-@ rm -f $(PAGES) $(DVIPAGES) $(PSPAGES) >/dev/null 2>&1
+	-@ rm -f $(PAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES) >/dev/null 2>&1
 	-@ rm -f mpatrol_man.tar.gz >/dev/null 2>&1
 
 clobber: clean
