@@ -24,11 +24,11 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.9 2000-04-24 13:33:29 graeme Exp $
+# $Id: build,v 1.10 2000-04-27 18:33:47 graeme Exp $
 
 
-version=1.1.4
-libversion=1.1
+version=1.2.0
+libversion=1.2
 
 
 # Build the mpatrol library.
