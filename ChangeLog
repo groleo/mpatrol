@@ -1,3 +1,89 @@
+Fri Mar  3 01:24:51 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more platforms on which mpatrol has been tested.
+
+	* src/diag.c, src/diag.h:
+	Modify return address in print symbol when looking for line numbers.
+
+Wed Mar  1 00:54:53 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/diag.c: Added source level information to __mp_printsymbol().
+
+	* src/option.c, src/option.h, src/mpatrol.h: Added the USEDEBUG option.
+
+Tue Feb 29 23:08:31 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/symbol.c:
+	Added __mp_closesymbols() and support for caching BFD library handles.
+	Completed __mp_findsource() for BFD targets.
+
+	* src/symbol.h:
+	Added the __mp_closesymbols() function and the head and tail pointers
+	for the access library handles list.  Added line number information
+	flag.
+
+	* src/inter.c: Added a call to __mp_closesymbols().
+
+Thu Feb 24 00:58:32 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.c:
+	Fixed problem when the allocation count gets incremented more than once
+	before being stored in an infonode if internal allocations are made.
+
+Tue Feb 22 22:29:47 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	The C++ operators now have source level information associated with
+	them.
+
+	* src/config.h: Added definition for MP_MAXDELSTACK.
+
+	* src/info.c: Added initialisation of delete stack pointer.
+
+	* src/info.h:
+	Added the delete stack for operator delete and operator delete[].
+
+	* src/inter.c, src/inter.h:
+	Added __mp_pushdelstack() and __mp_popdelstack().
+
+	* src/mpatrol.h:
+	Added the MP_FUNCNAME definition.  Added source level information to
+	operator new and operator new[].  Added __mp_pushdelstack() and
+	__mp_popdelstack() and added source level information to operator delete
+	and operator delete[].  Changed the semicolon to a comma in the macro
+	definition of delete as this caused problems in single statement blocks.
+
+	* tests/pass/test7.c: New C++ test for operators new and delete.
+
+Fri Feb 18 01:20:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added some information on the Amiga version of mpatrol.
+
+	* doc/mpatrol.texi: Added information on contributors.
+
+Thu Feb 10 21:27:50 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.c:
+	Changed order of deletion of symbols, addrs and allocs since we may need
+	to call a library function to close any object files before we delete
+	the heap.
+
+	* src/symbol.c, src/symbol.h: Added the __mp_findsource() function.
+
+Mon Feb  7 20:17:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added more related software.
+
+Mon Jan 31 21:06:39 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/Makefile: Added a target to build mpatrol_doc.tar.gz.
+
+	* doc/mpatrol.texi:
+	Forgot to add total bytes copied, etc. to the first example summary.
+
+	* src/utils.c, src/utils.h: Added __mp_squareroot().
+
 Sun Jan 30 21:26:39 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
