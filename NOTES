@@ -35,6 +35,10 @@ Notes for all platforms
     filename and line number from a call to operator new, for example.  Perhaps
     there isn't one and it would have to be done from within the compiler.
 
+  * Need to add support for 64-bit processors.  This shouldn't be too hard, but
+    I haven't got access to a 64-bit environment to test it, so I haven't
+    bothered yet.
+
   * The thread-safe code in the library doesn't yet work properly, probably
     because of the recursion flag which is incremented or decremented before
     the mutex is locked.  Hence, the threads test (tests/pass/test5.c) doesn't
@@ -143,17 +147,20 @@ Notes for UNIX platforms
     library when it is compiled by a C compiler.  There is already a solution to
     this problem when it is compiled by a C++ compiler.
 
-  * Need to add support for call stack traversal for at least the MIPS, PA/RISC
-    and PowerPC processor architectures.  The current implementation of call
-    stack traversal for the Motorola 88xx0 family is also a bit flaky and so
-    should only be used when the library and program are built unoptimised.
+  * Need to add support for call stack traversal for at least the Alpha, MIPS,
+    PA/RISC and PowerPC processor architectures.  The current implementation of
+    call stack traversal for the Motorola 88xx0 family is also a bit flaky and
+    so should only be used when the library and program are built unoptimised.
 
   * Need to add support for obtaining the program name from the stack for at
-    least the Motorola 88xx0, MIPS, PA/RISC and PowerPC processor architectures.
-    Also need to add support for reading the program symbols from a suitable
-    file in /proc for other operating systems that support it.  If there is no
-    support for either of these methods then the PROGFILE option can currently
-    be used to specify the program name at run-time.
+    least the Alpha, Motorola 88xx0, MIPS, PA/RISC and PowerPC processor
+    architectures.  Also need to add support for reading the program symbols
+    from a suitable file in /proc for other operating systems that support it.
+    If there is no support for either of these methods then the PROGFILE option
+    can currently be used to specify the program name at run-time.
+
+  * The library cannot currently read any symbols from shared objects that have
+    been read via dlopen().
 
   * The -d option to the mpatrol shell script does not always work on systems
     whose dynamic linkers support the LD_PRELOAD environment variable.  This
