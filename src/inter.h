@@ -82,6 +82,14 @@ __asm void *__mp_realloc(register __a0 void *, register __d0 size_t,
 __asm void __mp_free(register __a0 void *, register __d0 alloctype,
                      register __a1 char *, register __a2 char *,
                      register __d1 unsigned long, register __d2 size_t);
+__asm void *__mp_setmem(register __a0 void *, register __d0 size_t,
+                        register __d1 unsigned char, register __d2 alloctype,
+                        register __a1 char *, register __a2 char *,
+                        register __d3 unsigned long, register __d4 size_t);
+__asm void *__mp_copymem(register __a0 void *, register __a1 void *,
+                         register __d0 size_t, register __d1 alloctype,
+                         register __a2 char *, register __a3 char *,
+                         register __d2 unsigned long, register __d3 size_t);
 __asm int __mp_info(register __a0 void *, register __a1 allocinfo *);
 __asm void __mp_memorymap(register __d0 int);
 __asm void __mp_summary(void);
@@ -103,6 +111,10 @@ char *__mp_strdup(char *, size_t, alloctype, char *, char *, unsigned long,
 void *__mp_realloc(void *, size_t, size_t, alloctype, char *, char *,
                    unsigned long, size_t);
 void __mp_free(void *, alloctype, char *, char *, unsigned long, size_t);
+void *__mp_setmem(void *, size_t, unsigned char, alloctype, char *, char *,
+                  unsigned long, size_t);
+void *__mp_copymem(void *, void *, size_t, alloctype, char *, char *,
+                   unsigned long, size_t);
 int __mp_info(void *, allocinfo *);
 void __mp_memorymap(int);
 void __mp_summary(void);
