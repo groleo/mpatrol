@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.125 2000-10-31 18:40:49 graeme Exp $
+@c $Id: mpatrol.texi,v 1.126 2000-10-31 20:25:21 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3981,25 +3981,29 @@ The relevant excerpts from @file{mpatrol.log} appear below.  The format of the
 log messages should be familiar to you now.
 
 @smallexample
-ALLOC: malloc (13, 16 bytes, 8 bytes) [main|test2.c|36]
-        0x00010B18 main
-        0x00010A0C _start
+ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test2.c|36]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-returns 0x00028000
+returns 0x080620E8
 
-FREE: free (0x00028000) [main|test2.c|38]
-        0x00010B54 main
-        0x00010A0C _start
+FREE: free (0x080620E8) [main|test2.c|38]
+        0x08049456 main+70
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-    0x00028000 (16 bytes) @{malloc:13:0@} [main|test2.c|36]
-        0x00010B18 main
-        0x00010A0C _start
+    0x080620E8 (16 bytes) @{malloc:52:0@} [main|test2.c|36]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-REALLOC: realloc (0x00028000, 32 bytes, 8 bytes) [main|test2.c|39]
-        0x00010B88 main
-        0x00010A0C _start
+REALLOC: realloc (0x080620E8, 32 bytes, 4 bytes) [main|test2.c|39]
+        0x08049476 main+102
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-ERROR: realloc: 0x00028000 has not been allocated
+ERROR: realloc: 0x080620E8 has not been allocated
 
 returns 0x00000000
 @end smallexample
@@ -4021,28 +4025,33 @@ information about them and marking them as freed.  If you add the
 should see the following entries in @file{mpatrol.log} instead.
 
 @smallexample
-ALLOC: malloc (13, 16 bytes, 8 bytes) [main|test2.c|36]
-        0x00010B18 main
-        0x00010A0C _start
+ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test2.c|36]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-returns 0x00029DE0
+returns 0x08062F54
 
-FREE: free (0x00029DE0) [main|test2.c|38]
-        0x00010B54 main
-        0x00010A0C _start
+FREE: free (0x08062F54) [main|test2.c|38]
+        0x08049456 main+70
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-    0x00029DE0 (16 bytes) @{malloc:13:0@} [main|test2.c|36]
-        0x00010B18 main
-        0x00010A0C _start
+    0x08062F54 (16 bytes) @{malloc:52:0@} [main|test2.c|36]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-REALLOC: realloc (0x00029DE0, 32 bytes, 8 bytes) [main|test2.c|39]
-        0x00010B88 main
-        0x00010A0C _start
+REALLOC: realloc (0x08062F54, 32 bytes, 4 bytes) [main|test2.c|39]
+        0x08049476 main+102
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
-ERROR: realloc: 0x00029DE0 was freed with free
-    0x00029DE0 (16 bytes) @{free:13:0@} [main|test2.c|38]
-        0x00010B54 main
-        0x00010A0C _start
+ERROR: realloc: 0x08062F54 was freed with free
+    0x08062F54 (16 bytes) @{free:52:0@} [main|test2.c|38]
+        0x08049456 main+70
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
 returns 0x00000000
 @end smallexample
@@ -4109,12 +4118,13 @@ test was run using the same @env{MPATROL_OPTIONS} settings as the last example,
 but make sure that @option{PRESERVE} is not set.
 
 @smallexample
-ERROR: freed allocation 0x00029DE0 has memory corruption at 0x00029DE8
-        0x00029DE8  00555555 55555555                    .UUUUUUU
+ERROR: freed allocation 0x08062F54 has memory corruption at 0x08062F5C
+        0x08062F5C  00555555 55555555                    .UUUUUUU
 
-    0x00029DE0 (16 bytes) @{free:13:0@} [main|test4.c|38]
-        0x00010B1C main
-        0x000109D4 _start
+    0x08062F54 (16 bytes) @{free:52:0@} [main|test4.c|38]
+        0x08049456 main+70
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 @end smallexample
 
 The library was able to detect that something had been written into free memory
@@ -4170,14 +4180,16 @@ In our original example, if the @option{PAGEALLOC=LOWER} option is added to the
 produced instead of the original error.
 
 @smallexample
-ERROR: illegal memory access at address 0x0009E008
-    0x0009E000 (16 bytes) @{free:13:0@} [main|test4.c|38]
-        0x00010B1C main
-        0x000109D4 _start
+ERROR: illegal memory access at address 0x081C6008
+    0x081C6000 (16 bytes) @{free:52:0@} [main|test4.c|38]
+        0x08049456 main+70
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 
     call stack
-        0x00010B1C main
-        0x000109D4 _start
+        0x0804945F main+79
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 @end smallexample
 
 @cindex signal handler
@@ -4265,12 +4277,13 @@ of this example.  The test is located in @file{tests/fail/test5.c}, and
 The following error should be produced in @file{mpatrol.log}.
 
 @smallexample
-ERROR: allocation 0x00029E28 has a corrupted overflow buffer at 0x00029E27
-        0x00029E26  AA74                                 ªt
+ERROR: allocation 0x08062FB8 has a corrupted overflow buffer at 0x08062FB7
+        0x08062FB6  AA74                                 .t
 
-    0x00029E28 (16 bytes) @{malloc:13:0@} [main|test5.c|38]
-        0x00010B0C main
-        0x00010A00 _start
+    0x08062FB8 (16 bytes) @{malloc:52:0@} [main|test5.c|38]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 @end smallexample
 
 @cindex memory dump
@@ -4343,10 +4356,11 @@ allocations.  The following source can be found in @file{tests/fail/test9.c}.
 When this is compiled and run, the following should appear in the log file.
 
 @smallexample
-ERROR: memset: range [0x00027FFF,0x00028010] overflows [0x00028000,0x0002800F]
-    0x00028000 (16 bytes) @{malloc:13:0@} [main|test9.c|37]
-        0x00010B18 main
-        0x00010A0C _start
+ERROR: memset: range [0x08062FB7,0x08062FC8] overflows [0x08062FB8,0x08062FC7]
+    0x08062FB8 (16 bytes) @{malloc:52:0@} [main|test9.c|37]
+        0x0804942F main+31
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 @end smallexample
 
 As you can see, the library detected that the @code{memset()} function would
@@ -4365,9 +4379,10 @@ example, adding this option and running the above program again will produce
 something similar to the following.
 
 @smallexample
-MEMSET: memset (0x00027FFF, 18 bytes, 0x00) [main|test9.c|39]
-        0x00010B18 main
-        0x00010A0C _start
+MEMSET: memset (0x08062FB7, 18 bytes, 0x00) [main|test9.c|39]
+        0x0804945B main+75
+        0x4007C9CB __libc_start_main+255
+        0x08049381 _start+33
 @end smallexample
 
 This is similar to the tracing produced for memory allocation functions, except
@@ -4426,23 +4441,23 @@ similar.
 The relevant parts of @file{mpatrol.log} are shown below.
 
 @smallexample
-ALLOC: operator new[] (17, 16 bytes, 8 bytes) [int main()|test7.c|36]
-        0x00010A28 __builtin_vec_new
-        0x00010ADC main
-        0x000108D0 _start
+ALLOC: operator new[] (74, 16 bytes, 4 bytes) [int main()|test7.c|36]
+        0x0804955D main+13
+        0x400DB9CB __libc_start_main+255
+        0x080494C1 _start+33
 
-returns 0x00028000
+returns 0x08062FC0
 
-FREE: operator delete (0x00028000) [int main()|test7.c|37]
-        0x00010A74 __builtin_delete
-        0x00010AF0 main
-        0x000108D0 _start
+FREE: operator delete (0x08062FC0) [int main()|test7.c|37]
+        0x0804956E main+30
+        0x400DB9CB __libc_start_main+255
+        0x080494C1 _start+33
 
-ERROR: operator delete: 0x00028000 was allocated with operator new[]
-    0x00028000 (16 bytes) @{operator new[]:17:0@} [int main()|test7.c|36]
-        0x00010A28 __builtin_vec_new
-        0x00010ADC main
-        0x000108D0 _start
+ERROR: operator delete: 0x08062FC0 was allocated with operator new[]
+    0x08062FC0 (16 bytes) @{operator new[]:74:0@} [int main()|test7.c|36]
+        0x0804955D main+13
+        0x400DB9CB __libc_start_main+255
+        0x080494C1 _start+33
 @end smallexample
 
 This shows a call to @code{operator new[]}, closely followed by a call to
@@ -4663,7 +4678,7 @@ unfreed allocations: 2 (108 bytes)
 
 In this chapter we'll look at a real example of using the mpatrol library to
 debug a program.  All of the following building and debugging steps were
-performed on a Linux/m68k machine so the details may differ slightly on
+performed on an Intel Linux machine so the details may differ slightly on
 your system, but the concepts should remain the same.  However, on systems
 without virtual memory some of the steps may actually cause the machine to lock
 up or crash so be aware of this if you are running such a system --- you may be
@@ -4756,46 +4771,32 @@ If you look at the @file{mpatrol.log} file produced, you should see something
 along the lines of the following at the end of the log file.
 
 @smallexample
-
-ERROR: free memory corruption at 0x8000706C
-        0x8000706C  00555555 55555555 55555555 55555555  .UUUUUUUUUUUUUUU
-        0x8000707C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000708C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000709C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070AC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070BC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070CC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070DC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070EC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x800070FC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000710C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000711C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000712C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000713C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000714C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
-        0x8000715C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+ERROR: free memory corruption at 0x08067FF6
+        0x08067FF6  00555555 55555555 5555               .UUUUUUUUU
 @end smallexample
 
 This tells us that something has written a zero byte into free memory at
-location @samp{0x8000706C}.  Unfortunately, the library only caught it at the
+location @samp{0x08067FF6}.  Unfortunately, the library only caught it at the
 next call to one of its functions so it had already happened somewhere in
 between the last call and the current call.  Turning on the @option{LOGALL}
 option in the @env{MPATROL_OPTIONS} environment variable allows us to see the
 last successful function call to the mpatrol library.
 
 @smallexample
-ALLOC: malloc (50, 8192 bytes, 2 bytes) [main|test1.c|54]
-        0x80000A30 main at /usr/users/homedir/graeme/test1.c:54
-        0x80000944 _start
+ALLOC: malloc (56, 8192 bytes, 4 bytes) [main|test1.c|54]
+        0x0804960E main+34 at test1.c:54
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-returns 0x80009000
+returns 0x080F0B48
 
-ALLOC: malloc (51, 4 bytes, 2 bytes) [strtoupper|test1.c|42]
-        0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
-        0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
-        0x80000944 _start
+ALLOC: malloc (68, 2 bytes, 4 bytes) [strtoupper|test1.c|42]
+        0x08049592 strtoupper+50 at test1.c:42
+        0x08049631 main+69 at test1.c:57
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-returns 0x80007068
+returns 0x08067FF4
 @end smallexample
 
 Unfortunately, this only tells us that the last successful mpatrol library
@@ -4806,17 +4807,18 @@ affected@footnote{Note that the start address of the allocation has changed
 slightly since we added padding around it with the @option{OFLOWSIZE} option.}.
 
 @smallexample
-ERROR: allocation 0x80007080 has a corrupted overflow buffer at 0x80007084
-        0x80007084  00AAAAAA AAAAAAAA                    ........
+ERROR: allocation 0x08071E34 has a corrupted overflow buffer at 0x08071E36
+        0x08071E36  00AAAAAA AAAAAAAA                    ........
 
-    0x80007080 (4 bytes) @{malloc:51:0@} [strtoupper|test1.c|42]
-        0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
-        0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
-        0x80000944 _start
+    0x08071E34 (2 bytes) @{malloc:68:0@} [strtoupper|test1.c|42]
+        0x08049592 strtoupper+50 at test1.c:42
+        0x08049631 main+69 at test1.c:57
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 @end smallexample
 
 Now we can make a better guess about what is happening.  Since the start of
-the upper overflow buffer of allocation 51 has been written to, we can assume
+the upper overflow buffer of allocation 68 has been written to, we can assume
 that something has written one byte beyond the end of that memory allocation.
 You can probably see where that is happening now by looking at the code, but
 let's try to be even more sure that this is what is wrong.
@@ -4827,50 +4829,49 @@ debugger, but on systems that support programmable software watch points, the
 @option{OFLOWWATCH} option can be used to do the same thing.  For the sake of
 generality, we'll use the debugger watch point approach, in this case with
 @command{gdb}.  In order for the following example to work correctly you'll
-need to add the @option{ALLOCSTOP=51} option to the @env{MPATROL_OPTIONS}
+need to add the @option{ALLOCSTOP=68} option to the @env{MPATROL_OPTIONS}
 environment variable so that we can stop just after the last successful memory
 allocation.
 
 @smallexample
 (gdb) break main
-Breakpoint 1 at 0x80000a10: file test1.c, line 54.
-(gdb) run
+Breakpoint 1 at 0x80495f2: file test1.c, line 54.
+(gdb) run <test1.c
 Starting program: a.out
 Breakpoint 1, main() at test1.c:54
-54          b = malloc(BUFSIZ);
+54          b = (char *) malloc(BUFSIZ);
 (gdb) break __mp_trap
-Breakpoint 2 at 0xc00182ac
+Breakpoint 2 at 0x804f083
 (gdb) continue
 Continuing.
-test
-Breakpoint 2, 0xc00182ac in __mp_trap()
+Breakpoint 2, 0x804f083 in __mp_trap()
 (gdb) backtrace
-#0  0xc00182ac in __mp_trap()
-#1  0xc0016494 in __mp_getmemory()
-#2  0xc001a618 in __mp_alloc()
-#3  0x800009ae in strtoupper(s=0x80009008 "test") at test1.c:42
-#4  0x80000a54 in main() at test1.c:57
+#0  0x804f083 in __mp_trap()
+#1  0x804c81b in __mp_getmemory()
+#2  0x8049a94 in __mp_alloc()
+#3  0x8049592 in strtoupper(s=0x80f0be0 "/*") at test1.c:42
+#4  0x8049631 in main() at test1.c:57
 (gdb) step
 Single stepping until exit from function __mp_trap,
 which has no line number information.
-0xc0016494 in __mp_getmemory()
+0x804c81b in __mp_getmemory()
 (gdb) step
 Single stepping until exit from function __mp_getmemory,
 which has no line number information.
-0xc001a618 in __mp_alloc()
+0x8049a94 in __mp_alloc()
 (gdb) step
 Single stepping until exit from function __mp_alloc,
 which has no line number information.
-strtoupper(s=0x80009008 "test") at test1.c:43
+strtoupper(s=0x80f0be0 "/*") at test1.c:43
 43          for (i = 0; i < l; i++)
-(gdb) watch *0x80007084
-Watchpoint 3: *2147512452
+(gdb) watch *0x8071e36
+Hardware watchpoint 3: *134684214
 (gdb) continue
 Continuing.
-Watchpoint 3: *2147512452
+Hardware watchpoint 3: *134684214
 Old value = -1431655766
-New value = 11184810
-strtoupper(s=0x80009008 "test") at test1.c:46
+New value = -1431655936
+strtoupper(s=0x80f0be0 "/*") at test1.c:46
 46          return t;
 (gdb) quit
 The program is running.  Exit anyway? (y or n) y
@@ -4878,14 +4879,15 @@ The program is running.  Exit anyway? (y or n) y
 
 After loading the program into @command{gdb}, we need to break at @code{main()}
 so that we can run to a point where all of the shared library symbols have been
-loaded into memory@footnote{This is only necessary when the mpatrol library has
-been built as a shared library.}.  We can then set another breakpoint at
-@code{__mp_trap()} and continue until allocation 51 has been reached.
+loaded into memory@footnote{This is really only necessary when the mpatrol
+library has been built as a shared library.}.  We can then set another
+breakpoint at @code{__mp_trap()} and continue until allocation 68 has been
+reached.
 
 Because the mpatrol library has not been built with debugging information in
 this example we can quickly step back to the @code{strtoupper()} function since
 @command{gdb} won't step through functions that have no debugging information.
-We then set a watch point on address @samp{0x80007084}, which is the address of
+We then set a watch point on address @samp{0x8071e36}, which is the address of
 the memory location that has been causing the problems.  After continuing, the
 debugger stops at line 46, but this is more likely to be line 45 since that is
 where a zero byte is being written to@footnote{This is not necessarily the fault
@@ -4968,39 +4970,69 @@ from.  Following is some example output from the mpatrol log file when our
 program is run and is given a relatively small text file as input.
 
 @smallexample
-unfreed allocations: 6 (109 bytes)
-    0x80007000 (104 bytes) @{malloc:1:0@} [-|-|-]
-        0xC008DB4A _IO_fopen
-        0xC00183DC __mp_openlogfile
-        0xC001A3A4 __mp_init
-        0xC001A584 __mp_alloc
-        0x80000A98 main
-        0x80000980 _start
+unfreed allocations: 10 (185 bytes)
+    0x08062000 (176 bytes) @{malloc:1:0@} [-|-|-]
+        0x400B681B _IO_new_fopen+27
+        0x0804F24E __mp_openlogfile+70
+        0x080497B5 __mp_init+109
+        0x08049973 __mp_alloc+31
+        0x0804962E main+34 at test2.c:59
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-    0x80007068 (1 byte) @{malloc:52:0@} [strtoupper|test2.c|43]
-        0x800009EE strtoupper
-        0x80000ABC main
-        0x80000980 _start
+    0x08067FF4 (1 byte) @{malloc:83:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-    0x8000706A (1 byte) @{malloc:54:0@} [strtoupper|test2.c|43]
-        0x800009EE strtoupper
-        0x80000ABC main
-        0x80000980 _start
+    0x08067FF8 (1 byte) @{malloc:89:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-    0x8000706C (1 byte) @{malloc:56:0@} [strtoupper|test2.c|43]
-        0x800009EE strtoupper
-        0x80000ABC main
-        0x80000980 _start
+    0x08067FFC (1 byte) @{malloc:90:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-    0x8000706E (1 byte) @{malloc:58:0@} [strtoupper|test2.c|43]
-        0x800009EE strtoupper
-        0x80000ABC main
-        0x80000980 _start
+    0x0808B304 (1 byte) @{malloc:95:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 
-    0x80007070 (1 byte) @{malloc:60:0@} [strtoupper|test2.c|43]
-        0x800009EE strtoupper
-        0x80000ABC main
-        0x80000980 _start
+    0x0808B308 (1 byte) @{malloc:96:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
+
+    0x0808B30C (1 byte) @{malloc:101:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
+
+    0x0808B310 (1 byte) @{malloc:113:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
+
+    0x0808B314 (1 byte) @{malloc:114:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
+
+    0x0808B318 (1 byte) @{malloc:118:0@} [strtoupper|test2.c|43]
+        0x08049593 strtoupper+51 at test2.c:43
+        0x08049651 main+69 at test2.c:62
+        0x4007C9CB __libc_start_main+255
+        0x080494D1 _start+33
 @end smallexample
 
 We can discount the first entry since that is obviously coming from when the
