@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.29 2001-07-25 22:23:59 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.30 2001-07-25 22:34:49 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "25 July 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -163,7 +163,11 @@ void __mp_check(void);
 \}
 .if t \{__mp_epiloguehandler __mp_epilogue(const __mp_epiloguehandler);
 \}
-void (*__mp_nomemory(void (*func)(void)))(void);
+.if n \{__mp_nomemoryhandler __mp_nomemory(const
+                                   __mp_nomemoryhandler);
+\}
+.if t \{__mp_nomemoryhandler __mp_nomemory(const __mp_nomemoryhandler);
+\}
 int __mp_printf(const char *fmt, ...);
 int __mp_vprintf(const char *fmt, va_list args);
 void __mp_locprintf(const char *fmt, ...);

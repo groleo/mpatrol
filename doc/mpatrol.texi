@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.227 2001-07-25 22:24:08 graeme Exp $
+@c $Id: mpatrol.texi,v 1.228 2001-07-25 22:35:22 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -8841,7 +8841,7 @@ will be freed.  All of the previous contents will be destroyed.  This function
 must only be used with memory allocated by @code{operator new[]}.
 
 @findex set_new_handler
-@item @code{void (*set_new_handler(void (*func)(void)))(void)}
+@item @code{std::new_handler std::set_new_handler(std::new_handler func)}
 Installs a low-memory handler specifically for use with @code{operator new} and
 @code{operator new[]} and returns a pointer to the previously installed handler,
 or the null pointer if no handler had been previously installed.  This will be
@@ -9270,7 +9270,7 @@ blocks.  If any memory allocations made by the @code{alloca()} family of
 functions are out of scope then this function will also cause them to be freed.
 
 @findex __mp_prologue
-@item @code{__mp_prologuehandler __mp_prologue(const __mp_prologuehandler func}
+@item @code{__mp_prologuehandler __mp_prologue(const __mp_prologuehandler func)}
 Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
@@ -9298,7 +9298,7 @@ determined):
 @end multitable
 
 @findex __mp_epilogue
-@item @code{__mp_epiloguehandler __mp_epilogue(const __mp_epiloguehandler func}
+@item @code{__mp_epiloguehandler __mp_epilogue(const __mp_epiloguehandler func)}
 Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
@@ -9317,7 +9317,7 @@ determined):
 @end multitable
 
 @findex __mp_nomemory
-@item @code{void (*__mp_nomemory(void (*func)(void)))(void)}
+@item @code{__mp_nomemoryhandler __mp_nomemory(const __mp_nomemoryhandler func)}
 Installs a low-memory handler and returns a pointer to the previously installed
 handler, or the @samp{NULL} pointer if no handler had been previously installed.
 This will be called once by C memory allocation functions, and repeatedly by C++
