@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heapdiff.c,v 1.6 2001-06-12 19:28:35 graeme Exp $"
+#ident "$Id: heapdiff.c,v 1.7 2001-07-25 21:58:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.6 2001-06-12 19:28:35 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.7 2001-07-25 21:58:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -44,9 +44,6 @@ static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.6 2001-06-1
  */
 
 #define CONTENTS_FILENAME ".heapdiff"
-
-
-typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
 
 
 #ifdef __cplusplus
@@ -75,7 +72,7 @@ static unsigned long total;
 /* The previous mpatrol prologue handler.
  */
 
-static prologue_handler old_prologue;
+static __mp_prologuehandler old_prologue;
 
 
 /* Check to see if a memory allocation has been freed, and if so remove all

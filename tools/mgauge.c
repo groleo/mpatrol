@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mgauge.c,v 1.5 2001-03-07 20:43:49 graeme Exp $"
+#ident "$Id: mgauge.c,v 1.6 2001-07-25 21:58:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.5 2001-03-07 20:43:49 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.6 2001-07-25 21:58:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -45,9 +45,6 @@ static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.5 2001-03-07 20
 #define DEFAULT_CHAR  '#' /* the default allocation character to use */
 #define DELIMIT_CHAR  '|' /* the character to use as a gauge delimiter */
 #define OVERFLOW_CHAR '+' /* the character to use when an overflow occurs */
-
-
-typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
 
 
 #ifdef __cplusplus
@@ -59,7 +56,7 @@ extern "C"
 /* The previous mpatrol epilogue handler.
  */
 
-static epilogue_handler old_epilogue;
+static __mp_epiloguehandler old_epilogue;
 
 
 /* The file where the gauge is to be displayed.

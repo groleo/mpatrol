@@ -33,14 +33,10 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mtrace.c,v 1.4 2001-02-23 21:49:55 graeme Exp $"
+#ident "$Id: mtrace.c,v 1.5 2001-07-25 21:58:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.4 2001-02-23 21:49:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.5 2001-07-25 21:58:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
-
-
-typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
-typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
 
 
 #ifdef __cplusplus
@@ -52,8 +48,8 @@ extern "C"
 /* The previous mpatrol prologue and epilogue handlers.
  */
 
-static prologue_handler old_prologue;
-static epilogue_handler old_epilogue;
+static __mp_prologuehandler old_prologue;
+static __mp_epiloguehandler old_epilogue;
 
 
 /* The file where all tracing output goes.
