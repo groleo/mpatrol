@@ -77,6 +77,8 @@ MP_EXPORT void __mp_memfree(meminfo *, void *, size_t);
 MP_EXPORT int __mp_memprotect(meminfo *, void *, size_t, memaccess);
 MP_EXPORT int __mp_memwatch(meminfo *, void *, size_t, memaccess);
 MP_EXPORT void *__mp_memcheck(void *, char, size_t);
+MP_EXPORT void __mp_memset(void *, char, size_t);
+MP_EXPORT void __mp_memcopy(void *, void *, size_t);
 
 
 #ifdef __cplusplus

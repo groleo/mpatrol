@@ -54,7 +54,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.5 1999-11-07 13:24:44 graeme Exp $"
+#ident "$Id: memory.c,v 1.6 1999-12-20 20:00:17 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -610,6 +610,165 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
         if (*p != c)
             return p;
     return NULL;
+}
+
+
+/* Set a block of memory to contain a specific byte.
+ */
+
+MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
+{
+    int *w;
+    char *p;
+    size_t i, n;
+    int b;
+
+    /* This used to be a simple loop to set each byte individually, but
+     * that is less efficient than attempting to set words at a time.
+     * Therefore, if the number of bytes to set is larger than a certain
+     * number then this routine will attempt to set as many words as
+     * possible.
+     */
+    if (l > sizeof(int) * sizeof(int))
+    {
+        /* Set all bytes that occur before the first word.
+         */
+        if ((n = (unsigned long) t & (sizeof(int) - 1)) > 0)
+        {
+            if ((n = sizeof(int) - n) > l)
+                n = l;
+            for (p = (char *) t, t = (char *) t + n; p < (char *) t; *p++ = c);
+            l -= n;
+        }
+        if (l == 0)
+            return;
+        /* Set all words that occur in the memory block.
+         */
+        if ((n = l / sizeof(int)) > 0)
+        {
+            /* Build up the word that we will be writing to memory.
+             */
+            for (p = (char *) &b, i = 0; i < sizeof(int); *p++ = c, i++);
+            for (w = (int *) t, t = (int *) t + n; w < (int *) t; *w++ = b);
+            l -= n * sizeof(int);
+        }
+    }
+    if (l == 0)
+        return;
+    /* Set all remaining bytes.
+     */
+    for (p = (char *) t, t = (char *) t + l; p < (char *) t; *p++ = c);
+}
+
+
+/* Copy a block of memory from one address to another.
+ */
+
+MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
+{
+    size_t n;
+
+    /* This used to be a simple loop to copy each byte individually, but
+     * that is less efficient than attempting to copy words at a time.
+     * Therefore, if the number of bytes to copy is larger than a certain
+     * number then this routine will attempt to copy as many words as
+     * possible.
+     */
+    if ((s == t) || (l == 0))
+        return;
+    if ((s < t) && ((char *) s + l > (char *) t))
+    {
+        /* The end of the source block overlaps with the beginning of the
+         * destination block, so we have to copy from the end.
+         */
+        s = (char *) s + l;
+        t = (char *) t + l;
+        n = (unsigned long) s & (sizeof(int) - 1);
+        if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
+            (l > sizeof(int) * sizeof(int)))
+        {
+            /* We can only copy words if the source and destination have the
+             * same alignment.  This also guarantees that there is at least one
+             * word of difference between the source and destination pointers.
+             */
+            if (n > l)
+                n = l;
+            /* Copy all bytes that occur after the last word.
+             */
+            while (n > 0)
+            {
+                s = (char *) s - 1;
+                t = (char *) t - 1;
+                *((char *) t) = *((char *) s);
+                n--;
+                l--;
+            }
+            /* Copy all words that occur in the memory block.
+             */
+            while (l >= sizeof(int))
+            {
+                s = (int *) s - 1;
+                t = (int *) t - 1;
+                *((int *) t) = *((int *) s);
+                l -= sizeof(int);
+            }
+        }
+        /* Copy all remaining bytes.
+         */
+        while (l > 0)
+        {
+            s = (char *) s - 1;
+            t = (char *) t - 1;
+            *((char *) t) = *((char *) s);
+            l--;
+        }
+    }
+    else
+    {
+        /* The end of the destination block overlaps with the beginning of the
+         * source block, or there is no overlap at all, so we can copy from
+         * the beginning.
+         */
+        n = (unsigned long) s & (sizeof(int) - 1);
+        if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
+            (l > sizeof(int) * sizeof(int)))
+        {
+            /* We can only copy words if the source and destination have the
+             * same alignment.  This also guarantees that there is at least one
+             * word of difference between the source and destination pointers.
+             */
+            if ((n > 0) && ((n = sizeof(int) - n) > l))
+                n = l;
+            /* Copy all bytes that occur before the first word.
+             */
+            while (n > 0)
+            {
+                *((char *) t) = *((char *) s);
+                s = (char *) s + 1;
+                t = (char *) t + 1;
+                n--;
+                l--;
+            }
+            /* Copy all words that occur in the memory block.
+             */
+            while (l >= sizeof(int))
+            {
+                *((int *) t) = *((int *) s);
+                s = (int *) s + 1;
+                t = (int *) t + 1;
+                l -= sizeof(int);
+            }
+        }
+        /* Copy all remaining bytes.
+         */
+        while (l > 0)
+        {
+            *((char *) t) = *((char *) s);
+            s = (char *) s + 1;
+            t = (char *) t + 1;
+            l--;
+        }
+    }
 }
 
 
