@@ -47,7 +47,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.68 2001-02-01 19:00:25 graeme Exp $"
+#ident "$Id: inter.c,v 1.69 2001-02-01 19:03:03 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -530,7 +530,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (l == 0)
             l = 1;
         if ((p = sbrk(l)) == (void *) -1)
-            if ((f == AT_XMALLOC) || (f == AT_XCALLOC))
+            if ((f == ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
                 abort();
             else
                 p = NULL;
@@ -666,7 +666,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
                 o[n] = '\0';
             }
         }
-        if ((o == NULL) && (f == AT_XSTRDUP))
+        if ((o == NULL) && ((f == AT_STRDUPA) || (f == AT_STRNDUPA) ||
+             (f == AT_XSTRDUP)))
             abort();
         return o;
     }
