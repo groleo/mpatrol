@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.98 2001-12-11 21:20:41 graeme Exp $"
+#ident "$Id: info.c,v 1.99 2001-12-18 21:15:02 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.98 2001-12-11 21:20:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.99 2001-12-18 21:15:02 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1127,6 +1127,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
             if (!(h->alloc.flags & FLG_PAGEALLOC) &&
                 (p = __mp_memcheck(n->block, h->alloc.fbyte, n->size)))
             {
+                __mp_log(h, v);
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 __mp_error(ET_FRECOR, AT_MAX, v->file, v->line, NULL, p);
@@ -1147,6 +1148,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
              */
             if (p = __mp_memcheck(n->block, h->alloc.fbyte, n->size))
             {
+                __mp_log(h, v);
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 __mp_error(ET_FRDCOR, AT_MAX, v->file, v->line, NULL, n->block,
@@ -1181,6 +1183,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
                 (p = __mp_memcheck((char *) n->block + n->size, h->alloc.obyte,
                   l - n->size - s)))
             {
+                __mp_log(h, v);
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
@@ -1209,6 +1212,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
                 (p = __mp_memcheck((char *) n->block + n->size, h->alloc.obyte,
                   l)))
             {
+                __mp_log(h, v);
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
