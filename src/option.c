@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.11 2000-04-19 00:15:04 graeme Exp $"
+#ident "$Id: option.c,v 1.12 2000-04-20 22:06:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -71,6 +71,9 @@ static char *options_help[] =
     "ALLOCSTOP", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when it is",
     "", "being allocated.",
+    "AUTOSAVE", "unsigned integer",
+    "", "Specifies the frequency at which to periodically write the profiling",
+    "", "data to the profiling output file.",
     "CHECK", "unsigned range",
     "", "Specifies a range of allocation indices at which to check the",
     "", "integrity of free memory and overflow buffers.",
@@ -102,6 +105,9 @@ static char *options_help[] =
     "", "being freed.",
     "HELP", NULL,
     "", "Displays this quick-reference option summary.",
+    "LARGEBOUND", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as large allocations for profiling purposes.",
     "LIMIT", "unsigned integer",
     "", "Specifies the limit in bytes at which all memory allocations should",
     "", "fail if the total allocated memory should increase beyond this.",
@@ -123,6 +129,9 @@ static char *options_help[] =
     "LOGREALLOCS", NULL,
     "", "Specifies that all memory reallocations are to be logged and sent to",
     "", "the log file.",
+    "MEDIUMBOUND", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as medium allocations for profiling purposes.",
     "NOFREE", NULL,
     "", "Specifies that the mpatrol library should keep all reallocated and",
     "", "freed memory allocations.",
@@ -177,6 +186,9 @@ static char *options_help[] =
     "SHOWUNFREED", NULL,
     "", "Specifies that a summary of all of the unfreed memory allocations",
     "", "should be displayed at the end of program execution.",
+    "SMALLBOUND", "unsigned integer",
+    "", "Specifies the limit in bytes up to which memory allocations should be",
+    "", "classified as small allocations for profiling purposes.",
     "UNFREEDABORT", "unsigned integer",
     "", "Specifies the minimum number of unfreed allocations at which to abort",
     "", "the program just before program termination.",
@@ -443,6 +455,16 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         h->astop = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "AUTOSAVE"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        h->prof.autosave = n;
+                        i = OE_RECOGNISED;
+                    }
                 break;
               case 'C':
                 if (matchoption(o, "CHECK"))
@@ -560,7 +582,20 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                 }
                 break;
               case 'L':
-                if (matchoption(o, "LIMIT"))
+                if (matchoption(o, "LARGEBOUND"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        if (n == 0)
+                            h->prof.lbound = MP_LARGEBOUND;
+                        else
+                            h->prof.lbound = n;
+                        i = OE_RECOGNISED;
+                    }
+                else if (matchoption(o, "LIMIT"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -619,6 +654,21 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     h->flags |= FLG_LOGREALLOCS;
                 }
+                break;
+              case 'M':
+                if (matchoption(o, "MEDIUMBOUND"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        if (n == 0)
+                            h->prof.mbound = MP_MEDIUMBOUND;
+                        else
+                            h->prof.mbound = n;
+                        i = OE_RECOGNISED;
+                    }
                 break;
               case 'N':
                 if (matchoption(o, "NOFREE"))
@@ -799,6 +849,19 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     h->flags |= FLG_SHOWUNFREED;
                 }
+                else if (matchoption(o, "SMALLBOUND"))
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
+                    else
+                    {
+                        if (n == 0)
+                            h->prof.sbound = MP_SMALLBOUND;
+                        else
+                            h->prof.sbound = n;
+                        i = OE_RECOGNISED;
+                    }
                 break;
               case 'U':
                 if (matchoption(o, "UNFREEDABORT"))
@@ -838,33 +901,62 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
             /* Now check the error code returned from attempting to match
              * the keyword and report if anything went wrong.
              */
-            if (i == OE_UNRECOGNISED)
+            switch (i)
             {
+              case OE_UNRECOGNISED:
                 if (*a == '\0')
                     __mp_error(AT_MAX, "unrecognised option `%s'\n", o);
                 else
                     __mp_error(AT_MAX, "unrecognised option `%s=%s'\n", o, a);
-            }
-            else if (i == OE_NOARGUMENT)
+                break;
+              case OE_NOARGUMENT:
                 __mp_error(AT_MAX, "missing argument for option `%s'\n", o);
-            else if (i == OE_BADNUMBER)
+                break;
+              case OE_BADNUMBER:
                 __mp_error(AT_MAX, "bad numeric argument `%s' for option "
                            "`%s'\n", a, o);
-            else if (i == OE_BADRANGE)
+                break;
+              case OE_BADRANGE:
                 __mp_error(AT_MAX, "bad numeric range `%s' for option `%s'\n",
                            a, o);
-            else if (i == OE_BIGNUMBER)
+                break;
+              case OE_BIGNUMBER:
                 __mp_error(AT_MAX, "numeric argument `%s' is too large for "
                            "option `%s'\n", a, o);
-            else if (i == OE_LOWERORUPPER)
+                break;
+              case OE_LOWERORUPPER:
                 __mp_error(AT_MAX, "must specify `LOWER' or `UPPER' for "
                            "option `%s'\n", o);
-            else if (i == OE_IGNARGUMENT)
+                break;
+              case OE_IGNARGUMENT:
                 __mp_warn(AT_MAX, "ignoring argument `%s' for option `%s'\n",
                           a, o);
+                break;
+              default:
+                break;
+            }
         }
         else if (*a != '\0')
             __mp_warn(AT_MAX, "missing option for argument `%s'\n", a);
+    }
+    /* Check the validity of the profiling allocation boundaries.  There is
+     * potential for error if either of the small or large bounds overlap the
+     * medium bound and the medium bound is either 1 or the maximum sized
+     * integer, but it will just result in wrong profiling and nothing more.
+     */
+    if (h->prof.sbound >= h->prof.mbound)
+    {
+        __mp_error(AT_MAX, "small allocation boundary `%lu' overlaps medium "
+                   "allocation boundary `%lu'\n", h->prof.sbound,
+                   h->prof.mbound);
+        h->prof.sbound = h->prof.mbound - 1;
+    }
+    if (h->prof.lbound <= h->prof.mbound)
+    {
+        __mp_error(AT_MAX, "large allocation boundary `%lu' overlaps medium "
+                   "allocation boundary `%lu'\n", h->prof.lbound,
+                   h->prof.mbound);
+        h->prof.lbound = h->prof.mbound + 1;
     }
     if (l != 0)
         showoptions();
