@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.57 2000-04-13 19:15:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.58 2000-04-18 21:56:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.1.5
-@set UPDATED 13th April, 2000
+@set UPDATED 18th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -614,7 +614,7 @@ manual pages.
 
 @cindex Amiga 4000/040
 The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
-3.1.  I then installed Redhat Linux 5.1 on my Amiga and added support for
+3.1.  I then installed RedHat Linux 5.1 on my Amiga and added support for
 Linux/m68k.  I've tried my best to make it as easy as possible to build and
 install mpatrol on any system, but it isn't likely to run smoothly for
 everybody.  However, there shouldn't be any major problems if you perform the
@@ -2159,7 +2159,7 @@ unfreed allocations may not be entirely accurate.
 The @command{memleak} command takes one optional argument which must be a valid
 mpatrol log filename but if it is omitted then it will use @file{mpatrol.log} as
 the name of the log file to use.  The @command{memleak} command makes two passes
-over the log file so the file must be randomly-accessable.  If the filename
+over the log file so the file must be randomly-accessible.  If the filename
 argument is given as @samp{-} then the standard input file stream will be used
 as the log file.
 
@@ -6186,6 +6186,43 @@ MS-DOS, Windows
 Provides tracing and debugging for @code{malloc()} and @code{operator new}.
 @end table
 
+@cindex JProbe
+@cindex KL Group
+@item
+JProbe
+@table @asis
+@item Author
+KL Group (@email{info@@klgroup.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.klgroup.com/}
+@item Overview
+Helps pinpoint memory leaks in Java applications by tracking which objects
+hold references to other objects, and allows visualisation of memory usage in
+real-time.
+@end table
+
+@cindex Leak
+@item
+Leak
+@table @asis
+@item Author
+Christopher Phillips (@email{pefv700@@hermes.chpc.utexas.edu})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://sources.isc.org/devel/memleak/leak.txt}
+@item Overview
+Logs all calls to @code{malloc()} and related functions to database files with
+the filename and line number, then attempts to validate reallocations and
+deallocations and detect memory leaks.
+@end table
+
 @cindex LeakTracer
 @item
 LeakTracer
@@ -6252,6 +6289,22 @@ Various UNIX
 Implements wrappers for the normal heap handling functions.
 @end table
 
+@cindex MallocTrace
+@item
+MallocTrace
+@table @asis
+@item Author
+Mark Brader (@email{msb@@sq.sq.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{ftp://ftp.uu.net/usenet/comp.sources.unix/volume18/malloc-trace.Z}
+@item Overview
+A malloc package with call stack tracebacks.
+@end table
+
 @cindex MCheck
 @item
 MCheck
@@ -6267,6 +6320,22 @@ Linux
 @item Overview
 A memory usage and malloc checker for C and C++.  Comes with a Java application
 for browsing the trace files produced.
+@end table
+
+@cindex MEM
+@item
+MEM
+@table @asis
+@item Author
+Walter Bright
+@item License
+Free Software
+@item Platforms
+MS-DOS
+@item Location
+@uref{http://www.snippets.org/}
+@item Overview
+A set of functions for debugging pointer and memory allocation problems.
 @end table
 
 @cindex MemCheck
@@ -6562,6 +6631,23 @@ AmigaOS
 @uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
 @item Overview
 Patches the system to check for free memory corruption.
+@end table
+
+@cindex Optimizeit
+@cindex Intuitive Systems, Inc.
+@item
+Optimizeit
+@table @asis
+@item Author
+Intuitive Systems, Inc. (@email{info@@optimizeit.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.optimizeit.com/}
+@item Overview
+Attempts to locate memory leaks and performance bottlenecks in Java programs.
 @end table
 
 @cindex Plumber
