@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.32 2000-12-18 20:11:41 graeme Exp $
+# $Id: prototype,v 1.33 2000-12-18 21:56:06 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -88,6 +88,14 @@ f none doc/mpatrol/ps/mleak.ps 0664 bin bin
 f none doc/mpatrol/ps/mpsym.ps 0664 bin bin
 f none doc/mpatrol/ps/mpedit.ps 0664 bin bin
 f none doc/mpatrol/ps/libmpatrol.ps 0664 bin bin
+d none doc/mpatrol/pdf 0775 bin bin
+f none doc/mpatrol/pdf/mpatrol.pdf 0664 bin bin
+f none doc/mpatrol/pdf/mprof.pdf 0664 bin bin
+f none doc/mpatrol/pdf/mptrace.pdf 0664 bin bin
+f none doc/mpatrol/pdf/mleak.pdf 0664 bin bin
+f none doc/mpatrol/pdf/mpsym.pdf 0664 bin bin
+f none doc/mpatrol/pdf/mpedit.pdf 0664 bin bin
+f none doc/mpatrol/pdf/libmpatrol.pdf 0664 bin bin
 d none doc/mpatrol/tests 0775 bin bin
 d none doc/mpatrol/tests/pass 0775 bin bin
 f none doc/mpatrol/tests/pass/test1.c 0664 bin bin

@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.45 2000-12-18 20:11:41 graeme Exp $
+# $Id: build,v 1.46 2000-12-18 21:56:06 graeme Exp $
 
 
 version=1.3.1
@@ -114,6 +114,14 @@ cp ../../man/ps/mleak.ps doc/mpatrol/ps
 cp ../../man/ps/mpsym.ps doc/mpatrol/ps
 cp ../../man/ps/mpedit.ps doc/mpatrol/ps
 cp ../../man/ps/libmpatrol.ps doc/mpatrol/ps
+mkdir -p doc/mpatrol/pdf
+cp ../../man/pdf/mpatrol.pdf doc/mpatrol/pdf
+cp ../../man/pdf/mprof.pdf doc/mpatrol/pdf
+cp ../../man/pdf/mptrace.pdf doc/mpatrol/pdf
+cp ../../man/pdf/mleak.pdf doc/mpatrol/pdf
+cp ../../man/pdf/mpsym.pdf doc/mpatrol/pdf
+cp ../../man/pdf/mpedit.pdf doc/mpatrol/pdf
+cp ../../man/pdf/libmpatrol.pdf doc/mpatrol/pdf
 mkdir -p doc/mpatrol/tests/pass
 cp ../../tests/pass/test*.c doc/mpatrol/tests/pass
 mkdir -p doc/mpatrol/tests/fail

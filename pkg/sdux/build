@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.7 2000-12-18 20:11:42 graeme Exp $
+# $Id: build,v 1.8 2000-12-18 21:56:08 graeme Exp $
 
 
 version=1.3.1
@@ -111,6 +111,14 @@ cp ../../man/ps/mleak.ps mpatrol/doc/mpatrol/ps
 cp ../../man/ps/mpsym.ps mpatrol/doc/mpatrol/ps
 cp ../../man/ps/mpedit.ps mpatrol/doc/mpatrol/ps
 cp ../../man/ps/libmpatrol.ps mpatrol/doc/mpatrol/ps
+mkdir -p mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mpatrol.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mprof.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mptrace.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mleak.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mpsym.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/mpedit.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/libmpatrol.pdf mpatrol/doc/mpatrol/pdf
 mkdir -p mpatrol/doc/mpatrol/tests/pass
 cp ../../tests/pass/test*.c mpatrol/doc/mpatrol/tests/pass
 mkdir -p mpatrol/doc/mpatrol/tests/fail

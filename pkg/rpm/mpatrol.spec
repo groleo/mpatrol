@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.44 2000-12-14 18:15:57 graeme Exp $
+# $Id: mpatrol.spec,v 1.45 2000-12-18 21:56:07 graeme Exp $
 
 
 %define libversion 1.3
@@ -80,6 +80,7 @@ install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
 mv man/dvi .
 mv man/ps .
+mv man/pdf .
 mkdir -p $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpatrol.h $RPM_BUILD_ROOT/%{_includedir}
 mkdir -p $RPM_BUILD_ROOT/%{_infodir}
@@ -106,7 +107,7 @@ install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
 %doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
 %doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf
-%doc doc/images dvi ps
+%doc doc/images dvi ps pdf
 %doc tests
 %{_bindir}
 %{_includedir}
