@@ -527,4 +527,41 @@
 #endif /* MP_FREEBYTE */
 
 
+/* The number of bytes that distinguish where medium-sized allocations
+ * begin and small-sized allocations end for profiling purposes.
+ */
+
+#ifndef MP_SMALLBOUND
+#define MP_SMALLBOUND 32
+#endif /* MP_SMALLBOUND */
+
+
+/* The number of bytes that distinguish where large-sized allocations
+ * begin and medium-sized allocations end for profiling purposes.
+ */
+
+#ifndef MP_MEDIUMBOUND
+#define MP_MEDIUMBOUND 256
+#endif /* MP_MEDIUMBOUND */
+
+
+/* The number of bytes that distinguish where extra large-sized allocations
+ * begin and large-sized allocations end for profiling purposes.
+ */
+
+#ifndef MP_LARGEBOUND
+#define MP_LARGEBOUND 2048
+#endif /* MP_LARGEBOUND */
+
+
+/* Ensure that the small allocation boundary is less than the medium
+ * allocation boundary and the medium allocation boundary is less than the
+ * large allocation boundary.
+ */
+
+#if MP_SMALLBOUND >= MP_MEDIUMBOUND || MP_MEDIUMBOUND >= MP_LARGEBOUND
+#error allocation boundary overlap
+#endif
+
+
 #endif /* MP_CONFIG_H */
