@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.106 2001-03-05 00:13:41 graeme Exp $"
+#ident "$Id: inter.c,v 1.107 2001-03-05 18:59:57 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.106 2001-03-05 00:13:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.107 2001-03-05 18:59:57 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1762,6 +1762,52 @@ __mp_iterateall(int (*f)(void *, void *), void *d)
 }
 
 
+/* Clear the leak table.
+ */
+
+void
+__mp_clearleaktable(void)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+    __mp_clearleaktab(&memhead.ltable);
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    restoresignals();
+}
+
+
+/* Start recording memory allocation events in the leak table.
+ */
+
+void
+__mp_startleaktable(void)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    memhead.ltable.tracing = 1;
+    restoresignals();
+}
+
+
+/* Stop recording memory allocation events in the leak table.
+ */
+
+void
+__mp_stopleaktable(void)
+{
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    memhead.ltable.tracing = 0;
+    restoresignals();
+}
+
+
 /* Display a complete memory map of the heap and (optionally) a summary of
  * all mpatrol library settings and statistics.
  */
@@ -1812,11 +1858,12 @@ __mp_stats(heapinfo *d)
     d->icount = memhead.alloc.heap.itree.size + memhead.alloc.itree.size +
                 memhead.addr.list.size + memhead.syms.strings.list.size +
                 memhead.syms.strings.tree.size + memhead.syms.itree.size +
-                memhead.prof.ilist.size + memhead.list.size +
-                memhead.alist.size;
+                memhead.ltable.list.size + memhead.prof.ilist.size +
+                memhead.list.size + memhead.alist.size;
     d->itotal = memhead.alloc.heap.isize + memhead.alloc.isize +
                 memhead.addr.size + memhead.syms.strings.size +
-                memhead.syms.size + memhead.prof.size + memhead.size;
+                memhead.syms.size + memhead.ltable.isize + memhead.prof.size +
+                memhead.size;
     restoresignals();
     return 1;
 }

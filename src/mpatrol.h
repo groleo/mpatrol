@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.110 2001-03-05 00:13:41 graeme Exp $
+ * $Id: mpatrol.h,v 1.111 2001-03-05 18:59:57 graeme Exp $
  */
 
 
@@ -744,6 +744,9 @@ int __mp_printinfo(MP_CONST void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
 size_t __mp_iterateall(int (*)(MP_CONST void *, void *), void *);
+void __mp_clearleaktable(void);
+void __mp_startleaktable(void);
+void __mp_stopleaktable(void);
 void __mp_memorymap(int);
 void __mp_summary(void);
 int __mp_stats(__mp_heapinfo *);
@@ -823,6 +826,9 @@ __mp_locprintf(MP_CONST char *m, ...)
 #define __mp_snapshot() ((unsigned long) 0)
 #define __mp_iterate(p, d, s) ((size_t) 0)
 #define __mp_iterateall(p, d) ((size_t) 0)
+#define __mp_clearleaktable() ((void) 0)
+#define __mp_startleaktable() ((void) 0)
+#define __mp_stopleaktable() ((void) 0)
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)
 #define __mp_stats(d) ((int) 0)
