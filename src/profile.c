@@ -29,10 +29,13 @@
 
 #include "profile.h"
 #include "info.h"
+#include "diag.h"
+#include <stdio.h>
+#include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.8 2000-04-19 20:39:02 graeme Exp $"
+#ident "$Id: profile.c,v 1.9 2000-04-19 23:24:41 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -68,6 +71,22 @@ MP_GLOBAL void __mp_newprofile(profhead *p)
 
 MP_GLOBAL int __mp_writeprofile(profhead *p)
 {
+    FILE *f;
+
+    /* The profiling file name can also be named as stderr and stdout which
+     * will go to the standard error and standard output streams respectively.
+     */
+    if ((p->file == NULL) || (strcmp(p->file, "stderr") == 0))
+        f = stderr;
+    else if (strcmp(p->file, "stdout") == 0)
+        f = stdout;
+    else if ((f = fopen(p->file, "wb")) == NULL)
+    {
+        __mp_error(AT_MAX, "%s: cannot open file\n", p->file);
+        return 0;
+    }
+    if ((f != stderr) && (f != stdout) && fclose(f))
+        return 0;
     return 1;
 }
 
