@@ -36,11 +36,14 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF || \
-    FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
+#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || \
+    FORMAT == FORMAT_XCOFF || FORMAT == FORMAT_ELF32 || \
+    FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
 #include <fcntl.h>
 #include <unistd.h>
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+#if FORMAT == FORMAT_AOUT
+#include <a.out.h>
+#elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 #include <a.out.h>
 #if SYSTEM == SYSTEM_AIX
 #ifndef ISCOFF
@@ -75,7 +78,6 @@
  * use ELF so this is for SunOS and the BSD systems that still use COFF.
  */
 #include <sys/types.h>
-#include <nlist.h>
 #include <link.h>
 #elif DYNLINK == DYNLINK_HPUX
 /* The HP/UX dynamic linker support routines are available for use even by
@@ -108,7 +110,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.42 2001-01-14 23:06:10 graeme Exp $"
+#ident "$Id: symbol.c,v 1.43 2001-01-17 23:40:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -263,9 +265,9 @@ extern "C"
  * be NULL in an object that does not need dynamic linking.
  */
 #if SYSTEM == SYSTEM_SUNOS
-extern struct link_dynamic *_DYNAMIC;
+extern struct link_dynamic _DYNAMIC;
 #else /* SYSTEM */
-extern struct _dynamic *_DYNAMIC;
+extern struct _dynamic _DYNAMIC;
 #endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_IRIX
 /* The __rld_obj_head symbol is always defined in IRIX and points to the first
@@ -394,18 +396,64 @@ getsymnode(symhead *y)
 }
 
 
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+#if FORMAT == FORMAT_AOUT
+/* Allocate a new symbol node for a given a.out symbol.
+ */
+
+static
+int
+addsymbol(symhead *y, struct nlist *p, char *f, char *s, size_t b)
+{
+    symnode *n;
+    char *r;
+    size_t a;
+
+    a = b + p->n_value;
+    /* We don't bother storing a symbol which has no name or whose name
+     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
+     * for symbols which have a virtual address of zero.
+     */
+    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0))
+    {
+        if ((n = getsymnode(y)) == NULL)
+            return 0;
+        if ((r = __mp_addstring(&y->strings, s)) == NULL)
+        {
+            __mp_freeslot(&y->table, n);
+            return 0;
+        }
+        __mp_treeinsert(&y->dtree, &n->data.node, a);
+        n->data.file = f;
+        n->data.name = r;
+        n->data.addr = (void *) a;
+        /* The a.out file format doesn't record symbol sizes, so we have
+         * to rely on the assumption that a function symbol ends at the
+         * beginning of the next function symbol.  This will be calculated
+         * in __mp_fixsymbols().
+         */
+        n->data.size = 0;
+        n->data.index = 0;
+        n->data.offset = 0;
+        /* The linkage information is required for when we look up a symbol.
+         */
+        n->data.flags = p->n_type;
+    }
+    return 1;
+}
+#elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 /* Allocate a new symbol node for a given COFF or XCOFF symbol.
  */
 
 static
 int
-addsymbol(symhead *y, SYMENT *p, char *f, char *s)
+addsymbol(symhead *y, SYMENT *p, char *f, char *s, size_t b)
 {
     AUXENT *e;
     symnode *n;
     char *r;
+    size_t a;
 
+    a = b + p->n_value;
     /* We don't bother storing a symbol which has no name or whose name
      * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
      * likely to be the name of a CSECT beginning with a '.' and not the
@@ -420,7 +468,7 @@ addsymbol(symhead *y, SYMENT *p, char *f, char *s)
 #else /* FORMAT */
         (*s != '\0') &&
 #endif /* FORMAT */
-        !strpbrk(s, "$@.") && (p->n_value > 0) &&
+        !strpbrk(s, "$@.") && (a > 0) &&
 #if FORMAT == FORMAT_XCOFF
         (ISFCN(p->n_type) || (p->n_sclass == C_EXT)))
 #else /* FORMAT */
@@ -434,10 +482,10 @@ addsymbol(symhead *y, SYMENT *p, char *f, char *s)
             __mp_freeslot(&y->table, n);
             return 0;
         }
-        __mp_treeinsert(&y->dtree, &n->data.node, p->n_value);
+        __mp_treeinsert(&y->dtree, &n->data.node, a);
         n->data.file = f;
         n->data.name = r;
-        n->data.addr = (void *) p->n_value;
+        n->data.addr = (void *) a;
         /* Attempt to figure out the size of the symbol.
          */
         if (p->n_numaux > 0)
@@ -652,13 +700,73 @@ addsym(char *s, unsigned long a, unsigned long l, void *p)
 #endif /* DYNLINK */
 
 
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+#if FORMAT == FORMAT_AOUT
+/* Allocate a set of symbol nodes for an a.out executable file.
+ */
+
+static
+int
+addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
+{
+    struct exec *o;
+    struct nlist *p;
+    char *m;
+    size_t i, n;
+
+    /* Check that we have a valid a.out executable file.
+     */
+    if (b < sizeof(struct exec))
+    {
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an object file\n", f);
+        return 1;
+    }
+    o = (struct exec *) e;
+    if (N_BADMAG(*o))
+    {
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: not an executable file\n", f);
+        return 1;
+    }
+    /* Look for the symbol table.
+     */
+    i = N_SYMOFF(*o);
+    n = o->a_syms;
+    if ((i == 0) || (n == 0) || (b < i + n))
+    {
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing symbol table\n", f);
+        return 1;
+    }
+    p = (struct nlist *) (e + i);
+    b -= i + n;
+    n /= sizeof(struct nlist);
+    /* Look for the string table.
+     */
+    m = e + N_STROFF(*o);
+    if (b < 4)
+        i = 0;
+    else
+        i = *((size_t *) m);
+    if ((i == 0) || (b < i))
+    {
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s: missing string table\n", f);
+        return 1;
+    }
+    /* Cycle through every symbol contained in the executable file.
+     */
+    for (i = 0; i < n; i++, p++)
+        /* We only need to bother looking at text symbols.
+         */
+        if ((((p->n_type & N_TYPE) == N_TEXT) && !(p->n_type & N_STAB)) &&
+            !addsymbol(y, p, f, m + p->n_un.n_strx, a))
+            return 0;
+    return 1;
+}
+#elif FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 /* Allocate a set of symbol nodes for a COFF or XCOFF executable file.
  */
 
 static
 int
-addsymbols(symhead *y, char *e, char *f, size_t b)
+addsymbols(symhead *y, char *e, char *f, size_t b, size_t a)
 {
     char n[SYMNMLEN + 1];
     FILHDR *o;
@@ -743,7 +851,7 @@ addsymbols(symhead *y, char *e, char *f, size_t b)
                 /* Symbol name is stored in string table.
                  */
                 s = m + p->n_offset;
-            if (!addsymbol(y, p, f, s))
+            if (!addsymbol(y, p, f, s, a))
                 return 0;
         }
     return 1;
@@ -1046,9 +1154,10 @@ MP_GLOBAL
 int
 __mp_addsymbols(symhead *y, char *s, size_t b)
 {
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF || \
-    FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || \
+    FORMAT == FORMAT_XCOFF || FORMAT == FORMAT_ELF32 || \
+    FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
+#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
     char *m;
     off_t o;
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
@@ -1080,9 +1189,9 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
         SymSetOptions(SYMOPT_UNDNAME);
     SymInitialize(GetCurrentProcess(), NULL, 1);
 #endif /* DYNLINK */
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
-    /* This is a very simple, yet portable, way to read symbols from COFF
-     * and XCOFF executable files.
+#if FORMAT == FORMAT_AOUT || FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+    /* This is a very simple, yet portable, way to read symbols from a.out,
+     * COFF and XCOFF executable files.
      */
     if ((f = open(s, O_RDONLY)) == -1)
     {
@@ -1122,7 +1231,7 @@ __mp_addsymbols(symhead *y, char *s, size_t b)
             else if ((t = __mp_addstring(&y->strings, s)) == NULL)
                 r = 0;
             else
-                r = addsymbols(y, m, t, (size_t) o);
+                r = addsymbols(y, m, t, (size_t) o, b);
             free(m);
         }
         close(f);
@@ -1316,9 +1425,9 @@ __mp_addextsymbols(symhead *y)
     }
 #elif DYNLINK == DYNLINK_BSD
     /* Check to see if the dynamic linker has set up the _DYNAMIC symbol
-     * and also check that it points to a valid _dynamic structure.
+     * and also check that it is a valid structure.
      */
-    if ((d = _DYNAMIC) &&
+    if ((d = &_DYNAMIC) &&
 #if SYSTEM == SYSTEM_SUNOS
         (d->ld_version > 1) && (d->ld_version <= 3) && (d->ld_un.ld_1 != NULL))
 #else /* SYSTEM */
@@ -1555,7 +1664,12 @@ __mp_findsymbol(symhead *y, void *p)
              n = (symnode *) __mp_successor(&n->data.node))
             if ((char *) n->data.addr + n->data.size > (char *) p)
             {
-#if FORMAT == FORMAT_COFF
+#if FORMAT == FORMAT_AOUT
+                /* We give precedence to global symbols, then local symbols.
+                 */
+                if ((r == NULL) || (!(r->data.flags & N_EXT) &&
+                     (n->data.flags & N_EXT)))
+#elif FORMAT == FORMAT_COFF
                 /* We give precedence to global symbols, then local symbols.
                  */
                 if ((r == NULL) || ((r->data.flags == C_STAT) &&
