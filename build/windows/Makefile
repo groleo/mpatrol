@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.10 2000-04-06 00:38:41 graeme Exp $
+# $Id: Makefile,v 1.11 2000-04-06 18:03:14 graeme Exp $
 
 
 # Definitions
@@ -96,11 +96,11 @@ $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
-mpatrol.exe: mpatrol.obj getopt.obj
-	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj
+mpatrol.exe: mpatrol.obj getopt.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
-memleak.exe: memleak.obj getopt.obj tree.obj
-	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj
+memleak.exe: memleak.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 	mpatrol.exe memleak.exe
@@ -238,8 +238,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+	$(SOURCE)/target.h $(SOURCE)/version.h
 memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

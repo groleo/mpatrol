@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.8 2000-04-05 19:49:17 graeme Exp $
+# $Id: Makefile,v 1.9 2000-04-06 18:03:12 graeme Exp $
 
 
 # Definitions
@@ -103,11 +103,11 @@ $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-mpatrol: mpatrol.o getopt.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o
+mpatrol: mpatrol.o getopt.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
-memleak: memleak.o getopt.o tree.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o
+memleak: memleak.o getopt.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o version.o
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 	mpatrol memleak
@@ -241,8 +241,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/malloc.c $(SOURCE)/version.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+	$(SOURCE)/target.h $(SOURCE)/version.h
 memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

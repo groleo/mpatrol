@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.7 2000-04-06 00:41:35 graeme Exp $
+# $Id: Makefile,v 1.8 2000-04-06 18:03:11 graeme Exp $
 
 
 # Definitions
@@ -75,11 +75,11 @@ $(ARCHTS_LIBRARY): $(TOBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-mpatrol.nlm: mpatrol.obj getopt.obj
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj
+mpatrol.nlm: mpatrol.obj getopt.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
-memleak.nlm: memleak.obj getopt.obj tree.obj
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.obj getopt.obj tree.obj
+memleak.nlm: memleak.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol.nlm memleak.nlm
 
@@ -200,8 +200,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+	$(SOURCE)/target.h $(SOURCE)/version.h
 memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
