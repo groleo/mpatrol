@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.5 2001-02-27 21:58:44 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.6 2001-02-27 22:06:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.5 2001-02-27 21:58:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.6 2001-02-27 22:06:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -254,7 +254,7 @@ __mpt_dbmallocoption(int c, union dbmalloptarg *v)
     int r;
 
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     r = 0;
     switch (c)
     {
@@ -319,7 +319,7 @@ __mpt_dbmallocchaincheck(int f, MP_CONST char *s, MP_CONST char *t,
                          unsigned long u)
 {
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     __mp_checkheap(s, t, u);
     return 0;
 }
@@ -334,7 +334,7 @@ __mpt_dbmallocdump(int f)
     listinfo i;
 
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     i.file = f;
     i.event = __mp_snapshot();
     i.header = 0;
@@ -356,7 +356,7 @@ __mpt_dbmalloclist(int f, unsigned long l, unsigned long u)
     listinfo i;
 
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     i.file = f;
     if (l <= u)
         i.event = u;
@@ -387,7 +387,7 @@ __mpt_dbmallocinuse(unsigned long *h)
     unsigned long t;
 
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     if (__mp_stats(&i))
         t = i.atotal;
     else
@@ -409,7 +409,7 @@ __mpt_dbmallocsize(MP_CONST void *p)
     size_t t;
 
     if (!malloc_initialised)
-        __mpt_init_dbmalloc();
+        __mp_init_dbmalloc();
     if (__mp_info(p, &i) && !i.freed)
         t = i.size;
     else
