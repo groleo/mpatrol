@@ -10,8 +10,8 @@ slight changes in some files due to differences in the systems that they were
 generated on.
 
 
-The following files are provided with the main distribution and contain all of
-the information necessary to generate each of the preformatted files.
+The following files contain all of the information necessary to generate each of
+the preformatted files.
 
   * man1/*.1 & man3/*.3
         Format:    TROFF
@@ -19,9 +19,9 @@ the information necessary to generate each of the preformatted files.
         Notes:     The unprocessed source of the mpatrol manual pages.
 
 
-The following files are also provided with the main distribution and are all
-formatted for on-line documentation.  They generally contain little or no
-formatting codes, leaving the final formatting up to the viewer program.
+The following files are all formatted for on-line documentation.  They generally
+contain little or no formatting codes, leaving the final formatting up to the
+viewer program.
 
   * cat1/*.1 & cat3/*.3
         Format:    ASCII text
@@ -40,9 +40,8 @@ formatting codes, leaving the final formatting up to the viewer program.
         Notes:     Contains hypertext links with formatting codes.
 
 
-The following files are provided with the manual page distribution and are all
-formatted for printed manuals.  All can be viewed with a variety of programs,
-not just the ones listed here.
+The following files are all formatted for printed manuals.  All can be viewed
+with a variety of programs, not just the ones listed here.
 
   * dvi/*.dvi
         Format:    Device Independent format (DVI)
