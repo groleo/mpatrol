@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.2 2001-02-27 00:40:46 graeme Exp $
+ * $Id: dbmalloc.h,v 1.3 2001-02-27 00:44:54 graeme Exp $
  */
 
 
@@ -102,6 +102,16 @@
 #define MALLOC_DETAIL    109
 #define MALLOC_FREEMARK  110
 #define MALLOC_ZERO      111
+
+
+/* The settings for the MALLOC_WARN and MALLOC_FATAL options.
+ */
+
+#define M_HANDLE_IGNORE 0
+#define M_HANDLE_ABORT  1
+#define M_HANDLE_EXIT   2
+#define M_HANDLE_CORE   3
+#define M_HANDLE_DUMP   128
 
 
 /* The union used to supply a command argument to dbmallopt().
