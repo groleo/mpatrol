@@ -24,6 +24,11 @@
  */
 
 
+/*
+ * $Id: mpatrol.h,v 1.82 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>

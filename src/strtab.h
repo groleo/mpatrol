@@ -31,6 +31,11 @@
  */
 
 
+/*
+ * $Id: strtab.h,v 1.9 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 #include "config.h"
 #include "list.h"
 #include "heap.h"

@@ -31,6 +31,11 @@
  */
 
 
+/*
+ * $Id: info.h,v 1.39 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 #include "config.h"
 #include "alloc.h"
 #include "addr.h"

@@ -30,6 +30,11 @@
  */
 
 
+/*
+ * $Id: inter.h,v 1.19 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 #include "config.h"
 #include "info.h"
 #include <stdarg.h>

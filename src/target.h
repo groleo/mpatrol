@@ -31,6 +31,11 @@
  */
 
 
+/*
+ * $Id: target.h,v 1.24 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 /* The target operating system.  This determines how the mpatrol library
  * should interact with the underlying system, and how it should work around
  * deficiencies in some operating systems.

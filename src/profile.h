@@ -31,6 +31,11 @@
  */
 
 
+/*
+ * $Id: profile.h,v 1.18 2001-02-10 16:45:39 graeme Exp $
+ */
+
+
 #include "config.h"
 #include "symbol.h"
 
