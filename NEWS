@@ -1,3 +1,30 @@
+Changes for 1.1.1 (9th March, 2000)
+
+  * Added a section on threads to the mpatrol manual.
+
+  * Added the USEDEBUG option for displaying filenames and line numbers in call
+    stacks if the executable file contains debugging information.
+
+  * Changed the definitions of the C++ operators so that they now include source
+    level information.
+
+  * Added the MP_NOCPLUSPLUS preprocessor macro for disabling C++ support in
+    mpatrol.h.
+
+  * The mpatrol.h header file should have less incompatibilities with the
+    library functions that it overrides.
+
+  * The prologue and epilogue functions are now only called for user allocations
+    and not internal mpatrol allocations.
+
+  * The memory operation functions now continue to function even when the
+    mpatrol library has been terminated.
+
+  * Support has been added for building a tape archive distribution.
+
+  * Added a new C++ test.
+
+
 Changes for 1.1.0 (30th January, 2000)
 
   * Added a new file containing answers to frequently asked questions.

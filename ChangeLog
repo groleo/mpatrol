@@ -1,3 +1,56 @@
+Thu Mar  9 22:11:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added the section on building.
+
+	* build/amiga/mpatrol_pragmas.h:
+	Added __mp_pushdelstack() and __mp_popdelstack().
+
+	* doc/mpatrol.texi:
+	Added section on threads and added information about the tape archive
+	distribution.
+
+	* src/symbol.c: Explicit casts to const to remove warnings.
+
+	* pkg/tar/build:
+	Initial revision for building a tape archive distribution.
+
+Wed Mar  8 01:18:00 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Updated with all the recent changes.
+
+Tue Mar  7 22:10:59 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def, build/amiga/mpatrol_lib.fd:
+	Added __mp_pushdelstack() and __mp_popdelstack().
+
+	* src/config.h: Added the MP_CONST definition.
+
+	* src/inter.c:
+	Only call the prologue and epilogue functions if not recursive.  Allow
+	the memory operation functions to continue to operate even when the
+	mpatrol library has terminated.
+
+	* src/symbol.c:
+	Changed line field in sourcepos from long to int to match BFD
+	definition.
+
+	* src/malloc.c: Changed some parameters to be const.
+
+	* src/mpatrol.h:
+	Added the MP_NOCPLUSPLUS macro for disabling support for C++.
+
+	* man/cat1/mpatrol.1, man/man1/mpatrol.1, bin/mpatrol:
+	Added the -g option and changed the old -g option to -G.
+
+	* man/cat3/mpatrol.3, man/man3/mpatrol.3:
+	Documented the USEDEBUG option and added const to some function
+	prototypes.
+
+Mon Mar  6 21:45:43 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/mpatrol.h:
+	Added MP_CONST and made many pointer parameters constant.
+
 Fri Mar  3 01:24:51 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
