@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.14 2000-04-20 23:45:46 graeme Exp $"
+#ident "$Id: profile.c,v 1.15 2000-04-23 15:41:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -137,20 +137,44 @@ static profnode *getprofnode(profhead *p)
 
 static profnode *getcallsite(profhead *p, addrnode *a)
 {
-    profnode *n;
+    profnode *n, *t;
+    addrnode *d;
     size_t i;
 
-    if ((n = (profnode *) __mp_search(p->tree.root,
-          (unsigned long) a->data.addr)) == NULL)
+    if (n = (profnode *) __mp_search(p->tree.root,
+        (unsigned long) a->data.addr))
     {
-        if ((n = getprofnode(p)) == NULL)
-            return NULL;
-        __mp_treeinsert(&p->tree, &n->data.node, (unsigned long) a->data.addr);
-        for (i = 0; i < 4; i++)
+        while ((t = (profnode *) __mp_predecessor(&n->data.node)) &&
+               (t->data.addr == a->data.addr))
+            n = t;
+        while ((n != NULL) && (n->data.addr == a->data.addr))
         {
-            n->data.data.acount[i] = n->data.data.dcount[i] = 0;
-            n->data.data.atotal[i] = n->data.data.dtotal[i] = 0;
+            for (t = n->data.parent, d = a->data.next;
+                 (t != NULL) && (d != NULL);
+                 t = t->data.parent, d = d->data.next)
+                if (t->data.addr != d->data.addr)
+                    break;
+            if ((t == NULL) && (d == NULL))
+                return n;
+            n = (profnode *) __mp_successor(&n->data.node);
         }
+    }
+    t = NULL;
+    if (((n = getprofnode(p)) == NULL) || ((a->data.next != NULL) &&
+         ((t = getcallsite(p, a->data.next)) == NULL)))
+    {
+        if (n != NULL)
+            __mp_freeslot(&p->table, n);
+        return NULL;
+    }
+    __mp_treeinsert(&p->tree, &n->data.node, (unsigned long) a->data.addr);
+    n->data.parent = t;
+    n->data.index = p->tree.size;
+    n->data.addr = a->data.addr;
+    for (i = 0; i < 4; i++)
+    {
+        n->data.data.acount[i] = n->data.data.dcount[i] = 0;
+        n->data.data.atotal[i] = n->data.data.dtotal[i] = 0;
     }
     return n;
 }
@@ -291,7 +315,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
      * that if an error does occur then it will not be too drastic if we
      * continue writing the rest of the file.
      */
-    __mp_memcopy(s, MP_PROFMAGIC, 4);
+    __mp_memcopy(s, (char *) MP_PROFMAGIC, 4);
     fwrite(s, sizeof(char), 4, f);
     /* Write out the allocation and deallocation bins.
      */
@@ -303,6 +327,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     fwrite(&p->dtotals, sizeof(size_t), 1, f);
     /* Write out the statistics from every call site.
      */
+    i = 0;
     fwrite(&p->sbound, sizeof(size_t), 1, f);
     fwrite(&p->mbound, sizeof(size_t), 1, f);
     fwrite(&p->lbound, sizeof(size_t), 1, f);
@@ -310,7 +335,12 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
          n = (profnode *) __mp_successor(&n->data.node))
     {
-        fwrite(&n->data.node.key, sizeof(unsigned long), 1, f);
+        fwrite(&n->data.index, sizeof(unsigned long), 1, f);
+        if (n->data.parent != NULL)
+            fwrite(&n->data.parent->data.index, sizeof(unsigned long), 1, f);
+        else
+            fwrite(&i, sizeof(size_t), 1, f);
+        fwrite(&n->data.addr, sizeof(void *), 1, f);
         fwrite(n->data.data.acount, sizeof(size_t), 4, f);
         fwrite(n->data.data.atotal, sizeof(size_t), 4, f);
         fwrite(n->data.data.dcount, sizeof(size_t), 4, f);

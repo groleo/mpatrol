@@ -60,15 +60,18 @@ typedef union profnode
 {
     struct
     {
-        listnode node; /* internal list node */
-        void *block;   /* pointer to block of memory */
-        size_t size;   /* size of block of memory */
+        listnode node;          /* internal list node */
+        void *block;            /* pointer to block of memory */
+        size_t size;            /* size of block of memory */
     }
     index;
     struct
     {
-        treenode node; /* tree node */
-        profdata data; /* profiling data for this function */
+        treenode node;          /* tree node */
+        union profnode *parent; /* parent node */
+        unsigned long index;    /* node index */
+        void *addr;             /* return address */
+        profdata data;          /* profiling data */
     }
     data;
 }
