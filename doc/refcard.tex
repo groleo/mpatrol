@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.22 2001-03-11 23:23:40 graeme Exp $
+% $Id: refcard.tex,v 1.23 2001-03-11 23:49:22 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -45,6 +45,7 @@
 \newcommand{\heading}[1]{\textbf{\normalsize #1}}
 \newcommand{\command}[1]{\textbf{#1}}
 \newcommand{\function}[1]{\texttt{#1()}}
+\newcommand{\variable}[1]{\texttt{#1}}
 \newcommand{\error}[1]{\texttt{#1}}
 \newcommand{\flag}[1]{\textbf{---#1}}
 \newcommand{\flagpar}[2]{\flag{#1} \texttt{<}\textit{#2}\texttt{>}}
@@ -512,6 +513,15 @@ mpatrol library terminates.
 \hfill Lists a source file at a specific line.
 \item[\function{\_\_mp\_view}]
 \hfill Edits or lists a source file.
+\end{description}
+
+\vskip 12pt
+\heading{mpatrol library variables}
+\vskip 6pt
+
+\begin{description}
+\item[\variable{\_\_mp\_errno}]
+\hfill Contains the most recent error code.
 \end{description}
 
 \vskip 12pt

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.201 2001-03-11 23:23:40 graeme Exp $
+@c $Id: mpatrol.texi,v 1.202 2001-03-11 23:49:21 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2718,11 +2718,11 @@ obtained by calling @code{__mp_function()}.
 The mpatrol library records the error code from the most recently encountered
 warning or error in the @code{__mp_errno} global variable.  This variable can be
 read and compared with the known error codes listed in @file{mpatrol.h}.  It can
-also be reset to zero before calling any mpatrol library function in order to
-check to see if a warning or error was encountered during the call.  A string
-representation of the error message corresponding to any mpatrol error code can
-be obtained by calling the @code{__mp_strerror()} function with the specific
-code.
+also be reset to @code{MP_ET_NONE} before calling any mpatrol library function
+in order to check to see if a warning or error was encountered during the call.
+A string representation of the error message corresponding to any mpatrol error
+code can be obtained by calling the @code{__mp_strerror()} function with the
+specific code.
 
 The @code{userdata} field shown in the previous example can be set for any
 memory allocation with the @code{__mp_setuser()} function.  This can have any

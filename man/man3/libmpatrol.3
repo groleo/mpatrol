@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.22 2001-03-11 23:23:41 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.23 2001-03-11 23:49:23 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "11 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -175,6 +175,8 @@ int __mp_logaddr(const void *ptr);
 int __mp_edit(const char *file, unsigned long line);
 int __mp_list(const char *file, unsigned long line);
 int __mp_view(const char *file, unsigned long line);
+
+__mp_errortype __mp_errno;
 .fi
 .SH DESCRIPTION
 The \fImpatrol library\fP contains implementations of dynamic memory
@@ -1065,6 +1067,16 @@ options are not set or if these options are not supported on the system.
 Returns \fI1\fP if the edit or listing was successfully performed, \fI-1\fP if
 there was an error, or \fI0\fP if neither of the options were set or if there is
 no support for this feature.
+.PP
+The following global variable is available for additional control in the mpatrol
+library.  To use it you should include the \fImpatrol.h\fP header file:
+.TP
+\fB__mp_errno\fP
+Contains the most recent error code encountered by the mpatrol library.  Its
+value can be reset to \fIMP_ET_NONE\fP before calling an mpatrol library
+function, and then examined afterwards, either by comparison with the known
+error codes in the \fI__mp_errortype\fP enumeration, or with
+\fB__mp_strerror\fP.
 .SH LINKING
 In order to use the mpatrol library on UNIX platforms, the following libraries
 must be linked in before any other library that defines dynamic memory
