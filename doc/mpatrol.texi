@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.148 2000-11-19 20:38:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.149 2000-11-20 23:05:08 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 19th November, 2000
+@set UPDATED 20th November, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -10202,6 +10202,23 @@ Instruments the heap to provide heap error detection without the need to
 recompile any source code.
 @end table
 
+@cindex HeapCheck
+@item
+HeapCheck
+@table @asis
+@item Author
+Thanassis Tsiodras (@email{ttsiod@@softlab.ntua.gr})
+@item License
+GNU General Public License
+@item Platforms
+Windows
+@item Location
+@uref{http://www.image.ece.ntua.gr/~ttsiod/HeapCheck.html}
+@item Overview
+A debugging memory allocator that can detect invalid read/write accesses to heap
+memory, and also detects memory leaks.
+@end table
+
 @cindex HeapManager
 @item
 HeapManager
@@ -10598,6 +10615,23 @@ Windows
 @uref{http://www.totalqa.com/}
 @item Overview
 A memory and resource leak debugger for Borland's family of Windows compilers.
+@end table
+
+@cindex MemTrace
+@item
+MemTrace
+@table @asis
+@item Author
+Nico Hoogervorst (@email{nico@@knoware.nl})
+@item License
+Free Software
+@item Platforms
+Windows
+@item Location
+@uref{http://utopia.knoware.nl/users/nico/tools/c/memtrace/}
+@item Overview
+A simple enhancement for C source code which makes it easier to find memory
+leaks.
 @end table
 
 @cindex MemWatch

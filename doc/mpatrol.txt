@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
 November, 2000.
 
 Foreword
@@ -9284,6 +9284,24 @@ Netware platforms.
           Instruments the heap to provide heap error detection without
           the need to recompile any source code.
 
+   * HeapCheck
+    Author
+          Thanassis Tsiodras (<ttsiod@softlab.ntua.gr>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Windows
+
+    Location
+          `http://www.image.ece.ntua.gr/~ttsiod/HeapCheck.html'
+
+    Overview
+          A debugging memory allocator that can detect invalid
+          read/write accesses to heap memory, and also detects memory
+          leaks.
+
    * HeapManager
     Author
           Andrew Wulf (<heapmanager@biit.com>)
@@ -9682,6 +9700,23 @@ Netware platforms.
     Overview
           A memory and resource leak debugger for Borland's family of
           Windows compilers.
+
+   * MemTrace
+    Author
+          Nico Hoogervorst (<nico@knoware.nl>)
+
+    License
+          Free Software
+
+    Platforms
+          Windows
+
+    Location
+          `http://utopia.knoware.nl/users/nico/tools/c/memtrace/'
+
+    Overview
+          A simple enhancement for C source code which makes it easier
+          to find memory leaks.
 
    * MemWatch
     Author
@@ -11370,6 +11405,8 @@ heap:                                               See 5.3.
 heap usage:                                         See 11.1.
 HeapAgent:                                         
           See ``Appendix J Related software''.
+HeapCheck:                                         
+          See ``Appendix J Related software''.
 HeapManager:                                       
           See ``Appendix J Related software''.
 HELP:                                              
@@ -11568,6 +11605,8 @@ memory, virtual:                                    See 6.1.
 Memprof:                                           
           See ``Appendix J Related software''.
 Memproof:                                          
+          See ``Appendix J Related software''.
+MemTrace:                                          
           See ``Appendix J Related software''.
 MemWatch:                                          
           See ``Appendix J Related software''.

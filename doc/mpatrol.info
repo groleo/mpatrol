@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 19th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
 November, 2000.
 
 * Menu:
@@ -9572,6 +9572,24 @@ Netware platforms.
           Instruments the heap to provide heap error detection without
           the need to recompile any source code.
 
+   * HeapCheck
+    Author
+          Thanassis Tsiodras (<ttsiod@softlab.ntua.gr>)
+
+    License
+          GNU General Public License
+
+    Platforms
+          Windows
+
+    Location
+          `http://www.image.ece.ntua.gr/~ttsiod/HeapCheck.html'
+
+    Overview
+          A debugging memory allocator that can detect invalid
+          read/write accesses to heap memory, and also detects memory
+          leaks.
+
    * HeapManager
     Author
           Andrew Wulf (<heapmanager@biit.com>)
@@ -9970,6 +9988,23 @@ Netware platforms.
     Overview
           A memory and resource leak debugger for Borland's family of
           Windows compilers.
+
+   * MemTrace
+    Author
+          Nico Hoogervorst (<nico@knoware.nl>)
+
+    License
+          Free Software
+
+    Platforms
+          Windows
+
+    Location
+          `http://utopia.knoware.nl/users/nico/tools/c/memtrace/'
+
+    Overview
+          A simple enhancement for C source code which makes it easier
+          to find memory leaks.
 
    * MemWatch
     Author
@@ -11475,6 +11510,7 @@ Index
 * heap:                                  Dynamic memory allocations.
 * heap usage:                            Example 1.
 * HeapAgent:                             Related software.
+* HeapCheck:                             Related software.
 * HeapManager:                           Related software.
 * HELP:                                  Environment.
 * hexadecimal:                           Environment.
@@ -11605,6 +11641,7 @@ Index
 * memory, virtual:                       Virtual memory.
 * Memprof:                               Related software.
 * Memproof:                              Related software.
+* MemTrace:                              Related software.
 * MemWatch:                              Related software.
 * message passing:                       Threads.
 * MicroQuill:                            Related software.
@@ -12000,10 +12037,10 @@ Node: Linking399461
 Node: Running403733
 Node: Files417369
 Node: Related software420365
-Ref: Related software-Footnote-1454940
-Node: References455181
-Node: Copying457774
-Node: Function index485663
-Node: Index487921
+Ref: Related software-Footnote-1455688
+Node: References455929
+Node: Copying458522
+Node: Function index486411
+Node: Index488669
 
 End Tag Table
