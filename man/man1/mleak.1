@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mleak.1,v 1.14 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: mleak.1,v 1.15 2001-05-07 16:11:18 graeme Exp $
 .\"
-.TH MLEAK 1 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH MLEAK 1 "7 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mleak \- locates memory leaks in an mpatrol log file
 .SH SYNOPSIS
@@ -60,6 +60,11 @@ Displays a quick-reference option summary.
 \fB\-\-ignore\fP [\fB\-i\fP]
 Specifies that the list of unfreed allocations in the log file should be
 ignored.
+.TP
+\fB\-\-max\-stack\fP \fIdepth\fP [\fB\-n\fP]
+Specifies the maximum stack depth to display for each unfreed memory allocation.
+If \fIdepth\fP is \fI0\fP then the call stack depth will be unlimited in size.
+The default call stack depth is \fI0\fP.
 .TP
 \fB\-\-version\fP [\fB\-V\fP]
 Displays the version number of the \fBmleak\fP command.

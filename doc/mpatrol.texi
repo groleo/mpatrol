@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.213 2001-03-22 21:06:13 graeme Exp $
+@c $Id: mpatrol.texi,v 1.214 2001-05-07 16:05:59 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.8
-@set VERSION 1.4.3
-@set UPDATED 22nd March, 2001
+@set EDITION 2.9
+@set VERSION 1.4.4
+@set UPDATED 7th April, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -3601,6 +3601,14 @@ This command will also read the unfreed allocations table produced by the
 the table will be compared with the currently allocated entries and will be
 added if not already present.  However, this behaviour can be disabled by
 supplying the @option{--ignore} option to the @command{mleak} command.
+
+@cindex --max-stack
+The @command{mleak} command can also be instructed to limit the number of lines
+of stack tracing information that it will display for each unfreed memory
+allocation.  This is controlled by the @option{--max-stack} option which takes
+the maximum number of stack trace lines to display as an argument.  If the
+number of lines is given as @samp{0} (the default) then there will be no limit
+to the length of each stack trace.
 
 The @command{mleak} command takes one optional argument which must be a valid
 mpatrol log filename but if it is omitted then it will use @file{mpatrol.log} as
@@ -10888,6 +10896,11 @@ character @samp{A} followed by the allocation index, start address and size in
 bytes of the memory allocation encoded as unsigned LEB128 numbers.
 
 @item
+If the event is a memory reallocation then the event record will begin with the
+character @samp{R} followed by the allocation index, start address and size of
+the new memory allocation encoded as an unsigned LEB128 number.
+
+@item
 If the event is a memory deallocation then the event record will begin with the
 character @samp{F} followed by the allocation index of the memory allocation
 encoded as an unsigned LEB128 number.
@@ -13780,9 +13793,9 @@ David Duncan Ross Palmer (@email{overlord@@daybologic.co.uk})
 @item License
 GNU General Public License
 @item Platforms
-Windows, DOS
+Various UNIX, Windows, MS-DOS
 @item Location
-@uref{http://daybologic.com/Dev/dpcrtlmm/}
+@uref{http://www.daybologic.co.uk/dev/dpcrtlmm/}
 @item Overview
 Detects failures to release memory and attempts to release memory which has not
 been allocated, and can also provide statistics and logging facilities.
