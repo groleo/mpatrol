@@ -486,7 +486,8 @@
 
 
 /* The name of the environment variable which is used to specify a list of
- * shared libraries to preload.
+ * shared libraries to preload, and the string which is used to delimit the
+ * name of every library specified in that environment variable.
  */
 
 #if MP_PRELOAD_SUPPORT
@@ -497,48 +498,100 @@
 #define MP_PRELOAD_NAME "LD_PRELOAD"
 #endif /* SYSTEM */
 #endif /* MP_PRELOAD_NAME */
+
+#ifndef MP_PRELOAD_SEP
+#if SYSTEM == SYSTEM_IRIX
+#define MP_PRELOAD_SEP ":"
+#else /* SYSTEM */
+#define MP_PRELOAD_SEP " "
+#endif /* SYSTEM */
+#endif /* MP_PRELOAD_SEP */
 #endif /* MP_PRELOAD_SUPPORT */
 
 
-/* The list of shared libraries to preload.  These must all exist in the
- * shared library path used by the dynamic linker, otherwise full paths to
- * the libraries must be explicitly given.
+/* The macro function which will be used to calculate the filenames for each
+ * of the shared libraries that must be preloaded.
+ */
+
+#if MP_PRELOAD_SUPPORT
+#ifndef MP_LIBNAME
+#if SYSTEM == SYSTEM_HPUX
+#define MP_LIBNAME(l) "lib" #l ".sl"
+#else /* SYSTEM */
+#define MP_LIBNAME(l) "lib" #l ".so"
+#endif /* SYSTEM */
+#endif /* MP_LIBNAME */
+#endif /* MP_PRELOAD_SUPPORT */
+
+
+/* The filenames of all the different categories of libraries that must be
+ * included in the lists of shared libraries to preload.
+ */
+
+#if MP_PRELOAD_SUPPORT
+#ifndef MP_MPATROL_LIBS
+#define MP_MPATROL_LIBS MP_LIBNAME(mpatrol)
+#endif /* MP_MPATROL_LIBS */
+
+#ifndef MP_MPATROLMT_LIBS
+#define MP_MPATROLMT_LIBS MP_LIBNAME(mpatrolmt)
+#endif /* MP_MPATROLMT_LIBS */
+
+#ifndef MP_SYMBOL_LIBS
+#if FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
+#define MP_SYMBOL_LIBS , MP_LIBNAME(elf)
+#elif FORMAT == FORMAT_BFD
+#define MP_SYMBOL_LIBS , MP_LIBNAME(bfd), MP_LIBNAME(iberty)
+#else /* FORMAT */
+#define MP_SYMBOL_LIBS
+#endif /* FORMAT */
+#endif /* MP_SYMBOL_LIBS */
+
+#ifndef MP_THREADS_LIBS
+#if SYSTEM == SYSTEM_DGUX
+#define MP_THREADS_LIBS , MP_LIBNAME(thread)
+#elif SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
+      SYSTEM == SYSTEM_UNIXWARE
+#define MP_THREADS_LIBS , MP_LIBNAME(pthread)
+#else /* SYSTEM */
+#define MP_THREADS_LIBS
+#endif /* SYSTEM */
+#endif /* MP_THREADS_LIBS */
+
+#ifndef MP_SYSTEM_LIBS
+#if SYSTEM == SYSTEM_HPUX
+#if MP_LIBRARYSTACK_SUPPORT
+#define MP_SYSTEM_LIBS , MP_LIBNAME(cl)
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#define MP_SYSTEM_LIBS
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#elif SYSTEM == SYSTEM_IRIX
+#if MP_LIBRARYSTACK_SUPPORT
+#define MP_SYSTEM_LIBS , MP_LIBNAME(exc), "DEFAULT"
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#define MP_SYSTEM_LIBS , "DEFAULT"
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+#else /* SYSTEM */
+#define MP_SYSTEM_LIBS
+#endif /* SYSTEM */
+#endif /* MP_SYSTEM_LIBS */
+#endif /* MP_PRELOAD_SUPPORT */
+
+
+/* The final lists of normal and thread-safe shared libraries to preload.
+ * These must all exist in the shared library path used by the dynamic linker,
+ * otherwise full paths to the libraries must be explicitly given.
  */
 
 #if MP_PRELOAD_SUPPORT
 #ifndef MP_PRELOAD_LIBS
-#if FORMAT == FORMAT_NONE || FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
-#if SYSTEM == SYSTEM_IRIX
-#if MP_LIBRARYSTACK_SUPPORT
-#define MP_PRELOAD_LIBS "libmpatrol.so:libexc.so:DEFAULT"
-#else /* MP_LIBRARYSTACK_SUPPORT */
-#define MP_PRELOAD_LIBS "libmpatrol.so:DEFAULT"
-#endif /* MP_LIBRARYSTACK_SUPPORT */
-#else /* SYSTEM */
-#define MP_PRELOAD_LIBS "libmpatrol.so"
-#endif /* SYSTEM */
-#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
-#if SYSTEM == SYSTEM_IRIX
-#if MP_LIBRARYSTACK_SUPPORT
-#define MP_PRELOAD_LIBS "libmpatrol.so:libelf.so:libexc.so:DEFAULT"
-#else /* MP_LIBRARYSTACK_SUPPORT */
-#define MP_PRELOAD_LIBS "libmpatrol.so:libelf.so:DEFAULT"
-#endif /* MP_LIBRARYSTACK_SUPPORT */
-#else /* SYSTEM */
-#define MP_PRELOAD_LIBS "libmpatrol.so libelf.so"
-#endif /* SYSTEM */
-#elif FORMAT == FORMAT_BFD
-#if SYSTEM == SYSTEM_IRIX
-#if MP_LIBRARYSTACK_SUPPORT
-#define MP_PRELOAD_LIBS "libmpatrol.so:libbfd.so:libiberty.so:libexc.so:DEFAULT"
-#else /* MP_LIBRARYSTACK_SUPPORT */
-#define MP_PRELOAD_LIBS "libmpatrol.so:libbfd.so:libiberty.so:DEFAULT"
-#endif /* MP_LIBRARYSTACK_SUPPORT */
-#else /* SYSTEM */
-#define MP_PRELOAD_LIBS "libmpatrol.so libbfd.so libiberty.so"
-#endif /* SYSTEM */
-#endif /* FORMAT */
+#define MP_PRELOAD_LIBS MP_MPATROL_LIBS MP_SYMBOL_LIBS MP_SYSTEM_LIBS
 #endif /* MP_PRELOAD_LIBS */
+
+#ifndef MP_PRELOADMT_LIBS
+#define MP_PRELOADMT_LIBS MP_MPATROLMT_LIBS MP_SYMBOL_LIBS MP_THREADS_LIBS \
+                          MP_SYSTEM_LIBS
+#endif /* MP_PRELOADMT_LIBS */
 #endif /* MP_PRELOAD_SUPPORT */
 
 
