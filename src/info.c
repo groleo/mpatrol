@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.32 2000-08-31 20:20:48 graeme Exp $"
+#ident "$Id: info.c,v 1.33 2000-11-02 18:49:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,6 +60,7 @@ void _Inuse_free(void *);
 
 MP_GLOBAL void __mp_newinfo(infohead *h)
 {
+    struct { char x; allocanode y; } w;
     struct { char x; infonode y; } z;
     long n;
 
@@ -74,11 +75,15 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     __mp_newprofile(&h->prof, &h->alloc.heap, &h->syms);
     /* Determine the minimum alignment for an allocation information node
      * on this system and force the alignment to be a power of two.  This
-     * information is used when initialising the slot table.
+     * information is used when initialising the slot table.  Likewise for
+     * the slot table of allocanodes.
      */
     n = (char *) &z.y - &z.x;
     __mp_newslots(&h->table, sizeof(infonode), __mp_poweroftwo(n));
+    n = (char *) &w.y - &w.x;
+    __mp_newslots(&h->atable, sizeof(allocanode), __mp_poweroftwo(n));
     __mp_newlist(&h->list);
+    __mp_newlist(&h->alist);
     /* Initialise the settings to their default values.
      */
     h->size = h->count = h->peak = h->limit = 0;
@@ -130,7 +135,10 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     __mp_deleteallocs(&h->alloc);
     h->table.free = NULL;
     h->table.size = 0;
+    h->atable.free = NULL;
+    h->atable.size = 0;
     __mp_newlist(&h->list);
+    __mp_newlist(&h->alist);
     h->size = h->count = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->delpos = 0;
@@ -161,6 +169,34 @@ static infonode *getinfonode(infohead *h)
         n->index.size = p->size;
         h->size += p->size;
         n = (infonode *) __mp_getslot(&h->table);
+    }
+    return n;
+}
+
+
+/* Allocate a new allocanode.
+ */
+
+static allocanode *getallocanode(infohead *h)
+{
+    allocanode *n;
+    heapnode *p;
+
+    /* If we have no more allocanode slots left then we must allocate some more
+     * memory for them.  An extra MP_ALLOCFACTOR pages of memory should suffice.
+     */
+    if ((n = (allocanode *) __mp_getslot(&h->atable)) == NULL)
+    {
+        if ((p = __mp_heapalloc(&h->alloc.heap, h->alloc.heap.memory.page *
+              MP_ALLOCFACTOR, h->atable.entalign)) == NULL)
+            return NULL;
+        __mp_initslots(&h->atable, p->block, p->size);
+        n = (allocanode *) __mp_getslot(&h->atable);
+        __mp_addtail(&h->alist, &n->node);
+        n->block = p->block;
+        n->data.size = p->size;
+        h->size += p->size;
+        n = (allocanode *) __mp_getslot(&h->atable);
     }
     return n;
 }
@@ -791,6 +827,7 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
 
 MP_GLOBAL int __mp_protectinfo(infohead *h, memaccess a)
 {
+    allocanode *m;
     infonode *n;
 
     /* The library already knows what its protection status is so we don't
@@ -803,6 +840,10 @@ MP_GLOBAL int __mp_protectinfo(infohead *h, memaccess a)
          n = (infonode *) n->index.node.next)
         if (!__mp_memprotect(&h->alloc.heap.memory, n->index.block,
              n->index.size, a))
+            return 0;
+    for (m = (allocanode *) h->alist.head; m->node.next != NULL;
+         m = (allocanode *) m->node.next)
+        if (!__mp_memprotect(&h->alloc.heap.memory, m->block, m->data.size, a))
             return 0;
     if (!__mp_protectaddrs(&h->addr, a) || !__mp_protectprofile(&h->prof, a))
         return 0;

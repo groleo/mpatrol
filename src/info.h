@@ -176,7 +176,9 @@ typedef struct infohead
     sighead signals;                  /* signal handler table */
     profhead prof;                    /* profiling information */
     slottable table;                  /* table of information nodes */
+    slottable atable;                 /* table of allocanodes */
     listhead list;                    /* internal allocation list */
+    listhead alist;                   /* internal allocanode list */
     size_t size;                      /* internal allocation total */
     size_t count;                     /* allocation count */
     size_t peak;                      /* allocation peak */
