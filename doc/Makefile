@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.1 1999-11-10 20:27:36 graeme Exp $
+# $Id: Makefile,v 1.2 1999-11-14 11:41:52 graeme Exp $
 
 
 # Definitions
@@ -33,7 +33,7 @@ VERBOSE  = false
 
 # Rules
 
-.SUFFIXES: .texi .info .html .dvi .ps .pdf
+.SUFFIXES: .texi .info .html .dvi .ps .pdf .jpg .eps
 
 # Build the info file from the Texinfo file using makeinfo
 
@@ -47,7 +47,7 @@ endif
 
 # Build the HTML file from the Texinfo file using makeinfo
 
-$(DOCUMENT).html: $(DOCUMENT).texi
+$(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ makeinfo --html --number-sections --verbose $<
@@ -57,7 +57,7 @@ endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).dvi: $(DOCUMENT).texi
+$(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT).eps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ texi2dvi --batch --clean --verbose $<
@@ -75,11 +75,15 @@ else
 	@ dvips -q -o $@ $<
 endif
 
-# Build the PDF file from the postscript file using ps2pdf
+# Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).ps
+$(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT).pdf
 	@ echo creating $@ from $<...
-	@ ps2pdf $< $@
+ifeq ($(VERBOSE),true)
+	@ texi2dvi --pdf --batch --clean --verbose $<
+else
+	@ texi2dvi --pdf --batch --clean --quiet $<
+endif
 
 all: $(DOCUMENT).info $(DOCUMENT).html $(DOCUMENT).dvi $(DOCUMENT).ps \
 	$(DOCUMENT).pdf

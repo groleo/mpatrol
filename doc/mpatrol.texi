@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.1 1999-11-10 19:59:33 graeme Exp $
+@c $Id: mpatrol.texi,v 1.2 1999-11-14 11:41:53 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,6 +22,10 @@
 @set EDITION 1.0
 @set VERSION 1.0.5
 @set UPDATED 10th November, 1999
+
+@ifhtml
+@image{images/mpatrol}
+@end ifhtml
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -62,6 +66,8 @@ library are the trademarks of their respective owners.
 @subtitle A library for controlling and tracing dynamic memory allocations
 @subtitle Edition @value{EDITION} for mpatrol version @value{VERSION}
 @subtitle @value{UPDATED}
+@sp 5
+@image{images/mpatrol}
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
