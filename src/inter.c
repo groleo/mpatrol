@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.83 2001-02-15 21:32:36 graeme Exp $"
+#ident "$Id: inter.c,v 1.84 2001-02-15 21:33:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.83 2001-02-15 21:32:36 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.84 2001-02-15 21:33:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1621,7 +1621,7 @@ __mp_check(void)
 void
 (*__mp_prologue(void (*h)(void *, size_t, void *)))(void *, size_t, void *)
 {
-    void (*p)(void *, size_t);
+    void (*p)(void *, size_t, void *);
 
     savesignals();
     if (!memhead.init)
@@ -1639,7 +1639,7 @@ void
 void
 (*__mp_epilogue(void (*h)(void *, void *)))(void *, void *)
 {
-    void (*p)(void *);
+    void (*p)(void *, void *);
 
     savesignals();
     if (!memhead.init)
