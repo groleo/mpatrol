@@ -2,7 +2,7 @@
 
 @c mpatrol
 @c A library for controlling and tracing dynamic memory allocations.
-@c Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+@c Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 @c
 @c This library is free software; you can redistribute it and/or
 @c modify it under the terms of the GNU Library General Public
@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.232 2001-08-22 23:06:39 graeme Exp $
+@c $Id: mpatrol.texi,v 1.233 2001-08-23 23:05:29 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,13 +37,13 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 22nd August, 2001
+@set UPDATED 23rd August, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
 memory allocations.
 
-Copyright @copyright{} 1997-2001 Graeme S. Roy @email{graeme@@epc.co.uk}
+Copyright @copyright{} 1997-2001 Graeme S. Roy @email{graeme.roy@@analog.com}
 
 This is edition @value{EDITION} of the mpatrol manual for version
 @value{VERSION}, @value{UPDATED}.
@@ -83,7 +83,7 @@ library are the trademarks of their respective owners.
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1997-2001 Graeme S. Roy <@email{graeme@@epc.co.uk}>
+Copyright @copyright{} 1997-2001 Graeme S. Roy <@email{graeme.roy@@analog.com}>
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -226,8 +226,8 @@ is also registered at FreshMeat (@uref{http://freshmeat.net/projects/mpatrol/})
 and SourceForge (@uref{http://sourceforge.net/projects/mpatrol/}) and several
 other software sites so you can receive notification of updates there as well.
 I normally only check my e-mail about once or twice a week, so don't expect an
-immediate response.  I can also be reached at @email{graeme@@epc.co.uk} but that
-is my work e-mail address.  There is also a discussion group at
+immediate response.  I can also be reached at @email{graeme.roy@@analog.com} but
+that is my work e-mail address.  There is also a discussion group at
 @uref{http://groups.yahoo.com/group/mpatrol/} where you can post mpatrol-related
 questions but you must first subscribe to the group before you can send mail to
 it.
@@ -239,18 +239,19 @@ his help on reading debugging information from object files via the GNU BFD
 library, and Adam Zell (@email{zell@@best.com}) for helping with patching the
 dynamic linker support functions for loading shared libraries.  Both Alexander
 Barton (@email{abarton@@innotrac.com}) and Dave Gibson
-(@email{david@@epc.co.uk}) helped to make mpatrol thread-safe.  Roger Keane
-(@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym} command
-and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve McIntyre
-(@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the @code{fork()}
-problem and provided example code on how to fix it.  Boris Makushkin
-(@email{oberon@@antibiotic.ru}) requested, helped with, and provided initial
-testing for the FreeBSD port, and Ivan Finch (@email{i.finch@@rl.ac.uk}) and
-Andreas Schallenberg (@email{andreas.schallenberg@@informatik.uni-oldenburg.de})
-did the same for the Tru64 and SuSE ports.  Both Aleksandar Donev
-(@email{donev@@pa.msu.edu}) and Van Snyder (@email{vsnyder@@math.jpl.nasa.gov})
-provided suggestions and code for using mpatrol with FORTRAN.  Michael Anthony
-(@email{m@@xyzfind.com}) wrote the profdiff tool.
+(@email{david.gibson@@analog.com}) helped to make mpatrol thread-safe.  Roger
+Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
+command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve
+McIntyre (@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the
+@code{fork()} problem and provided example code on how to fix it.  Boris
+Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
+initial testing for the FreeBSD port, and Ivan Finch (@email{i.finch@@rl.ac.uk})
+and Andreas Schallenberg
+(@email{andreas.schallenberg@@informatik.uni-oldenburg.de}) did the same for the
+Tru64 and SuSE ports.  Both Aleksandar Donev (@email{donev@@pa.msu.edu}) and Van
+Snyder (@email{vsnyder@@math.jpl.nasa.gov}) provided suggestions and code for
+using mpatrol with FORTRAN.  Michael Anthony (@email{m@@xyzfind.com}) wrote the
+profdiff tool.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today

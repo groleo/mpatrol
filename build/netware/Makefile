@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.58 2001-05-23 20:23:44 graeme Exp $
+# $Id: Makefile,v 1.59 2001-08-23 23:08:58 graeme Exp $
 
 
 # Definitions

@@ -3,7 +3,7 @@
 
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -26,7 +26,7 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.8 2001-03-08 18:20:13 graeme Exp $
+# $Id: mpsym,v 1.9 2001-08-23 23:10:59 graeme Exp $
 
 
 # Program version.

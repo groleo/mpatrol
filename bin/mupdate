@@ -3,7 +3,7 @@
 
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.15 2001-02-28 00:51:26 graeme Exp $
+# $Id: mupdate,v 1.16 2001-08-23 23:10:59 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -96,7 +96,7 @@ cvs commit -m "Updated to version $release" src/version.c >/dev/null 2>&1
 # Update the ChangeLog and NEWS files with all the changes since the last
 # release.
 
-rcs2log -R -u 'graeme:Graeme Roy:graeme@epc.co.uk' >ChangeLog.new 2>/dev/null
+rcs2log -R -u 'graeme:Graeme Roy:graeme.roy@analog.com' >ChangeLog.new 2>/dev/null
 cp ChangeLog.new NEWS.new
 cat ChangeLog >>ChangeLog.new
 cat NEWS >>NEWS.new
