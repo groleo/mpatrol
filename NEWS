@@ -1,3 +1,35 @@
-Changes for 1.0 (11th October, 1999)
+Changes for 1.0.4 (21st October, 1999)
 
-* First public release.
+  * Added the CHECK option.
+
+
+Changes for 1.0.3 (19th October, 1999)
+
+  * Improved library performance.
+
+  * Added library performance figures.
+
+  * Added total number of warnings and errors to summary.
+
+
+Changes for 1.0.2 (15th October, 1999)
+
+  * Added the USEMMAP option for UNIX platforms so that mmap() can be used
+    instead of sbrk() to allocate heap memory on systems that support it.
+
+
+Changes for 1.0.1 (13th October, 1999)
+
+  * A bug that appeared when the mpatrol library was statically linked on a UNIX
+    system that defaults to dynamic linking has been fixed.
+
+  * A potential problem with losing details of some free memory blocks when the
+    library runs out of system memory has been fixed.
+
+  * Added a new examples document which illustrates the features of the mpatrol
+    library with annotated examples.
+
+
+Changes for 1.0.0 (11th October, 1999)
+
+  * First public release.
