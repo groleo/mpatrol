@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.8 2000-04-06 17:59:28 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.9 2000-04-06 19:26:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -587,6 +587,12 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     free(s);
+#if (TARGET == TARGET_AMIGA && defined(__GNUC__))
+    /* When gcc is used on AmigaOS, the return value from system() is similar
+     * to that on UNIX, so we need to modify it here.
+     */
+    r = ((unsigned int) r >> 8) & 0xFF;
+#endif /* TARGET && __GNUC__ */
 #endif /* TARGET */
     return r;
 }
