@@ -32,6 +32,7 @@
 
 
 void *buffer = NULL;
+int freed = 0;
 
 
 void handler(void)
@@ -45,29 +46,30 @@ void handler(void)
     free(buffer);
     fputs("successfully freed buffer\n", stderr);
     buffer = NULL;
+    freed = 1;
 }
 
 
 int main(void)
 {
     void *p;
+    int r;
 
+    r = EXIT_SUCCESS;
     __mp_nomemory(handler);
     buffer = malloc(1048576);
-    if (p = malloc(1048576))
+    p = malloc(1048576);
+    if ((p != NULL) && freed)
+        fputs("test passed\n", stderr);
+    else
     {
         fputs("test failed\n", stderr);
         fputs("set LIMIT=1572864\n", stderr);
-        free(p);
+        r = EXIT_FAILURE;
     }
-    else if (p = malloc(1048576))
-    {
-        fputs("test passed\n", stderr);
+    if (p != NULL)
         free(p);
-    }
-    else
-        fputs("test failed\n", stderr);
-    if (buffer)
+    if (buffer != NULL)
         free(buffer);
-    return EXIT_SUCCESS;
+    return r;
 }
