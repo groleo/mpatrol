@@ -111,9 +111,10 @@
 #endif /* MP_BREAK_SIZE */
 
 
-/* The size of the input line buffer in the mleak tool.  If any of the lines
- * in the log file are longer than this then an error message will be generated
- * and mleak will terminate.
+/* The size of the input line buffer in the mptrace and mleak tools.  If any of
+ * the entries in the tracing output file or any of the lines in the log file
+ * are longer than this then an error message will be generated and mptrace or
+ * mleak will terminate.
  */
 
 #ifndef MP_BUFFER_SIZE
