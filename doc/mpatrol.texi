@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.186 2001-02-20 23:46:15 graeme Exp $
+@c $Id: mpatrol.texi,v 1.187 2001-02-21 10:50:14 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.5
 @set VERSION 1.4.0
-@set UPDATED 20th February, 2001
+@set UPDATED 21st February, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -924,18 +924,14 @@ located there.  The @file{mpatrol.texi} file contains the @TeX{}info source for
 this manual and can be translated into a wide variety of documentation formats.
 The @file{refcard.tex} file contains the La@TeX{} source for the quick reference
 card and can be translated into formats suitable for printing onto a few pages.
-There may already be translated files in the @file{doc} directory, but if not
-you will either have to generate them yourself using an appropriate tool or you
-could download an archive containing the latest mpatrol manual and reference
-card in a variety of documentation formats from the mpatrol home page.  You can
-then install or print these documents.
+There should already be translated files in the @file{doc} directory, but if not
+you will have to generate them yourself using the @file{Makefile} provided.  You
+can then install or print these documents.
 
 If you are not installing on a system that supports UNIX manual pages then you
-can also check in the @file{man} directory to see if there are alternative
-formats for the mpatrol manual pages that you can install.  If not, you may be
-able to generate them yourself, or you can download an archive containing the
-latest mpatrol manual pages in a variety of documentation formats from the
-mpatrol home page.
+should also check in the @file{man} directory to ensure that there are
+alternative formats for the mpatrol manual pages that you can install.  If not,
+you will have to generate them yourself using the @file{Makefile} provided.
 @end enumerate
 
 @cindex PKG package
@@ -4495,6 +4491,15 @@ call to @code{malloc()}, and don't assume that the contents of a newly
 allocated memory block will be zeroed unless you created it with
 @code{calloc()}.
 
+Try to avoid allocating arrays on the stack if they are to hold data that may
+overflow.  In most cases this is common sense, but sometimes you may allocate
+an array that should suffice for 99% of the time.  However, if there is a 1%
+chance that it may overflow then on some systems the stack is executable and
+hackers can use that @emph{feature} to break into a secure program by
+overwriting the current function's return address on the stack.  Use
+statically-allocated or dynamically-allocated arrays for these situations, or
+better still, check for overflow.
+
 @cindex stress testing
 Finally, try stress-testing your program in low memory conditions.  The mpatrol
 library contains the @option{LIMIT} option which can place an upper bound on the
@@ -4796,7 +4801,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.4.0 (01/02/20)
+@@(#) mpatrol 1.4.0 (01/02/21)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -4806,7 +4811,7 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
-Log file generated on Tue Feb 20 21:56:05 2001
+Log file generated on Wed Feb 21 21:56:05 2001
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.4
 read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so
@@ -11006,12 +11011,12 @@ can view or print.  What am I doing wrong?
 
 You'll need to have the appropriate document formatting programs installed on
 your system before you can do this, and even then you'll also need to have
-suitable software for viewing or printing the formatted documents.  You can
-download an archive containing the latest mpatrol manual in a variety of formats
-from @uref{http://www.cbmamiga.demon.co.uk/mpatrol/} and this will also contain
-a file telling you where to get programs that can be used to view or print these
-files.  Alternatively, you can browse the latest mpatrol manual on-line at the
-same site.
+suitable software for viewing or printing the formatted documents.  The mpatrol
+distribution should already contain the latest mpatrol manual in a variety of
+formats and should also contain a file telling you where to get programs that
+can be used to view or print these files.  Alternatively, you can browse the
+latest mpatrol manual on-line at
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/}.
 
 @cindex DocBook
 @item
@@ -11071,9 +11076,8 @@ Alternatively, the mpatrol manual pages can be built in a variety of different
 documentation formats that can be viewed or printed without the need for a
 @command{man} command.  If you have the correct tools installed on your system
 then you should be able to do this by examining the @file{Makefile} in the
-@file{man} directory.  If not, you can always download an archive containing the
-latest mpatrol manual pages in a variety of formats from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/} and this will also contain a
+@file{man} directory.  The mpatrol distribution should already contain the
+latest mpatrol manual pages in a variety of formats and should also contain a
 file telling you where to get programs that can be used to view or print these
 files.
 
