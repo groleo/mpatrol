@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.100 2001-02-27 01:57:00 graeme Exp $
+ * $Id: mpatrol.h,v 1.101 2001-02-27 23:14:40 graeme Exp $
  */
 
 
@@ -60,6 +60,19 @@
 #define MP_CONST
 #endif /* __STDC__ && __cplusplus */
 #endif /* MP_CONST */
+
+
+/* A macro for representing a volatile object that may not have any loads
+ * from it or stores to it optimised away.
+ */
+
+#ifndef MP_VOLATILE
+#if defined(__STDC__) || defined(__cplusplus)
+#define MP_VOLATILE volatile
+#else /* __STDC__ && __cplusplus */
+#define MP_VOLATILE
+#endif /* __STDC__ && __cplusplus */
+#endif /* MP_VOLATILE */
 
 
 /* A macro for determining the alignment of a type at compile-time.
