@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.56 2001-02-05 22:11:00 graeme Exp $
+# $Id: Makefile,v 1.57 2001-02-05 22:19:38 graeme Exp $
 
 
 # Definitions
@@ -48,10 +48,10 @@ REVISION = 3
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
 
@@ -329,6 +329,13 @@ inter.t.o inter.s.t.o inter.t.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/machine.h
 malloc.o malloc.s.o malloc.n.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
 	$(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
+	$(SOURCE)/trace.h
+cplus.o cplus.s.o cplus.n.ln cplus.t.o cplus.s.t.o cplus.t.ln: \
+	$(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \

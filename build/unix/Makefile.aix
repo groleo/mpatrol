@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.14 2001-02-05 22:11:00 graeme Exp $
+# $Id: Makefile.aix,v 1.15 2001-02-05 22:19:38 graeme Exp $
 
 
 # Definitions
@@ -46,10 +46,10 @@ MPALLOC	 = mpalloc
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
 
@@ -296,6 +296,12 @@ malloc.o malloc.n.ln malloc.t.o malloc.t.ln: $(SOURCE)/malloc.c \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/profile.h $(SOURCE)/trace.h
+cplus.o cplus.n.ln cplus.t.o cplus.t.ln: $(SOURCE)/cplus.c $(SOURCE)/inter.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/profile.h $(SOURCE)/trace.h
 version.o version.n.ln version.t.o version.t.ln: $(SOURCE)/version.c \
 	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
 machine.o machine.t.o: $(SOURCE)/machine.c $(SOURCE)/config.h $(SOURCE)/target.h

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.54 2001-02-05 22:11:01 graeme Exp $
+# $Id: Makefile,v 1.55 2001-02-05 22:19:39 graeme Exp $
 
 
 # Definitions
@@ -44,23 +44,23 @@ MPALLOC	= mpalloc
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
 		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj sbrk.obj version.obj
+		  inter.obj malloc.obj cplus.obj sbrk.obj version.obj
 SHARED_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
 		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj sbrk.obj main.obj version.obj
+		  inter.obj malloc.obj cplus.obj sbrk.obj main.obj version.obj
 ARCHTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
-		  sbrk.ts.obj version.ts.obj
+		  cplus.ts.obj sbrk.ts.obj version.ts.obj
 SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
-		  sbrk.ts.obj main.ts.obj version.ts.obj
+		  cplus.ts.obj sbrk.ts.obj main.ts.obj version.ts.obj
 ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj
 SHARED_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
@@ -263,6 +263,12 @@ malloc.obj malloc.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/profile.h $(SOURCE)/trace.h
+cplus.obj cplus.ts.obj: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
+	$(SOURCE)/trace.h
 sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
         $(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 main.obj main.ts.obj: main.c $(SOURCE)/inter.h $(SOURCE)/config.h \

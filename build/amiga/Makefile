@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.47 2001-02-05 22:10:58 graeme Exp $
+# $Id: Makefile,v 1.48 2001-02-05 22:19:37 graeme Exp $
 
 
 # Definitions
@@ -41,11 +41,11 @@ MPALLOC	= mpalloc
 
 ARCHIVE_MPTOBJS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-		  profile.o trace.o inter.o malloc.o sbrk.o version.o
+		  profile.o trace.o inter.o malloc.o cplus.o sbrk.o version.o
 ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
-		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
+		  trace.t.o inter.t.o malloc.t.o cplus.t.o sbrk.t.o version.t.o
 ARCHIVE_MPAOBJS	= mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o \
 		  mpstrdup.o mprealloc.o
 
@@ -218,6 +218,12 @@ inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h $(SOURCE)/sbrk.h \
 	$(SOURCE)/profile.h $(SOURCE)/trace.h $(SOURCE)/machine.h
 malloc.o malloc.t.o: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
+	$(SOURCE)/trace.h
+cplus.o cplus.t.o: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
