@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.83 2001-09-26 22:18:21 graeme Exp $"
+#ident "$Id: diag.c,v 1.84 2001-09-26 22:47:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.83 2001-09-26 22:18:21 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.84 2001-09-26 22:47:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -492,7 +492,6 @@ __mp_openlogfile(char *s)
          * file as stderr, which should always work.
          */
         logfile = stderr;
-        __mp_diagflags &= ~FLG_HTML;
         __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         return 0;
     }
@@ -519,8 +518,15 @@ __mp_openlogfile(char *s)
     {
         __mp_diag("<HTML>\n");
         __mp_diag(" <HEAD>\n");
+        __mp_diag("  <TITLE>\n");
+        __mp_diag("   mpatrol log\n");
+        __mp_diag("  </TITLE>\n");
         __mp_diag(" </HEAD>\n");
         __mp_diag(" <BODY>\n");
+        __mp_diag("  <H3>\n");
+        __mp_diag("   mpatrol log\n");
+        __mp_diag("  </H3>\n");
+        __mp_diag("  <P>\n");
     }
     return 1;
 }
