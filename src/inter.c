@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.156 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: inter.c,v 1.157 2005-03-09 23:59:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.156 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.157 2005-03-09 23:59:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1457,7 +1457,10 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         m = 1;
     }
     if (!memhead.init || memhead.fini)
-        return __mp_memfind(p, l, q, m);
+        if ((f == AT_MEMMEM) && (m == 0))
+            return p;
+        else
+            return __mp_memfind(p, l, q, m);
     savesignals();
     if (__mp_processid() != memhead.pid)
         __mp_reinit();

@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.102 2005-03-09 23:32:05 graeme Exp $"
+#ident "$Id: info.c,v 1.103 2005-03-09 23:59:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.102 2005-03-09 23:32:05 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.103 2005-03-09 23:59:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1025,7 +1025,10 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m, loginfo *v)
      */
     if (__mp_checkrange(h, p, l, v) && __mp_checkrange(h, q, m, v))
     {
-        r = __mp_memfind(p, l, q, m);
+        if ((v->type == AT_MEMMEM) && (m == 0))
+            r = p;
+        else
+            r = __mp_memfind(p, l, q, m);
         h->ltotal += m;
     }
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
