@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.210 2001-03-21 21:36:57 graeme Exp $
+@c $Id: mpatrol.texi,v 1.211 2001-03-21 23:14:47 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3747,16 +3747,24 @@ constants that can be used as debugging aids:
 @tab @code{0xa110ca7e}
 @item badlabel
 @tab @code{0xbad1abe1}
+@item baseball
+@tab @code{0xba5eba11}
 @item codebabe
 @tab @code{0xc0debabe}
+@item codedbad
+@tab @code{0xc0dedbad}
 @item deadbeef
 @tab @code{0xdeadbeef}
+@item deadcode
+@tab @code{0xdeadc0de}
 @item failsafe
 @tab @code{0xfa115afe}
 @item feedface
 @tab @code{0xfeedface}
 @item freedata
 @tab @code{0xf4eeda7a}
+@item goodcode
+@tab @code{0x600dc0de}
 @end multitable
 
 As can be seen above, many decimal digits can be used to represent the letters
@@ -11562,12 +11570,15 @@ is defined and the only way to set the watchpoints is via a file in the
 
 Finally, you should add support for determining the system page size in
 @code{pagesize()} and the process identifier for the current process in
-@code{__mp_processid()} if the system is not already supported.  You will also
-have to add a way to determine the filename that the current process was invoked
-with in @code{progname()}, otherwise the @option{PROGFILE} option will always
-have to be used in order to read symbols from the executable file.  This can be
-done in a multitude of ways, including examining global variables, making
-function calls to query the system or traversing the call stack.
+@code{__mp_processid()} if the system is not already supported@footnote{You will
+also have to make any changes to @code{pagesize()} in @file{src/mpalloc.c} and
+possibly also have to define @code{MP_MEMALIGN_SUPPORT} in @file{src/config.h}
+if the new system supports the @code{memalign()} function.}.  You will also have
+to add a way to determine the filename that the current process was invoked with
+in @code{progname()}, otherwise the @option{PROGFILE} option will always have to
+be used in order to read symbols from the executable file.  This can be done in
+a multitude of ways, including examining global variables, making function calls
+to query the system or traversing the call stack.
 
 @item
 Make any required changes in @file{src/stack.c} in order to support stack
@@ -11782,6 +11793,40 @@ the @code{__mp_lib*} definitions in @file{src/inter.c} and the
 @code{AC_CHECK_LIB()} calls in @file{extra/mpatrol.m4}.
 
 @item
+Make any required changes to @file{src/diag.c} in order to support the new
+system.
+
+If the directory separation characters used by filesystem pathnames on the new
+system are different to those already supported then you must modify
+@code{processfile()}, @code{__mp_logfile()}, @code{__mp_proffile()} and
+@code{__mp_tracefile()} in order to support them.  The mpatrol library needs to
+know how to extract and join the directory and filename components in a pathname
+in order to support the special characters that may appear in the filenames
+specified in the @option{LOGFILE}, @option{PROFFILE} and @option{TRACEFILE}
+options.
+
+@item
+Make any required changes to @file{src/version.c} in order to support the new
+system.
+
+Different operating systems have different ways of embedding version information
+into libraries.  For example, on AmigaOS the @command{version} command looks for
+the @samp{$VER:} string in a binary file and displays any information following
+it.  If the new system uses a special format for embedding version information
+then an alternative definition for @code{__mp_version} should be added to
+@file{src/version.c}.  It might also be useful to make any necessary changes to
+the @command{mupdate} shell script in the @file{bin} directory in order to
+support the new format, although that is not strictly required as it is only
+used when building automated mpatrol releases.
+
+The RCS revision string of each mpatrol source file can also be embedded into
+the mpatrol library and its tools.  The way this is done is controlled by the
+@code{MP_IDENT_SUPPORT} macro in @file{src/config.h}.  If it is set then the
+system supports placing these strings in a special section in the object file
+via the @code{#ident} directive, otherwise the strings will be placed in a data
+section in the object file.
+
+@item
 Make any required changes in @file{src/mpatrol.c} in order to support executing
 external commands.
 
@@ -11818,6 +11863,43 @@ support but if you wish to add support for a new window system then it shouldn't
 be too hard to do.  Note that you will probably have to add additional libraries
 to the @file{Makefile} when building @command{mptrace} with
 @code{MP_GUI_SUPPORT} defined.
+
+@item
+Make any required changes to the shell scripts in the @file{bin} directory.
+
+The @command{mpsym}, @command{mpedit} and @command{hexwords} commands all
+require UNIX systems, or UNIX tools, to run.  If the new system has the ability
+to run these commands then you should check that they run as expected.  If not,
+you should make the necessary modifications to make them work, although it
+should be in a generic fashion as there are no checks for specific platforms or
+processors in these files.  You may also wish to add support for other debuggers
+in @command{mpsym} and other editors in @command{mpedit}.
+
+@item
+Add a new subdirectory to the @file{build} directory if a new operating system
+is being supported.
+
+A new @file{Makefile} should be added in the new subdirectory along with any
+extra system-specific files that might be needed to build the mpatrol library
+on the new system.  The new @file{Makefile} should be based upon one of the
+existing @file{Makefiles} in the other subdirectories but should obviously
+differ in the platform-dependent areas.  You may wish to add more than one
+@file{Makefile} to support different types of compilers on the new operating
+system.
+
+You must also decide which object files should get built into the mpatrol
+library.  If it is not safe to override the system @code{malloc()} routines on
+the new system then you should not include @file{src/malloc.c}, and the same
+goes for @file{src/cplus.c} and the C++ operators.  If there is no @code{sbrk()}
+function provided on the new operating system then you should include
+@file{src/sbrk.c} if you need to call @code{sbrk()} in @file{src/inter.c}.
+
+If the new operating system uses a special archive or package format then you
+should add support for it by adding a new subdirectory to the @file{pkg}
+directory.  A @file{build} script should be added to the new subdirectory that
+will automatically build the archive or package file from scratch.  Include any
+additional files that you need to perform the build in the new subdirectory as
+well.
 @end enumerate
 
 @node Notes, Frequently asked questions, Porting, Top
