@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.39 2001-02-10 16:45:39 graeme Exp $
+ * $Id: info.h,v 1.40 2001-02-12 19:27:58 graeme Exp $
  */
 
 
@@ -193,6 +193,7 @@ typedef union infonode
         addrnode *stack;       /* call stack details */
         char *typestr;         /* type stored in allocation */
         size_t typesize;       /* size of type stored in allocation */
+        void *userdata;        /* user data associated with allocation */
         unsigned long flags;   /* allocation flags */
     }
     data;
