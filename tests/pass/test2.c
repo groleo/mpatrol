@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 
-void prologue(void *p, size_t l)
+void prologue(const void *p, size_t l)
 {
     if (p == (void *) -1)
         fprintf(stderr, "allocating %lu bytes\n", l);
@@ -43,7 +43,7 @@ void prologue(void *p, size_t l)
 }
 
 
-void epilogue(void *p)
+void epilogue(const void *p)
 {
     if (p != (void *) -1)
         fprintf(stderr, "allocation returns 0x%08lX\n", p);

@@ -51,7 +51,7 @@ int main(void)
 {
     char *b, *s;
 
-    b = malloc(BUFSIZ);
+    b = (char *) malloc(BUFSIZ);
     while (gets(b))
     {
         s = strtoupper(b);

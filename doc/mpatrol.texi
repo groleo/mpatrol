@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.45 2000-03-23 20:28:23 graeme Exp $
+@c $Id: mpatrol.texi,v 1.46 2000-04-02 14:28:05 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.7
-@set VERSION 1.1.3
-@set UPDATED 23rd March, 2000
+@set EDITION 1.8
+@set VERSION 1.1.4
+@set UPDATED 2nd April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -1953,7 +1953,7 @@ code is an example of this and can be found in @file{tests/pass/test2.c}.
 30  #include <stdio.h>
 
 
-33  void prologue(void *p, size_t l)
+33  void prologue(const void *p, size_t l)
 34  @{
 35      if (p == (void *) -1)
 36          fprintf(stderr, "allocating %lu bytes\n", l);
@@ -1966,7 +1966,7 @@ code is an example of this and can be found in @file{tests/pass/test2.c}.
 43  @}
 
 
-46  void epilogue(void *p)
+46  void epilogue(const void *p)
 47  @{
 48      if (p != (void *) -1)
 49          fprintf(stderr, "allocation returns 0x%08lX\n", p);
@@ -3618,7 +3618,7 @@ also be found in @file{tests/tutorial/test1.c}.
 51  @{
 52      char *b, *s;
 
-54      b = malloc(BUFSIZ);
+54      b = (char *) malloc(BUFSIZ);
 55      while (gets(b))
 56      @{
 57          s = strtoupper(b);
@@ -3846,7 +3846,7 @@ program.  It can also be found in @file{tests/tutorial/test2.c}.
 56  @{
 57      char *b, *s;
 
-59      b = malloc(BUFSIZ);
+59      b = (char *) malloc(BUFSIZ);
 60      while (gets(b))
 61      @{
 62          s = strtoupper(b);
