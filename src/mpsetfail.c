@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpsetfail.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mpsetfail.c,v 1.3 2001-08-01 21:31:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpsetfail_id = "$Id: mpsetfail.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpsetfail_id = "$Id: mpsetfail.c,v 1.3 2001-08-01 21:31:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,6 +50,7 @@ extern __mp_failhandler __mp_failure;
 /* Set the allocation failure handler and return the previous setting.
  */
 
+MP_API
 __mp_failhandler
 __mp_setfailhandler(__mp_failhandler h)
 {

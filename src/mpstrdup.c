@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpstrdup.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mpstrdup.c,v 1.3 2001-08-01 21:31:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpstrdup_id = "$Id: mpstrdup.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpstrdup_id = "$Id: mpstrdup.c,v 1.3 2001-08-01 21:31:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -51,6 +51,7 @@ extern __mp_failhandler __mp_failure;
 /* Duplicate an existing string using memory from the heap and abort on failure.
  */
 
+MP_API
 char *
 __mp_xstrdup(MP_CONST char *r, MP_CONST char *s, MP_CONST char *t,
              unsigned long u)

@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.29 2001-02-06 21:58:42 graeme Exp $"
+#ident "$Id: malloc.c,v 1.30 2001-08-01 21:29:02 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.29 2001-02-06 21:58:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.30 2001-08-01 21:29:02 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,6 +50,7 @@ extern "C"
 #undef malloc
 #endif /* malloc */
 
+MP_API
 void *
 malloc(size_t l)
 {
@@ -58,6 +59,7 @@ malloc(size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(malloc)(size_t l)
 {
@@ -74,6 +76,7 @@ MP_ALTFUNCNAME(malloc)(size_t l)
 #undef calloc
 #endif /* calloc */
 
+MP_API
 void *
 calloc(size_t l, size_t n)
 {
@@ -82,6 +85,7 @@ calloc(size_t l, size_t n)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 {
@@ -97,6 +101,7 @@ MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 #undef memalign
 #endif /* memalign */
 
+MP_API
 void *
 memalign(size_t a, size_t l)
 {
@@ -105,6 +110,7 @@ memalign(size_t a, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
 {
@@ -121,6 +127,7 @@ MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
 #undef valloc
 #endif /* valloc */
 
+MP_API
 void *
 valloc(size_t l)
 {
@@ -129,6 +136,7 @@ valloc(size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(valloc)(size_t l)
 {
@@ -144,6 +152,7 @@ MP_ALTFUNCNAME(valloc)(size_t l)
 #undef pvalloc
 #endif /* pvalloc */
 
+MP_API
 void *
 pvalloc(size_t l)
 {
@@ -152,6 +161,7 @@ pvalloc(size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(pvalloc)(size_t l)
 {
@@ -167,6 +177,7 @@ MP_ALTFUNCNAME(pvalloc)(size_t l)
 #undef alloca
 #endif /* alloca */
 
+MP_API
 void *
 alloca(size_t l)
 {
@@ -175,6 +186,7 @@ alloca(size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(alloca)(size_t l)
 {
@@ -190,6 +202,7 @@ MP_ALTFUNCNAME(alloca)(size_t l)
 #undef strdup
 #endif /* strdup */
 
+MP_API
 char *
 strdup(MP_CONST char *p)
 {
@@ -198,6 +211,7 @@ strdup(MP_CONST char *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
 {
@@ -214,6 +228,7 @@ MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
 #undef strndup
 #endif /* strndup */
 
+MP_API
 char *
 strndup(MP_CONST char *p, size_t l)
 {
@@ -222,6 +237,7 @@ strndup(MP_CONST char *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
 {
@@ -237,6 +253,7 @@ MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
 #undef strsave
 #endif /* strsave */
 
+MP_API
 char *
 strsave(MP_CONST char *p)
 {
@@ -245,6 +262,7 @@ strsave(MP_CONST char *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
 {
@@ -261,6 +279,7 @@ MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
 #undef strnsave
 #endif /* strnsave */
 
+MP_API
 #if SYSTEM == SYSTEM_DGUX
 char *
 strnsave(MP_CONST char *p, int l)
@@ -274,6 +293,7 @@ strnsave(MP_CONST char *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 #if SYSTEM == SYSTEM_DGUX
 char *
 MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, int l)
@@ -294,6 +314,7 @@ MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
 #undef strdupa
 #endif /* strdupa */
 
+MP_API
 char *
 strdupa(MP_CONST char *p)
 {
@@ -302,6 +323,7 @@ strdupa(MP_CONST char *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
 {
@@ -318,6 +340,7 @@ MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
 #undef strndupa
 #endif /* strndupa */
 
+MP_API
 char *
 strndupa(MP_CONST char *p, size_t l)
 {
@@ -326,6 +349,7 @@ strndupa(MP_CONST char *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 {
@@ -341,6 +365,7 @@ MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 #undef realloc
 #endif /* realloc */
 
+MP_API
 void *
 realloc(void *p, size_t l)
 {
@@ -349,6 +374,7 @@ realloc(void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 {
@@ -365,6 +391,7 @@ MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 #undef reallocf
 #endif /* reallocf */
 
+MP_API
 void *
 reallocf(void *p, size_t l)
 {
@@ -373,6 +400,7 @@ reallocf(void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(reallocf)(void *p, size_t l)
 {
@@ -388,6 +416,7 @@ MP_ALTFUNCNAME(reallocf)(void *p, size_t l)
 #undef recalloc
 #endif /* recalloc */
 
+MP_API
 void *
 recalloc(void *p, size_t l, size_t n)
 {
@@ -396,6 +425,7 @@ recalloc(void *p, size_t l, size_t n)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 {
@@ -411,6 +441,7 @@ MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 #undef expand
 #endif /* expand */
 
+MP_API
 void *
 expand(void *p, size_t l)
 {
@@ -419,6 +450,7 @@ expand(void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(expand)(void *p, size_t l)
 {
@@ -434,6 +466,7 @@ MP_ALTFUNCNAME(expand)(void *p, size_t l)
 #undef free
 #endif /* free */
 
+MP_API
 void
 free(void *p)
 {
@@ -442,6 +475,7 @@ free(void *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(free)(void *p)
 {
@@ -457,6 +491,7 @@ MP_ALTFUNCNAME(free)(void *p)
 #undef cfree
 #endif /* cfree */
 
+MP_API
 void
 cfree(void *p, size_t l, size_t n)
 {
@@ -465,6 +500,7 @@ cfree(void *p, size_t l, size_t n)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 {
@@ -480,6 +516,7 @@ MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 #undef dealloca
 #endif /* dealloca */
 
+MP_API
 void
 dealloca(void *p)
 {
@@ -488,6 +525,7 @@ dealloca(void *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(dealloca)(void *p)
 {
@@ -503,6 +541,7 @@ MP_ALTFUNCNAME(dealloca)(void *p)
 #undef xmalloc
 #endif /* xmalloc */
 
+MP_API
 void *
 xmalloc(size_t l)
 {
@@ -511,6 +550,7 @@ xmalloc(size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(xmalloc)(size_t l)
 {
@@ -527,6 +567,7 @@ MP_ALTFUNCNAME(xmalloc)(size_t l)
 #undef xcalloc
 #endif /* xcalloc */
 
+MP_API
 void *
 xcalloc(size_t l, size_t n)
 {
@@ -535,6 +576,7 @@ xcalloc(size_t l, size_t n)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(xcalloc)(size_t l, size_t n)
 {
@@ -550,6 +592,7 @@ MP_ALTFUNCNAME(xcalloc)(size_t l, size_t n)
 #undef xstrdup
 #endif /* xstrdup */
 
+MP_API
 char *
 xstrdup(MP_CONST char *p)
 {
@@ -558,6 +601,7 @@ xstrdup(MP_CONST char *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 char *
 MP_ALTFUNCNAME(xstrdup)(MP_CONST char *p)
 {
@@ -573,6 +617,7 @@ MP_ALTFUNCNAME(xstrdup)(MP_CONST char *p)
 #undef xrealloc
 #endif /* xrealloc */
 
+MP_API
 void *
 xrealloc(void *p, size_t l)
 {
@@ -581,6 +626,7 @@ xrealloc(void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(xrealloc)(void *p, size_t l)
 {
@@ -596,6 +642,7 @@ MP_ALTFUNCNAME(xrealloc)(void *p, size_t l)
 #undef xfree
 #endif /* xfree */
 
+MP_API
 void
 xfree(void *p)
 {
@@ -604,6 +651,7 @@ xfree(void *p)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(xfree)(void *p)
 {
@@ -619,6 +667,7 @@ MP_ALTFUNCNAME(xfree)(void *p)
 #undef memset
 #endif /* memset */
 
+MP_API
 void *
 memset(void *p, int c, size_t l)
 {
@@ -627,6 +676,7 @@ memset(void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
 {
@@ -642,6 +692,7 @@ MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
 #undef bzero
 #endif /* bzero */
 
+MP_API
 void
 bzero(void *p, size_t l)
 {
@@ -650,6 +701,7 @@ bzero(void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 {
@@ -666,6 +718,7 @@ MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 #undef memccpy
 #endif /* memccpy */
 
+MP_API
 void *
 memccpy(void *q, MP_CONST void *p, int c, size_t l)
 {
@@ -675,6 +728,7 @@ memccpy(void *q, MP_CONST void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 {
@@ -691,6 +745,7 @@ MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 #undef memcpy
 #endif /* memcpy */
 
+MP_API
 void *
 memcpy(void *q, MP_CONST void *p, size_t l)
 {
@@ -699,6 +754,7 @@ memcpy(void *q, MP_CONST void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 {
@@ -714,6 +770,7 @@ MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 #undef memmove
 #endif /* memmove */
 
+MP_API
 void *
 memmove(void *q, MP_CONST void *p, size_t l)
 {
@@ -722,6 +779,7 @@ memmove(void *q, MP_CONST void *p, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 {
@@ -737,6 +795,7 @@ MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 #undef bcopy
 #endif /* bcopy */
 
+MP_API
 void
 bcopy(MP_CONST void *p, void *q, size_t l)
 {
@@ -745,6 +804,7 @@ bcopy(MP_CONST void *p, void *q, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void
 MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 {
@@ -760,6 +820,7 @@ MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 #undef memchr
 #endif /* memchr */
 
+MP_API
 void *
 memchr(MP_CONST void *p, int c, size_t l)
 {
@@ -769,6 +830,7 @@ memchr(MP_CONST void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
 {
@@ -785,6 +847,7 @@ MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
 #undef memmem
 #endif /* memmem */
 
+MP_API
 void *
 memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
@@ -794,6 +857,7 @@ memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 void *
 MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
@@ -810,6 +874,7 @@ MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 #undef memcmp
 #endif /* memcmp */
 
+MP_API
 int
 memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
@@ -819,6 +884,7 @@ memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 int
 MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
@@ -835,6 +901,7 @@ MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 #undef bcmp
 #endif /* bcmp */
 
+MP_API
 int
 bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
@@ -844,6 +911,7 @@ bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 
 #if MP_ALTFUNCNAMES
+MP_API
 int
 MP_ALTFUNCNAME(bcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 {

@@ -43,9 +43,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.9 2001-07-26 16:51:10 graeme Exp $"
+#ident "$Id: cplus.c,v 1.10 2001-08-01 21:29:02 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.9 2001-07-26 16:51:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.10 2001-08-01 21:29:02 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,6 +60,7 @@ namespace std
 /* Set the low-memory handler and return the previous setting.
  */
 
+MP_API
 #ifdef __cplusplus
 new_handler
 set_new_handler(new_handler h) throw()
@@ -90,6 +91,7 @@ void
  * exception if the allocation cannot be made.
  */
 
+MP_API
 #ifdef __cplusplus
 void *
 operator new(size_t l) throw(std::bad_alloc)
@@ -136,6 +138,7 @@ __nw__FUi(size_t l)
  * if the allocation cannot be made.
  */
 
+MP_API
 #ifdef __cplusplus
 void *
 operator new(size_t l, MP_CONST std::nothrow_t&) throw()
@@ -155,6 +158,7 @@ __nw__FUiRCQ2_3std9nothrow_t(size_t l)
  * throwing an exception if the allocation cannot be made.
  */
 
+MP_API
 #ifdef __cplusplus
 void *
 operator new[](size_t l) throw(std::bad_alloc)
@@ -201,6 +205,7 @@ __nwa__FUi(size_t l)
  * returning NULL if the allocation cannot be made.
  */
 
+MP_API
 #ifdef __cplusplus
 void *
 operator new[](size_t l, MP_CONST std::nothrow_t&) throw()
@@ -219,6 +224,7 @@ __nwa__FUiRCQ2_3std9nothrow_t(size_t l)
 /* Free an existing block of memory that was allocated by operator new.
  */
 
+MP_API
 #ifdef __cplusplus
 void
 operator delete(void *p) throw()
@@ -237,6 +243,7 @@ __dl__FPv(void *p)
 /* Free an existing block of memory that was allocated by operator new.
  */
 
+MP_API
 #ifdef __cplusplus
 void
 operator delete(void *p, MP_CONST std::nothrow_t&) throw()
@@ -255,6 +262,7 @@ __dl__FPvRCQ2_3std9nothrow_t(void *p)
 /* Free an existing block of memory that was allocated by operator new[].
  */
 
+MP_API
 #ifdef __cplusplus
 void
 operator delete[](void *p) throw()
@@ -273,6 +281,7 @@ __dla__FPv(void *p)
 /* Free an existing block of memory that was allocated by operator new[].
  */
 
+MP_API
 #ifdef __cplusplus
 void
 operator delete[](void *p, MP_CONST std::nothrow_t&) throw()

@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpmalloc.c,v 1.3 2001-02-08 21:16:38 graeme Exp $"
+#ident "$Id: mpmalloc.c,v 1.4 2001-08-01 21:31:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpmalloc_id = "$Id: mpmalloc.c,v 1.3 2001-02-08 21:16:38 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpmalloc_id = "$Id: mpmalloc.c,v 1.4 2001-08-01 21:31:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,6 +50,7 @@ extern __mp_failhandler __mp_failure;
 /* Allocate an uninitialised memory block of a given size and abort on failure.
  */
 
+MP_API
 void *
 __mp_xmalloc(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u,
              MP_CONST char *g, size_t h)
