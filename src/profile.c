@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.9 2000-04-19 23:24:41 graeme Exp $"
+#ident "$Id: profile.c,v 1.10 2000-04-20 00:03:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -61,33 +61,9 @@ MP_GLOBAL void __mp_newprofile(profhead *p)
     p->sbound = MP_SMALLBOUND;
     p->mbound = MP_MEDIUMBOUND;
     p->lbound = MP_LARGEBOUND;
+    p->autosave = p->autocount = 0;
     p->file = MP_PROFFILE;
     p->profiling = 0;
-}
-
-
-/* Write the profiling information to the output file.
- */
-
-MP_GLOBAL int __mp_writeprofile(profhead *p)
-{
-    FILE *f;
-
-    /* The profiling file name can also be named as stderr and stdout which
-     * will go to the standard error and standard output streams respectively.
-     */
-    if ((p->file == NULL) || (strcmp(p->file, "stderr") == 0))
-        f = stderr;
-    else if (strcmp(p->file, "stdout") == 0)
-        f = stdout;
-    else if ((f = fopen(p->file, "wb")) == NULL)
-    {
-        __mp_error(AT_MAX, "%s: cannot open file\n", p->file);
-        return 0;
-    }
-    if ((f != stderr) && (f != stdout) && fclose(f))
-        return 0;
-    return 1;
 }
 
 
@@ -103,6 +79,7 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
     p->acountl = p->dcountl = 0;
     p->acountt = p->dcountt = 0;
     p->acount = p->dcount = 0;
+    p->autocount = 0;
     p->file = NULL;
     p->profiling = 0;
 }
@@ -126,6 +103,12 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
     }
     p->acountt += l;
     p->acount++;
+    /* If the autosave feature is enabled then we may need to write out
+     * all of the current profiling information to the output file before
+     * we can return.
+     */
+    if ((p->autosave != 0) && (++p->autocount % p->autosave == 0))
+        __mp_writeprofile(p);
     return 1;
 }
 
@@ -148,6 +131,41 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
     }
     p->dcountt += l;
     p->dcount++;
+    /* If the autosave feature is enabled then we may need to write out
+     * all of the current profiling information to the output file before
+     * we can return.
+     */
+    if ((p->autosave != 0) && (++p->autocount % p->autosave == 0))
+        __mp_writeprofile(p);
+    return 1;
+}
+
+
+/* Write the profiling information to the output file.
+ */
+
+MP_GLOBAL int __mp_writeprofile(profhead *p)
+{
+    FILE *f;
+
+    p->autocount = 0;
+    /* The profiling file name can also be named as stderr and stdout which
+     * will go to the standard error and standard output streams respectively.
+     */
+    if (p->file == NULL)
+        return 0;
+    else if (strcmp(p->file, "stderr") == 0)
+        f = stderr;
+    else if (strcmp(p->file, "stdout") == 0)
+        f = stdout;
+    else if ((f = fopen(p->file, "wb")) == NULL)
+    {
+        __mp_error(AT_MAX, "%s: cannot open file\n", p->file);
+        p->file = NULL;
+        return 0;
+    }
+    if ((f != stderr) && (f != stdout) && fclose(f))
+        return 0;
     return 1;
 }
 

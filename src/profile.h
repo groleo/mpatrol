@@ -52,6 +52,8 @@ typedef struct profhead
     size_t sbound;               /* small allocation boundary */
     size_t mbound;               /* medium allocation boundary */
     size_t lbound;               /* large allocation boundary */
+    unsigned long autosave;      /* autosave frequency */
+    unsigned long autocount;     /* autosave count */
     char *file;                  /* profiling filename */
     char profiling;              /* profiling status */
 }
@@ -65,10 +67,10 @@ extern "C"
 
 
 MP_EXPORT void __mp_newprofile(profhead *);
-MP_EXPORT int __mp_writeprofile(profhead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
 MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
 MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
+MP_EXPORT int __mp_writeprofile(profhead *);
 
 
 #ifdef __cplusplus

@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.26 2000-04-19 19:56:36 graeme Exp $"
+#ident "$Id: inter.c,v 1.27 2000-04-20 00:03:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -234,7 +234,7 @@ void __mp_fini(void)
             /* Finally, write out any profiling information to the profiling
              * output file.
              */
-            if (memhead.prof.acount > 0)
+            if (memhead.prof.autocount > 0)
                 __mp_writeprofile(&memhead.prof);
             memhead.fini = 1;
 #if MP_INUSE_SUPPORT
