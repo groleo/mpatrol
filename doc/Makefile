@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.32 2001-02-21 10:27:01 graeme Exp $
+# $Id: Makefile,v 1.33 2001-07-12 22:38:55 graeme Exp $
 
 
 # Definitions
@@ -30,6 +30,7 @@ SHELL = /bin/sh
 
 DOCUMENT = mpatrol
 REFCARD  = refcard
+SOURCE	 = source
 
 SPLIT      = false
 THUMBNAILS = true
@@ -185,9 +186,66 @@ else
 	@ pstill -Fa4 -R270 -ct -o $@ $<
 endif
 
+# Build the DVI source code from the LaTeX file using texi2dvi
+
+$(SOURCE).dvi: $(SOURCE).tex
+	@ echo creating $@ from $<...
+	-@ rm -rf bin src tools >/dev/null 2>&1
+	@ mkdir bin src tools
+	@ for file in ../bin/[a-z]*; do lgrind -i -c -lsh -o bin/`basename $$file` $$file; done
+	@ for file in ../src/*.[ch]; do lgrind -i -c -lCC -o src/`basename $$file` $$file; done
+	@ for file in ../tools/*.[ch]; do lgrind -i -c -lCC -o tools/`basename $$file` $$file; done
+ifeq ($(VERBOSE),true)
+	@ texi2dvi --language=latex --batch --clean --verbose $<
+else
+	@ texi2dvi --language=latex --batch --clean --quiet $<
+endif
+	-@ rm -rf bin src tools >/dev/null 2>&1
+
+# Build the postscript source code from the DVI file using dvips
+
+$(SOURCE).ps: $(SOURCE).dvi
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ dvips -ta4 -Pcmz -o $@ $<
+else
+	@ dvips -ta4 -Pcmz -q -o $@ $<
+endif
+
+# Build the PDF source code from the LaTeX file using texi2dvi
+
+$(SOURCE).pdf: $(SOURCE).tex
+	@ echo creating $@ from $<...
+	-@ rm -rf bin src tools >/dev/null 2>&1
+	@ mkdir bin src tools
+	@ for file in ../bin/[a-z]*; do lgrind -i -c -lsh -o bin/`basename $$file` $$file; done
+	@ for file in ../src/*.[ch]; do lgrind -i -c -lCC -o src/`basename $$file` $$file; done
+	@ for file in ../tools/*.[ch]; do lgrind -i -c -lCC -o tools/`basename $$file` $$file; done
+ifeq ($(VERBOSE),true)
+	@ texi2dvi --language=latex --pdf --batch --clean --verbose $<
+else
+	@ texi2dvi --language=latex --pdf --batch --clean --quiet $<
+endif
+	-@ rm -rf bin src tools >/dev/null 2>&1
+ifeq ($(THUMBNAILS),true)
+ifeq ($(VERBOSE),true)
+	@ thumbpdf --verbose $@
+	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
+	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --verbose $<
+	-@ rm -f thumbdta.tex >/dev/null 2>&1
+else
+	@ thumbpdf --quiet $@
+	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
+	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --quiet $<
+	-@ rm -f thumbdta.tex >/dev/null 2>&1
+endif
+endif
+
 all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(REFCARD).dvi \
 	$(REFCARD).ps $(REFCARD).pdf
+
+source: $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf
 
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
@@ -196,5 +254,6 @@ clean:
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
+	-@ rm -f $(SOURCE).dvi $(SOURCE).ps $(SOURCE).pdf >/dev/null 2>&1
 
 clobber: clean
