@@ -1,0 +1,53 @@
+INSTALL FOR THE MPATROL LIBRARY
+
+
+This document contains information about building and installing mpatrol.  It
+currently needs to be done manually but I might consider using GNU configure at
+some point in the future.
+
+The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
+3.1.  I then installed Redhat Linux 5.1 on my Amiga and added support for
+Linux/m68k.  I've tried my best to make it as easy as possible to build and
+install mpatrol on any system, but it isn't likely to run smoothly for
+everybody.
+
+
+Building and installing
+
+  * Go into the build directory and then into the appropriate subdirectory for
+    your system.
+
+  * Edit the Makefile in that directory and check that it is using the
+    appropriate compiler and build tools.  The `CC' macro specifies the
+    compiler, the `AR' macro specifies the tool used to build the archive
+    library and the `LD' macro specifies the tool to build the shared library.
+    The `CFLAGS' macro specifies compiler options that are always to be used,
+    the `OFLAGS' macro specifies optimisation options for the compiler, the
+    `SFLAGS' macro specifies options to be passed to the compiler when building
+    a shared library and the `TFLAGS' macro specifies options to be passed to
+    the compiler when building a thread-safe library.  You may also need to
+    change the library names and library build commands on different systems.
+
+  * Use the make command (or equivalent) to build the mpatrol library in archive
+    form.  The `all' target builds all possible combinations of the mpatrol
+    library for your system.  The `clean' target removes all relevant object
+    files from the current directory, while the `clobber' target also removes
+    all libraries that have been built from the current directory.
+
+  * Copy all of the libraries that have been built into your local library
+    directory.  If there were symbolic links created in the build directory
+    then these should be recreated in the local library directory rather than
+    simply copying them.
+
+  * Go up two directory levels into the src directory and copy the `mpatrol.h'
+    header file into your local include directory.
+
+  * On UNIX platforms, go up one directory level into the bin directory and
+    copy the `mpatrol' shell script into your local bin directory.
+
+  * On UNIX platforms, go up one directory level into the man directory and
+    copy the man1 and man3 subdirectories to your local man directory.
+    Unfortunately, the location for manual pages varies from system to system
+    so you may or may not also be able to copy the cat1 and cat3 subdirectories
+    as well.  The man* subdirectories contain the unformatted manual pages while
+    the cat* subdirectories contain the formatted manual pages.
