@@ -29,11 +29,12 @@
 
 
 #include "heap.h"
+#include "trace.h"
 #include "utils.h"
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.7 2000-12-06 22:59:46 graeme Exp $"
+#ident "$Id: heap.c,v 1.8 2000-12-07 01:02:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -68,6 +69,7 @@ MP_GLOBAL void __mp_newheap(heaphead *h)
     h->isize = h->dsize = 0;
     h->prot = MA_NOACCESS;
     h->protrecur = 0;
+    h->tracing = 0;
 }
 
 
@@ -98,6 +100,7 @@ MP_GLOBAL void __mp_deleteheap(heaphead *h)
     h->isize = 0;
     h->prot = MA_NOACCESS;
     h->protrecur = 0;
+    h->tracing = 0;
 }
 
 
@@ -126,6 +129,11 @@ MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
         n->block = p;
         n->size = s;
         h->isize += s;
+        if (h->tracing)
+            __mp_traceheap(p, s, 1);
+#if MP_INUSE_SUPPORT
+        _Inuse_heapalloc(p, s);
+#endif /* MP_INUSE_SUPPORT */
         n = (heapnode *) __mp_getslot(&h->table);
     }
     /* Allocate the requested block of memory and add it to the heap.
@@ -139,6 +147,8 @@ MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a, int i)
     n->block = p;
     n->size = l;
     h->dsize += l;
+    if (h->tracing)
+        __mp_traceheap(p, l, i);
 #if MP_INUSE_SUPPORT
     _Inuse_heapalloc(p, l);
 #endif /* MP_INUSE_SUPPORT */

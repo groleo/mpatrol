@@ -66,6 +66,7 @@ typedef struct heaphead
     size_t dsize;     /* heap node allocation total */
     memaccess prot;   /* protection status */
     size_t protrecur; /* protection recursion count */
+    char tracing;     /* heap reservation tracing status */
 }
 heaphead;
 

@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.23 2000-11-30 21:40:00 graeme Exp $"
+#ident "$Id: option.c,v 1.24 2000-12-07 01:05:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -937,6 +937,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                     else
                         i = OE_RECOGNISED;
                     h->trace.tracing = 1;
+                    h->alloc.heap.tracing = 1;
                 }
                 else if (matchoption(o, "TRACEFILE"))
                     if (*a == '\0')
