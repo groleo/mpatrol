@@ -34,6 +34,56 @@
 #include "info.h"
 
 
+/* Options that can be set at run-time.
+ */
+
+#define OPT_HELP          0
+#define OPT_SETFLAGS      -1
+#define OPT_UNSETFLAGS    -2
+#define OPT_ALLOCSTOP     -3
+#define OPT_REALLOCSTOP   -4
+#define OPT_FREESTOP      -5
+#define OPT_ALLOCBYTE     -6
+#define OPT_FREEBYTE      -7
+#define OPT_OFLOWBYTE     -8
+#define OPT_OFLOWSIZE     -9
+#define OPT_DEFALIGN      -10
+#define OPT_LIMIT         -11
+#define OPT_FAILFREQ      -12
+#define OPT_FAILSEED      -13
+#define OPT_UNFREEDABORT  -14
+#define OPT_LOGFILE       -15
+#define OPT_PROGFILE      -16
+#define OPT_CHECK         -17
+
+
+/* Flags that can be set at run-time.
+ */
+
+#define OPT_SHOWALL       (OPT_SHOWMAP | OPT_SHOWSYMBOLS | OPT_SHOWFREED | \
+                           OPT_SHOWUNFREED)
+#define OPT_SHOWMAP       0x00000001
+#define OPT_SHOWSYMBOLS   0x00000002
+#define OPT_SHOWFREED     0x00000004
+#define OPT_SHOWUNFREED   0x00000008
+#define OPT_LOGALL        (OPT_LOGALLOCS | OPT_LOGREALLOCS | OPT_LOGFREES)
+#define OPT_LOGALLOCS     0x00000010
+#define OPT_LOGREALLOCS   0x00000020
+#define OPT_LOGFREES      0x00000040
+#define OPT_CHECKALL      (OPT_CHECKALLOCS | OPT_CHECKREALLOCS | \
+                           OPT_CHECKFREES)
+#define OPT_CHECKALLOCS   0x00000080
+#define OPT_CHECKREALLOCS 0x00000100
+#define OPT_CHECKFREES    0x00000200
+#define OPT_NOPROTECT     0x00000400
+#define OPT_NOFREE        0x00000800
+#define OPT_PRESERVE      0x00001000
+#define OPT_OFLOWWATCH    0x00002000
+#define OPT_PAGEALLOC     0x00004000
+#define OPT_ALLOCUPPER    0x00008000
+#define OPT_USEMMAP       0x00010000
+
+
 /* The different types of errors when parsing options.
  */
 
