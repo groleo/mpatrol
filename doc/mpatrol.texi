@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.170 2001-01-25 22:12:19 graeme Exp $
+@c $Id: mpatrol.texi,v 1.171 2001-02-01 21:03:42 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,8 +35,8 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.4
-@set VERSION 1.3.4
+@set EDITION 2.5
+@set VERSION 1.4.0
 @set UPDATED 25th January, 2001
 
 @ifinfo
@@ -4398,7 +4398,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.3.3 (01/01/06)
+@@(#) mpatrol 1.3.4 (01/01/25)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -4408,7 +4408,7 @@ details.
 For the latest mpatrol release and documentation,
 visit http://www.cbmamiga.demon.co.uk/mpatrol.
 
-Log file generated on Fri Jan  5 22:26:31 2001
+Log file generated on Thu Jan 25 22:26:31 2001
 
 ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
         0x0804942F main+31
