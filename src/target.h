@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.27 2001-03-07 00:39:43 graeme Exp $
+ * $Id: target.h,v 1.28 2001-03-12 20:21:15 graeme Exp $
  */
 
 
@@ -279,7 +279,8 @@
 #define FORMAT FORMAT_AOUT
 #endif /* __ELF__ */
 #elif SYSTEM == SYSTEM_CYGWIN || SYSTEM == SYSTEM_HPUX || \
-      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_LYNXOS || \
+      SYSTEM == SYSTEM_TRU64
 #define FORMAT FORMAT_BFD
 #else /* SYSTEM */
 #define FORMAT FORMAT_NONE
