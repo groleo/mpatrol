@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.78 2001-06-07 19:07:53 graeme Exp $
+ * $Id: config.h,v 1.79 2001-07-19 22:17:31 graeme Exp $
  */
 
 
@@ -160,7 +160,7 @@
  */
 
 #ifndef MP_BUFFER_SIZE
-#define MP_BUFFER_SIZE 1024
+#define MP_BUFFER_SIZE 8192
 #endif /* MP_BUFFER_SIZE */
 
 
