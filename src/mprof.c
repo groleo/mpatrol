@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.15 2000-05-15 23:13:29 graeme Exp $"
+#ident "$Id: mprof.c,v 1.16 2000-05-16 23:22:42 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -254,8 +254,8 @@ static void byteswap(void *b, size_t n)
     char *s, *t;
     char c;
 
-    s = b;
-    t = b + n - 1;
+    s = (char *) b;
+    t = (char *) b + n - 1;
     while (s < t)
     {
         c = *s;
