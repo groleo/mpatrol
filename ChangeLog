@@ -1,3 +1,170 @@
+Thu Apr 27 19:07:37 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented IRIX support.  Changed memleak to mleak.
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Renamed memleak to mleak.
+
+	* man/cat1/mpatrol.1, man/cat3/mpatrol.3, man/man1/mpatrol.1,
+	  man/man3/mpatrol.3, man/cat1/mleak.1, man/cat1/Attic/memleak.1,
+	  man/man1/mleak.1, man/man1/Attic/memleak.1:
+	Changed memleak to mleak.
+
+	* src/mleak.c, src/Attic/memleak.c:
+	Changed memleak to mleak.
+
+	* src/config.h, src/target.h, src/memory.c: Added IRIX support.
+
+	* src/mprof.c: Added support for symbol offsets.
+
+Wed Apr 26 23:24:00 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/symbol.c, src/symbol.h: Added an index into the profiling table.
+
+	* src/profile.c:
+	Added the symbol address table to write to the profiling output file.
+
+	* src/mprof.c:
+	Added the cleardata() function and temporary data for sorting.
+
+Tue Apr 25 23:40:11 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Added the tree module to mprof.
+
+	* doc/mpatrol.texi, src/config.h, src/target.h: Added AIX support.
+
+	* src/mprof.c: Added the direct allocation table.
+
+Mon Apr 24 19:24:38 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
+	  pkg/lha/build, build/windows/NMakefile, build/windows/Makefile,
+	  build/unix/Makefile, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added the mprof tool.
+
+	* src/info.c:
+	Added symbol table parameter to the call to __mp_newprofile().
+
+	* src/info.h: The profile header file now also includes symbol.h.
+
+	* src/symbol.c: Set the profiling data offset for each symbol.
+
+	* src/symbol.h: Added a profiling table offset for each symbol.
+
+	* src/profile.c:
+	Changed the format of the profiling output file slightly.  The profdata
+	structures are now only allocated for leaf call sites.  Added support
+	for symbols.
+
+	* src/inter.c:
+	Need to make the symbol table writable before we can dump any profiling
+	information.
+
+	* src/mprof.c:
+	New tool for displaying profiling information from a profiling output
+	file produced by the mpatrol library.
+
+Sun Apr 23 23:23:56 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.c, src/slots.c, src/option.c:
+	Added some explicit casting for compiling with C++.
+
+	* src/profile.c, src/profile.h, src/diag.c:
+	Changed the list field to ilist.  Added support for full call graphs.
+	The profdata structures are now only allocated for leaf call sites.
+
+Thu Apr 20 23:45:46 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Added more dependencies for the profile module.
+
+	* src/config.h:
+	Mentioned that the profiling allocation bounds can now be overridden at
+	run-time.  Added MP_PROFMAGIC.
+
+	* src/info.c:
+	Always profile a reallocation when profiling is enabled, even if the new
+	size is the same as the old size.  Added protection of internal profiler
+	memory.
+
+	* src/diag.c:
+	Added display of boundaries and autosave count in the summary.
+
+	* src/option.c, src/option.h, src/mpatrol.h:
+	Added the AUTOSAVE, SMALLBOUND, MEDIUMBOUND and LARGEBOUND options.
+
+	* src/profile.h, src/profile.c, src/inter.c:
+	Implemented the autosave feature.  Added the allocation boundaries to
+	the profiling output file.  Added a magic sequence of characters to the
+	beginning and end of the profiling output file.
+
+	* src/mpatrol.c: Added the -1, -2, -3 and -Q options.
+
+Wed Apr 19 23:24:41 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Added profile.h for info.h.
+
+	* doc/mpatrol.texi, man/cat1/mpatrol.1, man/man1/mpatrol.1:
+	Converted the -P and -p options to -X and -x.
+
+	* src/config.h:
+	Added MP_BINSIZE, MP_SMALLBOUND, MP_MEDIUMBOUND and MP_LARGEBOUND.
+
+	* src/info.c, src/info.h, src/diag.c:
+	Added profiling support.
+
+	* src/option.c, src/option.h, src/mpatrol.h:
+	Added the PROF and PROFFILE options.
+
+	* src/profile.c, src/profile.h: Added __mp_writeprofile().
+
+	* src/inter.c: Added call to __mp_writeprofile().
+
+	* src/mpatrol.c:
+	Changed the -P and -p options to -X and -x respectively.  Added the -P
+	and -p options for profiling.
+
+	* src/library.c: Added the profile module.
+
+Tue Apr 18 23:55:26 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Added the profile module.
+
+	* doc/mpatrol.texi: Added more related software.
+
+	* src/config.h: Added the MP_PROFFILE definition.
+
+	* src/profile.c, src/profile.h: New files for memory profiling.
+
+Thu Apr 13 19:15:11 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more related software and described how to embed object file
+	format access libraries into the shared version of the mpatrol library.
+	Documented the .gdbinit file provided, and also added more things to do.
+
+	* extra/.gdbinit: New file for using GDB with mpatrol.
+
+	* pkg/lha/build, pkg/tar/build: Added the GDB command file.
+
+	* src/malloc.c, src/mpatrol.h:
+	Made set_new_handler() have extern "C" linkage for G++.
+
+Tue Apr 11 21:48:34 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile: Removed -noentry.
+
+	* doc/mpatrol.texi: Added documentation on the GNU C library.
+
 Thu Apr  6 19:26:29 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Documented change to name of some object libraries.
