@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.10 2001-01-25 13:28:13 graeme Exp $
+# $Id: Makefile,v 1.11 2001-01-25 22:02:11 graeme Exp $
 
 
 # Definitions
@@ -48,7 +48,7 @@ PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
 
 .SUFFIXES: .1 .3 .html .dvi .ps .pdf
 
-default: $(PAGES)
+default: $(PAGES) $(HTMLPAGES)
 
 cat1/mpatrol.1: man1/mpatrol.1
 	$(ROFF) -Tascii -man $< >$@
@@ -172,9 +172,7 @@ pdf/libmpatrol.pdf: ps/libmpatrol.ps
 
 all: $(PAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
-mpatrol_man.tar.gz: $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
-	@ mkdir -p mpatrol/man/html
-	@ cp $(HTMLPAGES) mpatrol/man/html
+mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
 	@ mkdir -p mpatrol/man/dvi
 	@ cp $(DVIPAGES) mpatrol/man/dvi
 	@ mkdir -p mpatrol/man/ps
