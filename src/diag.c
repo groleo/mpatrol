@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.89 2001-10-05 20:52:00 graeme Exp $"
+#ident "$Id: diag.c,v 1.90 2001-10-05 21:35:19 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.89 2001-10-05 20:52:00 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.90 2001-10-05 21:35:19 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1751,25 +1751,137 @@ __mp_printsummary(infohead *h)
 {
     size_t n;
 
-    __mp_diag("system page size:  ");
-    __mp_printsize(h->alloc.heap.memory.page);
-    __mp_diag("\ndefault alignment: ");
-    __mp_printsize(h->alloc.heap.memory.align);
-    __mp_diag("\noverflow size:     ");
-    __mp_printsize(h->alloc.oflow);
-    __mp_diag("\noverflow byte:     0x%02X", h->alloc.obyte);
-    __mp_diag("\nallocation byte:   0x%02X", h->alloc.abyte);
-    __mp_diag("\nfree byte:         0x%02X", h->alloc.fbyte);
-    __mp_diag("\nallocation stop:   %lu", h->astop);
-    __mp_diag("\nreallocation stop: %lu", h->rstop);
-    __mp_diag("\nfree stop:         %lu", h->fstop);
-    __mp_diag("\nunfreed abort:     %lu", h->uabort);
-    __mp_diag("\nsmall boundary:    ");
-    __mp_printsize(h->prof.sbound);
-    __mp_diag("\nmedium boundary:   ");
-    __mp_printsize(h->prof.mbound);
-    __mp_diag("\nlarge boundary:    ");
-    __mp_printsize(h->prof.lbound);
+    if (__mp_diagflags & FLG_HTML)
+    {
+        __mp_diagtag("<TABLE CELLSPACING=0 CELLPADDING=1 BORDER=1>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("system page size");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->alloc.heap.memory.page);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("default alignment");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->alloc.heap.memory.align);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("overflow size");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->alloc.oflow);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("overflow byte");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("0x%02X", h->alloc.obyte);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocation byte");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("0x%02X", h->alloc.abyte);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("free byte");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("0x%02X", h->alloc.fbyte);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("allocation stop");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->astop);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("reallocation stop");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->rstop);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("free stop");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->fstop);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("unfreed abort");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("%lu", h->uabort);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("small boundary");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->prof.sbound);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("medium boundary");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->prof.mbound);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("<TR>\n");
+        __mp_diagtag("<TD>");
+        __mp_diag("large boundary");
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("<TD>");
+        __mp_printsize(h->prof.lbound);
+        __mp_diagtag("</TD>\n");
+        __mp_diagtag("</TR>\n");
+        __mp_diagtag("</TABLE>\n");
+    }
+    else
+    {
+        __mp_diag("system page size:  ");
+        __mp_printsize(h->alloc.heap.memory.page);
+        __mp_diag("\ndefault alignment: ");
+        __mp_printsize(h->alloc.heap.memory.align);
+        __mp_diag("\noverflow size:     ");
+        __mp_printsize(h->alloc.oflow);
+        __mp_diag("\noverflow byte:     0x%02X", h->alloc.obyte);
+        __mp_diag("\nallocation byte:   0x%02X", h->alloc.abyte);
+        __mp_diag("\nfree byte:         0x%02X", h->alloc.fbyte);
+        __mp_diag("\nallocation stop:   %lu", h->astop);
+        __mp_diag("\nreallocation stop: %lu", h->rstop);
+        __mp_diag("\nfree stop:         %lu", h->fstop);
+        __mp_diag("\nunfreed abort:     %lu", h->uabort);
+        __mp_diag("\nsmall boundary:    ");
+        __mp_printsize(h->prof.sbound);
+        __mp_diag("\nmedium boundary:   ");
+        __mp_printsize(h->prof.mbound);
+        __mp_diag("\nlarge boundary:    ");
+        __mp_printsize(h->prof.lbound);
+    }
     __mp_diag("\nlower check range: ");
     if (h->lrange == (size_t) -1)
         __mp_diag("-");
