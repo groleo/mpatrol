@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.74 2000-05-14 13:46:50 graeme Exp $
+@c $Id: mpatrol.texi,v 1.75 2000-05-14 23:48:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2910,7 +2910,7 @@ epilogue function: <unset>
 handler function:  <unset>
 log file:          mpatrol.log
 profiling file:    mpatrol.out
-program filename:  /proc/729/object/a.out
+program filename:  ./test1
 symbols read:      3240
 autosave count:    0
 allocation count:  13
@@ -3164,7 +3164,7 @@ example have been numbered and their descriptions appear below.
 20  handler function:  <unset>
 21  log file:          mpatrol.log
 22  profiling file:    mpatrol.out
-23  program filename:  /proc/729/object/a.out
+23  program filename:  ./test1
 24  symbols read:      3240
 25  autosave count:    0
 26  allocation count:  13
@@ -3982,15 +3982,15 @@ purposes of this example.  The @samp{@dots{}} marks text that has been removed.
 
 @smallexample
 symbols read: 2438
-    0x8000076C-0x800007D9 _init [/proc/789/exe] (110 bytes)
-    0x80000900-0x8000094F _start [/proc/789/exe] (80 bytes)
-    0x80000950-0x8000096F __do_global_dtors_aux [/proc/789/exe] (32 bytes)
-    0x80000970-0x80000977 fini_dummy [/proc/789/exe] (8 bytes)
+    0x8000076C-0x800007D9 _init [./a.out] (110 bytes)
+    0x80000900-0x8000094F _start [./a.out] (80 bytes)
+    0x80000950-0x8000096F __do_global_dtors_aux [./a.out] (32 bytes)
+    0x80000970-0x80000977 fini_dummy [./a.out] (8 bytes)
     @dots{}
-    0x80003B24-0x80003B4B __clear_cache [/proc/789/exe] (40 bytes)
-    0x80003B4C-0x80003B6F __do_global_ctors_aux [/proc/789/exe] (36 bytes)
-    0x80003B70-0x80003B77 init_dummy [/proc/789/exe] (8 bytes)
-    0x80003B78-0x80003BA9 _fini [/proc/789/exe] (50 bytes)
+    0x80003B24-0x80003B4B __clear_cache [./a.out] (40 bytes)
+    0x80003B4C-0x80003B6F __do_global_ctors_aux [./a.out] (36 bytes)
+    0x80003B70-0x80003B77 init_dummy [./a.out] (8 bytes)
+    0x80003B78-0x80003BA9 _fini [./a.out] (50 bytes)
     0xC0002604-0xC0002609 _start [/lib/ld.so.1] (6 bytes)
     0xC000260A-0xC0002659 _dl_start_user [/lib/ld.so.1] (80 bytes)
     0xC000265A-0xC0002B1B _dl_start [/lib/ld.so.1] (1218 bytes)
@@ -5331,6 +5331,11 @@ profiling output filename is @file{mpatrol.%n.out}.  Note that the
 @option{LOGALL} option is always implicitly used for commands that are run by
 this command.
 
+Alternatively, the log file and profiling output file names can contain
+@samp{%p}, which will be replaced with the name of the program being executed
+without the directory components.  If the executable filename could not be
+determined or was not set then it will be replaced with @samp{mpatrol}.
+
 All of the following options (except @option{-d} and @option{-V}) correspond to
 their listed mpatrol library option (@pxref{Environment}).
 
@@ -6029,6 +6034,9 @@ Add any support for signals in @file{signals.c}.
 Add any support for threads in @file{mutex.c}.
 
 @item
+Add any support for filenames in @file{diag.c}.
+
+@item
 Add a new version and date format (or use an existing one) in @file{version.c}.
 
 @item
@@ -6147,13 +6155,13 @@ locked.  Hence, the threads test (@file{tests/pass/test5.c}) doesn't work yet.
 
 @item
 Need to make the library re-entrant.  This could be achieved by moving the
-static variables in @file{memory.c}, @file{mutex.c}, @file{diag.c},
-@file{option.c} and @file{sbrk.c} into the @code{infohead} structure and then
-having an array of @code{infohead} structures from which to allocate new memory
-headers when a new one is required.  This is only necessary for Amiga shared
-libraries and Netware NLMs since UNIX and Windows platforms allocate a new copy
-of the data section in a shared library or DLL when it is opened by a new
-process.
+static variables in @file{memory.c}, @file{stack.c}, @file{mutex.c},
+@file{diag.c}, @file{option.c} and @file{sbrk.c} into the @code{infohead}
+structure and then having an array of @code{infohead} structures from which to
+allocate new memory headers when a new one is required.  This is only necessary
+for Amiga shared libraries and Netware NLMs since UNIX and Windows platforms
+allocate a new copy of the data section in a shared library or DLL when it is
+opened by a new process.
 
 @item
 The current implementation of call stack traversal is limited and will only
