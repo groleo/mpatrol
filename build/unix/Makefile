@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.14 2000-04-24 13:28:51 graeme Exp $
+# $Id: Makefile,v 1.15 2000-04-25 01:12:39 graeme Exp $
 
 
 # Definitions
@@ -106,8 +106,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
-mprof: mprof.o getopt.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o getopt.o version.o
+mprof: mprof.o getopt.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o getopt.o tree.o version.o
 
 memleak: memleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o version.o
@@ -255,8 +255,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/profile.h $(SOURCE)/version.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
-mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/version.h
+mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \

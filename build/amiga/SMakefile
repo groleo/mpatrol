@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.16 2000-04-24 13:28:47 graeme Exp $
+# $Id: SMakefile,v 1.17 2000-04-25 01:12:36 graeme Exp $
 
 
 # Definitions
@@ -76,8 +76,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mpatrol.o getopt.o version.o
 
-mprof: mprof.o getopt.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mprof.o getopt.o version.o
+mprof: mprof.o getopt.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mprof.o getopt.o tree.o version.o
 
 memleak: memleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ memleak.o getopt.o tree.o version.o
@@ -210,8 +210,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/version.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
-mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/version.h
+mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \

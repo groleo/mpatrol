@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.20 2000-04-24 13:28:53 graeme Exp $
+# $Id: Makefile,v 1.21 2000-04-25 01:12:47 graeme Exp $
 
 
 # Definitions
@@ -100,8 +100,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
-mprof.exe: mprof.obj getopt.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj getopt.obj version.obj
+mprof.exe: mprof.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj getopt.obj tree.obj version.obj
 
 memleak.exe: memleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj version.obj
@@ -255,8 +255,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/version.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
-mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/version.h
+mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
