@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.1 2000-05-12 18:37:26 graeme Exp $
+% $Id: refcard.tex,v 1.2 2000-05-15 19:38:08 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -31,18 +31,33 @@
 \addtolength{\textwidth}{-1in}
 \setlength{\textheight}{\paperheight}
 \addtolength{\textheight}{-1in}
-\setlength{\oddsidemargin}{-.5in}
-\setlength{\evensidemargin}{-.5in}
-\setlength{\topmargin}{-.5in}
 \setlength{\headheight}{0in}
 \setlength{\headsep}{0in}
 \setlength{\footskip}{0in}
 \setlength{\parindent}{0in}
 \setlength{\columnsep}{.5in}
 
+% Determine if a PDF file is being generated.
+
+\ifx\pdfoutput\undefined
+  \setlength{\oddsidemargin}{-.5in}
+  \setlength{\evensidemargin}{-.5in}
+  \setlength{\topmargin}{-.5in}
+\else
+  \pdfoutput=1
+  \pdfcompresslevel=9
+  \setlength{\oddsidemargin}{0in}
+  \setlength{\evensidemargin}{0in}
+  \setlength{\topmargin}{0in}
+\fi
+
 % Define new commands for formatting the headings and options.
 
 \newcommand{\heading}[1]{\textbf{\normalsize #1}}
+\newcommand{\command}[1]{\textbf{#1}}
+\newcommand{\function}[1]{\texttt{#1()}}
+\newcommand{\flag}[1]{\textbf{--#1}}
+\newcommand{\flagpar}[2]{\flag{#1} \texttt{<}\textit{#2}\texttt{>}}
 \newcommand{\option}[1]{\texttt{#1}}
 \newcommand{\optionarg}[2]{\option{#1}\texttt{=<#2>}}
 \newcommand{\optionpar}[2]{\option{#1}\texttt{=<}\textit{#2}\texttt{>}}
@@ -86,7 +101,7 @@ read-only after every memory allocation, reallocation or deallocation.
 Instructs the library to save and replace certain signal handlers during the
 execution of library code and to restore them afterwards.
 \item[\option{USEMMAP}]
-Specifies that the library should use \texttt{mmap()} instead of \texttt{sbrk()}
+Specifies that the library should use \function{mmap} instead of \function{sbrk}
 to allocate system memory on UNIX platforms.
 \end{description}
 
@@ -235,6 +250,238 @@ as medium allocations for profiling purposes.
 \item[\optionpar{LARGEBOUND}{unsigned integer}]
 Specifies the limit in bytes up to which memory allocations should be classified
 as large allocations for profiling purposes.
+\end{description}
+
+\end{multicols}
+
+\pagebreak
+
+\begin{multicols}{3}
+
+\vskip 12pt
+
+All of the function definitions in \texttt{mpatrol.h} can be disabled by
+defining the \texttt{NDEBUG} preprocessor macro, which is the same macro used
+to control the behaviour of the \function{assert} function.  If \texttt{NDEBUG}
+is defined then no macro redefinition of functions will take place and all
+special mpatrol library functions will evaluate to empty statements.  It is
+intended that the \texttt{NDEBUG} preprocessor macro be defined in release
+builds.
+
+\vskip 12pt
+\heading{C dynamic memory allocation functions}
+\vskip 6pt
+
+\begin{description}
+\item[\function{malloc}]
+\hfill Allocates memory.
+\item[\function{calloc}]
+\hfill Allocates zero-filled memory.
+\item[\function{memalign}]
+\hfill Allocates memory with a specified alignment.
+\item[\function{valloc}]
+\hfill Allocates page-aligned memory.
+\item[\function{pvalloc}]
+\hfill Allocates a number of pages.
+\item[\function{strdup}]
+\hfill Duplicates a string.
+\item[\function{strndup}]
+\hfill Duplicates a string with a maximum length.
+\item[\function{strsave}]
+\hfill Duplicates a string.
+\item[\function{strnsave}]
+\hfill Duplicates a string with a maximum length.
+\item[\function{realloc}]
+\hfill Resizes memory.
+\item[\function{recalloc}]
+\hfill Resizes memory allocated by \function{calloc}.
+\item[\function{expand}]
+\hfill Resizes memory but does not relocate it.
+\item[\function{free}]
+\hfill Frees memory.
+\item[\function{cfree}]
+\hfill Frees memory allocated by \function{calloc}.
+\end{description}
+
+\vskip 12pt
+\heading{C$++$ dynamic memory allocation functions}
+\vskip 6pt
+
+\begin{description}
+\item[\texttt{operator new}]
+\hfill Allocates memory.
+\item[\texttt{operator new[]}]
+\hfill Allocates memory for an array.
+\item[\texttt{operator delete}]
+\hfill Frees memory.
+\item[\texttt{operator delete[]}]
+\hfill Frees memory allocated by \texttt{new[]}.
+\item[\function{set\_new\_handler}]
+\hfill Sets up an allocation failure handler.
+\end{description}
+
+\vskip 12pt
+\heading{C memory operation functions}
+\vskip 6pt
+
+\begin{description}
+\item[\function{memset}]
+\hfill Fills memory with a specific byte.
+\item[\function{bzero}]
+\hfill Fills memory with the zero byte.
+\item[\function{memccpy}]
+\hfill Copies memory up to a specific byte.
+\item[\function{memcpy}]
+\hfill Copies non-overlapping memory.
+\item[\function{memmove}]
+\hfill Copies possibly-overlapping memory.
+\item[\function{bcopy}]
+\hfill Copies possibly-overlapping memory.
+\item[\function{memcmp}]
+\hfill Compares two blocks of memory.
+\item[\function{bcmp}]
+\hfill Compares two blocks of memory.
+\item[\function{memchr}]
+\hfill Searches memory for a specific byte.
+\item[\function{memmem}]
+\hfill Searches memory for specific bytes.
+\end{description}
+
+\vskip 12pt
+\heading{mpatrol library functions}
+\vskip 6pt
+
+\begin{description}
+\item[\function{\_\_mp\_info}]
+\hfill Returns information for an allocation.
+\item[\function{\_\_mp\_printinfo}]
+\hfill Displays information for an allocation.
+\item[\function{\_\_mp\_memorymap}]
+\hfill Displays a map of memory in the heap.
+\item[\function{\_\_mp\_summary}]
+\hfill Displays a summary of library statistics.
+\item[\function{\_\_mp\_check}]
+\hfill Validates memory in the heap.
+\item[\function{\_\_mp\_prologue}]
+\hfill Sets up an allocation prologue handler.
+\item[\function{\_\_mp\_epilogue}]
+\hfill Sets up an allocation epilogue handler.
+\item[\function{\_\_mp\_nomemory}]
+\hfill Sets up an allocation failure handler.
+\end{description}
+
+\vskip 12pt
+
+The commands that are distributed with the mpatrol library all parse their
+command line options in a similar way to the UNIX \function{getopt} function.
+Options that accept numeric arguments can have their value specified in binary,
+octal, decimal or hexadecimal notation.
+
+\vskip 12pt
+\heading{mpatrol command options}
+\vskip 6pt
+
+\begin{description}
+\item[\flagpar{1}{unsigned integer}]
+\hfill See \option{SMALLBOUND}.
+\item[\flagpar{2}{unsigned integer}]
+\hfill See \option{MEDIUMBOUND}.
+\item[\flagpar{3}{unsigned integer}]
+\hfill See \option{LARGEBOUND}.
+\item[\flagpar{A}{unsigned integer}]
+\hfill See \option{ALLOCSTOP}.
+\item[\flagpar{a}{unsigned integer}]
+\hfill See \option{ALLOCBYTE}.
+\item[\flagpar{C}{unsigned range}]
+\hfill See \option{CHECK}.
+\item[\flag{c}]
+\hfill See \option{CHECKALL}.
+\item[\flagpar{D}{unsigned integer}]
+\hfill See \option{DEFALIGN}.
+\item[\flag{d}]
+Specifies that programs which were not linked with the mpatrol library should
+also be traced, but only if they were dynamically linked.
+\item[\flagpar{e}{string}]
+\hfill See \option{PROGFILE}.
+\item[\flagpar{F}{unsigned integer}]
+\hfill See \option{FREESTOP}.
+\item[\flagpar{f}{unsigned integer}]
+\hfill See \option{FREEBYTE}.
+\item[\flag{G}]
+\hfill See \option{SAFESIGNALS}.
+\item[\flag{g}]
+\hfill See \option{USEDEBUG}.
+\item[\flagpar{L}{unsigned integer}]
+\hfill See \option{LIMIT}.
+\item[\flagpar{l}{string}]
+\hfill See \option{LOGFILE}.
+\item[\flag{m}]
+\hfill See \option{USEMMAP}.
+\item[\flag{N}]
+\hfill See \option{NOPROTECT}.
+\item[\flag{n}]
+\hfill See \option{NOFREE}.
+\item[\flagpar{O}{unsigned integer}]
+\hfill See \option{OFLOWSIZE}.
+\item[\flagpar{o}{unsigned integer}]
+\hfill See \option{OFLOWBYTE}.
+\item[\flagpar{P}{string}]
+\hfill See \option{PROFFILE}.
+\item[\flag{p}]
+\hfill See \option{PROF}.
+\item[\flagpar{Q}{unsigned integer}]
+\hfill See \option{AUTOSAVE}.
+\item[\flagpar{R}{unsigned integer}]
+\hfill See \option{REALLOCSTOP}.
+\item[\flag{S}]
+\hfill See \option{SHOWMAP} and \option{SHOWSYMBOLS}.
+\item[\flag{s}]
+\hfill See \option{SHOWFREED} and \option{SHOWUNFREED}.
+\item[\flagpar{U}{unsigned integer}]
+\hfill See \option{UNFREEDABORT}.
+\item[\flag{V}]
+Displays the version number of the \command{mpatrol} command.
+\item[\flag{v}]
+\hfill See \option{PRESERVE}.
+\item[\flag{w}]
+\hfill See \option{OFLOWWATCH}.
+\item[\flag{X}]
+\hfill See \option{PAGEALLOC=UPPER}.
+\item[\flag{x}]
+\hfill See \option{PAGEALLOC=LOWER}.
+\item[\flagpar{Z}{unsigned integer}]
+\hfill See \option{FAILSEED}.
+\item[\flagpar{z}{unsigned integer}]
+\hfill See \option{FAILFREQ}.
+\end{description}
+
+\vskip 12pt
+\heading{mprof command options}
+\vskip 6pt
+
+\begin{description}
+\item[\flag{a}]
+Specifies that different call sites from within the same function are to be
+differentiated and that the names of all functions should be displayed with
+their call site offset in bytes.
+\item[\flag{c}]
+Specifies that certain tables should be sorted by the number of allocations or
+deallocations rather than the total number of bytes allocated or deallocated.
+\item[\flagpar{n}{depth}]
+Specifies the maximum stack depth to use when calculating if one call site has
+the same call stack as another call site.  This also specifies the maximum
+number of functions to display in a call stack.
+\item[\flag{V}]
+Displays the version number of the \command{mprof} command.
+\end{description}
+
+\vskip 12pt
+\heading{mleak command options}
+\vskip 6pt
+
+\begin{description}
+\item[\flag{V}]
+Displays the version number of the \command{mleak} command.
 \end{description}
 
 \vskip 12pt
