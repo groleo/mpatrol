@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.123 2001-05-22 19:41:15 graeme Exp $
+ * $Id: mpatrol.h,v 1.124 2001-05-23 20:05:00 graeme Exp $
  */
 
 
@@ -751,6 +751,7 @@ void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
                      unsigned long, size_t);
 int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+unsigned long __mp_libversion(void);
 MP_CONST char *__mp_strerror(__mp_errortype);
 MP_CONST char *__mp_function(__mp_alloctype);
 int __mp_setuser(MP_CONST void *, MP_CONST void *);
@@ -833,6 +834,7 @@ static int __mp_errno;
 #define __mp_init() ((void) 0)
 #define __mp_reinit() ((void) 0)
 #define __mp_fini() ((void) 0)
+#define __mp_atexit(f) ((int) 0)
 #define __mp_setoption(o, v) ((unsigned long) ~0L)
 #define __mp_getoption(o, v) ((int) 0)
 #define __mp_alloc(l, a, f, s, t, u, g, h, k) ((void *) NULL)
@@ -843,6 +845,7 @@ static int __mp_errno;
 #define __mp_copymem(p, q, l, c, f, s, t, u, k) ((void *) NULL)
 #define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
+#define __mp_libversion() ((unsigned long) MPATROL_VERSION)
 #define __mp_strerror(f) ((MP_CONST char *) NULL)
 #define __mp_function(f) ((MP_CONST char *) NULL)
 #define __mp_setuser(p, d) ((int) 0)
@@ -915,6 +918,65 @@ __mp_locprintf(MP_CONST char *m, ...)
 #endif /* __STDC_VERSION__ && __GNUC__ */
 
 #endif /* NDEBUG */
+
+
+#define mpatrol_init __mp_init
+#define mpatrol_reinit __mp_reinit
+#define mpatrol_fini __mp_fini
+#define mpatrol_atexit __mp_atexit
+#define mpatrol_setoption __mp_setoption
+#define mpatrol_getoption __mp_getoption
+#define mpatrol_alloc __mp_alloc
+#define mpatrol_strdup __mp_strdup
+#define mpatrol_realloc __mp_realloc
+#define mpatrol_free __mp_free
+#define mpatrol_setmem __mp_setmem
+#define mpatrol_copymem __mp_copymem
+#define mpatrol_locatemem __mp_locatemem
+#define mpatrol_comparemem __mp_comparemem
+#define mpatrol_libversion __mp_libversion
+#define mpatrol_strerror __mp_strerror
+#define mpatrol_function __mp_function
+#define mpatrol_setuser __mp_setuser
+#define mpatrol_setmark __mp_setmark
+#define mpatrol_info __mp_info
+#define mpatrol_syminfo __mp_syminfo
+#define mpatrol_printinfo __mp_printinfo
+#define mpatrol_snapshot __mp_snapshot
+#define mpatrol_iterate __mp_iterate
+#define mpatrol_iterateall __mp_iterateall
+#define mpatrol_addallocentry __mp_addallocentry
+#define mpatrol_addfreeentry __mp_addfreeentry
+#define mpatrol_clearleaktable __mp_clearleaktable
+#define mpatrol_startleaktable __mp_startleaktable
+#define mpatrol_stopleaktable __mp_stopleaktable
+#define mpatrol_leaktable __mp_leaktable
+#define mpatrol_memorymap __mp_memorymap
+#define mpatrol_summary __mp_summary
+#define mpatrol_stats __mp_stats
+#define mpatrol_checkheap __mp_checkheap
+#define mpatrol_check __mp_check
+#define mpatrol_prologue __mp_prologue
+#define mpatrol_epilogue __mp_epilogue
+#define mpatrol_nomemory __mp_nomemory
+#define mpatrol_pushdelstack __mp_pushdelstack
+#define mpatrol_popdelstack __mp_popdelstack
+#define mpatrol_printf __mp_printf
+#define mpatrol_vprintf __mp_vprintf
+#define mpatrol_printfwithloc __mp_printfwithloc
+#define mpatrol_vprintfwithloc __mp_vprintfwithloc
+#define mpatrol_locprintf __mp_locprintf
+#define mpatrol_vlocprintf __mp_vlocprintf
+#define mpatrol_logmemory __mp_logmemory
+#define mpatrol_logstack __mp_logstack
+#define mpatrol_logaddr __mp_logaddr
+#define mpatrol_edit __mp_edit
+#define mpatrol_list __mp_list
+#define mpatrol_view __mp_view
+#define mpatrol_readcontents __mp_readcontents
+#define mpatrol_writecontents __mp_writecontents
+#define mpatrol_cmpcontents __mp_cmpcontents
+#define mpatrol_remcontents __mp_remcontents
 
 
 #if !MP_NOCPLUSPLUS
