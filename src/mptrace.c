@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.13 2001-03-08 18:41:03 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.14 2001-03-22 19:21:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.13 2001-03-08 18:41:03 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.14 2001-03-22 19:21:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.1" /* the current version of this program */
+#define VERSION "1.2" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -60,7 +60,9 @@ typedef enum options_flags
 {
     OF_HELP    = 'h',
     OF_SIMFILE = 's',
-    OF_VERSION = 'V'
+    OF_VERSION = 'V',
+    OF_VERBOSE = 'v',
+    OF_GUI     = 'w'
 }
 options_flags;
 
@@ -78,6 +80,27 @@ typedef struct allocation
     unsigned long time;  /* allocation lifetime */
 }
 allocation;
+
+
+/* Structure containing the statistics for a tracing output file.
+ */
+
+typedef struct statistics
+{
+    size_t acount; /* total number of allocated blocks */
+    size_t atotal; /* total size of allocated blocks */
+    size_t fcount; /* total number of freed blocks */
+    size_t ftotal; /* total size of freed blocks */
+    size_t rcount; /* total number of reserved blocks */
+    size_t rtotal; /* total size of reserved blocks */
+    size_t icount; /* total number of internal blocks */
+    size_t itotal; /* total size of internal blocks */
+    size_t pcount; /* peak number of allocated blocks */
+    size_t ptotal; /* peak size of allocated blocks */
+    size_t lsize;  /* smallest size of an allocation */
+    size_t usize;  /* largest size of an allocation */
+}
+statistics;
 
 
 /* The version of the mpatrol library which produced the tracing output file.
@@ -117,6 +140,12 @@ static void *tableslots[4096];
 static size_t maxslots;
 
 
+/* The statistics gathered from the tracing output file.
+ */
+
+static statistics stats;
+
+
 /* The tracing output file produced by mpatrol.
  */
 
@@ -135,7 +164,19 @@ static FILE *simfile;
 static char *progname;
 
 
+/* Indicates if the tracing table should be displayed.
+ */
+
+static int verbose;
+
+
 #if MP_GUI_SUPPORT
+/* Indicates if the GUI should be used or not.
+ */
+
+static int usegui;
+
+
 /* The X toolkit context for this application.
  */
 
@@ -254,11 +295,15 @@ static XrmOptionDescRec options[] =
 
 static option options_table[] =
 {
+    {"gui", OF_GUI, NULL,
+     "\tDisplays the GUI (if supported).\n"},
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
     {"sim-file", OF_SIMFILE, "file",
      "\tSpecifies that a trace-driven memory allocation simulation program\n"
      "\twritten in C should be written to a file.\n"},
+    {"verbose", OF_VERBOSE, NULL,
+     "\tSpecifies that the tracing table should be displayed.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
@@ -550,6 +595,73 @@ drawmemory(void *a, size_t s, GC g)
 #endif /* MP_GUI_SUPPORT */
 
 
+/* Divide two integers, rounding to the nearest integer.
+ */
+
+static
+unsigned long
+rounddivide(unsigned long n, unsigned long d)
+{
+    unsigned long q;
+    double r;
+
+    if (d == 0)
+        return 0;
+    q = n / d;
+    r = (double) (n - (q * d)) / (double) d;
+    if ((r < 0.5) || ((0.5 <= r) && (r <= 0.5) && !(q & 1)))
+        return q;
+    return q + 1;
+}
+
+
+/* Display a size in bytes.
+ */
+
+static
+void
+printsize(size_t l)
+{
+    fprintf(stdout, "%lu byte", l);
+    if (l != 1)
+        fputc('s', stdout);
+}
+
+
+/* Display the statistics gathered from the tracing output file.
+ */
+
+static
+void
+showstats(void)
+{
+    fputs("memory allocation tracing statistics\n", stdout);
+    fputs("------------------------------------\n", stdout);
+    fprintf(stdout, "allocated: %lu (", stats.acount);
+    printsize(stats.atotal);
+    fprintf(stdout, ")\nfreed:     %lu (", stats.fcount);
+    printsize(stats.ftotal);
+    fprintf(stdout, ")\nunfreed:   %lu (", stats.acount - stats.fcount);
+    printsize(stats.atotal - stats.ftotal);
+    fprintf(stdout, ")\npeak:      %lu (", stats.pcount);
+    printsize(stats.ptotal);
+    fprintf(stdout, ")\nreserved:  %lu (", stats.rcount);
+    printsize(stats.rtotal);
+    fprintf(stdout, ")\ninternal:  %lu (", stats.icount);
+    printsize(stats.itotal);
+    fprintf(stdout, ")\ntotal:     %lu (", stats.rcount + stats.icount);
+    printsize(stats.rtotal + stats.itotal);
+    fputs(")\n\n", stdout);
+    fputs("smallest size: ", stdout);
+    printsize(stats.lsize);
+    fputs("\nlargest size:  ", stdout);
+    printsize(stats.usize);
+    fputs("\naverage size:  ", stdout);
+    printsize(rounddivide(stats.atotal, stats.acount));
+    fputc('\n', stdout);
+}
+
+
 /* Read an event from the tracing output file.
  */
 
@@ -580,8 +692,19 @@ readevent(void)
             a = (void *) getuleb128();
             l = getuleb128();
             f = newalloc(n, currentevent, a, l);
-            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu\n",
-                    currentevent, n, a, l);
+            if (verbose)
+                fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu\n",
+                        currentevent, n, a, l);
+            stats.acount++;
+            stats.atotal += l;
+            if (stats.pcount < stats.acount - stats.fcount)
+                stats.pcount = stats.acount - stats.fcount;
+            if (stats.ptotal < stats.atotal - stats.ftotal)
+                stats.ptotal = stats.atotal - stats.ftotal;
+            if ((stats.lsize == 0) || (stats.lsize > l))
+                stats.lsize = l;
+            if (stats.usize < l)
+                stats.usize = l;
             if (f->entry != NULL)
             {
                 if ((m = slotentry(f)) > maxslots)
@@ -589,13 +712,15 @@ readevent(void)
                 fprintf(simfile, "    {%lu, %lu},\n", m, l);
             }
 #if MP_GUI_SUPPORT
-            if (addrbase == NULL)
-                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
-            drawmemory(a, l, algc);
-            return 0;
-#else /* MP_GUI_SUPPORT */
-            return 1;
+            if (usegui)
+            {
+                if (addrbase == NULL)
+                    addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
+                drawmemory(a, l, algc);
+                return 0;
+            }
 #endif /* MP_GUI_SUPPORT */
+            return 1;
           case 'F':
             bufferpos++;
             bufferlen--;
@@ -607,8 +732,12 @@ readevent(void)
                     fprintf(stderr, "%s: Allocation index `%lu' has already "
                             "been freed\n", progname, n);
                 f->time = currentevent - f->event;
-                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
-                        "%6lu\n", currentevent, n, f->addr, f->size, f->time);
+                if (verbose)
+                    fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
+                            "%6lu\n", currentevent, n, f->addr, f->size,
+                            f->time);
+                stats.fcount++;
+                stats.ftotal += f->size;
                 if (f->entry != NULL)
                 {
                     fprintf(simfile, "    {%lu, 0},\n", slotentry(f));
@@ -616,45 +745,56 @@ readevent(void)
                     f->entry = NULL;
                 }
 #if MP_GUI_SUPPORT
-                drawmemory(f->addr, f->size, frgc);
+                if (usegui)
+                    drawmemory(f->addr, f->size, frgc);
 #endif /* MP_GUI_SUPPORT */
             }
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
 #if MP_GUI_SUPPORT
-            return 0;
-#else /* MP_GUI_SUPPORT */
-            return 1;
+            if (usegui)
+                return 0;
 #endif /* MP_GUI_SUPPORT */
+            return 1;
           case 'H':
             bufferpos++;
             bufferlen--;
             a = (void *) getuleb128();
             l = getuleb128();
-            fprintf(stdout, "        reserve         " MP_POINTER "  %8lu\n", a,
-                    l);
+            if (verbose)
+                fprintf(stdout, "        reserve         " MP_POINTER
+                        "  %8lu\n", a, l);
+            stats.rcount++;
+            stats.rtotal += l;
 #if MP_GUI_SUPPORT
-            if (addrbase == NULL)
-                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
-            drawmemory(a, l, frgc);
-            return 0;
-#else /* MP_GUI_SUPPORT */
-            return 1;
+            if (usegui)
+            {
+                if (addrbase == NULL)
+                    addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
+                drawmemory(a, l, frgc);
+                return 0;
+            }
 #endif /* MP_GUI_SUPPORT */
+            return 1;
           case 'I':
             bufferpos++;
             bufferlen--;
             a = (void *) getuleb128();
             l = getuleb128();
-            fprintf(stdout, "        internal        " MP_POINTER "  %8lu\n", a,
-                    l);
+            if (verbose)
+                fprintf(stdout, "        internal        " MP_POINTER
+                        "  %8lu\n", a, l);
+            stats.icount++;
+            stats.itotal += l;
 #if MP_GUI_SUPPORT
-            drawmemory(a, l, ingc);
-            return 0;
-#else /* MP_GUI_SUPPORT */
-            return 1;
+            if (usegui)
+            {
+                drawmemory(a, l, ingc);
+                return 0;
+            }
 #endif /* MP_GUI_SUPPORT */
+            return 1;
           default:
             break;
         }
@@ -682,13 +822,16 @@ readevent(void)
         fprintf(stderr, "%s: Invalid file format\n", progname);
         exit(EXIT_FAILURE);
     }
+    if (verbose)
+        fputc('\n', stdout);
+    showstats();
     freeallocs();
     fclose(tracefile);
 #if MP_GUI_SUPPORT
-    return 1;
-#else /* MP_GUI_SUPPORT */
-    return 0;
+    if (usegui)
+        return 1;
 #endif /* MP_GUI_SUPPORT */
+    return 0;
 }
 
 
@@ -737,23 +880,29 @@ readfile(void)
     }
     /* Display the tracing table headings.
      */
-    fputs(" event  type     index  ", stdout);
+    if (verbose)
+    {
+        fputs(" event  type     index  ", stdout);
 #if ENVIRON == ENVIRON_64
-    fputs("    allocation    ", stdout);
+        fputs("    allocation    ", stdout);
 #else /* ENVIRON */
-    fputs("allocation", stdout);
+        fputs("allocation", stdout);
 #endif /* ENVIRON */
-    fputs("      size    life\n", stdout);
-    fputs("------  ------  ------  ", stdout);
+        fputs("      size    life\n", stdout);
+        fputs("------  ------  ------  ", stdout);
 #if ENVIRON == ENVIRON_64
-    fputs("------------------", stdout);
+        fputs("------------------", stdout);
 #else /* ENVIRON */
-    fputs("----------", stdout);
+        fputs("----------", stdout);
 #endif /* ENVIRON */
-    fputs("  --------  ------\n", stdout);
-#if !MP_GUI_SUPPORT
+        fputs("  --------  ------\n", stdout);
+    }
     /* Read each allocation or deallocation entry.
      */
+#if MP_GUI_SUPPORT
+    if (!usegui)
+        while (readevent(NULL));
+#else /* MP_GUI_SUPPORT */
     while (readevent());
 #endif /* MP_GUI_SUPPORT */
 }
@@ -779,8 +928,6 @@ main(int argc, char **argv)
                                   XtNumber(options), &argc, argv, NULL, NULL);
     XtVaGetApplicationResources(appwidget, NULL, resources, XtNumber(resources),
                                 NULL);
-    appdisplay = XtDisplay(appwidget);
-    appscreen = XtScreen(appwidget);
 #endif /* MP_GUI_SUPPORT */
     s = NULL;
     e = h = v = 0;
@@ -789,11 +936,19 @@ main(int argc, char **argv)
              options_table)) != EOF)
         switch (c)
         {
+          case OF_GUI:
+#if MP_GUI_SUPPORT
+            usegui = 1;
+#endif /* MP_GUI_SUPPORT */
+            break;
           case OF_HELP:
             h = 1;
             break;
           case OF_SIMFILE:
             s = __mp_optarg;
+            break;
+          case OF_VERBOSE:
+            verbose = 1;
             break;
           case OF_VERSION:
             v = 1;
@@ -870,47 +1025,55 @@ main(int argc, char **argv)
     }
     readfile();
 #if MP_GUI_SUPPORT
-    addrscale = (((addrspace * 1048576) - 1) / (width * height)) + 1;
-    /* Set up the main application window and scrollable drawing area.  Also
-     * set up a pixmap to backup the drawing area.
-     */
-    mainwidget = XtVaCreateManagedWidget("main", xmScrolledWindowWidgetClass,
-                                         appwidget, XmNwidth, vwidth, XmNheight,
-                                         vheight, XmNscrollingPolicy,
-                                         XmAUTOMATIC, XmNscrollBarDisplayPolicy,
-                                         XmAS_NEEDED, NULL);
-    drawwidget = XtVaCreateManagedWidget("draw", xmDrawingAreaWidgetClass,
-                                         mainwidget, XmNwidth, width, XmNheight,
-                                         height, NULL);
-    pixmap = XCreatePixmap(appdisplay, RootWindowOfScreen(appscreen), width,
-                           height, DefaultDepthOfScreen(appscreen));
-    /* Set up the graphics contexts that are used for drawing in different
-     * colours.
-     */
-    g.foreground = uncol;
-    ungc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
-                     &g);
-    g.foreground = incol;
-    ingc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
-                     &g);
-    g.foreground = frcol;
-    frgc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
-                     &g);
-    g.foreground = alcol;
-    algc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
-                     &g);
-    /* Add a callback procedure to handle the refreshing of the drawing area
-     * and also a work procedure to read events from the tracing output file.
-     * Then initialise the drawing area and enter the main X application loop.
-     */
-    XtAddCallback(drawwidget, XmNexposeCallback, (XtCallbackProc) redrawmemory,
-                  NULL);
-    XtAppAddWorkProc(appcontext, (XtWorkProc) readevent, NULL);
-    XtRealizeWidget(appwidget);
-    XFillRectangle(appdisplay, XtWindow(drawwidget), ungc, 0, 0, width - 1,
-                   height - 1);
-    XFillRectangle(appdisplay, pixmap, ungc, 0, 0, width - 1, height - 1);
-    XtAppMainLoop(appcontext);
+    if (usegui)
+    {
+        appdisplay = XtDisplay(appwidget);
+        appscreen = XtScreen(appwidget);
+        addrscale = (((addrspace * 1048576) - 1) / (width * height)) + 1;
+        /* Set up the main application window and scrollable drawing area.
+         * Also set up a pixmap to backup the drawing area.
+         */
+        mainwidget = XtVaCreateManagedWidget("main",
+                                             xmScrolledWindowWidgetClass,
+                                             appwidget, XmNwidth, vwidth,
+                                             XmNheight, vheight,
+                                             XmNscrollingPolicy, XmAUTOMATIC,
+                                             XmNscrollBarDisplayPolicy,
+                                             XmAS_NEEDED, NULL);
+        drawwidget = XtVaCreateManagedWidget("draw", xmDrawingAreaWidgetClass,
+                                             mainwidget, XmNwidth, width,
+                                             XmNheight, height, NULL);
+        pixmap = XCreatePixmap(appdisplay, RootWindowOfScreen(appscreen), width,
+                               height, DefaultDepthOfScreen(appscreen));
+        /* Set up the graphics contexts that are used for drawing in different
+         * colours.
+         */
+        g.foreground = uncol;
+        ungc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen),
+                         GCForeground, &g);
+        g.foreground = incol;
+        ingc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen),
+                         GCForeground, &g);
+        g.foreground = frcol;
+        frgc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen),
+                         GCForeground, &g);
+        g.foreground = alcol;
+        algc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen),
+                         GCForeground, &g);
+        /* Add a callback procedure to handle the refreshing of the drawing
+         * area and also a work procedure to read events from the tracing
+         * output file.  Then initialise the drawing area and enter the main X
+         * application loop.
+         */
+        XtAddCallback(drawwidget, XmNexposeCallback,
+                      (XtCallbackProc) redrawmemory, NULL);
+        XtAppAddWorkProc(appcontext, (XtWorkProc) readevent, NULL);
+        XtRealizeWidget(appwidget);
+        XFillRectangle(appdisplay, XtWindow(drawwidget), ungc, 0, 0, width - 1,
+                       height - 1);
+        XFillRectangle(appdisplay, pixmap, ungc, 0, 0, width - 1, height - 1);
+        XtAppMainLoop(appcontext);
+    }
 #endif /* MP_GUI_SUPPORT */
     return EXIT_SUCCESS;
 }
