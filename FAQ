@@ -99,6 +99,21 @@ their corresponding answers or solutions.
 
  3. RUNNING
 
+ Q. I've just linked and run my program with the mpatrol library, but the
+    resulting log file doesn't contain any useful information.  Why does it not
+    contain a list of all memory transactions or show any unfreed memory
+    allocations?
+
+ A. By default, the mpatrol library will only write a summary of library
+    settings and statistics to the log file, and that will only occur on
+    successful program termination (i.e. when exit() is called).  If this does
+    not appear then it is likely that your program (or some other library
+    function) called abort() due to a fatal error.  However, there are a
+    multitude of different options that you can pass to the mpatrol library via
+    the MPATROL_OPTIONS environment variable that will allow you to control what
+    is logged and what is not.  Note that the mpatrol shell script will always
+    log all calls to allocate, reallocate and free memory by default.
+
  Q. I am trying to use the mpatrol shell script to debug an executable file that
     was not originally compiled with the mpatrol library.  However, even though
     it runs successfully, no mpatrol log file is produced.  Why is this?
@@ -136,6 +151,37 @@ their corresponding answers or solutions.
     malloc() and related functions would have the capability to cause lots of
     undesirable side effects.  However, this does not normally happen, which is
     why the behaviour was moved to an option for those that needed it.
+
+ Q. I've linked and run my program with mpatrol under UNIX and it uses a large
+    amount of heap memory.  However, it crashes near the end of execution and
+    then proceeds to freeze up the whole system, sometimes requiring a reboot.
+    What am I doing wrong?
+
+ A. The most common possible explanation for this is that you are running your
+    program with too much access to system resources.  What is likely to be
+    happening is that when your program crashes the system attempts to dump the
+    entire process image to a core file for later debugging in a non-symbolic
+    debugger.  If the process has a huge heap then the core file is also going
+    to be huge, thus resulting in a massive file that may lead to the system
+    thrashing while it attempts to write it to the disk.  Technically, the
+    system has not frozen, but it is likely to take a long time to finish
+    writing the file.  The best solution involves setting your program's maximum
+    core file size to a reasonable limit (or just zero), and also possibly
+    limiting your program's maximum data segment size as well.  These can be set
+    from the shell but the exact details on how to do this differ between
+    shells.
+
+ Q. Why does my program run so slowly after I link it with the mpatrol library?
+
+ A. Normal malloc libraries are optimised for speed but will typically fall over
+    at the slightest hint of an error.  Debugging malloc libraries are written
+    to provide as much debugging information as possible whilst performing a
+    multitude of additional checks, which is why they may run much slower.
+    However, you can control which checks are performed (and when) by using the
+    MPATROL_OPTIONS environment variable.  Performance may also be lost if you
+    make lots of small memory allocations rather than fewer larger allocations,
+    but that is mainly due to the overhead of storing the extra tracing details
+    for each memory allocation.
 
 
  4. FILES
