@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.5 2000-04-19 19:33:25 graeme Exp $"
+#ident "$Id: profile.c,v 1.6 2000-04-19 19:45:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,7 +48,7 @@ extern "C"
 
 MP_GLOBAL void __mp_newprofile(profhead *p)
 {
-    unsigned long i;
+    size_t i;
 
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;
@@ -61,12 +61,21 @@ MP_GLOBAL void __mp_newprofile(profhead *p)
 }
 
 
+/* Write the profiling information to the output file.
+ */
+
+MP_GLOBAL int __mp_writeprofile(profhead *p)
+{
+    return 1;
+}
+
+
 /* Forget all existing profiling information.
  */
 
 MP_GLOBAL void __mp_deleteprofile(profhead *p)
 {
-    unsigned long i;
+    size_t i;
 
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;

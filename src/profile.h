@@ -41,15 +41,15 @@
 
 typedef struct profhead
 {
-    unsigned long acounts[MP_BIN_SIZE]; /* allocation bins */
-    unsigned long dcounts[MP_BIN_SIZE]; /* deallocation bins */
-    unsigned long acountl;              /* total bytes of large allocations */
-    unsigned long dcountl;              /* total bytes of large deallocations */
-    unsigned long sbound;               /* small allocation boundary */
-    unsigned long mbound;               /* medium allocation boundary */
-    unsigned long lbound;               /* large allocation boundary */
-    char *file;                         /* profiling filename */
-    char profiling;                     /* profiling status */
+    size_t acounts[MP_BIN_SIZE]; /* allocation bins */
+    size_t dcounts[MP_BIN_SIZE]; /* deallocation bins */
+    size_t acountl;              /* total bytes of large allocations */
+    size_t dcountl;              /* total bytes of large deallocations */
+    size_t sbound;               /* small allocation boundary */
+    size_t mbound;               /* medium allocation boundary */
+    size_t lbound;               /* large allocation boundary */
+    char *file;                  /* profiling filename */
+    char profiling;              /* profiling status */
 }
 profhead;
 
@@ -61,6 +61,7 @@ extern "C"
 
 
 MP_EXPORT void __mp_newprofile(profhead *);
+MP_EXPORT int __mp_writeprofile(profhead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
 MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
 MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
