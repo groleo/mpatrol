@@ -45,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.14 2000-07-31 23:47:16 graeme Exp $"
+#ident "$Id: signals.c,v 1.15 2000-10-30 23:19:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -252,7 +252,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
         a = (void *) e->ContextRecord->Eip;
         __mp_diag("\n    call stack\n");
         __mp_diag("\t" MP_POINTER " ", a);
-        __mp_printsymbol(&h->syms, a, -1);
+        __mp_printsymbol(&h->syms, a);
         __mp_diag("\n");
         __mp_printstack(&h->syms, &i);
     }
