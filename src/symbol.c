@@ -36,15 +36,20 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_BFD
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF || \
+    FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
 #include <fcntl.h>
 #include <unistd.h>
-#if FORMAT == FORMAT_COFF
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
 #include <a.out.h>
-#if SYSTEM == SYSTEM_LYNXOS
+#if SYSTEM == SYSTEM_AIX
+#ifndef ISCOFF
+#define ISCOFF(m) (((m) == U800TOCMAGIC) || ((m) == U802TOCMAGIC))
+#endif /* ISCOFF */
+#elif SYSTEM == SYSTEM_LYNXOS
 #include <coff.h>
 #ifndef ISCOFF
-#define ISCOFF(m) ISCOFFMAGIC(m)
+#define ISCOFF(m) ((m) == COFFMAGICNUM)
 #endif /* ISCOFF */
 #ifndef ISFCN
 #define ISFCN(t) (((t) & 0x30) == (DT_FCN << 4))
@@ -53,15 +58,20 @@
 #define n_name _n._n_name
 #endif /* n_name */
 #endif /* SYSTEM */
-#elif FORMAT == FORMAT_ELF32
+#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
 #include <libelf.h>
 #elif FORMAT == FORMAT_BFD
 #include <bfd.h>
 #endif /* FORMAT */
 #endif /* FORMAT */
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if SYSTEM == SYSTEM_AIX
+/* The shared libraries that an AIX executable has loaded can be obtained via
+ * the loadquery() function.
+ */
+#include <sys/ldr.h>
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
 /* Despite the fact that Linux is now ELF-based, libelf seems to be missing from
  * many recent distributions and so we must use the GNU BFD library to read the
  * symbols from the object files and libraries.  However, we still need the ELF
@@ -84,7 +94,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.26 2000-06-12 21:38:11 graeme Exp $"
+#ident "$Id: symbol.c,v 1.27 2000-06-20 17:43:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -312,8 +322,8 @@ static symnode *getsymnode(symhead *y)
 }
 
 
-#if FORMAT == FORMAT_COFF
-/* Allocate a new symbol node for a given COFF symbol.
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+/* Allocate a new symbol node for a given COFF or XCOFF symbol.
  */
 
 static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
@@ -323,12 +333,25 @@ static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
     char *r;
 
     /* We don't bother storing a symbol which has no name or whose name
-     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
-     * for symbols which have a virtual address of zero and we only remember
-     * symbols that are declared statically or externally visible.
+     * contains a '$', '@' or a '.'.  However, in XCOFF the symbol name is
+     * likely to be the name of a CSECT beginning with a '.' and not the
+     * original name of the function, so we skip the first character.  We
+     * also don't allocate a symbol node for symbols which have a virtual
+     * address of zero and we only remember symbols that are declared
+     * statically or externally visible.
      */
-    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (p->n_value > 0) &&
+    if ((s != NULL) &&
+#if FORMAT == FORMAT_XCOFF
+        (*s++ == '.') && (strcmp(s, "text") != 0) &&
+#else /* FORMAT */
+        (*s != '\0') &&
+#endif /* FORMAT */
+        !strpbrk(s, "$@.") && (p->n_value > 0) &&
+#if FORMAT == FORMAT_XCOFF
+        (ISFCN(p->n_type) || (p->n_sclass == C_EXT)))
+#else /* FORMAT */
         ((p->n_sclass == C_STAT) || (p->n_sclass == C_EXT)))
+#endif /* FORMAT */
     {
         if ((n = getsymnode(y)) == NULL)
             return 0;
@@ -362,7 +385,7 @@ static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
     return 1;
 }
 #elif FORMAT == FORMAT_ELF32
-/* Allocate a new symbol node for a given ELF symbol.
+/* Allocate a new symbol node for a given ELF32 symbol.
  */
 
 static int addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
@@ -397,6 +420,45 @@ static int addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
         /* The linkage information is required for when we look up a symbol.
          */
         n->data.flags = ELF32_ST_BIND(p->st_info);
+    }
+    return 1;
+}
+#elif FORMAT == FORMAT_ELF64
+/* Allocate a new symbol node for a given ELF64 symbol.
+ */
+
+static int addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
+{
+    symnode *n;
+    char *r;
+    size_t a;
+    unsigned char t;
+
+    a = b + p->st_value;
+    /* We don't bother storing a symbol which has no name or whose name
+     * contains a '$', '@' or a '.'.  We also don't allocate a symbol node
+     * for symbols which have a virtual address of zero or are of object type.
+     */
+    if ((s != NULL) && (*s != '\0') && !strpbrk(s, "$@.") && (a > 0) &&
+        (((t = ELF64_ST_TYPE(p->st_info)) == STT_NOTYPE) || (t == STT_FUNC)))
+    {
+        if ((n = getsymnode(y)) == NULL)
+            return 0;
+        if ((r = __mp_addstring(&y->strings, s)) == NULL)
+        {
+            __mp_freeslot(&y->table, n);
+            return 0;
+        }
+        __mp_treeinsert(&y->dtree, &n->data.node, a);
+        n->data.file = f;
+        n->data.name = r;
+        n->data.addr = (void *) a;
+        n->data.size = p->st_size;
+        n->data.index = 0;
+        n->data.offset = 0;
+        /* The linkage information is required for when we look up a symbol.
+         */
+        n->data.flags = ELF64_ST_BIND(p->st_info);
     }
     return 1;
 }
@@ -463,8 +525,8 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 #endif /* FORMAT */
 
 
-#if FORMAT == FORMAT_COFF
-/* Allocate a set of symbol nodes for a COFF executable file.
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
+/* Allocate a set of symbol nodes for a COFF or XCOFF executable file.
  */
 
 static int addsymbols(symhead *y, char *e, char *f, size_t b)
@@ -476,7 +538,7 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
     char *m, *s;
     size_t i, t;
 
-    /* Check that we have a valid COFF executable file.
+    /* Check that we have a valid COFF or XCOFF executable file.
      */
     if (b < FILHSZ)
     {
@@ -534,30 +596,31 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
     }
     /* Cycle through every symbol contained in the executable file.
      */
-    for (i = 0; i < o->f_nsyms; i += p[i].n_numaux + 1)
+    for (i = 0; i < o->f_nsyms; i += p->n_numaux + 1,
+         p = (SYMENT *) ((char *) p + (p->n_numaux + 1) * SYMESZ))
         /* We only need to bother looking at text symbols.
          */
-        if (p[i].n_scnum == t)
+        if (p->n_scnum == t)
         {
-            if (p[i].n_zeroes)
+            if (p->n_zeroes)
             {
                 /* Symbol name is stored in structure.
                  */
-                strncpy(n, p[i].n_name, 8);
-                n[8] = '\0';
+                strncpy(n, p->n_name, SYMNMLEN);
+                n[SYMNMLEN] = '\0';
                 s = n;
             }
             else
                 /* Symbol name is stored in string table.
                  */
-                s = m + p[i].n_offset;
-            if (!addsymbol(y, p + i, f, s))
+                s = m + p->n_offset;
+            if (!addsymbol(y, p, f, s))
                 return 0;
         }
     return 1;
 }
 #elif FORMAT == FORMAT_ELF32
-/* Allocate a set of symbol nodes for an ELF object file.
+/* Allocate a set of symbol nodes for an ELF32 object file.
  */
 
 static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
@@ -620,6 +683,74 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
         if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
             (n != SHN_COMMON) && (s = elf_getscn(e, n)) &&
             (h = elf32_getshdr(s)) && (h->sh_flags & SHF_EXECINSTR))
+            if (!addsymbol(y, p, f, elf_strptr(e, t, p->st_name), b))
+                return 0;
+    return 1;
+}
+#elif FORMAT == FORMAT_ELF64
+/* Allocate a set of symbol nodes for an ELF64 object file.
+ */
+
+static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
+{
+    Elf_Scn *s;
+    Elf64_Shdr *h;
+    Elf64_Sym *p;
+    Elf_Data *d;
+    char *m;
+    size_t i, l, n, t;
+
+    /* Look for the symbol table.
+     */
+    for (s = elf_nextscn(e, NULL), d = NULL; s != NULL; s = elf_nextscn(e, s))
+        if ((h = elf64_getshdr(s)) && (h->sh_type == SHT_SYMTAB) &&
+            (d = elf_getdata(s, NULL)))
+            break;
+    if (d == NULL)
+        /* If we couldn't find the symbol table then it is likely that the file
+         * has been stripped.  However, if the file was dynamically linked then
+         * we may be able to obtain some symbols from its dynamic symbol table.
+         */
+        for (s = elf_nextscn(e, NULL), d = NULL; s != NULL;
+             s = elf_nextscn(e, s))
+            if ((h = elf64_getshdr(s)) && (h->sh_type == SHT_DYNSYM) &&
+                (d = elf_getdata(s, NULL)))
+                break;
+    if ((d == NULL) || (d->d_buf == NULL) || (d->d_size == 0))
+    {
+        m = "missing symbol table";
+        if (a != NULL)
+            __mp_warn(AT_MAX, "%s [%s]: %s\n", f, a, m);
+        else
+            __mp_warn(AT_MAX, "%s: %s\n", f, m);
+        return 1;
+    }
+    t = h->sh_link;
+    /* Look for the string table.
+     */
+    if (((s = elf_getscn(e, t)) == NULL) || ((h = elf64_getshdr(s)) == NULL) ||
+        (h->sh_type != SHT_STRTAB))
+    {
+        m = "missing string table";
+        if (a != NULL)
+            __mp_warn(AT_MAX, "%s [%s]: %s\n", f, a, m);
+        else
+            __mp_warn(AT_MAX, "%s: %s\n", f, m);
+        return 1;
+    }
+    if (a != NULL)
+        f = a;
+    p = (Elf64_Sym *) d->d_buf + 1;
+    l = d->d_size / sizeof(Elf64_Sym);
+    /* Cycle through every symbol contained in the object file.
+     */
+    for (i = 1; i < l; i++, p++)
+        /* We don't need to bother looking at undefined, absolute or common
+         * symbols, and we only need to store non-data symbols.
+         */
+        if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
+            (n != SHN_COMMON) && (s = elf_getscn(e, n)) &&
+            (h = elf64_getshdr(s)) && (h->sh_flags & SHF_EXECINSTR))
             if (!addsymbol(y, p, f, elf_strptr(e, t, p->st_name), b))
                 return 0;
     return 1;
@@ -711,11 +842,12 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
 
 MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 {
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_BFD
-#if FORMAT == FORMAT_COFF
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF || \
+    FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
     char *m;
     off_t o;
-#elif FORMAT == FORMAT_ELF32
+#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
     Elf *a, *e;
     Elf_Arhdr *h;
 #elif FORMAT == FORMAT_BFD
@@ -728,10 +860,9 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
     int r;
 
     r = 1;
-#if FORMAT == FORMAT_COFF
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF
     /* This is a very simple, yet portable, way to read symbols from COFF
-     * executable files.  It's unlikely to work with anything but the most
-     * basic COFF file format.
+     * and XCOFF executable files.
      */
     if ((f = open(s, O_RDONLY)) == -1)
     {
@@ -774,7 +905,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
         }
         close(f);
     }
-#elif FORMAT == FORMAT_ELF32
+#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
     /* We use the libelf ELF access library in order to simplify the reading
      * of symbols.  At the moment, this solution is better than using the
      * GNU BFD library as it currently has no support for symbol sizes or
@@ -828,10 +959,11 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 #elif FORMAT == FORMAT_BFD
     /* Using the GNU BFD library allows us to read weird and wonderful
      * file formats that would otherwise be hard to support.  This is
-     * probably a better choice to use than the in-built COFF implementation
-     * but currently has no support for symbol sizes, so the ELF access
-     * library is still worth using for ELF file formats, but the BFD library
-     * comes with support for debugging information.  So take your pick!
+     * probably a better choice to use than the in-built COFF and XCOFF
+     * implementations but currently has no support for symbol sizes, so
+     * the ELF access library is still worth using for ELF file formats,
+     * but the BFD library comes with support for debugging information.
+     * So take your pick!
      */
     p = NULL;
     bfd_init();
@@ -896,9 +1028,12 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 
 MP_GLOBAL int __mp_addextsymbols(symhead *y)
 {
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if SYSTEM == SYSTEM_AIX
+    static char b[4096];
+    struct ld_info *l;
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
     Elf32_Dyn *d;
     dynamiclink *l;
 #elif SYSTEM == SYSTEM_HPUX
@@ -917,9 +1052,23 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
      * dynamically linked in order to read symbols from any required shared
      * objects.
      */
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
-    SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
+#if SYSTEM == SYSTEM_AIX
+    if (loadquery(L_GETINFO, b, sizeof(b)) != -1)
+    {
+        /* We skip past the first item on the list since it represents the
+         * executable file.
+         */
+        l = (struct ld_info *) b;
+        while (l = l->ldinfo_next ? (struct ld_info *)
+                                    ((char *) l + l->ldinfo_next) : NULL)
+            if ((*l->ldinfo_filename != '\0') &&
+                !__mp_addsymbols(y, l->ldinfo_filename,
+                                 (unsigned long) l->ldinfo_textorg))
+                return 0;
+    }
+#elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SINIX || \
+      SYSTEM == SYSTEM_SOLARIS || SYSTEM == SYSTEM_UNIXWARE
     if ((&_DYNAMIC != NULL) && (d = (Elf32_Dyn *) _DYNAMIC))
     {
         /* Search for the DT_DEBUG tag in the _DYNAMIC symbol.
@@ -1096,7 +1245,15 @@ MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
                 if ((r == NULL) || ((r->data.flags == C_STAT) &&
                      (n->data.flags == C_EXT)))
                     r = n;
-#elif FORMAT == FORMAT_ELF32
+#elif FORMAT == FORMAT_XCOFF
+                /* We give precedence to global symbols, then hidden external
+                 * symbols, then local symbols.
+                 */
+                if ((r == NULL) || ((r->data.flags & C_STAT) &&
+                     ((n->data.flags & C_HIDEXT) || (n->data.flags & C_EXT))) ||
+                    ((r->data.flags & C_HIDEXT) && (n->data.flags & C_EXT)))
+                    r = n;
+#elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
                 /* We give precedence to global symbols, then weak symbols,
                  * then local symbols.
                  */
