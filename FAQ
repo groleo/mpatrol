@@ -130,14 +130,16 @@ their corresponding answers or solutions.
     instead.  If you are using the thread-safe version of mpatrol then you may
     also need to link with the system threads library.
 
- Q. Why do I still get undefined symbols on HP/UX or IRIX platforms, despite
-    following the above instructions?
+ Q. Why do I still get undefined symbols on HP/UX, IRIX or Windows platforms,
+    despite following the above instructions?
 
  A. If the symbol is called U_get_previous_frame on HP/UX then you still need
     to link with the system stack traceback library, libcl.sl.  If the symbols
     are called exc_setjmp and unwind on IRIX and you defined the
     MP_LIBRARYSTACK_SUPPORT preprocessor macro when building the mpatrol library
-    then you still need to link with the system exception library libexc.so.
+    then you still need to link with the system exception library, libexc.so.
+    If the symbols all begin with Sym* on Windows platforms then you still need
+    to link with the system symbol access library, imagehlp.lib.
 
  Q. Why do I get duplicate definitions of symbols when linking with the mpatrol
     library?
@@ -211,12 +213,13 @@ their corresponding answers or solutions.
 
  A. Firstly, you have to ensure that you have built the mpatrol library with
     support for the GNU BFD object file access library by compiling with the
-    FORMAT=FORMAT_BFD preprocessor macro definition.  Secondly, you have to
-    ensure that you have compiled all relevant object files with debugging
-    information enabled (usually by adding an option to the compiler command
-    line), although the mpatrol library does not need to be compiled this way.
-    The file and line number information will hopefully then appear in the
-    log file for all symbols that have associated debugging information.
+    FORMAT=FORMAT_BFD preprocessor macro definition, or you are running on a
+    Windows platform.  Secondly, you have to ensure that you have compiled all
+    relevant object files with debugging information enabled (usually by adding
+    an option to the compiler command line), although the mpatrol library does
+    not need to be compiled this way.  The file and line number information will
+    hopefully then appear in the log file for all symbols that have associated
+    debugging information.
 
  Q. Why do some mpatrol log file entries only contain a partial call stack
     rather than following the function call stack back to the call to main()?
@@ -310,7 +313,9 @@ their corresponding answers or solutions.
     However, most compilers come with a demangling tool which can be used in a
     command pipe to accept mangled names on its standard input file stream and
     demangle them on its standard output file stream, and so can be used to
-    process the mpatrol log file.
+    process the mpatrol log file.  Note that mpatrol automatically demangles
+    C++ symbol names on Windows platforms as Microsoft's name mangling is
+    quite unreadable and would be hard to demangle using a command line tool.
 
  Q. Why does my program not stop when the mpatrol library notices an error?
 
