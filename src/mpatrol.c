@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.23 2000-10-19 18:35:01 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.24 2000-10-19 19:07:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -91,7 +91,15 @@ typedef enum options_flags
     OF_PAGEALLOCLOWER = 'x',
     OF_FAILSEED       = 'Z',
     OF_FAILFREQ       = 'z',
-    OF_SHOWENV        = SHORTOPT_MAX + 1
+    OF_LOGALL         = SHORTOPT_MAX + 1,
+    OF_LOGALLOCS,
+    OF_LOGFREES,
+    OF_LOGMEMORY,
+    OF_LOGREALLOCS,
+    OF_SHOWALL,
+    OF_SHOWENV,
+    OF_SHOWSYMBOLS,
+    OF_SHOWUNFREED
 }
 options_flags;
 
@@ -134,7 +142,10 @@ static char *smallbound, *mediumbound, *largebound;
  * setting the environment variable containing mpatrol library options.
  */
 
-static int showmap, showfreed;
+static int logallocs, logreallocs;
+static int logfrees, logmemory;
+static int showmap, showsymbols;
+static int showfreed, showunfreed;
 static int checkall, prof;
 static int safesignals, noprotect;
 static int preserve, oflowwatch;
@@ -193,9 +204,24 @@ static option options_table[] =
     {"limit", OF_LIMIT, "unsigned integer",
      "\tSpecifies the limit in bytes at which all memory allocations should\n"
      "\tfail if the total allocated memory should increase beyond this.\n"},
+    {"log-all", OF_LOGALL, NULL,
+     "\tEquivalent to the --log-allocs, --log-reallocs, --log-frees and\n"
+     "\t--log-memory options specified together.\n"},
+    {"log-allocs", OF_LOGALLOCS, NULL,
+     "\tSpecifies that all memory allocations are to be logged and sent to\n"
+     "\tthe log file.\n"},
     {"log-file", OF_LOGFILE, "string",
      "\tSpecifies an alternative file in which to place all diagnostics from\n"
      "\tthe mpatrol library.\n"},
+    {"log-frees", OF_LOGFREES, NULL,
+     "\tSpecifies that all memory deallocations are to be logged and sent to\n"
+     "\tthe log file.\n"},
+    {"log-memory", OF_LOGMEMORY, NULL,
+     "\tSpecifies that all memory operations are to be logged and sent to the\n"
+     "\tlog file.\n"},
+    {"log-reallocs", OF_LOGREALLOCS, NULL,
+     "\tSpecifies that all memory reallocations are to be logged and sent to\n"
+     "\tthe log file.\n"},
     {"medium-bound", OF_MEDIUMBOUND, "unsigned integer",
      "\tSpecifies the limit in bytes up to which memory allocations should be\n"
      "\tclassified as medium allocations for profiling purposes.\n"},
@@ -242,6 +268,9 @@ static option options_table[] =
      "\tInstructs the library to save and replace certain signal handlers\n"
      "\tduring the execution of library code and to restore them\n"
      "\tafterwards.\n"},
+    {"show-all", OF_SHOWALL, NULL,
+     "\tEquivalent to the --show-freed, --show-unfreed, --show-map and\n"
+     "\t--show-symbols options specified together.\n"},
     {"show-env", OF_SHOWENV, NULL,
      "\tDisplays the contents of the " MP_OPTIONS " environment variable.\n"},
     {"show-freed", OF_SHOWFREED, NULL,
@@ -250,6 +279,13 @@ static option options_table[] =
     {"show-map", OF_SHOWMAP, NULL,
      "\tSpecifies that a memory map of the entire heap and a summary of all\n"
      "\tof the function symbols read from the program's executable file\n"
+     "\tshould be displayed at the end of program execution.\n"},
+    {"show-symbols", OF_SHOWSYMBOLS, NULL,
+     "\tSpecifies that a summary of all of the function symbols read from\n"
+     "\tthe program's executable file should be displayed at the end of\n"
+     "\tprogram execution.\n"},
+    {"show-unfreed", OF_SHOWUNFREED, NULL,
+     "\tSpecifies that a summary of all of the unfreed memory allocations\n"
      "\tshould be displayed at the end of program execution.\n"},
     {"small-bound", OF_SMALLBOUND, "unsigned integer",
      "\tSpecifies the limit in bytes up to which memory allocations should be\n"
@@ -337,7 +373,14 @@ static void setoptions(int s)
         addoption("LARGEBOUND", largebound, 0);
     if (limit)
         addoption("LIMIT", limit, 0);
-    addoption("LOGALL", NULL, 0);
+    if (logallocs)
+        addoption("LOGALLOCS", NULL, 0);
+    if (logfrees)
+        addoption("LOGFREES", NULL, 0);
+    if (logmemory)
+        addoption("LOGMEMORY", NULL, 0);
+    if (logreallocs)
+        addoption("LOGREALLOCS", NULL, 0);
     if (mediumbound)
         addoption("MEDIUMBOUND", mediumbound, 0);
     if (nofree)
@@ -367,11 +410,10 @@ static void setoptions(int s)
     if (showfreed)
         addoption("SHOWFREED", NULL, 0);
     if (showmap)
-    {
         addoption("SHOWMAP", NULL, 0);
+    if (showsymbols)
         addoption("SHOWSYMBOLS", NULL, 0);
-    }
-    if (showfreed)
+    if (showunfreed)
         addoption("SHOWUNFREED", NULL, 0);
     if (smallbound)
         addoption("SMALLBOUND", smallbound, 0);
@@ -467,8 +509,26 @@ int main(int argc, char **argv)
           case OF_LIMIT:
             limit = __mp_optarg;
             break;
+          case OF_LOGALL:
+            logallocs = 1;
+            logreallocs = 1;
+            logfrees = 1;
+            logmemory = 1;
+            break;
+          case OF_LOGALLOCS:
+            logallocs = 1;
+            break;
           case OF_LOGFILE:
             logfile = __mp_optarg;
+            break;
+          case OF_LOGFREES:
+            logfrees = 1;
+            break;
+          case OF_LOGMEMORY:
+            logmemory = 1;
+            break;
+          case OF_LOGREALLOCS:
+            logreallocs = 1;
             break;
           case OF_MEDIUMBOUND:
             mediumbound = __mp_optarg;
@@ -512,6 +572,12 @@ int main(int argc, char **argv)
           case OF_SAFESIGNALS:
             safesignals = 1;
             break;
+          case OF_SHOWALL:
+            showmap = 1;
+            showsymbols = 1;
+            showfreed = 1;
+            showunfreed = 1;
+            break;
           case OF_SHOWENV:
             w = 1;
             break;
@@ -520,6 +586,12 @@ int main(int argc, char **argv)
             break;
           case OF_SHOWMAP:
             showmap = 1;
+            break;
+          case OF_SHOWSYMBOLS:
+            showsymbols = 1;
+            break;
+          case OF_SHOWUNFREED:
+            showunfreed = 1;
             break;
           case OF_SMALLBOUND:
             smallbound = __mp_optarg;
