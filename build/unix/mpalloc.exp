@@ -44,6 +44,7 @@ __mp_setuser
 __mp_setmark
 __mp_info
 __mp_syminfo
+__mp_symbol
 __mp_printinfo
 __mp_snapshot
 __mp_iterate
