@@ -1,4 +1,4 @@
-Changes for 1.4.0
+Changes for 1.4.0 (21st February, 2001)
 
   * Added release versions of all of the mpatrol library functions that can be
     used to quickly remove all mpatrol features by linking with libmpalloc.
@@ -78,7 +78,11 @@ Changes for 1.4.0
   * Added a tools directory containing additional source code for the mpatrol
     library.  Currently contains packages for determining the difference in the
     heap between two points in a program's execution, a GNU-compatible mtrace()
-    function and a memory allocation gauge.
+    function and a memory allocation gauge.  A new library is also available
+    which contains these packages.
+
+  * The mpatrol distribution now contains the mpatrol documentation and manual
+    page archives which are no longer available separately.
 
 
 Changes for 1.3.4 (25th January, 2001)

@@ -1,3 +1,88 @@
+2001-02-21  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate: No longer build the documentation archives.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added dependencies for tools.  Added mptools definitions.
+
+	* build/unix/Makefile, build/unix/Makefile.aix:
+	Added the mptools lint library.
+
+	* doc/Makefile: No longer have a rule to make the documentation archive.
+
+	* doc/README:
+	Removed distinction between main distribution and documentation archive.
+
+	* doc/mpatrol.txt, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.guide:
+	The documentation is now built automatically when a release is made so
+	there is no point in having preformatted manual pages in CVS.
+
+	* doc/mpatrol.texi:
+	Removed all references to the documentation and manual page archives.
+	Added the tools section.
+
+	* doc/texinfo.tex: Updated to the latest version of texinfo.tex.
+
+	* man/Makefile:
+	Changed PAGES to CATPAGES.  No longer have a rule to make the manual
+	page archive.
+
+	* man/README:
+	Removed distinction between main distribution and manual page archive.
+
+	* man/cat3/libmpalloc.3, man/cat3/libmpatrol.3, man/cat1/hexwords.1,
+	  man/cat1/mleak.1, man/cat1/mpatrol.1, man/cat1/mpedit.1,
+	  man/cat1/mprof.1, man/cat1/mpsym.1, man/cat1/mptrace.1,
+	  man/html/hexwords.html, man/html/libmpalloc.html,
+	  man/html/libmpatrol.html, man/html/mleak.html, man/html/mpatrol.html,
+	  man/html/mpedit.html, man/html/mprof.html, man/html/mpsym.html,
+	  man/html/mptrace.html:
+	The manual pages are now automatically built when a release is made so
+	there is no point in having preformatted manual pages in CVS.
+
+	* man/man3/libmpatrol.3: Added information about mptools.
+
+	* pkg/lsm/mpatrol.lsm: Updated file sizes.
+
+	* pkg/rpm/build, pkg/rpm/mpatrol.spec, pkg/lsm/mpatrol.lsm:
+	Removed references to the documentation and manual page archives.
+
+	* pkg/zip/build.bat, pkg/tar/build, pkg/sdux/build,
+	  pkg/sdux/mpatrol.psf, pkg/rpm/mpatrol.spec, pkg/pkg/build,
+	  pkg/pkg/prototype, pkg/lha/build:
+	Added the tools headers to include/mpatrol.  Added libmptools.
+
+	* tools/README:
+	Documented that the package scripts already install mptools.
+
+2001-02-20  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpalloc.def, build/windows/mpatrol.def,
+	  build/windows/mpatrolmt.def, build/unix/mpalloc.exp,
+	  build/unix/mpatrol.exp:
+	Added the __mp_stats() function.
+
+	* doc/mpatrol.html, doc/mpatrol.info, doc/mpatrol.texi, doc/mpatrol.txt,
+	  doc/mpatrol.guide:
+	Updated more of the manual.  Added more functions.  Final changes to get
+	the documentation up to date.  Phew!  Added the example for MP_MALLOC().
+
+	* doc/refcard.tex:
+	Added the C dynamic memory alternative functions and __mp_stats().
+
+	* extra/.gdbinit:
+	Cannot break at __mp_trap() by running to _start() since the shared
+	version of mpatrol will not work correctly when setting the environment.
+
+2001-02-19  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.html, doc/mpatrol.info, doc/mpatrol.texi, doc/mpatrol.txt,
+	  doc/mpatrol.guide:
+	Added the removing mpatrol section.
+
 2001-02-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* tools/mgauge.c: Didn't need the prologue handler.
