@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.7 2000-01-21 00:51:46 graeme Exp $"
+#ident "$Id: info.c,v 1.8 2000-01-24 20:33:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,6 +76,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->size = h->count = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
+    h->ctotal = h->stotal = 0;
     h->ffreq = h->fseed = 0;
     h->prologue = NULL;
     h->epilogue = NULL;
@@ -121,6 +122,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     h->table.size = 0;
     __mp_newlist(&h->list);
     h->size = h->count = h->peak = 0;
+    h->ctotal = h->stotal = 0;
 }
 
 
@@ -406,7 +408,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
             if (!(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READWRITE);
             m->data.realloc++;
-            if (h->alloc.flags & FLG_NOFREE)
+            if ((f != AT_EXPAND) && (h->alloc.flags & FLG_NOFREE))
                 /* We are not going to even attempt to resize the memory if
                  * we are preserving free blocks, and instead we will just
                  * create a new block all the time and preserve the old block.
@@ -448,7 +450,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                  * greater than the existing size then we must allocate a
                  * new block, copy the contents and free the old block.
                  */
-                if ((((h->alloc.flags & FLG_PAGEALLOC) &&
+                if ((f != AT_EXPAND) && (((h->alloc.flags & FLG_PAGEALLOC) &&
                       (h->alloc.flags & FLG_ALLOCUPPER)) || (l > d)) &&
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
@@ -624,7 +626,10 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
      * proceed to set the memory.
      */
     if (__mp_checkrange(h, p, l, f))
+    {
         __mp_memset(p, c, l);
+        h->stotal += l;
+    }
 }
 
 
@@ -670,7 +675,10 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
      * proceed to copy the memory.
      */
     if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
+    {
         __mp_memcopy(q, p, l);
+        h->ctotal += l;
+    }
 }
 
 
@@ -835,25 +843,41 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
 int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
 {
     allocnode *n;
+    infonode *m;
+    int e;
 
+    e = 1;
     if (s == 0)
         s = 1;
     if (p == NULL)
     {
         __mp_error(f, "attempt to perform operation on a NULL pointer\n");
-        return 0;
+        e = 0;
     }
-    else if ((n = __mp_findnode(&h->alloc, p, s)) &&
-             ((p < n->block) || ((char *) p + s > (char *) n->block + n->size)))
-    {
-        __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
-                   MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
-                   n->block, (char *) n->block + n->size - 1);
-        __mp_printalloc(&h->syms, n);
-        __mp_diag("\n");
-        return 0;
-    }
-    return 1;
+    else if (n = __mp_findnode(&h->alloc, p, s))
+        if ((m = (infonode *) n->info) == NULL)
+        {
+            __mp_error(f, "attempt to perform operation on free memory\n");
+            e = 0;
+        }
+        else if (m->data.freed)
+        {
+            __mp_error(f, "attempt to perform operation on freed memory");
+            __mp_printalloc(&h->syms, n);
+            __mp_diag("\n");
+            e = 0;
+        }
+        else if ((p < n->block) ||
+                 ((char *) p + s > (char *) n->block + n->size))
+        {
+            __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
+                       MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
+                       n->block, (char *) n->block + n->size - 1);
+            __mp_printalloc(&h->syms, n);
+            __mp_diag("\n");
+            e = 0;
+        }
+    return e;
 }
 
 

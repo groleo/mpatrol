@@ -69,6 +69,7 @@ typedef enum alloctype
     AT_STRNSAVE,  /* strnsave() */
     AT_REALLOC,   /* realloc() */
     AT_RECALLOC,  /* recalloc() */
+    AT_EXPAND,    /* expand() */
     AT_FREE,      /* free() */
     AT_CFREE,     /* cfree() */
     AT_NEW,       /* operator new */
@@ -140,6 +141,8 @@ typedef struct infohead
     size_t uabort;                    /* unfreed abort minimum */
     size_t lrange;                    /* lower check range */
     size_t urange;                    /* upper check range */
+    size_t ctotal;                    /* total bytes copied */
+    size_t stotal;                    /* total bytes set */
     unsigned long ffreq;              /* failure frequency */
     unsigned long fseed;              /* failure seed */
     void (*prologue)(void *, size_t); /* prologue function */
