@@ -36,13 +36,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.27 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mprof.c,v 1.28 2001-03-22 19:20:57 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.27 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.28 2001-03-22 19:20:57 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.1" /* the current version of this program */
+#define VERSION "1.2" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -56,7 +56,8 @@ typedef enum options_flags
     OF_HELP       = 'h',
     OF_LEAKS      = 'l',
     OF_STACKDEPTH = 'n',
-    OF_VERSION    = 'V'
+    OF_VERSION    = 'V',
+    OF_CALLGRAPH  = 'v'
 }
 options_flags;
 
@@ -268,6 +269,12 @@ static int showleaks;
 static unsigned long maxstack;
 
 
+/* Indicates if the allocation call graph should be displayed.
+ */
+
+static int showgraph;
+
+
 /* The table describing all recognised options.
  */
 
@@ -277,6 +284,8 @@ static option options_table[] =
      "\tSpecifies that different call sites from within the same function\n"
      "\tare to be differentiated and that the names of all functions should\n"
      "\tbe displayed with their call site offset in bytes.\n"},
+    {"call-graph", OF_CALLGRAPH, NULL,
+     "\tSpecifies that the allocation call graph should be displayed.\n"},
     {"counts", OF_COUNTS, NULL,
      "\tSpecifies that certain tables should be sorted by the number of\n"
      "\tallocations or deallocations rather than the total number of bytes\n"
@@ -352,7 +361,8 @@ comparestack(profilenode *n, profilenode *p, int c)
             return ((n->parent == 0) && (p->parent == 0));
         n = &nodes[n->parent - 1];
         p = &nodes[p->parent - 1];
-        if ((n->addr != p->addr) && (useaddresses || (n->symbol != p->symbol)))
+        if ((n->addr != p->addr) && (useaddresses || (n->symbol == 0) ||
+             (n->symbol != p->symbol)))
             return 0;
     }
     return 1;
@@ -660,7 +670,7 @@ addvertex(profilenode *n)
         fprintf(stderr, "%s: Out of memory\n", progname);
         exit(EXIT_FAILURE);
     }
-    if (useaddresses)
+    if (useaddresses || (n->symbol == 0))
         __mp_treeinsert(&temptree, &v->node, (unsigned long) n->addr);
     else
         __mp_treeinsert(&temptree, &v->node, n->symbol);
@@ -724,7 +734,7 @@ buildgraph(void)
                 p = (profilenode *) __mp_successor(&p->node);
             }
             p = n;
-            if (useaddresses)
+            if (useaddresses || (p->symbol == 0))
                 u = (vertex *) __mp_search(temptree.root,
                                            (unsigned long) p->addr);
             else
@@ -740,7 +750,7 @@ buildgraph(void)
             for (v = u; p->parent != 0; u = v)
             {
                 p = &nodes[p->parent - 1];
-                if (useaddresses)
+                if (useaddresses || (p->symbol == 0))
                     v = (vertex *) __mp_search(temptree.root,
                                                (unsigned long) p->addr);
                 else
@@ -776,7 +786,7 @@ buildgraph(void)
             p = n;
             do
             {
-                if (useaddresses)
+                if (useaddresses || (p->symbol == 0))
                     v = (vertex *) __mp_search(temptree.root,
                                                (unsigned long) p->addr);
                 else
@@ -1434,6 +1444,9 @@ main(int argc, char **argv)
           case OF_ADDRESSES:
             useaddresses = 1;
             break;
+          case OF_CALLGRAPH:
+            showgraph = 1;
+            break;
           case OF_COUNTS:
             showcounts = 1;
             break;
@@ -1517,7 +1530,6 @@ main(int argc, char **argv)
     directtable();
     fputs("\n\n", stdout);
     leaktable();
-    fputs("\n\n", stdout);
     /* The reason that the allocation call graph is not used for the direct
      * allocation and memory leak tables is that the code to build and display
      * the allocation call graph was added much later.  Rather than convert
@@ -1525,7 +1537,11 @@ main(int argc, char **argv)
      * already worked and only use the call graph for any new tables.
      */
     buildgraph();
-    callgraph();
+    if (showgraph)
+    {
+        fputs("\n\n", stdout);
+        callgraph();
+    }
     if (g != NULL)
     {
         if (strcmp(g, "stdout") == 0)
