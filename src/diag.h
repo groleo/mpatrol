@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.28 2001-03-04 12:50:35 graeme Exp $
+ * $Id: diag.h,v 1.29 2001-03-04 15:45:41 graeme Exp $
  */
 
 
@@ -79,12 +79,26 @@ typedef enum errortype
 errortype;
 
 
+/* The structure containing details about each error reported by the mpatrol
+ * library.
+ */
+
+typedef struct errorinfo
+{
+    char *code;   /* error abbreviation code */
+    char *string; /* error information string */
+    char *format; /* error format */
+}
+errorinfo;
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
+MP_EXPORT errorinfo __mp_errordetails[ET_MAX + 1];
 MP_EXPORT char *__mp_functionnames[AT_MAX];
 MP_EXPORT errortype __mp_errno;
 MP_EXPORT unsigned long __mp_diagflags;
