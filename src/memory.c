@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.18 2000-05-16 00:39:30 graeme Exp $"
+#ident "$Id: memory.c,v 1.19 2000-05-16 23:25:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -227,8 +227,13 @@ static char *progname(void)
     for (p = NULL; __mp_getframe(&s); p = (unsigned int *) s.frame);
     if (p != NULL)
 #if ARCH == ARCH_IX86
+#if SYSTEM == SYSTEM_LINUX
+        if (p = (unsigned int *) p[4])
+            return (char *) *p;
+#else /* SYSTEM */
         if (p = (unsigned int *) p[3])
             return (char *) p;
+#endif /* SYSTEM */
 #elif ARCH == ARCH_M68K
         if (p = (unsigned int *) p[3])
             return (char *) *p;
