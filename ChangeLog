@@ -1,3 +1,63 @@
+Thu Nov 25 18:09:43 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mpatrol: Added the -Z and -z options.
+
+	* doc/mpatrol.texi:
+	Added the using mpatrol and the improving performance chapters, added an
+	additional AmigaOS entry in related software, added the FAILFREQ and
+	FAILSEED options, and changed the descriptions of ALLOCSTOP, REALLOCSTOP
+	and FREESTOP.
+
+	* man/man3/mpatrol.3, man/man1/mpatrol.1, man/cat3/mpatrol.3,
+	  man/cat1/mpatrol.1:
+	Added the FAILFREQ and FAILSEED options.
+
+	* src/inter.c:
+	Set up the random number generator for the FAILFREQ option.
+
+	* src/info.c: Added support for the FAILFREQ and FAILSEED options.
+
+	* src/info.h: Added the failure frequency and failure seed.
+
+	* src/diag.c:
+	Added display of failure frequency and failure seed when showing the
+	summary.
+
+	* src/option.c:
+	Added the FAILFREQ and FAILSEED options and increased the maximum size
+	of the MPATROL_OPTIONS environment variable from 256 to 1024 bytes.
+
+	* src/signals.c:
+	Changed __mp_trap() to do nothing so that it can be used as a breakpoint
+	target within a debugger.
+
+Tue Nov 23 20:25:58 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more things to do and also added a list of related software for
+	the Amiga.
+
+Sun Nov 21 14:22:03 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* NOTES:
+	Removed this file as its contents are now in the manual.
+
+	* README: Removed the reference to NOTES as it no longer exists.
+
+	* doc/mpatrol.texi:
+	Added the library performance section along with updated performance
+	figures.
+
+Thu Nov 18 20:04:12 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* README, NOTES:
+	Removed a lot of text from these files as it is now in the manual.
+
+	* EXAMPLES, INSTALL:
+	Removed these files as their contents are now in the manual.
+
+	* doc/mpatrol.texi: Added the operating system support section.
+
 Tue Nov 16 01:07:15 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
