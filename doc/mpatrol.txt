@@ -3,8 +3,8 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 31st
-October, 2000.
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 1st
+November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -41,8 +41,8 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 31st
-October, 2000.
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 1st
+November, 2000.
 
 Foreword
 ********
@@ -393,7 +393,9 @@ out.
    * Compiler-generated line number tables from any debugging sections
      that exist in executable files and shared libraries can also be
      used by the mpatrol library in order to provide more meaningful
-     information in call stack tracebacks.
+     information in call stack tracebacks.  An external command is also
+     provided to make use of a debugger to get such information if one
+     is available.
 
    * If the library is unable to automatically determine a program's
      executable filename to read symbols from then an option exists to
@@ -517,7 +519,9 @@ if you perform the following steps.
      library directory rather than simply copying them.
 
   6. Copy the `mpatrol', `mprof' and `mleak' programs that have been
-     built into your local bin directory.
+     built into your local bin directory.  You may also wish to copy the
+     `mpsym' command to your local bin directory as well if your system
+     supports it.
 
   7. Go up two directory levels into the `src' directory and copy the
      `mpatrol.h' header file into your local include directory.
@@ -650,10 +654,11 @@ will require a complete recompilation of all your code.
 
    In all cases, it will be desirable to compile your source files with
 compiler-generated debugging information since that may be able to be
-used by the `USEDEBUG' option.  In addition, more symbolic information
-will be available if the executable files have not had their symbol
-tables stripped from them, although mpatrol can also fall back to using
-the dynamic symbol table from dynamically linked executable files.
+used by the `USEDEBUG' option or the `mpsym' command.  In addition, more
+symbolic information will be available if the executable files have not
+had their symbol tables stripped from them, although mpatrol can also
+fall back to using the dynamic symbol table from dynamically linked
+executable files.
 
    ---------- Footnotes ----------
 
@@ -1300,7 +1305,9 @@ any call stack tracebacks that appear after the library summary will
 not be displayed with their corresponding file name and line number.
 This option will also slow down program execution since a search
 through the line number tables will have to be made every time a call
-stack is displayed.
+stack is displayed.  Alternatively, the `mpsym' command may be used to
+process an mpatrol log file with a debugger in order to obtain symbol
+names and source level information for any call stacks.
 
    The mpatrol library will always try to display as much useful
 information as possible in this log file, and will always display a
@@ -2149,6 +2156,45 @@ randomly-accessible.  If the filename argument is given as `-' then the
 standard input file stream will be used as the log file.  Note also
 that the `mleak' command supports the `--help' and `--version' options
 in common with the other mpatrol command line tools.
+
+   The final utility program that is provided is called `mpsym', which
+is used to parse a log file produced by the mpatrol library and uses a
+debugger to append symbol names and source level information to code
+addresses in stack tracebacks.  This should be used if the `USEDEBUG'
+option is not supported on a particular platform or does not work
+properly with a specific program.  It will replace all existing symbols
+and source level information associated with the stack tracebacks in
+the mpatrol log file and will display the resulting log file on the
+standard output file stream.
+
+   The first argument to `mpsym' must be the filename of the executable
+file that produced the mpatrol log file but if it is omitted then
+`mpsym' will use `a.out' as the name of the executable file to use.
+The `mpsym' command will read the symbol table and debugging sections
+from this file in order to map the code addresses that appear in the
+mpatrol log file into symbol names and source level information.  If
+the executable file does not contain a symbol table then no symbol
+names will be available and if it does not contain the appropriate
+debugging sections then no source level information will be available
+either.  Obviously, if the executable file is not the same as the one
+that created the mpatrol log file then the final output will be wrong.
+
+   The second argument to `mpsym' must be a valid mpatrol log filename
+but if it is omitted then `mpsym' will use `mpatrol.log' as the name of
+the log file to use.  The `mpsym' command makes two passes over the log
+file so the file must be randomly-accessable.  Note also that the
+`mpsym' command supports the `--help' and `--version' options in common
+with the other mpatrol command line tools.
+
+   The `mpsym' command currently uses `gdb' as the debugger with which
+to obtain the additional information about the code addresses in the
+mpatrol log file.  It also makes use of several UNIX text processing
+commands in order to extract information from the debugger's output and
+from the log file.  As a result, the `mpsym' command is only likely to
+work on UNIX platforms or on systems which have the necessary commands
+installed.  By default, it is set up to work on 32-bit platforms, but
+this can be changed by altering the `POINTER' definition in the `mpsym'
+file itself.
 
 8 Profiling
 ***********
@@ -3453,8 +3499,8 @@ above example have been numbered and their descriptions appear below.
    ---------- Footnotes ----------
 
    (1) This information may also be filled in if the `USEDEBUG' option
-is used and supported, and if debugging information about the call to
-`malloc()' is available.
+or the `mpsym' command is used and supported, and if debugging
+information about the call to `malloc()' is available.
 
 11.2 Detecting incorrect reuse of freed memory
 ==============================================
@@ -3997,49 +4043,56 @@ also displays this information.
 internal memory blocks or to some other memory allocation library using
 up space.  On some systems that don't have virtual memory, gaps are
 likely to be owned by other processes or belong to the system free
-memory list.
+memory list.  The `...' marks text that has been removed.
 
      memory map:
-       / 0x8000A000-0x8000A00F overflow (16 bytes)
-      |+ 0x8000A010-0x8000A077 allocated (104 bytes) {malloc:1:0} [-|-|-]
-       \ 0x8000A078-0x8000A087 overflow (16 bytes)
-       / 0x8000A088-0x8000A097 overflow (16 bytes)
-      |+ 0x8000A098-0x8000A115 freed (126 bytes) {free:2:0} [-|-|-]
-       \ 0x8000A116-0x8000A125 overflow (16 bytes)
-       / 0x8000A126-0x8000A135 overflow (16 bytes)
-      |+ 0x8000A136-0x8000AF05 freed (3536 bytes) {free:3:0} [-|-|-]
-       \ 0x8000AF06-0x8000AF15 overflow (16 bytes)
-       / 0x8000AF16-0x8000AF25 overflow (16 bytes)
-      |+ 0x8000AF26-0x8000AFA3 freed (126 bytes) {free:4:0} [-|-|-]
-       \ 0x8000AFA4-0x8000AFB3 overflow (16 bytes)
-       / 0x8000AFB4-0x8000AFC3 overflow (16 bytes)
-      |+ 0x8000AFC4-0x8000AFC7 allocated (4 bytes) {malloc:10:0} [main|test.c|14]
-       \ 0x8000AFC8-0x8000AFD7 overflow (16 bytes)
-       / 0x8000AFD8-0x8000AFE7 overflow (16 bytes)
-      |+ 0x8000AFE8-0x8000AFEB freed (4 bytes) {free:11:0} [main|test.c|17]
-       \ 0x8000AFEC-0x8000AFFB overflow (16 bytes)
-     --- 0x8000AFFC-0x8000AFFF free (4 bytes)
-         --------------------- gap (12288 bytes)
-       / 0x8000E000-0x8000E00F overflow (16 bytes)
-      |+ 0x8000E010-0x8000EA27 freed (2584 bytes) {free:5:0} [-|-|-]
-       \ 0x8000EA28-0x8000EA37 overflow (16 bytes)
-       / 0x8000EA38-0x8000EA47 overflow (16 bytes)
-      |+ 0x8000EA48-0x8000EAC5 freed (126 bytes) {free:6:0} [-|-|-]
-       \ 0x8000EAC6-0x8000EAD5 overflow (16 bytes)
-       / 0x8000EAD6-0x8000EAE5 overflow (16 bytes)
-      |+ 0x8000EAE6-0x8000EB63 freed (126 bytes) {free:8:0} [-|-|-]
-       \ 0x8000EB64-0x8000EB73 overflow (16 bytes)
-     --- 0x8000EB74-0x8000EFFF free (1164 bytes)
-         --------------------- gap (8192 bytes)
-       / 0x80011000-0x8001100F overflow (16 bytes)
-      |+ 0x80011010-0x800127F7 freed (6120 bytes) {free:7:0} [-|-|-]
-       \ 0x800127F8-0x80012807 overflow (16 bytes)
-     --- 0x80012808-0x80012FFF free (2040 bytes)
-         --------------------- gap (106496 bytes)
-       / 0x8002D000-0x8002D00F overflow (16 bytes)
-      |+ 0x8002D010-0x8002DBBF freed (2992 bytes) {free:9:0} [-|-|-]
-       \ 0x8002DBC0-0x8002DBCF overflow (16 bytes)
-     --- 0x8002DBD0-0x8002DFFF free (1072 bytes)
+         ...
+       / 0x0002FDD0-0x0002FDDF overflow (16 bytes)
+      |+ 0x0002FDE0-0x0002FE03 allocated (36 bytes) {calloc:13:0} [-|-|-]
+       \ 0x0002FE04-0x0002FE13 overflow (16 bytes)
+     --- 0x0002FE14-0x0002FE17 free (4 bytes)
+       / 0x0002FE18-0x0002FE27 overflow (16 bytes)
+      |+ 0x0002FE28-0x0002FF18 allocated (241 bytes) {calloc:15:0} [-|-|-]
+       \ 0x0002FF19-0x0002FF28 overflow (16 bytes)
+     --- 0x0002FF29-0x0002FF2F free (7 bytes)
+       / 0x0002FF30-0x0002FF3F overflow (16 bytes)
+      |+ 0x0002FF40-0x0002FF93 allocated (84 bytes) {calloc:16:0} [-|-|-]
+       \ 0x0002FF94-0x0002FFA3 overflow (16 bytes)
+     --- 0x0002FFA4-0x0002FFA7 free (4 bytes)
+       / 0x0002FFA8-0x0002FFB7 overflow (16 bytes)
+      |+ 0x0002FFB8-0x0002FFC4 allocated (13 bytes) {calloc:17:0} [-|-|-]
+       \ 0x0002FFC5-0x0002FFD4 overflow (16 bytes)
+     --- 0x0002FFD5-0x0002FFD7 free (3 bytes)
+       / 0x0002FFD8-0x0002FFE7 overflow (16 bytes)
+      |+ 0x0002FFE8-0x0002FFEB allocated (4 bytes) {malloc:19:0} [main|test.c|14]
+       \ 0x0002FFEC-0x0002FFFB overflow (16 bytes)
+     --- 0x0002FFFC-0x0002FFFF free (4 bytes)
+         --------------------- gap (57344 bytes)
+       / 0x0003E000-0x0003E00F overflow (16 bytes)
+      |+ 0x0003E010-0x0003EFFF freed (4080 bytes) {free:6:0} [-|-|-]
+       \ 0x0003F000-0x0003F00F overflow (16 bytes)
+       / 0x0003F010-0x0003F01F overflow (16 bytes)
+      |+ 0x0003F020-0x0003F707 freed (1768 bytes) {free:12:0} [-|-|-]
+       \ 0x0003F708-0x0003F717 overflow (16 bytes)
+     --- 0x0003F718-0x0003FFFF free (2280 bytes)
+         --------------------- gap (16384 bytes)
+       / 0x00044000-0x0004400F overflow (16 bytes)
+      |+ 0x00044010-0x00045197 freed (4488 bytes) {free:8:0} [-|-|-]
+       \ 0x00045198-0x000451A7 overflow (16 bytes)
+       / 0x000451A8-0x000451B7 overflow (16 bytes)
+      |+ 0x000451B8-0x000459AF freed (2040 bytes) {free:10:0} [-|-|-]
+       \ 0x000459B0-0x000459BF overflow (16 bytes)
+       / 0x000459C0-0x000459CF overflow (16 bytes)
+      |+ 0x000459D0-0x00045D93 allocated (964 bytes) {calloc:14:0} [-|-|-]
+       \ 0x00045D94-0x00045DA3 overflow (16 bytes)
+       / 0x00045DA4-0x00045DB3 overflow (16 bytes)
+      |+ 0x00045DB4-0x00045DCE allocated (27 bytes) {strdup:18:0} [-|-|-]
+       \ 0x00045DCF-0x00045DDE overflow (16 bytes)
+     --- 0x00045DDF-0x00045DDF free (1 byte)
+       / 0x00045DE0-0x00045DEF overflow (16 bytes)
+      |+ 0x00045DF0-0x00045DF3 freed (4 bytes) {free:20:0} [main|test.c|17]
+       \ 0x00045DF4-0x00045E03 overflow (16 bytes)
+     --- 0x00045E04-0x00045FFF free (508 bytes)
 
    The next block of data shows a summary of all the symbols that could
 be read from the program's executable file and/or any shared libraries
@@ -4051,43 +4104,80 @@ option also displays this information.
 for the purposes of this example.  The `...' marks text that has been
 removed.
 
-     symbols read: 2438
-         0x8000076C-0x800007D9 _init [./a.out] (110 bytes)
-         0x80000900-0x8000094F _start [./a.out] (80 bytes)
-         0x80000950-0x8000096F __do_global_dtors_aux [./a.out] (32 bytes)
-         0x80000970-0x80000977 fini_dummy [./a.out] (8 bytes)
+     symbols read: 3300
+                    0x000108B0 _ex_text0 [a.out] (0 bytes)
+         0x000108B0-0x0001097F _start [a.out] (208 bytes)
+         0x00010990-0x00010A27 main [a.out] (152 bytes)
+                    0x00010A28 _ex_text1 [a.out] (0 bytes)
+         0x00010A28-0x00010A77 _init [a.out] (80 bytes)
+         0x00010A78-0x00010AC7 _fini [a.out] (80 bytes)
+                    0x7FA1FFF8 _ex_text0 [/usr/lib/libc.so.1] (0 bytes)
+         0x7FA1FFF8-0x7FA2005F atexit [/usr/lib/libc.so.1] (104 bytes)
+         0x7FA20060-0x7FA200EF _exithandle [/usr/lib/libc.so.1] (144 bytes)
+         0x7FA20470-0x7FA204EB __dtou [/usr/lib/libc.so.1] (124 bytes)
+         0x7FA20500-0x7FA20577 __ftou [/usr/lib/libc.so.1] (120 bytes)
+         0x7FA2083C-0x7FA20B2F __div64 [/usr/lib/libc.so.1] (756 bytes)
+         0x7FA20B30-0x7FA20DEB __rem64 [/usr/lib/libc.so.1] (700 bytes)
          ...
-         0x80003B24-0x80003B4B __clear_cache [./a.out] (40 bytes)
-         0x80003B4C-0x80003B6F __do_global_ctors_aux [./a.out] (36 bytes)
-         0x80003B70-0x80003B77 init_dummy [./a.out] (8 bytes)
-         0x80003B78-0x80003BA9 _fini [./a.out] (50 bytes)
-         0xC0002604-0xC0002609 _start [/lib/ld.so.1] (6 bytes)
-         0xC000260A-0xC0002659 _dl_start_user [/lib/ld.so.1] (80 bytes)
-         0xC000265A-0xC0002B1B _dl_start [/lib/ld.so.1] (1218 bytes)
-                    0xC000266A here [/lib/ld.so.1] (0 bytes)
+         0x7FA96858-0x7FA96867 getpid [/usr/lib/libc.so.1] (16 bytes)
+         0x7FA96858-0x7FA96867 _getpid [/usr/lib/libc.so.1] (16 bytes)
+         0x7FA96868-0x7FA9689F _kill [/usr/lib/libc.so.1] (56 bytes)
+         0x7FA96868-0x7FA9689F _libc_kill [/usr/lib/libc.so.1] (56 bytes)
+                    0x7FA968A0 _ex_text1 [/usr/lib/libc.so.1] (0 bytes)
+         0x7FA968A0-0x7FA968DF _init [/usr/lib/libc.so.1] (64 bytes)
+         0x7FA968E0-0x7FA9691F _fini [/usr/lib/libc.so.1] (64 bytes)
+         0x7FB105E4-0x7FB1069F memmove [/usr/lib/libc_psr.so.1] (188 bytes)
+         0x7FB105E4-0x7FB1069F _memmove [/usr/lib/libc_psr.so.1] (188 bytes)
+                    0x7FB106A0 forcpy [/usr/lib/libc_psr.so.1] (0 bytes)
+         0x7FB106A0-0x7FB1190B memcpy [/usr/lib/libc_psr.so.1] (4716 bytes)
+         0x7FB106A0-0x7FB1190B _memcpy [/usr/lib/libc_psr.so.1] (4716 bytes)
+         0x7FB106A0-0x7FB1190B __align_cpy_1 [/usr/lib/libc_psr.so.1] (4716 bytes)
          ...
-         0xC0007A78-0xC0007AB5 __libc_read [/lib/ld.so.1] (62 bytes)
-                    0xC0007A78 read [/lib/ld.so.1] (0 bytes)
-                    0xC0007A9A __syscall_error [/lib/ld.so.1] (0 bytes)
-         0xC0007AB8-0xC0007ADF __clear_cache [/lib/ld.so.1] (40 bytes)
-         0xC0013E70-0xC0013E8B __mp_newlist [/usr/lib/libmpatrol.so.1.0] (28 bytes)
-         0xC0013E8C-0xC0013EB3 __mp_addhead [/usr/lib/libmpatrol.so.1.0] (40 bytes)
-         0xC0013EB4-0xC0013EE7 __mp_addtail [/usr/lib/libmpatrol.so.1.0] (52 bytes)
-         0xC0013EE8-0xC0013F1B __mp_prepend [/usr/lib/libmpatrol.so.1.0] (52 bytes)
+         0x7FB135B0-0x7FB135D3 __div64 [/usr/lib/libc_psr.so.1] (36 bytes)
+         0x7FB135D4-0x7FB135F7 __udiv64 [/usr/lib/libc_psr.so.1] (36 bytes)
+         0x7FB135F8-0x7FB1362B __umul64 [/usr/lib/libc_psr.so.1] (52 bytes)
+         0x7FB135F8-0x7FB1362B __mul64 [/usr/lib/libc_psr.so.1] (52 bytes)
+         0x7FB1362C-0x7FB13657 __urem64 [/usr/lib/libc_psr.so.1] (44 bytes)
+         0x7FB13658-0x7FB13683 __rem64 [/usr/lib/libc_psr.so.1] (44 bytes)
+                    0x7FB333F8 _ex_text0 [/usr/lib/libelf.so.1] (0 bytes)
+         0x7FB333F8-0x7FB3346F _elf32_entsz [/usr/lib/libelf.so.1] (120 bytes)
+         0x7FB33470-0x7FB334EB elf32_fsize [/usr/lib/libelf.so.1] (124 bytes)
+         0x7FB33470-0x7FB334EB _elf32_fsize [/usr/lib/libelf.so.1] (124 bytes)
+         0x7FB334EC-0x7FB3352F _elf32_msize [/usr/lib/libelf.so.1] (68 bytes)
+         0x7FB33530-0x7FB335D3 _elf32_mtype [/usr/lib/libelf.so.1] (164 bytes)
          ...
-         0xC001A0DC-0xC001A0FF __nw__FUi [/usr/lib/libmpatrol.so.1.0] (36 bytes)
-         0xC001A100-0xC001A123 __arr_nw__FUi [/usr/lib/libmpatrol.so.1.0] (36 bytes)
-         0xC001A124-0xC001A143 __dl__FPv [/usr/lib/libmpatrol.so.1.0] (32 bytes)
-         0xC001A144-0xC001A163 __arr_dl__FPv [/usr/lib/libmpatrol.so.1.0] (32 bytes)
-         0xC003BB14-0xC003BB45 __libc_global_ctors [/lib/libc.so.6] (50 bytes)
-         0xC003BB48-0xC003BB97 __libc_init [/lib/libc.so.6] (80 bytes)
-         0xC003BB98-0xC003BBC3 __libc_print_version [/lib/libc.so.6] (44 bytes)
-         0xC003BBC4-0xC003BBD7 __libc_main [/lib/libc.so.6] (20 bytes)
+         0x7FB49054-0x7FB4921F _elf_nlist [/usr/lib/libelf.so.1] (460 bytes)
+         0x7FB49220-0x7FB4932F nlist [/usr/lib/libelf.so.1] (272 bytes)
+         0x7FB49330-0x7FB493E3 _elf_findop [/usr/lib/libelf.so.1] (180 bytes)
+                    0x7FB493E4 _ex_text1 [/usr/lib/libelf.so.1] (0 bytes)
+         0x7FB493E4-0x7FB4941B _init [/usr/lib/libelf.so.1] (56 bytes)
+         0x7FB4941C-0x7FB49453 _fini [/usr/lib/libelf.so.1] (56 bytes)
+         0x7FB65818-0x7FB6582F __mp_newlist [/usr/lib/libmpatrol.so.1.3] (24 bytes)
+         0x7FB65830-0x7FB65853 __mp_addhead [/usr/lib/libmpatrol.so.1.3] (36 bytes)
+         0x7FB65854-0x7FB6587B __mp_addtail [/usr/lib/libmpatrol.so.1.3] (40 bytes)
+         0x7FB6587C-0x7FB6589F __mp_prepend [/usr/lib/libmpatrol.so.1.3] (36 bytes)
+         0x7FB658A0-0x7FB658C3 __mp_insert [/usr/lib/libmpatrol.so.1.3] (36 bytes)
+         0x7FB658C4-0x7FB658EB __mp_remove [/usr/lib/libmpatrol.so.1.3] (40 bytes)
          ...
-         0xC008F8BC-0xC008FA4D __moddi3 [/lib/libc.so.6] (402 bytes)
-         0xC008FA50-0xC008FB19 __udivdi3 [/lib/libc.so.6] (202 bytes)
-         0xC008FB1C-0xC008FC1B __umoddi3 [/lib/libc.so.6] (256 bytes)
-         0xC008FC1C-0xC008FC4D _fini [/lib/libc.so.6] (50 bytes)
+         0x7FB725F4-0x7FB7262B memmem [/usr/lib/libmpatrol.so.1.3] (56 bytes)
+         0x7FB7262C-0x7FB72663 _memmem [/usr/lib/libmpatrol.so.1.3] (56 bytes)
+         0x7FB72664-0x7FB72697 memcmp [/usr/lib/libmpatrol.so.1.3] (52 bytes)
+         0x7FB72698-0x7FB726CB _memcmp [/usr/lib/libmpatrol.so.1.3] (52 bytes)
+         0x7FB726CC-0x7FB726FF bcmp [/usr/lib/libmpatrol.so.1.3] (52 bytes)
+         0x7FB72700-0x7FB72733 _bcmp [/usr/lib/libmpatrol.so.1.3] (52 bytes)
+         0x7FB9085C-0x7FB90863 dlinfo [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB9085C-0x7FB90863 _dlinfo [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB90864-0x7FB9086B dlmap [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB90864-0x7FB9086B _dlmap [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB9086C-0x7FB90873 dlmopen [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB9086C-0x7FB90873 _dlmopen [/usr/lib/libdl.so.1] (8 bytes)
+         ...
+         0x7FB90894-0x7FB9089B dladdr [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB90894-0x7FB9089B _dladdr [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB9089C-0x7FB908A3 dldump [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB9089C-0x7FB908A3 _dldump [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB908A4-0x7FB908AB _ld_concurrency [/usr/lib/libdl.so.1] (8 bytes)
+         0x7FB908AC-0x7FB908B3 bind_guard [/usr/lib/libdl.so.1] (8 bytes)
 
    The next block of data shows a summary of all freed memory
 allocations.  This is only possible because the `NOFREE' option was
@@ -4105,59 +4195,122 @@ recently-freed items.
 default implementations of `malloc()', `free()', etc.  As can be seen
 below, this allows the library to trace all calls to allocate dynamic
 memory in a process, even from functions that were not compiled with
-mpatrol.  The two functions shown below were called by the mpatrol
-library in order to read the symbols from ELF object files.  However,
-they are located in the ELF access library which was not compiled with
-mpatrol.
+mpatrol.  Four of the five functions shown below were called by the
+mpatrol library in order to read the symbols from ELF object files.
+However, they are located in the ELF access library which was not
+compiled with mpatrol.
 
    Note that the following data has again been cut down in size for the
 purposes of this example.  The `...' marks text that has been removed.
 
-     freed allocations: 9 (15740 bytes)
-         0x8000A098 (126 bytes) {free:2:0} [-|-|-]
-             0x800011BC elf_end
-             0xC0019668 __mp_init
-             0xC001982A __mp_alloc
-             0x8000099C main
-             0x80000944 _start
+     freed allocations: 13 (19756 bytes)
+         0x0002E010 (232 bytes) {free:1:0} [-|-|-]
+             0x7FB3E5BC _elf_end+776
+             0x7FB6B3D4 __mp_addsymbols+440
+             0x7FB6FF5C __mp_init+208
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
      
-         0x8000A136 (3536 bytes) {free:3:0} [-|-|-]
-             0x8000104E _elf_free
-             0xC0019668 __mp_init
-             0xC001982A __mp_alloc
-             0x8000099C main
-             0x80000944 _start
+         0x0002E118 (3536 bytes) {free:2:0} [-|-|-]
+             0x7FB3E450 _elf_end+412
+             0x7FB6B3D4 __mp_addsymbols+440
+             0x7FB6FF5C __mp_init+208
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         0x0002EF08 (232 bytes) {free:3:0} [-|-|-]
+             0x7FB3E5BC _elf_end+776
+             0x7FB6B3D4 __mp_addsymbols+440
+             0x7FB6B4B4 __mp_addextsymbols+208
+             0x7FB6FF64 __mp_init+216
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         0x0002F010 (2448 bytes) {free:4:0} [-|-|-]
+             0x7FB3E450 _elf_end+412
+             0x7FB6B3D4 __mp_addsymbols+440
+             0x7FB6B4B4 __mp_addextsymbols+208
+             0x7FB6FF64 __mp_init+216
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
      
          ...
+     
+         0x00045DF0 (4 bytes) {free:20:0} [main|test.c|17]
+             0x00010A14 main+132
+             0x00010970 _start+192
 
    The final block of data shows a summary of all unfreed memory
-allocations.  This can show up memory leaks, although the first unfreed
-memory allocation in this example comes from the standard C library.
-On systems such as UNIX it does not really matter about these unfreed
-allocations since they will automatically be returned to the system on
-process termination.
+allocations.  This can show up memory leaks, although all but one of
+the unfreed memory allocations in this example come from the standard C
+library.  On systems such as UNIX it does not really matter about these
+unfreed allocations since they will automatically be returned to the
+system on process termination.
 
-   However, the second unfreed allocation shows an example of a memory
+   However, the other unfreed allocation shows an example of a memory
 leak, where no pointers referencing that allocation remain in the
 program to free it with.  If this was within a loop then the program
 could quickly run away with memory, causing at least a decrease in
 performance, and at most a memory shortage.  The mpatrol library makes
-it easier to spot memory leaks.
+it easier to spot memory leaks, especially if the `PROF' profiling
+option is used.
 
    The `SHOWUNFREED' option also displays this information.
 
-     unfreed allocations: 2 (108 bytes)
-         0x8000A010 (104 bytes) {malloc:1:0} [-|-|-]
-             0xC0052B4A _IO_fopen
-             0xC0017A0C __mp_openlogfile
-             0xC0019648 __mp_init
-             0xC001982A __mp_alloc
-             0x8000099C main
-             0x80000944 _start
+     unfreed allocations: 7 (1369 bytes)
+         0x0002FDE0 (36 bytes) {calloc:13:0} [-|-|-]
+             0x7FA54B7C _tzload+56
+             0x7FA53990 _ltzset_u+444
+             0x7FA52D98 localtime_u+28
+             0x7FA3AF20 ctime+12
+             0x7FB6D05C __mp_printversion+184
+             0x7FB6FFA0 __mp_init+276
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
      
-         0x8000AFC4 (4 bytes) {malloc:10:0} [main|test.c|14]
-             0x8000099C main
-             0x80000944 _start
+         0x0002FE28 (241 bytes) {calloc:15:0} [-|-|-]
+             0x7FA54E3C _tzload+760
+             0x7FA53990 _ltzset_u+444
+             0x7FA52D98 localtime_u+28
+             0x7FA3AF20 ctime+12
+             0x7FB6D05C __mp_printversion+184
+             0x7FB6FFA0 __mp_init+276
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         0x0002FF40 (84 bytes) {calloc:16:0} [-|-|-]
+             0x7FA54E64 _tzload+800
+             0x7FA53990 _ltzset_u+444
+             0x7FA52D98 localtime_u+28
+             0x7FA3AF20 ctime+12
+             0x7FB6D05C __mp_printversion+184
+             0x7FB6FFA0 __mp_init+276
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         0x0002FFB8 (13 bytes) {calloc:17:0} [-|-|-]
+             0x7FA54EE8 _tzload+932
+             0x7FA53990 _ltzset_u+444
+             0x7FA52D98 localtime_u+28
+             0x7FA3AF20 ctime+12
+             0x7FB6D05C __mp_printversion+184
+             0x7FB6FFA0 __mp_init+276
+             0x7FB701FC __mp_alloc+84
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         0x0002FFE8 (4 bytes) {malloc:19:0} [main|test.c|14]
+             0x000109B8 main+40
+             0x00010970 _start+192
+     
+         ...
 
 12 Tutorial
 ***********
@@ -4176,7 +4329,8 @@ displays source-level file names and line numbers associated with
 symbols in call stack tracebacks, but only if the underlying object
 file access library supports reading line tables from object files and
 even then only if the object files were compiled with debugging
-information enabled.
+information enabled.  Alternatively, you may be able to use the `mpsym'
+command to obtain such information instead.
 
    The program we are going to look at is a simple filter which
 processes its standard input and displays the processed information on
@@ -6379,6 +6533,9 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
+        * The `mpsym' command does not work due to the lack of a
+          `printf' command on the system.
+
    * LynxOS 3.0.0, Intel Pentium Pro, COFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
@@ -6393,6 +6550,9 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
+        * The `mpsym' command does not work due to the lack of a
+          `printf' command on the system.
+
    * LynxOS 3.0.0, PowerPC, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
@@ -6404,6 +6564,9 @@ supported on that system.
           program, but that is the default on LynxOS anyway.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
+
+        * The `mpsym' command does not work due to the lack of a
+          `printf' command on the system.
 
    * LynxOS 3.0.0, PowerPC, XCOFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -6418,6 +6581,9 @@ supported on that system.
           program, but that is the default on LynxOS anyway.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
+
+        * The `mpsym' command does not work due to the lack of a
+          `printf' command on the system.
 
    * SINIX 5.43, MIPS R4000, ELF32, `cc'
         * The thread-safe version of the library does not work.  This
@@ -6506,6 +6672,9 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
+        * The `mpsym' command does not work unless `gdb' and the GNU
+          text processing tools are installed.
+
    * AmigaOS 3.1, Motorola 68040, n/a, SAS/C
         * No automatic override of `malloc()', etc., without inclusion
           of `mpatrol.h'.
@@ -6526,6 +6695,8 @@ supported on that system.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
 
+        * The `mpsym' command does not work.
+
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
      C/C++
         * The `OFLOWWATCH' option has no effect.
@@ -6537,6 +6708,8 @@ supported on that system.
           Runtime Library, and vice versa.
 
         * The `--dynamic' option to the `mpatrol' command has no effect.
+
+        * The `mpsym' command does not work.
 
 G.1 Adding a new operating system
 =================================
@@ -6836,6 +7009,13 @@ H.1 Notes for all platforms
    * The `mpatrol' command should explicitly search for the command it
      is to run if no directory component was supplied and set the
      `PROGFILE' option if it finds it.
+
+   * The `mpsym' command could optionally preserve any stack traceback
+     lines that already have symbolic or debugging information
+     associated with them.  It could also support more debuggers other
+     than just `gdb'.  Finally, it could support `-' as the filename
+     for reading the mpatrol log file from the standard input file
+     stream.
 
    * Add a script to wrap around various popular C and C++ compiler
      drivers so that linking with the mpatrol library is much less
@@ -7343,7 +7523,9 @@ I.4 Running
      option to the compiler command line), although the mpatrol library
      does not need to be compiled this way.  The file and line number
      information will hopefully then appear in the log file for all
-     symbols that have associated debugging information.
+     symbols that have associated debugging information.  If none of
+     the above suggestions work, you may still be able to get this
+     information with the `mpsym' command.
 
   4. Why does the mpatrol library not read the symbols in my executable
      file on Windows platforms?
@@ -7559,7 +7741,19 @@ I.5 Files
      hence the `CVS' subdirectories.  You shouldn't need to worry about
      them, so just ignore them.
 
-  3. What does the `mupdate' shell script do?
+  3. Why does the `mpsym' command not work for me?
+
+     Firstly, you have to ensure that you have compiled all relevant
+     object files with debugging information enabled (usually by adding
+     an option to the compiler command line).  The file and line number
+     information will hopefully then appear in the log file for all
+     symbols that have associated debugging information when you run
+     the `mpsym' command on the log file.  Alternatively, it could be
+     that your system does not have `gdb' or any of the required UNIX
+     text processing tools installed, in which case you might want to
+     try installing them.
+
+  4. What does the `mupdate' shell script do?
 
      This is for my use in order to automate every new release of
      mpatrol.  You should never need to run this script and it should
@@ -9765,6 +9959,7 @@ MPR:
 Mprof:                                             
           See ``Appendix J Related software''.
 mprof:                                              See 8.
+mpsym:                                              See 7.8.
 MSS (Memory Supervision System):                   
           See ``Appendix J Related software''.
 mtmalloc(3t):                                      
