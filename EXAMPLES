@@ -124,6 +124,8 @@ Example 1
     free blocks:       1 (8176 bytes)
     internal blocks:   25 (204800 bytes)
     total heap usage:  212992 bytes
+    total warnings:    0
+    total errors:      1
     ----------------------------------------------------------------------------
 
     Ignoring the copyright blurb at the top, let's first take a look at the
@@ -310,6 +312,8 @@ Example 1
 22  free blocks:       1 (8176 bytes)
 23  internal blocks:   25 (204800 bytes)
 24  total heap usage:  212992 bytes
+25  total warnings:    0
+26  total errors:      1
     ----------------------------------------------------------------------------
 
      1. System page size.  This value is used on some platforms when allocating
@@ -408,6 +412,11 @@ Example 1
 
     24. Total heap usage.  This value contains the total amount of system heap
         memory that has been allocated by the mpatrol library.
+
+    25. Total warnings.
+    26. Total errors.  The library keeps a count of the total number of warnings
+        and errors it has displayed so that you can quickly work out this
+        information at program termination.
 
 
 Example 2
