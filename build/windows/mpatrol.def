@@ -64,10 +64,11 @@ EXPORTS
 	cfree			@34
 	memset			@35
 	bzero			@36
-	memcpy			@37
-	memmove			@38
-	bcopy			@39
-	memchr			@40
-	memmem			@41
-	memcmp			@42
-	bcmp			@43
+	memccpy			@37
+	memcpy			@38
+	memmove			@39
+	bcopy			@40
+	memchr			@41
+	memmem			@42
+	memcmp			@43
+	bcmp			@44
