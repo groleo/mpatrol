@@ -575,12 +575,6 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 
 #define dealloca(p)
 
-#define MP_MALLOC(l, t) (t *) malloc((l) * sizeof(t))
-#define MP_CALLOC(l, t) (t *) calloc((l), sizeof(t))
-#define MP_STRDUP(p) strdup(p)
-#define MP_REALLOC(p, l, t) (t *) realloc((p), (l) * sizeof(t))
-#define MP_FREE(p) do { if (p) { free(p); } p = NULL; } while (0)
-
 #define MP_NEW new
 #define MP_DELETE delete
 
