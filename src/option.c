@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.24 2000-12-07 01:05:18 graeme Exp $"
+#ident "$Id: option.c,v 1.25 2000-12-10 22:34:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -186,8 +186,11 @@ static char *options_help[] =
     "", "Instructs the library to save and replace certain signal handlers",
     "", "during the execution of library code and to restore them afterwards.",
     "SHOWALL", NULL,
-    "", "Equivalent to the SHOWFREED, SHOWUNFREED, SHOWMAP and SHOWSYMBOLS",
-    "", "options specified together.",
+    "", "Equivalent to the SHOWFREE, SHOWFREED, SHOWUNFREED, SHOWMAP and",
+    "", "SHOWSYMBOLS options specified together.",
+    "SHOWFREE", NULL,
+    "", "Specifies that a summary of all of the free memory blocks should be",
+    "", "displayed at the end of program execution.",
     "SHOWFREED", NULL,
     "", "Specifies that a summary of all of the freed memory allocations",
     "", "should be displayed at the end of program execution.",
@@ -880,8 +883,16 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_IGNARGUMENT;
                     else
                         i = OE_RECOGNISED;
-                    h->flags |= FLG_SHOWFREED | FLG_SHOWUNFREED |
+                    h->flags |= FLG_SHOWFREE | FLG_SHOWFREED | FLG_SHOWUNFREED |
                                 FLG_SHOWMAP | FLG_SHOWSYMBOLS;
+                }
+                else if (matchoption(o, "SHOWFREE"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_SHOWFREE;
                 }
                 else if (matchoption(o, "SHOWFREED"))
                 {

@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.50 2000-11-30 21:14:31 graeme Exp $"
+#ident "$Id: inter.c,v 1.51 2000-12-10 22:36:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -397,6 +397,8 @@ void __mp_fini(void)
             if ((memhead.flags & FLG_SHOWSYMBOLS) &&
                 (memhead.syms.dtree.size > 0))
                 __mp_printsymbols(&memhead.syms);
+            if ((memhead.flags & FLG_SHOWFREE) && (memhead.alloc.fsize > 0))
+                __mp_printfree(&memhead);
             if ((memhead.flags & FLG_SHOWFREED) && (memhead.alloc.gsize > 0))
                 __mp_printfreed(&memhead);
             if (memhead.alloc.asize > 0)
