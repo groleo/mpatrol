@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.16 2003-11-25 23:15:45 graeme Exp $
+# $Id: setup,v 1.17 2003-11-27 00:25:31 graeme Exp $
 
 
 uselinks=0
@@ -75,9 +75,10 @@ copyfile ../../config/configure.in configure.in
 copyfile ../../config/top.am Makefile.am
 if [ $generate = 0 ]
 then
-    files="../../config/INSTALL ../../config/install-sh ../../config/missing
-           ../../config/mkinstalldirs ../../config/config.guess
-           ../../config/config.sub ../../config/ltconfig ../../config/ltmain.sh
+    files="../../config/INSTALL ../../config/depcomp ../../config/install-sh
+           ../../config/missing ../../config/mkinstalldirs
+           ../../config/config.guess ../../config/config.sub
+           ../../config/ltconfig ../../config/ltmain.sh
            ../../config/aclocal.m4 ../../config/configure"
     for file in $files
     do
