@@ -28,74 +28,75 @@ VERSION 1.4
 DESCRIPTION "controls and traces dynamic memory allocations"
 
 EXPORTS
-	__mp_init		@1
-	__mp_fini		@2
-	__mp_setoption		@3
-	__mp_getoption		@4
-	__mp_alloc		@5
-	__mp_strdup		@6
-	__mp_realloc		@7
-	__mp_free		@8
-	__mp_setmem		@9
-	__mp_copymem		@10
-	__mp_comparemem		@11
-	__mp_locatemem		@12
-	__mp_function		@13
-	__mp_setuser		@14
-	__mp_info		@15
-	__mp_syminfo		@16
-	__mp_printinfo		@17
-	__mp_snapshot		@18
-	__mp_iterate		@19
-	__mp_memorymap		@20
-	__mp_summary		@21
-	__mp_stats		@22
-	__mp_check		@23
-	__mp_prologue		@24
-	__mp_epilogue		@25
-	__mp_nomemory		@26
-	__mp_pushdelstack	@27
-	__mp_popdelstack	@28
-	__mp_printf		@29
-	__mp_vprintf		@30
-	__mp_logmemory		@31
-	__mp_logstack		@32
-	__mp_logaddr		@33
-	__mp_edit		@34
-	__mp_list		@35
-	__mp_view		@36
-	__mp_libimagehlp	@37
-	chkr_set_right		@38
-	chkr_copy_bitmap	@39
-	chkr_check_addr		@40
-	chkr_check_str		@41
-	chkr_check_exec		@42
-	malloc			@43
-	calloc			@44
-	memalign		@45
-	valloc			@46
-	pvalloc			@47
-	alloca			@48
-	strdup			@49
-	strndup			@50
-	strsave			@51
-	strnsave		@52
-	strdupa			@53
-	strndupa		@54
-	realloc			@55
-	reallocf		@56
-	recalloc		@57
-	expand			@58
-	free			@59
-	cfree			@60
-	dealloca		@61
-	memset			@62
-	bzero			@63
-	memccpy			@64
-	memcpy			@65
-	memmove			@66
-	bcopy			@67
-	memchr			@68
-	memmem			@69
-	memcmp			@70
-	bcmp			@71
+	__mp_init
+	__mp_fini
+	__mp_atexit
+	__mp_setoption
+	__mp_getoption
+	__mp_alloc
+	__mp_strdup
+	__mp_realloc
+	__mp_free
+	__mp_setmem
+	__mp_copymem
+	__mp_comparemem
+	__mp_locatemem
+	__mp_function
+	__mp_setuser
+	__mp_info
+	__mp_syminfo
+	__mp_printinfo
+	__mp_snapshot
+	__mp_iterate
+	__mp_memorymap
+	__mp_summary
+	__mp_stats
+	__mp_check
+	__mp_prologue
+	__mp_epilogue
+	__mp_nomemory
+	__mp_pushdelstack
+	__mp_popdelstack
+	__mp_printf
+	__mp_vprintf
+	__mp_logmemory
+	__mp_logstack
+	__mp_logaddr
+	__mp_edit
+	__mp_list
+	__mp_view
+	__mp_libimagehlp
+	chkr_set_right
+	chkr_copy_bitmap
+	chkr_check_addr
+	chkr_check_str
+	chkr_check_exec
+	malloc
+	calloc
+	memalign
+	valloc
+	pvalloc
+	alloca
+	strdup
+	strndup
+	strsave
+	strnsave
+	strdupa
+	strndupa
+	realloc
+	reallocf
+	recalloc
+	expand
+	free
+	cfree
+	dealloca
+	memset
+	bzero
+	memccpy
+	memcpy
+	memmove
+	bcopy
+	memchr
+	memmem
+	memcmp
+	bcmp

@@ -23,6 +23,7 @@
 
 __mp_init
 __mp_fini
+__mp_atexit
 __mp_setoption
 __mp_getoption
 __mp_alloc
