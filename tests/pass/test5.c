@@ -82,6 +82,7 @@ int main(void)
     int t[16];
 #else /* _WIN32 && _NETWARE */
     pthread_t t[16];
+    void *r;
 #endif /* _WIN32 && _NETWARE */
     size_t i;
 
@@ -102,7 +103,7 @@ int main(void)
 #if defined(_WIN32)
         if (WaitForSingleObject(t[i], INFINITE) == -1)
 #else /* _WIN32 */
-        if (pthread_join(t[i], NULL) == -1)
+        if (pthread_join(t[i], &r) == -1)
 #endif /* _WIN32 */
         {
             fprintf(stderr, "error waiting for thread %lu to finish\n", i);
