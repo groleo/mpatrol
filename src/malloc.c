@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.14 2000-05-10 19:54:08 graeme Exp $"
+#ident "$Id: malloc.c,v 1.15 2000-05-14 11:37:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -330,14 +330,14 @@ void MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 
 void *memcpy(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, -1, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, -1, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -347,14 +347,14 @@ void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 
 void *memmove(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, AT_MEMMOVE, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, -1, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 {
-    return __mp_copymem((void *) p, q, l, AT_MEMMOVE, NULL, NULL, 0, 1);
+    return __mp_copymem((void *) p, q, l, -1, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -364,14 +364,14 @@ void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 
 void bcopy(MP_CONST void *p, void *q, size_t l)
 {
-    __mp_copymem((void *) p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
+    __mp_copymem((void *) p, q, l, -1, AT_BCOPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
 void MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 {
-    __mp_copymem((void *) p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
+    __mp_copymem((void *) p, q, l, -1, AT_BCOPY, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

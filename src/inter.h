@@ -74,7 +74,7 @@ void *__mp_realloc(void *, size_t, size_t, alloctype, char *, char *,
 void __mp_free(void *, alloctype, char *, char *, unsigned long, size_t);
 void *__mp_setmem(void *, size_t, unsigned char, alloctype, char *, char *,
                   unsigned long, size_t);
-void *__mp_copymem(void *, void *, size_t, alloctype, char *, char *,
+void *__mp_copymem(void *, void *, size_t, int, alloctype, char *, char *,
                    unsigned long, size_t);
 void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *, char *,
                      unsigned long, size_t);

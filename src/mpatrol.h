@@ -339,11 +339,11 @@ __mp_allocinfo;
                                     MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, MP_FUNCNAME, \
                                        __FILE__, __LINE__, 0)
-#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, MP_FUNCNAME, \
-                                     __FILE__, __LINE__, 0)
-#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, \
+#define memcpy(q, p, l) __mp_copymem((p), (q), (l), -1, MP_AT_MEMCPY, \
+                                     MP_FUNCNAME, __FILE__, __LINE__, 0)
+#define memmove(q, p, l) __mp_copymem((p), (q), (l), -1, MP_AT_MEMMOVE, \
                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
-#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
+#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), -1, MP_AT_BCOPY, \
                                            MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define memchr(p, c, l) __mp_locatemem((p), (l), NULL, (size_t) (c), \
                                        MP_AT_MEMCHR, MP_FUNCNAME, __FILE__, \
@@ -374,7 +374,7 @@ void __mp_free(void *, __mp_alloctype, MP_CONST char *, MP_CONST char *,
                unsigned long, size_t);
 void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype,
                   MP_CONST char *, MP_CONST char *, unsigned long, size_t);
-void *__mp_copymem(MP_CONST void *, void *, size_t, __mp_alloctype,
+void *__mp_copymem(MP_CONST void *, void *, size_t, int, __mp_alloctype,
                    MP_CONST char *, MP_CONST char *, unsigned long, size_t);
 void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
                      __mp_alloctype, MP_CONST char *, MP_CONST char *,
@@ -407,7 +407,7 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #define __mp_realloc(p, l, a, f, s, t, u, k) ((void *) NULL)
 #define __mp_free(p, f, s, t, u, k) ((void) 0)
 #define __mp_setmem(p, l, c, f, s, t, u, k) ((void *) NULL)
-#define __mp_copymem(p, q, l, f, s, t, u, k) ((void *) NULL)
+#define __mp_copymem(p, q, l, c, f, s, t, u, k) ((void *) NULL)
 #define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
 #define __mp_info(p, d) ((int) 0)
