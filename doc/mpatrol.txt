@@ -10850,6 +10850,7 @@ Index
           See ``Appendix C Options''.
 -list:                                             
           See ``Appendix C Options''.
+-listing:                                           See 7.8.4.
 -log-all:                                          
           See ``Appendix C Options''.
 -log-allocs:                                       

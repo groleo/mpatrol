@@ -25,7 +25,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.2 2000-11-14 17:56:39 graeme Exp $
+# $Id: mpedit,v 1.3 2000-11-16 20:37:48 graeme Exp $
 
 
 # Program version.
@@ -72,7 +72,7 @@ addsourcedir()
 
 error=0
 help=0
-list=0
+listing=0
 skip=0
 version=0
 progname=`basename "$0"`
@@ -125,8 +125,8 @@ do
         optarg=`expr "$option" : '.*=\(.*\)'`
         addsourcedir "--source-dir" "$optarg"
         shift;;
-      -l|--list)
-        list=1
+      -l|--listing)
+        listing=1
         shift;;
       -V|--version)
         version=1
@@ -206,7 +206,7 @@ Options:
         Specifies the text editor to use.
   -h  --help
         Displays this quick-reference option summary.
-  -l  --list
+  -l  --listing
         Displays a context listing of the source line instead of invoking the
         text editor.
   -I  --source-dir=<directory>
@@ -271,9 +271,9 @@ fi
 # Either produce a context listing of the source line or invoke the text editor
 # on the source file.
 
-if [ $list = 1 ]
+if [ $listing = 1 ]
 then
-    # If the --list option was given on the command line then display the
+    # If the --listing option was given on the command line then display the
     # contents of the source file surrounding the relevant line number.
 
     linecount=`wc -l "$sourcefile" | awk '{ print $1; }'`

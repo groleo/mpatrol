@@ -11367,6 +11367,7 @@ Index
  @{" -leaks                                   " link "Profiling"}   Profiling
  @{" -limit                                   " link "Options"}   Options
  @{" -list                                    " link "Options"}   Options
+ @{" -listing                                 " link "The mpedit command"}   The mpedit command
  @{" -log-all                                 " link "Options"}   Options
  @{" -log-allocs                              " link "Options"}   Options
  @{" -log-file                                " link "Options"}   Options

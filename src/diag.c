@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.43 2000-11-14 20:30:43 graeme Exp $"
+#ident "$Id: diag.c,v 1.44 2000-11-16 20:35:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -411,7 +411,7 @@ static int editfile(char *f, unsigned long l, int d)
         }
         else
         {
-            v[1] = "--list";
+            v[1] = "--listing";
             v[2] = f;
             v[3] = t;
             v[4] = NULL;

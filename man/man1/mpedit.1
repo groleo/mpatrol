@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpedit.1,v 1.1 2000-11-14 20:11:49 graeme Exp $
+.\" $Id: mpedit.1,v 1.2 2000-11-16 20:39:46 graeme Exp $
 .\"
-.TH MPEDIT 1 "14 November 2000" "Release 1.3" "mpatrol library"
+.TH MPEDIT 1 "16 November 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpedit \- edits a text file at a specific line number in a new window
 .SH SYNOPSIS
@@ -61,11 +61,12 @@ must also open a new window to edit the source file so that it does not obscure
 any mpatrol diagnostic messages, and if it does not support this then a new
 terminal window must be opened for it to use.
 .PP
-If the \fB\-\-list\fP option is given on the command line then the \fBmpedit\fP
-command will display a context listing of the source file at the specified line
-number to the standard error output stream instead of invoking the text editor.
-The listing will be annotated with line numbers and will also show the contents
-of the five lines before and after the specified line if possible.
+If the \fB\-\-listing\fP option is given on the command line then the
+\fBmpedit\fP command will display a context listing of the source file at the
+specified line number to the standard error output stream instead of invoking
+the text editor.  The listing will be annotated with line numbers and will also
+show the contents of the five lines before and after the specified line if
+possible.
 .SH OPTIONS
 .TP
 \fB\-\-editor\fP <\fIfilename\fP> [\fB\-e\fP]
@@ -75,7 +76,7 @@ Specifies the text editor to use.  This overrides the contents of the
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
 .TP
-\fB\-\-list\fP [\fB\-l\fP]
+\fB\-\-listing\fP [\fB\-l\fP]
 Displays a context listing of the source line instead of invoking the text
 editor.
 .TP

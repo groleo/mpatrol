@@ -11093,6 +11093,7 @@ Index
 * -leaks:                                Profiling.
 * -limit:                                Options.
 * -list:                                 Options.
+* -listing:                              The mpedit command.
 * -log-all:                              Options.
 * -log-allocs:                           Options.
 * -log-file:                             Options.

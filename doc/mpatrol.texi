@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.141 2000-11-16 20:34:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.142 2000-11-16 20:40:31 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2633,6 +2633,7 @@ that the text editor must also open a new window to edit the source file so that
 it does not obscure any mpatrol diagnostic messages, and if it does not support
 this then a new terminal window must be opened for it to use.
 
+@cindex --listing
 @cindex list
 @cindex context listing
 If the @option{--listing} option is given on the command line then the
