@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.12 2000-05-12 18:37:15 graeme Exp $
+# $Id: Makefile,v 1.13 2000-05-15 19:49:03 graeme Exp $
 
 
 # Definitions
@@ -123,16 +123,15 @@ else
 	@ texi2dvi --pdf --batch --clean --quiet $<
 endif
 
-# Build the DVI reference card from the LaTeX file using latex
+# Build the DVI reference card from the LaTeX file using texi2dvi
 
 $(REFCARD).dvi: $(REFCARD).tex
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ latex $<
+	@ texi2dvi --language=latex --batch --clean --verbose $<
 else
-	@ latex $< >/dev/null 2>&1
+	@ texi2dvi --language=latex --batch --clean --quiet $<
 endif
-	-@ rm -f $(REFCARD).aux $(REFCARD).log >/dev/null 2>&1
 
 # Build the postscript reference card from the DVI file using dvips
 
@@ -144,9 +143,19 @@ else
 	@ dvips -t landscape -r0 -q -o $@ $<
 endif
 
+# Build the PDF reference card from the LaTeX file using texi2dvi
+
+$(REFCARD).pdf: $(REFCARD).tex
+	@ echo creating $@ from $<...
+ifeq ($(VERBOSE),true)
+	@ texi2dvi --pdf --language=latex --batch --clean --verbose $<
+else
+	@ texi2dvi --pdf --language=latex --batch --clean --quiet $<
+endif
+
 all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
 	$(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf $(REFCARD).dvi \
-	$(REFCARD).ps
+	$(REFCARD).ps $(REFCARD).pdf
 
 $(DOCUMENT)_doc.tar.gz: all README
 	@ mkdir -p $(DOCUMENT)/doc
@@ -154,7 +163,7 @@ $(DOCUMENT)_doc.tar.gz: all README
 	@ cp $(DOCUMENT).guide $(DOCUMENT).html $(DOCUMENT)/doc
 	@ cp $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT)/doc
 	@ cp $(DOCUMENT).pdf $(REFCARD).dvi $(DOCUMENT)/doc
-	@ cp $(REFCARD).ps README $(DOCUMENT)/doc
+	@ cp $(REFCARD).ps $(REFCARD).pdf README $(DOCUMENT)/doc
 	@ tar cf $(DOCUMENT)_doc.tar $(DOCUMENT)
 	@ gzip $(DOCUMENT)_doc.tar
 	-@ rm -rf $(DOCUMENT) >/dev/null 2>&1
@@ -166,7 +175,7 @@ ifeq ($(SPLITHTML),true)
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
 endif
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
-	-@ rm -f $(REFCARD).dvi $(REFCARD).ps >/dev/null 2>&1
+	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT)_doc.tar.gz >/dev/null 2>&1
 
 clobber: clean
