@@ -15,6 +15,9 @@ Changes for 1.2.0 (10th May, 2000)
   * The CHECK* options now display the calling function details even when the
     LOG* options are not used.
 
+  * The log file and profiling output file can now contain %p in their names
+    which will be expanded to the name of the executable program file.
+
   * AIX and IRIX are now supported.
 
   * The recalloc() and cfree() functions now take extra arguments to be in line
@@ -26,13 +29,21 @@ Changes for 1.2.0 (10th May, 2000)
   * All replacement function definitions are now disabled in mpatrol.h if the
     NDEBUG preprocessor macro is defined.
 
+  * Added the memccpy() function.
+
   * Fixed a bug in the reimplementation of memcmp() and bcmp() which used plain
     chars for comparison rather than unsigned chars.
+
+  * Function call stack traversal is now more robust on UNIX systems, with
+    the library simply stopping reading a call stack if it is corrupt rather
+    than crashing.
 
   * Added lint support in the UNIX makefile and the ability to build a lint
     library for mpatrol.
 
   * Added a GDB command file for use with mpatrol.
+
+  * Added a quick reference card.
 
   * Added instructions on how to build the mpatrol library as a shared library
     while also resolving references to any object file access libraries.  Also

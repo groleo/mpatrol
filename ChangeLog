@@ -1,13 +1,97 @@
-Thu May 11 00:37:58 2000  Graeme Roy  <graeme@epc.co.uk>
+Mon May 15 00:04:33 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Added information about frame pointers.
+
+Sun May 14 23:48:46 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def: Added memccpy().
+
+	* doc/mpatrol.texi:
+	Added memccpy().  Mentioned the %p component when specifying the log
+	file or profiling output file names.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Added the memccpy() function.
+
+	* src/inter.c, src/inter.h, src/malloc.c, src/mpatrol.h:
+	Added an extra argument to __mp_copymem().
+
+	* src/info.h, src/diag.c, src/malloc.c, src/mpatrol.h:
+	Added the memccpy() function.
+
+	* src/diag.c, src/diag.h: Added an extra argument to __mp_logmemcopy().
+
+	* src/info.c, src/info.h, src/inter.c:
+	Added an extra argument and return value to __mp_copymemory().
+
+	* src/stack.c:
+	Added signal handlers for UNIX when traversing the call stack.
+
+	* src/memory.c:
+	Now only fall back on /proc to get the program filename if other methods
+	don't work.
+
+	* src/diag.c: Added the %p log file variable.
+
+	* src/diag.c, src/diag.h, src/info.c, src/profile.c, src/option.c:
+	Added a meminfo header to __mp_logfile() and __mp_proffile().
+
+Sat May 13 09:56:06 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Mentioned the reference card.
+
+Fri May 12 19:01:12 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* README: Added information on the reference card.
+
+	* doc/README: Added details about the reference card.
+
+	* doc/Makefile: Added ability to build the quick reference card.
+
+	* doc/mpatrol.texi: Added information about the quick reference card.
+
+	* doc/refcard.tex: New quick reference card.
+
+	* man/man3/mpatrol.3, man/man1/mprof.1, man/man1/mleak.1,
+	  man/man1/mpatrol.1, man/cat3/mpatrol.3, man/cat1/mprof.1,
+	  man/cat1/mleak.1, man/cat1/mpatrol.1:
+	Added a reference to the quick reference card.
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/prototype, pkg/pkg/build,
+	  pkg/lha/build:
+	Added the quick reference card.
+
+Thu May 11 21:08:36 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:
 	Mentioned -fno-inline-functions and how to suppress diagnostic messages.
 
-	* doc/README, doc/Makefile: Added the ASCII art image file.
+	* doc/README, doc/Makefile:
+	Added the ASCII art image file.  The HTML version of the manual when
+	split into separate nodes also relies on the JPEG image.
+
+	* doc/mpatrol.texi: Documented the NDEBUG macro.
+
+	* man/man3/mpatrol.3, man/man1/mprof.1, man/man1/mleak.1,
+	  man/man1/mpatrol.1, man/cat3/mpatrol.3, man/cat1/mprof.1,
+	  man/cat1/mleak.1, man/cat1/mpatrol.1:
+	Added the mpatrol homepage as a reference.
 
 	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
 	  pkg/lha/build:
 	Added doc/images/mpatrol.txt to the distribution.
+
+	* src/info.c:
+	Added an extra parameter to the calls to __mp_profilealloc() and
+	__mp_profilefree() to indicate whether the symbol table should be
+	unprotected or not.
+
+	* src/profile.c, src/profile.h, src/inter.c:
+	Fixed problem with write-protected symbols when writing an intermediate
+	profiling information file.
+
+	* src/inter.c:
+	The comparison in memcmp() should be between unsigned chars and not plain
+	chars.
 
 Wed May 10 23:59:26 2000  Graeme Roy  <graeme@epc.co.uk>
 
