@@ -26,12 +26,12 @@
 # stack tracebacks
 
 
-# $Id: mpsym,v 1.6 2001-01-03 18:25:33 graeme Exp $
+# $Id: mpsym,v 1.7 2001-03-06 19:34:13 graeme Exp $
 
 
 # Program version.
 
-VERSION="1.1"
+VERSION="1.2"
 
 
 # The following value must match how pointers are formatted in the mpatrol
@@ -191,6 +191,7 @@ export MPATROL_OPTIONS
 # explicitly by the program after main().
 
 echo "set print symbol-filename on" >"$dbtemp"
+echo "set width 0" >>"$dbtemp"
 echo "break main" >>"$dbtemp"
 echo "run" >>"$dbtemp"
 awk '/^\t0x[0-9A-F]+ [^ ]/ { printf("x %s\n", $1); }' "$logfile" |
