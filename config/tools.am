@@ -21,11 +21,12 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: tools.am,v 1.1 2001-08-27 21:59:30 graeme Exp $
+## $Id: tools.am,v 1.2 2001-09-13 20:21:01 graeme Exp $
 
 
 INCLUDES = -I../src
-LDFLAGS = -static
+
+libmptools_la_LDFLAGS = -static
 
 lib_LTLIBRARIES = libmptools.la
 
