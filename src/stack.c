@@ -60,7 +60,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.19 2000-07-16 22:28:58 graeme Exp $"
+#ident "$Id: stack.c,v 1.20 2000-11-06 00:23:21 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -201,7 +201,7 @@ static void stackhandler(int s)
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
-      TARGET == NETWARE) && ARCH == ARCH_IX86)
+      TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
 /* Obtain the return address for the specified stack frame handle.
  */
 
@@ -371,7 +371,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
-      TARGET == NETWARE) && ARCH == ARCH_IX86)
+      TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
     unsigned long *f;
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
@@ -513,7 +513,7 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
-      TARGET == NETWARE) && ARCH == ARCH_IX86)
+      TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
     /* This section is not complete in any way for the OS / processor
      * combinations it supports, as it is intended to be as portable as possible
      * without writing in assembler.  In particular, optimised code is likely
