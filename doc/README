@@ -43,7 +43,7 @@ the information necessary to generate each of the preformatted files.
         Notes:     The mpatrol logo required by the DVI and Postscript versions
                    of the mpatrol manual.
 
-  * images/mpatrol.pdf
+  * images/mpatrol.png
         Format:    Portable Network Graphics (PNG) colour image
                    http://www.cdrom.com/pub/png/
         Notes:     The mpatrol logo required by the PDF version of the mpatrol
