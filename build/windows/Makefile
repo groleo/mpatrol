@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.4 2000-03-23 19:38:07 graeme Exp $
+# $Id: Makefile,v 1.5 2000-03-23 19:48:20 graeme Exp $
 
 
 # Definitions
@@ -42,21 +42,23 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj sbrk.obj version.obj
+		  signals.obj diag.obj option.obj inter.obj malloc.obj \
+		  sbrk.obj version.obj
 SHARED_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj inter.obj sbrk.obj main.obj \
-		  version.obj
+		  signals.obj diag.obj option.obj inter.obj malloc.obj \
+		  sbrk.obj main.obj version.obj
 ARCHTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  inter.ts.obj sbrk.ts.obj version.ts.obj
+		  inter.ts.obj malloc.ts.obj sbrk.ts.obj version.ts.obj
 SHARTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  inter.ts.obj sbrk.ts.obj main.ts.obj version.ts.obj
+		  inter.ts.obj malloc.ts.obj sbrk.ts.obj main.ts.obj \
+		  version.ts.obj
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
 SHARED_LIBRARY	= $(LIBRARY).dll
@@ -79,7 +81,7 @@ OBJTS_LIBRARY	= $(LIBRARY)mt.obj
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
 
-$(SHARED_LIBRARY): $(SHARED_OBJECTS)
+$(SHARED_LIBRARY): $(SHARED_OBJECTS) $(LIBRARY).def
 	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS)
 
 $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
@@ -88,7 +90,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(SHARTS_OBJECTS)
+$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
 	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS)
 
 $(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
@@ -189,6 +191,11 @@ inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h
+malloc.obj malloc.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h
 sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
         $(SOURCE)/target.h $(SOURCE)/memory.h
 main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
