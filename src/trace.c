@@ -36,10 +36,25 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.15 2001-06-07 17:58:42 graeme Exp $"
+#ident "$Id: trace.c,v 1.16 2001-06-07 20:20:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.15 2001-06-07 17:58:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.16 2001-06-07 20:20:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
+
+
+/* A name cache is used to record the most recently-used strings that have been
+ * written to the tracing output file.  Such strings can be replaced with
+ * indices into the name cache.  When the name cache is full, the cache entry
+ * that was accessed least recently will be replaced by a new name.
+ */
+
+typedef struct namecache
+{
+    listnode node;        /* list node */
+    char *name;           /* pointer to name */
+    unsigned char index;  /* cache index */
+}
+namecache;
 
 
 /* A rescache structure stores information about memory reservations on the
@@ -59,6 +74,21 @@ rescache;
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* The arrays of cache entries for the function and file name caches.
+ */
+
+static namecache funcnames[MP_NAMECACHE_SIZE];
+static namecache filenames[MP_NAMECACHE_SIZE];
+
+
+/* The lists of used and free cache entries for the function and file name
+ * caches.
+ */
+
+static listhead usedfuncs, freefuncs;
+static listhead usedfiles, freefiles;
 
 
 /* The cache that stores information about memory reservations on the heap
@@ -88,8 +118,21 @@ MP_GLOBAL
 void
 __mp_newtrace(tracehead *t, meminfo *m)
 {
+    size_t i;
+
     t->file = __mp_tracefile(m, NULL);
     t->tracing = 0;
+    __mp_newlist(&usedfuncs);
+    __mp_newlist(&freefuncs);
+    __mp_newlist(&usedfiles);
+    __mp_newlist(&freefiles);
+    for (i = 0; i < MP_NAMECACHE_SIZE; i++)
+    {
+        __mp_addtail(&freefuncs, &funcnames[i].node);
+        __mp_addtail(&freefiles, &filenames[i].node);
+        funcnames[i].name = filenames[i].name = NULL;
+        funcnames[i].index = filenames[i].index = i + 1;
+    }
     tracefile = NULL;
     traceready = 0;
 }
@@ -102,6 +145,7 @@ MP_GLOBAL
 int
 __mp_changetrace(tracehead *t, char *f, int e)
 {
+    size_t i;
     int r;
     char s;
 
@@ -123,6 +167,16 @@ __mp_changetrace(tracehead *t, char *f, int e)
         r = 0;
     t->file = f;
     t->tracing = s;
+    __mp_newlist(&usedfuncs);
+    __mp_newlist(&freefuncs);
+    __mp_newlist(&usedfiles);
+    __mp_newlist(&freefiles);
+    for (i = 0; i < MP_NAMECACHE_SIZE; i++)
+    {
+        __mp_addtail(&freefuncs, &funcnames[i].node);
+        __mp_addtail(&freefiles, &filenames[i].node);
+        funcnames[i].name = filenames[i].name = NULL;
+    }
     tracefile = NULL;
     traceready = 0;
     return r;
@@ -137,6 +191,7 @@ int
 __mp_endtrace(tracehead *t)
 {
     char s[4];
+    size_t i;
     int r;
 
     r = 1;
@@ -158,6 +213,16 @@ __mp_endtrace(tracehead *t)
     else if (fclose(tracefile))
         r = 0;
     tracefile = NULL;
+    __mp_newlist(&usedfuncs);
+    __mp_newlist(&freefuncs);
+    __mp_newlist(&usedfiles);
+    __mp_newlist(&freefiles);
+    for (i = 0; i < MP_NAMECACHE_SIZE; i++)
+    {
+        __mp_addtail(&freefuncs, &funcnames[i].node);
+        __mp_addtail(&freefiles, &filenames[i].node);
+        funcnames[i].name = filenames[i].name = NULL;
+    }
     t->file = NULL;
     t->tracing = 0;
     return r;
@@ -261,6 +326,92 @@ __mp_traceheap(void *a, size_t l, int i)
 }
 
 
+/* Add a string to a specified name cache or return the index of an existing
+ * string.
+ */
+
+static
+unsigned char
+addname(listhead *u, listhead *f, char *s)
+{
+    namecache *n;
+
+    /* First check to see if the name already exists in the cache.
+     */
+    for (n = (namecache *) u->head; n->node.next != NULL;
+         n = (namecache *) n->node.next)
+        if ((*n->name == *s) && (strcmp(n->name + 1, s + 1) == 0))
+        {
+            /* If the entry is not at the front of the cache then move it there.
+             */
+            if (n != (namecache *) u->head)
+            {
+                __mp_remove(u, &n->node);
+                __mp_addhead(u, &n->node);
+            }
+            return n->index;
+        }
+    /* If there are free entries in the cache then use the first one, otherwise
+     * use the least-recently-used entry.
+     */
+    if (f->size > 0)
+        n = (namecache *) __mp_remhead(f);
+    else
+        n = (namecache *) __mp_remtail(u);
+    __mp_addhead(u, &n->node);
+    n->name = s;
+    return (unsigned char) (n->index | 0x80);
+}
+
+
+/* Write out a function name to the tracing output file.
+ */
+
+static
+void
+writefuncname(char *s)
+{
+    unsigned char n;
+
+    if ((s != NULL) && (*s != '\0'))
+    {
+        n = addname(&usedfuncs, &freefuncs, s);
+        fputc(n, tracefile);
+        if (n & 0x80)
+        {
+            fputs(s, tracefile);
+            fputc('\0', tracefile);
+        }
+    }
+    else
+        fputc('\0', tracefile);
+}
+
+
+/* Write out a file name to the tracing output file.
+ */
+
+static
+void
+writefilename(char *s)
+{
+    unsigned char n;
+
+    if ((s != NULL) && (*s != '\0'))
+    {
+        n = addname(&usedfiles, &freefiles, s);
+        fputc(n, tracefile);
+        if (n & 0x80)
+        {
+            fputs(s, tracefile);
+            fputc('\0', tracefile);
+        }
+    }
+    else
+        fputc('\0', tracefile);
+}
+
+
 /* Record a memory allocation for tracing.
  */
 
@@ -286,12 +437,8 @@ __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l,
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(d, &s);
     fwrite(b, s, 1, tracefile);
-    if ((f != NULL) && (*f != '\0'))
-        fputs(f, tracefile);
-    fputc(0, tracefile);
-    if ((g != NULL) && (*g != '\0'))
-        fputs(g, tracefile);
-    fputc(0, tracefile);
+    writefuncname(f);
+    writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
 }
@@ -322,12 +469,8 @@ __mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l,
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(d, &s);
     fwrite(b, s, 1, tracefile);
-    if ((f != NULL) && (*f != '\0'))
-        fputs(f, tracefile);
-    fputc(0, tracefile);
-    if ((g != NULL) && (*g != '\0'))
-        fputs(g, tracefile);
-    fputc(0, tracefile);
+    writefuncname(f);
+    writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
 }
@@ -354,12 +497,8 @@ __mp_tracefree(tracehead *t, unsigned long n, unsigned long d, char *f, char *g,
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(d, &s);
     fwrite(b, s, 1, tracefile);
-    if ((f != NULL) && (*f != '\0'))
-        fputs(f, tracefile);
-    fputc(0, tracefile);
-    if ((g != NULL) && (*g != '\0'))
-        fputs(g, tracefile);
-    fputc(0, tracefile);
+    writefuncname(f);
+    writefilename(g);
     b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
 }
