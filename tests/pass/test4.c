@@ -80,6 +80,10 @@ void display(void *p)
     fprintf(stderr, "typestr:  %s\n",
             d.typestr ? d.typestr : "<unknown>");
     fprintf(stderr, "typesize: %lu\n", d.typesize);
+    if (sizeof(void *) == 8)
+        fprintf(stderr, "userdata: 0x%016lX\n", d.userdata);
+    else
+        fprintf(stderr, "userdata: 0x%08lX\n", d.userdata);
     fprintf(stderr, "freed:    %d\n", d.freed);
 }
 
