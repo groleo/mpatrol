@@ -156,6 +156,24 @@
 #endif /* ARCH */
 
 
+#define ENVIRON_32 1 /* 32-bit */
+#define ENVIRON_64 2 /* 64-bit */
+
+
+#ifndef ENVIRON
+#if SYSTEM == SYSTEM_SOLARIS
+#if defined(sparcv9) || defined(_sparcv9) || defined(__sparcv9) || \
+    defined(__sparcv9__)
+#define ENVIRON ENVIRON_64
+#else /* sparcv9 */
+#define ENVIRON ENVIRON_32
+#endif /* sparcv9 */
+#else /* SYSTEM */
+#define ENVIRON ENVIRON_32
+#endif /* SYSTEM */
+#endif /* ENVIRON */
+
+
 #define FORMAT_NONE  0 /* no symbol support */
 #define FORMAT_COFF  1 /* COFF */
 #define FORMAT_XCOFF 2 /* XCOFF */
@@ -171,7 +189,11 @@
     SYSTEM == SYSTEM_LYNXOS
 #define FORMAT FORMAT_BFD
 #else /* SYSTEM */
+#if ENVIRON == ENVIRON_64
+#define FORMAT FORMAT_ELF64
+#else /* ENVIRON */
 #define FORMAT FORMAT_ELF32
+#endif /* ENVIRON */
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
 #define FORMAT FORMAT_PE
