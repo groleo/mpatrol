@@ -4,7 +4,7 @@ README FOR THE MPATROL LIBRARY
 This document contains an overview of the mpatrol library.  For instructions on
 how to build and install the mpatrol library, see INSTALL.  The documentation
 for the library currently exists as a set of UNIX manual pages located in the
-man directory or as Texinfo format located in the doc directory.
+man directory or in Texinfo format located in the doc directory.
 
 
 Introduction
@@ -334,11 +334,11 @@ Further information
     look in the library source code to see if it's obvious what is wrong.
 
     The latest version of the mpatrol library can always be found at
-    `http://www.cbmamiga.demon.co.uk/mpatrol' and any correspondence relating to
-    mpatrol (bug reports, enhancement requests, compliments ;-) should be sent
-    to <mpatrol@cbmamiga.demon.co.uk>.  I normally only check my e-mail about
-    once or twice a week, so don't expect an immediate response.  I can also be
-    reached at <graeme@epc.co.uk> but that is my work e-mail address.
+    `http://www.cbmamiga.demon.co.uk/mpatrol/', and any correspondence relating
+    to mpatrol (bug reports, enhancement requests, compliments ;-) should be
+    sent to <mpatrol@cbmamiga.demon.co.uk>.  I normally only check my e-mail
+    about once or twice a week, so don't expect an immediate response.  I can
+    also be reached at <graeme@epc.co.uk> but that is my work e-mail address.
 
     Happy debugging!
 
