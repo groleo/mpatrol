@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.43 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: option.c,v 1.44 2002-02-05 00:49:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.43 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.44 2002-02-05 00:49:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -426,7 +426,7 @@ __mp_parseoptions(infohead *h)
 
     l = 0;
     f = p = t = NULL;
-    if (((s = getenv(MP_OPTIONS)) == NULL) || (*s == '\0'))
+    if (((s = __mp_getenv(MP_OPTIONS)) == NULL) || (*s == '\0'))
         return;
     if (strlen(s) + 1 > sizeof(options))
     {
@@ -434,7 +434,7 @@ __mp_parseoptions(infohead *h)
                    "long\n", MP_OPTIONS);
         return;
     }
-    /* We shouldn't modify the original string returned by getenv() since
+    /* We shouldn't modify the original string returned by __mp_getenv() since
      * that would modify the environment, and it may be placed in read-only
      * memory anyway.
      */
