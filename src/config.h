@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.75 2001-03-07 23:16:58 graeme Exp $
+ * $Id: config.h,v 1.76 2001-05-14 12:15:13 graeme Exp $
  */
 
 
@@ -968,6 +968,15 @@
 #ifndef MP_TRACEMAGIC
 #define MP_TRACEMAGIC "MTRC"
 #endif /* MP_TRACEMAGIC */
+
+
+/* The default prefix string to use when calculating the filename of each
+ * allocation contents file.
+ */
+
+#ifndef MP_CONTENTSFILE
+#define MP_CONTENTSFILE ".mpatrol"
+#endif /* MP_CONTENTSFILE */
 
 
 /* The prefix string to print at the start of each line in the mpatrol log

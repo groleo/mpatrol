@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.42 2001-03-07 20:33:54 graeme Exp $
+ * $Id: inter.h,v 1.43 2001-05-14 12:15:14 graeme Exp $
  */
 
 
@@ -177,6 +177,9 @@ int __mp_logaddr(void *);
 int __mp_edit(char *, unsigned long);
 int __mp_list(char *, unsigned long);
 int __mp_view(char *, unsigned long);
+int __mp_readcontents(char *, void *);
+int __mp_writecontents(char *, void *);
+int __mp_remcontents(char *, void *);
 void chkr_set_right(void *, size_t, unsigned char);
 void chkr_copy_bitmap(void *, void *, size_t);
 void chkr_check_addr(void *, size_t, unsigned char);

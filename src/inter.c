@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.119 2001-03-10 17:56:39 graeme Exp $"
+#ident "$Id: inter.c,v 1.120 2001-05-14 12:15:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.119 2001-03-10 17:56:39 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.120 2001-05-14 12:15:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2514,6 +2514,81 @@ __mp_view(char *f, unsigned long l)
         r = __mp_editfile(f, l, 1);
     else
         r = 0;
+    restoresignals();
+    return r;
+}
+
+
+/* Read in an allocation contents file.
+ */
+
+int
+__mp_readcontents(char *s, void *p)
+{
+    allocnode *n;
+    infonode *m;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = 0;
+    else
+        r = __mp_readalloc(s, m->data.alloc, n->block, n->size);
+    restoresignals();
+    return r;
+}
+
+
+/* Write out an allocation contents file.
+ */
+
+int
+__mp_writecontents(char *s, void *p)
+{
+    allocnode *n;
+    infonode *m;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = 0;
+    else
+        r = __mp_writealloc(s, m->data.alloc, n->block, n->size);
+    restoresignals();
+    return r;
+}
+
+
+/* Remove an allocation contents file.
+ */
+
+int
+__mp_remcontents(char *s, void *p)
+{
+    allocnode *n;
+    infonode *m;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
+        r = 0;
+    else
+        r = __mp_remalloc(s, m->data.alloc);
     restoresignals();
     return r;
 }

@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.27 2001-03-06 19:47:56 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.28 2001-05-14 12:15:14 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.27 2001-03-06 19:47:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.28 2001-05-14 12:15:14 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -923,6 +923,36 @@ __mp_list(char *f, unsigned long l)
 
 int
 __mp_view(char *f, unsigned long l)
+{
+    return 0;
+}
+
+
+/* Read in an allocation contents file.
+ */
+
+int
+__mp_readcontents(char *s, void *p)
+{
+    return 0;
+}
+
+
+/* Write out an allocation contents file.
+ */
+
+int
+__mp_writecontents(char *s, void *p)
+{
+    return 0;
+}
+
+
+/* Remove an allocation contents file.
+ */
+
+int
+__mp_remcontents(char *s, void *p)
 {
     return 0;
 }

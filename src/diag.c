@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.75 2001-03-07 21:29:10 graeme Exp $"
+#ident "$Id: diag.c,v 1.76 2001-05-14 12:15:13 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.75 2001-03-07 21:29:10 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.76 2001-05-14 12:15:13 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -713,6 +713,81 @@ __mp_editfile(char *f, unsigned long l, int d)
 #else /* TARGET */
     return 0;
 #endif /* TARGET */
+}
+
+
+/* Calculate the filename to use for an allocation contents file.
+ */
+
+static
+char *
+allocfile(char *s, unsigned long n)
+{
+    static char b[1024];
+
+    if (s == NULL)
+        s = MP_CONTENTSFILE;
+    sprintf(b, "%s.%lu", s, n);
+    return b;
+}
+
+
+/* Read in an allocation contents file.
+ */
+
+MP_GLOBAL
+int
+__mp_readalloc(char *s, unsigned long n, void *a, size_t l)
+{
+    FILE *f;
+    int r;
+
+    r = 0;
+    if (f = fopen(allocfile(s, n), "rb"))
+    {
+        if (fread(a, sizeof(char), l, f) == l)
+            r = 1;
+        fclose(f);
+    }
+    return r;
+}
+
+
+/* Write out an allocation contents file.
+ */
+
+MP_GLOBAL
+int
+__mp_writealloc(char *s, unsigned long n, void *a, size_t l)
+{
+    FILE *f;
+    char *t;
+    int r;
+
+    r = 0;
+    t = allocfile(s, n);
+    if (f = fopen(t, "wb"))
+    {
+        if (fwrite(a, sizeof(char), l, f) == l)
+            r = 1;
+        fclose(f);
+        if (r == 0)
+            remove(t);
+    }
+    return r;
+}
+
+
+/* Remove an allocation contents file.
+ */
+
+MP_GLOBAL
+int
+__mp_remalloc(char *s, unsigned long n)
+{
+    if (remove(allocfile(s, n)))
+        return 0;
+    return 1;
 }
 
 

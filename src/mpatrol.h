@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.120 2001-03-22 21:13:43 graeme Exp $
+ * $Id: mpatrol.h,v 1.121 2001-05-14 12:15:14 graeme Exp $
  */
 
 
@@ -789,6 +789,9 @@ int __mp_logaddr(MP_CONST void *);
 int __mp_edit(MP_CONST char *, unsigned long);
 int __mp_list(MP_CONST char *, unsigned long);
 int __mp_view(MP_CONST char *, unsigned long);
+int __mp_readcontents(MP_CONST char *, void *);
+int __mp_writecontents(MP_CONST char *, MP_CONST void *);
+int __mp_remcontents(MP_CONST char *, MP_CONST void *);
 
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
@@ -873,6 +876,9 @@ static int __mp_errno;
 #define __mp_edit(f, l) ((int) 0)
 #define __mp_list(f, l) ((int) 0)
 #define __mp_view(f, l) ((int) 0)
+#define __mp_readcontents(s, p) ((int) 0)
+#define __mp_writecontents(s, p) ((int) 0)
+#define __mp_remcontents(s, p) ((int) 0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
 #define __mp_printf(...) ((int) 0)
