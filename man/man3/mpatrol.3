@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.1 1999-10-10 21:38:18 graeme Exp $
+.\" $Id: mpatrol.3,v 1.2 1999-10-10 21:51:14 graeme Exp $
 .\"
 .TH MPATROL 3 "11 October 1999" "Release 1.0" "mpatrol library"
 .SH NAME
@@ -305,17 +305,17 @@ will be returned and \fIinfo\fP will contain the following information:
 
  \fBField\fP   \fBDescription\fP
 
- \fBblock\fP   Pointer to first byte of allocation.
- \fBsize\fP    Size of allocation in bytes.
+ \fBblock\fP   Pointer to first byte of alloc.
+ \fBsize\fP    Size of alloc in bytes.
  \fBtype\fP    Type of function which allocated memory.
  \fBalloc\fP   Allocation index.
  \fBrealloc\fP Number of times reallocated.
  \fBthread\fP  Thread identifier.
- \fBfunc\fP    Function in which memory was allocated.
- \fBfile\fP    File in which memory was allocated.
- \fBline\fP    Line number at which memory was allocated.
+ \fBfunc\fP    Function in which alloc took place.
+ \fBfile\fP    File in which alloc took place.
+ \fBline\fP    Line number at which alloc took place.
  \fBstack\fP   Pointer to function call stack.
- \fBfreed\fP   Indicates if allocation has been freed.
+ \fBfreed\fP   Indicates if alloc has been freed.
 .RE
 .TP
 \fB__mp_memorymap\fP
