@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.24 2000-11-30 22:28:41 graeme Exp $
+# $Id: NMakefile,v 1.25 2000-11-30 22:44:18 graeme Exp $
 
 
 # Definitions
@@ -40,24 +40,24 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj inter.obj \
-		  malloc.obj sbrk.obj version.obj
+		  signals.obj diag.obj option.obj profile.obj trace.obj \
+		  inter.obj malloc.obj sbrk.obj version.obj
 SHARED_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj inter.obj \
-		  malloc.obj sbrk.obj main.obj version.obj
+		  signals.obj diag.obj option.obj profile.obj trace.obj \
+		  inter.obj malloc.obj sbrk.obj main.obj version.obj
 ARCHTS_OBJECTS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  profile.ts_obj inter.ts_obj malloc.ts_obj sbrk.ts_obj \
-		  version.ts_obj
+		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
+		  sbrk.ts_obj version.ts_obj
 SHARTS_OBJECTS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  profile.ts_obj inter.ts_obj malloc.ts_obj sbrk.ts_obj \
-		  main.ts_obj version.ts_obj
+		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
+		  sbrk.ts_obj main.ts_obj version.ts_obj
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).lib
 SHARED_LIBRARY	= $(LIBRARY).dll
@@ -216,6 +216,12 @@ profile.obj profile.ts_obj: $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
+trace.obj trace.ts_obj: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/diag.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/signals.h $(SOURCE)/utils.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.29 2000-11-30 22:15:51 graeme Exp $
+# $Id: Makefile,v 1.30 2000-11-30 22:41:43 graeme Exp $
 
 
 # Definitions
@@ -40,11 +40,11 @@ LIBRARY	= mpatrol
 
 ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-		  profile.o inter.o malloc.o sbrk.o version.o
+		  profile.o trace.o inter.o malloc.o sbrk.o version.o
 ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
-		  inter.t.o malloc.t.o sbrk.t.o version.t.o
+		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).a
 OBJECT_LIBRARY	= lib$(LIBRARY).o
@@ -180,6 +180,12 @@ profile.o profile.t.o: $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
+trace.o trace.t.o: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/diag.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/signals.h $(SOURCE)/utils.h
 inter.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

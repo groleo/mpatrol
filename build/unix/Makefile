@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.35 2000-11-30 22:22:18 graeme Exp $
+# $Id: Makefile,v 1.36 2000-11-30 22:42:45 graeme Exp $
 
 
 # Definitions
@@ -47,10 +47,10 @@ REVISION = 3
 
 OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-	   profile.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o version.o
 TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
-	   profile.o inter.o malloc.o version.o
+	   profile.o trace.o inter.o malloc.o version.o
 
 ARCHIVE_OBJECTS	= $(OBJECTS) machine.o
 SHARED_OBJECTS	= $(OBJECTS:.o=.s.o) machine.s.o
@@ -269,6 +269,12 @@ profile.o profile.s.o profile.n.ln profile.t.o profile.s.t.o profile.t.ln: \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
+trace.o trace.s.o trace.t.o trace.s.t.o: $(SOURCE)/trace.c $(SOURCE)/trace.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/memory.h \
+	$(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/utils.h
 inter.o inter.s.o inter.n.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \

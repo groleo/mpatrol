@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.28 2000-11-30 22:19:02 graeme Exp $
+# $Id: Makefile,v 1.29 2000-11-30 22:41:31 graeme Exp $
 
 
 # Definitions
@@ -41,11 +41,11 @@ LIBRARY	= mpatrol
 
 OBJECTS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
-	   diag.obj option.obj profile.obj inter.obj version.obj
+	   diag.obj option.obj profile.obj trace.obj inter.obj version.obj
 TOBJECTS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   heap.ts.obj alloc.ts.obj info.ts.obj stack.ts.obj addr.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
-	   option.ts.obj profile.ts.obj inter.ts.obj version.ts.obj
+	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
 
 ARCHIVE_LIBRARY	= $(LIBRARY).lib
 OBJECT_LIBRARY	= lib$(LIBRARY).obj
@@ -185,6 +185,12 @@ profile.obj profile.ts.obj: $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/trace.h $(SOURCE)/version.h
+trace.obj trace.ts.obj: $(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/diag.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/profile.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/signals.h $(SOURCE)/utils.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
