@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.46 2003-11-25 23:19:39 graeme Exp $
+# $Id: Makefile,v 1.47 2003-11-26 00:20:16 graeme Exp $
 
 
 # Definitions
@@ -153,14 +153,12 @@ endif
 ifeq ($(THUMBNAILS),true)
 ifeq ($(VERBOSE),true)
 	@ thumbpdf --verbose $@
-	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
-	-@ rm -f $(DOCUMENT).tpt thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).tpt >/dev/null 2>&1
 else
 	@ thumbpdf --quiet $@
-	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
-	-@ rm -f $(DOCUMENT).tpt thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).tpt >/dev/null 2>&1
 endif
 endif
 
