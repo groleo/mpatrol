@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.60 2001-01-15 21:28:36 graeme Exp $"
+#ident "$Id: inter.c,v 1.61 2001-01-17 23:42:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -496,7 +496,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     void *p;
     stackinfo i;
     loginfo v;
-    int j;
+    int j, z;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we must
@@ -509,8 +509,11 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (l == 0)
             l = 1;
         if ((p = sbrk(l)) == (void *) -1)
-            p = NULL;
-        else if (f == AT_CALLOC)
+            if ((f == AT_XMALLOC) || (f == AT_XCALLOC))
+                abort();
+            else
+                p = NULL;
+        else if ((f == AT_CALLOC) || (f == AT_XCALLOC))
             __mp_memset(p, 0, l);
         return p;
     }
@@ -556,35 +559,49 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
     v.typestr = g;
     v.typesize = h;
     checkalloca(&v, 0);
+    z = 0;
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
-    /* Call the low-memory handler if no memory block was allocated.
-     */
     if (p == NULL)
     {
-        if (memhead.nomemory)
-            memhead.nomemory();
-        else if ((f == AT_NEW) || (f == AT_NEWVEC))
+        if (z == 0)
+            if (memhead.nomemory)
+            {
+                /* Call the low-memory handler if no memory block was allocated.
+                 */
+                memhead.nomemory();
+                if (memhead.prologue && (memhead.recur == 1))
+                    memhead.prologue((void *) -1, l);
+                if ((f != AT_NEW) && (f != AT_NEWVEC))
+                    z = 1;
+                goto retry;
+            }
+            else if ((f == AT_NEW) || (f == AT_NEWVEC))
+            {
+                /* The C++ standard specifies that operators new and new[]
+                 * should always return non-NULL pointers.  Since we have
+                 * ascertained that we have no low-memory handler, this either
+                 * means throwing an exception or aborting.  Since this is a
+                 * no-throw version of new we'll opt for the latter.
+                 */
+                __mp_printsummary(&memhead);
+                __mp_diag("\n");
+                __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+                memhead.fini = 1;
+                __mp_abort();
+            }
+        if ((f == AT_XMALLOC) || (f == AT_XCALLOC))
         {
-            /* The C++ standard specifies that operators new and new[] should
-             * always return non-NULL pointers.  Since we have ascertained that
-             * we have no low-memory handler, this either means throwing an
-             * exception or aborting.  Since this is a no-throw version of new
-             * we'll opt for the latter.
+            /* The xmalloc() and xcalloc() functions should always return
+             * non-NULL pointers, which means we must abort here.
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
             __mp_error(ET_OUTMEM, f, t, u, "out of memory");
             memhead.fini = 1;
             __mp_abort();
-        }
-        if ((f == AT_NEW) || (f == AT_NEWVEC))
-        {
-            if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue((void *) -1, l);
-            goto retry;
         }
     }
     restoresignals();
@@ -603,7 +620,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     stackinfo i;
     loginfo v;
     size_t n;
-    int j;
+    int j, z;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we must
@@ -628,6 +645,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
                 o[n] = '\0';
             }
         }
+        if ((o == NULL) && (f == AT_XSTRDUP))
+            abort();
         return o;
     }
 #endif /* TARGET */
@@ -672,6 +691,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     v.typestr = "char";
     v.typesize = sizeof(char);
     checkalloca(&v, 0);
+    z = 0;
+  retry:
     if ((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA))
         j = 1;
     else
@@ -693,10 +714,30 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
         p = NULL;
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
-    /* Call the low-memory handler if no memory block was allocated.
-     */
-    if ((p == NULL) && memhead.nomemory)
-        memhead.nomemory();
+    if (p == NULL)
+    {
+        if ((z == 0) && memhead.nomemory)
+        {
+            /* Call the low-memory handler if no memory block was allocated.
+             */
+            memhead.nomemory();
+            if (memhead.prologue && (memhead.recur == 1))
+                memhead.prologue(p, (size_t) -2);
+            z = 1;
+            goto retry;
+        }
+        if (f == AT_XSTRDUP)
+        {
+            /* The xstrdup() function should always return a non-NULL pointer,
+             * which means we must abort here.
+             */
+            __mp_printsummary(&memhead);
+            __mp_diag("\n");
+            __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+            memhead.fini = 1;
+            __mp_abort();
+        }
+    }
     restoresignals();
     return p;
 }
@@ -714,7 +755,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
 #endif /* TARGET */
     stackinfo i;
     loginfo v;
-    int j;
+    int j, z;
 
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we must
@@ -737,6 +778,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             q = NULL;
         else
             __mp_memcopy(q, p, l);
+        if ((q == NULL) && (f == AT_XREALLOC))
+            abort();
         return q;
     }
 #endif /* TARGET */
@@ -781,13 +824,35 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     v.typestr = g;
     v.typesize = h;
     checkalloca(&v, 0);
+    z = 0;
+  retry:
     p = __mp_resizememory(&memhead, p, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
-    /* Call the low-memory handler if no memory block was allocated.
-     */
-    if ((p == NULL) && memhead.nomemory)
-        memhead.nomemory();
+    if (p == NULL)
+    {
+        if ((z == 0) && memhead.nomemory)
+        {
+            /* Call the low-memory handler if no memory block was allocated.
+             */
+            memhead.nomemory();
+            if (memhead.prologue && (memhead.recur == 1))
+                memhead.prologue(p, l);
+            z = 1;
+            goto retry;
+        }
+        if (f == AT_XREALLOC)
+        {
+            /* The xrealloc() function should always return a non-NULL pointer,
+             * which means we must abort here.
+             */
+            __mp_printsummary(&memhead);
+            __mp_diag("\n");
+            __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+            memhead.fini = 1;
+            __mp_abort();
+        }
+    }
     restoresignals();
     return p;
 }
