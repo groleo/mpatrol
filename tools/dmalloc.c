@@ -29,24 +29,34 @@
 #include "config.h"
 #include "dmalloc.h"
 #include <stdio.h>
+#include <ctype.h>
 #include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.3 2001-03-01 19:13:12 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.4 2001-03-01 22:29:12 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.3 2001-03-01 19:13:12 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.4 2001-03-01 22:29:12 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-/* Specify whether to prefix every log message produced by dmalloc_message()
- * and dmalloc_vmessage() with the current time in numerical form and/or
- * string form.  The current event number can also be logged as well.
+/* Specify whether to prefix every log message produced by
+ * __mpt_dmallocmessage() and __mpt_dmallocvmessage() with the current
+ * time in numerical form and/or string form.  The current event number
+ * can also be logged as well.
  */
 
 #define LOG_TIME_NUMBER     1
 #define LOG_CTIME_STRING    0
 #define LOG_ITERATION_COUNT 1
+
+
+/* The escape characters that should be given special consideration in
+ * bytestring().
+ */
+
+#define ESCAPE_CHARS   "\\\a\b\f\n\r\t\v"
+#define ESCAPE_REPLACE "\\abfnrtv"
 
 
 /* The structure used to store information about each debugging token
@@ -60,6 +70,23 @@ typedef struct tokeninfo
     unsigned long flag; /* associated flag */
 }
 tokeninfo;
+
+
+/* The structure used to pass information to the callback function from
+ * __mp_iterate() when __mpt_dmalloclogchanged() is called.
+ */
+
+typedef struct listinfo
+{
+    unsigned long kcount; /* known count */
+    unsigned long ktotal; /* known total */
+    unsigned long ucount; /* unknown count */
+    unsigned long utotal; /* unknown total */
+    int unfreed : 1;      /* log unfreed allocations */
+    int freed : 1;        /* log freed allocations */
+    int details : 1;      /* log pointer details */
+}
+listinfo;
 
 
 typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
@@ -135,7 +162,7 @@ static unsigned long malloc_flags;
 static unsigned long malloc_start, malloc_interval;
 
 
-/* The pointer to the callback function registered with dmalloc_track().
+/* The pointer to the callback function registered with __mpt_dmalloctrack().
  */
 
 static dmalloc_track_t malloc_tracker;
@@ -316,8 +343,9 @@ prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
 }
 
 
-/* Call the tracker function with any relevant details and possibly also call
- * the old epilogue function if one was installed.
+/* Call the tracker function with any relevant details if one has been
+ * registered and possibly also call the old epilogue function if one was
+ * installed.
  */
 
 static
@@ -362,6 +390,97 @@ epilogue(MP_CONST void *p, MP_CONST void *a)
 }
 
 
+/* Convert the bytes in a memory allocation to human-readable form.
+ */
+
+static
+char *
+bytestring(char *b, size_t s, char *p, size_t l)
+{
+    char *t;
+    size_t i, n;
+
+    for (i = n = 0; (i < s) && (i < l); i++)
+        if (p[i] == '\0')
+        {
+            b[n++] = '\\';
+            b[n++] = '0';
+            if ((i < s - 1) && (i < l - 1))
+            {
+                b[n++] = '0';
+                b[n++] = '0';
+            }
+        }
+        else if (t = strchr(ESCAPE_CHARS, p[i]))
+        {
+            b[n++] = '\\';
+            b[n++] = ESCAPE_REPLACE[t - ESCAPE_CHARS];
+        }
+        else if (!isprint(p[i]))
+        {
+            sprintf(b + n, "\\%03o", p[i]);
+            n += 4;
+        }
+        else
+            b[n++] = p[i];
+    b[n] = '\0';
+    return b;
+}
+
+
+/* The callback function that is called by __mp_iterate() for every heap
+ * allocation that has changed since a specified heap event.
+ */
+
+static
+int
+callback(MP_CONST void *p, void *t)
+{
+    char b[1024];
+    char s[81];
+    listinfo *i;
+    __mp_allocinfo d;
+
+    if (!__mp_info(p, &d))
+        return 0;
+    i = (listinfo *) t;
+    if ((d.freed && i->freed) || (!d.freed && i->unfreed))
+    {
+        if (d.file != NULL)
+        {
+            i->kcount++;
+            i->ktotal += d.size;
+        }
+        else
+        {
+            i->ucount++;
+            i->utotal += d.size;
+        }
+        if (i->details && ((d.file != NULL) ||
+             (malloc_flags & DMALLOC_LOG_KNOWN)))
+        {
+            if (d.file != NULL)
+                sprintf(b, "%s:%lu", d.file, d.line);
+            else if (d.stack == NULL)
+                strcpy(b, "unknown");
+            else if (d.stack->name != NULL)
+                strcpy(b, d.stack->name);
+            else
+                sprintf(b, "ra=%#lx", d.stack->addr);
+            __mpt_dmallocmessage(" %s: '%#lx' (%lu byte%s) from '%s'\n",
+                                 d.freed ? "freed" : "not freed", d.block,
+                                 d.size, (d.size == 1) ? "" : "s", b);
+            if (malloc_flags & DMALLOC_LOG_NONFREE_SPACE)
+                __mpt_dmallocmessage("  dump of '%#lx': '%s'\n", d.block,
+                                     bytestring(s, 20, (char *) d.block,
+                                                d.size));
+        }
+        return 1;
+    }
+    return 0;
+}
+
+
 /* Terminate the dmalloc module.
  */
 
@@ -390,17 +509,6 @@ __mpt_dmallocshutdown(void)
     __mpt_dmallocmessage("ending time = %lu, elapsed since start = "
                          "%lu:%02lu:%02lu\n\n", (unsigned long) t, h, m, s);
     malloc_initialised = 0;
-}
-
-
-/* Log the details of any unfreed memory allocations.
- */
-
-void
-__mpt_dmalloclogunfreed(void)
-{
-    if (!malloc_initialised)
-        __mp_init_dmalloc();
 }
 
 
@@ -581,8 +689,37 @@ __mpt_dmalloctrack(dmalloc_track_t h)
 void
 __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
 {
+    char *s;
+    listinfo i;
+
     if (!malloc_initialised)
         __mp_init_dmalloc();
+    if ((u != 0) && (f != 0))
+        s = "not-freed and freed";
+    else if (u != 0)
+        s = "not-freed";
+    else if (f != 0)
+        s = "freed";
+    else
+        return;
+    __mpt_dmallocmessage("dumping %s pointers changed since %lu:\n", s, m);
+    i.kcount = i.ktotal = 0;
+    i.ucount = i.utotal = 0;
+    i.unfreed = (u != 0) ? 1 : 0;
+    i.freed = (f != 0) ? 1 : 0;
+    i.details = (d != 0) ? 1 : 0;
+    if (__mp_iterate(callback, &i, m))
+    {
+        if (i.kcount != 0)
+            __mpt_dmallocmessage(" known memory: %lu pointer%s, %lu byte%s\n",
+                                 i.kcount, (i.kcount == 1) ? "" : "s", i.ktotal,
+                                 (i.ktotal == 1) ? "" : "s");
+        if (i.ucount != 0)
+            __mpt_dmallocmessage(" unknown memory: %lu pointer%s, %lu byte%s\n",
+                                 i.ucount, (i.ucount == 1) ? "" : "s", i.utotal,
+                                 (i.utotal == 1) ? "" : "s");
+    }
+    __mpt_dmallocmessage("\n");
 }
 
 
