@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.7 2000-05-29 18:04:30 graeme Exp $"
+#ident "$Id: mutex.c,v 1.8 2000-06-01 00:05:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -64,30 +64,31 @@ typedef LONG mutex;                   /* Netware handle */
 #endif /* TARGET */
 
 
+/* A recursive mutex allows a thread to relock a mutex that is currently
+ * locked by that thread.
+ */
+
+typedef struct recmutex
+{
+    mutex guard;         /* guard mutex */
+    mutex real;          /* actual mutex */
+    unsigned long owner; /* owning thread */
+    unsigned long count; /* recursion count */
+}
+recmutex;
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_UNIX
-/* We can make use of the POSIX threads static initialisation of mutexes
- * feature in order to initialise the array of mutex locks, which has the
- * added advantage of not having to delete the mutexes at the end of program
- * execution.  However, care must be taken to ensure that there are exactly
- * the same number of initialisers as there are mutex types.
- */
-
-static mutex locks[MT_MAX] =
-{
-    PTHREAD_MUTEX_INITIALIZER
-};
-#else /* TARGET */
 /* We will have to initialise the array of mutex locks at run-time.  This
  * means that we must find a way of initialising the mutexes before the
  * mpatrol library is initialised.
  */
-static mutex locks[MT_MAX];
+static recmutex locks[MT_MAX];
 
 
 #ifdef __cplusplus
@@ -105,7 +106,6 @@ static struct initmutexes
 }
 initlocks;
 #endif /* __cplusplus */
-#endif /* TARGET */
 
 
 /* Initialise the mpatrol library mutexes.  We're up a brown smelly creek if
@@ -114,22 +114,26 @@ initlocks;
 
 MP_GLOBAL void __mp_initmutexes(void)
 {
-#if TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
-    TARGET == TARGET_NETWARE
     unsigned long i;
-#endif /* TARGET */
 
-#if TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS || \
-    TARGET == TARGET_NETWARE
     for (i = 0; i < MT_MAX; i++)
-#if TARGET == TARGET_AMIGA
-        InitSemaphore(&locks[i]);
+    {
+#if TARGET == TARGET_UNIX
+        pthread_mutex_init(&locks[i].guard, NULL);
+        pthread_mutex_init(&locks[i].real, NULL);
+#elif TARGET == TARGET_AMIGA
+        InitSemaphore(&locks[i].guard);
+        InitSemaphore(&locks[i].real);
 #elif TARGET == TARGET_WINDOWS
-        locks[i] = CreateMutex(NULL, 0, NULL);
+        locks[i].guard = CreateMutex(NULL, 0, NULL);
+        locks[i].real = CreateMutex(NULL, 0, NULL);
 #elif TARGET == TARGET_NETWARE
-        locks[i] = OpenLocalSemaphore(1);
+        locks[i].guard = OpenLocalSemaphore(1);
+        locks[i].real = OpenLocalSemaphore(1);
 #endif /* TARGET */
-#endif /* TARGET */
+        locks[i].owner = 0;
+        locks[i].count = 0;
+    }
 }
 
 
@@ -145,11 +149,17 @@ MP_GLOBAL void __mp_finimutexes(void)
 
 #if TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
     for (i = 0; i < MT_MAX; i++)
+    {
 #if TARGET == TARGET_WINDOWS
-        CloseHandle(locks[i]);
+        CloseHandle(locks[i].guard);
+        CloseHandle(locks[i].real);
 #elif TARGET == TARGET_NETWARE
-        CloseLocalSemaphore(locks[i]);
+        CloseLocalSemaphore(locks[i].guard);
+        CloseLocalSemaphore(locks[i].real);
 #endif /* TARGET */
+        locks[i].owner = 0;
+        locks[i].count = 0;
+    }
 #endif /* TARGET */
 }
 
@@ -157,16 +167,16 @@ MP_GLOBAL void __mp_finimutexes(void)
 /* Lock an mpatrol library mutex.
  */
 
-MP_GLOBAL void __mp_lockmutex(mutextype t)
+static void lockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
-    pthread_mutex_lock(&locks[t]);
+    pthread_mutex_lock(m);
 #elif TARGET == TARGET_AMIGA
-    ObtainSemaphore(&locks[t]);
+    ObtainSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
-    WaitForSingleObject(locks[t], INFINITE);
+    WaitForSingleObject(*m, INFINITE);
 #elif TARGET == TARGET_NETWARE
-    WaitOnLocalSemaphore(locks[t]);
+    WaitOnLocalSemaphore(*m);
 #endif /* TARGET */
 }
 
@@ -174,17 +184,68 @@ MP_GLOBAL void __mp_lockmutex(mutextype t)
 /* Unlock an mpatrol library mutex.
  */
 
-MP_GLOBAL void __mp_unlockmutex(mutextype t)
+static void unlockmutex(mutex *m)
 {
 #if TARGET == TARGET_UNIX
-    pthread_mutex_unlock(&locks[t]);
+    pthread_mutex_unlock(m);
 #elif TARGET == TARGET_AMIGA
-    ReleaseSemaphore(&locks[t]);
+    ReleaseSemaphore(m);
 #elif TARGET == TARGET_WINDOWS
-    ReleaseMutex(locks[t]);
+    ReleaseMutex(*m);
 #elif TARGET == TARGET_NETWARE
-    SignalLocalSemaphore(locks[t]);
+    SignalLocalSemaphore(*m);
 #endif /* TARGET */
+}
+
+
+/* Lock an mpatrol library recursive mutex.
+ */
+
+MP_GLOBAL void __mp_lockmutex(mutextype m)
+{
+    recmutex *l;
+    unsigned long i;
+
+    l = &locks[m];
+    i = __mp_threadid();
+    while (1)
+    {
+        lockmutex(&l->guard);
+        if (l->count == 0)
+        {
+            l->owner = i;
+            l->count = 1;
+            unlockmutex(&l->guard);
+            lockmutex(&l->real);
+            break;
+        }
+        else if (l->owner == i)
+        {
+            l->count++;
+            unlockmutex(&l->guard);
+            break;
+        }
+        unlockmutex(&l->guard);
+    }
+}
+
+
+/* Unlock an mpatrol library recursive mutex.
+ */
+
+MP_GLOBAL void __mp_unlockmutex(mutextype m)
+{
+    recmutex *l;
+    unsigned long i;
+
+    l = &locks[m];
+    i = __mp_threadid();
+    lockmutex(&l->guard);
+    if (l->count > 0)
+        l->count--;
+    if ((l->owner == i) && (l->count == 0))
+        unlockmutex(&l->real);
+    unlockmutex(&l->guard);
 }
 
 
