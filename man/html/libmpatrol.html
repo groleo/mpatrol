@@ -29,6 +29,7 @@ char *strnsave(const char *str, size_t size);
 char *strdupa(const char *str);
 char *strndupa(const char *str, size_t size);
 void *realloc(void *ptr, size_t size);
+void *reallocf(void *ptr, size_t size);
 void *recalloc(void *ptr, size_t nelem, size_t size);
 void *expand(void *ptr, size_t size);
 void free(void *ptr);
@@ -65,6 +66,12 @@ void (*__mp_prologue(void (*func)(const void *, size_t)))
 void (*__mp_epilogue(void (*func)(const void *)))
      (const void *);
 void (*__mp_nomemory(void (*func)(void)))(void);
+void __mp_logmemory(const void *ptr, size_t size);
+int __mp_logstack(size_t frames);
+int __mp_logaddr(const void *ptr);
+int __mp_edit(const char *file, unsigned long line);
+int __mp_list(const char *file, unsigned long line);
+int __mp_view(const char *file, unsigned long line);
 </PRE>
 
 <A NAME="lbAD">&nbsp;</A>
@@ -131,7 +138,7 @@ tracing output file in a concise encoded format for later processing by the
 <A NAME="lbAE">&nbsp;</A>
 <H2>FUNCTIONS</H2>
 
-The following 18 functions are available as replacements for existing C library
+The following 19 functions are available as replacements for existing C library
 functions.  To use these you must include <I>mpatrol.h</I> before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
 <B>gcc</B>) they will be used anyway, albeit with slightly less tracing
@@ -306,6 +313,22 @@ uninitialised bytes.  If there is not enough space in the heap then the null
 pointer will be returned and <B>errno</B> will be set to <B>ENOMEM</B>.  The
 allocated memory must be deallocated with <B>free</B> and can be reallocated
 again with <B>realloc</B>.
+<DT><B>reallocf</B><DD>
+Resizes the memory allocation beginning at <I>ptr</I> to <I>size</I> bytes and
+returns a pointer to the first byte of the new allocation after copying
+<I>ptr</I> to the newly-allocated memory, which will be truncated if <I>size</I>
+is smaller than the original allocation.  The pointer returned will be suitably
+aligned for casting to any type and can be used to store data of up to
+<I>size</I> bytes in length.  If <I>ptr</I> is <B>NULL</B> then the call will be
+equivalent to <B>malloc</B>.  If <I>size</I> is <I>0</I> then the existing memory
+allocation will be freed and the null pointer will be returned.  If <I>size</I>
+is greater than the original allocation then the extra space will be filled with
+uninitialised bytes.  If there is not enough space in the heap then the null
+pointer will be returned, the original allocation will be freed and <B>errno</B>
+will be set to <B>ENOMEM</B>.  The allocated memory must be deallocated with
+<B>free</B> and can be reallocated again with <B>realloc</B>.  This function is
+available for backwards compatibility with older C libraries and should not be
+used in new code.
 <DT><B>recalloc</B><DD>
 Resizes the memory allocation beginning at <I>ptr</I> to <I>nelem</I> elements of
 <I>size</I> bytes and returns a pointer to the first byte of the new allocation
@@ -498,7 +521,7 @@ and no bytes will be searched.
 </DL>
 <P>
 
-The following 8 functions are available as support routines for additional
+The following 14 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 <I>mpatrol.h</I> header file:
 <DL COMPACT>
@@ -579,6 +602,39 @@ will be called once by C memory allocation functions, and repeatedly by C++
 memory allocation functions, when they would normally return <B>NULL</B>.  Note
 that this function is equivalent to <B>set_new_handler</B> and will replace the
 handler installed by that function.
+<DT><B>__mp_logmemory</B><DD>
+Displays the contents of a block of memory beginning at <I>ptr</I>, dumping
+<I>size</I> consecutive bytes to the log file in hexadecimal format.
+<DT><B>__mp_logstack</B><DD>
+Displays the current call stack, skipping <B>frames</B> stack frames from the
+current stack frame before writing the symbolic stack trace to the log file.
+Returns <I>1</I> if successful, or <I>0</I> if the call stack could not be
+determined or if <I>frames</I> was too large for the current call stack.
+<DT><B>__mp_logaddr</B><DD>
+Displays information about a specific memory allocation containing <I>ptr</I> to
+the log file.  If <I>ptr</I> does not belong to a previously allocated memory
+allocation then <I>0</I> will be returned, otherwise <I>1</I> will be returned.
+<DT><B>__mp_edit</B><DD>
+Invokes a text editor to edit <I>file</I> at line number <I>line</I> via the
+<B>mpedit</B> command.  Returns <I>1</I> if the text editor was successfully
+invoked, <I>-1</I> if there was an error, or <I>0</I> if there is no support for
+this feature.  This function will only work on a system where the <B>EDIT</B>
+option works.
+<DT><B>__mp_list</B><DD>
+Displays a context listing of <I>file</I> at line number <I>line</I> via the
+<B>mpedit</B> command.  Returns <I>1</I> if the listing was successfully
+performed, <I>-1</I> if there was an error, or <I>0</I> if there is no support for
+this feature.  This function will only work on a system where the <B>LIST</B>
+option works.
+<DT><B>__mp_view</B><DD>
+Either invokes a text editor to edit <I>file</I> at line number <I>line</I> or
+displays a context listing of <I>file</I> at line number <I>line</I> depending
+on the setting of the <B>EDIT</B> and <B>LIST</B> options.  This is done via the
+<B>mpedit</B> command and will have no effect if the <B>EDIT</B> and <B>LIST</B>
+options are not set or if these options are not supported on the system.
+Returns <I>1</I> if the edit or listing was successfully performed, <I>-1</I> if
+there was an error, or <I>0</I> if neither of the options were set or if there is
+no support for this feature.
 </DL>
 <A NAME="lbAF">&nbsp;</A>
 <H2>LINKING</H2>
@@ -592,6 +648,7 @@ allocation functions with the same names:
 <TR VALIGN=top><TD></TD><TD><BR></TD></TR>
 <TR VALIGN=top><TD><I>-lmpatrol</I></TD><TD>To use this library.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lmpatrolmt</I></TD><TD>To use the thread-safe mpatrol library.<BR></TD></TR>
+<TR VALIGN=top><TD><I>-lmpalloc</I></TD><TD>To use the release library.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lld</I></TD><TD>If built with COFF or XCOFF support.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lelf</I></TD><TD>If built with ELF support.<BR></TD></TR>
 <TR VALIGN=top><TD><I>-lbfd</I> &amp; <I>-liberty</I></TD><TD>If built with BFD support.<BR></TD></TR>
@@ -697,7 +754,8 @@ that are associated with any warnings or errors when they occur.  Only
 diagnostics which occur at source lines in the program will be affected and only
 then if they contain source-level information.  This option is currently only
 available on UNIX platforms as it makes use of the <B>mpedit</B> command.  It
-also overrides the behaviour of the <B>LIST</B> option.
+also overrides the behaviour of the <B>LIST</B> option and affects the behaviour
+of the <B>__mp_view</B> function.
 <DT><B>FAILFREQ</B>=<I>unsigned integer</I><DD>
 Specifies the frequency at which all memory allocations will randomly fail.  For
 example, a value of <I>10</I> will mean that roughly 1 in 10 memory allocations
@@ -743,7 +801,8 @@ that are associated with any warnings or errors when they occur.  Only
 diagnostics which occur at source lines in the program will be affected and only
 then if they contain source-level information.  This option is currently only
 available on UNIX platforms as it makes use of the <B>mpedit</B> command.  It
-also overrides the behaviour of the <B>EDIT</B> option.
+also overrides the behaviour of the <B>EDIT</B> option and affects the behaviour
+of the <B>__mp_view</B> function.
 <DT><B>LOGALL</B><DD>
 Equivalent to the <B>LOGALLOCS</B>, <B>LOGREALLOCS</B>, <B>LOGFREES</B> and
 <B>LOGMEMORY</B> options specified together.
@@ -990,6 +1049,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 22:34:20 GMT, February 08, 2001
+Time: 23:16:10 GMT, February 08, 2001
 </BODY>
 </HTML>
