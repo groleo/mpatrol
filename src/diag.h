@@ -69,8 +69,9 @@ MP_EXPORT void __mp_logfree(infohead *, void *, alloctype, char *, char *,
 MP_EXPORT void __mp_logmemset(infohead *, void *, size_t, unsigned char,
                               alloctype, char *, char *, unsigned long,
                               stackinfo *);
-MP_EXPORT void __mp_logmemcopy(infohead *, void *, void *, size_t, alloctype,
-                               char *, char *, unsigned long, stackinfo *);
+MP_EXPORT void __mp_logmemcopy(infohead *, void *, void *, size_t,
+                               unsigned char, alloctype, char *, char *,
+                               unsigned long, stackinfo *);
 MP_EXPORT void __mp_logmemlocate(infohead *, void *, size_t, void *, size_t,
                                  alloctype, char *, char *, unsigned long,
                                  stackinfo *);

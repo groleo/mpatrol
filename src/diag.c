@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.25 2000-05-14 11:57:24 graeme Exp $"
+#ident "$Id: diag.c,v 1.26 2000-05-14 12:51:42 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -563,8 +563,7 @@ MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
 MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
                             unsigned long u, stackinfo *v)
 {
-    __mp_diag("FREE: %s (" MP_POINTER, __mp_functionnames[f], p);
-    __mp_diag(") ");
+    __mp_diag("FREE: %s (" MP_POINTER ") ", __mp_functionnames[f], p);
     logcall(h, s, t, u, v);
 }
 
@@ -578,8 +577,7 @@ MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
 {
     __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
-    __mp_diag(", 0x%02lX", c);
-    __mp_diag(") ");
+    __mp_diag(", 0x%02X) ", c);
     logcall(h, s, t, u, v);
 }
 
@@ -588,13 +586,13 @@ MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
  */
 
 MP_GLOBAL void __mp_logmemcopy(infohead *h, void *p, void *q, size_t l,
-                               alloctype f, char *s, char *t, unsigned long u,
-                               stackinfo *v)
+                               unsigned char c, alloctype f, char *s, char *t,
+                               unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
               __mp_functionnames[f], p, q);
     __mp_printsize(l);
-    __mp_diag(") ");
+    __mp_diag(", 0x%02X) ", c);
     logcall(h, s, t, u, v);
 }
 
@@ -820,9 +818,9 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_printsize(h->alloc.heap.memory.align);
     __mp_diag("\noverflow size:     ");
     __mp_printsize(h->alloc.oflow);
-    __mp_diag("\noverflow byte:     0x%02lX", h->alloc.obyte);
-    __mp_diag("\nallocation byte:   0x%02lX", h->alloc.abyte);
-    __mp_diag("\nfree byte:         0x%02lX", h->alloc.fbyte);
+    __mp_diag("\noverflow byte:     0x%02X", h->alloc.obyte);
+    __mp_diag("\nallocation byte:   0x%02X", h->alloc.abyte);
+    __mp_diag("\nfree byte:         0x%02X", h->alloc.fbyte);
     __mp_diag("\nallocation stop:   %lu", h->astop);
     __mp_diag("\nreallocation stop: %lu", h->rstop);
     __mp_diag("\nfree stop:         %lu", h->fstop);
