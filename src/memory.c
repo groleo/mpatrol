@@ -54,7 +54,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.4 1999-11-07 12:50:14 graeme Exp $"
+#ident "$Id: memory.c,v 1.5 1999-11-07 13:24:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -340,14 +340,14 @@ static void *getmemory(long l)
 MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
 {
     void *p;
-#if TARGET == TARGET_UNIX
+#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX
     void *t;
     unsigned long n;
-#endif /* TARGET */
+#endif /* MP_ARRAY_SUPPORT && TARGET */
 
     if (*l == 0)
         *l = 1;
-#if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
+#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
     TARGET == TARGET_NETWARE
     *l = __mp_roundup(*l, i->page);
 #elif TARGET == TARGET_AMIGA
@@ -359,8 +359,8 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
         a = i->page;
     if (a > MEM_BLOCKSIZE)
         *l += __mp_poweroftwo(a) - MEM_BLOCKSIZE;
-#endif /* TARGET */
-#if TARGET == TARGET_UNIX
+#endif /* MP_ARRAY_SUPPORT && TARGET */
+#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX
     /* UNIX has a contiguous heap for a process, but we are not guaranteed to
      * have full control over it, so we must assume that each separate memory
      * allocation is independent.  If we are using sbrk() to allocate memory
@@ -401,7 +401,7 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
                 if ((p = getmemory(n)) == (void *) -1)
                 {
                     /* We failed to allocate more memory, but we try to be nice
-                     * and return our original allocation.
+                     * and return our original allocation back to the system.
                      */
                     getmemory(-*l);
                     p = NULL;
@@ -416,14 +416,15 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
     p = VirtualAlloc(NULL, *l, MEM_COMMIT, PAGE_READWRITE);
 #elif TARGET == TARGET_NETWARE
     p = NXPageAlloc(*l / i->page, 0);
-#endif /* TARGET */
-#if TARGET == TARGET_UNIX || TARGET == TARGET_NETWARE
+#endif /* MP_ARRAY_SUPPORT && TARGET */
+#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX || TARGET == TARGET_NETWARE
     /* UNIX's sbrk() and Netware's NXPageAlloc() do not zero the allocated
-     * memory, so we do this here for predictable behaviour.
+     * memory, so we do this here for predictable behaviour.  This is also the
+     * case if we are using a simulated heap.
      */
     if ((i->mfile == -1) && (p != NULL))
         memset(p, 0, *l);
-#endif /* TARGET */
+#endif /* MP_ARRAY_SUPPORT && TARGET */
     if (p == NULL)
         errno = ENOMEM;
     return p;
@@ -435,15 +436,19 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
 
 MP_GLOBAL void __mp_memfree(meminfo *i, void *p, size_t l)
 {
+#if !MP_ARRAY_SUPPORT
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
     TARGET == TARGET_NETWARE
     void *t;
 #endif /* TARGET */
+#endif /* MP_ARRAY_SUPPORT */
 
     /* This function is hardly ever called except when the process is
      * terminating as the heap manager will take care of reusing unused
-     * memory.
+     * memory.  There is also no point in doing anything when we are using
+     * a simulated heap as it will automatically be returned to the system.
      */
+#if !MP_ARRAY_SUPPORT
     if (l == 0)
         return;
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
@@ -468,6 +473,7 @@ MP_GLOBAL void __mp_memfree(meminfo *i, void *p, size_t l)
 #elif TARGET == TARGET_NETWARE
     NXPageFree(t);
 #endif /* TARGET */
+#endif /* MP_ARRAY_SUPPORT */
 }
 
 
