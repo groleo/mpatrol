@@ -13,7 +13,9 @@ point in the future then you could firstly copy all of the header files into an
 mpatrol subdirectory that should be installed in the same directory as the
 mpatrol.h header file.  You could then build an mptools library from the source
 files in this directory and install it in the same directory that you have the
-mpatrol library installed in.
+mpatrol library installed in.  This is actually what is currently done by the
+package scripts when building an mpatrol package so you won't need to do any of
+the above if you installed mpatrol from such a package.
 
 If you've written a useful extension to mpatrol then you might wish to submit
 it for inclusion in the next release of mpatrol.  Even if it's just for a
