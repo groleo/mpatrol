@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.81 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.82 2001-09-25 22:59:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.81 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.82 2001-09-25 22:59:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -499,12 +499,21 @@ __mp_openlogfile(char *s)
      * that we won't get recursive memory allocations if the standard library
      * tries to allocate space for the stream buffer.
      */
-    if ((logfile == stderr) || setvbuf(logfile, buffer, _IOLBF, sizeof(buffer)))
+    if ((logfile == stderr) ||
+#if defined(HAVE_CONFIG_H) && defined(SETVBUF_REVERSED)
+        setvbuf(logfile, _IOLBF, buffer, sizeof(buffer)))
+#else /* HAVE_CONFIG_H && SETVBUF_REVERSED */
+        setvbuf(logfile, buffer, _IOLBF, sizeof(buffer)))
+#endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
         /* If that failed, or the log file is stderr, then we set the buffering
          * mode for the log file to none.  The standard error stream is not
          * guaranteed to be unbuffered by default on all systems.
          */
+#if defined(HAVE_CONFIG_H) && defined(SETVBUF_REVERSED)
+        setvbuf(logfile, _IONBF, NULL, 0);
+#else /* HAVE_CONFIG_H && SETVBUF_REVERSED */
         setvbuf(logfile, NULL, _IONBF, 0);
+#endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
     return 1;
 }
 

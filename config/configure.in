@@ -21,12 +21,12 @@ dnl MA 02111-1307, USA.
 dnl Process this file with autoconf to produce a configure script
 
 
-dnl $Id: configure.in,v 1.8 2001-09-23 22:11:06 graeme Exp $
+dnl $Id: configure.in,v 1.9 2001-09-25 23:03:16 graeme Exp $
 
 
 dnl Initialisation.
 
-AC_REVISION($Revision: 1.8 $)
+AC_REVISION($Revision: 1.9 $)
 AC_INIT(src/mpatrol.h)
 AM_CONFIG_HEADER(configure.h)
 AM_INIT_AUTOMAKE(mpatrol, 1.4.8)
@@ -56,6 +56,7 @@ AC_CHECK_SIZEOF(void *, 4)
 dnl Checks for library functions.
 
 AC_FUNC_MMAP
+AC_FUNC_SETVBUF_REVERSED
 AC_CHECK_FUNCS(memalign mincore)
 
 

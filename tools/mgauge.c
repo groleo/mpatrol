@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mgauge.c,v 1.8 2001-08-23 22:18:17 graeme Exp $"
+#ident "$Id: mgauge.c,v 1.9 2001-09-25 22:59:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.8 2001-08-23 22:18:17 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.9 2001-09-25 22:59:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -149,7 +149,11 @@ __mpt_mgaugestart(MP_CONST char *f, unsigned char c, unsigned long s,
         if ((f == NULL) || (*f == '\0'))
             gauge_file = stderr;
         else
+#if defined(HAVE_CONFIG_H) && defined(SETVBUF_REVERSED)
+            setvbuf(gauge_file, _IONBF, NULL, 0);
+#else /* HAVE_CONFIG_H && SETVBUF_REVERSED */
             setvbuf(gauge_file, NULL, _IONBF, 0);
+#endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
         if ((c == '\0') || (c == DELIMIT_CHAR) || (c == OVERFLOW_CHAR) ||
             isspace(c) || !isprint(c))
             gauge_char = DEFAULT_CHAR;
