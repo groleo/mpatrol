@@ -34,11 +34,93 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.1 2000-04-24 13:15:07 graeme Exp $"
+#ident "$Id: mprof.c,v 1.2 2000-04-24 15:56:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 #define VERSION "1.0" /* the current version of this program */
+
+
+/* Structure containing statistics about the counts and totals of all of the
+ * small, medium, large and extra large allocations and deallocations for a
+ * particular call site.
+ */
+
+typedef struct profiledata
+{
+    size_t acount[4]; /* total numbers of allocations */
+    size_t dcount[4]; /* total numbers of deallocations */
+    size_t atotal[4]; /* total numbers of allocated bytes */
+    size_t dtotal[4]; /* total numbers of deallocated bytes */
+}
+profiledata;
+
+
+/* Structure containing profiling details for a function in a call stack.
+ */
+
+typedef struct profilenode
+{
+    unsigned long parent; /* parent node */
+    void *addr;           /* return address */
+    unsigned long symbol; /* associated symbol */
+    unsigned long data;   /* profiling data */
+}
+profilenode;
+
+
+/* The allocation and deallocation bins.
+ */
+
+static size_t *acounts, *dcounts;
+
+
+/* The total bytes of large allocations and deallocations.
+ */
+
+static size_t atotals, dtotals;
+
+
+/* The number of allocation bins.
+ */
+
+static size_t binsize;
+
+
+/* The allocations and deallocations for all call sites.
+ */
+
+static profiledata *data;
+
+
+/* The number of profiledata structures for all call sites.
+ */
+
+static size_t datasize;
+
+
+/* The profiling details for all call sites.
+ */
+
+static profilenode *nodes;
+
+
+/* The number of profilenode structures for all call sites.
+ */
+
+static size_t nodesize;
+
+
+/* The string table containing the symbol names.
+ */
+
+static char *symbols;
+
+
+/* The small, medium and large allocation boundaries.
+ */
+
+static size_t sbound, mbound, lbound;
 
 
 /* The profiling output file produced by mpatrol.
@@ -51,6 +133,126 @@ static FILE *proffile;
  */
 
 static char *progname;
+
+
+/* Read an entry from the profiling output file.
+ */
+
+static void getentry(void *d, size_t l, size_t n)
+{
+    if (fread(d, l, n, proffile) != n)
+    {
+        fprintf(stderr, "%s: Error reading file\n", progname);
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+/* Read all of the data from the profiling output file.
+ */
+
+static void readfile(void)
+{
+    char s[4];
+    profiledata *d;
+    profilenode *p;
+    size_t i;
+    unsigned long n;
+
+    /* When reading the profiling output file, we assume that if it begins and
+     * ends with the magic sequence of characters then it is a valid profiling
+     * output file from the mpatrol library.  There are probably an infinite
+     * number of checks we could do to ensure that the rest of the data in the
+     * file is valid, but that would be overcomplicated and probably slow this
+     * program down.  However, if the file is only partially written then the
+     * getentry() function will catch the error before we do something silly.
+     */
+    getentry(s, sizeof(char), 4);
+    if (memcmp(s, MP_PROFMAGIC, 4) != 0)
+    {
+        fprintf(stderr, "%s: Invalid file format\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    getentry(&sbound, sizeof(size_t), 1);
+    getentry(&mbound, sizeof(size_t), 1);
+    getentry(&lbound, sizeof(size_t), 1);
+    /* Read the allocation and deallocation bins.
+     */
+    getentry(&binsize, sizeof(size_t), 1);
+    if (binsize > 0)
+    {
+        if (((acounts = (size_t *) malloc(binsize * sizeof(size_t))) == NULL) ||
+            ((dcounts = (size_t *) malloc(binsize * sizeof(size_t))) == NULL))
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        getentry(acounts, sizeof(size_t), binsize);
+        getentry(&atotals, sizeof(size_t), 1);
+        getentry(dcounts, sizeof(size_t), binsize);
+        getentry(&dtotals, sizeof(size_t), 1);
+    }
+    /* Read the profiling data structures.
+     */
+    getentry(&datasize, sizeof(size_t), 1);
+    if (datasize > 0)
+    {
+        if ((data = (profiledata *) malloc(datasize * sizeof(profiledata))) ==
+            NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        for (i = 0; i < datasize; i++)
+        {
+            getentry(&n, sizeof(unsigned long), 1);
+            d = &data[n - 1];
+            getentry(d->acount, sizeof(size_t), 4);
+            getentry(d->atotal, sizeof(size_t), 4);
+            getentry(d->dcount, sizeof(size_t), 4);
+            getentry(d->dtotal, sizeof(size_t), 4);
+        }
+    }
+    /* Read the statistics for every call site.
+     */
+    getentry(&nodesize, sizeof(size_t), 1);
+    if (nodesize > 0)
+    {
+        if ((nodes = (profilenode *) malloc(nodesize * sizeof(profilenode))) ==
+            NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        for (i = 0; i < nodesize; i++)
+        {
+            getentry(&n, sizeof(unsigned long), 1);
+            p = &nodes[n - 1];
+            getentry(&p->parent, sizeof(unsigned long), 1);
+            getentry(&p->addr, sizeof(void *), 1);
+            getentry(&p->symbol, sizeof(unsigned long), 1);
+            getentry(&p->data, sizeof(unsigned long), 1);
+        }
+    }
+    /* Read the string table containing the symbol names.
+     */
+    getentry(&i, sizeof(size_t), 1);
+    if (i > 1)
+    {
+        if ((symbols = (char *) malloc(i * sizeof(char))) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        getentry(symbols, sizeof(char), i);
+    }
+    getentry(s, sizeof(char), 4);
+    if (memcmp(s, MP_PROFMAGIC, 4) != 0)
+    {
+        fprintf(stderr, "%s: Invalid file format\n", progname);
+        exit(EXIT_FAILURE);
+    }
+}
 
 
 /* Read the profiling output file and display all specified information.
@@ -94,6 +296,15 @@ int main(int argc, char **argv)
         f = argv[0];
     else
         f = MP_PROFFILE;
+    acounts = dcounts = NULL;
+    atotals = dtotals = 0;
+    binsize = 0;
+    data = NULL;
+    datasize = 0;
+    nodes = NULL;
+    nodesize = 0;
+    symbols = NULL;
+    sbound = mbound = lbound = 0;
     if (strcmp(f, "-") == 0)
         proffile = stdin;
     else if ((proffile = fopen(f, "rb")) == NULL)
@@ -101,6 +312,17 @@ int main(int argc, char **argv)
         fprintf(stderr, "%s: Cannot open file `%s'\n", progname, f);
         exit(EXIT_FAILURE);
     }
+    readfile();
     fclose(proffile);
+    if (acounts != NULL)
+        free(acounts);
+    if (dcounts != NULL)
+        free(dcounts);
+    if (data != NULL)
+        free(data);
+    if (nodes != NULL)
+        free(nodes);
+    if (symbols != NULL)
+        free(symbols);
     return EXIT_SUCCESS;
 }
