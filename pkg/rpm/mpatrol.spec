@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.56 2001-02-08 20:06:59 graeme Exp $
+# $Id: mpatrol.spec,v 1.57 2001-02-08 20:15:49 graeme Exp $
 
 
 %define libversion 1.4
@@ -98,15 +98,9 @@ install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir
 install -m644 build/unix/libmpalloc.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpalloc.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mpatrol.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mprof.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mptrace.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mleak.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mpsym.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/mpedit.1 $RPM_BUILD_ROOT/%{_mandir}/man1
-install -m644 man/man1/hexwords.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/*.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
-install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
+install -m644 man/man3/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 
 %files

@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.18 2001-02-08 20:07:00 graeme Exp $
+# $Id: build,v 1.19 2001-02-08 20:15:50 graeme Exp $
 
 
 version=1.4.0
@@ -98,41 +98,13 @@ cp ../../doc/images/trace.jpg mpatrol/doc/mpatrol/images
 cp ../../doc/images/trace.eps mpatrol/doc/mpatrol/images
 cp ../../doc/images/trace.pdf mpatrol/doc/mpatrol/images
 mkdir -p mpatrol/doc/mpatrol/html
-cp ../../man/html/mpatrol.html mpatrol/doc/mpatrol/html
-cp ../../man/html/mprof.html mpatrol/doc/mpatrol/html
-cp ../../man/html/mptrace.html mpatrol/doc/mpatrol/html
-cp ../../man/html/mleak.html mpatrol/doc/mpatrol/html
-cp ../../man/html/mpsym.html mpatrol/doc/mpatrol/html
-cp ../../man/html/mpedit.html mpatrol/doc/mpatrol/html
-cp ../../man/html/hexwords.html mpatrol/doc/mpatrol/html
-cp ../../man/html/libmpatrol.html mpatrol/doc/mpatrol/html
+cp ../../man/html/*.html mpatrol/doc/mpatrol/html
 mkdir -p mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mpatrol.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mprof.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mptrace.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mleak.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mpsym.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/mpedit.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/hexwords.dvi mpatrol/doc/mpatrol/dvi
-cp ../../man/dvi/libmpatrol.dvi mpatrol/doc/mpatrol/dvi
+cp ../../man/dvi/*.dvi mpatrol/doc/mpatrol/dvi
 mkdir -p mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mpatrol.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mprof.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mptrace.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mleak.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mpsym.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/mpedit.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/hexwords.ps mpatrol/doc/mpatrol/ps
-cp ../../man/ps/libmpatrol.ps mpatrol/doc/mpatrol/ps
+cp ../../man/ps/*.ps mpatrol/doc/mpatrol/ps
 mkdir -p mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mpatrol.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mprof.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mptrace.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mleak.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mpsym.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/mpedit.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/hexwords.pdf mpatrol/doc/mpatrol/pdf
-cp ../../man/pdf/libmpatrol.pdf mpatrol/doc/mpatrol/pdf
+cp ../../man/pdf/*.pdf mpatrol/doc/mpatrol/pdf
 mkdir -p mpatrol/doc/mpatrol/tests/pass
 cp ../../tests/pass/test*.c mpatrol/doc/mpatrol/tests/pass
 mkdir -p mpatrol/doc/mpatrol/tests/fail
@@ -152,15 +124,9 @@ cp ../../build/unix/libmpatrol.sl mpatrol/lib
 cp ../../build/unix/libmpalloc.a mpatrol/lib
 cp ../../build/unix/libmpalloc.sl mpatrol/lib
 mkdir -p mpatrol/man/man1
-cp ../../man/man1/mpatrol.1 mpatrol/man/man1
-cp ../../man/man1/mprof.1 mpatrol/man/man1
-cp ../../man/man1/mptrace.1 mpatrol/man/man1
-cp ../../man/man1/mleak.1 mpatrol/man/man1
-cp ../../man/man1/mpsym.1 mpatrol/man/man1
-cp ../../man/man1/mpedit.1 mpatrol/man/man1
-cp ../../man/man1/hexwords.1 mpatrol/man/man1
+cp ../../man/man1/*.1 mpatrol/man/man1
 mkdir -p mpatrol/man/man3
-cp ../../man/man3/libmpatrol.3 mpatrol/man/man3
+cp ../../man/man3/*.3 mpatrol/man/man3
 
 
 # Create the package file.  You must have root permission or be able to

@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.56 2001-02-08 20:06:57 graeme Exp $
+# $Id: build,v 1.57 2001-02-08 20:15:48 graeme Exp $
 
 
 version=1.4.0
@@ -102,41 +102,13 @@ cp ../../doc/images/trace.jpg doc/mpatrol/images
 cp ../../doc/images/trace.eps doc/mpatrol/images
 cp ../../doc/images/trace.pdf doc/mpatrol/images
 mkdir -p doc/mpatrol/html
-cp ../../man/html/mpatrol.html doc/mpatrol/html
-cp ../../man/html/mprof.html doc/mpatrol/html
-cp ../../man/html/mptrace.html doc/mpatrol/html
-cp ../../man/html/mleak.html doc/mpatrol/html
-cp ../../man/html/mpsym.html doc/mpatrol/html
-cp ../../man/html/mpedit.html doc/mpatrol/html
-cp ../../man/html/hexwords.html doc/mpatrol/html
-cp ../../man/html/libmpatrol.html doc/mpatrol/html
+cp ../../man/html/*.html doc/mpatrol/html
 mkdir -p doc/mpatrol/dvi
-cp ../../man/dvi/mpatrol.dvi doc/mpatrol/dvi
-cp ../../man/dvi/mprof.dvi doc/mpatrol/dvi
-cp ../../man/dvi/mptrace.dvi doc/mpatrol/dvi
-cp ../../man/dvi/mleak.dvi doc/mpatrol/dvi
-cp ../../man/dvi/mpsym.dvi doc/mpatrol/dvi
-cp ../../man/dvi/mpedit.dvi doc/mpatrol/dvi
-cp ../../man/dvi/hexwords.dvi doc/mpatrol/dvi
-cp ../../man/dvi/libmpatrol.dvi doc/mpatrol/dvi
+cp ../../man/dvi/*.dvi doc/mpatrol/dvi
 mkdir -p doc/mpatrol/ps
-cp ../../man/ps/mpatrol.ps doc/mpatrol/ps
-cp ../../man/ps/mprof.ps doc/mpatrol/ps
-cp ../../man/ps/mptrace.ps doc/mpatrol/ps
-cp ../../man/ps/mleak.ps doc/mpatrol/ps
-cp ../../man/ps/mpsym.ps doc/mpatrol/ps
-cp ../../man/ps/mpedit.ps doc/mpatrol/ps
-cp ../../man/ps/hexwords.ps doc/mpatrol/ps
-cp ../../man/ps/libmpatrol.ps doc/mpatrol/ps
+cp ../../man/ps/*.ps doc/mpatrol/ps
 mkdir -p doc/mpatrol/pdf
-cp ../../man/pdf/mpatrol.pdf doc/mpatrol/pdf
-cp ../../man/pdf/mprof.pdf doc/mpatrol/pdf
-cp ../../man/pdf/mptrace.pdf doc/mpatrol/pdf
-cp ../../man/pdf/mleak.pdf doc/mpatrol/pdf
-cp ../../man/pdf/mpsym.pdf doc/mpatrol/pdf
-cp ../../man/pdf/mpedit.pdf doc/mpatrol/pdf
-cp ../../man/pdf/hexwords.pdf doc/mpatrol/pdf
-cp ../../man/pdf/libmpatrol.pdf doc/mpatrol/pdf
+cp ../../man/pdf/*.pdf doc/mpatrol/pdf
 mkdir -p doc/mpatrol/tests/pass
 cp ../../tests/pass/test*.c doc/mpatrol/tests/pass
 mkdir -p doc/mpatrol/tests/fail
@@ -161,15 +133,9 @@ cp ../../build/unix/libmpalloc.a lib
 cp ../../build/unix/libmpalloc.so.$libversion lib
 cp ../../build/unix/llib-lmpalloc.ln lib
 mkdir -p man/man1
-cp ../../man/man1/mpatrol.1 man/man1
-cp ../../man/man1/mprof.1 man/man1
-cp ../../man/man1/mptrace.1 man/man1
-cp ../../man/man1/mleak.1 man/man1
-cp ../../man/man1/mpsym.1 man/man1
-cp ../../man/man1/mpedit.1 man/man1
-cp ../../man/man1/hexwords.1 man/man1
+cp ../../man/man1/*.1 man/man1
 mkdir -p man/man3
-cp ../../man/man3/libmpatrol.3 man/man3
+cp ../../man/man3/*.3 man/man3
 
 
 # Create the package within a package directory structure.

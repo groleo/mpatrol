@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.51 2001-02-08 20:07:01 graeme Exp $
+# $Id: build,v 1.52 2001-02-08 20:15:51 graeme Exp $
 
 
 version=1.4.0
@@ -102,41 +102,13 @@ cp ../../doc/images/trace.pdf mpatrol/doc/images
 mkdir -p mpatrol/doc/man
 cp ../../man/README mpatrol/doc/man
 mkdir -p mpatrol/doc/man/html
-cp ../../man/html/mpatrol.html mpatrol/doc/man/html
-cp ../../man/html/mprof.html mpatrol/doc/man/html
-cp ../../man/html/mptrace.html mpatrol/doc/man/html
-cp ../../man/html/mleak.html mpatrol/doc/man/html
-cp ../../man/html/mpsym.html mpatrol/doc/man/html
-cp ../../man/html/mpedit.html mpatrol/doc/man/html
-cp ../../man/html/hexwords.html mpatrol/doc/man/html
-cp ../../man/html/libmpatrol.html mpatrol/doc/man/html
+cp ../../man/html/*.html mpatrol/doc/man/html
 mkdir -p mpatrol/doc/man/dvi
-cp ../../man/dvi/mpatrol.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/mprof.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/mptrace.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/mleak.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/mpsym.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/mpedit.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/hexwords.dvi mpatrol/doc/man/dvi
-cp ../../man/dvi/libmpatrol.dvi mpatrol/doc/man/dvi
+cp ../../man/dvi/*.dvi mpatrol/doc/man/dvi
 mkdir -p mpatrol/doc/man/ps
-cp ../../man/ps/mpatrol.ps mpatrol/doc/man/ps
-cp ../../man/ps/mprof.ps mpatrol/doc/man/ps
-cp ../../man/ps/mptrace.ps mpatrol/doc/man/ps
-cp ../../man/ps/mleak.ps mpatrol/doc/man/ps
-cp ../../man/ps/mpsym.ps mpatrol/doc/man/ps
-cp ../../man/ps/mpedit.ps mpatrol/doc/man/ps
-cp ../../man/ps/hexwords.ps mpatrol/doc/man/ps
-cp ../../man/ps/libmpatrol.ps mpatrol/doc/man/ps
+cp ../../man/ps/*.ps mpatrol/doc/man/ps
 mkdir -p mpatrol/doc/man/pdf
-cp ../../man/pdf/mpatrol.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/mprof.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/mptrace.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/mleak.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/mpsym.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/mpedit.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/hexwords.pdf mpatrol/doc/man/pdf
-cp ../../man/pdf/libmpatrol.pdf mpatrol/doc/man/pdf
+cp ../../man/pdf/*.pdf mpatrol/doc/man/pdf
 mkdir -p mpatrol/extra
 cp ../../extra/.profile mpatrol/extra
 cp ../../extra/.cshrc mpatrol/extra
@@ -160,25 +132,13 @@ ln -s libmpatrolmt.so.$libversion libmpatrolmt.so
 ln -s libmpalloc.so.$libversion libmpalloc.so
 cd ../..
 mkdir -p mpatrol/man/cat1
-cp ../../man/cat1/mpatrol.1 mpatrol/man/cat1
-cp ../../man/cat1/mprof.1 mpatrol/man/cat1
-cp ../../man/cat1/mptrace.1 mpatrol/man/cat1
-cp ../../man/cat1/mleak.1 mpatrol/man/cat1
-cp ../../man/cat1/mpsym.1 mpatrol/man/cat1
-cp ../../man/cat1/mpedit.1 mpatrol/man/cat1
-cp ../../man/cat1/hexwords.1 mpatrol/man/cat1
+cp ../../man/cat1/*.1 mpatrol/man/cat1
 mkdir -p mpatrol/man/man1
-cp ../../man/man1/mpatrol.1 mpatrol/man/man1
-cp ../../man/man1/mprof.1 mpatrol/man/man1
-cp ../../man/man1/mptrace.1 mpatrol/man/man1
-cp ../../man/man1/mleak.1 mpatrol/man/man1
-cp ../../man/man1/mpsym.1 mpatrol/man/man1
-cp ../../man/man1/mpedit.1 mpatrol/man/man1
-cp ../../man/man1/hexwords.1 mpatrol/man/man1
+cp ../../man/man1/*.1 mpatrol/man/man1
 mkdir -p mpatrol/man/cat3
-cp ../../man/cat3/libmpatrol.3 mpatrol/man/cat3
+cp ../../man/cat3/*.3 mpatrol/man/cat3
 mkdir -p mpatrol/man/man3
-cp ../../man/man3/libmpatrol.3 mpatrol/man/man3
+cp ../../man/man3/*.3 mpatrol/man/man3
 mkdir -p mpatrol/tests/pass
 cp ../../tests/pass/test*.c mpatrol/tests/pass
 mkdir -p mpatrol/tests/fail

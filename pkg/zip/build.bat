@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.32 2001-02-08 20:07:02 graeme Exp $
+rem $Id: build.bat,v 1.33 2001-02-08 20:15:52 graeme Exp $
 
 
 set version=1.4.0
@@ -102,41 +102,13 @@ copy ..\..\doc\images\trace.pdf mpatrol\doc\images
 mkdir mpatrol\doc\man
 copy ..\..\man\README mpatrol\doc\man\README.txt
 mkdir mpatrol\doc\man\html
-copy ..\..\man\html\mpatrol.html mpatrol\doc\man\html
-copy ..\..\man\html\mprof.html mpatrol\doc\man\html
-copy ..\..\man\html\mptrace.html mpatrol\doc\man\html
-copy ..\..\man\html\mleak.html mpatrol\doc\man\html
-copy ..\..\man\html\mpsym.html mpatrol\doc\man\html
-copy ..\..\man\html\mpedit.html mpatrol\doc\man\html
-copy ..\..\man\html\hexwords.html mpatrol\doc\man\html
-copy ..\..\man\html\libmpatrol.html mpatrol\doc\man\html
+copy ..\..\man\html\*.html mpatrol\doc\man\html
 mkdir mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mpatrol.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mprof.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mptrace.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mleak.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mpsym.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\mpedit.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\hexwords.dvi mpatrol\doc\man\dvi
-copy ..\..\man\dvi\libmpatrol.dvi mpatrol\doc\man\dvi
+copy ..\..\man\dvi\*.dvi mpatrol\doc\man\dvi
 mkdir mpatrol\doc\man\ps
-copy ..\..\man\ps\mpatrol.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\mprof.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\mptrace.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\mleak.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\mpsym.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\mpedit.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\hexwords.ps mpatrol\doc\man\ps
-copy ..\..\man\ps\libmpatrol.ps mpatrol\doc\man\ps
+copy ..\..\man\ps\*.ps mpatrol\doc\man\ps
 mkdir mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mpatrol.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mprof.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mptrace.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mleak.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mpsym.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\mpedit.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\hexwords.pdf mpatrol\doc\man\pdf
-copy ..\..\man\pdf\libmpatrol.pdf mpatrol\doc\man\pdf
+copy ..\..\man\pdf\*.pdf mpatrol\doc\man\pdf
 mkdir mpatrol\include
 copy ..\..\src\mpatrol.h mpatrol\include
 copy ..\..\src\mpalloc.h mpatrol\include
@@ -152,25 +124,13 @@ copy ..\..\build\windows\mpalloc.lib mpatrol\lib
 copy ..\..\build\windows\mpalloc.exp mpatrol\lib
 mkdir mpatrol\man
 mkdir mpatrol\man\cat1
-copy ..\..\man\cat1\mpatrol.1 mpatrol\man\cat1
-copy ..\..\man\cat1\mprof.1 mpatrol\man\cat1
-copy ..\..\man\cat1\mptrace.1 mpatrol\man\cat1
-copy ..\..\man\cat1\mleak.1 mpatrol\man\cat1
-copy ..\..\man\cat1\mpsym.1 mpatrol\man\cat1
-copy ..\..\man\cat1\mpedit.1 mpatrol\man\cat1
-copy ..\..\man\cat1\hexwords.1 mpatrol\man\cat1
+copy ..\..\man\cat1\*.1 mpatrol\man\cat1
 mkdir mpatrol\man\man1
-copy ..\..\man\man1\mpatrol.1 mpatrol\man\man1
-copy ..\..\man\man1\mprof.1 mpatrol\man\man1
-copy ..\..\man\man1\mptrace.1 mpatrol\man\man1
-copy ..\..\man\man1\mleak.1 mpatrol\man\man1
-copy ..\..\man\man1\mpsym.1 mpatrol\man\man1
-copy ..\..\man\man1\mpedit.1 mpatrol\man\man1
-copy ..\..\man\man1\hexwords.1 mpatrol\man\man1
+copy ..\..\man\man1\*.1 mpatrol\man\man1
 mkdir mpatrol\man\cat3
-copy ..\..\man\cat3\libmpatrol.3 mpatrol\man\cat3
+copy ..\..\man\cat3\*.3 mpatrol\man\cat3
 mkdir mpatrol\man\man3
-copy ..\..\man\man3\libmpatrol.3 mpatrol\man\man3
+copy ..\..\man\man3\*.3 mpatrol\man\man3
 mkdir mpatrol\tests
 mkdir mpatrol\tests\pass
 copy ..\..\tests\pass\test*.c mpatrol\tests\pass
