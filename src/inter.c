@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.146 2001-09-04 22:42:08 graeme Exp $"
+#ident "$Id: inter.c,v 1.147 2001-09-26 23:00:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.146 2001-09-04 22:42:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.147 2001-09-26 23:00:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -686,12 +686,15 @@ __mp_fini(void)
              * tracing has not been enabled.
              */
             __mp_endtrace(&memhead.trace);
-            /* Finally, write out any profiling information to the profiling
-             * output file.
+            /* Now write out any profiling information to the profiling output
+             * file.
              */
             if (memhead.prof.autocount > 0)
                 __mp_writeprofile(&memhead.prof,
                                   !(memhead.flags & FLG_NOPROTECT));
+            /* Finally, attempt to close the log file.
+             */
+            __mp_closelogfile();
             memhead.fini = 1;
 #if MP_INUSE_SUPPORT
             _Inuse_close();
