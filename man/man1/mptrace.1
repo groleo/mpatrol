@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mptrace.1,v 1.9 2001-05-22 20:43:19 graeme Exp $
+.\" $Id: mptrace.1,v 1.10 2001-05-30 22:00:02 graeme Exp $
 .\"
-.TH MPTRACE 1 "22 May 2001" "Release 1.4" "mpatrol library"
+.TH MPTRACE 1 "30 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 mptrace \- displays tracing information produced by the mpatrol library
 .SH SYNOPSIS
@@ -57,6 +57,15 @@ can be written with the \fB\-\-sim\-file\fP option.  This program will have the
 identical memory allocation behaviour to the program which produced the original
 trace file.  This option can be useful to use if you wish to determine which
 malloc library is most suitable to use for a specific application.
+.PP
+A trace file in Heap Allocation Trace Format (HATF) can also be written out by
+the \fBmptrace\fP command by using the \fB\-\-hatf\-file\fP option.  It takes
+the name of the HATF trace file to be written as an argument and writes out the
+HATF version of the mpatrol tracing output file given as input when it is being
+processed.  The HATF file format is an attempt to standardise trace file formats
+for memory allocation tracing, and is being developed by Benjamin Zorn and
+Richard Jones.  There is a HATF DTD located in the \fIextra\fP directory in the
+mpatrol distribution.
 .PP
 The \fBmptrace\fP command will normally be built with GUI support on UNIX
 platforms that are running X Windows.  This means that a graphical memory map
@@ -94,6 +103,10 @@ more functionality.
 .TP
 \fB\-\-gui\fP [\fB\-w\fP]
 Displays the GUI (if supported).
+.TP
+\fB\-\-hatf\-file\fP \fIfile\fP [\fB\-H\fP]
+Specifies that the trace should also be written to a file in Heap Allocation
+Trace Format (HATF).
 .TP
 \fB\-\-help\fP [\fB\-h\fP]
 Displays a quick-reference option summary.
