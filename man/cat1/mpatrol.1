@@ -20,8 +20,10 @@ DDEESSCCRRIIPPTTIIOONN
        All  mpatrol library diagnostics are sent to the file _m_p_a_-
        _t_r_o_l_._%_n_._l_o_g in the current directory by default (where  _%_n
        is  the  current process id) but this can be changed using
-       the --ll option.  The LLOOGGAALLLL  option  is  always  implicitly
-       used for commands that are run by this command.
+       the --ll option.  Similarly, the  default  profiling  output
+       filename  is  _m_p_a_t_r_o_l_._%_n_._o_u_t.  Note that the LLOOGGAALLLL option
+       is always implicitly used for commands  that  are  run  by
+       this command.
 
 OOPPTTIIOONNSS
        All of the following options (except --dd and --VV) correspond
@@ -56,12 +58,10 @@ OOPPTTIIOONNSS
               which to check the integrity  of  free  memory  and
               overflow buffers.
 
-       --cc     [CCHHEECCKKAALLLL]   Specifies  that all arguments to func-
-              tions which  allocate,  reallocate  and  deallocate
 
 
 
-Release 1.2               30 April 2000                         1
+Release 1.2                 1 May 2000                          1
 
 
 
@@ -70,6 +70,8 @@ Release 1.2               30 April 2000                         1
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+       --cc     [CCHHEECCKKAALLLL]   Specifies  that all arguments to func-
+              tions which  allocate,  reallocate  and  deallocate
               memory have rigorous checks performed on them.
 
        --DD <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
@@ -123,11 +125,9 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               only after every memory allocation, reallocation or
               deallocation.
 
-       --nn     [NNOOFFRREEEE]  Specifies that the mpatrol library should
 
 
-
-Release 1.2               30 April 2000                         2
+Release 1.2                 1 May 2000                          2
 
 
 
@@ -136,6 +136,7 @@ Release 1.2               30 April 2000                         2
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+       --nn     [NNOOFFRREEEE]  Specifies that the mpatrol library should
               keep  all reallocated and freed memory allocations.
 
        --OO <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
@@ -189,11 +190,10 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               contents.
 
        --ww     [OOFFLLOOWWWWAATTCCHH]   Specifies  that  watch  point  areas
-              should  be  used  for  overflow buffers rather than
 
 
 
-Release 1.2               30 April 2000                         3
+Release 1.2                 1 May 2000                          3
 
 
 
@@ -202,6 +202,7 @@ Release 1.2               30 April 2000                         3
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+              should  be  used  for  overflow buffers rather than
               filling with the overflow byte.
 
        --XX     [PPAAGGEEAALLLLOOCC=_U_P_P_E_R]  Specifies that  each  individual
@@ -258,7 +259,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-Release 1.2               30 April 2000                         4
+Release 1.2                 1 May 2000                          4
 
 

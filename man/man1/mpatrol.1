@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.15 2000-04-30 23:57:47 graeme Exp $
+.\" $Id: mpatrol.1,v 1.16 2000-05-01 10:14:53 graeme Exp $
 .\"
-.TH MPATROL 1 "30 April 2000" "Release 1.2" "mpatrol library"
+.TH MPATROL 1 "1 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -35,8 +35,9 @@ dynamically linked.
 .PP
 All mpatrol library diagnostics are sent to the file \fImpatrol.%n.log\fP in the
 current directory by default (where \fI%n\fP is the current process id) but this
-can be changed using the \fB\-l\fP option.  The \fBLOGALL\fP option is always
-implicitly used for commands that are run by this command.
+can be changed using the \fB\-l\fP option.  Similarly, the default profiling
+output filename is \fImpatrol.%n.out\fP.  Note that the \fBLOGALL\fP option is
+always implicitly used for commands that are run by this command.
 .SH OPTIONS
 All of the following options (except \fB\-d\fP and \fB\-V\fP) correspond to
 their listed mpatrol library option.  See \fBmpatrol\fP(3) for more details on
