@@ -54,3 +54,12 @@ not just the ones listed here.
         Viewer:    Ghostview
                    http://www.cs.wisc.edu/~ghost/ghostview/
         Notes:     Contains standard Postscript Type 1 fonts.
+
+  * pdf/*.pdf
+        Format:    Adobe Portable Document Format (PDF)
+                   http://www.adobe.com/
+        Generator: PStill
+                   http://www.this.net/~frank/pstill.html
+        Viewer:    XPDF
+                   http://www.foolabs.com/xpdf/
+        Notes:     Contains standard Postscript Type 1 fonts.
