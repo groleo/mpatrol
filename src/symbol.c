@@ -31,9 +31,9 @@
 #include "symbol.h"
 #include "diag.h"
 #include "utils.h"
-#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_BFD
 #include <stdlib.h>
 #include <string.h>
+#if FORMAT == FORMAT_COFF || FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_BFD
 #include <fcntl.h>
 #include <unistd.h>
 #if FORMAT == FORMAT_COFF
@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.16 2000-03-21 01:45:28 graeme Exp $"
+#ident "$Id: symbol.c,v 1.17 2000-03-22 19:05:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
