@@ -13,8 +13,8 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
-November, 2000.
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 12th
+December, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -52,8 +52,8 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
-November, 2000.
+   This is edition 2.2 of the mpatrol manual for version 1.3.2, 12th
+December, 2000.
 
 
  @{" Foreword                   " link "Foreword"}  Motivation and feedback.
@@ -223,6 +223,12 @@ graph of all memory allocations listed in tabular form, and an optional
 graph specification file for later processing by the @{b}dot@{ub} graph
 visualisation package.
 
+   A file containing a concise encoded trace of all memory allocations
+and deallocations made by a program can also be produced by the mpatrol
+library.  This file can then be read by a tracing tool which will
+decode the trace and display the events in tabular or graphical form,
+and also display any relevant statistics that could be calculated.
+
    The mpatrol library has been designed with the intention of
 replacing calls to existing C and C++ memory allocation functions as
 seamlessly as possible, but in many cases that may not be possible and
@@ -370,6 +376,18 @@ out.
      graph specification file for later processing by the @{b}dot@{ub} graph
      visualisation package.
 
+   * An option exists to enable memory allocation tracing, which forces
+     certain details for every memory allocation event to be written to
+     a specified file for later use by a tracing command.  The tracing
+     file is written in a concise encoded form so as to keep the size
+     of the file down.  An environment variable specifying a default
+     directory in which to place tracing output files can also be set.
+
+   * A tracing command is provided which reads a tracing output file
+     produced by the mpatrol library and displays the memory allocation
+     events in tabular or graphical form.  It also displays any
+     relevant statistics that could be calculated.
+
    * On UNIX platforms, the @{b}mmap()@{ub} function can optionally be used to
      allocate memory instead of the @{b}sbrk()@{ub} function, but only if the
      system supports it.  This can be useful if the mpatrol library
@@ -505,9 +523,9 @@ out.
      call at any point during program execution.
 
    * Options exist to display all freed and unfreed memory allocations
-     at program termination in order to detect memory leaks.  A
-     separate program is also provided for locating memory leaks in
-     unfinished log files.
+     at program termination in order to detect memory leaks, as well as
+     all free memory blocks.  A separate program is also provided for
+     locating memory leaks in unfinished log files.
 
    * An option exists to abort the program with a failure condition if
      there are more than a specified number of unfreed memory
@@ -610,10 +628,10 @@ if you perform the following steps.
      @{b}build@{ub} directory then these should be recreated in the local
      library directory rather than simply copying them.
 
-  6. Copy the @{b}mpatrol@{ub}, @{b}mprof@{ub} and @{b}mleak@{ub} programs that have been built
-     into your local bin directory.  You may also wish to copy the
-     @{b}mpsym@{ub} and @{b}mpedit@{ub} commands to your local bin directory as well if
-     your system supports it.
+  6. Copy the @{b}mpatrol@{ub}, @{b}mprof@{ub}, @{b}mptrace@{ub} and @{b}mleak@{ub} programs that have been
+     built into your local bin directory.  You may also wish to copy
+     the @{b}mpsym@{ub} and @{b}mpedit@{ub} commands to your local bin directory as well
+     if your system supports Bourne shell scripts.
 
   7. Go up two directory levels into the @{b}src@{ub} directory and copy the
      @{b}mpatrol.h@{ub} header file into your local include directory.
@@ -694,13 +712,15 @@ will require a complete recompilation of all your code.
      the system's dynamic linker to use mpatrol's versions of @{b}malloc()@{ub},
      etc. instead of the default versions by typing:
 
-          mpatrol -d ./testprog -i file
+          mpatrol --dynamic ./testprog -i file
 
      The resulting log file should be called @{b}mpatrol.<procid>.log@{ub} by
      default (where PROCID is the current process id), but if no such
      file exists after running the @{b}mpatrol@{ub} command then it will not be
      possible to force the run-time linking of mpatrol functions to
-     your program and you will have to proceed to the next step.
+     your program and you will have to proceed to the next step.  Note
+     that the @{b}mpatrol@{ub} command overrides any previous setting of the
+     @{b}MPATROL_OPTIONS@{ub} environment variable.
 
   2. This step is currently only available on UNIX and Windows
      platforms (and AmigaOS when using @{b}gcc@{ub}).
@@ -1552,12 +1572,28 @@ to the log file after it writes out its settings and statistics at
 program termination.  Use the @{b}SHOWFREED@{ub} and @{b}SHOWUNFREED@{ub} options to
 display a list of freed and unfreed memory allocations.  The former
 will only be displayed if the @{b}NOFREE@{ub} option is used, but the latter can
-be useful for detecting memory leaks.  The @{b}SHOWMAP@{ub} option will display
-a memory map of the heap that was valid when the process terminated,
-and the @{b}SHOWSYMBOLS@{ub} option will display any symbolic information that
-the mpatrol library managed to obtain from any executable files and
-libraries that were relevant to the program being tested.  All of these
-options can be selected with the @{b}SHOWALL@{ub} option.
+be useful for detecting memory leaks.  The @{b}SHOWFREE@{ub} option can be used
+to display a summary of any free memory blocks.
+
+   The @{b}SHOWMAP@{ub} option will display a memory map of the heap that was
+valid when the process terminated, and the @{b}SHOWSYMBOLS@{ub} option will
+display any symbolic information that the mpatrol library managed to
+obtain from any executable files and libraries that were relevant to
+the program being tested.  All of the above five options can be
+selected with the @{b}SHOWALL@{ub} option.
+
+   Because the log file can contain verbose information about memory
+allocations, reallocations, deallocations and operations, it can end up
+being too large if all such information is being logged for a large
+program.  To get around this, it is possible to @{i}trace@{ui} all memory
+allocation and deallocation events in a concise way, to be stored in a
+separate file for later processing by the @{b}mptrace@{ub} command.  By default,
+no such tracing is performed but it can be enabled with the @{b}TRACE@{ub}
+option.  The default tracing output file is @{b}mpatrol.trace@{ub}, but this can
+be changed using the @{b}TRACEFILE@{ub} option.  As with the @{b}LOGFILE@{ub} option, you
+can also specify a directory where all tracing output files from the
+mpatrol library will get placed by setting the @{b}TRACEDIR@{ub} environment
+variable.
 
 
 @endnode
@@ -3269,7 +3305,10 @@ program makes during its execution, and builds statistics for later
 viewing with the @{b}mprof@{ub} command.  It is then possible for you to see
 exactly how many calls were made to each function and where they came
 from.  Such information can then be put to good use in order to
-optimise the relevant parts of your code.
+optimise the relevant parts of your code.  The tracing output files
+that can be produced by the mpatrol library may also be useful in order
+to view patterns in memory allocation behaviour and gather information
+about lifetimes of memory allocations.
 
    And finally, some tips on how to correctly use dynamic memory
 allocations.  The first, most basic rule is to @{i}always@{ui} check the return
@@ -3389,6 +3428,15 @@ the added bonus of allowing the user to save profiling output files for
 later use even when the executable files which produced them have
 changed or no longer exist.
 
+   Memory allocation tracing support was added for mpatrol release
+1.3.2 and was added to produce concise information for every memory
+allocation event.  This information could also be produced in a verbose
+form in the log file, but to log every memory allocation event in a
+large program would result in a massive log file that would be hard to
+parse.  In order to keep the size of the tracing output file down,
+almost all of the data in the file is encoded as LEB128 numbers.  The
+idea for this comes from the DWARF 2 debugging format.
+
    Support for the @{b}alloca()@{ub} family of functions was added for mpatrol
 release 1.3.0 and uses the heap instead of the stack in order to trace
 and debug these functions.  If full call stack tracebacks are supported
@@ -3409,9 +3457,9 @@ later point.
 
    The library is written in a modular fashion so as to make it easy to
 add new functionality.  New modules have already been added, such as
-the @{i}stack@{ui}, @{i}symbol@{ui} and @{i}profile@{ui} modules.  Extra information about each
-memory allocation can be added to the @{i}allocation information@{ui} module in
-@{b}src/info.h@{ub} and @{b}src/info.c@{ub} without having to change much code in any
+the @{i}stack@{ui}, @{i}symbol@{ui}, @{i}profile@{ui} and @{i}trace@{ui} modules.  Extra information about
+each memory allocation can be added to the @{i}allocation information@{ui} module
+in @{b}src/info.h@{ub} and @{b}src/info.c@{ub} without having to change much code in any
 other files.
 
    Platform-dependent code has been isolated to specific modules, and
@@ -3567,7 +3615,7 @@ library, the @{b}MPATROL_OPTIONS@{ub} environment variable should be set to be
 @{b}LOGALL@{ub} and the program should be executed, generating the following
 output in @{b}mpatrol.log@{ub}.
 
-     @(#) mpatrol 1.3.1 (00/11/22)
+     @(#) mpatrol 1.3.2 (00/12/12)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
@@ -3619,12 +3667,13 @@ output in @{b}mpatrol.log@{ub}.
      handler function:  <unset>
      log file:          mpatrol.log
      profiling file:    mpatrol.out
+     tracing file:      mpatrol.trace
      program filename:  ./test1
      symbols read:      3711
      autosave count:    0
      freed queue size:  0
      allocation count:  52
-     allocation peak:   426176 bytes
+     allocation peak:   32 (426176 bytes)
      allocation limit:  0 bytes
      allocated blocks:  7 (1528 bytes)
      freed blocks:      0 (0 bytes)
@@ -3852,24 +3901,25 @@ above example have been numbered and their descriptions appear below.
      20  handler function:  <unset>
      21  log file:          mpatrol.log
      22  profiling file:    mpatrol.out
-     23  program filename:  ./test1
-     24  symbols read:      3711
-     25  autosave count:    0
-     26  freed queue size:  0
-     27  allocation count:  52
-     28  allocation peak:   426176 bytes
-     29  allocation limit:  0 bytes
-     30  allocated blocks:  7 (1528 bytes)
-     31  freed blocks:      0 (0 bytes)
-     32  free blocks:       8 (494088 bytes)
-     33  internal blocks:   46 (323584 bytes)
-     34  total heap usage:  819200 bytes
-     35  total compared:    0 bytes
-     36  total located:     2 bytes
-     37  total copied:      19450 bytes
-     38  total set:         374704 bytes
-     39  total warnings:    0
-     40  total errors:      1
+     23  tracing file:      mpatrol.trace
+     24  program filename:  ./test1
+     25  symbols read:      3711
+     26  autosave count:    0
+     27  freed queue size:  0
+     28  allocation count:  52
+     29  allocation peak:   32 (426176 bytes)
+     30  allocation limit:  0 bytes
+     31  allocated blocks:  7 (1528 bytes)
+     32  freed blocks:      0 (0 bytes)
+     33  free blocks:       8 (494088 bytes)
+     34  internal blocks:   46 (323584 bytes)
+     35  total heap usage:  819200 bytes
+     36  total compared:    0 bytes
+     37  total located:     2 bytes
+     38  total copied:      19450 bytes
+     39  total set:         374704 bytes
+     40  total warnings:    0
+     41  total errors:      1
 
   1. System page size.  This value is used on some platforms when
      allocating and protecting system memory.
@@ -3973,17 +4023,22 @@ above example have been numbered and their descriptions appear below.
      the @{b}PROF@{ub} option is used.  It can be changed at run-time using the
      @{b}PROFFILE@{ub} option.
 
- 23. Program filename.  Contains the full pathname to the program's
+ 23. Tracing file.  Contains the name of the file where all of the
+     mpatrol library memory allocation tracing information goes when
+     the @{b}TRACE@{ub} option is used.  It can be changed at run-time using the
+     @{b}TRACEFILE@{ub} option.
+
+ 24. Program filename.  Contains the full pathname to the program's
      executable file.  This is used by the mpatrol library to read the
      symbol table in order to provide symbolic information in function
      call stacks.  It can be changed at run-time using the @{b}PROGFILE@{ub}
      option.
 
- 24. Symbols read.  This value contains the total number of symbols
+ 25. Symbols read.  This value contains the total number of symbols
      read from a program's executable file and/or the dynamic linker,
      if applicable.
 
- 25. Autosave count.  This value contains the frequency at which the
+ 26. Autosave count.  This value contains the frequency at which the
      mpatrol library should periodically write the profiling data to
      the profiling output file.  When the total number of profiled
      memory allocations and deallocations is a multiple of this number
@@ -3991,7 +4046,7 @@ above example have been numbered and their descriptions appear below.
      profiling output file.  It can be changed at run-time using the
      @{b}AUTOSAVE@{ub} option.
 
- 26. Freed queue size.  This value contains the maximum number of freed
+ 27. Freed queue size.  This value contains the maximum number of freed
      memory allocations that will be stored in the freed queue if the
      @{b}NOFREE@{ub} option is used.  Once the freed queue becomes full then the
      oldest freed allocation in the queue will be returned to the free
@@ -4000,26 +4055,28 @@ above example have been numbered and their descriptions appear below.
      become full.  It can be changed at run-time using the @{b}NOFREE@{ub}
      option.
 
- 27. Allocation count.  This value contains the total number of memory
+ 28. Allocation count.  This value contains the total number of memory
      allocations that were created by the mpatrol library.  This value
      may be more than expected if the mpatrol library makes any memory
      allocations during initialisation.
 
- 28. Allocation peak.  This value contains the peak memory usage set by
-     the program when running.  This value may be more than expected if
-     the mpatrol library makes any memory allocations during
-     initialisation.
+ 29. Allocation peak.  This value contains the peak memory usage set by
+     the program when running; the peak number of memory allocations,
+     and also the peak number of bytes allocated in parentheses (the
+     two numbers may peak at different times throughout the lifetime of
+     the program).  This value may be more than expected if the mpatrol
+     library makes any memory allocations during initialisation.
 
- 29. Allocation limit.  This value is used to limit the amount of
+ 30. Allocation limit.  This value is used to limit the amount of
      memory that can be allocated by a program, which can be useful for
      stress-testing in simulated low memory conditions.  It can be
      changed at run-time using the @{b}LIMIT@{ub} option.
 
- 30. Allocated blocks.
+ 31. Allocated blocks.
 
- 31. Freed blocks.
+ 32. Freed blocks.
 
- 32. Free blocks.  These values contain the total number of allocated,
+ 33. Free blocks.  These values contain the total number of allocated,
      freed and free blocks at the time the summary was produced.  A
      freed block is an allocated block that has been freed but has not
      been returned to the free memory list for later allocation.  These
@@ -4030,7 +4087,7 @@ above example have been numbered and their descriptions appear below.
      program's executable file and any shared libraries that it
      requires.
 
- 33. Internal blocks.  This value contains the total number of memory
+ 34. Internal blocks.  This value contains the total number of memory
      blocks (of varying sizes) that have been allocated from the system
      for the mpatrol library to use internally.  These memory blocks
      will be write-protected on systems that support memory protection
@@ -4038,16 +4095,16 @@ above example have been numbered and their descriptions appear below.
      structures.  This can be overridden at run-time using the
      @{b}NOPROTECT@{ub} option in order to speed up program execution slightly.
 
- 34. Total heap usage.  This value contains the total amount of system
+ 35. Total heap usage.  This value contains the total amount of system
      heap memory that has been allocated by the mpatrol library.
 
- 35. Total compared.
+ 36. Total compared.
 
- 36. Total located.
+ 37. Total located.
 
- 37. Total copied.
+ 38. Total copied.
 
- 38. Total set.  These values contain the total number of bytes that
+ 39. Total set.  These values contain the total number of bytes that
      have been tracked by the mpatrol library in byte comparison
      operations (such as @{b}memcmp()@{ub}), byte location operations (such as
      @{b}memchr()@{ub}, byte copy operations (such as @{b}memcpy()@{ub}) and byte set
@@ -4055,9 +4112,9 @@ above example have been numbered and their descriptions appear below.
      account any other such operations that occur outwith these
      functions, such as loading and storing from machine instructions.
 
- 39. Total warnings.
+ 40. Total warnings.
 
- 40. Total errors.  The library keeps a count of the total number of
+ 41. Total errors.  The library keeps a count of the total number of
      warnings and errors it has displayed so that you can quickly work
      out this information at program termination.
 
@@ -5127,6 +5184,25 @@ removed.
          0x7FB9089C-0x7FB908A3 _dldump [/usr/lib/libdl.so.1] (8 bytes)
          0x7FB908A4-0x7FB908AB _ld_concurrency [/usr/lib/libdl.so.1] (8 bytes)
          0x7FB908AC-0x7FB908B3 bind_guard [/usr/lib/libdl.so.1] (8 bytes)
+
+   The next table is really only useful for seeing how much memory
+fragmentation has occurred in the memory map.  It shows a breakdown of
+the free memory blocks that have either resulted from the mpatrol
+library allocating uninitialised memory from the system heap or from
+freeing existing memory allocations.  The column on the left shows the
+size of the free block in bytes and the column on the right shows the
+number of blocks of that size that are available.  The @{b}SHOWFREE@{ub} option
+also displays this information.
+
+     free blocks: 10 (2919 bytes)
+            2280: 1
+             508: 1
+              76: 1
+              32: 1
+               7: 1
+               4: 3
+               3: 1
+               1: 1
 
    The next block of data shows a summary of all freed memory
 allocations.  This is only possible because the @{b}NOFREE@{ub} option was also
@@ -6510,8 +6586,14 @@ a mixture of both.
      giving the impression that the program or system had hung.
 
 @{b}SHOWALL@{ub}
-     Equivalent to the @{b}SHOWFREED@{ub}, @{b}SHOWUNFREED@{ub}, @{b}SHOWMAP@{ub} and @{b}SHOWSYMBOLS@{ub}
-     options specified together.
+     Equivalent to the @{b}SHOWFREE@{ub}, @{b}SHOWFREED@{ub}, @{b}SHOWUNFREED@{ub}, @{b}SHOWMAP@{ub} and
+     @{b}SHOWSYMBOLS@{ub} options specified together.
+
+@{b}SHOWFREE@{ub}
+     Specifies that a summary of all of the free memory blocks should
+     be displayed at the end of program execution.  This step will not
+     be performed if an abnormal termination occurs or if there were no
+     free memory blocks.
 
 @{b}SHOWFREED@{ub}
      Specifies that a summary of all of the freed memory allocations
@@ -6543,6 +6625,25 @@ a mixture of both.
      be classified as small allocations for profiling purposes.  This
      limit must be greater than zero but less than the medium and large
      bounds.  Default value: @{b}SMALLBOUND=32@{ub}.
+
+@{b}TRACE@{ub}
+     Specifies that all memory allocations and deallocations are to be
+     traced and sent to the tracing output file.  Memory reallocations
+     are treated as a memory deallocation immediately followed by a
+     memory allocation.
+
+@{b}TRACEFILE@{ub}=<STRING>
+     Specifies an alternative file in which to place all memory
+     allocation tracing information from the mpatrol library.  If the
+     @{b}TRACEDIR@{ub} environment variable is set and the specified file does
+     not contain a path component in its filename then the tracing
+     output file will be located in the directory specified in
+     @{b}TRACEDIR@{ub}.  A filename of @{b}stderr@{ub} will send this information to the
+     @{b}stderr@{ub} file stream and a filename of @{b}stdout@{ub} will do the equivalent
+     with the @{b}stdout@{ub} file stream.  Note that if a problem occurs while
+     opening the tracing output file then the tracing information will
+     not be output.  Default value: @{b}TRACEFILE=mpatrol.trace@{ub} or
+     @{b}TRACEFILE=%n.%p.trace@{ub} if the @{b}TRACEDIR@{ub} environment variable is set.
 
 @{b}UNFREEDABORT@{ub}=<UNSIGNED-INTEGER>
      Specifies the minimum number of unfreed allocations at which to
@@ -6598,13 +6699,23 @@ is used in which case COMMAND need only have been dynamically linked.
    All mpatrol library diagnostics are sent to the file @{b}mpatrol.%n.log@{ub}
 in the current directory by default (where @{b}%n@{ub} is the current process
 id) but this can be changed using the @{b}--log-file@{ub} option.  Similarly, the
-default profiling output filename is @{b}mpatrol.%n.out@{ub}.
+default profiling output filename is @{b}mpatrol.%n.out@{ub} and the default
+tracing output filename is @{b}mpatrol.%n.trace@{ub}.
 
-   Alternatively, the log file and profiling output file names can
-contain @{b}%p@{ub}, which will be replaced with the name of the program being
-executed without the directory components.  If the executable filename
-could not be determined or was not set then it will be replaced with
-@{b}mpatrol@{ub}.
+   Alternatively, the log file, profiling output file and tracing
+output file names can contain @{b}%p@{ub}, which will be replaced with the name
+of the program being executed without the directory components.  If the
+executable filename could not be determined or was not set then it will
+be replaced with @{b}mpatrol@{ub}.  A similar replacement character sequence is
+@{b}%f@{ub}, which will be replaced by the pathname of the program being
+executed, with all path separation characters replaced by underscores.
+
+   The current date can be entered into such filenames through the use
+of the @{b}%d@{ub} character sequence, which will be replaced with the date in
+the form @{b}YYYYMMDD@{ub}.  The current time can be added with @{b}%t@{ub}, which will be
+replaced with the time in the form @{b}HHMMSS@{ub}.  If the date or time could
+not be determined, these will be replaced with @{b}today@{ub} and @{b}now@{ub}
+respectively.
 
    All of the following options (except @{b}--dynamic@{ub}, @{b}--help@{ub}, @{b}--show-env@{ub},
 @{b}--threads@{ub} and @{b}--version@{ub}) correspond to their listed mpatrol library
@@ -6793,14 +6904,19 @@ a similar way to the UNIX function @{b}getopt()@{ub}.
      restore them afterwards.
 
 @{b}--show-all@{ub}
-     [@{b}SHOWALL@{ub}]  Equivalent to the @{b}--show-freed@{ub}, @{b}--show-unfreed@{ub},
-     @{b}--show-map@{ub} and @{b}--show-symbols@{ub} options specified together.
+     [@{b}SHOWALL@{ub}]  Equivalent to the @{b}--show-free@{ub}, @{b}--show-freed@{ub},
+     @{b}--show-unfreed@{ub}, @{b}--show-map@{ub} and @{b}--show-symbols@{ub} options specified
+     together.
 
 @{b}--show-env@{ub}
      Displays the contents of the @{b}MPATROL_OPTIONS@{ub} environment variable.
      This will be shown after all of the other command line options
      have been processed and will prevent the specified command from
      being run.
+
+@{b}--show-free@{ub}
+     [@{b}SHOWFREE@{ub}]  Specifies that a summary of all of the free memory
+     blocks should be displayed at the end of program execution.
 
 @{b}--show-freed@{ub}
      [@{b}SHOWFREED@{ub}]  Specifies that a summary of all of the freed memory
@@ -6830,6 +6946,14 @@ a similar way to the UNIX function @{b}getopt()@{ub}.
      @{b}--dynamic@{ub} option is used.  This option is required if the
      multithreaded version of the mpatrol library should be preloaded
      instead of the normal version.
+
+@{b}--trace@{ub}
+     [@{b}TRACE@{ub}]  Specifies that all memory allocations are to be traced and
+     sent to the tracing output file.
+
+@{b}--trace-file@{ub} <STRING>
+     [@{b}TRACEFILE@{ub}]  Specifies an alternative file in which to place all
+     memory allocation tracing information from the mpatrol library.
 
 @{b}--unfreed-abort@{ub} <UNSIGNED-INTEGER>
      [@{b}UNFREEDABORT@{ub}]  Specifies the minimum number of unfreed
@@ -7924,6 +8048,8 @@ supported on that system.
 
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
 
+        * The @{b}mptrace@{ub} command has no GUI.
+
         * The @{b}mpsym@{ub} command does not work unless @{b}gdb@{ub} and the GNU text
           processing tools are installed.
 
@@ -7951,6 +8077,8 @@ supported on that system.
 
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
 
+        * The @{b}mptrace@{ub} command has no GUI.
+
         * The @{b}mpsym@{ub} command does not work.
 
         * The @{b}mpedit@{ub} command does not work.
@@ -7968,6 +8096,8 @@ supported on that system.
           Runtime Library, and vice versa.
 
         * The @{b}--dynamic@{ub} option to the @{b}mpatrol@{ub} command has no effect.
+
+        * The @{b}mptrace@{ub} command has no GUI.
 
         * The @{b}mpsym@{ub} command does not work.
 
@@ -8136,10 +8266,10 @@ Notes for all platforms
 
    * Need to make the library re-entrant.  This could be achieved by
      moving the static variables in @{b}memory.c@{ub}, @{b}stack.c@{ub}, @{b}mutex.c@{ub}, @{b}diag.c@{ub},
-     @{b}option.c@{ub} and @{b}sbrk.c@{ub} into the @{b}infohead@{ub} structure and then having an
-     array of @{b}infohead@{ub} structures from which to allocate new memory
-     headers when a new one is required.  This is only necessary for
-     Amiga shared libraries and Netware NLMs since UNIX and Windows
+     @{b}trace.c@{ub}, @{b}option.c@{ub} and @{b}sbrk.c@{ub} into the @{b}infohead@{ub} structure and then
+     having an array of @{b}infohead@{ub} structures from which to allocate new
+     memory headers when a new one is required.  This is only necessary
+     for Amiga shared libraries and Netware NLMs since UNIX and Windows
      platforms allocate a new copy of the data section in a shared
      library or DLL when it is opened by a new process.
 
@@ -8218,11 +8348,9 @@ Notes for all platforms
      be used by chart drawing software for a better visualisation of
      the first few profiling tables.
 
-   * Perhaps add a memory usage profiling feature which would dump out
-     memory usage statistics to a file at set intervals during run-time
-     so that a table of memory usage could be built up.  This could
-     also be extended to having a graphical tool which could display
-     this information.
+   * Extend the @{b}mptrace@{ub} command to graphically display the size of the
+     heap plotted against time and the allocation size frequency.  Also
+     rewrite the GUI support to use GNOME instead of Motif.
 
    * Improve the speed of watch points by setting a range of allocation
      indices for which they will be used.  This may require a lot of
@@ -8266,31 +8394,19 @@ Notes for all platforms
      could also be extended to providing a function that could
      individually label each memory allocation with a given string.
 
-   * Add support for @{b}%d@{ub} and @{b}%t@{ub} keywords (representing date and time) in
-     the filenames for the mpatrol log file and profiling output file.
-     Also perhaps add time information to the details stored about each
-     memory allocation.  Another possible keyword to recognise in
-     filenames could be @{b}%f@{ub} which would represent the full pathname of
-     the executable file with path separation characters replaced with
-     underscores.
-
-   * Add a @{b}SHOWFREE@{ub} option to display a list of all free memory blocks
-     at program termination for debugging purposes to view memory
-     fragmentation.  If that option is added then perhaps @{b}SHOWALL@{ub}
-     should only be equivalent to @{b}SHOWFREE@{ub}, @{b}SHOWFREED@{ub} and @{b}SHOWUNFREED@{ub},
-     and @{b}SHOWMAP@{ub} and @{b}SHOWSYMBOLS@{ub} should be explicitly given.
+   * Perhaps add time information to the details stored about each
+     memory allocation.  This is probably not useful unless the system
+     provides a high-resolution timer.
 
    * Add an option (perhaps @{b}NOINTERNAL@{ub}) to suppress the display of
      internal (recursive) memory allocations in the mpatrol log file
      and also prevent information about such allocations being written
-     to the profiling output file.  This could also be extended to
-     prevent memory leaks from being reported if the original
-     allocations were made from a given set of functions.
+     to the profiling output and tracing output files.  This could also
+     be extended to prevent memory leaks from being reported if the
+     original allocations were made from a given set of functions.
 
-   * Add an extra piece of information in the log file summary which
-     highlights the peak number of memory allocations in use at any one
-     time during program execution.  Maybe also show the contents of
-     the @{b}MPATROL_OPTIONS@{ub} environment variable in the summary as well.
+   * Maybe show the contents of the @{b}MPATROL_OPTIONS@{ub} environment
+     variable in the summary as well.
 
    * Add versions of @{b}mallopt()@{ub}, @{b}mallinfo()@{ub}, @{b}memorymap()@{ub}, @{b}mallocctl()@{ub},
      @{b}mallocblksize()@{ub} and @{b}msize()@{ub} which are provided in many other
@@ -8607,6 +8723,8 @@ new AmigaOS may be added in the future.
      having to search for the script file or allocating memory in the
      process.
 
+   * Add GUI support for the @{b}mptrace@{ub} command.
+
    * When using SAS/C it is currently not possible to override the
      definition of @{b}malloc()@{ub}, etc., without including the @{b}mpatrol.h@{ub}
      header file first.  This is because the compiler startup code and
@@ -8654,6 +8772,8 @@ Notes for Windows platforms
      probably involve finding a way to invoke a batch file without
      having to search for the batch file or allocating memory in the
      process.
+
+   * Add GUI support for the @{b}mptrace@{ub} command.
 
    * Add a Windows resource file to the mpatrol library with copyright
      and version information.
@@ -8708,6 +8828,8 @@ someone else would have had to have done it anyway.
      probably involve finding a way to invoke a batch file without
      having to search for the batch file or allocating memory in the
      process.
+
+   * Add GUI support for the @{b}mptrace@{ub} command.
 
    * Need to investigate if it is safe (or even possible) to override
      the definitions of @{b}malloc()@{ub}, etc., without including the @{b}mpatrol.h@{ub}
@@ -8937,6 +9059,14 @@ Building
      top of its stack, even though it will be removed in the inlined
      case.
 
+  9. How do I build the @{b}mptrace@{ub} command with GUI support?
+
+     The GUI support for the @{b}mptrace@{ub} command is currently written to use
+     Motif and X Windows and so can only be built on systems with these
+     libraries and run on systems with an X server.  This will most
+     likely be possible only on UNIX platforms.  LessTif can be used
+     instead of Motif if that is all that is available on your system.
+
 
 @endnode
 
@@ -9083,7 +9213,15 @@ Running
      the above suggestions work, you may still be able to get this
      information with the @{b}mpsym@{ub} command.
 
-  4. Why does the mpatrol library not read the symbols in my executable
+  4. Why does the @{b}mpatrol@{ub} command ignore the current value of the
+     @{b}MPATROL_OPTIONS@{ub} environment variable?
+
+     Because I would most likely get lots of bug reports or queries
+     from people who had forgotten that they had set some options in
+     the environment variable and had then not seen the expected
+     behaviour from the options they specified to the @{b}mpatrol@{ub} command.
+
+  5. Why does the mpatrol library not read the symbols in my executable
      file on Windows platforms?
 
      If the mpatrol library was compiled with the @{b}FORMAT=FORMAT_PE@{ub}
@@ -9096,7 +9234,7 @@ Running
      file will not have a symbol table and so the mpatrol library
      cannot give symbolic stack tracebacks.
 
-  5. Why do some mpatrol log file entries only contain a partial call
+  6. Why do some mpatrol log file entries only contain a partial call
      stack rather than following the function call stack back to the
      call to @{b}main()@{ub}?
 
@@ -9109,7 +9247,7 @@ Running
      function on most platforms, otherwise the stack cannot be
      traversed.  See your compiler manual for further details.
 
-  6. I am trying to use the @{b}mpatrol@{ub} command to debug an executable file
+  7. I am trying to use the @{b}mpatrol@{ub} command to debug an executable file
      that was not originally compiled with the mpatrol library.
      However, even though it runs successfully, no mpatrol log file is
      produced.  Why is this?
@@ -9124,7 +9262,7 @@ Running
      special environment variable, in which case you can't use this
      feature.
 
-  7. I am attempting to run a multithreaded C++ program with the
+  8. I am attempting to run a multithreaded C++ program with the
      mpatrol library on Linux.  However, my program crashes before
      @{b}main()@{ub} and the debugger shows that the failure is in @{b}__sigaction()@{ub}
      which is called from @{b}__mp_initsignals()@{ub}.  Is the fault with the
@@ -9142,7 +9280,7 @@ Running
      @{b}libpthread.so@{ub}.  You can verify this by running the @{b}ldd@{ub} command on
      them.
 
-  8. I know that there's a definite heap corruption problem in my
+  9. I know that there's a definite heap corruption problem in my
      program as it keeps crashing in unrelated code due to pointer
      corruption, and when I link with the mpatrol library it stops
      crashing.  What can I do?
@@ -9159,7 +9297,7 @@ Running
      through your program in a debugger until something unusual or
      unexpected happens.
 
-  9. If I link my program to version 1.0 of the mpatrol library then I
+ 10. If I link my program to version 1.0 of the mpatrol library then I
      cannot interrupt it using the keyboard, which I would normally be
      able to do without using mpatrol.  Is this a bug?
 
@@ -9174,7 +9312,7 @@ Running
      which is why the behaviour was moved to an option for those that
      needed it.
 
- 10. Why does mpatrol not report an illegal memory access when it can
+ 11. Why does mpatrol not report an illegal memory access when it can
      be detected by a debugger?
 
      First of all, illegal memory accesses can only be detected on
@@ -9188,7 +9326,7 @@ Running
      try to live with that, or you could try disabling the overriding
      handlers.
 
- 11. I've linked and run my program with mpatrol under UNIX and it uses
+ 12. I've linked and run my program with mpatrol under UNIX and it uses
      a large amount of heap memory.  However, it crashes near the end
      of execution and then proceeds to freeze up the whole system,
      sometimes requiring a reboot.  What am I doing wrong?
@@ -9208,7 +9346,7 @@ Running
      segment size as well.  These can be set from the shell but the
      exact details on how to do this differ between shells.
 
- 12. Why does my program run so slowly after I link it with the mpatrol
+ 13. Why does my program run so slowly after I link it with the mpatrol
      library?
 
      Normal malloc libraries are optimised for speed but will typically
@@ -9222,7 +9360,7 @@ Running
      allocations, but that is mainly due to the overhead of storing the
      extra tracing details for each memory allocation.
 
- 13. My program is written in C++ and is linked to the mpatrol library,
+ 14. My program is written in C++ and is linked to the mpatrol library,
      but how do I go about demangling the C++ symbol names that are
      shown in the stack tracebacks in the resulting log file?
 
@@ -9239,7 +9377,7 @@ Running
      platforms as Microsoft's name mangling is quite unreadable and
      would be hard to demangle using a command line tool.
 
- 14. Why does my program not stop when the mpatrol library notices an
+ 15. Why does my program not stop when the mpatrol library notices an
      error?
 
      The library was written to give as much information as possible
@@ -9251,7 +9389,7 @@ Running
      of program execution, and then search backwards in the log file for
      @{b}WARNING@{ub} or @{b}ERROR@{ub}.
 
- 15. I have linked my program with the mpatrol library on an Amiga or
+ 16. I have linked my program with the mpatrol library on an Amiga or
      Netware machine, but when it runs it still crashes the entire
      system.  Why is this?
 
@@ -9265,7 +9403,7 @@ Running
      conjunction with mpatrol.  I'm not sure about the availability of
      such software for Netware.
 
- 16. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
+ 17. I have built the mpatrol library with @{b}gcc@{ub} on AmigaOS and have
      successfully linked it to my program.  However, why are none of
      the options in the @{b}MPATROL_OPTIONS@{ub} environment variable recognised
      when I run it?
@@ -9278,7 +9416,7 @@ Running
      allows you to set an environment variable that the GNU @{b}getenv()@{ub}
      function can read when you are running in AmigaDOS.
 
- 17. How do I suppress all diagnostic output from the mpatrol library?
+ 18. How do I suppress all diagnostic output from the mpatrol library?
 
      You can do this by setting the mpatrol log file to be your
      system's @{i}bit bucket@{ui}, which is @{b}/dev/null@{ub} on UNIX platforms and @{b}NIL:@{ub}
@@ -11537,6 +11675,7 @@ Index
  @{" -safe-signals                            " link "Options"}   Options
  @{" -show-all                                " link "Options"}   Options
  @{" -show-env                                " link "Options"}   Options
+ @{" -show-free                               " link "Options"}   Options
  @{" -show-freed                              " link "Options"}   Options
  @{" -show-map                                " link "Options"}   Options
  @{" -show-symbols                            " link "Options"}   Options
@@ -11545,6 +11684,8 @@ Index
  @{" -source-dir                              " link "The mpedit command"}   The mpedit command
  @{" -stack-depth                             " link "Profiling"}   Profiling
  @{" -threads                                 " link "Options"}   Options
+ @{" -trace                                   " link "Options"}   Options
+ @{" -trace-file                              " link "Options"}   Options
  @{" -unfreed-abort                           " link "Options"}   Options
  @{" -use-debug                               " link "Options"}   Options
  @{" -use-mmap                                " link "Options"}   Options
@@ -11698,6 +11839,7 @@ Index
  @{" dumping memory                           " link "Example 4"}   Example 4
  @{" duplicate symbols                        " link "Linking"}   Linking
  @{" DVI                                      " link "Documentation"}   Documentation
+ @{" DWARF                                    " link "How it works"}   How it works
  @{" dynamic link libraries                   " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" dynamic linker                           " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" dynamic linking                          " link "Call stacks and symbol tables"}   Call stacks and symbol tables
@@ -11831,6 +11973,7 @@ Index
  @{" Leakers                                  " link "Related software"}   Related software
  @{" LeakTracer                               " link "Related software"}   Related software
  @{" Leaky                                    " link "Related software"}   Related software
+ @{" LessTif                                  " link "Building"}   Building
  @{" LhA archive                              " link "Installation"}   Installation
  @{" LibKmalloc                               " link "Related software"}   Related software
  @{" library behaviour                        " link "Library behaviour"}   Library behaviour
@@ -11937,7 +12080,7 @@ Index
  @{" mmap                                     " link "Library behaviour"}   Library behaviour
  @{" MMU                                      " link "Virtual memory"}   Virtual memory
  @{" modules                                  " link "How it works"}   How it works
- @{" Motif                                    " link "References"}   References
+ @{" Motif                                    " link "Building"}   Building
  @{" MP_BUILTINSTACK_SUPPORT                  " link "Call stacks and symbol tables"}   Call stacks and symbol tables
  @{" MP_DELETE                                " link "Functions"}   Functions
  @{" MP_INLINE                                " link "Building"}   Building
@@ -12097,6 +12240,7 @@ Index
  @{" shared library                           " link "Features"}   Features
  @{" shared memory                            " link "Threads"}   Threads
  @{" SHOWALL                                  " link "Environment"}   Environment
+ @{" SHOWFREE                                 " link "Environment"}   Environment
  @{" SHOWFREED                                " link "Environment"}   Environment
  @{" SHOWMAP                                  " link "Environment"}   Environment
  @{" SHOWSYMBOLS                              " link "Environment"}   Environment
@@ -12159,7 +12303,10 @@ Index
  @{" threads library                          " link "Threads"}   Threads
  @{" times                                    " link "Library performance"}   Library performance
  @{" tips                                     " link "Improving performance"}   Improving performance
+ @{" TRACE                                    " link "Environment"}   Environment
  @{" tracebacks                               " link "Call stacks and symbol tables"}   Call stacks and symbol tables
+ @{" TRACEDIR                                 " link "Environment"}   Environment
+ @{" TRACEFILE                                " link "Environment"}   Environment
  @{" tracing                                  " link "Logging and tracing"}   Logging and tracing
  @{" tree structure                           " link "Example 2"}   Example 2
  @{" TurboPower                               " link "Related software"}   Related software
@@ -12198,7 +12345,7 @@ Index
  @{" Windows, Intel 80x86                     " link "Supported systems"}   Supported systems
  @{" Wipeout                                  " link "Related software"}   Related software
  @{" write protection                         " link "Virtual memory"}   Virtual memory
- @{" X Windows                                " link "References"}   References
+ @{" X Windows                                " link "Building"}   Building
  @{" XANALYS Software Tools                   " link "References"}   References
  @{" XCOFF                                    " link "Examples"}   Examples
  @{" xemacs                                   " link "The mpedit command"}   The mpedit command
