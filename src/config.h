@@ -309,6 +309,17 @@
 #endif /* MP_PROCFS_SUPPORT */
 
 
+/* The filename of the command line file within /proc that allows a process to
+ * examine the arguments it was invoked with.
+ */
+
+#if MP_PROCFS_SUPPORT
+#ifndef MP_PROCFS_CMDNAME
+#define MP_PROCFS_CMDNAME "cmdline"
+#endif /* MP_PROCFS_CMDNAME */
+#endif /* MP_PROCFS_SUPPORT */
+
+
 /* The filename of the executable file within /proc that allows a process to
  * examine the command it was invoked with.
  */
