@@ -84,7 +84,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.25 2000-06-08 18:21:42 graeme Exp $"
+#ident "$Id: symbol.c,v 1.26 2000-06-12 21:38:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -904,6 +904,7 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
 #elif SYSTEM == SYSTEM_HPUX
     struct shl_descriptor d;
     size_t i;
+    unsigned int o;
 #elif SYSTEM == SYSTEM_IRIX
     struct obj_list *l;
     struct obj *o;
@@ -947,9 +948,20 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
      * that the program depends on.
      */
     for (i = 1; shl_get_r(i, &d) != -1; i++)
+    {
+        /* Determine the offset of the first text symbol in the library.  This
+         * is normally 0x1000 but may be something else on later systems.  The
+         * handle structure is not documented anywhere, but the fourth word
+         * appears to contain the information we need, based on trial and error.
+         */
+        if (d.handle != NULL)
+            o = ((unsigned int *) d.handle)[3];
+        else
+            o = 0;
         if ((d.filename[0] != '\0') &&
-            !__mp_addsymbols(y, d.filename, d.tstart))
+            !__mp_addsymbols(y, d.filename, d.tstart - o))
             return 0;
+    }
 #elif SYSTEM == SYSTEM_IRIX
     if (l = __rld_obj_head)
         while (l = l->next)
