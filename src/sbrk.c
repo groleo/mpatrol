@@ -31,12 +31,13 @@
 
 #include "sbrk.h"
 #include "memory.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <errno.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.3 2000-03-23 19:14:55 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.4 2000-03-24 01:36:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -106,11 +107,15 @@ static int initbrk(void)
 
 int brk(void *p)
 {
-    if (((brkhead.block != NULL) || initbrk()) && (p >= brkhead.block) &&
-        ((char *) p <= (char *) brkhead.block + brkhead.size))
+    if ((brkhead.block != NULL) || initbrk())
     {
-        brkhead.len = (char *) p - (char *) brkhead.block;
-        return 0;
+        p = (void *) __mp_roundup((unsigned long) p, brkhead.memory.align);
+        if ((p >= brkhead.block) &&
+            ((char *) p <= (char *) brkhead.block + brkhead.size))
+        {
+            brkhead.len = (char *) p - (char *) brkhead.block;
+            return 0;
+        }
     }
     errno = ENOMEM;
     return -1;
@@ -123,23 +128,26 @@ int brk(void *p)
 void *sbrk(int l)
 {
     void *p;
+    unsigned long s;
 
     p = (void *) -1;
     if ((brkhead.block != NULL) || initbrk())
         if (l > 0)
         {
-            if (brkhead.len + l <= brkhead.size)
+            s = __mp_roundup((unsigned long) l, brkhead.memory.align);
+            if (brkhead.len + s <= brkhead.size)
             {
                 p = (char *) brkhead.block + brkhead.len;
-                brkhead.len += l;
+                brkhead.len += s;
             }
         }
         else if (l < 0)
         {
-            if (brkhead.len >= -l)
+            s = __mp_roundup((unsigned long) -l, brkhead.memory.align);
+            if (brkhead.len >= s)
             {
                 p = (char *) brkhead.block + brkhead.len;
-                brkhead.len += l;
+                brkhead.len -= s;
             }
         }
         else
