@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.66 2001-02-26 00:36:54 graeme Exp $"
+#ident "$Id: info.c,v 1.67 2001-02-27 19:59:26 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.66 2001-02-26 00:36:54 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.67 2001-02-27 19:59:26 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -101,7 +101,7 @@ __mp_newinfo(infohead *h)
     h->prologue = NULL;
     h->epilogue = NULL;
     h->nomemory = NULL;
-    h->finicount = 0;
+    h->initcount = h->finicount = 0;
     h->log = __mp_logfile(&h->alloc.heap.memory, NULL);
     h->delpos = 0;
 #if MP_PROTECT_SUPPORT
@@ -152,7 +152,7 @@ __mp_deleteinfo(infohead *h)
     __mp_newlist(&h->astack);
     h->size = h->event = h->count = h->cpeak = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
-    h->finicount = 0;
+    h->initcount = h->finicount = 0;
     h->delpos = 0;
 }
 
