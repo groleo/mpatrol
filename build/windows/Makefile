@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.38 2000-11-30 23:13:52 graeme Exp $
+# $Id: Makefile,v 1.39 2000-12-03 22:29:51 graeme Exp $
 
 
 # Definitions
@@ -103,16 +103,19 @@ mpatrol.exe: mpatrol.obj getopt.obj version.obj
 mprof.exe: mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj graph.obj getopt.obj list.obj tree.obj version.obj
 
+mtrace.exe: mtrace.obj getopt.obj tree.obj utils.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mtrace.obj getopt.obj tree.obj utils.obj version.obj
+
 mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
-	mpatrol.exe mprof.exe mleak.exe
+	mpatrol.exe mprof.exe mtrace.exe mleak.exe
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.obj mprof.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
+	-@ rm -f mpatrol.obj mprof.obj mtrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -120,7 +123,7 @@ clobber: clean
 	-@ rm -f $(LIBRARY).lib $(LIBRARY).exp 2>&1 >/dev/null
 	-@ rm -f $(LIBRARY)mt.lib $(LIBRARY)mt.exp 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f mpatrol.exe mprof.exe mleak.exe 2>&1 >/dev/null
+	-@ rm -f mpatrol.exe mprof.exe mtrace.exe mleak.exe 2>&1 >/dev/null
 
 
 # Dependencies
@@ -279,6 +282,9 @@ mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/graph.h $(SOURCE)/list.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
+mtrace.obj: $(SOURCE)/mtrace.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h \
+	$(SOURCE)/version.h
 mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
