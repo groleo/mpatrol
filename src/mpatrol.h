@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.104 2001-03-02 02:00:46 graeme Exp $
+ * $Id: mpatrol.h,v 1.105 2001-03-03 14:44:23 graeme Exp $
  */
 
 
@@ -728,6 +728,26 @@ int __mp_list(MP_CONST char *, unsigned long);
 int __mp_view(MP_CONST char *, unsigned long);
 
 
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
+#define __mp_locprintf(...) \
+    __mp_printfwithloc(MP_FUNCNAME, __FILE__, __LINE__, __VA_ARGS__)
+#elif defined(__GNUC__)
+#define __mp_locprintf(a...) \
+    __mp_printfwithloc(MP_FUNCNAME, __FILE__, __LINE__, a)
+#else /* __STDC_VERSION__ && __GNUC__ */
+static
+void
+__mp_locprintf(MP_CONST char *m, ...)
+{
+    va_list v;
+
+    va_start(v, m);
+    __mp_vprintfwithloc(NULL, NULL, 0, m, v);
+    va_end(v);
+}
+#endif /* __STDC_VERSION__ && __GNUC__ */
+
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -782,13 +802,13 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_view(f, l) ((int) 0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
-#define __mp_printf(s, ...) ((int) 0)
-#define __mp_printfwithloc(s, t, u, m, ...) ((void) 0)
-#define __mp_locprintf(m, ...) ((void) 0)
+#define __mp_printf(...) ((int) 0)
+#define __mp_printfwithloc(s, t, u, ...) ((void) 0)
+#define __mp_locprintf(...) ((void) 0)
 #elif defined(__GNUC__)
-#define __mp_printf(s, a...) ((int) 0)
-#define __mp_printfwithloc(s, t, u, m, a...) ((void) 0)
-#define __mp_locprintf(m, a...) ((void) 0)
+#define __mp_printf(a...) ((int) 0)
+#define __mp_printfwithloc(s, t, u, a...) ((void) 0)
+#define __mp_locprintf(a...) ((void) 0)
 #else /* __STDC_VERSION__ && __GNUC__ */
 static
 int
