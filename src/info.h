@@ -48,7 +48,8 @@
 #define FLG_SHOWUNFREED   128  /* show all unfreed allocations */
 #define FLG_SHOWMAP       256  /* show memory map of heap */
 #define FLG_SHOWSYMBOLS   512  /* show all symbols read */
-#define FLG_NOPROTECT     1024 /* do not protect internal structures */
+#define FLG_SAFESIGNALS   1024 /* save and restore signal handlers */
+#define FLG_NOPROTECT     2048 /* do not protect internal structures */
 
 
 /* The different types of memory allocation functions.
