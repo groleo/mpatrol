@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.3 1999-10-21 20:50:30 graeme Exp $"
+#ident "$Id: diag.c,v 1.4 1999-11-25 16:19:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -640,6 +640,8 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
         __mp_diag("-");
     else
         __mp_diag("%lu", h->urange);
+    __mp_diag("\nfailure frequency: %lu", h->ffreq);
+    __mp_diag("\nfailure seed:      %lu", h->fseed);
     __mp_diag("\nprologue function: ");
     if (h->prologue == NULL)
         __mp_diag("<unset>");
