@@ -318,6 +318,15 @@
 #endif /* MP_MAXDELSTACK */
 
 
+/* The number of buckets in the hash table used to implement the string table.
+ * This must be a prime number.
+ */
+
+#ifndef MP_HASHTABSIZE
+#define MP_HASHTABSIZE 211
+#endif /* MP_HASHTABSIZE */
+
+
 /* Indicates if the compiler supports the long long type.  This is only used
  * to determine the minimum alignment required for a generic memory allocation.
  */
