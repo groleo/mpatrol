@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.19 2000-04-24 09:30:40 graeme Exp $"
+#ident "$Id: profile.c,v 1.20 2000-04-24 10:36:48 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,7 +50,7 @@ extern "C"
  * is ready to profile memory allocations.
  */
 
-MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h)
+MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h, symhead *s)
 {
     struct { char x; profdata y; } w;
     struct { char x; profnode y; } z;
@@ -58,6 +58,7 @@ MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h)
     long n;
 
     p->heap = h;
+    p->syms = s;
     /* Determine the minimum alignment for a profdata structure and a
      * profnode on this system and force the alignments to be a power
      * of two.  This information is used when initialising the slot
@@ -94,6 +95,7 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
      * at a lower level by the heap manager.
      */
     p->heap = NULL;
+    p->syms = NULL;
     p->dtable.free = NULL;
     p->dtable.size = 0;
     p->ntable.free = NULL;
@@ -215,6 +217,7 @@ static profnode *getcallsite(profhead *p, addrnode *a)
     n->data.parent = t;
     n->data.index = p->tree.size;
     n->data.addr = a->data.addr;
+    n->data.symbol = __mp_findsymbol(p->syms, a->data.addr);
     n->data.data = NULL;
     return n;
 }
@@ -335,7 +338,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     profdata *d;
     profnode *n;
     FILE *f;
-    size_t i;
+    size_t i, l;
 
     p->autocount = 0;
     /* The profiling file name can also be named as stderr and stdout which
@@ -388,6 +391,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     /* Write out the statistics from every call site.
      */
     i = 0;
+    l = 1;
     fwrite(&p->tree.size, sizeof(size_t), 1, f);
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
          n = (profnode *) __mp_successor(&n->data.node))
@@ -398,10 +402,35 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         else
             fwrite(&i, sizeof(unsigned long), 1, f);
         fwrite(&n->data.addr, sizeof(void *), 1, f);
+        if (n->data.symbol != NULL)
+        {
+            if (n->data.symbol->data.offset == 0)
+            {
+                n->data.symbol->data.offset = l;
+                l += strlen(n->data.symbol->data.name) + 1;
+            }
+            fwrite(&n->data.symbol->data.offset, sizeof(unsigned long), 1, f);
+        }
+        else
+            fwrite(&i, sizeof(unsigned long), 1, f);
         if (n->data.data != NULL)
             fwrite(&n->data.data->data.index, sizeof(unsigned long), 1, f);
         else
             fwrite(&i, sizeof(unsigned long), 1, f);
+    }
+    /* Write out the name of every symbol that has been referenced.
+     */
+    fwrite(&l, sizeof(size_t), 1, f);
+    fputc('\0', f);
+    for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
+         n = (profnode *) __mp_successor(&n->data.node))
+    {
+        if (n->data.symbol->data.offset != 0)
+        {
+            fputs(n->data.symbol->data.name, f);
+            fputc('\0', f);
+        }
+        n->data.symbol->data.offset = 0;
     }
     fwrite(s, sizeof(char), 4, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
