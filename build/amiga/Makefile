@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.18 2000-05-08 20:56:50 graeme Exp $
+# $Id: Makefile,v 1.19 2000-05-23 21:56:46 graeme Exp $
 
 
 # Definitions
@@ -147,11 +147,7 @@ signals.o signals.t.o: $(SOURCE)/signals.c $(SOURCE)/signals.h \
 	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/inter.h $(SOURCE)/profile.h
 mutex.t.o: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/inter.h $(SOURCE)/info.h $(SOURCE)/addr.h \
-	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
-	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
-	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/profile.h
+	$(SOURCE)/target.h
 diag.o: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
