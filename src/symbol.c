@@ -126,9 +126,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.60 2001-10-05 21:14:03 graeme Exp $"
+#ident "$Id: symbol.c,v 1.61 2001-10-10 20:47:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.60 2001-10-05 21:14:03 graeme Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.61 2001-10-10 20:47:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2062,6 +2062,7 @@ __mp_findsymbol(symhead *y, void *p)
                  */
                 if ((r == NULL) || (!(r->data.flags & N_EXT) &&
                      (n->data.flags & N_EXT)))
+                    r = n;
 #elif FORMAT == FORMAT_COFF
                 /* We give precedence to global symbols, then local symbols.
                  */
