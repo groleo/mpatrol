@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.13 2000-04-20 23:25:33 graeme Exp $
+# $Id: Makefile,v 1.14 2000-04-24 13:28:50 graeme Exp $
 
 
 # Definitions
@@ -78,19 +78,22 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj
 
+mprof.nlm: mprof.obj getopt.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.obj getopt.obj version.obj
+
 memleak.nlm: memleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.obj getopt.obj tree.obj version.obj
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol.nlm memleak.nlm
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol.nlm mprof.nlm memleak.nlm
 
 clean:
 	-@ rm -f $(OBJECTS) $(TOBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.obj memleak.obj getopt.obj 2>&1 >/dev/null
+	-@ rm -f mpatrol.obj mprof.obj memleak.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f mpatrol.nlm memleak.nlm 2>&1 >/dev/null
+	-@ rm -f mpatrol.nlm mprof.nlm memleak.nlm 2>&1 >/dev/null
 
 
 # Dependencies
@@ -210,6 +213,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.c $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/version.c
 mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/version.h
+mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h

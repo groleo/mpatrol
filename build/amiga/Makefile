@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.14 2000-04-20 23:25:30 graeme Exp $
+# $Id: Makefile,v 1.15 2000-04-24 13:28:47 graeme Exp $
 
 
 # Definitions
@@ -77,19 +77,22 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
 
+mprof: mprof.o getopt.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o getopt.o version.o
+
 memleak: memleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol memleak
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof memleak
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.o memleak.o getopt.o 2>&1 >/dev/null
+	-@ rm -f mpatrol.o mprof.o memleak.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f mpatrol memleak 2>&1 >/dev/null
+	-@ rm -f mpatrol mprof memleak 2>&1 >/dev/null
 
 
 # Dependencies
@@ -215,6 +218,8 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.c $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/version.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/version.h
+mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
