@@ -377,6 +377,30 @@
 #endif /* MP_PRELOAD_SUPPORT */
 
 
+/* Indicates if the C functions defined in malloc.c are to have duplicate
+ * functions defined with an alternative name.
+ */
+
+#ifndef MP_ALTFUNCNAMES
+#if TARGET == TARGET_UNIX
+#define MP_ALTFUNCNAMES 1
+#else /* TARGET */
+#define MP_ALTFUNCNAMES 0
+#endif /* TARGET */
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* The macro function which will be used to calculate the alternative names
+ * for all C functions that are defined in malloc.c.
+ */
+
+#if MP_ALTFUNCNAMES
+#ifndef MP_ALTFUNCNAME
+#define MP_ALTFUNCNAME(f) _ ## f
+#endif /* MP_ALTFUNCNAME */
+#endif /* MP_ALTFUNCNAMES */
+
+
 /* Indicates if the compiler supports the __builtin_frame_address() and
  * __builtin_return_address() macros, and if they should be used instead of
  * traversing the call stack directly.  Note that this method only allows a
