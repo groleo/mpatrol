@@ -82,10 +82,12 @@ addrnode;
 
 typedef struct addrhead
 {
-    heaphead *heap;  /* pointer to heap */
-    slottable table; /* table of address nodes */
-    listhead list;   /* internal list of memory blocks */
-    size_t size;     /* number of nodes allocated */
+    heaphead *heap;   /* pointer to heap */
+    slottable table;  /* table of address nodes */
+    listhead list;    /* internal list of memory blocks */
+    size_t size;      /* number of nodes allocated */
+    memaccess prot;   /* protection status */
+    size_t protrecur; /* protection recursion count */
 }
 addrhead;
 
