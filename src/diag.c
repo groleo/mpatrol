@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.72 2001-03-06 01:01:55 graeme Exp $"
+#ident "$Id: diag.c,v 1.73 2001-03-06 19:48:24 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.72 2001-03-06 01:01:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.73 2001-03-06 19:48:24 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1226,7 +1226,7 @@ __mp_printfree(infohead *h)
 
 static
 void
-printleakinfo(tablenode *n, int o, int c)
+printleakinfo(tablenode *n, size_t *a, size_t *b, int o, int c)
 {
     size_t i, j;
 
@@ -1257,6 +1257,8 @@ printleakinfo(tablenode *n, int o, int c)
         __mp_diag(MP_POINTER "\n", n->data.line);
     else
         __mp_diag("unknown location\n");
+    *a += i;
+    *b += j;
 }
 
 
@@ -1270,6 +1272,7 @@ __mp_printleaktab(infohead *h, size_t l, int o, unsigned char f)
     tablenode *n;
     treenode *t;
     char *s;
+    size_t b, c;
 
     __mp_sortleaktab(&h->ltable, o, (f & FLG_COUNTS));
     if ((l == 0) || (l > h->ltable.tree.size))
@@ -1298,20 +1301,25 @@ __mp_printleaktab(infohead *h, size_t l, int o, unsigned char f)
         __mp_diag("       bytes   count  location\n");
         __mp_diag("    --------  ------  --------\n");
     }
+    b = c = 0;
     if (f & FLG_BOTTOM)
         for (t = __mp_minimum(h->ltable.tree.root); (t != NULL) && (l != 0);
              t = __mp_successor(t), l--)
         {
             n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
-            printleakinfo(n, o, (f & FLG_COUNTS));
+            printleakinfo(n, &c, &b, o, (f & FLG_COUNTS));
         }
     else
         for (t = __mp_maximum(h->ltable.tree.root); (t != NULL) && (l != 0);
              t = __mp_predecessor(t), l--)
         {
             n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
-            printleakinfo(n, o, (f & FLG_COUNTS));
+            printleakinfo(n, &c, &b, o, (f & FLG_COUNTS));
         }
+    if (f & FLG_COUNTS)
+        __mp_diag("    %6lu  %8lu  total\n", c, b);
+    else
+        __mp_diag("    %8lu  %6lu  total\n", b, c);
 }
 
 
