@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.240 2001-09-03 22:40:31 graeme Exp $
+@c $Id: mpatrol.texi,v 1.241 2001-09-03 22:43:53 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -11245,9 +11245,6 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
 @item
-The @option{LIST} option does not work since the @option{--listing} option does
-not work in the @command{mpedit} command.
-@item
 On ELF-based systems, the mpatrol library requires either the ELF access library
 or the GNU BFD library to be installed on the system, otherwise no symbols can
 be read from executable files or shared libraries and the library must be built
@@ -11405,9 +11402,6 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-The @option{LIST} option does not work since the @option{--listing} option does
-not work in the @command{mpedit} command.
-@item
 There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -11428,9 +11422,6 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-The @option{LIST} option does not work since the @option{--listing} option does
-not work in the @command{mpedit} command.
-@item
 There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -11449,9 +11440,6 @@ LynxOS 3.0.0, PowerPC, BFD, @command{gcc}
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
-@item
-The @option{LIST} option does not work since the @option{--listing} option does
-not work in the @command{mpedit} command.
 @item
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
@@ -11475,9 +11463,6 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
-@item
-The @option{LIST} option does not work since the @option{--listing} option does
-not work in the @command{mpedit} command.
 @item
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
