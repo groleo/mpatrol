@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.9 2001-02-05 22:58:34 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.10 2001-03-01 00:54:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.9 2001-02-05 22:58:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.10 2001-03-01 00:54:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -101,9 +101,9 @@ initbrk(void)
         return 0;
     brkhead.size = l;
     brkhead.len = 0;
-#if MP_DELETE
+#if MP_DELETEHEAP
     atexit(finibrk);
-#endif /* MP_DELETE */
+#endif /* MP_DELETEHEAP */
     return 1;
 }
 

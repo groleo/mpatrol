@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.69 2001-02-28 23:08:04 graeme Exp $
+ * $Id: config.h,v 1.70 2001-03-01 00:54:16 graeme Exp $
  */
 
 
@@ -215,13 +215,13 @@
  * do not reclaim memory from a process when it terminates.
  */
 
-#ifndef MP_DELETE
+#ifndef MP_DELETEHEAP
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
-#define MP_DELETE 0
+#define MP_DELETEHEAP 0
 #elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
-#define MP_DELETE 1
+#define MP_DELETEHEAP 1
 #endif /* TARGET */
-#endif /* MP_DELETE */
+#endif /* MP_DELETEHEAP */
 
 
 /* Indicates if the system supports memory protection.  If not, then the

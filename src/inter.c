@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.94 2001-02-27 20:10:55 graeme Exp $"
+#ident "$Id: inter.c,v 1.95 2001-03-01 00:54:16 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.94 2001-02-27 20:10:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.95 2001-03-01 00:54:16 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -499,7 +499,7 @@ __mp_fini(void)
             _Inuse_close();
 #endif /* MP_INUSE_SUPPORT */
         }
-#if MP_DELETE
+#if MP_DELETEHEAP
         /* We only need to perform this step if the operating system does not
          * reclaim memory from a terminated process.  We must not perform this
          * step if the operating system needs to deal with dynamically
@@ -515,7 +515,7 @@ __mp_fini(void)
 #if MP_THREADS_SUPPORT
         __mp_finimutexes();
 #endif /* MP_THREADS_SUPPORT */
-#endif /* MP_DELETE */
+#endif /* MP_DELETEHEAP */
         memhead.init = 0;
     }
     restoresignals();
