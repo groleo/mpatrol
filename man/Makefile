@@ -21,28 +21,32 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.9 2001-01-04 21:01:35 graeme Exp $
+# $Id: Makefile,v 1.10 2001-01-25 13:28:13 graeme Exp $
 
 
 # Definitions
 
 SHELL  = /bin/sh
 ROFF   = groff
+HTML   = man2html
 PSTILL = pstill
 
-PAGES	 = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
-	   cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3
-DVIPAGES = dvi/mpatrol.dvi dvi/mprof.dvi dvi/mptrace.dvi dvi/mleak.dvi \
-	   dvi/mpsym.dvi dvi/mpedit.dvi dvi/hexwords.dvi dvi/libmpatrol.dvi
-PSPAGES	 = ps/mpatrol.ps ps/mprof.ps ps/mptrace.ps ps/mleak.ps \
-	   ps/mpsym.ps ps/mpedit.ps ps/hexwords.ps ps/libmpatrol.ps
-PDFPAGES = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
-	   pdf/mpsym.pdf pdf/mpedit.pdf pdf/hexwords.pdf pdf/libmpatrol.pdf
+PAGES	  = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
+	    cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3
+HTMLPAGES = html/mpatrol.html html/mprof.html html/mptrace.html \
+	    html/mleak.html html/mpsym.html html/mpedit.html \
+	    html/hexwords.html html/libmpatrol.html
+DVIPAGES  = dvi/mpatrol.dvi dvi/mprof.dvi dvi/mptrace.dvi dvi/mleak.dvi \
+	    dvi/mpsym.dvi dvi/mpedit.dvi dvi/hexwords.dvi dvi/libmpatrol.dvi
+PSPAGES	  = ps/mpatrol.ps ps/mprof.ps ps/mptrace.ps ps/mleak.ps \
+	    ps/mpsym.ps ps/mpedit.ps ps/hexwords.ps ps/libmpatrol.ps
+PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
+	    pdf/mpsym.pdf pdf/mpedit.pdf pdf/hexwords.pdf pdf/libmpatrol.pdf
 
 
 # Rules
 
-.SUFFIXES: .1 .3 .dvi .ps .pdf
+.SUFFIXES: .1 .3 .html .dvi .ps .pdf
 
 default: $(PAGES)
 
@@ -69,6 +73,30 @@ cat1/hexwords.1: man1/hexwords.1
 
 cat3/libmpatrol.3: man3/libmpatrol.3
 	$(ROFF) -Tascii -man -t $< >$@
+
+html/mpatrol.html: man1/mpatrol.1
+	$(HTML) $< >$@
+
+html/mprof.html: man1/mprof.1
+	$(HTML) $< >$@
+
+html/mptrace.html: man1/mptrace.1
+	$(HTML) $< >$@
+
+html/mleak.html: man1/mleak.1
+	$(HTML) $< >$@
+
+html/mpsym.html: man1/mpsym.1
+	$(HTML) $< >$@
+
+html/mpedit.html: man1/mpedit.1
+	$(HTML) $< >$@
+
+html/hexwords.html: man1/hexwords.1
+	$(HTML) $< >$@
+
+html/libmpatrol.html: man3/libmpatrol.3
+	$(HTML) $< >$@
 
 dvi/mpatrol.dvi: man1/mpatrol.1
 	$(ROFF) -Tdvi -man $< >$@
@@ -142,9 +170,11 @@ pdf/hexwords.pdf: ps/hexwords.ps
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
 	$(PSTILL) -c -o $@ $<
 
-all: $(PAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
+all: $(PAGES) $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES)
 
-mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
+mpatrol_man.tar.gz: $(HTMLPAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
+	@ mkdir -p mpatrol/man/html
+	@ cp $(HTMLPAGES) mpatrol/man/html
 	@ mkdir -p mpatrol/man/dvi
 	@ cp $(DVIPAGES) mpatrol/man/dvi
 	@ mkdir -p mpatrol/man/ps
@@ -157,7 +187,8 @@ mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) $(PDFPAGES) README
 	-@ rm -rf mpatrol >/dev/null 2>&1
 
 clean:
-	-@ rm -f $(PAGES) $(DVIPAGES) $(PSPAGES) $(PDFPAGES) >/dev/null 2>&1
+	-@ rm -f $(PAGES) $(HTMLPAGES) >/dev/null 2>&1
+	-@ rm -f $(DVIPAGES) $(PSPAGES) $(PDFPAGES) >/dev/null 2>&1
 	-@ rm -f mpatrol_man.tar.gz >/dev/null 2>&1
 
 clobber: clean
