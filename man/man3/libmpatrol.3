@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.24 2001-05-22 20:43:22 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.25 2001-05-30 22:21:01 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "22 May 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "30 May 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -112,6 +112,7 @@ void *memchr(const void *ptr, int byte, size_t size);
 int __mp_atexit(void (*func)(void));
 unsigned long __mp_setoption(long opt, unsigned long val);
 int __mp_getoption(long opt, unsigned long *val);
+unsigned long __mp_libversion(void);
 const char *__mp_strerror(__mp_errortype err);
 const char *__mp_function(__mp_alloctype func);
 int __mp_setuser(const void *ptr, const void *data);
@@ -242,6 +243,18 @@ Note that this feature will have no effect if the symbol table is stripped from
 the executable file or shared library before the program is run, and the order
 in which such functions will be called if there are more than one is
 unspecified.
+.PP
+On UNIX platforms, the \fBfork\fP function can cause problems if it is used
+to make a copy of the parent process without immediately calling one of the
+\fBexec\fP family of functions.  This is because the child process inherits
+all of the memory allocations of the parent process, but also inherits the log,
+profile and trace files as well.  If both the parent and child processes make
+subsequent memory allocations there will be multiple entries with the same
+allocation indices written to the log, profile or trace files.  This can be
+most confusing when processing these files afterwards!  As a workaround, the
+mpatrol library will always check the current process identifier every time one
+of its functions is called and will open new log, profile or trace files if it
+has determined that the process has been forked.
 .PP
 Memory allocation profiling is supported, with statistics about every memory
 allocation and deallocation that was made during the execution of a program
@@ -720,7 +733,7 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 36 functions are available as support routines for additional
+The following 37 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
 .TP
@@ -751,6 +764,11 @@ unsigned integer, otherwise \fI0\fP will be returned.  If \fIopt\fP is
 \fIMP_OPT_SETFLAGS\fP then all of the mpatrol library flags that are set will be
 returned in \fIval\fP.  If \fIopt\fP is \fIMP_OPT_UNSETFLAGS\fP then all of the
 mpatrol library flags that are not set will be returned in \fIval\fP.
+.TP
+\fB__mp_libversion\fP
+Returns the version number of the mpatrol library.  This can be useful for
+verifying that the version of the mpatrol library that a program is linked with
+is the one expected at compile-time.
 .TP
 \fB__mp_strerror\fP
 Returns the error message corresponding to the error code \fIerr\fP or
