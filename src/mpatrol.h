@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.136 2001-08-28 00:09:29 graeme Exp $
+ * $Id: mpatrol.h,v 1.137 2001-09-04 22:32:01 graeme Exp $
  */
 
 
@@ -772,6 +772,7 @@ int __mp_setuser(MP_CONST void *, MP_CONST void *);
 int __mp_setmark(MP_CONST void *);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
+MP_CONST char *__mp_symbol(MP_CONST void *);
 int __mp_printinfo(MP_CONST void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
@@ -864,6 +865,7 @@ static int __mp_errno;
 #define __mp_setmark(p) ((int) 0)
 #define __mp_info(p, d) ((int) 0)
 #define __mp_syminfo(p, d) ((int) 0)
+#define __mp_symbol(p) ((MP_CONST char *) NULL)
 #define __mp_printinfo(p) ((int) 0)
 #define __mp_snapshot() ((unsigned long) 0)
 #define __mp_iterate(p, d, s) ((size_t) 0)
@@ -952,6 +954,7 @@ __mp_locprintf(MP_CONST char *m, ...)
 #define mpatrol_setmark __mp_setmark
 #define mpatrol_info __mp_info
 #define mpatrol_syminfo __mp_syminfo
+#define mpatrol_symbol __mp_symbol
 #define mpatrol_printinfo __mp_printinfo
 #define mpatrol_snapshot __mp_snapshot
 #define mpatrol_iterate __mp_iterate

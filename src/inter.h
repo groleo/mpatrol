@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.54 2001-08-23 22:46:42 graeme Exp $
+ * $Id: inter.h,v 1.55 2001-09-04 22:32:01 graeme Exp $
  */
 
 
@@ -149,6 +149,7 @@ MP_API int __mp_setuser(void *, void *);
 MP_API int __mp_setmark(void *);
 MP_API int __mp_info(void *, allocinfo *);
 MP_API int __mp_syminfo(void *, symbolinfo *);
+MP_API char *__mp_symbol(void *);
 MP_API int __mp_printinfo(void *);
 MP_API unsigned long __mp_snapshot(void);
 MP_API size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);

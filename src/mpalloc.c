@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.42 2001-08-24 11:43:18 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.43 2001-09-04 22:32:01 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.42 2001-08-24 11:43:18 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.43 2001-09-04 22:32:01 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -674,6 +674,17 @@ int
 __mp_syminfo(void *p, symbolinfo *d)
 {
     return 0;
+}
+
+
+/* Obtain the name of the function symbol that contains a given address.
+ */
+
+MP_API
+char *
+__mp_symbol(void *p)
+{
+    return NULL;
 }
 
 
