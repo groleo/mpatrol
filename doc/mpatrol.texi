@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.199 2001-03-09 01:09:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.200 2001-03-10 17:57:19 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1826,6 +1826,7 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Using with a debugger::       Setting breakpoints.
 * Testing::                     Additional checks.
 * Library functions::           What's provided.
+* Leak table::                  Memory leak table.
 * Tools::                       Additional tools.
 * Utilities::                   External programs.
 @end menu
@@ -2004,7 +2005,6 @@ any symbolic information that the mpatrol library managed to obtain from any
 executable files and libraries that were relevant to the program being tested.
 All of the above five options can be selected with the @option{SHOWALL} option.
 
-@cindex leak table
 For the purpose of detecting memory leaks, you can instruct the mpatrol library
 to automatically log every memory allocation event into a special hash table
 called the leak table with the @option{LEAKTABLE} option.  This option will then
@@ -2536,7 +2536,7 @@ number of unfreed allocations higher than this then it will abort the program at
 termination so that it fails.  All tests that fail in this way can then be
 examined after the test suite finishes.
 
-@node Library functions, Tools, Testing, Using mpatrol
+@node Library functions, Leak table, Testing, Using mpatrol
 @section Library functions
 @cindex library functions
 
@@ -3030,7 +3030,154 @@ library statistics to the mpatrol log file, while the @code{__mp_stats()}
 function fills in a data structure with selected statistics for examination in
 user code.
 
-@node Tools, Utilities, Library functions, Using mpatrol
+@node Leak table, Tools, Library functions, Using mpatrol
+@section Leak table
+@cindex leak table
+
+@cindex hash table
+The mpatrol library provides a hash table called a @emph{leak table} that can be
+used to record memory allocations and deallocations for the purpose of detecting
+memory leaks.  It can be fully controlled from the source code of a program by
+calling the appropriate mpatrol library functions, but the mpatrol library can
+also be instructed to automatically enter the details of each memory event into
+the leak table by using the @option{LEAKTABLE} option.
+
+The leak table records a flat profile of memory allocation behaviour between two
+points in a program and is keyed by source file location.  What that means is,
+it contains an entry for each source file and line number that allocated memory,
+and if more than one memory allocation event occurred at that point then the
+entry will summarise the total events that occurred at that point.  In many
+cases, the source file and line number is not available for a memory allocation
+event, in which case either the function name or the return address can be used
+instead.
+
+The following example shows the use of the leak table manipulation functions.
+
+@smallexample
+ 1  /*
+ 2   * Illustrates the explicit and implicit manipulation of the
+ 3   * leak table.
+ 4   */
+
+
+ 7  #include "mpatrol.h"
+
+
+10  int main(void)
+11  @{
+12      void *p, *q;
+13      int r;
+
+15      __mp_clearleaktable();
+16      __mp_addallocentry("file.c", 1, 1);
+17      __mp_addfreeentry("file.c", 1, 1);
+18      __mp_addallocentry("file.c", 1, 2);
+19      __mp_addfreeentry("file.c", 1, 2);
+20      __mp_addallocentry("file.c", 1, 3);
+21      __mp_addfreeentry("file.c", 1, 3);
+22      __mp_addallocentry("function", 0, 8);
+23      __mp_addfreeentry("function", 0, 4);
+24      __mp_addallocentry("function", 0, 16);
+25      __mp_addfreeentry("function", 0, 12);
+26      __mp_addallocentry(NULL, 0x40000000, 8);
+27      r = __mp_startleaktable();
+28      if (p = malloc(16))
+29          if (q = realloc(p, 32))
+30              free(q);
+31          else
+32              free(p);
+33      if (r == 0)
+34          __mp_stopleaktable();
+35      __mp_leaktable(0, MP_LT_ALLOCATED, MP_LT_BOTTOM);
+36      __mp_printf("\n");
+37      __mp_leaktable(0, MP_LT_FREED, MP_LT_COUNTS);
+38      __mp_printf("\n");
+39      __mp_leaktable(0, MP_LT_UNFREED, 0);
+40      __mp_printf("\n");
+41      return EXIT_SUCCESS;
+42  @}
+@end smallexample
+
+The output that appears in @file{mpatrol.log} should look similar to this.
+
+@smallexample
+bottom 5 allocated memory entries in leak table:
+
+       bytes   count  location
+    --------  ------  --------
+           6       3  file.c line 1
+           8       1  0x40000000
+          16       1  test.c line 28
+          24       2  function
+          32       1  test.c line 29
+          86       8  total
+
+top 4 freed memory entries in leak table:
+
+     count     bytes  location
+    ------  --------  --------
+         3         6  file.c line 1
+         2        16  function
+         1        32  test.c line 29
+         1        16  test.c line 28
+         7        70  total
+
+top 2 unfreed memory entries in leak table:
+
+       bytes   count  location
+    --------  ------  --------
+           8       1  0x40000000
+           8       0  function
+          16       1  total
+@end smallexample
+
+Line 15 of the above program clears the leak table.  This can be done as many
+times as necessary during the execution of the program, but note that there is
+only one leak table so this will affect the @option{LEAKTABLE} option.  The
+following 6 lines then add matching allocation and deallocation entries to the
+leak table corresponding to a source location of line 1 in a file called
+@file{file.c}.  Any deallocation entries must match the source position of the
+original allocation due to the nature of the leak table.  Note that these 6
+lines correspond to an allocation of 1 byte, followed by two reallocations of
+2 and 3 bytes respectively, followed by a final deallocation.
+
+Lines 22-23 allocate 8 bytes from a function called @code{function()} but only
+free 4 bytes, resulting in a memory leak of 4 bytes.  Lines 24-25 do the same
+but allocate 16 bytes and free 12.  The next line allocates 8 bytes from a
+code address of @samp{0x40000000} but does not free it, resulting in a memory
+leak of 8 bytes.  Note that if the line number is specified as @samp{0} then
+the filename will be taken as a function name, and if the filename is specified
+as @samp{NULL} then the line number will be taken as a return address.  If
+neither are specified then the number of bytes will be added or subtracted from
+the @samp{unknown} location.
+
+Line 27 instructs mpatrol to automatically record any subsequent memory
+allocation events in the leak table, while line 34 does the opposite.  The
+@code{__mp_startleaktable()} function returns @samp{1} if automatic leak table
+recording was turned on and @samp{0} otherwise, so we check in line 33 to see if
+we should turn off automatic recording by examining the previous state.  Lines
+28-32 allocate, reallocate and free some memory just to demonstrate this.
+
+Finally, lines 35-40 display the contents of the memory leak table that have
+been recorded since the call to @code{__mp_clearleaktable()}.  Three different
+types of display can be generated: allocated memory allocations, freed memory
+allocations and unfreed memory allocations.  They can also be sorted by the
+total number of calls instead of the total number of bytes (@code{MP_LT_COUNTS})
+or in reverse order with the smallest first (@code{MP_LT_BOTTOM}).  The count of
+@samp{0} in the last table indicates that there were a matching number of calls
+to allocate and free memory within @code{function()} but the number of bytes
+freed was less than the number of bytes allocated.  This can only happen if
+the entries were added by @code{__mp_addallocentry()} and
+@code{__mp_addfreeentry()} and is usually an indication that something is wrong
+when making these calls.
+
+The leak table is a useful tool to manipulate when debugging your application
+to check for memory leaks, but it is not as detailed as full memory allocation
+profiling which is controlled by the @option{PROF} option.  It is probably
+better at summarising unfreed allocations than the @option{SHOWUNFREED} option
+but does not show the call stack for each allocation.
+
+@node Tools, Utilities, Leak table, Using mpatrol
 @section Tools
 @cindex tools
 @cindex extensions
