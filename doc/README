@@ -11,6 +11,11 @@ due to differences in the systems that they were generated on.  Note that the
 UNIX manual pages are not considered part of this documentation (although they
 are kept up to date) and are located in a separate directory.
 
+Note that the texinfo.tex file that is currently supplied with the main
+distribution contains a change to make it work with the current version of
+PDFTeX.  The change involved replacing the .pdf image file extension with .png
+and can be found by looking for png in the file itself.
+
 
 The following files are provided with the main distribution and contain all of
 the information necessary to generate each of the preformatted files.
