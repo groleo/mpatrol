@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.69 2001-06-13 23:07:28 graeme Exp $
+# $Id: build,v 1.70 2001-07-25 21:36:32 graeme Exp $
 
 
 version=1.4.5
@@ -40,7 +40,7 @@ make libmpatrolmt.a libmpatrolmt.so.$libversion
 make libmpalloc.a libmpalloc.so.$libversion
 make libmptools.a
 make lint
-make mpatrol mprof mptrace mleak
+make mpatrol mprof mptrace mleak GUISUP=true
 strip mpatrol
 strip mprof
 strip mptrace
