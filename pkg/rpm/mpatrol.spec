@@ -21,10 +21,10 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.5 2000-01-11 00:17:19 graeme Exp $
+# $Id: mpatrol.spec,v 1.6 2000-03-09 21:37:15 graeme Exp $
 
 
-%define version 1.1.0
+%define version 1.1.1
 %define libversion 1.1
 
 

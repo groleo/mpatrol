@@ -24,11 +24,11 @@
 # UNIX shell script to build an RPM package file
 
 
-# $Id: build,v 1.5 2000-01-24 21:20:53 graeme Exp $
+# $Id: build,v 1.6 2000-03-09 21:37:15 graeme Exp $
 
 
 arch=m68k
-version=1.1.0
+version=1.1.1
 base=/usr
 
 

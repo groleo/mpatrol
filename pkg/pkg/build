@@ -24,10 +24,10 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.6 2000-01-30 20:27:03 graeme Exp $
+# $Id: build,v 1.7 2000-03-09 21:37:03 graeme Exp $
 
 
-version=1.1.0
+version=1.1.1
 libversion=1.1
 
 
