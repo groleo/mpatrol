@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.26 2000-06-29 00:49:46 graeme Exp $
+# $Id: Makefile,v 1.27 2000-07-17 21:14:48 graeme Exp $
 
 
 # Definitions
@@ -224,13 +224,19 @@ symbol.o symbol.s.o symbol.n.ln symbol.t.o symbol.s.t.o symbol.t.ln: \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/utils.h \
 	$(SOURCE)/profile.h
-signals.o signals.s.o signals.n.ln signals.t.o signals.s.t.o signals.t.ln: \
-	$(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
-	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
-	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
-	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
-	$(SOURCE)/profile.h
+signals.o signals.s.o signals.n.ln: $(SOURCE)/signals.c $(SOURCE)/signals.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/diag.h \
+	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
+	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/inter.h $(SOURCE)/profile.h
+signals.t.o signals.s.t.o signals.t.ln: $(SOURCE)/signals.c \
+	$(SOURCE)/signals.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/inter.h $(SOURCE)/profile.h \
+	$(SOURCE)/mutex.h
 mutex.t.o mutex.s.t.o mutex.t.ln: $(SOURCE)/mutex.c $(SOURCE)/mutex.h \
 	$(SOURCE)/inter.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

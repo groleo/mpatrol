@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.22 2000-06-15 20:26:58 graeme Exp $
+# $Id: Makefile,v 1.23 2000-07-17 21:14:43 graeme Exp $
 
 
 # Definitions
@@ -140,12 +140,18 @@ symbol.o symbol.t.o: $(SOURCE)/symbol.c $(SOURCE)/symbol.h $(SOURCE)/config.h \
 	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/utils.h \
 	$(SOURCE)/profile.h
-signals.o signals.t.o: $(SOURCE)/signals.c $(SOURCE)/signals.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/diag.h \
-	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
-	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
-	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/inter.h $(SOURCE)/profile.h
+signals.o: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
+	$(SOURCE)/profile.h
+signals.t.o: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
+	$(SOURCE)/profile.h $(SOURCE)/mutex.h
 mutex.t.o: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/inter.h \
 	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \

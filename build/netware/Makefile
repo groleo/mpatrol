@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.21 2000-06-15 20:27:01 graeme Exp $
+# $Id: Makefile,v 1.22 2000-07-17 21:14:46 graeme Exp $
 
 
 # Definitions
@@ -143,12 +143,18 @@ symbol.obj symbol.ts.obj: $(SOURCE)/symbol.c $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
 	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/utils.h $(SOURCE)/profile.h
-signals.obj signals.ts.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/diag.h \
-	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
-	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
-	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/inter.h $(SOURCE)/profile.h
+signals.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
+	$(SOURCE)/profile.h
+signals.ts.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/inter.h \
+	$(SOURCE)/profile.h $(SOURCE)/mutex.h
 mutex.ts.obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/inter.h \
 	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
