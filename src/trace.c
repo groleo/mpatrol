@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.4 2000-11-30 23:09:27 graeme Exp $"
+#ident "$Id: trace.c,v 1.5 2000-12-03 22:09:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,6 +59,7 @@ static FILE *tracefile;
 
 MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
 {
+    t->time = 0;
     t->file = __mp_tracefile(m, NULL);
     t->tracing = 0;
     tracefile = NULL;
@@ -74,8 +75,11 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
     int r;
 
     r = 1;
-    __mp_memcopy(s, (char *) MP_TRACEMAGIC, 4);
-    fwrite(s, sizeof(char), 4, tracefile);
+    if ((t->tracing) && (tracefile != NULL))
+    {
+        __mp_memcopy(s, (char *) MP_TRACEMAGIC, 4);
+        fwrite(s, sizeof(char), 4, tracefile);
+    }
     if ((tracefile == NULL) || (tracefile == stderr) || (tracefile == stdout))
     {
         /* We don't want to close the stderr or stdout file streams so
@@ -88,6 +92,7 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
     else if (fclose(tracefile))
         r = 0;
     tracefile = NULL;
+    t->time = 0;
     t->file = NULL;
     t->tracing = 0;
     return r;
@@ -134,6 +139,7 @@ static int opentracefile(tracehead *t)
 MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 {
     void *b;
+    clock_t c;
     size_t s;
 
     if ((tracefile == NULL) && !opentracefile(t))
@@ -142,12 +148,19 @@ MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
     /* Some of the following values are written as LEB128 numbers.  This is so
      * that the size of the tracing output file can be kept to a minimum.
      */
+    c = clock();
+    if (t->time == 0)
+        b = __mp_encodeuleb128((unsigned long) time(NULL), &s);
+    else
+        b = __mp_encodeuleb128((unsigned long) c - t->time, &s);
+    fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(n, &s);
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128((unsigned long) a, &s);
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(l, &s);
     fwrite(b, s, 1, tracefile);
+    t->time = c;
 }
 
 
@@ -157,6 +170,7 @@ MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 MP_GLOBAL void __mp_tracefree(tracehead *t, unsigned long n)
 {
     void *b;
+    clock_t c;
     size_t s;
 
     if ((tracefile == NULL) && !opentracefile(t))
@@ -165,8 +179,15 @@ MP_GLOBAL void __mp_tracefree(tracehead *t, unsigned long n)
     /* Some of the following values are written as LEB128 numbers.  This is so
      * that the size of the tracing output file can be kept to a minimum.
      */
+    c = clock();
+    if (t->time == 0)
+        b = __mp_encodeuleb128((unsigned long) time(NULL), &s);
+    else
+        b = __mp_encodeuleb128((unsigned long) c - t->time, &s);
+    fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(n, &s);
     fwrite(b, s, 1, tracefile);
+    t->time = c;
 }
 
 

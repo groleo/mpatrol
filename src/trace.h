@@ -33,6 +33,7 @@
 
 #include "config.h"
 #include "memory.h"
+#include <time.h>
 
 
 /* A tracehead contains all the tracing information including the
@@ -41,6 +42,7 @@
 
 typedef struct tracehead
 {
+    clock_t time; /* time interval */
     char *file;   /* tracing filename */
     char tracing; /* tracing status */
 }
