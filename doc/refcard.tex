@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.5 2000-08-31 20:44:14 graeme Exp $
+% $Id: refcard.tex,v 1.6 2000-10-10 19:19:35 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -56,7 +56,7 @@
 \newcommand{\heading}[1]{\textbf{\normalsize #1}}
 \newcommand{\command}[1]{\textbf{#1}}
 \newcommand{\function}[1]{\texttt{#1()}}
-\newcommand{\flag}[1]{\textbf{--#1}}
+\newcommand{\flag}[1]{\textbf{---#1}}
 \newcommand{\flagpar}[2]{\flag{#1} \texttt{<}\textit{#2}\texttt{>}}
 \newcommand{\option}[1]{\texttt{#1}}
 \newcommand{\optionarg}[2]{\option{#1}\texttt{=<#2>}}
@@ -381,87 +381,91 @@ builds.
 
 The commands that are distributed with the mpatrol library all parse their
 command line options in a similar way to the UNIX \function{getopt} function.
-Options that accept numeric arguments can have their value specified in binary,
-octal, decimal or hexadecimal notation.
+Only the long names of the options are shown here.  If an option has a single
+character equivalent it will be listed in the \flag{help} output.  Options that
+accept numeric arguments can have their value specified in binary, octal,
+decimal or hexadecimal notation.
 
 \vskip 12pt
 \heading{mpatrol command options}
 \vskip 6pt
 
 \begin{description}
-\item[\flagpar{1}{unsigned integer}]
-\hfill See \option{SMALLBOUND}.
-\item[\flagpar{2}{unsigned integer}]
-\hfill See \option{MEDIUMBOUND}.
-\item[\flagpar{3}{unsigned integer}]
-\hfill See \option{LARGEBOUND}.
-\item[\flagpar{A}{unsigned integer}]
-\hfill See \option{ALLOCSTOP}.
-\item[\flagpar{a}{unsigned integer}]
+\item[\flagpar{alloc-byte}{unsigned integer}]
 \hfill See \option{ALLOCBYTE}.
-\item[\flagpar{C}{unsigned range}]
+\item[\flagpar{alloc-stop}{unsigned integer}]
+\hfill See \option{ALLOCSTOP}.
+\item[\flag{allow-oflow}]
+\hfill See \option{ALLOWOFLOW}.
+\item[\flagpar{auto-save}{unsigned integer}]
+\hfill See \option{AUTOSAVE}.
+\item[\flagpar{check}{unsigned range}]
 \hfill See \option{CHECK}.
-\item[\flag{c}]
+\item[\flag{check-all}]
 \hfill See \option{CHECKALL}.
-\item[\flagpar{D}{unsigned integer}]
+\item[\flagpar{def-align}{unsigned integer}]
 \hfill See \option{DEFALIGN}.
-\item[\flag{d}]
+\item[\flag{dynamic}]
 Specifies that programs which were not linked with the mpatrol library should
 also be traced, but only if they were dynamically linked.
-\item[\flagpar{e}{string}]
-\hfill See \option{PROGFILE}.
-\item[\flagpar{F}{unsigned integer}]
-\hfill See \option{FREESTOP}.
-\item[\flagpar{f}{unsigned integer}]
-\hfill See \option{FREEBYTE}.
-\item[\flag{G}]
-\hfill See \option{SAFESIGNALS}.
-\item[\flag{g}]
-\hfill See \option{USEDEBUG}.
-\item[\flagpar{L}{unsigned integer}]
-\hfill See \option{LIMIT}.
-\item[\flagpar{l}{string}]
-\hfill See \option{LOGFILE}.
-\item[\flag{M}]
-\hfill See \option{ALLOWOFLOW}.
-\item[\flag{m}]
-\hfill See \option{USEMMAP}.
-\item[\flag{N}]
-\hfill See \option{NOPROTECT}.
-\item[\flagpar{n}{unsigned integer}]
-\hfill See \option{NOFREE}.
-\item[\flagpar{O}{unsigned integer}]
-\hfill See \option{OFLOWSIZE}.
-\item[\flagpar{o}{unsigned integer}]
-\hfill See \option{OFLOWBYTE}.
-\item[\flagpar{P}{string}]
-\hfill See \option{PROFFILE}.
-\item[\flag{p}]
-\hfill See \option{PROF}.
-\item[\flagpar{Q}{unsigned integer}]
-\hfill See \option{AUTOSAVE}.
-\item[\flagpar{R}{unsigned integer}]
-\hfill See \option{REALLOCSTOP}.
-\item[\flag{S}]
-\hfill See \option{SHOWMAP} and \option{SHOWSYMBOLS}.
-\item[\flag{s}]
-\hfill See \option{SHOWFREED} and \option{SHOWUNFREED}.
-\item[\flagpar{U}{unsigned integer}]
-\hfill See \option{UNFREEDABORT}.
-\item[\flag{V}]
-Displays the version number of the \command{mpatrol} command.
-\item[\flag{v}]
-\hfill See \option{PRESERVE}.
-\item[\flag{w}]
-\hfill See \option{OFLOWWATCH}.
-\item[\flag{X}]
-\hfill See \option{PAGEALLOC=UPPER}.
-\item[\flag{x}]
-\hfill See \option{PAGEALLOC=LOWER}.
-\item[\flagpar{Z}{unsigned integer}]
-\hfill See \option{FAILSEED}.
-\item[\flagpar{z}{unsigned integer}]
+\item[\flagpar{fail-freq}{unsigned integer}]
 \hfill See \option{FAILFREQ}.
+\item[\flagpar{fail-seed}{unsigned integer}]
+\hfill See \option{FAILSEED}.
+\item[\flagpar{free-byte}{unsigned integer}]
+\hfill See \option{FREEBYTE}.
+\item[\flagpar{free-stop}{unsigned integer}]
+\hfill See \option{FREESTOP}.
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flagpar{large-bound}{unsigned integer}]
+\hfill See \option{LARGEBOUND}.
+\item[\flagpar{limit}{unsigned integer}]
+\hfill See \option{LIMIT}.
+\item[\flagpar{log-file}{string}]
+\hfill See \option{LOGFILE}.
+\item[\flagpar{medium-bound}{unsigned integer}]
+\hfill See \option{MEDIUMBOUND}.
+\item[\flagpar{no-free}{unsigned integer}]
+\hfill See \option{NOFREE}.
+\item[\flag{no-protect}]
+\hfill See \option{NOPROTECT}.
+\item[\flagpar{oflow-byte}{unsigned integer}]
+\hfill See \option{OFLOWBYTE}.
+\item[\flagpar{oflow-size}{unsigned integer}]
+\hfill See \option{OFLOWSIZE}.
+\item[\flag{oflow-watch}]
+\hfill See \option{OFLOWWATCH}.
+\item[\flag{page-alloc-lower}]
+\hfill See \option{PAGEALLOC=LOWER}.
+\item[\flag{page-alloc-upper}]
+\hfill See \option{PAGEALLOC=UPPER}.
+\item[\flag{preserve}]
+\hfill See \option{PRESERVE}.
+\item[\flag{prof}]
+\hfill See \option{PROF}.
+\item[\flagpar{prof-file}{string}]
+\hfill See \option{PROFFILE}.
+\item[\flagpar{prog-file}{string}]
+\hfill See \option{PROGFILE}.
+\item[\flagpar{realloc-stop}{unsigned integer}]
+\hfill See \option{REALLOCSTOP}.
+\item[\flag{safe-signals}]
+\hfill See \option{SAFESIGNALS}.
+\item[\flag{show-freed}]
+\hfill See \option{SHOWFREED} and \option{SHOWUNFREED}.
+\item[\flag{show-map}]
+\hfill See \option{SHOWMAP} and \option{SHOWSYMBOLS}.
+\item[\flagpar{small-bound}{unsigned integer}]
+\hfill See \option{SMALLBOUND}.
+\item[\flagpar{unfreed-abort}{unsigned integer}]
+\hfill See \option{UNFREEDABORT}.
+\item[\flag{use-debug}]
+\hfill See \option{USEDEBUG}.
+\item[\flag{use-mmap}]
+\hfill See \option{USEMMAP}.
+\item[\flag{version}]
+Displays the version number of the \command{mpatrol} command.
 \end{description}
 
 \vskip 12pt
@@ -469,18 +473,20 @@ Displays the version number of the \command{mpatrol} command.
 \vskip 6pt
 
 \begin{description}
-\item[\flag{a}]
+\item[\flag{addresses}]
 Specifies that different call sites from within the same function are to be
 differentiated and that the names of all functions should be displayed with
 their call site offset in bytes.
-\item[\flag{c}]
+\item[\flag{counts}]
 Specifies that certain tables should be sorted by the number of allocations or
 deallocations rather than the total number of bytes allocated or deallocated.
-\item[\flagpar{n}{depth}]
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flagpar{stack-depth}{depth}]
 Specifies the maximum stack depth to use when calculating if one call site has
 the same call stack as another call site.  This also specifies the maximum
 number of functions to display in a call stack.
-\item[\flag{V}]
+\item[\flag{version}]
 Displays the version number of the \command{mprof} command.
 \end{description}
 
@@ -489,7 +495,12 @@ Displays the version number of the \command{mprof} command.
 \vskip 6pt
 
 \begin{description}
-\item[\flag{V}]
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flag{ignore}]
+Specifies that the list of unfreed allocations in the log file should be
+ignored.
+\item[\flag{version}]
 Displays the version number of the \command{mleak} command.
 \end{description}
 

@@ -8,7 +8,7 @@ NNAAMMEE
        mleak - locates memory leaks in an mpatrol log file
 
 SSYYNNOOPPSSIISS
-       mmlleeaakk [--VV] [_f_i_l_e]
+       mmlleeaakk [_o_p_t_i_o_n_s] [_f_i_l_e]
 
 DDEESSCCRRIIPPTTIIOONN
        The  mmlleeaakk  command  is used to display all unfreed memory
@@ -30,6 +30,12 @@ DDEESSCCRRIIPPTTIIOONN
        resulting  unfreed  allocations  may not be entirely accu-
        rate.
 
+       This command will also read the unfreed allocations  table
+       produced  by the SSHHOOWWUUNNFFRREEEEDD option in the log file if one
+       is present.  The entries in the  table  will  be  compared
+       with  the currently allocated entries and will be added if
+       not already present.
+
        The _f_i_l_e argument must be a valid mpatrol log filename but
        if  _f_i_l_e is omitted then mmlleeaakk will use _m_p_a_t_r_o_l_._l_o_g as the
        name of the log file to use.  The mmlleeaakk command makes  two
@@ -38,12 +44,31 @@ DDEESSCCRRIIPPTTIIOONN
        file stream will be used as the log file.
 
 OOPPTTIIOONNSS
-       --VV     Displays the version number of the mmlleeaakk command.
+       ----hheellpp [--hh]
+              Displays a quick-reference option summary.
+
+       ----iiggnnoorree [--ii]
+              Specifies  that  the list of unfreed allocations in
+              the log file should be ignored.
+
+       ----vveerrssiioonn [--VV]
+              Displays the version number of the mmlleeaakk command.
 
 SSEEEE AALLSSOO
        mmppaattrrooll(1), mmpprrooff(1), mmppaattrrooll(3).
 
        The mpatrol manual and reference card.
+
+
+
+Release 1.3              10 October 2000                        1
+
+
+
+
+
+MLEAK(1)                 mpatrol library                 MLEAK(1)
+
 
        http://www.cbmamiga.demon.co.uk/mpatrol/
 
@@ -53,31 +78,20 @@ AAUUTTHHOORR
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-       This  library  is  free  software; you can redistribute it
-       and/or modify it under the terms of the GNU  Library  Gen-
-       eral  Public  License  as  published  by the Free Software
-       Foundation; either version 2 of the License, or  (at  your
+       This library is free software;  you  can  redistribute  it
+       and/or  modify  it under the terms of the GNU Library Gen-
+       eral Public License as  published  by  the  Free  Software
+       Foundation;  either  version 2 of the License, or (at your
        option) any later version.
 
-
-
-Release 1.3                18 July 2000                         1
-
-
-
-
-
-MLEAK(1)                 mpatrol library                 MLEAK(1)
-
-
-       This  library  is  distributed in the hope that it will be
+       This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
-       PURPOSE.  See the GNU Library General Public  License  for
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the GNU Library General Public License for
        more details.
 
        You should have received a copy of the GNU Library General
-       Public License along with this library; if not,  write  to
+       Public  License  along with this library; if not, write to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
@@ -113,20 +127,6 @@ MLEAK(1)                 mpatrol library                 MLEAK(1)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.3                18 July 2000                         2
+Release 1.3              10 October 2000                        2
 
 
