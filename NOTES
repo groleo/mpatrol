@@ -86,6 +86,16 @@ Notes for all platforms
     number information to the call stack, but could also be used to extend the
     library to monitor static and stack variables.
 
+  * There is a potential problem in the splitnode() function if no more system
+    memory is available.  The function will return without a problem, but the
+    free node that was being split may be lost forever...
+
+  * Add a SHOWFREE option to display a list of all free memory blocks at program
+    termination for debugging purposes to view memory fragmentation.  If that
+    option is added then perhaps SHOWALL should only be equivalent to SHOWFREE,
+    SHOWFREED and SHOWUNFREED, and SHOWMAP and SHOWSYMBOLS should be explicitly
+    given.
+
   * Add versions of mallopt(), mallinfo(), memorymap() and mallocctl() which
     are provided in many other malloc libraries.  These won't necessarily behave
     in exactly the same way as existing implementations, but at least there
@@ -100,6 +110,10 @@ Notes for all platforms
     from the UNIX manual pages as well as a set of tutorials and examples
     illustrating how best to use mpatrol.  TeXinfo documentation can be
     converted to wide variety of documentation formats.
+
+  * Perhaps use a configure script to automatically work out values for config.h
+    on the platform it is being built on, and provide locations for installing
+    files.
 
 
 Notes for UNIX platforms
