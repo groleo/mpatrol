@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.14 2001-02-14 00:24:01 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.15 2001-02-15 22:32:45 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "14 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "15 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -125,15 +125,17 @@ unsigned long __mp_snapshot(void);
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
-.if n \{void (*__mp_prologue(void (*func)(const void *, size_t)))
-     (const void *, size_t);
+.if n \{void (*__mp_prologue(void (*func)(const void *, size_t,
+                                  const void *)))
+     (const void *, size_t, const void *);
 \}
-.if t \{void (*__mp_prologue(void (*func)(const void *, size_t)))(const void *, size_t);
+.if t \{void (*__mp_prologue(void (*func)(const void *, size_t, const void *)))(const void *, size_t, const void *);
 \}
-.if n \{void (*__mp_epilogue(void (*func)(const void *)))
-     (const void *);
+.if n \{void (*__mp_epilogue(void (*func)(const void *,
+                                  const void *)))
+     (const void *, const void *);
 \}
-.if t \{void (*__mp_epilogue(void (*func)(const void *)))(const void *);
+.if t \{void (*__mp_epilogue(void (*func)(const void *, const void *)))(const void *, const void *);
 \}
 void (*__mp_nomemory(void (*func)(void)))(void);
 int __mp_printf(const char *fmt, ...);
@@ -803,7 +805,9 @@ Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
 function had been previously installed.  The following arguments will be used
-to call the prologue function:
+to call the prologue function (including a third argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 
 .TS
 c c l.
@@ -820,7 +824,9 @@ Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
 function had been previously installed.  The following arguments will be used
-to call the epilogue function:
+to call the epilogue function (including a second argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 
 .TS
 c l.

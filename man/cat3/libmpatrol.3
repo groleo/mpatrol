@@ -61,7 +61,7 @@ SSYYNNOOPPSSIISS
 
 
 
-Release 1.4              14 February 2001                       1
+Release 1.4              15 February 2001                       1
 
 
 
@@ -90,10 +90,12 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        void __mp_memorymap(int stats);
        void __mp_summary(void);
        void __mp_check(void);
-       void (*__mp_prologue(void (*func)(const void *, size_t)))
-            (const void *, size_t);
-       void (*__mp_epilogue(void (*func)(const void *)))
-            (const void *);
+       void (*__mp_prologue(void (*func)(const void *, size_t,
+                                         const void *)))
+            (const void *, size_t, const void *);
+       void (*__mp_epilogue(void (*func)(const void *,
+                                         const void *)))
+            (const void *, const void *);
        void (*__mp_nomemory(void (*func)(void)))(void);
        int __mp_printf(const char *fmt, ...);
        int __mp_vprintf(const char *fmt, va_list args);
@@ -122,12 +124,10 @@ DDEESSCCRRIIPPTTIIOONN
        function.  If NNDDEEBBUUGG is defined then no macro redefinition
        of  functions  will  take  place  and  all special mpatrol
        library functions will evaluate to empty statements.   The
-       _m_p_a_l_l_o_c_._h  header file will also be included in this case.
-       It is intended  that  the  NNDDEEBBUUGG  preprocessor  macro  be
 
 
 
-Release 1.4              14 February 2001                       2
+Release 1.4              15 February 2001                       2
 
 
 
@@ -136,6 +136,8 @@ Release 1.4              14 February 2001                       2
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       _m_p_a_l_l_o_c_._h  header file will also be included in this case.
+       It is intended  that  the  NNDDEEBBUUGG  preprocessor  macro  be
        defined in release builds.
 
        The  MMPP__MMAALLLLOOCC  family  of  functions  that are defined in
@@ -188,12 +190,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        duced it.  Memory allocation tracing  is  also  supported,
        where  a trace of all memory allocations and deallocations
        can be written to a  tracing  output  file  in  a  concise
-       encoded  format  for  later processing by the mmppttrraaccee com-
-       mand.  This is controlled with the TTRRAACCEE option.
 
 
 
-Release 1.4              14 February 2001                       3
+Release 1.4              15 February 2001                       3
 
 
 
@@ -201,6 +201,9 @@ Release 1.4              14 February 2001                       3
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+       encoded  format  for  later processing by the mmppttrraaccee com-
+       mand.  This is controlled with the TTRRAACCEE option.
 
 FFUUNNCCTTIIOONNSS
        The following 19 functions are available  as  replacements
@@ -253,13 +256,10 @@ FFUUNNCCTTIIOONNSS
               pointer will be returned and eerrrrnnoo will be  set  to
               EENNOOMMEEMM.   The  allocated memory must be deallocated
               with ffrreeee or reallocated with rreeaalllloocc, although the
-              latter  will  not  guarantee  the  preservation  of
-              alignment.
 
 
 
-
-Release 1.4              14 February 2001                       4
+Release 1.4              15 February 2001                       4
 
 
 
@@ -267,6 +267,9 @@ Release 1.4              14 February 2001                       4
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              latter  will  not  guarantee  the  preservation  of
+              alignment.
 
        vvaalllloocc Allocates _s_i_z_e uninitialised bytes  from  the  heap
               and  returns  a  pointer  to  the first byte of the
@@ -319,13 +322,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               wards  compatibility  with  older C source code and
               should not be used in new code.
 
-       ssttrrdduupp Allocates exactly enough memory from  the  heap  to
-              duplicate  _s_t_r (including the terminating nul char-
-              acter) and returns a pointer to the first  byte  of
 
 
 
-Release 1.4              14 February 2001                       5
+Release 1.4              15 February 2001                       5
 
 
 
@@ -334,6 +334,9 @@ Release 1.4              14 February 2001                       5
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       ssttrrdduupp Allocates exactly enough memory from  the  heap  to
+              duplicate  _s_t_r (including the terminating nul char-
+              acter) and returns a pointer to the first  byte  of
               the allocation after copying _s_t_r to the newly-allo-
               cated memory.  The pointer returned  will  have  no
               alignment  constraints  and  can  be  used to store
@@ -385,13 +388,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        ssttrrnnssaavvee
               Allocates exactly enough memory from  the  heap  to
-              duplicate  _s_t_r (including the terminating nul char-
-              acter) and returns a pointer to the first  byte  of
-              the  allocation  after  copying  _s_t_r  to the newly-
 
 
 
-Release 1.4              14 February 2001                       6
+Release 1.4              15 February 2001                       6
 
 
 
@@ -400,8 +400,11 @@ Release 1.4              14 February 2001                       6
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              allocated memory.  The pointer returned  will  have
-              no  alignment  constraints and can be used to store
+              duplicate  _s_t_r (including the terminating nul char-
+              acter) and returns a pointer to the first  byte  of
+              the allocation after copying _s_t_r to the newly-allo-
+              cated memory.  The pointer returned  will  have  no
+              alignment  constraints  and  can  be  used to store
               character data up to the length of _s_t_r.  If _s_t_r  is
               NNUULLLL  and  _s_i_z_e  is  non-zero then an error will be
               given and the null pointer will  be  returned.   If
@@ -451,13 +454,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               store character data up to the length of  _s_t_r.   If
               _s_t_r is NNUULLLL and _s_i_z_e is non-zero then an error will
               be given and the null pointer will be returned.  If
-              the  length  of  _s_t_r is greater than _s_i_z_e then only
-              _s_i_z_e characters will be allocated and copied,  with
-              one  additional  byte  for  the  nul character.  If
 
 
 
-Release 1.4              14 February 2001                       7
+Release 1.4              15 February 2001                       7
 
 
 
@@ -466,6 +466,9 @@ Release 1.4              14 February 2001                       7
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              the  length  of  _s_t_r is greater than _s_i_z_e then only
+              _s_i_z_e characters will be allocated and copied,  with
+              one  additional  byte  for  the  nul character.  If
               there is not enough space in the heap then the pro-
               gram  will  be terminated and the _O_U_T_M_E_M error will
               be given.  The ssttrrnndduuppaa function normally allocates
@@ -517,13 +520,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               space will be filled with uninitialised bytes.   If
               there is not enough space in the heap then the null
               pointer will be returned, the  original  allocation
-              will be freed and eerrrrnnoo will be set to EENNOOMMEEMM.  The
-              allocated memory must be deallocated with ffrreeee  and
-              can   be  reallocated  again  with  rreeaalllloocc.   This
 
 
 
-Release 1.4              14 February 2001                       8
+Release 1.4              15 February 2001                       8
 
 
 
@@ -532,9 +532,12 @@ Release 1.4              14 February 2001                       8
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              function is available for  backwards  compatibility
-              with  older  C  libraries and should not be used in
-              new code.
+              will be freed and eerrrrnnoo will be set to EENNOOMMEEMM.  The
+              allocated memory must be deallocated with ffrreeee  and
+              can  be reallocated again with rreeaalllloocc.  This func-
+              tion is available for backwards compatibility  with
+              older  C  libraries  and  should not be used in new
+              code.
 
        rreeccaalllloocc
               Resizes the memory allocation beginning at  _p_t_r  to
@@ -584,12 +587,9 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               freed.   All  of  the  previous  contents  will  be
               destroyed.
 
-       ccffrreeee  Frees the memory allocation beginning at _p_t_r so the
-              memory can be reused by another  call  to  allocate
 
 
-
-Release 1.4              14 February 2001                       9
+Release 1.4              15 February 2001                       9
 
 
 
@@ -598,6 +598,8 @@ Release 1.4              14 February 2001                       9
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       ccffrreeee  Frees the memory allocation beginning at _p_t_r so the
+              memory can be reused by another  call  to  allocate
               memory.   If  _p_t_r  is  NNUULLLL  then no memory will be
               freed.   All  of  the  previous  contents  will  be
               destroyed.   The  _n_e_l_e_m  and  _s_i_z_e  parameters  are
@@ -650,12 +652,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               and can be used to store data of up to _n_e_l_e_m _* _s_i_z_e
               bytes in length.  If _n_e_l_e_m _* _s_i_z_e  is  _0  then  the
               amount  of  memory  allocated  will  be  implicitly
-              rounded up to _1 byte.  If there is not enough space
-              in the heap then the program will be terminated and
 
 
 
-Release 1.4              14 February 2001                      10
+Release 1.4              15 February 2001                      10
 
 
 
@@ -664,6 +664,8 @@ Release 1.4              14 February 2001                      10
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              rounded up to _1 byte.  If there is not enough space
+              in the heap then the program will be terminated and
               the _O_U_T_M_E_M error will be given.  The allocated mem-
               ory  must  be deallocated with xxffrreeee or reallocated
               with xxrreeaalllloocc.
@@ -716,12 +718,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        level  information.   If  this  causes  problems  then you
        should define the MMPP__NNOONNEEWWDDEELLEETTEE  preprocessor  macro  and
        use   the  MMPP__NNEEWW,  MMPP__NNEEWW__NNOOTTHHRROOWW  and  MMPP__DDEELLEETTEE  macros
-       instead of nneeww and ddeelleettee directly.  To use these C++ fea-
-       tures  you  must include _m_p_a_t_r_o_l_._h before all other header
 
 
 
-Release 1.4              14 February 2001                      11
+Release 1.4              15 February 2001                      11
 
 
 
@@ -730,6 +730,8 @@ Release 1.4              14 February 2001                      11
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       instead of nneeww and ddeelleettee directly.  To use these C++ fea-
+       tures  you  must include _m_p_a_t_r_o_l_._h before all other header
        files, although on UNIX and Windows platforms (and AmigaOS
        when  using  ggcccc)  they  will  be used anyway, albeit with
        slightly less tracing information:
@@ -782,12 +784,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        sseett__nneeww__hhaannddlleerr
               Installs a low-memory handler specifically for  use
-              with  ooppeerraattoorr nneeww and ooppeerraattoorr nneeww[[]] and returns a
-              pointer to the previously installed handler, or the
 
 
 
-Release 1.4              14 February 2001                      12
+Release 1.4              15 February 2001                      12
 
 
 
@@ -796,6 +796,8 @@ Release 1.4              14 February 2001                      12
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              with  ooppeerraattoorr nneeww and ooppeerraattoorr nneeww[[]] and returns a
+              pointer to the previously installed handler, or the
               null  pointer  if  no  handler  had been previously
               installed.  This will be called repeatedly by  both
               functions when they would normally return NNUULLLL, and
@@ -848,12 +850,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               _d_e_s_t.  If _s_i_z_e is 00 or _s_r_c is the same as _d_e_s_t then
               no bytes will be copied.  The source  and  destina-
               tion ranges should not overlap, otherwise a warning
-              will be written to the log file.  If the  operation
-              would  affect  an existing memory allocation in the
 
 
 
-Release 1.4              14 February 2001                      13
+Release 1.4              15 February 2001                      13
 
 
 
@@ -862,6 +862,8 @@ Release 1.4              14 February 2001                      13
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              will be written to the log file.  If the  operation
+              would  affect  an existing memory allocation in the
               heap but would straddle  that  allocation's  bound-
               aries  then  an  error message will be generated in
               the log file and no bytes will be copied.
@@ -914,12 +916,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               affect an existing memory allocation  in  the  heap
               but  would  straddle  that  allocation's boundaries
               then an error message will be generated in the  log
-              file and no bytes will be searched.
 
 
 
-
-Release 1.4              14 February 2001                      14
+Release 1.4              15 February 2001                      14
 
 
 
@@ -927,6 +927,8 @@ Release 1.4              14 February 2001                      14
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              file and no bytes will be searched.
 
        mmeemmmmeemm Searches  up  to  _s_i_z_e_1 bytes in _p_t_r_1 for the first
               occurrence of _p_t_r_2 (which is exactly _s_i_z_e_2 bytes in
@@ -980,12 +982,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        ____mmpp__sseettuusseerr
               Sets  the  user data for the memory allocation con-
               taining _p_t_r.  The contents  of  _d_a_t_a  are  entirely
-              application-specific  as  user  data  will never be
-              examined by the  mpatrol  library.   Such  data  is
 
 
 
-Release 1.4              14 February 2001                      15
+Release 1.4              15 February 2001                      15
 
 
 
@@ -994,6 +994,8 @@ Release 1.4              14 February 2001                      15
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              application-specific  as  user  data  will never be
+              examined by the  mpatrol  library.   Such  data  is
               associated  with a memory allocation for its entire
               lifetime unless overridden by a subsequent call  to
               ____mmpp__sseettuusseerr.  As such, the user data must be valid
@@ -1045,13 +1047,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               ffiillee     Filename corresponding to address.
               lliinnee     Line number corresponding to address.
 
-       ____mmpp__pprriinnttiinnffoo
-              Displays  information about a specific memory allo-
-              cation containing _p_t_r to the  standard  error  file
 
 
 
-Release 1.4              14 February 2001                      16
+
+Release 1.4              15 February 2001                      16
 
 
 
@@ -1060,6 +1060,9 @@ Release 1.4              14 February 2001                      16
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       ____mmpp__pprriinnttiinnffoo
+              Displays  information about a specific memory allo-
+              cation containing _p_t_r to the  standard  error  file
               stream.   If  _p_t_r  does  not belong to a previously
               allocated  memory  allocation  then   _0   will   be
               returned, otherwise _1 will be returned.  This func-
@@ -1111,13 +1114,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        ____mmpp__pprroolloogguuee
               Installs a prologue function to  be  called  before
               any memory allocation, reallocation or deallocation
-              function.  This function will return a  pointer  to
-              the  previously installed prologue function, or the
-              null pointer  if  no  prologue  function  had  been
 
 
 
-Release 1.4              14 February 2001                      17
+Release 1.4              15 February 2001                      17
 
 
 
@@ -1126,8 +1126,14 @@ Release 1.4              14 February 2001                      17
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              previously installed.  The following arguments will
-              be used to call the prologue function:
+              function.  This function will return a  pointer  to
+              the  previously installed prologue function, or the
+              null pointer if no prologue function had been  pre-
+              viously installed.  The following arguments will be
+              used to call the  prologue  function  (including  a
+              third argument containing the return address of the
+              calling function, or the null pointer if it  cannot
+              be determined):
 
               AArrgguummeenntt 11   AArrgguummeenntt 22   CCaalllleedd bbyy
 
@@ -1137,13 +1143,16 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
                  _p_t_r           _-_2       ssttrrdduupp, etc.
 
        ____mmpp__eeppiilloogguuee
-              Installs an epilogue function to  be  called  after
+              Installs  an  epilogue  function to be called after
               any memory allocation, reallocation or deallocation
-              function.  This function will return a  pointer  to
-              the  previously installed epilogue function, or the
-              null pointer if no epilogue function had been  pre-
+              function.   This  function will return a pointer to
+              the previously installed epilogue function, or  the
+              null  pointer if no epilogue function had been pre-
               viously installed.  The following arguments will be
-              used to call the epilogue function:
+              used  to  call  the  epilogue function (including a
+              second argument containing the  return  address  of
+              the  calling  function,  or  the null pointer if it
+              cannot be determined):
 
               AArrgguummeenntt   CCaalllleedd bbyy
 
@@ -1171,6 +1180,18 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        ____mmpp__vvpprriinnttff
               Writes  format  string  _f_m_t  with variable argument
+
+
+
+Release 1.4              15 February 2001                      18
+
+
+
+
+
+LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
+
+
               list _a_r_g_s to the log file, with each line  prefixed
               by _>.  The final length of the string that is writ-
               ten to the log file must not  exceed  1024  charac-
@@ -1180,18 +1201,6 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        ____mmpp__llooggmmeemmoorryy
               Displays the contents of a block of  memory  begin-
               ning  at _p_t_r, dumping _s_i_z_e consecutive bytes to the
-
-
-
-Release 1.4              14 February 2001                      18
-
-
-
-
-
-LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
-
-
               log file in hexadecimal format.
 
        ____mmpp__llooggssttaacckk
@@ -1237,19 +1246,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               was  an  error, or _0 if neither of the options were
               set or if there is no support for this feature.
 
-LLIINNKKIINNGG
-       In order to use the mpatrol library on UNIX platforms, the
-       following  libraries  must  be  linked in before any other
-       library that defines dynamic memory  allocation  functions
-       with the same names:
-
-       LLiibbrraarryy            RReeaassoonn
 
 
 
-
-
-Release 1.4              14 February 2001                      19
+Release 1.4              15 February 2001                      19
 
 
 
@@ -1257,6 +1257,14 @@ Release 1.4              14 February 2001                      19
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+LLIINNKKIINNGG
+       In order to use the mpatrol library on UNIX platforms, the
+       following  libraries  must  be  linked in before any other
+       library that defines dynamic memory  allocation  functions
+       with the same names:
+
+       LLiibbrraarryy            RReeaassoonn
 
        _-_l_m_p_a_t_r_o_l          To use this library.
        _-_l_m_p_a_t_r_o_l_m_t        To use the thread-safe mpatrol library.
@@ -1304,18 +1312,10 @@ EENNVVIIRROONNMMEENNTT
        Note that option keywords can be  given  in  lowercase  as
        well as uppercase, or a mixture of both.
 
-       AALLLLOOCCBBYYTTEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  an 8-bit byte pattern with which to pre-
-              fill newly-allocated memory.  This can be  used  to
-              detect  the  use  of memory which has not been ini-
-              tialised after allocation.  Note that this  setting
-              will  not  affect  memory  allocated with ccaalllloocc or
-              rreeccaalllloocc as these functions  always  prefill  allo-
-              cated  memory  with  an 8-bit byte pattern of zero.
 
 
 
-Release 1.4              14 February 2001                      20
+Release 1.4              15 February 2001                      20
 
 
 
@@ -1324,6 +1324,14 @@ Release 1.4              14 February 2001                      20
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       AALLLLOOCCBBYYTTEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies  an 8-bit byte pattern with which to pre-
+              fill newly-allocated memory.  This can be  used  to
+              detect  the  use  of memory which has not been ini-
+              tialised after allocation.  Note that this  setting
+              will  not  affect  memory  allocated with ccaalllloocc or
+              rreeccaalllloocc as these functions  always  prefill  allo-
+              cated  memory  with  an 8-bit byte pattern of zero.
               Default value: AALLLLOOCCBBYYTTEE=_0_x_F_F.
 
        AALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
@@ -1370,18 +1378,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               be  assumed  to be _0 and _i_n_f_i_n_i_t_y respectively.  If
               the event checking frequency is omitted then it  is
               assumed to be _1.  A value of _0 on its own indicates
-              that no such checking will ever be performed.  This
-              option  can be used to speed up the execution speed
-              of the library at the expense of checking.  Default
-              value: CCHHEECCKK=_0.
-
-       CCHHEECCKKAALLLL
-              Equivalent   to   the  CCHHEECCKKAALLLLOOCCSS,  CCHHEECCKKRREEAALLLLOOCCSS,
-              CCHHEECCKKFFRREEEESS  and   CCHHEECCKKMMEEMMOORRYY   options   specified
 
 
 
-Release 1.4              14 February 2001                      21
+Release 1.4              15 February 2001                      21
 
 
 
@@ -1390,6 +1390,14 @@ Release 1.4              14 February 2001                      21
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              that no such checking will ever be performed.  This
+              option  can be used to speed up the execution speed
+              of the library at the expense of checking.  Default
+              value: CCHHEECCKK=_0.
+
+       CCHHEECCKKAALLLL
+              Equivalent   to   the  CCHHEECCKKAALLLLOOCCSS,  CCHHEECCKKRREEAALLLLOOCCSS,
+              CCHHEECCKKFFRREEEESS  and   CCHHEECCKKMMEEMMOORRYY   options   specified
               together.
 
        CCHHEECCKKAALLLLOOCCSS
@@ -1436,18 +1444,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               _1_0 will mean that roughly 1 in  10  memory  alloca-
               tions  will fail, but a value of _0 will disable all
               random failures.  This option  can  be  useful  for
-              stress-testing   an  application.   Default  value:
-              FFAAIILLFFRREEQQ=_0.
-
-       FFAAIILLSSEEEEDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies the random number seed which will be used
-              when determining which memory allocations will ran-
-              domly fail.  A value of _0 will instruct the library
-              to  pick  a  random seed every time it is run.  Any
 
 
 
-Release 1.4              14 February 2001                      22
+Release 1.4              15 February 2001                      22
 
 
 
@@ -1456,6 +1456,14 @@ Release 1.4              14 February 2001                      22
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              stress-testing   an  application.   Default  value:
+              FFAAIILLFFRREEQQ=_0.
+
+       FFAAIILLSSEEEEDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies the random number seed which will be used
+              when determining which memory allocations will ran-
+              domly fail.  A value of _0 will instruct the library
+              to  pick  a  random seed every time it is run.  Any
               other value will mean that the random failures will
               be the same every time the program is run, but only
               as long as the seed stays the same.  Default value:
@@ -1502,18 +1510,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               the  library  itself will not be counted as part of
               the total heap size, but on some systems there  may
               be  a small amount of memory required to initialise
-              the library itself.  Note that this setting will be
-              ignored  if  its  value  is  zero.   Default value:
-              LLIIMMIITT=_0.
-
-       LLIISSTT   Specifies that a context listing  should  be  shown
-              for  any  relevant source files that are associated
-              with any warnings or errors when they occur.   Only
-              diagnostics  which  occur  at  source  lines in the
 
 
 
-Release 1.4              14 February 2001                      23
+Release 1.4              15 February 2001                      23
 
 
 
@@ -1522,10 +1522,18 @@ Release 1.4              14 February 2001                      23
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
-              program will be affected and only then if they con-
-              tain source-level information.  This option is cur-
-              rently only available on UNIX platforms as it makes
-              use  of  the mmppeeddiitt command.  It also overrides the
+              the library itself.  Note that this setting will be
+              ignored  if  its  value  is  zero.   Default value:
+              LLIIMMIITT=_0.
+
+       LLIISSTT   Specifies that a context listing  should  be  shown
+              for  any  relevant source files that are associated
+              with any warnings or errors when they occur.   Only
+              diagnostics which occur at source lines in the pro-
+              gram will be affected and only then if they contain
+              source-level information.  This option is currently
+              only available on UNIX platforms as it makes use of
+              the   mmppeeddiitt   command.    It  also  overrides  the
               behaviour  of  the  EEDDIITT  option  and  affects  the
               behaviour of the ____mmpp__vviieeww function.
 
@@ -1568,18 +1576,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               and  mmeemmccppyy.   Note that any memory operations made
               internally by the library will not be logged.
 
-       LLOOGGRREEAALLLLOOCCSS
-              Specifies that all memory reallocations are  to  be
-              logged  and  sent  to  the log file.  Note that any
-              memory reallocations made internally by the library
-              will not be logged.
-
-       MMEEDDIIUUMMBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  the  limit  in  bytes up to which memory
 
 
 
-Release 1.4              14 February 2001                      24
+Release 1.4              15 February 2001                      24
 
 
 
@@ -1588,6 +1588,14 @@ Release 1.4              14 February 2001                      24
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       LLOOGGRREEAALLLLOOCCSS
+              Specifies that all memory reallocations are  to  be
+              logged  and  sent  to  the log file.  Note that any
+              memory reallocations made internally by the library
+              will not be logged.
+
+       MMEEDDIIUUMMBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies  the  limit  in  bytes up to which memory
               allocations should be classified as medium  alloca-
               tions  for  profiling purposes.  This limit must be
               greater than the small  bound  but  less  than  the
@@ -1634,18 +1642,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               rounded  up  to  the  nearest power of two if it is
               not).  This is used internally to ensure that noth-
               ing  has  been  written beyond the beginning or the
-              end of a block of allocated memory.  Note that this
-              setting  specifies  the  size  for  only one of the
-              overflow buffers given to each  memory  allocation;
-              the  other  overflow  buffer will have an identical
-              size.  No overflow buffers will  be  used  if  this
-              setting is zero.  Default value: OOFFLLOOWWSSIIZZEE=_0.
 
 
 
-
-
-Release 1.4              14 February 2001                      25
+Release 1.4              15 February 2001                      25
 
 
 
@@ -1653,6 +1653,13 @@ Release 1.4              14 February 2001                      25
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+              end of a block of allocated memory.  Note that this
+              setting  specifies  the  size  for  only one of the
+              overflow buffers given to each  memory  allocation;
+              the  other  overflow  buffer will have an identical
+              size.  No overflow buffers will  be  used  if  this
+              setting is zero.  Default value: OOFFLLOOWWSSIIZZEE=_0.
 
        OOFFLLOOWWWWAATTCCHH
               Specifies that watch point areas should be used for
@@ -1701,17 +1708,10 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
               while  opening  the  profiling output file then the
               profiling information will not be output.   Default
               value:  PPRROOFFFFIILLEE=_m_p_a_t_r_o_l_._o_u_t  or PPRROOFFFFIILLEE=_%_n_._%_p_._o_u_t
-              if the PPRROOFFDDIIRR environment variable is set.
-
-       PPRROOGGFFIILLEE=_s_t_r_i_n_g
-              Specifies an alternative  filename  with  which  to
-              locate the executable file containing the program's
-              symbols.  On most systems, the library  will  auto-
-              matically  be  able to determine this filename, but
 
 
 
-Release 1.4              14 February 2001                      26
+Release 1.4              15 February 2001                      26
 
 
 
@@ -1720,6 +1720,13 @@ Release 1.4              14 February 2001                      26
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              if the PPRROOFFDDIIRR environment variable is set.
+
+       PPRROOGGFFIILLEE=_s_t_r_i_n_g
+              Specifies an alternative  filename  with  which  to
+              locate the executable file containing the program's
+              symbols.  On most systems, the library  will  auto-
+              matically  be  able to determine this filename, but
               on a few systems this option may have  to  be  used
               before any or all symbols can be read.
 
@@ -1766,18 +1773,11 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        SSHHOOWWMMAAPP
               Specifies that a memory  map  of  the  entire  heap
-              should  be  displayed  at the end of program execu-
-              tion.  This step will not be performed if an abnor-
-              mal termination occurs or if the heap is empty.
-
-       SSHHOOWWSSYYMMBBOOLLSS
-              Specifies  that  a  summary  of all of the function
-              symbols read from  the  program's  executable  file
               should   be   displayed   at  the  end  of  program
 
 
 
-Release 1.4              14 February 2001                      27
+Release 1.4              15 February 2001                      27
 
 
 
@@ -1787,63 +1787,63 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
               execution.  This step will not be performed  if  an
-              abnormal  termination occurs or if no symbols could
-              be read from the executable file.
+              abnormal  termination  occurs  or  if  the  heap is
+              empty.
+
+       SSHHOOWWSSYYMMBBOOLLSS
+              Specifies that a summary of  all  of  the  function
+              symbols  read  from  the  program's executable file
+              should be displayed at the end  of  program  execu-
+              tion.  This step will not be performed if an abnor-
+              mal termination occurs or if no  symbols  could  be
+              read from the executable file.
 
        SSHHOOWWUUNNFFRREEEEDD
               Specifies that a summary of all of the unfreed mem-
-              ory  allocations  should be displayed at the end of
+              ory allocations should be displayed at the  end  of
               program execution.  This step will not be performed
-              if  an  abnormal termination occurs or if there are
+              if an abnormal termination occurs or if  there  are
               no unfreed allocations.
 
        SSMMAALLLLBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies the limit in bytes  up  to  which  memory
-              allocations  should  be classified as small alloca-
-              tions for profiling purposes.  This limit  must  be
-              greater  than  zero  but  less  than the medium and
+              Specifies  the  limit  in  bytes up to which memory
+              allocations should be classified as  small  alloca-
+              tions  for  profiling purposes.  This limit must be
+              greater than zero but  less  than  the  medium  and
               large bounds.  Default value: SSMMAALLLLBBOOUUNNDD=_3_2.
 
        TTRRAACCEE  Specifies that all memory allocations and dealloca-
               tions are to be traced and sent to the tracing out-
-              put file.  Memory reallocations are  treated  as  a
-              memory  deallocation immediately followed by a mem-
+              put  file.   Memory  reallocations are treated as a
+              memory deallocation immediately followed by a  mem-
               ory allocation.
 
        TTRRAACCEEFFIILLEE=_s_t_r_i_n_g
               Specifies an alternative file in which to place all
               memory allocation tracing information from the mpa-
               trol library.  If the TTRRAACCEEDDIIRR environment variable
-              is  set  and  the specified file does not contain a
-              path component in its  filename  then  the  tracing
+              is set and the specified file does  not  contain  a
+              path  component  in  its  filename then the tracing
               output file will be located in the directory speci-
-              fied in TTRRAACCEEDDIIRR.  A filename of _s_t_d_e_r_r  will  send
-              this  information  to  the ssttddeerrrr file stream and a
-              filename of _s_t_d_o_u_t will do the equivalent with  the
-              ssttddoouutt  file stream.  Note that if a problem occurs
-              while opening the  tracing  output  file  then  the
-              tracing  information  will  not be output.  Default
-              value:    TTRRAACCEEFFIILLEE=_m_p_a_t_r_o_l_._t_r_a_c_e     or     TTRRAACCEE--
-              FFIILLEE=_%_n_._%_p_._t_r_a_c_e  if the TTRRAACCEEDDIIRR environment vari-
+              fied  in  TTRRAACCEEDDIIRR.  A filename of _s_t_d_e_r_r will send
+              this information to the ssttddeerrrr file  stream  and  a
+              filename  of _s_t_d_o_u_t will do the equivalent with the
+              ssttddoouutt file stream.  Note that if a problem  occurs
+              while  opening  the  tracing  output  file then the
+              tracing information will not  be  output.   Default
+              value:     TTRRAACCEEFFIILLEE=_m_p_a_t_r_o_l_._t_r_a_c_e     or    TTRRAACCEE--
+              FFIILLEE=_%_n_._%_p_._t_r_a_c_e if the TTRRAACCEEDDIIRR environment  vari-
               able is set.
 
        UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies the minimum number of unfreed allocations
-              at  which  to abort the program just before program
+              at which to abort the program just  before  program
               termination.  A summary of all the allocations will
-              be  displayed  on  the  standard  error file stream
-              before aborting.  This option may be handy for  use
-              in  batch  tests  as  it can force tests to fail if
-              they do not free up  a  minimum  number  of  memory
-              allocations.    Note  that  this  setting  will  be
-              ignored if  its  value  is  zero.   Default  value:
-              UUNNFFRREEEEDDAABBOORRTT=_0.
+              be displayed on  the  standard  error  file  stream
 
 
 
-
-
-Release 1.4              14 February 2001                      28
+Release 1.4              15 February 2001                      28
 
 
 
@@ -1852,32 +1852,39 @@ Release 1.4              14 February 2001                      28
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+              before  aborting.  This option may be handy for use
+              in batch tests as it can force  tests  to  fail  if
+              they  do  not  free  up  a minimum number of memory
+              allocations.   Note  that  this  setting  will   be
+              ignored  if  its  value  is  zero.   Default value:
+              UUNNFFRREEEEDDAABBOORRTT=_0.
+
        UUSSEEDDEEBBUUGG
-              Specifies  that  any  debugging  information in the
+              Specifies that any  debugging  information  in  the
               executable file should be used to obtain additional
-              source-level  information.   This  option will only
-              have an effect if the executable  file  contains  a
-              compiler-generated  line  number  table and will be
+              source-level information.  This  option  will  only
+              have  an  effect  if the executable file contains a
+              compiler-generated line number table  and  will  be
               ignored if the mpatrol library was built to support
               an object file access library that cannot read line
               tables from object files.
 
        UUSSEEMMMMAAPP
-              Specifies that the library should use mmmmaapp  instead
-              of  ssbbrrkk to allocate user memory on UNIX platforms.
-              This option should be used if  there  are  problems
-              when  using the mpatrol library in combination with
-              another malloc library which uses ssbbrrkk to  allocate
+              Specifies  that the library should use mmmmaapp instead
+              of ssbbrrkk to allocate user memory on UNIX  platforms.
+              This  option  should  be used if there are problems
+              when using the mpatrol library in combination  with
+              another  malloc library which uses ssbbrrkk to allocate
               its memory.  Memory internal to the mpatrol library
-              is allocated with mmmmaapp on systems where it is  sup-
-              ported  in  order to segregate it from user memory,
-              and this behaviour is  reversed  with  the  UUSSEEMMMMAAPP
-              option.   It is ignored on systems that do not sup-
+              is  allocated with mmmmaapp on systems where it is sup-
+              ported in order to segregate it from  user  memory,
+              and  this  behaviour  is  reversed with the UUSSEEMMMMAAPP
+              option.  It is ignored on systems that do not  sup-
               port the mmmmaapp system call.
 
 SSEEEE AALLSSOO
-       mmppaattrrooll(1),  mmpprrooff(1),  mmppttrraaccee(1),  mmlleeaakk(1),   mmppssyymm(1),
-       mmppeeddiitt(1),  hheexxwwoorrddss(1),  mmmmaapp(2), ssbbrrkk(2), lliibbmmppaalllloocc(3),
+       mmppaattrrooll(1),   mmpprrooff(1),  mmppttrraaccee(1),  mmlleeaakk(1),  mmppssyymm(1),
+       mmppeeddiitt(1), hheexxwwoorrddss(1), mmmmaapp(2),  ssbbrrkk(2),  lliibbmmppaalllloocc(3),
        mmaalllloocc(3),  nneeww(3c++),  aallllooccaa(3),  mmeemmoorryy(3),  ssttrriinngg(3),
        aasssseerrtt(3), eellff(3e), bbffdd(3).
 
@@ -1891,25 +1898,18 @@ AAUUTTHHOORR
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-       This  library  is  free  software; you can redistribute it
-       and/or modify it under the terms of the GNU  Library  Gen-
-       eral  Public  License  as  published  by the Free Software
-       Foundation; either version 2 of the License, or  (at  your
+       This library is free software;  you  can  redistribute  it
+       and/or  modify  it under the terms of the GNU Library Gen-
+       eral Public License as  published  by  the  Free  Software
+       Foundation;  either  version 2 of the License, or (at your
        option) any later version.
 
-       This  library  is  distributed in the hope that it will be
+       This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
-       PURPOSE.  See the GNU Library General Public  License  for
-       more details.
-
-       You should have received a copy of the GNU Library General
-       Public License along with this library; if not,  write  to
-       the Free Software Foundation, Inc., 59 Temple Place, Suite
 
 
 
-Release 1.4              14 February 2001                      29
+Release 1.4              15 February 2001                      29
 
 
 
@@ -1918,6 +1918,13 @@ Release 1.4              14 February 2001                      29
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the GNU Library General Public License for
+       more details.
+
+       You should have received a copy of the GNU Library General
+       Public  License  along with this library; if not, write to
+       the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
 
@@ -1968,13 +1975,6 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
 
 
-
-
-
-
-
-
-
-Release 1.4              14 February 2001                      30
+Release 1.4              15 February 2001                      30
 
 

@@ -3,7 +3,7 @@ Content-type: text/html
 <HTML><HEAD><TITLE>Manpage of LIBMPATROL</TITLE>
 </HEAD><BODY>
 <H1>LIBMPATROL</H1>
-Section: mpatrol library (3)<BR>Updated: 14 February 2001<BR><A HREF="#index">Index</A>
+Section: mpatrol library (3)<BR>Updated: 15 February 2001<BR><A HREF="#index">Index</A>
 <A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -84,10 +84,12 @@ size_t __mp_iterate(int (*func)(const void *, void *),
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*func)(const void *, size_t)))
-     (const void *, size_t);
-void (*__mp_epilogue(void (*func)(const void *)))
-     (const void *);
+void (*__mp_prologue(void (*func)(const void *, size_t,
+                                  const void *)))
+     (const void *, size_t, const void *);
+void (*__mp_epilogue(void (*func)(const void *,
+                                  const void *)))
+     (const void *, const void *);
 void (*__mp_nomemory(void (*func)(void)))(void);
 int __mp_printf(const char *fmt, ...);
 int __mp_vprintf(const char *fmt, va_list args);
@@ -729,7 +731,9 @@ Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
 function had been previously installed.  The following arguments will be used
-to call the prologue function:
+to call the prologue function (including a third argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 <P>
 <TABLE>
 <TR VALIGN=top><TD ALIGN=center><B>Argument 1</B></TD><TD ALIGN=center><B>Argument 2</B></TD><TD><B>Called by</B><BR></TD></TR>
@@ -745,7 +749,9 @@ Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
 function had been previously installed.  The following arguments will be used
-to call the epilogue function:
+to call the epilogue function (including a second argument containing the return
+address of the calling function, or the null pointer if it cannot be
+determined):
 <P>
 <TABLE>
 <TR VALIGN=top><TD ALIGN=center><B>Argument</B></TD><TD><B>Called by</B><BR></TD></TR>
@@ -1221,6 +1227,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 00:23:06 GMT, February 14, 2001
+Time: 22:32:01 GMT, February 15, 2001
 </BODY>
 </HTML>
