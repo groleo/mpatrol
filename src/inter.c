@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.54 2000-12-21 23:59:02 graeme Exp $"
+#ident "$Id: inter.c,v 1.55 2000-12-22 00:25:34 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -669,7 +669,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     /* If the string is not NULL and does not overflow any memory blocks then
      * allocate the memory and copy the string to the new allocation.
      */
-    if (__mp_checkstring(&memhead, p, &n, f, j))
+    if (__mp_checkstring(&memhead, p, &n, f, &v, j))
     {
         o = p;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, &v))
@@ -1384,6 +1384,9 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
 void
 chkr_set_right(void *p, size_t l, unsigned char a)
 {
+    stackinfo i;
+    loginfo v;
+
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
@@ -1394,7 +1397,16 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX))
+    /* Determine the call stack details in case we need to report any errors.
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -1410,6 +1422,9 @@ chkr_set_right(void *p, size_t l, unsigned char a)
 void
 chkr_copy_bitmap(void *p, void *q, size_t l)
 {
+    stackinfo i;
+    loginfo v;
+
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
@@ -1420,8 +1435,17 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX) ||
-        !__mp_checkrange(&memhead, q, l, AT_MAX))
+    /* Determine the call stack details in case we need to report any errors.
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v) ||
+        !__mp_checkrange(&memhead, q, l, AT_MAX, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -1436,6 +1460,9 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
 void
 chkr_check_addr(void *p, size_t l, unsigned char a)
 {
+    stackinfo i;
+    loginfo v;
+
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
@@ -1446,7 +1473,16 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX))
+    /* Determine the call stack details in case we need to report any errors.
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -1461,6 +1497,8 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
 void
 chkr_check_str(char *p, unsigned char a)
 {
+    stackinfo i;
+    loginfo v;
     size_t l;
 
 #if TARGET == TARGET_WINDOWS
@@ -1473,7 +1511,16 @@ chkr_check_str(char *p, unsigned char a)
     savesignals();
     if (!memhead.init)
         __mp_init();
-    if (!__mp_checkstring(&memhead, p, &l, AT_MAX, 0))
+    /* Determine the call stack details in case we need to report any errors.
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
+    if (!__mp_checkstring(&memhead, p, &l, AT_MAX, &v, 0))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -1488,6 +1535,9 @@ chkr_check_str(char *p, unsigned char a)
 void
 chkr_check_exec(void *p)
 {
+    stackinfo i;
+    loginfo v;
+
 #if TARGET == TARGET_WINDOWS
     /* If the C run-time library has not finished initialising then we cannot
      * initialise the mpatrol library and so we just return.
@@ -1498,6 +1548,15 @@ chkr_check_exec(void *p)
     savesignals();
     if (!memhead.init)
         __mp_init();
+    /* Determine the call stack details in case we need to report any errors.
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    v.func = NULL;
+    v.file = NULL;
+    v.line = 0;
+    v.stack = &i;
     restoresignals();
 }
 
