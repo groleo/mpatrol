@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.48 2000-04-03 18:15:11 graeme Exp $
+@c $Id: mpatrol.texi,v 1.49 2000-04-03 23:48:56 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.8
 @set VERSION 1.1.4
-@set UPDATED 3rd April, 2000
+@set UPDATED 4th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -591,6 +591,11 @@ some UNIX platforms, an option also exists to override the default memory
 allocation routines for any dynamically-linked program that was not previously
 linked with the mpatrol library.
 
+@item
+The mpatrol library can be built to liaise with Parasoft Inuse, a commercial
+graphical memory usage tool that can display the current memory map of a running
+process.  Inuse is supplied with Parasoft Insure++.
+
 @cindex test suite
 @item
 A small test suite is provided in order to test basic features.
@@ -654,6 +659,15 @@ archive form.  The @samp{all} target builds all possible combinations of the
 mpatrol library for your system.  The @samp{clean} target removes all relevant
 object files from the current directory, while the @samp{clobber} target also
 removes all libraries that have been built from the current directory.
+
+@cindex Inuse
+@item
+If the mpatrol library is to be built with support for Parasoft Inuse then the
+@code{MP_INUSE_SUPPORT} preprocessor macro must be defined in the
+@code{CFLAGS} portion of the @file{Makefile} before building.  This will ensure
+that Inuse will be notified of every memory allocation, reallocation and
+deallocation, but the Insure++ runtime library will also have to be linked in
+with any program that uses mpatrol.
 
 @cindex symbolic links
 @cindex links, symbolic
@@ -725,8 +739,8 @@ of all your code.
 
 @enumerate 1
 @item
-This step is currently only available on Solaris platforms and on DG/UX 4.20MU05
-or later platforms with the @env{LD_PRELOAD} feature.
+This step is currently only available on Linux and Solaris platforms and on
+DG/UX 4.20MU07 or later platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -2404,12 +2418,17 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.1.0 (00/01/30)
+@@(#) mpatrol 1.1.3 (00/03/26)
 Copyright (C) 1997-2000 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
 certain conditions; see the GNU Library General Public License for
 details.
+
+For the latest mpatrol release and documentation,
+visit http://www.cbmamiga.demon.co.uk/mpatrol.
+
+Log file generated on Sat Mar 25 18:43:28 2000
 
 ALLOC: malloc (13, 16 bytes, 8 bytes) [main|test1.c|36]
         0x00010AE0 main
@@ -5024,7 +5043,7 @@ library that are not (or cannot be) supported on that system.
 @cindex DG/UX, Intel 80x86
 @itemize @bullet
 @item
-DG/UX 4.20MU05, Intel Pentium Pro, ELF32, @command{gcc}
+DG/UX 4.20MU07, Intel Pentium Pro, ELF32, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work.
@@ -5032,6 +5051,9 @@ The thread-safe version of the library does not work.
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
+@item
+The @option{-d} option to the @command{mpatrol} shell script does not work
+unless @file{libelf.so} is available.
 @end itemize
 
 @item
@@ -5110,7 +5132,7 @@ The @option{OFLOWWATCH} option has no effect.
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} shell script does not work
-properly.
+unless @file{libiberty.so} is available.
 @end itemize
 
 @cindex Linux, Motorola 680x0
@@ -5125,7 +5147,7 @@ The @option{OFLOWWATCH} option has no effect.
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} shell script does not work
-properly.
+unless @file{libiberty.so} is available.
 @end itemize
 
 @item
@@ -5141,7 +5163,7 @@ The @option{USEDEBUG} option has no effect.
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} shell script does not work
-properly.
+unless @file{libelf.so} is available.
 @end itemize
 
 @cindex LynxOS, PowerPC
@@ -5979,7 +6001,8 @@ Various UNIX, Windows
 @item Overview
 Uses Source Code Instrumentation and Runtime Pointer Tracking technologies to
 pinpoint memory corruption, memory leaks, operations on unrelated pointers and
-more.
+more.  The Inuse graphical memory usage display tool is also provided with this
+software.
 @end table
 
 @cindex LeakTracer
