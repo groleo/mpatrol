@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.57 2001-02-21 11:32:59 graeme Exp $
+# $Id: Makefile,v 1.58 2001-02-21 11:51:48 graeme Exp $
 
 
 # Definitions
@@ -32,14 +32,16 @@ AR    = lib
 LD    = link
 
 SOURCE = ../../src
-VPATH  = $(SOURCE)
+TOOLS  = ../../tools
+VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS = -nologo -I$(SOURCE)
+CFLAGS = -nologo -I$(SOURCE) -I$(TOOLS)
 OFLAGS = -Ogt
 TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
 MPALLOC	= mpalloc
+MPTOOLS	= mptools
 
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
@@ -65,6 +67,7 @@ ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj
 SHARED_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj main2.obj
+ARCHIVE_MPLOBJS	= heapdiff.obj mgauge.obj mtrace.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll
@@ -76,6 +79,8 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 ARCHIVE_MPALLOC	= lib$(MPALLOC).lib
 SHARED_MPALLOC	= $(MPALLOC).dll
 OBJECT_MPALLOC	= lib$(MPALLOC).obj
+
+ARCHIVE_MPTOOLS	= lib$(MPTOOLS).lib
 
 
 # Rules

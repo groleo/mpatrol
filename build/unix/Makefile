@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.60 2001-02-21 11:32:58 graeme Exp $
+# $Id: Makefile,v 1.61 2001-02-21 11:51:47 graeme Exp $
 
 
 # Definitions
@@ -33,9 +33,10 @@ LD    = $(CC)
 LINT  = lint
 
 SOURCE = ../../src
-VPATH  = $(SOURCE)
+TOOLS  = ../../tools
+VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS	= -I$(SOURCE)
+CFLAGS	= -I$(SOURCE) -I$(TOOLS)
 OFLAGS	= -O3 -fno-inline-functions
 SFLAGS	= -fPIC
 TFLAGS	= -DMP_THREADS_SUPPORT
@@ -43,6 +44,7 @@ LDFLAGS	= -shared
 
 MPATROL	 = mpatrol
 MPALLOC	 = mpalloc
+MPTOOLS	 = mptools
 VERSION	 = 1
 REVISION = 4
 
@@ -54,6 +56,7 @@ MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
+MPLOBJS	 = heapdiff.o mgauge.o mtrace.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 SHARED_MPTOBJS	= $(MPTOBJS:.o=.s.o) machine.s.o
@@ -65,6 +68,8 @@ LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 ARCHIVE_MPAOBJS	= $(MPAOBJS)
 SHARED_MPAOBJS	= $(MPAOBJS:.o=.s.o)
 LINT_MPAOBJS	= $(MPAOBJS:.o=.n.ln)
+
+ARCHIVE_MPLOBJS	= $(MPLOBJS)
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= lib$(MPATROL).so
@@ -79,6 +84,8 @@ ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= lib$(MPALLOC).so
 OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
+
+ARCHIVE_MPTOOLS	= lib$(MPTOOLS).a
 
 
 # Rules

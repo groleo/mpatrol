@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.17 2001-02-21 11:32:58 graeme Exp $
+# $Id: Makefile.aix,v 1.18 2001-02-21 11:51:47 graeme Exp $
 
 
 # Definitions
@@ -35,14 +35,16 @@ LDR   = $(CCR)
 LINT  = lint
 
 SOURCE = ../../src
-VPATH  = $(SOURCE)
+TOOLS  = ../../tools
+VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS	= -I$(SOURCE)
+CFLAGS	= -I$(SOURCE) -I$(TOOLS)
 OFLAGS	= -O2 -Q!
 TFLAGS	= -DMP_THREADS_SUPPORT
 
 MPATROL	 = mpatrol
 MPALLOC	 = mpalloc
+MPTOOLS	 = mptools
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
@@ -52,6 +54,7 @@ MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
+MPLOBJS	 = heapdiff.o mgauge.o mtrace.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)
@@ -60,6 +63,8 @@ LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 
 ARCHIVE_MPAOBJS	= $(MPAOBJS)
 LINT_MPAOBJS	= $(MPAOBJS:.o=.n.ln)
+
+ARCHIVE_MPLOBJS	= $(MPLOBJS)
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= shr.o
@@ -74,6 +79,8 @@ ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= shra.o
 OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
+
+ARCHIVE_MPTOOLS	= lib$(MPTOOLS).a
 
 
 # Rules

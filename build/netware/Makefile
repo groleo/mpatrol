@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.47 2001-02-21 11:32:55 graeme Exp $
+# $Id: Makefile,v 1.48 2001-02-21 11:51:46 graeme Exp $
 
 
 # Definitions
@@ -31,14 +31,16 @@ CC    = nc++
 AR    = nc++
 
 SOURCE = ../../src
-VPATH  = $(SOURCE)
+TOOLS  = ../../tools
+VPATH  = $(SOURCE):$(TOOLS)
 
-CFLAGS = -I$(SOURCE)
+CFLAGS = -I$(SOURCE) -I$(TOOLS)
 OFLAGS = -O
 TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
 MPALLOC	= mpalloc
+MPTOOLS	= mptools
 
 MPTOBJS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
@@ -49,6 +51,7 @@ MPTTOBJS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
 MPAOBJS	 = mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
 	   mpstrdup.obj mprealloc.obj
+MPLOBJS	 = heapdiff.obj mgauge.obj mtrace.obj
 
 ARCHIVE_MPATROL	= $(MPATROL).lib
 OBJECT_MPATROL	= lib$(MPATROL).obj
@@ -57,6 +60,8 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 ARCHIVE_MPALLOC	= $(MPALLOC).lib
 OBJECT_MPALLOC	= lib$(MPALLOC).obj
+
+ARCHIVE_MPTOOLS	= $(MPTOOLS).lib
 
 
 # Rules
