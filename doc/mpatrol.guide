@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 14th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 14th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 16th
 November, 2000.
 
 
@@ -2863,8 +2863,9 @@ profiling output files belong to which processes.
    As mentioned above, we're not interested in the mpatrol log and
 profiling output files for @{b}as@{ub} and @{b}ld@{ub} so we'll delete them.  We can now
 use @{b}mprof@{ub} to create graph specification files for each of the profiling
-output files produced.  You can find these graph specification files in
-the @{b}extra@{ub} directory in the mpatrol distribution.
+output files produced.  You can find these graph specification files
+and the profiling output files used to generate them in the @{b}extra@{ub}
+directory in the mpatrol distribution.
 
      bash$ rm as.log as.out ld.log ld.out
      bash$ ls *.out
@@ -7237,6 +7238,9 @@ contains the following components.
      the profiling output file so that it can decide whether to perform
      byte-swapping on the input data.
 
+   * 1 unsigned integer containing the version number of the mpatrol
+     library which produced the profiling output file.
+
    * 3 unsigned integers containing the small, medium and large
      allocation bounds.
 
@@ -7809,7 +7813,9 @@ Notes for all platforms
      explicit references to @{b}operator new@{ub} rather than @{b}new@{ub} are likely to
      result in compilation errors, and the way that source level
      information is obtained for @{b}operator delete@{ub} means that the
-     resulting code will not be thread-safe.
+     resulting code will not be thread-safe.  It might also be an idea
+     to provide an allocation class from which user-defined memory
+     allocators can be derived.
 
    * Need to add support for other 64-bit processors in addition to the
      existing SPARC V9 support.  This shouldn't be too hard, but I
@@ -7853,7 +7859,9 @@ Notes for all platforms
      depends on both of these builtin functions returning @{b}NULL@{ub} when the
      top of stack is reached.  If this is not the case then this method
      cannot be used or should only be used with a small number of fixed
-     stack frames.
+     stack frames.  However, perhaps there might even be a use for an
+     option to limit the number of stack frames in stack tracebacks for
+     systems that have no such limitation.
 
    * Need to change @{b}__mp_compareaddrs()@{ub} so that it will improve the
      detection of when to free memory allocations made by @{b}alloca()@{ub} and
@@ -7866,10 +7874,12 @@ Notes for all platforms
 
    * Add a function to display a stack trace of the current call stack
      to a file stream and another function to walk all current memory
-     allocations invoking a call-back function for each one
-     encountered.  Note that there is still an issue with call-back
-     functions if they call mpatrol library functions, since this will
-     lead to recursion.
+     allocations invoking a callback function for each one encountered.
+     Note that there is still an issue with callback functions if they
+     call mpatrol library functions, since this will lead to recursion.
+     Callback functions could also be defined for @{b}__malloc_hook()@{ub},
+     @{b}__realloc_hook()@{ub} and @{b}__free_hook()@{ub} in much the same way as for the
+     GNU C library.
 
    * Need to store filename and line number information in all call
      stacks so that the information can be used at program termination.
@@ -7894,6 +7904,11 @@ Notes for all platforms
 
    * Add functions to start and stop profiling, and perhaps also to
      clear the profiling tables and begin a new profiling output file.
+     Should also write more information to the profiling output file,
+     such as the date that it was produced on and the word size of the
+     processor that it was produced on, so that @{b}mprof@{ub} will not crash
+     when reading a profiling output file produced on a processor that
+     has a different word size.
 
    * Perhaps add the ability to profile memory operations such as
      @{b}memcpy()@{ub} and @{b}memset()@{ub} to the existing memory allocation profiling
@@ -7907,6 +7922,18 @@ Notes for all platforms
      also be extended to having a graphical tool which could display
      this information.
 
+   * Improve the speed of watch points by setting a range of allocation
+     indices for which they will be used.  This may require a lot of
+     code changes in @{b}alloc.c@{ub}.
+
+   * Add a software watch point facility that can be placed on ranges
+     of addresses in the heap.  Then, if a heap operation touches the
+     watch point, either the user can be notified or a callback
+     function can be called.  The same could be done for local
+     variables if the stack frame can be easily determined, which would
+     also allow detecting if a read from or write to memory was
+     performed just beyond the stack pointer.
+
    * Add a CRC checksum to memory blocks and use it to check that freed
      memory allocations have not been corrupted when the @{b}NOFREE@{ub} and
      @{b}PRESERVE@{ub} options are in use on platforms which have no memory
@@ -7915,6 +7942,20 @@ Notes for all platforms
      certain period from within a debugger.  Another idea could be to
      display all memory allocations, etc.  made since a certain
      function was called from within a program.
+
+   * Add an option to set up a timer that will automatically check the
+     heap after a certain number of clock cycles have elapsed.  This
+     could be useful in programs that have long periods of time where
+     no dynamic memory allocation functions are called, but heap
+     allocations are still manipulated.  In addition, checks could
+     automatically be made upon receipt of special signals sent to the
+     program by the user and information about the last successful
+     verification of the heap could be used to narrow down problems.
+
+   * Add a diagnostic number count to each warning and error reported
+     in the log file.  This could then be used to implement a @{b}DIAGSTOP@{ub}
+     option which would stop the program running after a certain number
+     of diagnostics have been displayed.
 
    * Perhaps add the string used as an argument to @{b}malloc()@{ub}, @{b}calloc()@{ub},
      etc. to the information stored about each memory allocation.  This
@@ -7926,7 +7967,10 @@ Notes for all platforms
    * Add support for @{b}%d@{ub} and @{b}%t@{ub} keywords (representing date and time) in
      the filenames for the mpatrol log file and profiling output file.
      Also perhaps add time information to the details stored about each
-     memory allocation.
+     memory allocation.  Another possible keyword to recognise in
+     filenames could be @{b}%f@{ub} which would represent the full pathname of
+     the executable file with path separation characters replaced with
+     underscores.
 
    * Add a @{b}SHOWFREE@{ub} option to display a list of all free memory blocks
      at program termination for debugging purposes to view memory
@@ -7937,17 +7981,22 @@ Notes for all platforms
    * Add an option (perhaps @{b}NOINTERNAL@{ub}) to suppress the display of
      internal (recursive) memory allocations in the mpatrol log file
      and also prevent information about such allocations being written
-     to the profiling output file.
+     to the profiling output file.  This could also be extended to
+     prevent memory leaks from being reported if the original
+     allocations were made from a given set of functions.
 
    * Add an extra piece of information in the log file summary which
      highlights the peak number of memory allocations in use at any one
-     time during program execution.
+     time during program execution.  Maybe also show the contents of
+     the @{b}MPATROL_OPTIONS@{ub} environment variable in the summary as well.
 
    * Add versions of @{b}mallopt()@{ub}, @{b}mallinfo()@{ub}, @{b}memorymap()@{ub}, @{b}mallocctl()@{ub},
      @{b}mallocblksize()@{ub} and @{b}msize()@{ub} which are provided in many other
      malloc libraries.  These won't necessarily behave in exactly the
      same way as existing implementations, but at least there won't be
-     link errors when compiling source code which uses them.
+     link errors when compiling source code which uses them.  Global
+     variables could also be added for reading and writing library
+     settings in a debugger.
 
    * Perhaps add debugging/tracing versions of the string manipulation
      functions, such as @{b}strlen()@{ub} and @{b}strcmp()@{ub} in much the same way as
@@ -7967,12 +8016,41 @@ Notes for all platforms
      and this may well be incorporated into the library at some point
      in the future.
 
+   * Add functions to write diagnostics to the mpatrol log file from
+     within program code.  These could include displaying call stacks
+     and dumping contents of memory allocations.  The @{b}__mp_edit()@{ub} and
+     @{b}__mp_list()@{ub} functions could be added to give functionality similar
+     to the @{b}EDIT@{ub} and @{b}LIST@{ub} options at any time during program execution.
+
+   * The @{b}LOG*@{ub} options could be extended to take a list of specific
+     functions to log.  They could also only log operations spanning a
+     range of addresses or allocation indices as well.
+
+   * Add an option to limit the size of each memory allocation to a
+     maximum number of bytes.  This could be useful if a memory
+     allocation function is called with an uninitialised variable.
+
    * Add another library which can be linked in instead of mpatrol and
      replaces all calls to @{b}__mp_alloc()@{ub}, etc., with the original calls
      to @{b}malloc()@{ub} and related functions.  This would be very useful for
      quickly removing all mpatrol functionality for perhaps even a
      release build, and might be useful for implementing functions such
      as @{b}memalign()@{ub} which don't exist on many systems.
+
+   * Add assertion macros to @{b}mpatrol.h@{ub} that can be used in program code.
+     These could be used to assert that pointers have not been freed or
+     are valid heap addresses, etc.  They would be disabled if @{b}NDEBUG@{ub}
+     is defined.
+
+   * Add support functions that could be added to user code to enter
+     and leave scopes in a source file and ensure that all allocations
+     allocated within the scope are freed by the time the scope has
+     been exited.  A function could also be added to mark certain
+     memory allocations as being validly in use so as to avoid leak
+     warnings.  Any attempts to free such allocations would result in an
+     error.  Other functions could be added to add or clear references
+     to certain memory allocations and to return the current number of
+     memory allocations or bytes allocated.
 
    * Write a set of functions that are compatible with those
      implemented by Checker, the @{b}gcc@{ub} run-time memory access checker.
@@ -7982,6 +8060,13 @@ Notes for all platforms
      instrumentation.  Could also make use of the @{b}etext@{ub}, @{b}edata@{ub} and @{b}end@{ub}
      pointers that are set at run-time on most UNIX systems.
 
+   * Details of the segments which make up the executable file and any
+     shared libraries could be made use of in order to detect
+     operations which cross such segments.  For example, a memory
+     operation may erroneously cross the data and BSS segments.  The
+     symbol table for data symbols could also be used to provide much
+     finer-grained error-checking.
+
    * Add an option to specify that all failed memory allocations should
      abort (or at least give a warning) instead of returning a @{b}NULL@{ub}
      pointer.  Also, perhaps add an option to display the partial
@@ -7990,6 +8075,11 @@ Notes for all platforms
      memory allocation to the log file.
 
    * Perhaps add memory protection to the simulated @{b}sbrk@{ub} heap.
+
+   * Add an option to report if one thread resizes or frees another
+     thread's allocations.  This may not be useful in most cases, but
+     it might be possible to track down some obscure bugs in some
+     situations.
 
    * Perhaps add internationalisation support through the use of
      locales and message catalogs.  Unfortunately, there does not
@@ -8015,6 +8105,15 @@ Notes for all platforms
      laborious.  In addition, a user-defined command or script file
      could be executed at the end of every invocation of the @{b}mpatrol@{ub}
      command.
+
+   * Add a script to automatically run the mpatrol library tests.  It
+     could be quite hard to verify the tests since the heap addresses
+     are likely to be different on every new build and will certainly
+     be different across different platforms.
+
+   * Perhaps include a script which will combine two or more archive
+     libraries.  This would certainly simplify linking with the mpatrol
+     library since only one library would be required.
 
    * Perhaps use GNU autoconf to automatically work out values for
      @{b}config.h@{ub} on the platform it is being built on, and also use
@@ -8122,6 +8221,10 @@ Notes for UNIX platforms
      libraries in the SOM object file format without needing to use the
      GNU BFD library.
 
+   * Perhaps add support for other popular text editors in the @{b}mpedit@{ub}
+     command.  Also add a way to specify editor options to the @{b}mpedit@{ub}
+     command.
+
    * Add support for Digital UNIX and also the BSD systems
      (specifically FreeBSD, NetBSD, OpenBSD and SunOS) and other
      non-System V UNIX operating systems.
@@ -8197,6 +8300,11 @@ new AmigaOS may be added in the future.
      file and hunk location of entries on the call stack could be
      determined.
 
+   * Could add support for the @{b}EDIT@{ub} and @{b}LIST@{ub} options.  This would
+     probably involve finding a way to invoke a shell script without
+     having to search for the script file or allocating memory in the
+     process.
+
    * When using SAS/C it is currently not possible to override the
      definition of @{b}malloc()@{ub}, etc., without including the @{b}mpatrol.h@{ub}
      header file first.  This is because the compiler startup code and
@@ -8239,6 +8347,11 @@ Notes for Windows platforms
 
    * Perhaps add support for the @{b}mpatrol@{ub} command's @{b}--dynamic@{ub} option by
      preloading the mpatrol DLL from the @{b}mpatrol@{ub} command.
+
+   * Could add support for the @{b}EDIT@{ub} and @{b}LIST@{ub} options.  This would
+     probably involve finding a way to invoke a batch file without
+     having to search for the batch file or allocating memory in the
+     process.
 
    * Add a Windows resource file to the mpatrol library with copyright
      and version information.
@@ -8288,6 +8401,11 @@ someone else would have had to have done it anyway.
      are required by the program.  This may be possible in a limited
      fashion by using the GNU BFD library, but may only work with code
      compiled with @{b}gcc@{ub}.
+
+   * Could add support for the @{b}EDIT@{ub} and @{b}LIST@{ub} options.  This would
+     probably involve finding a way to invoke a batch file without
+     having to search for the batch file or allocating memory in the
+     process.
 
    * Need to investigate if it is safe (or even possible) to override
      the definitions of @{b}malloc()@{ub}, etc., without including the @{b}mpatrol.h@{ub}

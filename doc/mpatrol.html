@@ -102,7 +102,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.0 of the mpatrol manual for version
-1.3.0, 14th November, 2000.
+1.3.0, 16th November, 2000.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -2719,7 +2719,8 @@ cc1.log        collect2.out   gcc.log        ld.out
 output files for <code>as</code> and <code>ld</code> so we'll delete them.  We can
 now use <code>mprof</code> to create graph specification files for each of the
 profiling output files produced.  You can find these graph specification files
-in the <code>extra</code> directory in the mpatrol distribution.
+and the profiling output files used to generate them in the <code>extra</code>
+directory in the mpatrol distribution.
 
 <pre>bash$ rm as.log as.out ld.log ld.out
 bash$ ls *.out
@@ -6909,6 +6910,9 @@ profiling output file contains the following components.
 profiling output file so that it can decide whether to perform byte-swapping on
 the input data.
 
+<li>1 unsigned integer containing the version number of the mpatrol library which
+produced the profiling output file.
+
 <li>3 unsigned integers containing the small, medium and large allocation bounds.
 
 <li>1 unsigned integer containing the allocation bin size.  If the allocation bin
@@ -7420,7 +7424,8 @@ code due to the way the operators are overridden (i.e. there are no exceptions
 versions of the functions).  Also, explicit references to <code>operator new</code>
 rather than <code>new</code> are likely to result in compilation errors, and the way
 that source level information is obtained for <code>operator delete</code> means that
-the resulting code will not be thread-safe.
+the resulting code will not be thread-safe.  It might also be an idea to provide
+an allocation class from which user-defined memory allocators can be derived.
 
 <li>Need to add support for other 64-bit processors in addition to the existing
 SPARC V9 support.  This shouldn't be too hard, but I haven't got access to such
@@ -7459,7 +7464,9 @@ only traverse a number of stack frames at compile-time, not run-time so there is
 a maximum number of stack frames that can be traversed at any one time.  The
 implementation depends on both of these builtin functions returning <code>NULL</code>
 when the top of stack is reached.  If this is not the case then this method
-cannot be used or should only be used with a small number of fixed stack frames.
+cannot be used or should only be used with a small number of fixed stack frames. 
+However, perhaps there might even be a use for an option to limit the number of
+stack frames in stack tracebacks for systems that have no such limitation.
 
 <li>Need to change <code>__mp_compareaddrs()</code> so that it will improve the detection
 of when to free memory allocations made by <code>alloca()</code> and its related
@@ -7471,9 +7478,11 @@ current value is way too high.
 
 <li>Add a function to display a stack trace of the current call stack to a file
 stream and another function to walk all current memory allocations invoking a
-call-back function for each one encountered.  Note that there is still an issue
-with call-back functions if they call mpatrol library functions, since this
-will lead to recursion.
+callback function for each one encountered.  Note that there is still an issue
+with callback functions if they call mpatrol library functions, since this
+will lead to recursion.  Callback functions could also be defined for
+<code>__malloc_hook()</code>, <code>__realloc_hook()</code> and <code>__free_hook()</code> in much
+the same way as for the GNU C library.
 
 <li>Need to store filename and line number information in all call stacks so that
 the information can be used at program termination.  May also need to display
@@ -7494,7 +7503,11 @@ assume that the current symbol terminates at the beginning of the next symbol in
 the virtual address space.
 
 <li>Add functions to start and stop profiling, and perhaps also to clear the
-profiling tables and begin a new profiling output file.
+profiling tables and begin a new profiling output file.  Should also write more
+information to the profiling output file, such as the date that it was produced
+on and the word size of the processor that it was produced on, so that
+<code>mprof</code> will not crash when reading a profiling output file produced on
+a processor that has a different word size.
 
 <li>Perhaps add the ability to profile memory operations such as <code>memcpy()</code> and
 <code>memset()</code> to the existing memory allocation profiling facility.  Also, add
@@ -7506,6 +7519,17 @@ statistics to a file at set intervals during run-time so that a table of memory
 usage could be built up.  This could also be extended to having a graphical
 tool which could display this information.
 
+<li>Improve the speed of watch points by setting a range of allocation indices for
+which they will be used.  This may require a lot of code changes in
+<code>alloc.c</code>.
+
+<li>Add a software watch point facility that can be placed on ranges of addresses in
+the heap.  Then, if a heap operation touches the watch point, either the user
+can be notified or a callback function can be called.  The same could be done
+for local variables if the stack frame can be easily determined, which would
+also allow detecting if a read from or write to memory was performed just beyond
+the stack pointer.
+
 <li>Add a CRC checksum to memory blocks and use it to check that freed memory
 allocations have not been corrupted when the <code>NOFREE</code> and
 <code>PRESERVE</code> options are in use on platforms which have no memory
@@ -7513,6 +7537,19 @@ protection.  This could also be extended to marking allocated memory blocks
 and then displaying what blocks have changed after a certain period from within
 a debugger.  Another idea could be to display all memory allocations, etc. 
 made since a certain function was called from within a program.
+
+<li>Add an option to set up a timer that will automatically check the heap after a
+certain number of clock cycles have elapsed.  This could be useful in programs
+that have long periods of time where no dynamic memory allocation functions are
+called, but heap allocations are still manipulated.  In addition, checks could
+automatically be made upon receipt of special signals sent to the program by
+the user and information about the last successful verification of the heap
+could be used to narrow down problems.
+
+<li>Add a diagnostic number count to each warning and error reported in the log
+file.  This could then be used to implement a <code>DIAGSTOP</code> option which
+would stop the program running after a certain number of diagnostics have been
+displayed.
 
 <li>Perhaps add the string used as an argument to <code>malloc()</code>, <code>calloc()</code>,
 etc. to the information stored about each memory allocation.  This could aid
@@ -7523,7 +7560,10 @@ string.
 
 <li>Add support for <code>%d</code> and <code>%t</code> keywords (representing date and time)
 in the filenames for the mpatrol log file and profiling output file.  Also
-perhaps add time information to the details stored about each memory allocation.
+perhaps add time information to the details stored about each memory allocation. 
+Another possible keyword to recognise in filenames could be <code>%f</code> which
+would represent the full pathname of the executable file with path separation
+characters replaced with underscores.
 
 <li>Add a <code>SHOWFREE</code> option to display a list of all free memory blocks at
 program termination for debugging purposes to view memory fragmentation.  If
@@ -7533,17 +7573,21 @@ that option is added then perhaps <code>SHOWALL</code> should only be equivalent
 
 <li>Add an option (perhaps <code>NOINTERNAL</code>) to suppress the display of internal
 (recursive) memory allocations in the mpatrol log file and also prevent
-information about such allocations being written to the profiling output file.
+information about such allocations being written to the profiling output file. 
+This could also be extended to prevent memory leaks from being reported if the
+original allocations were made from a given set of functions.
 
 <li>Add an extra piece of information in the log file summary which highlights the
 peak number of memory allocations in use at any one time during program
-execution.
+execution.  Maybe also show the contents of the <code>MPATROL_OPTIONS</code>
+environment variable in the summary as well.
 
 <li>Add versions of <code>mallopt()</code>, <code>mallinfo()</code>, <code>memorymap()</code>,
 <code>mallocctl()</code>, <code>mallocblksize()</code> and <code>msize()</code> which are provided
 in many other malloc libraries.  These won't necessarily behave in exactly the
 same way as existing implementations, but at least there won't be link errors
-when compiling source code which uses them.
+when compiling source code which uses them.  Global variables could also be
+added for reading and writing library settings in a debugger.
 
 <li>Perhaps add debugging/tracing versions of the string manipulation functions,
 such as <code>strlen()</code> and <code>strcmp()</code> in much the same way as was done for
@@ -7561,12 +7605,39 @@ occurs on some systems.  Example code to do this was submitted by Alexander
 Barton (<a href="mailto:abarton@innotrac.com">abarton@innotrac.com</a>) and this may well be incorporated into
 the library at some point in the future.
 
+<li>Add functions to write diagnostics to the mpatrol log file from within program
+code.  These could include displaying call stacks and dumping contents of
+memory allocations.  The <code>__mp_edit()</code> and <code>__mp_list()</code> functions
+could be added to give functionality similar to the <code>EDIT</code> and
+<code>LIST</code> options at any time during program execution.
+
+<li>The <code>LOG*</code> options could be extended to take a list of specific functions
+to log.  They could also only log operations spanning a range of addresses or
+allocation indices as well.
+
+<li>Add an option to limit the size of each memory allocation to a maximum number
+of bytes.  This could be useful if a memory allocation function is called with
+an uninitialised variable.
+
 <li>Add another library which can be linked in instead of mpatrol and replaces
 all calls to <code>__mp_alloc()</code>, etc., with the original calls to
 <code>malloc()</code> and related functions.  This would be very useful for quickly
 removing all mpatrol functionality for perhaps even a release build, and might
 be useful for implementing functions such as <code>memalign()</code> which don't
 exist on many systems.
+
+<li>Add assertion macros to <code>mpatrol.h</code> that can be used in program code. 
+These could be used to assert that pointers have not been freed or are valid
+heap addresses, etc.  They would be disabled if <code>NDEBUG</code> is defined.
+
+<li>Add support functions that could be added to user code to enter and leave
+scopes in a source file and ensure that all allocations allocated within the
+scope are freed by the time the scope has been exited.  A function could also
+be added to mark certain memory allocations as being validly in use so as to
+avoid leak warnings.  Any attempts to free such allocations would result in an
+error.  Other functions could be added to add or clear references to certain
+memory allocations and to return the current number of memory allocations or
+bytes allocated.
 
 <li>Write a set of functions that are compatible with those implemented by Checker,
 the <code>gcc</code> run-time memory access checker.  This would allow every memory
@@ -7575,6 +7646,12 @@ pointers into the heap, and would provide error checking as effective as source
 code instrumentation.  Could also make use of the <code>etext</code>, <code>edata</code> and
 <code>end</code> pointers that are set at run-time on most UNIX systems.
 
+<li>Details of the segments which make up the executable file and any shared
+libraries could be made use of in order to detect operations which cross such
+segments.  For example, a memory operation may erroneously cross the data
+and BSS segments.  The symbol table for data symbols could also be used to
+provide much finer-grained error-checking.
+
 <li>Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a <code>NULL</code> pointer.  Also, perhaps
 add an option to display the partial contents of freed and unfreed allocations
@@ -7582,6 +7659,10 @@ in the mpatrol log file and also a function which can be called to dump the
 contents of a memory allocation to the log file.
 
 <li>Perhaps add memory protection to the simulated <code>sbrk</code> heap.
+
+<li>Add an option to report if one thread resizes or frees another thread's
+allocations.  This may not be useful in most cases, but it might be possible
+to track down some obscure bugs in some situations.
 
 <li>Perhaps add internationalisation support through the use of locales and message
 catalogs.  Unfortunately, there does not appear to be a unified method for doing
@@ -7604,6 +7685,14 @@ standard input file stream.
 linking with the mpatrol library is much less laborious.  In addition, a
 user-defined command or script file could be executed at the end of every
 invocation of the <code>mpatrol</code> command.
+
+<li>Add a script to automatically run the mpatrol library tests.  It could be quite
+hard to verify the tests since the heap addresses are likely to be different on
+every new build and will certainly be different across different platforms.
+
+<li>Perhaps include a script which will combine two or more archive libraries.  This
+would certainly simplify linking with the mpatrol library since only one library
+would be required.
 
 <li>Perhaps use GNU autoconf to automatically work out values for <code>config.h</code> on
 the platform it is being built on, and also use automake, libtool and install
@@ -7694,6 +7783,10 @@ shared library on those systems.
 <li>Perhaps add support for reading HP/UX executable files and libraries in the SOM
 object file format without needing to use the GNU BFD library.
 
+<li>Perhaps add support for other popular text editors in the <code>mpedit</code>
+command.  Also add a way to specify editor options to the <code>mpedit</code>
+command.
+
 <li>Add support for Digital UNIX and also the BSD systems (specifically FreeBSD,
 NetBSD, OpenBSD and SunOS) and other non-System V UNIX operating systems.
 
@@ -7761,6 +7854,10 @@ to provide some form of memory protection.  The features of SegTracker could
 also be put to good use so that the file and hunk location of entries on the
 call stack could be determined.
 
+<li>Could add support for the <code>EDIT</code> and <code>LIST</code> options.  This would
+probably involve finding a way to invoke a shell script without having to search
+for the script file or allocating memory in the process.
+
 <li>When using SAS/C it is currently not possible to override the definition of
 <code>malloc()</code>, etc., without including the <code>mpatrol.h</code> header file first. 
 This is because the compiler startup code and libraries call <code>malloc()</code>
@@ -7802,6 +7899,10 @@ to be looked into, but for the moment, don't mix them.
 
 <li>Perhaps add support for the <code>mpatrol</code> command's <code>--dynamic</code>
 option by preloading the mpatrol DLL from the <code>mpatrol</code> command.
+
+<li>Could add support for the <code>EDIT</code> and <code>LIST</code> options.  This would
+probably involve finding a way to invoke a batch file without having to search
+for the batch file or allocating memory in the process.
 
 <li>Add a Windows resource file to the mpatrol library with copyright and version
 information.
@@ -7848,6 +7949,10 @@ running under one large process.
 add support for reading symbols from any NLMs that are required by the program. 
 This may be possible in a limited fashion by using the GNU BFD library, but may
 only work with code compiled with <code>gcc</code>.
+
+<li>Could add support for the <code>EDIT</code> and <code>LIST</code> options.  This would
+probably involve finding a way to invoke a batch file without having to search
+for the batch file or allocating memory in the process.
 
 <li>Need to investigate if it is safe (or even possible) to override the definitions
 of <code>malloc()</code>, etc., without including the <code>mpatrol.h</code> header file

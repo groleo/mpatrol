@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.137 2000-11-14 22:02:47 graeme Exp $
+@c $Id: mpatrol.texi,v 1.138 2000-11-16 01:25:40 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -22,7 +22,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 14th November, 2000
+@set UPDATED 16th November, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2982,7 +2982,8 @@ As mentioned above, we're not interested in the mpatrol log and profiling
 output files for @command{as} and @command{ld} so we'll delete them.  We can
 now use @command{mprof} to create graph specification files for each of the
 profiling output files produced.  You can find these graph specification files
-in the @file{extra} directory in the mpatrol distribution.
+and the profiling output files used to generate them in the @file{extra}
+directory in the mpatrol distribution.
 
 @smallexample
 bash$ rm as.log as.out ld.log ld.out
@@ -7515,6 +7516,10 @@ profiling output file so that it can decide whether to perform byte-swapping on
 the input data.
 
 @item
+1 unsigned integer containing the version number of the mpatrol library which
+produced the profiling output file.
+
+@item
 3 unsigned integers containing the small, medium and large allocation bounds.
 
 @item
@@ -8221,7 +8226,8 @@ code due to the way the operators are overridden (i.e.@: there are no exceptions
 versions of the functions).  Also, explicit references to @code{operator new}
 rather than @code{new} are likely to result in compilation errors, and the way
 that source level information is obtained for @code{operator delete} means that
-the resulting code will not be thread-safe.
+the resulting code will not be thread-safe.  It might also be an idea to provide
+an allocation class from which user-defined memory allocators can be derived.
 
 @item
 Need to add support for other 64-bit processors in addition to the existing
@@ -8269,6 +8275,8 @@ a maximum number of stack frames that can be traversed at any one time.  The
 implementation depends on both of these builtin functions returning @samp{NULL}
 when the top of stack is reached.  If this is not the case then this method
 cannot be used or should only be used with a small number of fixed stack frames.
+However, perhaps there might even be a use for an option to limit the number of
+stack frames in stack tracebacks for systems that have no such limitation.
 
 @item
 Need to change @code{__mp_compareaddrs()} so that it will improve the detection
@@ -8282,9 +8290,11 @@ current value is way too high.
 @item
 Add a function to display a stack trace of the current call stack to a file
 stream and another function to walk all current memory allocations invoking a
-call-back function for each one encountered.  Note that there is still an issue
-with call-back functions if they call mpatrol library functions, since this
-will lead to recursion.
+callback function for each one encountered.  Note that there is still an issue
+with callback functions if they call mpatrol library functions, since this
+will lead to recursion.  Callback functions could also be defined for
+@code{__malloc_hook()}, @code{__realloc_hook()} and @code{__free_hook()} in much
+the same way as for the GNU C library.
 
 @item
 Need to store filename and line number information in all call stacks so that
@@ -8309,7 +8319,11 @@ the virtual address space.
 
 @item
 Add functions to start and stop profiling, and perhaps also to clear the
-profiling tables and begin a new profiling output file.
+profiling tables and begin a new profiling output file.  Should also write more
+information to the profiling output file, such as the date that it was produced
+on and the word size of the processor that it was produced on, so that
+@command{mprof} will not crash when reading a profiling output file produced on
+a processor that has a different word size.
 
 @item
 Perhaps add the ability to profile memory operations such as @code{memcpy()} and
@@ -8324,6 +8338,19 @@ usage could be built up.  This could also be extended to having a graphical
 tool which could display this information.
 
 @item
+Improve the speed of watch points by setting a range of allocation indices for
+which they will be used.  This may require a lot of code changes in
+@file{alloc.c}.
+
+@item
+Add a software watch point facility that can be placed on ranges of addresses in
+the heap.  Then, if a heap operation touches the watch point, either the user
+can be notified or a callback function can be called.  The same could be done
+for local variables if the stack frame can be easily determined, which would
+also allow detecting if a read from or write to memory was performed just beyond
+the stack pointer.
+
+@item
 Add a CRC checksum to memory blocks and use it to check that freed memory
 allocations have not been corrupted when the @option{NOFREE} and
 @option{PRESERVE} options are in use on platforms which have no memory
@@ -8331,6 +8358,21 @@ protection.  This could also be extended to marking allocated memory blocks
 and then displaying what blocks have changed after a certain period from within
 a debugger.  Another idea could be to display all memory allocations, etc.@:
 made since a certain function was called from within a program.
+
+@item
+Add an option to set up a timer that will automatically check the heap after a
+certain number of clock cycles have elapsed.  This could be useful in programs
+that have long periods of time where no dynamic memory allocation functions are
+called, but heap allocations are still manipulated.  In addition, checks could
+automatically be made upon receipt of special signals sent to the program by
+the user and information about the last successful verification of the heap
+could be used to narrow down problems.
+
+@item
+Add a diagnostic number count to each warning and error reported in the log
+file.  This could then be used to implement a @option{DIAGSTOP} option which
+would stop the program running after a certain number of diagnostics have been
+displayed.
 
 @item
 Perhaps add the string used as an argument to @code{malloc()}, @code{calloc()},
@@ -8344,6 +8386,9 @@ string.
 Add support for @samp{%d} and @samp{%t} keywords (representing date and time)
 in the filenames for the mpatrol log file and profiling output file.  Also
 perhaps add time information to the details stored about each memory allocation.
+Another possible keyword to recognise in filenames could be @samp{%f} which
+would represent the full pathname of the executable file with path separation
+characters replaced with underscores.
 
 @item
 Add a @option{SHOWFREE} option to display a list of all free memory blocks at
@@ -8356,18 +8401,22 @@ that option is added then perhaps @option{SHOWALL} should only be equivalent to
 Add an option (perhaps @option{NOINTERNAL}) to suppress the display of internal
 (recursive) memory allocations in the mpatrol log file and also prevent
 information about such allocations being written to the profiling output file.
+This could also be extended to prevent memory leaks from being reported if the
+original allocations were made from a given set of functions.
 
 @item
 Add an extra piece of information in the log file summary which highlights the
 peak number of memory allocations in use at any one time during program
-execution.
+execution.  Maybe also show the contents of the @env{MPATROL_OPTIONS}
+environment variable in the summary as well.
 
 @item
 Add versions of @code{mallopt()}, @code{mallinfo()}, @code{memorymap()},
 @code{mallocctl()}, @code{mallocblksize()} and @code{msize()} which are provided
 in many other malloc libraries.  These won't necessarily behave in exactly the
 same way as existing implementations, but at least there won't be link errors
-when compiling source code which uses them.
+when compiling source code which uses them.  Global variables could also be
+added for reading and writing library settings in a debugger.
 
 @item
 Perhaps add debugging/tracing versions of the string manipulation functions,
@@ -8389,12 +8438,44 @@ Barton (@email{abarton@@innotrac.com}) and this may well be incorporated into
 the library at some point in the future.
 
 @item
+Add functions to write diagnostics to the mpatrol log file from within program
+code.  These could include displaying call stacks and dumping contents of
+memory allocations.  The @code{__mp_edit()} and @code{__mp_list()} functions
+could be added to give functionality similar to the @option{EDIT} and
+@option{LIST} options at any time during program execution.
+
+@item
+The @option{LOG*} options could be extended to take a list of specific functions
+to log.  They could also only log operations spanning a range of addresses or
+allocation indices as well.
+
+@item
+Add an option to limit the size of each memory allocation to a maximum number
+of bytes.  This could be useful if a memory allocation function is called with
+an uninitialised variable.
+
+@item
 Add another library which can be linked in instead of mpatrol and replaces
 all calls to @code{__mp_alloc()}, etc., with the original calls to
 @code{malloc()} and related functions.  This would be very useful for quickly
 removing all mpatrol functionality for perhaps even a release build, and might
 be useful for implementing functions such as @code{memalign()} which don't
 exist on many systems.
+
+@item
+Add assertion macros to @file{mpatrol.h} that can be used in program code.
+These could be used to assert that pointers have not been freed or are valid
+heap addresses, etc.  They would be disabled if @code{NDEBUG} is defined.
+
+@item
+Add support functions that could be added to user code to enter and leave
+scopes in a source file and ensure that all allocations allocated within the
+scope are freed by the time the scope has been exited.  A function could also
+be added to mark certain memory allocations as being validly in use so as to
+avoid leak warnings.  Any attempts to free such allocations would result in an
+error.  Other functions could be added to add or clear references to certain
+memory allocations and to return the current number of memory allocations or
+bytes allocated.
 
 @item
 Write a set of functions that are compatible with those implemented by Checker,
@@ -8405,6 +8486,13 @@ code instrumentation.  Could also make use of the @code{etext}, @code{edata} and
 @code{end} pointers that are set at run-time on most UNIX systems.
 
 @item
+Details of the segments which make up the executable file and any shared
+libraries could be made use of in order to detect operations which cross such
+segments.  For example, a memory operation may erroneously cross the data
+and BSS segments.  The symbol table for data symbols could also be used to
+provide much finer-grained error-checking.
+
+@item
 Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a @samp{NULL} pointer.  Also, perhaps
 add an option to display the partial contents of freed and unfreed allocations
@@ -8413,6 +8501,11 @@ contents of a memory allocation to the log file.
 
 @item
 Perhaps add memory protection to the simulated @code{sbrk} heap.
+
+@item
+Add an option to report if one thread resizes or frees another thread's
+allocations.  This may not be useful in most cases, but it might be possible
+to track down some obscure bugs in some situations.
 
 @item
 Perhaps add internationalisation support through the use of locales and message
@@ -8439,6 +8532,16 @@ Add a script to wrap around various popular C and C++ compiler drivers so that
 linking with the mpatrol library is much less laborious.  In addition, a
 user-defined command or script file could be executed at the end of every
 invocation of the @command{mpatrol} command.
+
+@item
+Add a script to automatically run the mpatrol library tests.  It could be quite
+hard to verify the tests since the heap addresses are likely to be different on
+every new build and will certainly be different across different platforms.
+
+@item
+Perhaps include a script which will combine two or more archive libraries.  This
+would certainly simplify linking with the mpatrol library since only one library
+would be required.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
@@ -8541,6 +8644,11 @@ Perhaps add support for reading HP/UX executable files and libraries in the SOM
 object file format without needing to use the GNU BFD library.
 
 @item
+Perhaps add support for other popular text editors in the @command{mpedit}
+command.  Also add a way to specify editor options to the @command{mpedit}
+command.
+
+@item
 Add support for Digital UNIX and also the BSD systems (specifically FreeBSD,
 NetBSD, OpenBSD and SunOS) and other non-System V UNIX operating systems.
 
@@ -8613,6 +8721,11 @@ also be put to good use so that the file and hunk location of entries on the
 call stack could be determined.
 
 @item
+Could add support for the @option{EDIT} and @option{LIST} options.  This would
+probably involve finding a way to invoke a shell script without having to search
+for the script file or allocating memory in the process.
+
+@item
 When using SAS/C it is currently not possible to override the definition of
 @code{malloc()}, etc., without including the @file{mpatrol.h} header file first.
 This is because the compiler startup code and libraries call @code{malloc()}
@@ -8657,6 +8770,11 @@ The library cannot currently read any symbols from DLLs that have been read via
 @item
 Perhaps add support for the @command{mpatrol} command's @option{--dynamic}
 option by preloading the mpatrol DLL from the @command{mpatrol} command.
+
+@item
+Could add support for the @option{EDIT} and @option{LIST} options.  This would
+probably involve finding a way to invoke a batch file without having to search
+for the batch file or allocating memory in the process.
 
 @item
 Add a Windows resource file to the mpatrol library with copyright and version
@@ -8707,6 +8825,11 @@ Need to add support for reading symbols from Netware load modules.  Also need to
 add support for reading symbols from any NLMs that are required by the program.
 This may be possible in a limited fashion by using the GNU BFD library, but may
 only work with code compiled with @command{gcc}.
+
+@item
+Could add support for the @option{EDIT} and @option{LIST} options.  This would
+probably involve finding a way to invoke a batch file without having to search
+for the batch file or allocating memory in the process.
 
 @item
 Need to investigate if it is safe (or even possible) to override the definitions
