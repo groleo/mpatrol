@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.15 2001-02-11 22:01:04 graeme Exp $"
+#ident "$Id: alloc.c,v 1.16 2001-02-13 22:40:53 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *alloc_id = "$Id: alloc.c,v 1.15 2001-02-11 22:01:04 graeme Exp $";
+static MP_CONST MP_VOLATILE char *alloc_id = "$Id: alloc.c,v 1.16 2001-02-13 22:40:53 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -574,7 +574,7 @@ __mp_freealloc(allochead *h, allocnode *n, void *i)
      * the oldest freed allocation if the length of the queue would extend past
      * the user-specified limit.
      */
-    if ((i != NULL) && (h->fmax != 0) && (h->flist.size == h->fmax))
+    if ((i != NULL) && (h->flist.size != 0) && (h->flist.size == h->fmax))
         __mp_recyclefreed(h);
     /* Remove the allocated node from the allocation tree.
      */
