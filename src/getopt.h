@@ -33,6 +33,18 @@
 #include "config.h"
 
 
+/* Contains all of the details about long options.
+ */
+
+typedef struct option
+{
+    char *name; /* option name */
+    int value;  /* option value */
+    char arg;   /* option has an argument */
+}
+option;
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,7 +56,7 @@ MP_EXPORT char *__mp_optarg;
 
 
 MP_EXPORT int __mp_getnum(char *, char *, long *, int);
-MP_EXPORT int __mp_getopt(unsigned long, char **, char *);
+MP_EXPORT int __mp_getopt(unsigned long, char **, char *, option *);
 
 
 #ifdef __cplusplus

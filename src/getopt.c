@@ -23,7 +23,8 @@
 /*
  * Option parsing.  Implements a routine, similar to getopt() provided on most
  * UNIX systems, which is used to parse command line options in the mpatrol
- * tools.
+ * tools.  Options with long names are also supported in a way that is similar
+ * to the GNU style of command line option handling.
  */
 
 
@@ -36,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.2 2000-04-30 15:05:01 graeme Exp $"
+#ident "$Id: getopt.c,v 1.3 2000-09-25 18:22:21 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,12 +104,40 @@ MP_GLOBAL int __mp_getnum(char *p, char *s, long *n, int u)
 }
 
 
+/* Search for an option in the long options table.
+ */
+
+static option *findopt(char *s, option *l, char **a)
+{
+    char *t;
+    size_t n;
+
+    if (t = strchr(s, '='))
+        n = t - s;
+    else
+        n = strlen(s);
+    while (l->name != NULL)
+    {
+        if (strncmp(s, l->name, n) == 0)
+        {
+            if (t != NULL)
+                n++;
+            *a = s + n;
+            return l;
+        }
+        l++;
+    }
+    return NULL;
+}
+
+
 /* Read an option from a supplied command line argument array.
  */
 
-MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s)
+MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s, option *l)
 {
     static char *t;
+    option *m;
     char *p;
     int r;
 
@@ -141,6 +170,47 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s)
             return EOF;
         }
         t++;
+        /* Parse a long option and possibly its argument.
+         */
+        if ((*t == '-') && (l != NULL))
+        {
+            t++;
+            /* Check that the option appears in the long options table.
+             */
+            if ((m = findopt(t, l, &t)) == NULL)
+            {
+                fprintf(stderr, "%s: Illegal option `--%s'\n", a[0], t);
+                __mp_optindex++;
+                t = NULL;
+                return '?';
+            }
+            /* Check to see if the option takes an argument.
+             */
+            if (m->arg)
+                if (*t == '\0')
+                {
+                    /* The rest of this argument is empty, so we proceed to the
+                     * next argument.
+                     */
+                    if ((++__mp_optindex >= n) ||
+                        (strcmp(a[__mp_optindex], "--") == 0))
+                    {
+                        fprintf(stderr, "%s: Option `--%s' requires an "
+                                "argument\n", a[0], m->name);
+                        t = NULL;
+                        return '?';
+                    }
+                    __mp_optarg = a[__mp_optindex];
+                }
+                else
+                    __mp_optarg = t;
+            else if (*t != '\0')
+                fprintf(stderr, "%s: Ignoring argument `%s' for option "
+                        "`--%s'\n", a[0], t, m->name);
+            __mp_optindex++;
+            t = NULL;
+            return m->value;
+        }
     }
     /* Check that the option appears in the string of recognised options.
      */
@@ -159,7 +229,7 @@ MP_GLOBAL int __mp_getopt(unsigned long n, char **a, char *s)
             /* The rest of this argument is empty, so we proceed to the next
              * argument.
              */
-            if (++__mp_optindex >= n)
+            if ((++__mp_optindex >= n) || (strcmp(a[__mp_optindex], "--") == 0))
             {
                 fprintf(stderr, "%s: Option `-%c' requires an argument\n", a[0],
                         r);
