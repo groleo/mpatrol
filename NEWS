@@ -1,3 +1,34 @@
+Changes for 1.4.4 (30th May, 2001)
+
+  * Added ability to read, write, compare and remove allocation contents files.
+
+  * Added the __mp_libversion() function to return the library version number.
+
+  * The __mp_* functions can now be called as mpatrol_* functions when the
+    mpatrol.h header file is included.
+
+  * Added support for automatic compilation when TARGET=TARGET_ANY and
+    ARCH=ARCH_ANY and added information about the platform in the log file.
+
+  * SuSE Linux is now supported.
+
+  * Added ability to trace reallocations.
+
+  * Fixed a problem on UNIX platforms when fork() was called and the child
+    process continued to make memory allocations.
+
+  * Fixed a problem on Windows platforms when protecting pages that were
+    allocated by different calls to VirtualAlloc().
+
+  * Fixed a bug when using alloca() without full stack support.
+
+  * Added the --hatf-file option to the mptrace command to write out the trace
+    file in HATF format.  Also added running statistics to the --verbose
+    option.
+
+  * Added the --max-stack option to the mleak command.
+
+
 Changes for 1.4.3 (22th March, 2001)
 
   * Added the --call-graph option to the mprof command and fixed a rare bug when
