@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: utils.c,v 1.6 2000-12-20 22:05:59 graeme Exp $"
+#ident "$Id: utils.c,v 1.7 2000-12-20 23:47:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -44,7 +44,9 @@ extern "C"
 /* Return the base-two logarithm of an unsigned integer.
  */
 
-MP_GLOBAL unsigned char __mp_logtwo(unsigned long n)
+MP_GLOBAL
+unsigned char
+__mp_logtwo(unsigned long n)
 {
     unsigned char l;
 
@@ -56,7 +58,9 @@ MP_GLOBAL unsigned char __mp_logtwo(unsigned long n)
 /* Return the truncated square root of an unsigned integer.
  */
 
-MP_GLOBAL unsigned long __mp_squareroot(unsigned long n)
+MP_GLOBAL
+unsigned long
+__mp_squareroot(unsigned long n)
 {
     unsigned long r, t;
 
@@ -69,7 +73,9 @@ MP_GLOBAL unsigned long __mp_squareroot(unsigned long n)
 /* Determine if an unsigned integer is a power of two.
  */
 
-MP_GLOBAL int __mp_ispoweroftwo(unsigned long n)
+MP_GLOBAL
+int
+__mp_ispoweroftwo(unsigned long n)
 {
     return ((n > 0) && ((n & (n - 1)) == 0));
 }
@@ -79,7 +85,9 @@ MP_GLOBAL int __mp_ispoweroftwo(unsigned long n)
 /* Round an unsigned integer up to the nearest power of two.
  */
 
-MP_GLOBAL unsigned long __mp_poweroftwo(unsigned long n)
+MP_GLOBAL
+unsigned long
+__mp_poweroftwo(unsigned long n)
 {
     if ((n == 0) || __mp_ispoweroftwo(n))
         return n;
@@ -91,7 +99,9 @@ MP_GLOBAL unsigned long __mp_poweroftwo(unsigned long n)
 /* Round an unsigned integer down to a specified power of two alignment.
  */
 
-MP_GLOBAL unsigned long __mp_rounddown(unsigned long n, unsigned long a)
+MP_GLOBAL
+unsigned long
+__mp_rounddown(unsigned long n, unsigned long a)
 {
     return n & ~(a - 1);
 }
@@ -102,7 +112,9 @@ MP_GLOBAL unsigned long __mp_rounddown(unsigned long n, unsigned long a)
 /* Round an unsigned integer up to a specified power of two alignment.
  */
 
-MP_GLOBAL unsigned long __mp_roundup(unsigned long n, unsigned long a)
+MP_GLOBAL
+unsigned long
+__mp_roundup(unsigned long n, unsigned long a)
 {
     return ((n - 1) & ~(a - 1)) + a;
 }
@@ -112,7 +124,9 @@ MP_GLOBAL unsigned long __mp_roundup(unsigned long n, unsigned long a)
 /* Convert a signed integer to a signed LEB128 number.
  */
 
-MP_GLOBAL void *__mp_encodesleb128(long n, size_t *l)
+MP_GLOBAL
+void *
+__mp_encodesleb128(long n, size_t *l)
 {
     static unsigned char b[32];
     size_t i;
@@ -139,7 +153,9 @@ MP_GLOBAL void *__mp_encodesleb128(long n, size_t *l)
 /* Convert an unsigned integer to an unsigned LEB128 number.
  */
 
-MP_GLOBAL void *__mp_encodeuleb128(unsigned long n, size_t *l)
+MP_GLOBAL
+void *
+__mp_encodeuleb128(unsigned long n, size_t *l)
 {
     static unsigned char b[32];
     size_t i;
@@ -160,7 +176,9 @@ MP_GLOBAL void *__mp_encodeuleb128(unsigned long n, size_t *l)
 /* Convert a signed LEB128 number to a signed integer.
  */
 
-MP_GLOBAL long __mp_decodesleb128(void *d, size_t *l)
+MP_GLOBAL
+long
+__mp_decodesleb128(void *d, size_t *l)
 {
     unsigned char *b;
     long n;
@@ -185,7 +203,9 @@ MP_GLOBAL long __mp_decodesleb128(void *d, size_t *l)
 /* Convert an unsigned LEB128 number to an unsigned integer.
  */
 
-MP_GLOBAL unsigned long __mp_decodeuleb128(void *d, size_t *l)
+MP_GLOBAL
+unsigned long
+__mp_decodeuleb128(void *d, size_t *l)
 {
     unsigned char *b;
     unsigned long n;

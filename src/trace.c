@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.8 2000-12-08 00:13:18 graeme Exp $"
+#ident "$Id: trace.c,v 1.9 2000-12-20 23:42:23 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -82,7 +82,9 @@ static int traceready;
  * is ready to trace memory allocations.
  */
 
-MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
+MP_GLOBAL
+void
+__mp_newtrace(tracehead *t, meminfo *m)
 {
     t->file = __mp_tracefile(m, NULL);
     t->tracing = 0;
@@ -94,7 +96,9 @@ MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
 /* Finish tracing and attempt to close the tracing output file.
  */
 
-MP_GLOBAL int __mp_endtrace(tracehead *t)
+MP_GLOBAL
+int
+__mp_endtrace(tracehead *t)
 {
     char s[4];
     int r;
@@ -127,7 +131,9 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
 /* Attempt to open the tracing output file.
  */
 
-static int opentracefile(tracehead *t)
+static
+int
+opentracefile(tracehead *t)
 {
     char s[4];
     void *b;
@@ -179,7 +185,9 @@ static int opentracefile(tracehead *t)
 /* Record a heap memory reservation for tracing.
  */
 
-MP_GLOBAL void __mp_traceheap(void *a, size_t l, int i)
+MP_GLOBAL
+void
+__mp_traceheap(void *a, size_t l, int i)
 {
     void *b;
     size_t s;
@@ -220,7 +228,9 @@ MP_GLOBAL void __mp_traceheap(void *a, size_t l, int i)
 /* Record a memory allocation for tracing.
  */
 
-MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
+MP_GLOBAL
+void
+__mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 {
     void *b;
     size_t s;
@@ -243,7 +253,9 @@ MP_GLOBAL void __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 /* Record a memory deallocation for tracing.
  */
 
-MP_GLOBAL void __mp_tracefree(tracehead *t, unsigned long n)
+MP_GLOBAL
+void
+__mp_tracefree(tracehead *t, unsigned long n)
 {
     void *b;
     size_t s;

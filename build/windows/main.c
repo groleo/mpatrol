@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: main.c,v 1.2 2000-01-09 22:07:18 graeme Exp $"
+#ident "$Id: main.c,v 1.3 2000-12-20 23:50:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -45,7 +45,9 @@ extern "C"
 /* DLL entry point to initialise and finalise the library.
  */
 
-BOOL WINAPI DllMain(HANDLE h, DWORD r, LPVOID d)
+BOOL
+WINAPI
+DllMain(HANDLE h, DWORD r, LPVOID d)
 {
     switch (r)
     {

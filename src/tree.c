@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: tree.c,v 1.2 2000-01-09 20:35:23 graeme Exp $"
+#ident "$Id: tree.c,v 1.3 2000-12-20 23:45:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -47,7 +47,9 @@ extern "C"
  * easier and is pointed to by all real leaf nodes.
  */
 
-MP_GLOBAL void __mp_newtree(treeroot *t)
+MP_GLOBAL
+void
+__mp_newtree(treeroot *t)
 {
     t->root = &t->null;
     t->null.parent = t->null.left = t->null.right = NULL;
@@ -60,7 +62,9 @@ MP_GLOBAL void __mp_newtree(treeroot *t)
  * ordering.
  */
 
-static void rotateleft(treeroot *t, treenode *l)
+static
+void
+rotateleft(treeroot *t, treenode *l)
 {
     treenode *r;
 
@@ -83,7 +87,9 @@ static void rotateleft(treeroot *t, treenode *l)
  * ordering.
  */
 
-static void rotateright(treeroot *t, treenode *r)
+static
+void
+rotateright(treeroot *t, treenode *r)
 {
     treenode *l;
 
@@ -107,7 +113,9 @@ static void rotateright(treeroot *t, treenode *r)
  * keep it properly balanced.
  */
 
-MP_GLOBAL void __mp_treeinsert(treeroot *t, treenode *n, unsigned long k)
+MP_GLOBAL
+void
+__mp_treeinsert(treeroot *t, treenode *n, unsigned long k)
 {
     treenode *a, *b;
 
@@ -183,7 +191,9 @@ MP_GLOBAL void __mp_treeinsert(treeroot *t, treenode *n, unsigned long k)
  * balanced.
  */
 
-MP_GLOBAL void __mp_treeremove(treeroot *t, treenode *n)
+MP_GLOBAL
+void
+__mp_treeremove(treeroot *t, treenode *n)
 {
     treenode *a, *b;
     char f;
@@ -295,7 +305,9 @@ MP_GLOBAL void __mp_treeremove(treeroot *t, treenode *n)
  * or return NULL if no such node exists.
  */
 
-MP_GLOBAL treenode *__mp_search(treenode *n, unsigned long k)
+MP_GLOBAL
+treenode *
+__mp_search(treenode *n, unsigned long k)
 {
     while (n->left && (k != n->key))
         if (k < n->key)
@@ -312,7 +324,9 @@ MP_GLOBAL treenode *__mp_search(treenode *n, unsigned long k)
  * given key, or return NULL if no such node exists.
  */
 
-MP_GLOBAL treenode *__mp_searchlower(treenode *n, unsigned long k)
+MP_GLOBAL
+treenode *
+__mp_searchlower(treenode *n, unsigned long k)
 {
     treenode *a;
 
@@ -337,7 +351,9 @@ MP_GLOBAL treenode *__mp_searchlower(treenode *n, unsigned long k)
  * given key, or return NULL if no such node exists.
  */
 
-MP_GLOBAL treenode *__mp_searchhigher(treenode *n, unsigned long k)
+MP_GLOBAL
+treenode *
+__mp_searchhigher(treenode *n, unsigned long k)
 {
     treenode *a;
 
@@ -361,7 +377,9 @@ MP_GLOBAL treenode *__mp_searchhigher(treenode *n, unsigned long k)
 /* Return the leftmost node of a subtree.
  */
 
-MP_GLOBAL treenode *__mp_minimum(treenode *n)
+MP_GLOBAL
+treenode *
+__mp_minimum(treenode *n)
 {
     treenode *a;
 
@@ -376,7 +394,9 @@ MP_GLOBAL treenode *__mp_minimum(treenode *n)
 /* Return the rightmost node of a subtree.
  */
 
-MP_GLOBAL treenode *__mp_maximum(treenode *n)
+MP_GLOBAL
+treenode *
+__mp_maximum(treenode *n)
 {
     treenode *a;
 
@@ -392,7 +412,9 @@ MP_GLOBAL treenode *__mp_maximum(treenode *n)
  * node exists.
  */
 
-MP_GLOBAL treenode *__mp_predecessor(treenode *n)
+MP_GLOBAL
+treenode *
+__mp_predecessor(treenode *n)
 {
     treenode *a;
 
@@ -414,7 +436,9 @@ MP_GLOBAL treenode *__mp_predecessor(treenode *n)
  * node exists.
  */
 
-MP_GLOBAL treenode *__mp_successor(treenode *n)
+MP_GLOBAL
+treenode *
+__mp_successor(treenode *n)
 {
     treenode *a;
 

@@ -105,7 +105,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.37 2000-12-06 22:53:38 graeme Exp $"
+#ident "$Id: symbol.c,v 1.38 2000-12-20 23:39:42 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -294,7 +294,9 @@ extern struct obj_list *__rld_obj_head;
 /* Initialise the fields of a symhead so that the symbol table becomes empty.
  */
 
-MP_GLOBAL void __mp_newsymbols(symhead *y, heaphead *h)
+MP_GLOBAL
+void
+__mp_newsymbols(symhead *y, heaphead *h)
 {
     struct { char x; symnode y; } z;
     long n;
@@ -320,7 +322,9 @@ MP_GLOBAL void __mp_newsymbols(symhead *y, heaphead *h)
 /* Close all access library handles.
  */
 
-MP_GLOBAL void __mp_closesymbols(symhead *y)
+MP_GLOBAL
+void
+__mp_closesymbols(symhead *y)
 {
 #if FORMAT == FORMAT_BFD
     objectfile *n, *p;
@@ -342,7 +346,9 @@ MP_GLOBAL void __mp_closesymbols(symhead *y)
 /* Forget all data currently in the symbol table.
  */
 
-MP_GLOBAL void __mp_deletesymbols(symhead *y)
+MP_GLOBAL
+void
+__mp_deletesymbols(symhead *y)
 {
     /* We don't need to explicitly free any memory as this is dealt with
      * at a lower level by the heap manager.
@@ -362,7 +368,9 @@ MP_GLOBAL void __mp_deletesymbols(symhead *y)
 /* Allocate a new symbol node.
  */
 
-static symnode *getsymnode(symhead *y)
+static
+symnode *
+getsymnode(symhead *y)
 {
     symnode *n;
     heapnode *p;
@@ -392,7 +400,9 @@ static symnode *getsymnode(symhead *y)
 /* Allocate a new symbol node for a given COFF or XCOFF symbol.
  */
 
-static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
+static
+int
+addsymbol(symhead *y, SYMENT *p, char *f, char *s)
 {
     AUXENT *e;
     symnode *n;
@@ -454,7 +464,9 @@ static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
 /* Allocate a new symbol node for a given ELF32 symbol.
  */
 
-static int addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
+static
+int
+addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
 {
     symnode *n;
     char *r;
@@ -493,7 +505,9 @@ static int addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
 /* Allocate a new symbol node for a given ELF64 symbol.
  */
 
-static int addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
+static
+int
+addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
 {
     symnode *n;
     char *r;
@@ -532,7 +546,9 @@ static int addsymbol(symhead *y, Elf64_Sym *p, char *f, char *s, size_t b)
 /* Allocate a new symbol node for a given BFD symbol.
  */
 
-static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
+static
+int
+addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
 {
     symnode *n;
     char *r;
@@ -596,7 +612,9 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
  * symbol located in a module by the imagehlp library.
  */
 
-static int __stdcall addsym(char *s, unsigned long a, unsigned long l, void *p)
+static
+int __stdcall
+addsym(char *s, unsigned long a, unsigned long l, void *p)
 {
     syminfo *i;
     symhead *y;
@@ -640,7 +658,9 @@ static int __stdcall addsym(char *s, unsigned long a, unsigned long l, void *p)
 /* Allocate a set of symbol nodes for a COFF or XCOFF executable file.
  */
 
-static int addsymbols(symhead *y, char *e, char *f, size_t b)
+static
+int
+addsymbols(symhead *y, char *e, char *f, size_t b)
 {
     char n[SYMNMLEN + 1];
     FILHDR *o;
@@ -734,7 +754,9 @@ static int addsymbols(symhead *y, char *e, char *f, size_t b)
 /* Allocate a set of symbol nodes for an ELF32 object file.
  */
 
-static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
+static
+int
+addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 {
     Elf_Scn *s;
     Elf32_Shdr *h;
@@ -810,7 +832,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 /* Allocate a set of symbol nodes for an ELF64 object file.
  */
 
-static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
+static
+int
+addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 {
     Elf_Scn *s;
     Elf64_Shdr *h;
@@ -886,7 +910,9 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
 /* Allocate a set of symbol nodes for a BFD object file.
  */
 
-static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
+static
+int
+addsymbols(symhead *y, bfd *h, char *f, size_t b)
 {
     asymbol **p;
     long i, n;
@@ -971,7 +997,9 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
  * module located by the imagehlp library.
  */
 
-static int __stdcall addsyms(char *f, unsigned long b, void *p)
+static
+int __stdcall
+addsyms(char *f, unsigned long b, void *p)
 {
     modinfo *i;
     symhead *y;
@@ -1016,7 +1044,9 @@ static int __stdcall addsyms(char *f, unsigned long b, void *p)
  * symbol table.
  */
 
-MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
+MP_GLOBAL
+int
+__mp_addsymbols(symhead *y, char *s, size_t b)
 {
 #if FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF || \
     FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64 || FORMAT == FORMAT_BFD
@@ -1232,7 +1262,9 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
 /* Add any external or additional symbols to the symbol table.
  */
 
-MP_GLOBAL int __mp_addextsymbols(symhead *y)
+MP_GLOBAL
+int
+__mp_addextsymbols(symhead *y)
 {
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
@@ -1377,7 +1409,9 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
  * conflicts from the symbols that have been read.
  */
 
-MP_GLOBAL void __mp_fixsymbols(symhead *y)
+MP_GLOBAL
+void
+__mp_fixsymbols(symhead *y)
 {
     symnode *n, *p;
     void *l, *m;
@@ -1438,7 +1472,9 @@ MP_GLOBAL void __mp_fixsymbols(symhead *y)
  * permission.
  */
 
-MP_GLOBAL int __mp_protectsymbols(symhead *y, memaccess a)
+MP_GLOBAL
+int
+__mp_protectsymbols(symhead *y, memaccess a)
 {
     symnode *n;
 
@@ -1468,7 +1504,9 @@ MP_GLOBAL int __mp_protectsymbols(symhead *y, memaccess a)
 /* Attempt to find the symbol located at a particular address.
  */
 
-MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
+MP_GLOBAL
+symnode *
+__mp_findsymbol(symhead *y, void *p)
 {
     symnode *m, *n, *r;
 
@@ -1535,7 +1573,9 @@ MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
  * to match it up with source position information.
  */
 
-static void findsource(bfd *h, asection *p, void *d)
+static
+void
+findsource(bfd *h, asection *p, void *d)
 {
     sourcepos *s;
     bfd_vma v;
@@ -1566,8 +1606,9 @@ static void findsource(bfd *h, asection *p, void *d)
  * at a particular address.
  */
 
-MP_GLOBAL int __mp_findsource(symhead *y, void *p, char **s, char **t,
-                              unsigned long *u)
+MP_GLOBAL
+int
+__mp_findsource(symhead *y, void *p, char **s, char **t, unsigned long *u)
 {
 #if FORMAT == FORMAT_BFD
     objectfile *n;
