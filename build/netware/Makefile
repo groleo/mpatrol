@@ -18,17 +18,17 @@
 # MA 02111-1307, USA.
 
 
-# GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
+# GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.42 2001-02-01 20:46:20 graeme Exp $
+# $Id: Makefile,v 1.43 2001-02-04 21:27:16 graeme Exp $
 
 
 # Definitions
 
 SHELL = sh
-CC    = ncc
-AR    = ncc
+CC    = nc++
+AR    = nc++
 
 SOURCE = ../../src
 VPATH  = $(SOURCE)
