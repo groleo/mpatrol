@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.17 2000-09-25 18:21:19 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.18 2000-09-25 20:06:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -98,121 +98,120 @@ static int allowoflow;
 /* The table describing a summary of all recognised options.
  */
 
-static char *options_help[] =
+static option options_help[] =
 {
-    "1", "unsigned integer",
-    "", "Specifies the limit in bytes up to which memory allocations should be",
-    "", "classified as small allocations for profiling purposes.",
-    "2", "unsigned integer",
-    "", "Specifies the limit in bytes up to which memory allocations should be",
-    "", "classified as medium allocations for profiling purposes.",
-    "3", "unsigned integer",
-    "", "Specifies the limit in bytes up to which memory allocations should be",
-    "", "classified as large allocations for profiling purposes.",
-    "A", "unsigned integer",
-    "", "Specifies an allocation index at which to stop the program when it is",
-    "", "being allocated.",
-    "a", "unsigned integer",
-    "", "Specifies an 8-bit byte pattern with which to prefill newly-allocated",
-    "", "memory.",
-    "C", "unsigned range",
-    "", "Specifies a range of allocation indices at which to check the",
-    "", "integrity of free memory and overflow buffers.",
-    "c", NULL,
-    "", "Specifies that all arguments to functions which allocate, reallocate",
-    "", "and deallocate memory have rigorous checks performed on them.",
-    "D", "unsigned integer",
-    "", "Specifies the default alignment for general-purpose memory",
-    "", "allocations, which must be a power of two.",
-    "d", NULL,
-    "", "Specifies that programs which were not linked with the mpatrol",
-    "", "library should also be traced, but only if they were dynamically",
-    "", "linked.",
-    "e", "string",
-    "", "Specifies an alternative filename with which to locate the executable",
-    "", "file containing the program's symbols.",
-    "F", "unsigned integer",
-    "", "Specifies an allocation index at which to stop the program when it is",
-    "", "being freed.",
-    "f", "unsigned integer",
-    "", "Specifies an 8-bit byte pattern with which to prefill newly-freed",
-    "", "memory.",
-    "G", NULL,
-    "", "Instructs the library to save and replace certain signal handlers",
-    "", "during the execution of library code and to restore them afterwards.",
-    "g", NULL,
-    "", "Specifies that any debugging information in the executable file",
-    "", "should be used to obtain additional source-level information.",
-    "L", "unsigned integer",
-    "", "Specifies the limit in bytes at which all memory allocations should",
-    "", "fail if the total allocated memory should increase beyond this.",
-    "l", "string",
-    "", "Specifies an alternative file in which to place all diagnostics from",
-    "", "the mpatrol library.",
-    "M", NULL,
-    "", "Specifies that a warning rather than an error should be produced if",
-    "", "any memory operation function overflows the boundaries of a memory",
-    "", "allocation, and that the operation should still be performed.",
-    "m", NULL,
-    "", "Specifies that the library should use mmap() instead of sbrk() to",
-    "", "allocate system memory.",
-    "N", NULL,
-    "", "Specifies that the mpatrol library's internal data structures should",
-    "", "not be made read-only after every memory allocation, reallocation or",
-    "", "deallocation.",
-    "n", "unsigned integer",
-    "", "Specifies that a number of recently-freed memory allocations should",
-    "", "be prevented from being returned to the free memory pool.",
-    "O", "unsigned integer",
-    "", "Specifies the size in bytes to use for all overflow buffers, which",
-    "", "must be a power of two.",
-    "o", "unsigned integer",
-    "", "Specifies an 8-bit byte pattern with which to fill the overflow",
-    "", "buffers of all memory allocations.",
-    "P", "string",
-    "", "Specifies an alternative file in which to place all memory allocation",
-    "", "profiling information from the mpatrol library.",
-    "p", NULL,
-    "", "Specifies that all memory allocations are to be profiled and sent to",
-    "", "the profiling output file.",
-    "Q", "unsigned integer",
-    "", "Specifies the frequency at which to periodically write the profiling",
-    "", "data to the profiling output file.",
-    "R", "unsigned integer",
-    "", "Specifies an allocation index at which to stop the program when a",
-    "", "memory allocation is being reallocated.",
-    "S", NULL,
-    "", "Specifies that a memory map of the entire heap and a summary of all",
-    "", "of the function symbols read from the program's executable file",
-    "", "should be displayed at the end of program execution.",
-    "s", NULL,
-    "", "Specifies that a summary of all of the freed and unfreed memory",
-    "", "allocations should be displayed at the end of program execution.",
-    "U", "unsigned integer",
-    "", "Specifies the minimum number of unfreed allocations at which to abort",
-    "", "the program just before program termination.",
-    "V", NULL,
-    "", "Displays the version number of this program.",
-    "v", NULL,
-    "", "Specifies that any reallocated or freed memory allocations should",
-    "", "preserve their original contents.",
-    "w", NULL,
-    "", "Specifies that watch point areas should be used for overflow buffers",
-    "", "rather than filling with the overflow byte.",
-    "X", NULL,
-    "", "Specifies that each individual memory allocation should occupy at",
-    "", "least one page of virtual memory and should be placed at the highest",
-    "", "point within these pages.",
-    "x", NULL,
-    "", "Specifies that each individual memory allocation should occupy at",
-    "", "least one page of virtual memory and should be placed at the lowest",
-    "", "point within these pages.",
-    "Z", "unsigned integer",
-    "", "Specifies the random number seed which will be used when determining",
-    "", "which memory allocations will randomly fail.",
-    "z", "unsigned integer",
-    "", "Specifies the frequency at which all memory allocations will randomly",
-    "", "fail.",
+    {"small-bound", '1', "unsigned integer",
+     "Specifies the limit in bytes up to which memory allocations should be "
+     "classified as small allocations for profiling purposes."},
+    {"medium-bound", '2', "unsigned integer",
+     "Specifies the limit in bytes up to which memory allocations should be "
+     "classified as medium allocations for profiling purposes."},
+    {"large-bound", '3', "unsigned integer",
+     "Specifies the limit in bytes up to which memory allocations should be "
+     "classified as large allocations for profiling purposes."},
+    {"alloc-stop", 'A', "unsigned integer",
+     "Specifies an allocation index at which to stop the program when it is "
+     "being allocated."},
+    {"alloc-byte", 'a', "unsigned integer",
+     "Specifies an 8-bit byte pattern with which to prefill newly-allocated "
+     "memory."},
+    {"check", 'C', "unsigned range",
+     "Specifies a range of allocation indices at which to check the integrity "
+     "of free memory and overflow buffers."},
+    {"check-all", 'c', NULL,
+     "Specifies that all arguments to functions which allocate, reallocate and "
+     "deallocate memory have rigorous checks performed on them."},
+    {"def-align", 'D', "unsigned integer",
+     "Specifies the default alignment for general-purpose memory allocations, "
+     "which must be a power of two."},
+    {"dynamic", 'd', NULL,
+     "Specifies that programs which were not linked with the mpatrol library "
+     "should also be traced, but only if they were dynamically linked."},
+    {"prog-file", 'e', "string",
+     "Specifies an alternative filename with which to locate the executable "
+     "file containing the program's symbols."},
+    {"free-stop", 'F', "unsigned integer",
+     "Specifies an allocation index at which to stop the program when it is "
+     "being freed."},
+    {"free-byte", 'f', "unsigned integer",
+     "Specifies an 8-bit byte pattern with which to prefill newly-freed "
+     "memory."},
+    {"safe-signals", 'G', NULL,
+     "Instructs the library to save and replace certain signal handlers during "
+     "the execution of library code and to restore them afterwards."},
+    {"use-debug", 'g', NULL,
+     "Specifies that any debugging information in the executable file should "
+     "be used to obtain additional source-level information."},
+    {"limit", 'L', "unsigned integer",
+     "Specifies the limit in bytes at which all memory allocations should fail "
+     "if the total allocated memory should increase beyond this."},
+    {"log-file", 'l', "string",
+     "Specifies an alternative file in which to place all diagnostics from the "
+     "mpatrol library."},
+    {"allow-oflow", 'M', NULL,
+     "Specifies that a warning rather than an error should be produced if any "
+     "memory operation function overflows the boundaries of a memory "
+     "allocation, and that the operation should still be performed."},
+    {"use-mmap", 'm', NULL,
+     "Specifies that the library should use mmap() instead of sbrk() to "
+     "allocate system memory."},
+    {"no-protect", 'N', NULL,
+     "Specifies that the mpatrol library's internal data structures should not "
+     "be made read-only after every memory allocation, reallocation or "
+     "deallocation."},
+    {"no-free", 'n', "unsigned integer",
+     "Specifies that a number of recently-freed memory allocations should be "
+     "prevented from being returned to the free memory pool."},
+    {"oflow-size", 'O', "unsigned integer",
+     "Specifies the size in bytes to use for all overflow buffers, which must "
+     "be a power of two."},
+    {"oflow-byte", 'o', "unsigned integer",
+     "Specifies an 8-bit byte pattern with which to fill the overflow buffers "
+     "of all memory allocations."},
+    {"prof-file", 'P', "string",
+     "Specifies an alternative file in which to place all memory allocation "
+     "profiling information from the mpatrol library."},
+    {"prof", 'p', NULL,
+     "Specifies that all memory allocations are to be profiled and sent to the "
+     "profiling output file."},
+    {"auto-save", 'Q', "unsigned integer",
+     "Specifies the frequency at which to periodically write the profiling "
+     "data to the profiling output file."},
+    {"realloc-stop", 'R', "unsigned integer",
+     "Specifies an allocation index at which to stop the program when a memory "
+     "allocation is being reallocated."},
+    {"show-map", 'S', NULL,
+     "Specifies that a memory map of the entire heap and a summary of all of "
+     "the function symbols read from the program's executable file should be "
+     "displayed at the end of program execution."},
+    {"show-freed", 's', NULL,
+     "Specifies that a summary of all of the freed and unfreed memory "
+     "allocations should be displayed at the end of program execution."},
+    {"unfreed-abort", 'U', "unsigned integer",
+     "Specifies the minimum number of unfreed allocations at which to abort "
+     "the program just before program termination."},
+    {"version", 'V', NULL,
+     "Displays the version number of this program."},
+    {"preserve", 'v', NULL,
+     "Specifies that any reallocated or freed memory allocations should "
+     "preserve their original contents."},
+    {"oflow-watch", 'w', NULL,
+     "Specifies that watch point areas should be used for overflow buffers "
+     "rather than filling with the overflow byte."},
+    {"page-alloc-upper", 'X', NULL,
+     "Specifies that each individual memory allocation should occupy at least "
+     "one page of virtual memory and should be placed at the highest point "
+     "within these pages."},
+    {"page-alloc-lower", 'x', NULL,
+     "Specifies that each individual memory allocation should occupy at least "
+     "one page of virtual memory and should be placed at the lowest point "
+     "within these pages."},
+    {"fail-seed", 'Z', "unsigned integer",
+     "Specifies the random number seed which will be used when determining "
+     "which memory allocations will randomly fail."},
+    {"fail-freq", 'z', "unsigned integer",
+     "Specifies the frequency at which all memory allocations will randomly "
+     "fail."},
     NULL
 };
 
@@ -222,19 +221,18 @@ static char *options_help[] =
 
 static void showoptions(void)
 {
+    option *l;
     char **s, **t;
 
     fputs("Options:\n", stderr);
-    for (s = options_help, t = s + 1; *s != NULL; s += 2, t += 2)
-        if (**s != '\0')
-        {
-            fprintf(stderr, "    -%s", *s);
-            if (*t != NULL)
-                fprintf(stderr, " <%s>", *t);
-            fputc('\n', stderr);
-        }
-        else
-            fprintf(stderr, "\t%s\n", *t);
+    for (l = options_help; l->name != NULL; l++)
+    {
+        fprintf(stderr, "    -%c --%s", l->value, l->name);
+        if (l->arg)
+            fprintf(stderr, "=<%s>", l->arg);
+        fputc('\n', stderr);
+        fprintf(stderr, "\t%s\n", l->desc);
+    }
 }
 
 
@@ -386,7 +384,7 @@ int main(int argc, char **argv)
     proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv,
              "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNn:O:o:P:pQ:R:SsU:VvwXxZ:z:",
-             NULL)) != EOF)
+             options_help)) != EOF)
         switch (c)
         {
           case '1':
