@@ -62,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.31 2000-07-14 00:07:57 graeme Exp $"
+#ident "$Id: memory.c,v 1.32 2000-07-14 00:16:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -224,7 +224,7 @@ static char *progname(void)
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
      ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
-    unsigned int *p;
+    unsigned long *p;
     stackinfo s;
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
 #if MP_PROCFS_SUPPORT
@@ -295,30 +295,34 @@ static char *progname(void)
      * doing this, but unfortunately it seemed to be the only way.
      */
     __mp_newframe(&s, NULL);
-    for (p = NULL; __mp_getframe(&s); p = (unsigned int *) s.frame);
+    for (p = NULL; __mp_getframe(&s); p = (unsigned long *) s.frame);
     if (p != NULL)
 #if ARCH == ARCH_IX86
 #if SYSTEM == SYSTEM_LINUX
-        if (p = (unsigned int *) p[4])
+        if (p = (unsigned long *) p[4])
             return (char *) *p;
 #elif SYSTEM == SYSTEM_LYNXOS
-        if (p = (unsigned int *) p[3])
+        if (p = (unsigned long *) p[3])
             return (char *) *p;
 #else /* SYSTEM */
-        if (p = (unsigned int *) p[3])
+        if (p = (unsigned long *) p[3])
             return (char *) p;
 #endif /* SYSTEM */
 #elif ARCH == ARCH_M68K
-        if (p = (unsigned int *) p[3])
+        if (p = (unsigned long *) p[3])
             return (char *) *p;
 #elif ARCH == ARCH_MIPS
-        if (p = (unsigned int *) p[7])
+        if (p = (unsigned long *) p[7])
             return (char *) p;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
-        if (p = (unsigned int *) p[23])
+        if (p = (unsigned long *) p[23])
             return (char *) *p;
 #elif ARCH == ARCH_SPARC
-        if (p = (unsigned int *) *(((unsigned int *) *p) + 1))
+#if ENVIRON == ENVIRON_64
+        if (p = (unsigned long *) *(((unsigned long *) (*p + 0x7FF)) + 1))
+#else /* ENVIRON */
+        if (p = (unsigned long *) *(((unsigned long *) *p) + 1))
+#endif /* ENVIRON */
             return (char *) *p;
 #endif /* ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
