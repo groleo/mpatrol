@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.45 2001-02-23 22:18:52 graeme Exp $
+ * $Id: info.h,v 1.46 2001-02-25 23:22:21 graeme Exp $
  */
 
 
@@ -280,7 +280,7 @@ MP_EXPORT void *__mp_locatememory(infohead *, void *, size_t, void *, size_t,
 MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, alloctype,
                                  loginfo *);
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
-MP_EXPORT void __mp_checkinfo(infohead *);
+MP_EXPORT void __mp_checkinfo(infohead *, loginfo *);
 MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype, loginfo *);
 MP_EXPORT int __mp_checkstring(infohead *, char *, size_t *, alloctype,
                                loginfo *, int);

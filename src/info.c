@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.64 2001-02-25 23:10:01 graeme Exp $"
+#ident "$Id: info.c,v 1.65 2001-02-25 23:22:21 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.64 2001-02-25 23:10:01 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.65 2001-02-25 23:22:21 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1023,7 +1023,7 @@ __mp_protectinfo(infohead *h, memaccess a)
 
 MP_GLOBAL
 void
-__mp_checkinfo(infohead *h)
+__mp_checkinfo(infohead *h, loginfo *v)
 {
     allocnode *n;
     infonode *m;
@@ -1043,8 +1043,8 @@ __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(ET_FRECOR, AT_MAX, NULL, 0, "free memory corruption "
-                           "at " MP_POINTER, p);
+                __mp_error(ET_FRECOR, AT_MAX, v->file, v->line,
+                           "free memory corruption at " MP_POINTER, p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -1064,9 +1064,9 @@ __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(ET_FRDCOR, AT_MAX, NULL, 0, "freed allocation "
-                           MP_POINTER " has memory corruption at " MP_POINTER,
-                           n->block, p);
+                __mp_error(ET_FRDCOR, AT_MAX, v->file, v->line, "freed "
+                           "allocation " MP_POINTER " has memory corruption at "
+                           MP_POINTER, n->block, p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -1100,13 +1100,13 @@ __mp_checkinfo(infohead *h)
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
-                    __mp_error(ET_FRDOVF, AT_MAX, NULL, 0, "freed allocation "
-                               MP_POINTER " has a corrupted overflow buffer at "
-                               MP_POINTER, n->block, p);
+                    __mp_error(ET_FRDOVF, AT_MAX, v->file, v->line, "freed "
+                               "allocation " MP_POINTER " has a corrupted "
+                               "overflow buffer at " MP_POINTER, n->block, p);
                 else
-                    __mp_error(ET_ALLOVF, AT_MAX, NULL, 0, "allocation "
-                               MP_POINTER " has a corrupted overflow buffer at "
-                               MP_POINTER, n->block, p);
+                    __mp_error(ET_ALLOVF, AT_MAX, v->file, v->line,
+                               "allocation " MP_POINTER " has a corrupted "
+                               "overflow buffer at " MP_POINTER, n->block, p);
                 if (p < n->block)
                     __mp_printmemory(b, s);
                 else
@@ -1130,13 +1130,13 @@ __mp_checkinfo(infohead *h)
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
-                    __mp_error(ET_FRDOVF, AT_MAX, NULL, 0, "freed allocation "
-                               MP_POINTER " has a corrupted overflow buffer at "
-                               MP_POINTER, n->block, p);
+                    __mp_error(ET_FRDOVF, AT_MAX, v->file, v->line, "freed "
+                               "allocation " MP_POINTER " has a corrupted "
+                               "overflow buffer at " MP_POINTER, n->block, p);
                 else
-                    __mp_error(ET_ALLOVF, AT_MAX, NULL, 0, "allocation "
-                               MP_POINTER " has a corrupted overflow buffer at "
-                               MP_POINTER, n->block, p);
+                    __mp_error(ET_ALLOVF, AT_MAX, v->file, v->line,
+                               "allocation " MP_POINTER " has a corrupted "
+                               "overflow buffer at " MP_POINTER, n->block, p);
                 if (p < n->block)
                     __mp_printmemory((char *) n->block - l, l);
                 else
