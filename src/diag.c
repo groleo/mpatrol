@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.9 2000-01-30 20:29:09 graeme Exp $"
+#ident "$Id: diag.c,v 1.10 2000-03-01 00:54:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -357,11 +357,22 @@ MP_GLOBAL void __mp_printloc(infonode *n)
 MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
 {
     symnode *n;
+    char *r, *s, *t;
+    unsigned long u;
 
     if (n = __mp_findsymbol(y, a))
-        __mp_diag("%s", n->data.name);
+        r = n->data.name;
+    else
+        r = NULL;
+    __mp_findsource(y, a, &s, &t, &u);
+    if (r != NULL)
+        __mp_diag("%s", r);
+    else if (s != NULL)
+        __mp_diag("%s", s);
     else
         __mp_diag("???");
+    if ((t != NULL) && (u != 0))
+        __mp_diag(" (%s:%lu)", t, u);
 }
 
 
