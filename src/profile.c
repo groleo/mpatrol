@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.21 2000-04-24 10:46:50 graeme Exp $"
+#ident "$Id: profile.c,v 1.22 2000-04-26 23:24:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -338,7 +338,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     profdata *d;
     profnode *n;
     FILE *f;
-    size_t i, l;
+    size_t i, j, l;
 
     p->autocount = 0;
     /* The profiling file name can also be named as stderr and stdout which
@@ -390,7 +390,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     }
     /* Write out the statistics from every call site.
      */
-    i = 0;
+    i = j = 0;
     l = 1;
     fwrite(&p->tree.size, sizeof(size_t), 1, f);
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
@@ -404,20 +404,36 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         fwrite(&n->data.addr, sizeof(void *), 1, f);
         if (n->data.symbol != NULL)
         {
-            if (n->data.symbol->data.offset == 0)
+            if (n->data.symbol->data.index == 0)
             {
+                n->data.symbol->data.index = ++j;
                 n->data.symbol->data.offset = l;
                 l += strlen(n->data.symbol->data.name) + 1;
             }
+            fwrite(&n->data.symbol->data.index, sizeof(unsigned long), 1, f);
             fwrite(&n->data.symbol->data.offset, sizeof(unsigned long), 1, f);
         }
         else
+        {
             fwrite(&i, sizeof(unsigned long), 1, f);
+            fwrite(&i, sizeof(unsigned long), 1, f);
+        }
         if (n->data.data != NULL)
             fwrite(&n->data.data->data.index, sizeof(unsigned long), 1, f);
         else
             fwrite(&i, sizeof(unsigned long), 1, f);
     }
+    /* Write out the address of every symbol that has been referenced.
+     */
+    fwrite(&j, sizeof(size_t), 1, f);
+    if (j > 0)
+        for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
+             n = (profnode *) __mp_successor(&n->data.node))
+            if ((n->data.symbol != NULL) && (n->data.symbol->data.index != 0))
+            {
+                n->data.symbol->data.index = 0;
+                fwrite(&n->data.symbol->data.addr, sizeof(void *), 1, f);
+            }
     /* Write out the name of every symbol that has been referenced.
      */
     fwrite(&l, sizeof(size_t), 1, f);
