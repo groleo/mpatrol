@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.5 1999-11-25 16:31:53 graeme Exp $"
+#ident "$Id: option.c,v 1.6 1999-12-21 20:14:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -366,7 +366,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                 {
                     /* Remove any quotes from the keyword.
                      */
-                    memmove(s, s + 1, strlen(s));
+                    __mp_memcopy(s, s + 1, strlen(s));
                     q = (q == 0) ? 1 : 0;
                     s--;
                 }
@@ -388,7 +388,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                 {
                     /* Remove any quotes from the value.
                      */
-                    memmove(s, s + 1, strlen(s));
+                    __mp_memcopy(s, s + 1, strlen(s));
                     q = (q == 0) ? 1 : 0;
                     s--;
                 }
