@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.2 2000-11-01 00:20:25 graeme Exp $
+# $Id: Makefile,v 1.3 2000-11-14 18:49:56 graeme Exp $
 
 
 # Definitions
@@ -31,7 +31,8 @@ SHELL = /bin/sh
 NROFF = nroff
 CAT   = cat
 
-PAGES = cat1/mpatrol.1 cat1/mprof.1 cat1/mleak.1 cat1/mpsym.1 cat3/mpatrol.3
+PAGES = cat1/mpatrol.1 cat1/mprof.1 cat1/mleak.1 cat1/mpsym.1 cat1/mpedit.1 \
+	cat3/mpatrol.3
 
 
 # Rules
@@ -50,6 +51,9 @@ cat1/mleak.1: man1/mleak.1
 	$(NROFF) -man $< | $(CAT) >$@
 
 cat1/mpsym.1: man1/mpsym.1
+	$(NROFF) -man $< | $(CAT) >$@
+
+cat1/mpedit.1: man1/mpedit.1
 	$(NROFF) -man $< | $(CAT) >$@
 
 cat3/mpatrol.3: man3/mpatrol.3
