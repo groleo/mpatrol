@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.2 2001-02-27 01:39:47 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.3 2001-02-27 21:05:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.2 2001-02-27 01:39:47 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.3 2001-02-27 21:05:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -264,7 +264,7 @@ __mpt_dbmallocoption(int c, union dbmalloptarg *v)
         break;
       case MALLOC_FILLAREA:
         if (v->i != 0)
-            n = sizeof(void *);
+            n = 1;
         else
             n = 0;
         r = __mp_setoption(MP_OPT_OFLOWSIZE, n);
