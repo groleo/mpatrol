@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.51 2001-02-27 19:44:57 graeme Exp $
+# $Id: Makefile,v 1.52 2001-03-01 01:00:33 graeme Exp $
 
 
 # Definitions
@@ -51,7 +51,7 @@ MPTTOBJS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
 MPAOBJS	 = mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
 	   mpstrdup.obj mprealloc.obj
-MPLOBJS	 = dbmalloc.obj heapdiff.obj mgauge.obj mtrace.obj
+MPLOBJS	 = dbmalloc.obj dmalloc.obj heapdiff.obj mgauge.obj mtrace.obj
 
 ARCHIVE_MPATROL	= $(MPATROL).lib
 OBJECT_MPATROL	= lib$(MPATROL).obj
@@ -303,6 +303,8 @@ graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 dbmalloc.obj: $(TOOLS)/dbmalloc.c $(TOOLS)/dbmalloc.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+dmalloc.obj: $(TOOLS)/dmalloc.c $(TOOLS)/dmalloc.h $(SOURCE)/mpatrol.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 heapdiff.obj: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
