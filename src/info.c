@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.27 2000-05-11 20:10:38 graeme Exp $"
+#ident "$Id: info.c,v 1.28 2000-05-14 13:25:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -662,8 +662,8 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
      */
     if (__mp_checkrange(h, p, l, f))
     {
-        h->stotal += l;
         __mp_memset(p, c, l);
+        h->stotal += l;
     }
 }
 
@@ -671,31 +671,32 @@ MP_GLOBAL void __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c,
 /* Copy a block of memory from one address to another.
  */
 
-MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
-                               alloctype f, char *s, char *t, unsigned long u,
-                               stackinfo *v)
+MP_GLOBAL void *__mp_copymemory(infohead *h, void *p, void *q, size_t l,
+                                unsigned char c, alloctype f, char *s, char *t,
+                                unsigned long u, stackinfo *v)
 {
+    void *r;
     int o;
 
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
     {
-        __mp_logmemcopy(h, p, q, l, f, s, t, u, v);
+        __mp_logmemcopy(h, p, q, l, c, f, s, t, u, v);
         o = 1;
     }
     else
         o = 0;
     /* We must ensure that the memory to be copied does not overlap when
-     * memcpy() is called.  This does not matter when calling __mp_memcopy()
-     * but it will matter when calling the normal system function, in which
-     * case memmove() should be used instead.
+     * memcpy() or memccpy() are called.  This does not matter when calling
+     * __mp_memcopy() but it will matter when calling the normal system
+     * functions, in which case memmove() should be used instead.
      */
-    if ((f == AT_MEMCPY) && (l > 0) &&
+    if (((f == AT_MEMCPY) || (f == AT_MEMCCPY)) && (l > 0) &&
         (((p < q) && ((char *) p + l > (char *) q)) ||
          ((q < p) && ((char *) q + l > (char *) p))))
     {
         if ((o == 0) && (h->recur == 1))
         {
-            __mp_logmemcopy(h, p, q, l, f, s, t, u, v);
+            __mp_logmemcopy(h, p, q, l, c, f, s, t, u, v);
             o = 1;
         }
         __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overlaps ["
@@ -707,9 +708,23 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
      */
     if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, l, f))
     {
+        if (f == AT_MEMCCPY)
+        {
+            if (r = __mp_memfind(p, l, &c, 1))
+                l = (size_t) ((char *) r - (char *) p) + 1;
+            __mp_memcopy(q, p, l);
+            if (r != NULL)
+                q = (char *) q + l;
+            else
+                q = NULL;
+        }
+        else
+            __mp_memcopy(q, p, l);
         h->ctotal += l;
-        __mp_memcopy(q, p, l);
     }
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+        __mp_diag("returns " MP_POINTER "\n\n", q);
+    return q;
 }
 
 
@@ -730,8 +745,8 @@ MP_GLOBAL void *__mp_locatememory(infohead *h, void *p, size_t l, void *q,
      */
     if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, m, f))
     {
-        h->ltotal += m;
         r = __mp_memfind(p, l, q, m);
+        h->ltotal += m;
     }
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
         __mp_diag("returns " MP_POINTER "\n\n", r);
