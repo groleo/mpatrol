@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.59 2000-04-19 00:36:03 graeme Exp $
+@c $Id: mpatrol.texi,v 1.60 2000-04-19 17:50:06 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1813,6 +1813,7 @@ address 0x80033000 located in allocated block:
         0x80000D24 _start
 @end smallexample
 
+@cindex .gdbinit
 Some debuggers, such as @command{gdb}, also allow you to define your own
 commands for use in a debugging session.  The following example defines a
 new @command{gdb} command called @samp{printalloc} which calls
@@ -5791,12 +5792,12 @@ Need to add support for reading symbols from Windows executable files.  Also
 need to add support for reading symbols from any DLLs that are required by the
 program.  This may be possible in a limited fashion by using the GNU BFD
 library, but may only work with code compiled with @command{gcc}.
-@end itemize
 
 @item
 There seems to be a problem when mixing the archive version of the mpatrol
 library and the Microsoft C run-time library DLL, and vice versa.  This needs
 to be looked into, but for the moment, don't mix them.
+@end itemize
 
 @node Netware notes, , Windows notes, Notes
 @appendixsec Notes for Netware platforms
@@ -6722,6 +6723,7 @@ from uninitialised objects.
 @end table
 
 @cindex Third Degree
+@cindex ATOM
 @cindex Digital Equipment Corporation
 @item
 Third Degree
