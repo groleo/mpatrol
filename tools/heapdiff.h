@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: heapdiff.h,v 1.3 2001-02-25 21:19:30 graeme Exp $
+ * $Id: heapdiff.h,v 1.4 2001-02-25 21:29:15 graeme Exp $
  */
 
 
@@ -54,7 +54,8 @@
  * HD_FREED flag, although the latter makes use of the NOFREE option and
  * can incur a large performance and space penalty, and also relies on
  * the NOFREE option being unmodified between the calls to heapdiffstart()
- * and heapdiffend().
+ * and heapdiffend().  Note that marked allocations are not normally
+ * logged but this can be changed by adding the HD_MARKED flag.
  *
  * By default, only a minimal amount of detail is logged for each
  * allocation, but this can be changed with the HD_FULL flag to log full
@@ -68,10 +69,11 @@
 #include <mpatrol.h>
 
 
-#define HD_FREED   1 /* log all freed allocations */
-#define HD_UNFREED 2 /* log all unfreed allocations */
-#define HD_FULL    4 /* log full details of each allocation */
-#define HD_VIEW    8 /* view each allocation */
+#define HD_FREED   1  /* log all freed allocations */
+#define HD_UNFREED 2  /* log all unfreed allocations */
+#define HD_MARKED  4  /* include marked allocations */
+#define HD_FULL    8  /* log full details of each allocation */
+#define HD_VIEW    16 /* view each allocation */
 
 
 /* The structure used to store the current state of the heap and any

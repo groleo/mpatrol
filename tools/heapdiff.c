@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heapdiff.c,v 1.3 2001-02-23 21:49:55 graeme Exp $"
+#ident "$Id: heapdiff.c,v 1.4 2001-02-25 21:29:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.3 2001-02-23 21:49:55 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.4 2001-02-25 21:29:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -68,8 +68,9 @@ callback(MP_CONST void *p, void *t)
     if (!__mp_info(p, &d))
         return 0;
     h = (heapdiff *) t;
-    if (((h->flags & HD_FREED) && d.freed) ||
-        ((h->flags & HD_UNFREED) && !d.freed))
+    if (((d.freed && (h->flags & HD_FREED)) ||
+         (!d.freed && (h->flags & HD_UNFREED))) &&
+        (!d.marked || (h->flags & HD_MARKED)))
     {
         if (h->flags & HD_FULL)
             __mp_logaddr(d.block);
