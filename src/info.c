@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.38 2000-11-08 00:18:02 graeme Exp $"
+#ident "$Id: info.c,v 1.39 2000-11-08 18:20:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1049,6 +1049,8 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
 {
     allocnode *n;
     infonode *m;
+    void *b;
+    size_t l;
     int e;
 
     if (p == NULL)
@@ -1076,18 +1078,125 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
         else if ((p < n->block) ||
                  ((char *) p + s > (char *) n->block + n->size))
         {
-            if (h->flags & FLG_ALLOWOFLOW)
-                __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
-                          MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
-                          n->block, (char *) n->block + n->size - 1);
+            if (h->alloc.flags & FLG_PAGEALLOC)
+            {
+                b = (void *) __mp_rounddown((unsigned long) n->block,
+                                            h->alloc.heap.memory.page);
+                l = __mp_roundup(n->size + ((char *) n->block - (char *) b),
+                                 h->alloc.heap.memory.page);
+            }
             else
-                __mp_error(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
-                           MP_POINTER "," MP_POINTER "]", p, (char *) p + s - 1,
-                           n->block, (char *) n->block + n->size - 1);
+            {
+                b = n->block;
+                l = n->size;
+            }
+            b = (char *) b - h->alloc.oflow;
+            l += h->alloc.oflow << 1;
+            if (h->flags & FLG_ALLOWOFLOW)
+                __mp_warn(f, "range [" MP_POINTER "," MP_POINTER
+                          "] overflows [" MP_POINTER "," MP_POINTER "]", p,
+                          (char *) p + s - 1, b, (char *) b + l - 1);
+            else
+                __mp_error(f, "range [" MP_POINTER "," MP_POINTER
+                           "] overflows [" MP_POINTER "," MP_POINTER "]", p,
+                           (char *) p + s - 1, b, (char *) b + l - 1);
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = ((h->flags & FLG_ALLOWOFLOW) != 0);
         }
+    return e;
+}
+
+
+/* Check that a string does not overflow the boundaries of a memory block and
+ * then return the length of the string.
+ */
+
+MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f)
+{
+    allocnode *n;
+    infonode *m;
+    treenode *t;
+    void *b;
+    char *c;
+    size_t l;
+    int e;
+
+    *s = 0;
+    if (p == NULL)
+    {
+        __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+        return 0;
+    }
+    e = 1;
+    if ((n = __mp_findnode(&h->alloc, p, 1)) == NULL)
+    {
+        if ((t = __mp_searchhigher(h->alloc.atree.root, (unsigned long) p)) ||
+            (t = __mp_searchhigher(h->alloc.gtree.root, (unsigned long) p)))
+        {
+            n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
+            if (h->alloc.flags & FLG_PAGEALLOC)
+                b = (void *) __mp_rounddown((unsigned long) n->block,
+                                            h->alloc.heap.memory.page);
+            else
+                b = n->block;
+            b = (char *) b - h->alloc.oflow;
+            for (c = p; (c < (char *) b) && (*c != '\0'); c++);
+            if (c == b)
+                e = 0;
+        }
+        else
+            for (c = p; *c != '\0'; c++);
+        *s = (size_t) (c - p);
+    }
+    else if ((m = (infonode *) n->info) == NULL)
+    {
+        __mp_error(f, "attempt to perform operation on free memory\n");
+        return 0;
+    }
+    else if (m->data.flags & FLG_FREED)
+    {
+        __mp_error(f, "attempt to perform operation on freed memory");
+        __mp_printalloc(&h->syms, n);
+        __mp_diag("\n");
+        return 0;
+    }
+    else if ((p >= (char *) n->block) && (p < (char *) n->block + n->size))
+    {
+        b = (char *) n->block + n->size;
+        for (c = p; (c < (char *) b) && (*c != '\0'); c++);
+        if (c == b)
+            e = 0;
+        *s = (size_t) (c - p);
+    }
+    else
+        e = 0;
+    if (e == 0)
+    {
+        if (h->alloc.flags & FLG_PAGEALLOC)
+        {
+            b = (void *) __mp_rounddown((unsigned long) n->block,
+                                        h->alloc.heap.memory.page);
+            l = __mp_roundup(n->size + ((char *) n->block - (char *) b),
+                             h->alloc.heap.memory.page);
+        }
+        else
+        {
+            b = n->block;
+            l = n->size;
+        }
+        b = (char *) b - h->alloc.oflow;
+        l += h->alloc.oflow << 1;
+        if (h->flags & FLG_ALLOWOFLOW)
+            __mp_warn(f, "string " MP_POINTER " overflows [" MP_POINTER ","
+                      MP_POINTER "]", p, b, (char *) b + l - 1);
+        else
+            __mp_error(f, "string " MP_POINTER " overflows [" MP_POINTER ","
+                       MP_POINTER "]", p, b, (char *) b + l - 1);
+        __mp_printalloc(&h->syms, n);
+        __mp_diag("\n");
+        e = ((h->flags & FLG_ALLOWOFLOW) != 0);
+    }
     return e;
 }
 
