@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.76 2001-08-24 10:41:06 graeme Exp $
+# $Id: Makefile,v 1.77 2001-08-24 10:55:16 graeme Exp $
 
 
 # Definitions
@@ -199,7 +199,7 @@ mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 
 mptrace: mptrace.o getopt.o tree.o slots.o utils.o version.o
 ifeq ($(GUISUP),true)
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11R6/lib -L/usr/X11R5/lib -L/usr/X11/lib -L/usr/X/lib -lXm -lXt -lX11
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11R6/lib -L/usr/X11R5/lib -L/usr/X11/lib -L/usr/X/lib -lXm -lXt -lXp -lXext -lX11
 else
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o
 endif
