@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.1 2001-03-01 00:51:28 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.2 2001-03-01 18:49:09 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.1 2001-03-01 00:51:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.2 2001-03-01 18:49:09 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,10 +49,65 @@ static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.1 2001-03-01 
 #define LOG_ITERATION_COUNT 1
 
 
+/* The structure used to store information about each debugging token
+ * recognised by the Dmalloc library.
+ */
+
+typedef struct tokeninfo
+{
+    char *longname;     /* long token name */
+    char *shortname;    /* short token name */
+    unsigned long flag; /* associated flag */
+}
+tokeninfo;
+
+
+typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
+typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* The table containing all of the recognised debugging tokens with their
+ * associated flags.
+ */
+
+static tokeninfo tokens[] =
+{
+    {"none", "nil", 0},
+    {"log-stats", "lst", DMALLOC_LOG_STATS},
+    {"log-non-free", "lnf", DMALLOC_LOG_NONFREE},
+    {"log-known", "lkn", DMALLOC_LOG_KNOWN},
+    {"log-trans", "ltr", DMALLOC_LOG_TRANS},
+    {"log-admin", "lad", DMALLOC_LOG_ADMIN},
+    {"log-blocks", "lbl", DMALLOC_LOG_BLOCKS},
+    {"log-bad-space", "lbs", DMALLOC_LOG_BAD_SPACE},
+    {"log-nonfree-space", "lns", DMALLOC_LOG_NONFREE_SPACE},
+    {"check-fence", "cfe", DMALLOC_CHECK_FENCE},
+    {"check-heap", "che", DMALLOC_CHECK_HEAP},
+    {"check-lists", "cli", DMALLOC_CHECK_LISTS},
+    {"check-blank", "cbl", DMALLOC_CHECK_BLANK},
+    {"check-funcs", "cfu", DMALLOC_CHECK_FUNCS},
+    {"force-linear", "fli", DMALLOC_FORCE_LINEAR},
+    {"catch-signals", "csi", DMALLOC_CATCH_SIGNALS},
+    {"log-elapsed-time", "let", DMALLOC_LOG_ELAPSED_TIME},
+    {"log-current-time", "lct", DMALLOC_LOG_CURRENT_TIME},
+    {"realloc-copy", "rco", DMALLOC_REALLOC_COPY},
+    {"free-blank", "fbl", DMALLOC_FREE_BLANK},
+    {"error-abort", "eab", DMALLOC_ERROR_ABORT},
+    {"alloc-blank", "abl", DMALLOC_ALLOC_BLANK},
+    {"heap-check-map", "hcm", DMALLOC_HEAP_CHECK_MAP},
+    {"print-messages", "pme", DMALLOC_PRINT_MESSAGES},
+    {"catch-null", "cnu", DMALLOC_CATCH_NULL},
+    {"never-reuse", "nre", DMALLOC_NEVER_REUSE},
+    {"allow-free-null", "afn", DMALLOC_ALLOW_FREE_NULL},
+    {"error-dump", "edu", DMALLOC_ERROR_DUMP},
+    {NULL, NULL, 0}
+};
 
 
 /* Indicates if this module has been initialised.
@@ -61,10 +116,46 @@ extern "C"
 static int malloc_initialised;
 
 
+/* The time at which this module was initialised.
+ */
+
+static time_t malloc_time;
+
+
 /* The library debug flags.
  */
 
 static unsigned long malloc_flags;
+
+
+/* The point at which to start checking the heap and the frequency at which
+ * to check it.
+ */
+
+static unsigned long malloc_start, malloc_interval;
+
+
+/* The pointer to the callback function registered with dmalloc_track().
+ */
+
+static dmalloc_track_t malloc_tracker;
+
+
+/* The previous mpatrol prologue and epilogue handlers.
+ */
+
+static prologue_handler old_prologue;
+static epilogue_handler old_epilogue;
+
+
+/* The pointer and size obtained each time our prologue function is called.
+ * This is then used by our epilogue function, but we don't need to worry
+ * about nested calls to the prologue function since the mpatrol library
+ * guarantees that it will never occur, even when there are multiple threads.
+ */
+
+static void *malloc_pointer;
+static size_t malloc_size;
 
 
 /* The global variables which control the behaviour of the library and are
@@ -78,7 +169,62 @@ void *dmalloc_address;
 unsigned long dmalloc_address_count;
 
 
-/* Map the library debug flags to mpatrol options.
+/* Read any library options from the DMALLOC_OPTIONS environment variable.
+ */
+
+static
+void
+readoptions(void)
+{
+    static char b[1024];
+    tokeninfo *i;
+    char *p, *s, *t;
+
+    if (((s = getenv("DMALLOC_OPTIONS")) == NULL) || (*s == '\0'))
+        return;
+    strncpy(b, s, sizeof(b) - 1);
+    b[sizeof(b) - 1] = '\0';
+    for (s = t = b; t != NULL; s = t + 1)
+    {
+        if (t = strchr(s, ','))
+            *t = '\0';
+        if (*s == '\0')
+            continue;
+        if ((strncmp(s, "addr", 4) == 0) && (s[4] == '='))
+        {
+            if (p = strchr(s + 5, ':'))
+                *p = '\0';
+            dmalloc_address = (void *) strtoul(s + 5, NULL, 16);
+            if (p != NULL)
+                dmalloc_address_count = strtoul(p + 1, NULL, 10);
+        }
+        else if ((strncmp(s, "debug", 5) == 0) && (s[5] == '='))
+            malloc_flags = strtoul(s + 6, NULL, 16);
+        else if ((strncmp(s, "inter", 5) == 0) && (s[5] == '='))
+        {
+            if ((malloc_interval = strtoul(s + 6, NULL, 10)) == 0)
+                malloc_interval = 1;
+        }
+        else if ((strncmp(s, "log", 3) == 0) && (s[3] == '='))
+            dmalloc_logpath = s + 4;
+        else if ((strncmp(s, "start", 5) == 0) && (s[5] == '='))
+            if (strchr(s + 6, ':') == NULL)
+                malloc_start = strtoul(s + 6, NULL, 10);
+            else
+                malloc_start = 0;
+        else
+            for (i = tokens; i->longname != NULL; i++)
+                if ((strcmp(s, i->longname) == 0) ||
+                    (strcmp(s, i->shortname) == 0))
+                {
+                    malloc_flags |= i->flag;
+                    break;
+                }
+    }
+}
+
+
+/* Map the Dmalloc options to mpatrol options.
  */
 
 static
@@ -87,6 +233,11 @@ setoptions(void)
 {
     unsigned long v;
 
+    if (dmalloc_logpath != NULL)
+    {
+        __mp_setoption(MP_OPT_LOGFILE, (unsigned long) dmalloc_logpath);
+        dmalloc_logpath = NULL;
+    }
     v = MP_FLG_SHOWFREE;
     if (malloc_flags & DMALLOC_LOG_STATS)
         __mp_setoption(MP_OPT_SETFLAGS, v);
@@ -111,12 +262,17 @@ setoptions(void)
         v = 0;
     __mp_setoption(MP_OPT_OFLOWSIZE, v);
     if (malloc_flags & DMALLOC_CHECK_HEAP)
+    {
         v = (unsigned long) -1;
+        __mp_setoption(MP_OPT_CHECKLOWER, malloc_start);
+    }
     else
+    {
         v = 0;
-    __mp_setoption(MP_OPT_CHECKLOWER, v);
+        __mp_setoption(MP_OPT_CHECKLOWER, 0);
+    }
     __mp_setoption(MP_OPT_CHECKUPPER, v);
-    __mp_setoption(MP_OPT_CHECKFREQ, 1);
+    __mp_setoption(MP_OPT_CHECKFREQ, malloc_interval);
     v = MP_FLG_SAFESIGNALS;
     if (malloc_flags & DMALLOC_CATCH_SIGNALS)
         __mp_setoption(MP_OPT_SETFLAGS, v);
@@ -145,15 +301,81 @@ setoptions(void)
 }
 
 
+/* Record the pointer and size for later processing by the epilogue function
+ * and possibly also call the old prologue function if one was installed.
+ */
+
+static
+void
+prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
+{
+    if (old_prologue != NULL)
+        old_prologue(p, l, a);
+    malloc_pointer = (void *) p;
+    malloc_size = l;
+}
+
+
+/* Call the tracker function with any relevant details and possibly also call
+ * the old epilogue function if one was installed.
+ */
+
+static
+void
+epilogue(MP_CONST void *p, MP_CONST void *a)
+{
+    size_t l;
+
+    if (malloc_pointer == (void *) -1)
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
+    else if (malloc_size == (size_t) -1)
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
+    else if (malloc_size == (size_t) -2)
+    {
+        if (malloc_pointer == NULL)
+            l = 0;
+        else
+            l = strlen((char *) malloc_pointer) + 1;
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_STRDUP, l, 0, NULL, p);
+    }
+    else if (malloc_pointer == NULL)
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_MALLOC, malloc_size, 0, NULL, p);
+    else if (malloc_size == 0)
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_FREE, 0, 0, malloc_pointer, NULL);
+    else
+        malloc_tracker(NULL, 0, DMALLOC_FUNC_REALLOC, malloc_size, 0,
+                       malloc_pointer, p);
+    if (old_epilogue != NULL)
+        old_epilogue(p, a);
+}
+
+
 /* Terminate the dmalloc module.
  */
 
 void
 __mpt_dmallocshutdown(void)
 {
+    time_t t;
+    unsigned long h, m, s;
+
     if (malloc_initialised)
     {
-        malloc_flags = 0;
+        __mpt_dmalloctrack(NULL);
+        if ((t = time(NULL)) != (time_t) -1)
+        {
+            s = (unsigned long) t - (unsigned long) malloc_time;
+            h = s / 3600;
+            m = (s / 60) % 60;
+            s %= 60;
+        }
+        else
+        {
+            t = (time_t) 0;
+            h = m = s = 0;
+        }
+        __mpt_dmallocmessage("ending time = %lu, elapsed since start = "
+                             "%lu:%02lu:%02lu\n\n", (unsigned long) t, h, m, s);
         malloc_initialised = 0;
     }
 }
@@ -314,9 +536,9 @@ __mpt_dmallocvmessage(MP_CONST char *s, va_list v)
         }
         else
         {
-            __mp_printf("%s\n", m);
+            __mp_printf("\n");
             if (malloc_flags & DMALLOC_PRINT_MESSAGES)
-                fprintf(stderr, "%s\n", m);
+                fputc('\n', stderr);
         }
     }
     if (*c != '\0')
@@ -337,6 +559,19 @@ __mpt_dmalloctrack(dmalloc_track_t h)
 {
     if (!malloc_initialised)
         __mp_init_dmalloc();
+    if (malloc_tracker != NULL)
+    {
+        __mp_prologue(old_prologue);
+        __mp_epilogue(old_epilogue);
+        old_prologue = NULL;
+        old_epilogue = NULL;
+    }
+    if (h != NULL)
+    {
+        old_prologue = __mp_prologue(prologue);
+        old_epilogue = __mp_epilogue(epilogue);
+    }
+    malloc_tracker = h;
 }
 
 
@@ -357,11 +592,36 @@ __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
 void
 __mp_init_dmalloc(void)
 {
+    char *t;
+
     if (!malloc_initialised)
     {
         malloc_initialised = 1;
+        if ((malloc_time = time(NULL)) == (time_t) -1)
+            malloc_time = (time_t) 0;
         malloc_flags = 0;
+        malloc_start = 0;
+        malloc_interval = 1;
+        malloc_tracker = NULL;
+        dmalloc_logpath = NULL;
+        dmalloc_errno = 0;
+        dmalloc_address = NULL;
+        dmalloc_address_count = 0;
+        readoptions();
+        setoptions();
         __mp_atexit(__mpt_dmallocshutdown);
+        if (!__mp_getoption(MP_OPT_LOGFILE, (unsigned long *) &t) ||
+            (t == NULL))
+            t = "stderr";
+        __mpt_dmallocmessage("Dmalloc version '%lu.%lu.%lu' (mpatrol)\n",
+                             DMALLOC_VERSION_MAJOR, DMALLOC_VERSION_MINOR,
+                             DMALLOC_VERSION_PATCH);
+        __mpt_dmallocmessage("flags = %#lx, logfile '%s'\n", malloc_flags, t);
+        __mpt_dmallocmessage("interval = %lu, addr = %#lx, seen # = %lu\n",
+                             malloc_interval, dmalloc_address,
+                             dmalloc_address_count);
+        __mpt_dmallocmessage("starting time = %lu\n\n",
+                             (unsigned long) malloc_time);
     }
 }
 
