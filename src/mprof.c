@@ -35,11 +35,11 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.17 2000-09-25 18:21:19 graeme Exp $"
+#ident "$Id: mprof.c,v 1.18 2000-09-25 21:37:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.0" /* the current version of this program */
+#define VERSION "1.1" /* the current version of this program */
 
 
 /* Structure containing statistics about the counts and totals of all of the
@@ -190,6 +190,29 @@ static int showcounts;
  */
 
 static unsigned long maxstack;
+
+
+/* The table describing all recognised options.
+ */
+
+static option options_table[] =
+{
+    {"addresses", 'a', NULL,
+     "\tSpecifies that different call sites from within the same function\n"
+     "\tare to be differentiated and that the names of all functions should\n"
+     "\tbe displayed with their call site offset in bytes.\n"},
+    {"counts", 'c', NULL,
+     "\tSpecifies that certain tables should be sorted by the number of\n"
+     "\tallocations or deallocations rather than the total number of bytes\n"
+     "\tallocated or deallocated.\n"},
+    {"stack-depth", 'n', "depth",
+     "\tSpecifies the maximum stack depth to display and also use when\n"
+     "\tcalculating if one call site has the same call stack as another call\n"
+     "\tsite.\n"},
+    {"version", 'V', NULL,
+     "\tDisplays the version number of this program.\n"},
+    NULL
+};
 
 
 /* Clear the statistics for a set of profiling data.
@@ -839,7 +862,7 @@ int main(int argc, char **argv)
     e = v = 0;
     maxstack = 1;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "acn:V", NULL)) != EOF)
+    while ((c = __mp_getopt(argc, argv, "acn:V", options_table)) != EOF)
         switch (c)
         {
           case 'a':
@@ -873,7 +896,8 @@ int main(int argc, char **argv)
     }
     if ((argc > 1) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [-acV] [-n depth] [file]\n", progname);
+        fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
+        __mp_showopts(options_table);
         exit(EXIT_FAILURE);
     }
     if (argc == 1)
