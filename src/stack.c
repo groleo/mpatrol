@@ -32,6 +32,7 @@
 #include "stack.h"
 #include "memory.h"
 #include "machine.h"
+#include <string.h>
 #if !MP_BUILTINSTACK_SUPPORT
 #if MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX
@@ -64,9 +65,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.28 2001-08-23 22:42:34 graeme Exp $"
+#ident "$Id: stack.c,v 1.29 2001-09-04 23:20:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.28 2001-08-23 22:42:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.29 2001-09-04 23:20:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -145,6 +146,10 @@ int U_get_previous_frame(frameinfo *, frameinfo *);
  */
 
 static unsigned char recursive;
+
+#if SYSTEM == SYSTEM_TRU64
+MP_API char *__mp_symbol(void *);
+#endif /* SYSTEM */
 #endif /* SYSTEM */
 #else /* MP_LIBRARYSTACK_SUPPORT */
 static jmp_buf environment;
@@ -386,6 +391,8 @@ __mp_getframe(stackinfo *p)
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
     frameinfo f;
+#elif SYSTEM == SYSTEM_TRU64
+    char *s;
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
     jmp_buf j;
@@ -497,8 +504,30 @@ __mp_getframe(stackinfo *p)
             p->frame = (void *) p->next.sc_regs[R_SP];
 #endif /* SYSTEM */
             p->addr = (void *) p->next.sc_pc;
-            unwind(&p->next, NULL);
-            r = 1;
+#if SYSTEM == SYSTEM_TRU64
+            /* On Tru64 we cannot reliably unwind the stack from file scope
+             * initialisation or finalisation functions, or from exception-
+             * handling support functions.  Unfortunately, this means we must
+             * look at the names of the calling functions, which is likely to
+             * fail if the executable file has been stripped.
+             */
+            if (((s = __mp_symbol(p->addr)) == NULL) ||
+                ((strncmp(s, "__INIT_00_add_", 14) != 0) &&
+                 (strncmp(s, "__FINI_00_remove_", 17) != 0) &&
+                 (strncmp(s, "__exc_add_", 10) != 0) &&
+                 (strncmp(s, "__exc_remove_", 13) != 0)))
+            {
+#endif /* SYSTEM */
+                unwind(&p->next, NULL);
+                r = 1;
+#if SYSTEM == SYSTEM_TRU64
+            }
+            else
+            {
+                p->frame = NULL;
+                p->addr = NULL;
+            }
+#endif /* SYSTEM */
         }
         else
         {
