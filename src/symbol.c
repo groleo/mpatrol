@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.6 2000-02-10 20:24:08 graeme Exp $"
+#ident "$Id: symbol.c,v 1.7 2000-02-10 20:49:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -122,12 +122,8 @@ extern "C"
  * a text symbol.
  */
 
-#ifdef __GNUC__
-void _DYNAMIC(void) __attribute__ ((weak));
-#else /* __GNUC__ */
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
-#endif /* __GNUC__ */
 #endif /* SYSTEM */
 
 
@@ -855,6 +851,19 @@ MP_GLOBAL symnode *__mp_findsymbol(symhead *y, void *p)
             }
     }
     return r;
+}
+
+
+/* Attempt to find the source correspondence for a machine instruction located
+ * at a particular address.
+ */
+
+MP_GLOBAL int __mp_findsource(symhead *y, void *p, char **s, char **t,
+                              unsigned long *u)
+{
+    *s = *t = NULL;
+    u = 0;
+    return 0;
 }
 
 
