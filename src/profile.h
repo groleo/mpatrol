@@ -32,7 +32,47 @@
 
 
 #include "config.h"
-#include <stddef.h>
+#include "heap.h"
+#include "list.h"
+
+
+/* A profdata structure contains statistics about the counts and totals
+ * of all of the small, medium, large and extra large allocations and
+ * deallocations for a particular call site.
+ */
+
+typedef struct profdata
+{
+    size_t acount[4]; /* total numbers of allocations */
+    size_t dcount[4]; /* total numbers of deallocations */
+    size_t atotal[4]; /* total numbers of allocated bytes */
+    size_t dtotal[4]; /* total numbers of deallocated bytes */
+}
+profdata;
+
+
+/* A profnode belongs to a tree of profnodes and contains profiling
+ * details for the topmost function in a call stack.  An internal profnode
+ * stores details of a single memory block allocated for profnode slots.
+ */
+
+typedef union profnode
+{
+    struct
+    {
+        listnode node; /* internal list node */
+        void *block;   /* pointer to block of memory */
+        size_t size;   /* size of block of memory */
+    }
+    index;
+    struct
+    {
+        treenode node; /* tree node */
+        profdata data; /* profiling data for this function */
+    }
+    data;
+}
+profnode;
 
 
 /* A profhead contains all the profiling information including the
@@ -41,14 +81,15 @@
 
 typedef struct profhead
 {
+    heaphead *heap;              /* pointer to heap */
+    slottable table;             /* table of profnodes */
+    listhead list;               /* internal list of memory blocks */
+    treeroot tree;               /* tree of profnodes */
+    size_t size;                 /* memory used by internal blocks */
     size_t acounts[MP_BIN_SIZE]; /* allocation bins */
     size_t dcounts[MP_BIN_SIZE]; /* deallocation bins */
-    size_t acountl;              /* total bytes of large allocations */
-    size_t dcountl;              /* total bytes of large deallocations */
-    size_t acountt;              /* total bytes allocated */
-    size_t dcountt;              /* total bytes deallocated */
-    size_t acount;               /* total number of allocations */
-    size_t dcount;               /* total number of deallocations */
+    size_t atotals;              /* total bytes of large allocations */
+    size_t dtotals;              /* total bytes of large deallocations */
     size_t sbound;               /* small allocation boundary */
     size_t mbound;               /* medium allocation boundary */
     size_t lbound;               /* large allocation boundary */
@@ -66,11 +107,12 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newprofile(profhead *);
+MP_EXPORT void __mp_newprofile(profhead *, heaphead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
 MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
 MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
 MP_EXPORT int __mp_writeprofile(profhead *);
+MP_EXPORT int __mp_protectprofile(profhead *, memaccess);
 
 
 #ifdef __cplusplus

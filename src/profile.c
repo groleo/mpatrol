@@ -30,12 +30,13 @@
 #include "profile.h"
 #include "info.h"
 #include "diag.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.11 2000-04-20 00:55:23 graeme Exp $"
+#ident "$Id: profile.c,v 1.12 2000-04-20 18:14:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -49,15 +50,25 @@ extern "C"
  * is ready to profile memory allocations.
  */
 
-MP_GLOBAL void __mp_newprofile(profhead *p)
+MP_GLOBAL void __mp_newprofile(profhead *p, heaphead *h)
 {
+    struct { char x; profnode y; } z;
     size_t i;
+    long n;
 
+    p->heap = h;
+    /* Determine the minimum alignment for a profnode on this system
+     * and force the alignment to be a power of two.  This information
+     * is used when initialising the slot table.
+     */
+    n = (char *) &z.y - &z.x;
+    __mp_newslots(&p->table, sizeof(profnode), __mp_poweroftwo(n));
+    __mp_newlist(&p->list);
+    __mp_newtree(&p->tree);
+    p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;
-    p->acountl = p->dcountl = 0;
-    p->acountt = p->dcountt = 0;
-    p->acount = p->dcount = 0;
+    p->atotals = p->dtotals = 0;
     p->sbound = MP_SMALLBOUND;
     p->mbound = MP_MEDIUMBOUND;
     p->lbound = MP_LARGEBOUND;
@@ -74,14 +85,74 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
 {
     size_t i;
 
+    /* We don't need to explicitly free any memory as this is dealt with
+     * at a lower level by the heap manager.
+     */
+    p->heap = NULL;
+    p->table.free = NULL;
+    p->table.size = 0;
+    __mp_newlist(&p->list);
+    __mp_newtree(&p->tree);
+    p->size = 0;
     for (i = 0; i < MP_BIN_SIZE; i++)
         p->acounts[i] = p->dcounts[i] = 0;
-    p->acountl = p->dcountl = 0;
-    p->acountt = p->dcountt = 0;
-    p->acount = p->dcount = 0;
+    p->atotals = p->dtotals = 0;
     p->autocount = 0;
     p->file = NULL;
     p->profiling = 0;
+}
+
+
+/* Allocate a new profiling node.
+ */
+
+static profnode *getprofnode(profhead *p)
+{
+    profnode *n;
+    heapnode *h;
+
+    /* If we have no more profnode slots left then we must allocate
+     * some more memory for them.  An extra MP_ALLOCFACTOR pages of memory
+     * should suffice.
+     */
+    if ((n = (profnode *) __mp_getslot(&p->table)) == NULL)
+    {
+        if ((h = __mp_heapalloc(p->heap, p->heap->memory.page * MP_ALLOCFACTOR,
+              p->table.entalign)) == NULL)
+            return NULL;
+        __mp_initslots(&p->table, h->block, h->size);
+        n = (profnode *) __mp_getslot(&p->table);
+        __mp_addtail(&p->list, &n->index.node);
+        n->index.block = h->block;
+        n->index.size = h->size;
+        p->size += h->size;
+        n = (profnode *) __mp_getslot(&p->table);
+    }
+    return n;
+}
+
+
+/* Locate or create a call site associated with a specified return address.
+ */
+
+static profnode *getcallsite(profhead *p, addrnode *a)
+{
+    profnode *n;
+    size_t i;
+
+    if ((n = (profnode *) __mp_search(p->tree.root,
+          (unsigned long) a->data.addr)) == NULL)
+    {
+        if ((n = getprofnode(p)) == NULL)
+            return NULL;
+        __mp_treeinsert(&p->tree, &n->data.node, (unsigned long) a->data.addr);
+        for (i = 0; i < 4; i++)
+        {
+            n->data.data.acount[i] = n->data.data.dcount[i] = 0;
+            n->data.data.atotal[i] = n->data.data.dtotal[i] = 0;
+        }
+    }
+    return n;
 }
 
 
@@ -90,6 +161,30 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
 
 MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 {
+    profnode *n;
+    infonode *m;
+    size_t i;
+
+    /* Try to associate the allocation with a previous call site, or create
+     * a new call site if no such site exists.  This information is not
+     * recorded if the return address could not be determined.
+     */
+    m = (infonode *) d;
+    if ((m->data.stack != NULL) && (m->data.stack->data.addr != NULL))
+    {
+        if ((n = getcallsite(p, m->data.stack)) == NULL)
+            return 0;
+        if (l <= p->sbound)
+            i = 0;
+        else if (l <= p->mbound)
+            i = 1;
+        else if (l <= p->lbound)
+            i = 2;
+        else
+            i = 3;
+        n->data.data.acount[i]++;
+        n->data.data.atotal[i] += l;
+    }
     /* Note the size of the allocation in one of the allocation bins.
      * The highest allocation bin stores a count of all the allocations
      * that are larger than the largest bin.
@@ -99,10 +194,8 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
     else
     {
         p->acounts[MP_BIN_SIZE - 1]++;
-        p->acountl += l;
+        p->atotals += l;
     }
-    p->acountt += l;
-    p->acount++;
     /* If the autosave feature is enabled then we may need to write out
      * all of the current profiling information to the output file before
      * we can return.
@@ -119,6 +212,30 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 
 MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 {
+    profnode *n;
+    infonode *m;
+    size_t i;
+
+    /* Try to associate the deallocation with a previous call site, or create
+     * a new call site if no such site exists.  This information is not
+     * recorded if the return address could not be determined.
+     */
+    m = (infonode *) d;
+    if ((m->data.stack != NULL) && (m->data.stack->data.addr != NULL))
+    {
+        if ((n = getcallsite(p, m->data.stack)) == NULL)
+            return 0;
+        if (l <= p->sbound)
+            i = 0;
+        else if (l <= p->mbound)
+            i = 1;
+        else if (l <= p->lbound)
+            i = 2;
+        else
+            i = 3;
+        n->data.data.dcount[i]++;
+        n->data.data.dtotal[i] += l;
+    }
     /* Note the size of the deallocation in one of the deallocation bins.
      * The highest deallocation bin stores a count of all the deallocations
      * that are larger than the largest bin.
@@ -128,10 +245,8 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
     else
     {
         p->dcounts[MP_BIN_SIZE - 1]++;
-        p->dcountl += l;
+        p->dtotals += l;
     }
-    p->dcountt += l;
-    p->dcount++;
     /* If the autosave feature is enabled then we may need to write out
      * all of the current profiling information to the output file before
      * we can return.
@@ -148,8 +263,9 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 
 MP_GLOBAL int __mp_writeprofile(profhead *p)
 {
+    profnode *n;
     FILE *f;
-    size_t n;
+    size_t i;
 
     p->autocount = 0;
     /* The profiling file name can also be named as stderr and stdout which
@@ -174,20 +290,42 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
      * that if an error does occur then it will not be too drastic if we
      * continue writing the rest of the file.
      */
-    fwrite(&p->acount, sizeof(size_t), 1, f);
-    fwrite(&p->acountt, sizeof(size_t), 1, f);
-    fwrite(&p->dcount, sizeof(size_t), 1, f);
-    fwrite(&p->dcountt, sizeof(size_t), 1, f);
-    /* Write out the contents of the allocation and deallocation bins.
-     */
-    n = MP_BIN_SIZE;
-    fwrite(&n, sizeof(size_t), 1, f);
+    i = MP_BIN_SIZE;
+    fwrite(&i, sizeof(size_t), 1, f);
     fwrite(p->acounts, sizeof(size_t), MP_BIN_SIZE, f);
-    fwrite(&p->acountl, sizeof(size_t), 1, f);
+    fwrite(&p->atotals, sizeof(size_t), 1, f);
     fwrite(p->dcounts, sizeof(size_t), MP_BIN_SIZE, f);
-    fwrite(&p->dcountl, sizeof(size_t), 1, f);
+    fwrite(&p->dtotals, sizeof(size_t), 1, f);
+    /* Write out the statistics from every call site.
+     */
+    for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
+         n = (profnode *) __mp_successor(&n->data.node))
+    {
+        fwrite(&n->data.node.key, sizeof(unsigned long), 1, f);
+        fwrite(n->data.data.acount, sizeof(size_t), 4, f);
+        fwrite(n->data.data.atotal, sizeof(size_t), 4, f);
+        fwrite(n->data.data.dcount, sizeof(size_t), 4, f);
+        fwrite(n->data.data.dtotal, sizeof(size_t), 4, f);
+    }
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
+    return 1;
+}
+
+
+/* Protect the memory blocks used by the profiling table with the supplied
+ * access permission.
+ */
+
+MP_GLOBAL int __mp_protectprofile(profhead *p, memaccess a)
+{
+    profnode *n;
+
+    for (n = (profnode *) p->list.head; n->index.node.next != NULL;
+         n = (profnode *) n->index.node.next)
+        if (!__mp_memprotect(&p->heap->memory, n->index.block, n->index.size,
+             a))
+            return 0;
     return 1;
 }
 
