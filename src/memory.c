@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.15 2000-04-27 18:22:26 graeme Exp $"
+#ident "$Id: memory.c,v 1.16 2000-05-14 23:35:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -178,14 +178,15 @@ static size_t pagesize(void)
 static char *progname(void)
 {
 #if TARGET == TARGET_UNIX
-#if MP_PROCFS_SUPPORT
-    static char b[64];
-#elif SYSTEM == SYSTEM_IRIX
+#if SYSTEM == SYSTEM_IRIX
     extern char **__Argv;
 #elif ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_SPARC
     unsigned int *p;
     stackinfo s;
-#endif /* MP_PROCFS_SUPPORT && ARCH */
+#endif /* SYSTEM && ARCH */
+#if MP_PROCFS_SUPPORT
+    static char b[64];
+#endif /* MP_PROCFS_SUPPORT */
 #elif TARGET == TARGET_AMIGA || TARGET == TARGET_WINDOWS
     static char p[256];
 #elif TARGET == TARGET_NETWARE
@@ -193,15 +194,7 @@ static char *progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-#if MP_PROCFS_SUPPORT
-    /* If the /proc filesystem is supported then we can usually access the
-     * actual executable file that contains the current program through a
-     * special file in the current /proc entry.
-     */
-    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
-            MP_PROCFS_EXENAME);
-    return b;
-#elif SYSTEM == SYSTEM_IRIX
+#if SYSTEM == SYSTEM_IRIX
     /* IRIX has global variables containing argc and argv which we can use
      * to determine the filename that the program was invoked with.
      */
@@ -227,7 +220,16 @@ static char *progname(void)
         if (p = (unsigned int *) *(((unsigned int *) *p) + 1))
             return (char *) *p;
 #endif /* ARCH */
-#endif /* MP_PROCFS_SUPPORT && ARCH && MP_BUILTINSTACK_SUPPORT */
+#endif /* SYSTEM && ARCH && MP_BUILTINSTACK_SUPPORT */
+#if MP_PROCFS_SUPPORT
+    /* If the /proc filesystem is supported then we can usually access the
+     * actual executable file that contains the current program through a
+     * special file in the current /proc entry.
+     */
+    sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
+            MP_PROCFS_EXENAME);
+    return b;
+#endif /* MP_PROCFS_SUPPORT */
 #elif TARGET == TARGET_AMIGA
     if (GetProgramName(p, sizeof(p)))
         return p;
