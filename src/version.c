@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.1.1.1 1999-10-03 11:25:23 graeme Exp $"
+#ident "$Id: version.c,v 1.2 1999-10-06 00:10:34 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,19 +48,19 @@ extern "C"
 
 /* SCCS identification string and American date format.
  */
-MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (10/3/99)";
+MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (99/10/11)";
 
 #elif TARGET == TARGET_AMIGA
 
 /* Amiga identification string and European date format.
  */
-MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (3.10.99)";
+MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (11.10.99)";
 
 #elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (3rd October 1999)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (11th October 1999)";
 
 #endif /* TARGET */
 
