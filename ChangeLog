@@ -1,3 +1,8 @@
+Sun Oct 10 10:21:00 1999  Graeme Roy  <graeme@epc.co.uk>
+
+	* bin/mupdate:
+	Only update ChangeLog if it has changed since the last release.
+
 Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
