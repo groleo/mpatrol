@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.14 2001-03-22 19:21:51 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.15 2001-04-26 22:57:28 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.14 2001-03-22 19:21:51 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.15 2001-04-26 22:57:28 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.2" /* the current version of this program */
+#define VERSION "1.3" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -324,22 +324,19 @@ newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
-    if (n = (allocation *) __mp_search(alloctree.root, i))
+    if (__mp_search(alloctree.root, i))
     {
-        if (n->time == 0)
-            fprintf(stderr, "%s: Allocation index `%lu' has been allocated "
-                    "twice without being freed\n", progname, i);
+        fprintf(stderr, "%s: Allocation index `%lu' has been allocated twice\n",
+                progname, i);
+        exit(EXIT_FAILURE);
     }
-    else
+    if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
     {
-        if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
-        {
-            fprintf(stderr, "%s: Out of memory\n", progname);
-            exit(EXIT_FAILURE);
-        }
-        __mp_treeinsert(&alloctree, &n->node, i);
-        n->event = e;
+        fprintf(stderr, "%s: Out of memory\n", progname);
+        exit(EXIT_FAILURE);
     }
+    __mp_treeinsert(&alloctree, &n->node, i);
+    n->event = e;
     if (simfile != NULL)
     {
         if ((n->entry = __mp_getslot(&table)) == NULL)
@@ -719,6 +716,57 @@ readevent(void)
                 drawmemory(a, l, algc);
                 return 0;
             }
+#endif /* MP_GUI_SUPPORT */
+            return 1;
+          case 'R':
+            bufferpos++;
+            bufferlen--;
+            currentevent++;
+            n = getuleb128();
+            if (f = (allocation *) __mp_search(alloctree.root, n))
+            {
+                if (f->time != 0)
+                    fprintf(stderr, "%s: Allocation index `%lu' has already "
+                            "been freed\n", progname, n);
+                a = (void *) getuleb128();
+                l = getuleb128();
+                if (verbose)
+                    fprintf(stdout, "%6lu  realloc %6lu  " MP_POINTER
+                            "  %8lu\n", currentevent, n, a, l);
+                stats.acount++;
+                stats.atotal += l;
+                stats.fcount++;
+                stats.ftotal += f->size;
+                if (stats.pcount < stats.acount - stats.fcount)
+                    stats.pcount = stats.acount - stats.fcount;
+                if (stats.ptotal < stats.atotal - stats.ftotal)
+                    stats.ptotal = stats.atotal - stats.ftotal;
+                if ((stats.lsize == 0) || (stats.lsize > l))
+                    stats.lsize = l;
+                if (stats.usize < l)
+                    stats.usize = l;
+                if (f->entry != NULL)
+                {
+                    m = slotentry(f);
+                    fprintf(simfile, "    {%lu, 0},\n", m);
+                    fprintf(simfile, "    {%lu, %lu},\n", m, l);
+                }
+#if MP_GUI_SUPPORT
+                if (usegui)
+                {
+                    drawmemory(f->addr, f->size, frgc);
+                    drawmemory(a, l, algc);
+                }
+#endif /* MP_GUI_SUPPORT */
+                f->addr = a;
+                f->size = l;
+            }
+            else
+                fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
+                        progname, n);
+#if MP_GUI_SUPPORT
+            if (usegui)
+                return 0;
 #endif /* MP_GUI_SUPPORT */
             return 1;
           case 'F':
