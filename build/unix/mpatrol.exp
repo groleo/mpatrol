@@ -45,6 +45,7 @@ __mp_syminfo
 __mp_printinfo
 __mp_snapshot
 __mp_iterate
+__mp_iterateall
 __mp_memorymap
 __mp_summary
 __mp_stats

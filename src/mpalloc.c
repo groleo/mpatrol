@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.22 2001-03-04 16:24:26 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.23 2001-03-04 23:39:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.22 2001-03-04 16:24:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.23 2001-03-04 23:39:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -656,6 +656,17 @@ __mp_snapshot(void)
 
 size_t
 __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
+{
+    return 0;
+}
+
+
+/* Iterate over all of the allocated, freed and free memory blocks, calling
+ * a user-supplied function for each one encountered.
+ */
+
+size_t
+__mp_iterateall(int (*f)(void *, void *), void *d)
 {
     return 0;
 }

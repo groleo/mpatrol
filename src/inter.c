@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.102 2001-03-04 16:24:26 graeme Exp $"
+#ident "$Id: inter.c,v 1.103 2001-03-04 23:39:41 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.102 2001-03-04 16:24:26 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.103 2001-03-04 23:39:41 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1692,6 +1692,38 @@ __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
             else if (r < 0)
                 break;
         }
+    restoresignals();
+    return i;
+}
+
+
+/* Iterate over all of the allocated, freed and free memory blocks, calling
+ * a user-supplied function for each one encountered.
+ */
+
+size_t
+__mp_iterateall(int (*f)(void *, void *), void *d)
+{
+    allocnode *n, *p;
+    size_t i;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    i = 0;
+    for (n = (allocnode *) memhead.alloc.list.head;
+         p = (allocnode *) n->lnode.next; n = p)
+    {
+        if (f == NULL)
+            r = __mp_printinfo(n->block);
+        else
+            r = f(n->block, d);
+        if (r > 0)
+            i++;
+        else if (r < 0)
+            break;
+    }
     restoresignals();
     return i;
 }

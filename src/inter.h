@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.35 2001-03-04 16:30:54 graeme Exp $
+ * $Id: inter.h,v 1.36 2001-03-04 23:40:52 graeme Exp $
  */
 
 
@@ -147,6 +147,7 @@ int __mp_syminfo(void *, symbolinfo *);
 int __mp_printinfo(void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
+size_t __mp_iterateall(int (*)(void *, void *), void *);
 void __mp_memorymap(int);
 void __mp_summary(void);
 int __mp_stats(heapinfo *);
