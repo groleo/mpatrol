@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.41 2001-09-27 23:08:57 graeme Exp $"
+#ident "$Id: option.c,v 1.42 2001-09-27 23:39:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.41 2001-09-27 23:08:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.42 2001-09-27 23:39:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -688,7 +688,7 @@ __mp_parseoptions(infohead *h)
                         i = OE_IGNARGUMENT;
                     else
                         i = OE_RECOGNISED;
-                    __mp_diagflags |= FLG_HTML;
+                    __mp_diagflags |= FLG_HTMLNEXT;
                 }
                 break;
               case 'L':
