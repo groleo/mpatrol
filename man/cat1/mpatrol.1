@@ -24,12 +24,12 @@ DDEESSCCRRIIPPTTIIOONN
        variable settings which are not overridden by _o_p_t_i_o_n_s will
        be passed through unchanged to the mpatrol  library.   The
        LLOOGGAALLLL  option is always implicitly used for commands that
-       are run by this script.
+       are run by this command.
 
 OOPPTTIIOONNSS
-       All of the following options  (except  --dd)  correspond  to
-       their  listed  mpatrol library option.  See mmppaattrrooll(3) for
-       more details on these options.
+       All of the following options (except --dd and --VV) correspond
+       to  their  listed  mpatrol library option.  See mmppaattrrooll(3)
+       for more details on these options.
 
        --AA <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [AALLLLOOCCSSTTOOPP]  Specifies an allocation index at which
@@ -61,7 +61,7 @@ OOPPTTIIOONNSS
 
 
 
-Release 1.1               30 March 2000                         1
+Release 1.1                5 April 2000                         1
 
 
 
@@ -127,7 +127,7 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
 
 
-Release 1.1               30 March 2000                         2
+Release 1.1                5 April 2000                         2
 
 
 
@@ -166,21 +166,23 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               unfreed  allocations  at which to abort the program
               just before program termination.
 
+       --VV     Displays the version number of the mmppaattrrooll command.
+
        --vv     [PPRREESSEERRVVEE]  Specifies that any reallocated or freed
-              memory  allocations  should preserve their original
+              memory allocations should preserve  their  original
               contents.
 
        --ww     [OOFFLLOOWWWWAATTCCHH]   Specifies  that  watch  point  areas
-              should  be  used  for  overflow buffers rather than
+              should be used for  overflow  buffers  rather  than
               filling with the overflow byte.
 
        --ZZ <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
-              [FFAAIILLSSEEEEDD]  Specifies the random number seed  which
-              will  be used when determining which memory alloca-
+              [FFAAIILLSSEEEEDD]   Specifies the random number seed which
+              will be used when determining which memory  alloca-
               tions will randomly fail.
 
        --zz <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
-              [FFAAIILLFFRREEQQ]  Specifies the frequency  at  which  all
+              [FFAAIILLFFRREEQQ]   Specifies  the  frequency at which all
               memory allocations will randomly fail.
 
 SSEEEE AALLSSOO
@@ -188,12 +190,10 @@ SSEEEE AALLSSOO
 
        The mpatrol manual and FAQ.
 
-AAUUTTHHOORR
-       Graeme S. Roy <graeme@epc.co.uk>
 
 
 
-Release 1.1               30 March 2000                         3
+Release 1.1                5 April 2000                         3
 
 
 
@@ -202,23 +202,26 @@ Release 1.1               30 March 2000                         3
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+AAUUTTHHOORR
+       Graeme S. Roy <graeme@epc.co.uk>
+
 CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-       This  library  is  free  software; you can redistribute it
-       and/or modify it under the terms of the GNU  Library  Gen-
-       eral  Public  License  as  published  by the Free Software
-       Foundation; either version 2 of the License, or  (at  your
+       This library is free software;  you  can  redistribute  it
+       and/or  modify  it under the terms of the GNU Library Gen-
+       eral Public License as  published  by  the  Free  Software
+       Foundation;  either  version 2 of the License, or (at your
        option) any later version.
 
-       This  library  is  distributed in the hope that it will be
+       This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
-       PURPOSE.  See the GNU Library General Public  License  for
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the GNU Library General Public License for
        more details.
 
        You should have received a copy of the GNU Library General
-       Public License along with this library; if not,  write  to
+       Public  License  along with this library; if not, write to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
@@ -256,9 +259,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-Release 1.1               30 March 2000                         4
+Release 1.1                5 April 2000                         4
 
 

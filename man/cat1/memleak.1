@@ -8,7 +8,7 @@ NNAAMMEE
        memleak - locates memory leaks in an mpatrol log file
 
 SSYYNNOOPPSSIISS
-       mmeemmlleeaakk [_f_i_l_e]
+       mmeemmlleeaakk [--VV] [_f_i_l_e]
 
 DDEESSCCRRIIPPTTIIOONN
        The  mmeemmlleeaakk command is used to display all unfreed memory
@@ -34,7 +34,11 @@ DDEESSCCRRIIPPTTIIOONN
        if  _f_i_l_e  is  omitted then mmeemmlleeaakk will use _m_p_a_t_r_o_l_._l_o_g as
        the name of the log file  to  use.   The  mmeemmlleeaakk  command
        makes  two  passes  over  the log file so the file must be
-       randomly-accessable.
+       randomly-accessable.  If _f_i_l_e is given as _- then the stan-
+       dard input file stream will be used as the log file.
+
+OOPPTTIIOONNSS
+       --VV     Displays the version number of the mmeemmlleeaakk command.
 
 SSEEEE AALLSSOO
        mmppaattrrooll(1), mmppaattrrooll(3).
@@ -54,14 +58,10 @@ CCOOPPYYRRIIGGHHTT
        option) any later version.
 
        This library is distributed in the hope that  it  will  be
-       useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
-       PURPOSE.   See  the GNU Library General Public License for
-       more details.
 
 
 
-Release 1.1               30 March 2000                         1
+Release 1.1                5 April 2000                         1
 
 
 
@@ -69,6 +69,11 @@ Release 1.1               30 March 2000                         1
 
 MEMLEAK(1)               mpatrol library               MEMLEAK(1)
 
+
+       useful, but WITHOUT ANY WARRANTY; without even the implied
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the GNU Library General Public License for
+       more details.
 
        You should have received a copy of the GNU Library General
        Public  License  along with this library; if not, write to
@@ -122,11 +127,6 @@ MEMLEAK(1)               mpatrol library               MEMLEAK(1)
 
 
 
-
-
-
-
-
-Release 1.1               30 March 2000                         2
+Release 1.1                5 April 2000                         2
 
 
