@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.13 2000-04-19 00:54:37 graeme Exp $
+# $Id: Makefile,v 1.14 2000-04-20 23:25:30 graeme Exp $
 
 
 # Definitions
@@ -164,7 +164,9 @@ option.o option.t.o: $(SOURCE)/option.c $(SOURCE)/option.h $(SOURCE)/config.h \
 profile.o profile.t.o: $(SOURCE)/profile.c $(SOURCE)/profile.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/alloc.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
-	$(SOURCE)/list.h
+	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/diag.h $(SOURCE)/utils.h
 inter.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

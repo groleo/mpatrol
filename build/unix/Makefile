@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.12 2000-04-19 00:44:09 graeme Exp $
+# $Id: Makefile,v 1.13 2000-04-20 23:25:35 graeme Exp $
 
 
 # Definitions
@@ -202,7 +202,9 @@ option.o option.s.o option.t.o option.s.t.o: $(SOURCE)/option.c \
 profile.o profile.s.o profile.t.o profile.s.t.o: $(SOURCE)/profile.c \
 	$(SOURCE)/profile.h $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
-	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/utils.h
 inter.o inter.s.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

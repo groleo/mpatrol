@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.12 2000-04-19 00:47:54 graeme Exp $
+# $Id: Makefile,v 1.13 2000-04-20 23:25:33 graeme Exp $
 
 
 # Definitions
@@ -165,9 +165,11 @@ option.obj option.ts.obj: $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/utils.h $(SOURCE)/profile.h
 profile.obj profile.ts.obj: $(SOURCE)/profile.c $(SOURCE)/profile.h \
-        $(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/alloc.h \
-        $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
-        $(SOURCE)/list.h
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/alloc.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/stack.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/diag.h $(SOURCE)/utils.h
 inter.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
