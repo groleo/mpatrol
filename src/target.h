@@ -60,14 +60,15 @@
 #define SYSTEM_ANY      0  /* no specific system */
 #define SYSTEM_AIX      1  /* AIX */
 #define SYSTEM_DGUX     2  /* DG/UX */
-#define SYSTEM_DYNIX    3  /* DYNIX/ptx */
-#define SYSTEM_HPUX     4  /* HP/UX */
-#define SYSTEM_IRIX     5  /* IRIX */
-#define SYSTEM_LINUX    6  /* Linux */
-#define SYSTEM_LYNXOS   7  /* LynxOS */
-#define SYSTEM_SINIX    8  /* SINIX */
-#define SYSTEM_SOLARIS  9  /* Solaris */
-#define SYSTEM_UNIXWARE 10 /* UnixWare */
+#define SYSTEM_DRSNX    3  /* DRS/NX */
+#define SYSTEM_DYNIX    4  /* DYNIX/ptx */
+#define SYSTEM_HPUX     5  /* HP/UX */
+#define SYSTEM_IRIX     6  /* IRIX */
+#define SYSTEM_LINUX    7  /* Linux */
+#define SYSTEM_LYNXOS   8  /* LynxOS */
+#define SYSTEM_SINIX    9  /* SINIX */
+#define SYSTEM_SOLARIS  10 /* Solaris */
+#define SYSTEM_UNIXWARE 11 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -97,8 +98,6 @@
        defined(__svr4__) || defined(SVR4) || defined(_SVR4) || \
        defined(__SVR4) || defined(__SVR4__))
 #define SYSTEM SYSTEM_SOLARIS
-#elif defined(USLC) || defined(_USLC) || defined(__USLC) || defined(__USLC__)
-#define SYSTEM SYSTEM_UNIXWARE
 #else /* SYSTEM */
 #define SYSTEM SYSTEM_ANY
 #endif /* SYSTEM */
