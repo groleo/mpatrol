@@ -25,7 +25,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.1 2000-11-13 19:05:26 graeme Exp $
+# $Id: mpedit,v 1.2 2000-11-14 17:56:39 graeme Exp $
 
 
 # Program version.
@@ -286,19 +286,21 @@ then
         lowerline=1
         upperline=$linecount
     else
+        newnumber=$linenumber
         maxnumber=`expr $linecount - 5`
-        if [ $linenumber -lt 6 ]
+        if [ $newnumber -lt 6 ]
         then
-            linenumber=6
-        elif [ $linenumber -gt $maxnumber ]
+            newnumber=6
+        elif [ $newnumber -gt $maxnumber ]
         then
-            linenumber=$maxnumber
+            newnumber=$maxnumber
         fi
-        lowerline=`expr $linenumber - 5`
-        upperline=`expr $linenumber + 5`
+        lowerline=`expr $newnumber - 5`
+        upperline=`expr $newnumber + 5`
     fi
 
-    nl -ba "$sourcefile" | sed -n "${lowerline},${upperline}p"
+    echo "    $sourcefile at line $linenumber:" >&2
+    nl -ba "$sourcefile" | sed -n "${lowerline},${upperline}p" >&2
 else
     # If the --editor option was given on the command line then use the text
     # editor that was specified, otherwise look to the EDITOR environment
