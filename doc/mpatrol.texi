@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.237 2001-08-27 20:29:22 graeme Exp $
+@c $Id: mpatrol.texi,v 1.238 2001-08-29 19:25:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 26th August, 2001
+@set UPDATED 29th August, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -12588,11 +12588,6 @@ In the same vein, perhaps there should be some sort of support for
 @code{set_new_handler()} in libmpalloc.
 
 @item
-Perhaps change the prefixes in the names of the visible interface functions to
-the mpatrol library.  They all currently begin with @samp{__mp_} but perhaps
-it would be more user-friendly to make them begin with @samp{mpatrol_}?
-
-@item
 Add an option to write the mpatrol log file in HTML format, or even better XML
 format.  Need to also extend what is written out by the @option{--hatf-file}
 option.
@@ -12690,10 +12685,10 @@ compiler.  Also perhaps need to support other threads packages instead of just
 POSIX threads.
 
 @item
-Need to add support for call stack traversal for the Alpha, and Itanium
-processor architectures.  The current implementation of call stack traversal for
-the Motorola 88xx0 family is also a bit flaky and so should only be used when
-the library and program are built unoptimised.  This could be improved on DG/UX
+Need to add support for call stack traversal for the Itanium processor
+architecture.  The current implementation of call stack traversal for the
+Motorola 88xx0 family is also a bit flaky and so should only be used when the
+library and program are built unoptimised.  This could be improved on DG/UX
 platforms by making use of the TDESC information stored in the object files.
 
 @item
