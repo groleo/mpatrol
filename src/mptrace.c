@@ -34,14 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 #if MP_GUI_SUPPORT
-#include <Xm/Xm.h>
 #include <Xm/DrawingA.h>
 #include <Xm/ScrolledW.h>
 #endif /* MP_GUI_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.4 2000-12-06 01:07:11 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.5 2000-12-06 22:36:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -84,6 +83,12 @@ static unsigned long version;
 static treeroot alloctree;
 
 
+/* The number of the current event in the tracing output file.
+ */
+
+static unsigned long currentevent;
+
+
 /* The input buffer used to read from the tracing output file, and also the
  * current buffer position and length.
  */
@@ -112,6 +117,13 @@ static char *progname;
 static XtAppContext appcontext;
 
 
+/* The X display and screen pointers for this application.
+ */
+
+static Display *appdisplay;
+static Screen *appscreen;
+
+
 /* The X widgets for the application shell, main application and drawing area.
  */
 
@@ -124,23 +136,41 @@ static Widget appwidget, mainwidget, drawwidget;
 static Pixmap pixmap;
 
 
-/* The X display and screen pointers for this application.
+/* The X graphics contexts for unallocated, free and allocated memory.
  */
 
-static Display *appdisplay;
-static Screen *appscreen;
+static GC ungc, frgc, algc;
 
 
-/* The X colours for the background, free memory and allocated memory.
+/* The colours for unallocated, free and allocated memory.
  */
 
-static Pixel bgcol, frcol, alcol;
+static Pixel uncol, frcol, alcol;
 
 
-/* The width and height (in pixels) of the drawing area.
+/* The width and height (in pixels) of the window and the drawing area.
  */
 
-static Dimension width, height;
+static Dimension vwidth, vheight, width, height;
+
+
+/* The delay between drawing each event.
+ */
+
+static unsigned long delay;
+
+
+/* The size (in megabytes) of the address space covered by the drawing area.
+ */
+
+static unsigned long addrspace;
+
+
+/* The base address and the scaling factor of the drawing area.
+ */
+
+static void *addrbase;
+static unsigned long addrscale;
 
 
 /* The X resources for this application.
@@ -148,16 +178,41 @@ static Dimension width, height;
 
 static XtResource resources[] =
 {
-    {"bgcol", XmCBackground, XmRPixel, sizeof(Pixel), (Cardinal) &bgcol,
-     XmRString, "Blue"},
-    {"frcol", XmCForeground, XmRPixel, sizeof(Pixel), (Cardinal) &frcol,
-     XmRString, "White"},
-    {"alcol", XmCForeground, XmRPixel, sizeof(Pixel), (Cardinal) &alcol,
-     XmRString, "Black"},
-    {"width", "Width", XmRShort, sizeof(Dimension), (Cardinal) &width,
-     XmRImmediate, (String) 512},
-    {"height", "Height", XmRShort, sizeof(Dimension), (Cardinal) &height,
-     XmRImmediate, (String) 1024}
+    {"alloc", XmCColor, XmRPixel, sizeof(Pixel),
+     (Cardinal) &alcol, XmRString, (XtPointer) "black"},
+    {"delay", "Delay", XmRInt, sizeof(unsigned long),
+     (Cardinal) &delay, XmRImmediate, (XtPointer) 0},
+    {"free", XmCColor, XmRPixel, sizeof(Pixel),
+     (Cardinal) &frcol, XmRString, (XtPointer) "white"},
+    {"height", XmCHeight, XmRShort, sizeof(Dimension),
+     (Cardinal) &height, XmRImmediate, (XtPointer) 512},
+    {"space", "Space", XmRInt, sizeof(unsigned long),
+     (Cardinal) &addrspace, XmRImmediate, (XtPointer) 4},
+    {"unalloc", XmCColor, XmRPixel, sizeof(Pixel),
+     (Cardinal) &uncol, XmRString, (XtPointer) "gray50"},
+    {"view-height", XmCHeight, XmRShort, sizeof(Dimension),
+     (Cardinal) &vheight, XmRImmediate, (XtPointer) 256},
+    {"view-width", XmCWidth, XmRShort, sizeof(Dimension),
+     (Cardinal) &vwidth, XmRImmediate, (XtPointer) 256},
+    {"width", XmCWidth, XmRShort, sizeof(Dimension),
+     (Cardinal) &width, XmRImmediate, (XtPointer) 512}
+};
+
+
+/* The X options for this application.
+ */
+
+static XrmOptionDescRec options[] =
+{
+    {"-alloc", "alloc", XrmoptionSepArg, NULL},
+    {"-delay", "delay", XrmoptionSepArg, NULL},
+    {"-free", "free", XrmoptionSepArg, NULL},
+    {"-height", "height", XrmoptionSepArg, NULL},
+    {"-space", "space", XrmoptionSepArg, NULL},
+    {"-unalloc", "unalloc", XrmoptionSepArg, NULL},
+    {"-viewheight", "view-height", XrmoptionSepArg, NULL},
+    {"-viewwidth", "view-width", XrmoptionSepArg, NULL},
+    {"-width", "width", XrmoptionSepArg, NULL}
 };
 #endif /* MP_GUI_SUPPORT */
 
@@ -354,17 +409,151 @@ static unsigned long getuleb128(void)
 }
 
 
+#if MP_GUI_SUPPORT
+/* Refresh the memory display window.
+ */
+
+static void redrawmemory(Widget w, XtPointer d, XmDrawingAreaCallbackStruct *s)
+{
+    XCopyArea(appdisplay, pixmap, s->window, ungc, 0, 0, width, height, 0, 0);
+}
+#endif /* MP_GUI_SUPPORT */
+
+
+#if MP_GUI_SUPPORT
+/* Update the memory display window.
+ */
+
+static void drawmemory(void *a, size_t s, GC g)
+{
+    unsigned long i, j, l, u, x1, x2, y1, y2;
+
+    if (a < addrbase)
+        return;
+    l = (unsigned long) a - (unsigned long) addrbase;
+    u = l + s - 1;
+    l /= addrscale;
+    u /= addrscale;
+    x1 = l % width;
+    y1 = l / width;
+    x2 = u % width;
+    y2 = u / width;
+    if (y2 >= height)
+        return;
+    if (y1 == y2)
+    {
+        XDrawLine(appdisplay, XtWindow(drawwidget), g, x1, y1, x2, y1);
+        XDrawLine(appdisplay, pixmap, g, x1, y1, x2, y1);
+    }
+    else
+    {
+        for (i = x1, j = y1; j < y2; i = 0, j++)
+        {
+            XDrawLine(appdisplay, XtWindow(drawwidget), g, i, j, width - 1, j);
+            XDrawLine(appdisplay, pixmap, g, i, j, width - 1, j);
+        }
+        XDrawLine(appdisplay, XtWindow(drawwidget), g, 0, y2, x2, y2);
+        XDrawLine(appdisplay, pixmap, g, 0, y2, x2, y2);
+    }
+    /* We just do a busy loop here since sleep() does not have enough accuracy
+     * and usleep() is only available on a small number of platforms.  We need
+     * to modify the global variable "delay" in case some clever compilers
+     * optimise away the pointless modification of a local variable.
+     */
+    if (delay > 0)
+    {
+        i = delay;
+        for (delay *= 100000; delay > 0; delay--);
+        delay = i;
+    }
+}
+#endif /* MP_GUI_SUPPORT */
+
+
+/* Read an event from the tracing output file.
+ */
+
+#if MP_GUI_SUPPORT
+static int readevent(XtPointer p)
+#else /* MP_GUI_SUPPORT */
+static int readevent(void)
+#endif /* MP_GUI_SUPPORT */
+{
+    char s[4];
+    allocation *f;
+    void *a;
+    size_t l;
+    unsigned long n;
+
+    if (refill(1))
+        switch (*bufferpos)
+        {
+          case 'A':
+            bufferpos++;
+            bufferlen--;
+            currentevent++;
+            n = getuleb128();
+            a = (void *) getuleb128();
+            l = getuleb128();
+            newalloc(n, currentevent, a, l);
+            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %lu\n",
+                    currentevent, n, a, l);
+#if MP_GUI_SUPPORT
+            if (addrbase == NULL)
+                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
+            drawmemory(a, l, algc);
+            return 0;
+#else /* MP_GUI_SUPPORT */
+            return 1;
+#endif /* MP_GUI_SUPPORT */
+          case 'F':
+            bufferpos++;
+            bufferlen--;
+            currentevent++;
+            n = getuleb128();
+            if (f = (allocation *) __mp_search(alloctree.root, n))
+            {
+                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %lu\n",
+                        currentevent, n, f->addr, f->size);
+#if MP_GUI_SUPPORT
+                drawmemory(f->addr, f->size, frgc);
+#endif /* MP_GUI_SUPPORT */
+            }
+            else
+                fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
+                        progname, n);
+#if MP_GUI_SUPPORT
+            return 0;
+#else /* MP_GUI_SUPPORT */
+            return 1;
+#endif /* MP_GUI_SUPPORT */
+          default:
+            break;
+        }
+    getentry(s, sizeof(char), 4, 0);
+    if (memcmp(s, MP_TRACEMAGIC, 4) != 0)
+    {
+        fprintf(stderr, "%s: Invalid file format\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    freeallocs();
+    fclose(tracefile);
+#if MP_GUI_SUPPORT
+    return 1;
+#else /* MP_GUI_SUPPORT */
+    return 0;
+#endif /* MP_GUI_SUPPORT */
+}
+
+
 /* Log the allocations and deallocations from the tracing output file.
  */
 
 static void readfile(void)
 {
     char s[4];
-    allocation *f;
-    void *a;
-    size_t i, l;
-    unsigned long n;
-    int b, e;
+    size_t i;
+    int b;
 
     /* When reading the tracing output file, we assume that if it begins and
      * ends with the magic sequence of characters then it is a valid tracing
@@ -414,46 +603,11 @@ static void readfile(void)
     fputs("----------", stdout);
 #endif /* ENVIRON */
     fputs("  ----\n", stdout);
+#if !MP_GUI_SUPPORT
     /* Read each allocation or deallocation entry.
      */
-    e = 0;
-    i = 0;
-    while ((e == 0) && refill(1))
-        switch (*bufferpos)
-        {
-          case 'A':
-            bufferpos++;
-            bufferlen--;
-            i++;
-            n = getuleb128();
-            a = (void *) getuleb128();
-            l = getuleb128();
-            newalloc(n, i, a, l);
-            fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %lu\n", i, n,
-                    a, l);
-            break;
-          case 'F':
-            bufferpos++;
-            bufferlen--;
-            i++;
-            n = getuleb128();
-            if (f = (allocation *) __mp_search(alloctree.root, n))
-                fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %lu\n", i,
-                        n, f->addr, f->size);
-            else
-                fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
-                        progname, n);
-            break;
-          default:
-            e = 1;
-            break;
-        }
-    getentry(s, sizeof(char), 4, 0);
-    if (memcmp(s, MP_TRACEMAGIC, 4) != 0)
-    {
-        fprintf(stderr, "%s: Invalid file format\n", progname);
-        exit(EXIT_FAILURE);
-    }
+    while (readevent());
+#endif /* MP_GUI_SUPPORT */
 }
 
 
@@ -464,13 +618,18 @@ int main(int argc, char **argv)
 {
     char b[256];
     char *f;
+#if MP_GUI_SUPPORT
+    XGCValues g;
+#endif /* MP_GUI_SUPPORT */
     int c, e, h, v;
 
 #if MP_GUI_SUPPORT
-    appwidget = XtVaAppInitialize(&appcontext, "MPTrace", NULL, 0, &argc, argv,
-                                  NULL, NULL);
-    XtGetApplicationResources(appwidget, NULL, resources, XtNumber(resources),
-                              NULL, 0);
+    appwidget = XtVaAppInitialize(&appcontext, "MPTrace", options,
+                                  XtNumber(options), &argc, argv, NULL, NULL);
+    XtVaGetApplicationResources(appwidget, NULL, resources, XtNumber(resources),
+                                NULL);
+    appdisplay = XtDisplay(appwidget);
+    appscreen = XtScreen(appwidget);
 #endif /* MP_GUI_SUPPORT */
     e = h = v = 0;
     progname = argv[0];
@@ -526,26 +685,49 @@ int main(int argc, char **argv)
         fprintf(stderr, "%s: Cannot open file `%s'\n", progname, f);
         exit(EXIT_FAILURE);
     }
+    currentevent = 0;
     bufferpos = buffer;
     bufferlen = 0;
+    readfile();
 #if MP_GUI_SUPPORT
+    addrbase = NULL;
+    addrscale = (((addrspace * 1048576) - 1) / (width * height)) + 1;
+    /* Set up the main application window and scrollable drawing area.  Also
+     * set up a pixmap to backup the drawing area.
+     */
     mainwidget = XtVaCreateManagedWidget("main", xmScrolledWindowWidgetClass,
-                                         appwidget, XmNscrollingPolicy,
+                                         appwidget, XmNwidth, vwidth, XmNheight,
+                                         vheight, XmNscrollingPolicy,
                                          XmAUTOMATIC, XmNscrollBarDisplayPolicy,
                                          XmAS_NEEDED, NULL);
     drawwidget = XtVaCreateManagedWidget("draw", xmDrawingAreaWidgetClass,
                                          mainwidget, XmNwidth, width, XmNheight,
                                          height, NULL);
-    appdisplay = XtDisplay(appwidget);
-    appscreen = XtScreen(mainwidget);
     pixmap = XCreatePixmap(appdisplay, RootWindowOfScreen(appscreen), width,
                            height, DefaultDepthOfScreen(appscreen));
+    /* Set up the graphics contexts that are used for drawing in different
+     * colours.
+     */
+    g.foreground = uncol;
+    ungc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
+                     &g);
+    g.foreground = frcol;
+    frgc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
+                     &g);
+    g.foreground = alcol;
+    algc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
+                     &g);
+    /* Add a callback procedure to handle the refreshing of the drawing area
+     * and also a work procedure to read events from the tracing output file.
+     * Then initialise the drawing area and enter the main X application loop.
+     */
+    XtAddCallback(drawwidget, XmNexposeCallback, (XtCallbackProc) redrawmemory,
+                  NULL);
+    XtAppAddWorkProc(appcontext, (XtWorkProc) readevent, NULL);
     XtRealizeWidget(appwidget);
+    XFillRectangle(appdisplay, XtWindow(drawwidget), ungc, 0, 0, width, height);
+    XFillRectangle(appdisplay, pixmap, ungc, 0, 0, width, height);
     XtAppMainLoop(appcontext);
-#else /* MP_GUI_SUPPORT */
-    readfile();
-    freeallocs();
-    fclose(tracefile);
 #endif /* MP_GUI_SUPPORT */
     return EXIT_SUCCESS;
 }
