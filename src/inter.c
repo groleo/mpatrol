@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.113 2001-03-07 20:22:28 graeme Exp $"
+#ident "$Id: inter.c,v 1.114 2001-03-07 20:38:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.113 2001-03-07 20:22:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.114 2001-03-07 20:38:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1455,6 +1455,7 @@ __mp_setmark(void *p)
         m->data.flags |= FLG_MARKED;
         if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READONLY);
+        memhead.mcount++;
         memhead.mtotal += n->size;
         r = 1;
     }
@@ -1980,6 +1981,8 @@ __mp_stats(heapinfo *d)
                 memhead.addr.size + memhead.syms.strings.size +
                 memhead.syms.size + memhead.ltable.isize + memhead.prof.size +
                 memhead.size;
+    d->mcount = memhead.mcount;
+    d->mtotal = memhead.mtotal;
     restoresignals();
     return 1;
 }
