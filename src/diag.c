@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.105 2002-02-05 00:46:16 graeme Exp $"
+#ident "$Id: diag.c,v 1.106 2002-02-05 01:01:33 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.105 2002-02-05 00:46:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.106 2002-02-05 01:01:33 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -62,6 +62,17 @@ extern "C"
 
 
 MP_API extern errortype __mp_errno;
+
+
+#if TARGET == TARGET_WINDOWS && MP_THREADS_SUPPORT
+/* This contains a pointer to the environment variables for a process.  It
+ * is used by __mp_getenv() to read the environment in a multi-threaded
+ * Windows environment since the mutexes guarding the system getenv() are
+ * locked using malloc().
+ */
+
+extern char **_environ;
+#endif /* TARGET && MP_THREADS_SUPPORT */
 
 
 /* The file pointer to the log file.  This should not really be a file scope
@@ -498,7 +509,21 @@ MP_GLOBAL
 char *
 __mp_getenv(char *s)
 {
+#if TARGET == TARGET_WINDOWS && MP_THREADS_SUPPORT
+    char **e;
+    size_t l;
+#endif /* TARGET && MP_THREADS_SUPPORT */
+
+#if TARGET == TARGET_WINDOWS && MP_THREADS_SUPPORT
+    if ((_environ != NULL) && (s != NULL) && ((l = strlen(s)) != 0))
+        for (e = _environ; *e != NULL; e++)
+            if ((strlen(*e) > l) && (*(*e + l) == '=') &&
+                (strncmp(*e, s, l) == 0))
+                return *e + l + 1;
+    return NULL;
+#else /* TARGET && MP_THREADS_SUPPORT */
     return getenv(s);
+#endif /* TARGET && MP_THREADS_SUPPORT */
 }
 
 
