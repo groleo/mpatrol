@@ -1,4 +1,23 @@
-Changes for 1.3.0
+Changes for 1.3.1 (22nd November, 2000)
+
+  * The initialisation and termination of the mpatrol library has been improved
+    when compiling on ELF, GNU or C++ systems.  All memory deallocations
+    resulting from C++ file-scope destructors will now be recorded as a result.
+
+  * The thread-safe shared library version of mpatrol was not being built
+    correctly with the GNU linker.  This has now been fixed, with the result
+    that the library is properly initialised.
+
+  * Improved the RPM package specification file to keep in line with the Red Hat
+    PowerTools release.
+
+  * Added the ability to build an SD/UX package for use on HP/UX.
+
+  * Documented how to create shared libraries from archive libraries when using
+    the GNU linker.
+
+
+Changes for 1.3.0 (19th November, 2000)
 
   * Added the CHECKMEMORY option for displaying an error for each zero-size
     memory operation on a NULL pointer.
@@ -37,7 +56,7 @@ Changes for 1.3.0
 
   * Added the --show-env option to the mpatrol command and removed the implicit
     LOGALL that was always being added to MPATROL_OPTIONS.  Also added the
-    --threads option to link at run-time with threadsafe libraries.
+    --threads option to link at run-time with thread-safe libraries.
 
   * Fixed a problem with the mpatrol command on UNIX platforms when the command
     to be run was not supplied with a pathname.
