@@ -1,4 +1,9 @@
-Changes for 1.2.2
+Changes for 1.2.2 (18th June, 2000)
+
+  * The mpatrol library can now be built as a thread-safe library on many
+    platforms.
+
+  * Added ability to determine the program name on DG/UX M88K.
 
   * SINIX and UnixWare are now supported.
 

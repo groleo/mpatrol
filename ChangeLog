@@ -1,3 +1,48 @@
+Sun Jun 18 09:43:06 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented problems making library thread-safe.
+
+Fri Jun 16 17:55:41 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Documented that thread-safety available on lots more platforms, and
+	that the program name can automatically be determined on DG/UX M88K
+	platforms.
+
+	* src/config.h:
+	Changed one of the macros to specify thread-safety on LynxOS.
+
+	* src/memory.c:
+	Added ability to determine the program name under DG/UX, LynxOS and
+	Solaris without traversing the stack.
+
+	* src/mutex.c: LynxOS doesn't have pthread_once().
+
+	* tests/pass/test5.c:
+	Added a non-NULL second argument to pthread_join() since LynxOS
+	requires it.
+
+Thu Jun 15 20:27:05 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/SMakefile, build/amiga/Makefile:
+	Revised the dependencies for the mutex module.
+
+	* doc/mpatrol.texi: Documented Intel Linux threads support.
+
+	* pkg/tar/build, pkg/lha/build:
+	Now also build the thread-safe libraries.
+
+	* pkg/rpm/mpatrol.spec, pkg/pkg/prototype, pkg/pkg/build:
+	Now also build and install the thread-safe libraries.
+
+	* src/config.h: Added the MP_INIT_SUPPORT preprocessor macro.
+
+	* src/mutex.c: Recursive mutexes are now working properly.
+
+	* src/machine.c, src/machine.h:
+	Added support for calling functions from the .init section of ELF files.
+
 Mon Jun 12 21:54:19 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Removed references to problems on HP/UX as they are now fixed.
