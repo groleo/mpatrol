@@ -1,0 +1,114 @@
+#!/bin/ksh
+
+
+# mpatrol
+# A library for controlling and tracing dynamic memory allocations.
+# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+
+
+# UNIX shell script to update the mpatrol library version and create a new
+# release archive - this file should be used for administrative purposes only
+
+
+# $Id: mupdate,v 1.1 1999-10-10 01:11:57 graeme Exp $
+
+
+# Read the old release version and release date from the VERSION file.
+
+if [ ! -f VERSION ]
+then
+    echo "cannot locate VERSION file" >&2
+    exit 1
+fi
+
+read oldcnt olddate <VERSION
+
+oldver=`expr "$oldcnt" : '\([^.]*\)'`
+oldcnt=`expr "$oldcnt" : '[^.]*\.\(.*\)'`
+oldrev=`expr "$oldcnt" : '\([^.]*\)'`
+oldcnt=`expr "$oldcnt" : '[^.]*\.\(.*\)'`
+
+newver="$oldver"
+newrev="$oldrev"
+newcnt=`expr "$oldcnt" + 1`
+newdate=`date +"%d %B %Y %H:%M:%S %Z"`
+
+release="$newver.$newrev.$newcnt"
+
+
+# Change the mpatrol.h header file in order to update the MPATROL_VERSION
+# preprocessor macro with the latest version of the library.
+
+oldversion=`printf %d%02d%02d $oldver $oldrev $oldcnt`
+newversion=`printf %d%02d%02d $newver $newrev $newcnt`
+
+sed "s/MPATROL_VERSION $oldversion/MPATROL_VERSION $newversion/" src/mpatrol.h \
+    >src/mpatrol.h.new
+mv src/mpatrol.h.new src/mpatrol.h
+cvs commit -m "Updated to version $release" src/mpatrol.h 2>&1 >/dev/null
+
+
+# Change the version.c source file in order to update the MP_VERSION
+# preprocessor macro with the latest version of the library, and also to update
+# the release date strings.
+
+oldversion="$oldver\\.$oldrev\\.$oldcnt"
+newversion="$newver\\.$newrev\\.$newcnt"
+
+olddate1=`date -d"$olddate" +"(%y\\/%m\\/%d)"`
+olddate2=`date -d"$olddate" +"(%d\\.%m\\.%y)"`
+olddate3=`date -d"$olddate" +"(%d %B %Y)"`
+
+newdate1=`date -d"$newdate" +"(%y\\/%m\\/%d)"`
+newdate2=`date -d"$newdate" +"(%d\\.%m\\.%y)"`
+newdate3=`date -d"$newdate" +"(%d %B %Y)"`
+
+sed -e "s/MP_VERSION \"mpatrol $oldversion\"/MP_VERSION \"mpatrol $newversion\"/" \
+    -e "s/MP_VERSION \" $olddate1\"/MP_VERSION \" $newdate1\"/" \
+    -e "s/MP_VERSION \" $olddate2\"/MP_VERSION \" $newdate2\"/" \
+    -e "s/MP_VERSION \" $olddate3\"/MP_VERSION \" $newdate3\"/" src/version.c \
+    >src/version.c.new
+mv src/version.c.new src/version.c
+cvs commit -m "Updated to version $release" src/version.c 2>&1 >/dev/null
+
+
+# Update the ChangeLog file with all the changes since the last release.
+
+rcs2log -R -u 'graeme	Graeme Roy	graeme@epc.co.uk' >ChangeLog.new
+cat ChangeLog >>ChangeLog.new
+mv ChangeLog.new ChangeLog
+vi ChangeLog
+cvs commit -m "Updated to version $release" ChangeLog 2>&1 >/dev/null
+
+
+# Write the new release version and release date to the VERSION file.
+
+echo "$release $newdate" >VERSION
+cvs commit -m "Updated to version $release" VERSION 2>&1 >/dev/null
+
+
+# Tag the entire distribution and create a new release archive.
+
+cvs tag REL_${newver}_${newrev}_${newcnt} 2>&1 >/dev/null
+
+archive="mpatrol_$release.tar"
+
+cd ..
+tar cf "$archive" mpatrol
+gzip "$archive"
+echo "created ../$archive.gz" >&2
