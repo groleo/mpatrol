@@ -1,8 +1,21 @@
 The author would like to thank the following people for their various
 contributions to the mpatrol library.
 
-Alexander Barton <abarton@innotrac.com>
-Dave Gibson      <david@epc.co.uk>
-Roger Keane      <rgr@bcs-inc.com>
-Boris Makushkin  <oberon@antibiotic.ru>
-Stephan Springl  <springl@bfw-online.de>
+Alexander Barton        <abarton@innotrac.com>
+Dave Gibson             <david@epc.co.uk>
+Roger Keane             <rgr@bcs-inc.com>
+Boris Makushkin         <oberon@antibiotic.ru>
+Stephan Springl         <springl@bfw-online.de>
+
+The following people helped answer any queries from the author or gave
+useful feedback on the mpatrol library.
+
+Volker Boerchers        <boercher@kidata.de>
+Stefan Hoffmeister      <stefan.hoffmeister@econos.de>
+Georg Huettenegger      <georg@ist.org>
+Aryeh Katz              <aryeh@vasco.com>
+Dimitrios Michailidis   <dm@desanasystems.com>
+Paul Pluzhnikov         <paul@parasoft.com>
+Tim Powers              <timp@redhat.com>
+Victor R. Volkman       <sysop@hal9k.com>
+Ben Zorn                <zorn@microsoft.com>
