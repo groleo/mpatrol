@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.101 2000-07-02 22:40:52 graeme Exp $
+@c $Id: mpatrol.texi,v 1.102 2000-07-07 10:45:32 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.14
 @set VERSION 1.2.5
-@set UPDATED 2nd July, 2000
+@set UPDATED 7th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -634,6 +634,10 @@ The mpatrol library can be built to liaise with Parasoft Inuse, a commercial
 graphical memory usage tool that can display the current memory map of a running
 process.  Inuse is supplied with Parasoft Insure++.
 
+@item
+Build scripts are supplied to build both installation packages and binary
+distributions.  A Linux Software Map file is also provided.
+
 @cindex test suite
 @item
 A small test suite is provided in order to test basic features.
@@ -760,19 +764,22 @@ then install or print these documents.
 @cindex RPM package
 @cindex TAR archive
 @cindex LhA archive
+@cindex ZIP archive
 Alternatively, the @file{pkg} directory contains files that can be used to
 automatically generate a @emph{package} in a specific format suitable for
-installation on a system.  Two package formats (PKG and RPM) and two archive
-formats are currently supported (generic tape archive and LhA).  The first
+installation on a system.  Two package formats (PKG and RPM) and three archive
+formats are currently supported (generic tape archive, LhA and ZIP).  The first
 package format is generally used on UNIX SVR4 systems, while the second was
 introduced by Red Hat for use in their Linux distributions.  The generic tape
 archive can be used as a distribution for UNIX systems where no package format
 is supported, but it does not contain information on how to install the files on
-the system once they have been extracted from the distribution.  The LhA format
-is roughly the same, but is intended for Amiga systems and is used for Aminet
-distributions.  You should really know what you are doing before you attempt to
-build a package, and you should also be aware that some of the package files may
-need to be modified before you begin.
+the system once they have been extracted from the distribution.  The LhA and ZIP
+formats are also roughly the same, but the LhA format is intended for Amiga
+systems and is used for Aminet distributions, while the ZIP format is intended
+for Windows systems and is used for WinSite distributions.  You should really
+know what you are doing before you attempt to build a package, and you should
+also be aware that some of the package files may need to be modified before you
+begin.
 
 @cindex Linux Software Map
 @cindex LSM
@@ -5851,9 +5858,12 @@ Running using the Solaris malloc libraries:
 @appendix Profiling file format
 @cindex profiling file format
 
+@cindex magic
 The format of the profiling output files that are produced by the mpatrol
-library is described here.  Every profiling output file contains the following
-components.
+library is described here@footnote{The file @file{extra/magic} contains a UNIX
+@emph{magic} file excerpt for automatically identifying an mpatrol log file and
+an mpatrol profiling output file with the @command{file} command.}.  Every
+profiling output file contains the following components.
 
 @itemize @bullet
 @item
@@ -6821,7 +6831,8 @@ Perhaps add support for reading HP/UX executable files and libraries in the SOM
 object file format without needing to use the GNU BFD library.
 
 @item
-Add support for BSD systems and other non-System V UNIX operating systems.
+Add support for Digital UNIX and also the BSD systems (specifically FreeBSD,
+NetBSD, OpenBSD and SunOS) and other non-System V UNIX operating systems.
 
 @item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
@@ -6937,6 +6948,9 @@ preloading the mpatrol DLL from the @command{mpatrol} command.
 @item
 Add a Windows resource file to the mpatrol library with copyright and version
 information.
+
+@item
+Perhaps add an @command{InstallShield} installation script with icons.
 @end itemize
 
 @node Netware notes, , Windows notes, Notes
@@ -6991,13 +7005,14 @@ currently running.
 @cindex similar programs
 @cindex programs
 
-A list of software which helps in debugging dynamic memory allocation problems
-is given below@footnote{This list can be considered to be a slightly more up to
-date version of @cite{Debugging Tools for Dynamic Storage Allocation and Memory
-Management} (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben
-Zorn (@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features
-that mpatrol contains and you may wish to use one of them to solve your problem
-if you have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
+A list of over sixty different items of software which help in debugging dynamic
+memory allocation problems is given below@footnote{This list can be considered
+to be a slightly more up to date version of @cite{Debugging Tools for Dynamic
+Storage Allocation and Memory Management}
+(@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
+(@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features that
+mpatrol contains and you may wish to use one of them to solve your problem if
+you have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
 Fence, so I can't vouch for any of the others, although if you have any
 recommendations feel free to let me know so I can add them to this list.  In
 particular, there seems to be a shortage of such programs for Netware platforms.
@@ -7319,6 +7334,23 @@ Instruments the heap to provide heap error detection without the need to
 recompile any source code.
 @end table
 
+@cindex HeapManager
+@item
+HeapManager
+@table @asis
+@item Author
+Andrew Wulf (@email{heapmanager@@biit.com})
+@item License
+Free Software
+@item Platforms
+MacOS
+@item Location
+@uref{http://www.biit.com/}
+@item Overview
+Provides a general-purpose dynamic memory allocation debugging package with
+symbolic stack traceback.
+@end table
+
 @cindex Insure++
 @cindex Parasoft
 @item
@@ -7390,6 +7422,23 @@ Various UNIX
 Logs all calls to @code{malloc()} and related functions to database files with
 the filename and line number, then attempts to validate reallocations and
 deallocations and detect memory leaks.
+@end table
+
+@cindex Leakers
+@item
+Leakers
+@table @asis
+@item Author
+Gabriel M. Deal (@email{gmd@@yellowleaf.org})
+@item License
+GNU General Public License
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.yellowleaf.org/gmd/software/leakers/}
+@item Overview
+Detects memory allocation errors by writing a log file and then examining it
+for memory leaks and attempts to free memory multiple times.
 @end table
 
 @cindex LeakTracer
@@ -7681,6 +7730,22 @@ Simplifies the usage (and can help debug) the use of shared memory between
 related processes.
 @end table
 
+@item
+MM
+@table @asis
+@item Author
+Dave Clements (@email{clements@@cs.uoregon.edu})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.cirl.uoregon.edu/clements/memoryManager.html}
+@item Overview
+Overrides the C dynamic memory allocation functions to provide better debugging
+capabilities.
+@end table
+
 @cindex Mmalloc
 @item
 Mmalloc
@@ -7887,6 +7952,23 @@ MacOS
 @item Overview
 Runs in the background as a control panel and detects various memory errors
 which can then be caught and run under a debugger.
+@end table
+
+@cindex SmartAlloc
+@item
+SmartAlloc
+@table @asis
+@item Author
+John Walker
+@item License
+Free Software
+@item Platforms
+Various UNIX, MS-DOS
+@item Location
+@uref{http://www.fourmilab.ch/smartall/}
+@item Overview
+Detects orphaned buffers of dynamic memory allocations and also helps to find
+other common problems in management of dynamic storage.
 @end table
 
 @cindex TestCenter
