@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.92 2000-06-18 09:37:33 graeme Exp $
+@c $Id: mpatrol.texi,v 1.93 2000-06-20 18:07:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.11
-@set VERSION 1.2.2
-@set UPDATED 18th June, 2000
+@set EDITION 1.12
+@set VERSION 1.2.3
+@set UPDATED 20th June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2282,16 +2282,16 @@ are unable to recompile or relink it.
 Note that the @command{mpatrol} command must be set up to use the correct
 object file format access libraries that are required for your system if you
 wish to use the @option{-d} option.  If the mpatrol library was built with
-@code{FORMAT=FORMAT_ELF32} support then it must be told to preload the ELF
-access library (normally @file{libelf.so}).  If it was built with
-@code{FORMAT=FORMAT_BFD} support then it must be told to preload the GNU BFD
-access libraries (normally @file{libbfd.so} and @file{libiberty.so}).  However,
-if these libraries only exist on your system in archive form then you must build
-@file{libmpatrol.so} with these extra libraries incorporated into it so that
-there are no dependencies on them at run-time.  However, there may well be
-problems if the resulting shared library contains position-dependent code from
-the archive libraries you incorporated.  The only way to find out is for you to
-try it and see.
+@code{FORMAT=FORMAT_ELF32} or @code{FORMAT=FORMAT_ELF64} support then it must
+be told to preload the ELF access library (normally @file{libelf.so}).  If it
+was built with @code{FORMAT=FORMAT_BFD} support then it must be told to preload
+the GNU BFD access libraries (normally @file{libbfd.so} and
+@file{libiberty.so}).  However, if these libraries only exist on your system in
+archive form then you must build @file{libmpatrol.so} with these extra
+libraries incorporated into it so that there are no dependencies on them at
+run-time.  However, there may well be problems if the resulting shared library
+contains position-dependent code from the archive libraries you incorporated.
+The only way to find out is for you to try it and see.
 
 @cindex embedded libraries
 In order to build a shared version of the mpatrol library with embedded object
@@ -2937,18 +2937,20 @@ program using the following commands:
 
 @itemize @bullet
 @cindex COFF
+@cindex XCOFF
 @item
 If the mpatrol library was built with no support for any object file format or
-was built with support for the COFF object file format:
+was built with support for the COFF or XCOFF object file formats:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
 @end smallexample
 
 @cindex ELF32
+@cindex ELF64
 @item
-If the mpatrol library was built with support for the ELF32 object file format
-access library:
+If the mpatrol library was built with support for the ELF32 or ELF64 object file
+format access library:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lelf
@@ -5935,6 +5937,11 @@ The thread-safe version of the library does not work.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
+There is currently no support for reading symbols from XCOFF shared libraries.
+You should instead link your programs with the following compiler options in
+order to perform a static link instead of a dynamic link:
+@option{-Wl,-bnoautoimp,-bimport:/lib/syscalls.exp}.
+@item
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
@@ -6083,6 +6090,8 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+There is currently no support for reading symbols from COFF shared libraries.
+@item
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
@@ -6098,6 +6107,8 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+There is currently no support for reading symbols from COFF shared libraries.
+@item
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
@@ -6111,6 +6122,8 @@ LynxOS 3.0.0, PowerPC, BFD, @command{gcc}
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
+@item
+There is currently no support for reading symbols from XCOFF shared libraries.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6299,6 +6312,9 @@ Add any support for memory allocation in @file{memory.c}.
 Add any support for stack traversal in @file{stack.c}.
 
 @item
+Add any platform-specific assembler code in @file{machine.c}.
+
+@item
 Add any support for signals in @file{signals.c}.
 
 @item
@@ -6339,6 +6355,9 @@ Add any support for memory allocation in @file{memory.c}.
 
 @item
 Add any support for stack traversal in @file{stack.c}.
+
+@item
+Add any machine-specific assembler code in @file{machine.c}.
 @end itemize
 
 @node New file format support, , New processor support, Supported systems
