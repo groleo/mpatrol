@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.65 2001-02-22 20:04:59 graeme Exp $
+ * $Id: config.h,v 1.66 2001-02-27 19:55:50 graeme Exp $
  */
 
 
@@ -191,10 +191,17 @@
 #endif /* MP_MAXDELSTACK */
 
 
-/* The maximum number of finalisation functions that can be registered with
- * the mpatrol library through __mp_atexit() and then called in reverse order
- * when __mp_fini() is called.
+/* The maximum number of initialisation and finalisation functions that can
+ * be registered with the mpatrol library through the __mp_init_*() functions
+ * and through the __mp_atexit() function respectively.  The initialisation
+ * functions are called in order of discovery when __mp_init() is called and
+ * the finalisation functions are called in reverse order when __mp_fini()
+ * is called.
  */
+
+#ifndef MP_MAXINITS
+#define MP_MAXINITS 32
+#endif /* MP_MAXINITS */
 
 #ifndef MP_MAXFINIS
 #define MP_MAXFINIS 32
