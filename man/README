@@ -31,6 +31,14 @@ formatting codes, leaving the final formatting up to the viewer program.
         Viewer:    Any text viewer that can handle formatted manual pages.
         Notes:     Plain text with basic formatting codes.
 
+  * html/*.html
+        Format:    Hypertext Markup Language (HTML)
+                   http://www.w3c.org/MarkUp/
+        Generator: Man2HTML
+                   http://www.win.tue.nl/~rcb5/man2html.html
+        Viewer:    Any web browser
+        Notes:     Contains hypertext links with formatting codes.
+
 
 The following files are provided with the manual page distribution and are all
 formatted for printed manuals.  All can be viewed with a variety of programs,
