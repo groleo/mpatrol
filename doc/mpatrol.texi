@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.71 2000-05-10 23:59:26 graeme Exp $
+@c $Id: mpatrol.texi,v 1.72 2000-05-11 21:08:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 10th May, 2000
+@set UPDATED 11th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -301,7 +301,8 @@ using heap memory from the system.
 @cindex library, thread-safe
 @item
 Can be built as archive, shared and/or thread-safe libraries on systems that
-support them, or even as one large object file.
+support them, or even as one large object file.  A lint library can also be
+built from the mpatrol library on UNIX platforms.
 
 @item
 Details of memory allocations and free memory are stored internally as a tree
@@ -404,6 +405,11 @@ Contains 9 replacement C memory operation functions:
 @tab UNIX
 @tab Searches memory for specific bytes.
 @end multitable
+
+@item
+All of the above functions can also be defined with an additional underscore
+prepended to their external name in order to catch all uses of these functions
+in the system and third-party libraries.
 
 @item
 Contains support for a user-defined low-memory handler function, including a
@@ -610,7 +616,8 @@ The library uses a header file to redefine the memory allocation functions as
 macros in order to obtain more information about where they were called from.
 This is not strictly required on UNIX and Windows platforms (and AmigaOS when
 using @command{gcc}), since the library automatically redefines the default
-system memory allocation functions.
+system memory allocation functions.  All redefinitions in the header can also
+be disabled by defining the @code{NDEBUG} preprocessor macro.
 
 @item
 A command is supplied to run a program that was linked with the mpatrol library
@@ -4439,6 +4446,14 @@ functions are supplied for extra tracing and control.  Note that the current
 version of the mpatrol library is contained in the @code{MPATROL_VERSION}
 preprocessor macro.
 
+@cindex NDEBUG
+All of the function definitions in @file{mpatrol.h} can be disabled by defining
+the @code{NDEBUG} preprocessor macro, which is the same macro used to control
+the behaviour of the @code{assert()} function.  If @code{NDEBUG} is defined then
+no macro redefinition of functions will take place and all special mpatrol
+library functions will evaluate to empty statements.  It is intended that the
+@code{NDEBUG} preprocessor macro be defined in release builds.
+
 The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include @file{mpatrol.h} before all other
 header files, although on UNIX and Windows platforms (and AmigaOS when using
@@ -7244,6 +7259,23 @@ AmigaOS
 @uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
 @item Overview
 Patches the system to check for free memory corruption.
+@end table
+
+@cindex NJAMD (Not Just Another Malloc Debugger)
+@item
+NJAMD (Not Just Another Malloc Debugger)
+@table @asis
+@item Author
+Mike Perry (@email{mikepery@@fscked.org})
+@item License
+GNU General Public License
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://fscked.org/proj/njamd.shtml/}
+@item Overview
+Helps track down a wide range of memory allocation problems and is divided
+into a front end executable and a library back end.
 @end table
 
 @cindex Optimizeit
