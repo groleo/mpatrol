@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: cleanup,v 1.6 2001-08-23 22:50:58 graeme Exp $
+# $Id: cleanup,v 1.7 2001-08-27 22:51:53 graeme Exp $
 
 
 rm -f README AUTHORS THANKS COPYING COPYING.LIB NEWS ChangeLog
@@ -33,4 +33,5 @@ rm -f INSTALL install-sh missing mkinstalldirs
 rm -f config.guess config.sub ltconfig ltmain.sh
 rm -f aclocal.m4 configure
 rm -f configure.in Makefile.am Makefile.in
+rm -f config.cache config.log config.status libtool Makefile
 rm -rf bin doc man src tsrc tools
