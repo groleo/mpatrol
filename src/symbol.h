@@ -80,6 +80,7 @@ typedef struct symhead
     size_t size;     /* number of symbol nodes in table */
     void *hhead;     /* access library handle list head */
     void *htail;     /* access library handle list tail */
+    char lineinfo;   /* line number information flag */
 }
 symhead;
 
@@ -90,7 +91,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newsymbols(symhead *, heaphead *);
+MP_EXPORT void __mp_newsymbols(symhead *, heaphead *, char);
 MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
 MP_EXPORT int __mp_addsymbols(symhead *, char *, size_t);
