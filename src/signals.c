@@ -29,15 +29,20 @@
 #include "signals.h"
 #include "diag.h"
 #include "inter.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
 #include <siginfo.h>
 #endif /* MP_SIGINFO_SUPPORT */
+#elif TARGET == TARGET_WINDOWS
+#include <windows.h>
+#endif /* TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.5 2000-01-21 00:33:21 graeme Exp $"
+#ident "$Id: signals.c,v 1.6 2000-06-23 19:30:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -51,21 +56,38 @@ extern "C"
 /* Handles any signals that result from illegal memory accesses.
  */
 
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
 static void signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
 static void signalhandler(int s)
 #endif /* MP_SIGINFO_SUPPORT */
+#elif TARGET == TARGET_WINDOWS
+static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
+#endif /* TARGET */
 {
     infohead *h;
-#if MP_SIGINFO_SUPPORT
+#if (TARGET == TARGET_UNIX && MP_SIGINFO_SUPPORT) || TARGET == TARGET_WINDOWS
     allocnode *t;
     void *a;
-#endif /* MP_SIGINFO_SUPPORT */
+#endif /* TARGET && MP_SIGINFO_SUPPORT */
+#if TARGET == TARGET_WINDOWS
+    EXCEPTION_RECORD *r;
+#endif /* TARGET */
     stackinfo i;
 
+#if TARGET == TARGET_WINDOWS
+    /* This exception handler will catch all kinds of exceptions, but the
+     * only one we are interested in is an access violation, so we return
+     * control to the system to decide what to do in all other cases.
+     */
+    r = e->ExceptionRecord;
+    if (r->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+        return EXCEPTION_CONTINUE_SEARCH;
+#endif /* TARGET */
     h = __mp_memhead();
     __mp_printsummary(h);
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT && MP_WATCH_SUPPORT
     /* If we received a TRAP signal then we should only say that it is an
      * illegal memory access if it is a watch point error.  Otherwise we
@@ -78,7 +100,9 @@ static void signalhandler(int s)
         __mp_abort();
     }
 #endif /* MP_SIGINFO_SUPPORT && MP_WATCH_SUPPORT */
+#endif /* TARGET */
     __mp_diag("\n");
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -109,14 +133,57 @@ static void signalhandler(int s)
      * for the signal handler is the same as the stack area for the main
      * process.
      */
-    __mp_newframe(&i);
+    __mp_newframe(&i, NULL);
     if (__mp_getframe(&i) && __mp_getframe(&i) && __mp_getframe(&i))
     {
         __mp_diag("\n    call stack\n");
         __mp_printstack(&h->syms, &i);
     }
+#elif TARGET == TARGET_WINDOWS
+    /* The exception information provided for access violations allows us to
+     * determine the address of the violation and whether an attempt was made
+     * to read to or write from that address.
+     */
+    a = (void *) r->ExceptionInformation[1];
+    if (r->ExceptionInformation[0])
+        __mp_error(AT_MAX, "illegal memory write at address " MP_POINTER, a);
+    else
+        __mp_error(AT_MAX, "illegal memory read at address " MP_POINTER, a);
+    if (t = __mp_findnode(&h->alloc, a, 1))
+        if (t->info != NULL)
+            __mp_printalloc(&h->syms, t);
+        else
+        {
+            __mp_diag("    within free block " MP_POINTER " (", t->block);
+            __mp_printsize(t->size);
+            __mp_diag(")\n");
+        }
+    else
+        __mp_diag("    " MP_POINTER " not in heap\n", a);
+    /* Unfortunately, the call stack where the access violation came from
+     * is not linked to the stack frame of this function.  Therefore, we
+     * need to invoke the __mp_newframe() function with the proper frame
+     * pointer and explicitly display the first frame as well.
+     */
+    __mp_newframe(&i, (unsigned int *) e->ContextRecord->Ebp);
+    if (__mp_getframe(&i))
+    {
+        a = (void *) e->ContextRecord->Eip;
+        __mp_diag("\n    call stack\n");
+        __mp_diag("\t" MP_POINTER " ", a);
+        __mp_printsymbol(&h->syms, a, -1);
+        __mp_diag("\n");
+        __mp_printstack(&h->syms, &i);
+    }
+#endif /* TARGET */
     h->fini = 1;
     __mp_abort();
+#if TARGET == TARGET_WINDOWS
+    /* This line of code will not be executed due to the call to __mp_abort()
+     * on the previous line, but exists to suppress compiler warnings.
+     */
+    return EXCEPTION_CONTINUE_SEARCH;
+#endif /* TARGET */
 }
 #endif /* TARGET */
 
@@ -126,10 +193,13 @@ static void signalhandler(int s)
 
 MP_GLOBAL void __mp_initsignals(sighead *s)
 {
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
     struct sigaction i;
 #endif /* MP_SIGINFO_SUPPORT */
+#endif /* TARGET */
 
+#if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
     i.sa_flags = SA_SIGINFO;
     (void *) i.sa_handler = (void *) signalhandler;
@@ -138,9 +208,12 @@ MP_GLOBAL void __mp_initsignals(sighead *s)
 #if MP_WATCH_SUPPORT
     sigaction(SIGTRAP, &i, NULL);
 #endif /* MP_WATCH_SUPPORT */
-#elif TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
+#else /* MP_SIGINFO_SUPPORT */
     signal(SIGSEGV, signalhandler);
-#endif /* MP_SIGINFO_SUPPORT && TARGET */
+#endif /* MP_SIGINFO_SUPPORT */
+#elif TARGET == TARGET_WINDOWS
+    SetUnhandledExceptionFilter(signalhandler);
+#endif /* TARGET */
     s->sigint = s->sigterm = NULL;
     s->saved = 0;
 }
@@ -180,6 +253,7 @@ MP_GLOBAL void __mp_abort(void)
     /* Send the current process an ABORT signal for use in a debugger.
      * Used on systems where this is supported.
      */
+    fflush(NULL);
     abort();
 #elif TARGET == TARGET_AMIGA || TARGET == TARGET_NETWARE
     /* Terminate the current process with a failure exit code.
