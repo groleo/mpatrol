@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.152 2001-12-05 23:42:13 graeme Exp $"
+#ident "$Id: inter.c,v 1.153 2001-12-05 23:47:14 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.152 2001-12-05 23:42:13 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.153 2001-12-05 23:47:14 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1049,7 +1049,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     /* If the string is not NULL and does not overflow any memory blocks then
      * allocate the memory and copy the string to the new allocation.
      */
-    if (__mp_checkstring(&memhead, o, &n, f, &v, j))
+    if (__mp_checkstring(&memhead, o, &n, &v, j))
     {
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, &v))
         {
@@ -3039,7 +3039,7 @@ chkr_set_right(void *p, size_t l, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
+    if (!__mp_checkrange(&memhead, p, l, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -3100,8 +3100,8 @@ chkr_copy_bitmap(void *p, void *q, size_t l)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v) ||
-        !__mp_checkrange(&memhead, q, l, AT_MAX, &v))
+    if (!__mp_checkrange(&memhead, p, l, &v) ||
+        !__mp_checkrange(&memhead, q, l, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -3161,7 +3161,7 @@ chkr_check_addr(void *p, size_t l, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
-    if (!__mp_checkrange(&memhead, p, l, AT_MAX, &v))
+    if (!__mp_checkrange(&memhead, p, l, &v))
     {
         memhead.fini = 1;
         __mp_abort();
@@ -3222,7 +3222,7 @@ chkr_check_str(char *p, unsigned char a)
     v.stack = &i;
     v.typestr = NULL;
     v.typesize = 0;
-    if (!__mp_checkstring(&memhead, p, &l, AT_MAX, &v, 0))
+    if (!__mp_checkstring(&memhead, p, &l, &v, 0))
     {
         memhead.fini = 1;
         __mp_abort();
