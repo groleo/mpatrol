@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: utils.c,v 1.5 2000-11-30 19:07:31 graeme Exp $"
+#ident "$Id: utils.c,v 1.6 2000-12-20 22:05:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -125,7 +125,7 @@ MP_GLOBAL void *__mp_encodesleb128(long n, size_t *l)
         b[i] = n & 0x7F;
         n >>= 7;
         if (!p)
-            n |= -(1 << ((sizeof(long) << 3) - 7));
+            n |= -(1UL << ((sizeof(long) << 3) - 7));
         s = b[i] & 0x40;
         if (((n != 0) || (s != 0)) && ((n != -1) || (s == 0)))
             b[i] |= 0x80;
