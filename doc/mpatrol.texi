@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.97 2000-06-23 19:52:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.98 2000-06-26 23:06:12 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.12
 @set VERSION 1.2.3
-@set UPDATED 23rd June, 2000
+@set UPDATED 26th June, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -553,8 +553,8 @@ the address in question and where the illegal memory access occurred.
 A call stack traceback from any function performing a memory allocation is
 stored if the library supports this feature on the system it is being run on.
 This information can then be displayed when information about a specific memory
-allocation is required.  Two different call stack traceback implementations are
-provided.
+allocation is required.  Many different call stack traceback implementations are
+provided for different platforms.
 
 @item
 Symbol table details from executable files and shared libraries are
@@ -6070,8 +6070,6 @@ supports threads.
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEDEBUG} option has no effect.
-@item
-The address of an illegal memory access cannot be determined.
 @item
 Stack traversal may be unreliable from signal-handlers.
 @end itemize
