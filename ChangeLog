@@ -1,3 +1,54 @@
+2001-02-18  Graeme Roy  <graeme@epc.co.uk>
+
+	* tools/mgauge.c: Didn't need the prologue handler.
+
+2001-02-16  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/man3/libmpatrol.3, man/html/libmpatrol.html,
+	  man/cat3/libmpatrol.3:
+	Added __mp_stats().
+
+	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
+	Added __mp_stats().
+
+	* tests/pass/test2.c, tests/pass/test4.c, tests/pass/test10.c:
+	Changed the format strings for pointers.
+
+	* tools/mgauge.c, tools/mgauge.h:
+	Added new files for a memory allocation gauge.
+
+2001-02-15  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.info, doc/mpatrol.texi, doc/mpatrol.txt,
+	  doc/mpatrol.guide, doc/mpatrol.html:
+	Documented mtrace() and muntrace() now implemented.
+
+	* man/man3/libmpatrol.3, man/html/libmpatrol.html,
+	  man/cat3/libmpatrol.3:
+	Added the return address argument to the prologue and epilogue
+	functions.
+
+	* src/inter.c:
+	Added return address arguments to the prologue and epilogue functions
+	and fixed some bugs in __mp_strdup() and __mp_realloc() that would be
+	triggered if they ran out memory.
+
+	* src/mpalloc.c, src/info.h, src/inter.h, src/mpatrol.h:
+	Added a return address argument to the prologue and epilogue functions.
+
+	* tests/pass/test2.c:
+	Added an extra return address argument to the prologue and epilogue
+	functions.
+
+	* tools/README: New file describing the tools directory.
+
+	* tools/heapdiff.c, tools/heapdiff.h:
+	New files for logging changes in the heap between two points in a
+	program's execution.
+
+	* tools/mtrace.c, tools/mtrace.h:
+	New files implementating mtrace() and muntrace().
+
 2001-02-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpatrol.def, build/windows/mpatrolmt.def,

@@ -27,7 +27,8 @@ Changes for 1.4.0
     allocations in the heap.  Also added functions to write strings, hex dumps,
     memory allocations and current call stacks to the mpatrol log file, as well
     as the ability to edit or view specific source files from within a program
-    when it is running.
+    when it is running.  A function is also now available to obtain various
+    statistics about the current state of the heap.
 
   * The CHECK option is now zero by default, which means that the library does
     not perform as much checking by default as it did before.  Also added a
@@ -43,6 +44,9 @@ Changes for 1.4.0
     order to perform memory operations faster than would normally be done with
     __mp_memset(), etc.
 
+  * Fixed a bug in the strdup() and realloc() families of functions that would
+    be triggered if they ran out of memory.
+
   * Fixed a bug in memalign() which meant that if the alignment was specified as
     zero then the system page size would be used instead of the default system
     alignment.
@@ -51,6 +55,9 @@ Changes for 1.4.0
     the symbol tables from object files.  Previously this meant that memory
     allocations from such destructors were recorded as having occurred in the
     wrong place.
+
+  * Added the return address as an additional argument to the prologue and
+    epilogue handlers.
 
   * The hexwords command now searches for a dictionary in several other
     locations if the default dictionary is not found.
@@ -67,6 +74,11 @@ Changes for 1.4.0
   * Added new tests demonstrating the MP_MALLOC() family of functions and the
     __mp_snapshot() and __mp_iterate() functions.  Also improved some of the
     existing tests to make use of the new functions.
+
+  * Added a tools directory containing additional source code for the mpatrol
+    library.  Currently contains packages for determining the difference in the
+    heap between two points in a program's execution, a GNU-compatible mtrace()
+    function and a memory allocation gauge.
 
 
 Changes for 1.3.4 (25th January, 2001)
