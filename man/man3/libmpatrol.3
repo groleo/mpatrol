@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.12 2001-02-12 19:15:04 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.13 2001-02-12 20:18:39 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "12 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -853,7 +853,7 @@ Displays the contents of a block of memory beginning at \fIptr\fP, dumping
 \fIsize\fP consecutive bytes to the log file in hexadecimal format.
 .TP
 \fB__mp_logstack\fP
-Displays the current call stack, skipping \fBframes\fP stack frames from the
+Displays the current call stack, skipping \fIframes\fP stack frames from the
 current stack frame before writing the symbolic stack trace to the log file.
 Returns \fI1\fP if successful, or \fI0\fP if the call stack could not be
 determined or if \fIframes\fP was too large for the current call stack.
