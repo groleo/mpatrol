@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.4 2001-02-27 21:47:29 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.5 2001-02-27 21:58:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.4 2001-02-27 21:47:29 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.5 2001-02-27 21:58:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -62,6 +62,12 @@ listinfo;
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+/* Indicates if this module has been initialised.
+ */
+
+static int malloc_initialised;
 
 
 /* Specifies that more details should be shown when __mpt_dbmallocdump() is
@@ -247,6 +253,8 @@ __mpt_dbmallocoption(int c, union dbmalloptarg *v)
     unsigned long n;
     int r;
 
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     r = 0;
     switch (c)
     {
@@ -310,6 +318,8 @@ int
 __mpt_dbmallocchaincheck(int f, MP_CONST char *s, MP_CONST char *t,
                          unsigned long u)
 {
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     __mp_checkheap(s, t, u);
     return 0;
 }
@@ -323,6 +333,8 @@ __mpt_dbmallocdump(int f)
 {
     listinfo i;
 
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     i.file = f;
     i.event = __mp_snapshot();
     i.header = 0;
@@ -343,6 +355,8 @@ __mpt_dbmalloclist(int f, unsigned long l, unsigned long u)
 {
     listinfo i;
 
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     i.file = f;
     if (l <= u)
         i.event = u;
@@ -372,6 +386,8 @@ __mpt_dbmallocinuse(unsigned long *h)
     __mp_heapinfo i;
     unsigned long t;
 
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     if (__mp_stats(&i))
         t = i.atotal;
     else
@@ -392,11 +408,27 @@ __mpt_dbmallocsize(MP_CONST void *p)
     __mp_allocinfo i;
     size_t t;
 
+    if (!malloc_initialised)
+        __mpt_init_dbmalloc();
     if (__mp_info(p, &i) && !i.freed)
         t = i.size;
     else
         t = (size_t) -1;
     return t;
+}
+
+
+/* Initialise the dbmalloc module.
+ */
+
+void
+__mp_init_dbmalloc(void)
+{
+    if (!malloc_initialised)
+    {
+        malloc_initialised = 1;
+        malloc_detail = 0;
+    }
 }
 
 
