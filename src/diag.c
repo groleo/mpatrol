@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.99 2001-12-06 01:09:14 graeme Exp $"
+#ident "$Id: diag.c,v 1.100 2001-12-11 21:11:02 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.99 2001-12-06 01:09:14 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.100 2001-12-11 21:11:02 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1340,13 +1340,10 @@ logcall(infohead *h, loginfo *i, size_t s)
 /* Log the details of a call to allocate memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logalloc(infohead *h, loginfo *i)
+logalloc(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1376,13 +1373,10 @@ __mp_logalloc(infohead *h, loginfo *i)
 /* Log the details of a call to reallocate memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logrealloc(infohead *h, loginfo *i)
+logrealloc(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1412,13 +1406,10 @@ __mp_logrealloc(infohead *h, loginfo *i)
 /* Log the details of a call to deallocate memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logfree(infohead *h, loginfo *i)
+logfree(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1441,13 +1432,10 @@ __mp_logfree(infohead *h, loginfo *i)
 /* Log the details of a call to set memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logmemset(infohead *h, loginfo *i)
+logmemset(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1472,13 +1460,10 @@ __mp_logmemset(infohead *h, loginfo *i)
 /* Log the details of a call to copy memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logmemcopy(infohead *h, loginfo *i)
+logmemcopy(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1504,13 +1489,10 @@ __mp_logmemcopy(infohead *h, loginfo *i)
 /* Log the details of a call to locate memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logmemlocate(infohead *h, loginfo *i)
+logmemlocate(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1537,13 +1519,10 @@ __mp_logmemlocate(infohead *h, loginfo *i)
 /* Log the details of a call to compare memory.
  */
 
-MP_GLOBAL
+static
 void
-__mp_logmemcompare(infohead *h, loginfo *i)
+logmemcompare(infohead *h, loginfo *i)
 {
-    if (i->logged)
-        return;
-    i->logged = 1;
     if (__mp_diagflags & FLG_HTML)
     {
         __mp_diagtag("<P>\n");
@@ -1563,6 +1542,45 @@ __mp_logmemcompare(infohead *h, loginfo *i)
     __mp_printsize(i->variant.logmemcompare.size);
     __mp_diag(") ");
     logcall(h, i, 0);
+}
+
+
+/* Log the details of a call to the mpatrol library.
+ */
+
+MP_GLOBAL
+void
+__mp_log(infohead *h, loginfo *i)
+{
+    if (i->logged)
+        return;
+    i->logged = 1;
+    switch (i->ltype)
+    {
+      case LT_ALLOC:
+        logalloc(h, i);
+        break;
+      case LT_REALLOC:
+        logrealloc(h, i);
+        break;
+      case LT_FREE:
+        logfree(h, i);
+        break;
+      case LT_SET:
+        logmemset(h, i);
+        break;
+      case LT_COPY:
+        logmemcopy(h, i);
+        break;
+      case LT_LOCATE:
+        logmemlocate(h, i);
+        break;
+      case LT_COMPARE:
+        logmemcompare(h, i);
+        break;
+      default:
+        break;
+    }
 }
 
 

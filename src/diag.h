@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.43 2001-12-06 01:03:02 graeme Exp $
+ * $Id: diag.h,v 1.44 2001-12-11 21:11:02 graeme Exp $
  */
 
 
@@ -136,13 +136,7 @@ MP_EXPORT void __mp_printsymbols(symhead *);
 MP_EXPORT void __mp_printaddrs(symhead *, addrnode *);
 MP_EXPORT void __mp_printstack(symhead *, stackinfo *);
 MP_EXPORT void __mp_printalloc(symhead *, allocnode *);
-MP_EXPORT void __mp_logalloc(infohead *, loginfo *);
-MP_EXPORT void __mp_logrealloc(infohead *, loginfo *);
-MP_EXPORT void __mp_logfree(infohead *, loginfo *);
-MP_EXPORT void __mp_logmemset(infohead *, loginfo *);
-MP_EXPORT void __mp_logmemcopy(infohead *, loginfo *);
-MP_EXPORT void __mp_logmemlocate(infohead *, loginfo *);
-MP_EXPORT void __mp_logmemcompare(infohead *, loginfo *);
+MP_EXPORT void __mp_log(infohead *, loginfo *);
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
 MP_EXPORT void __mp_printfree(infohead *);
