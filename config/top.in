@@ -72,8 +72,6 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 
 SUBDIRS = bin doc man src tsrc tools
-
-EXTRA_DIST = COPYING.LIB THANKS
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

@@ -21,9 +21,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: top.am,v 1.1 2001-08-27 22:22:27 graeme Exp $
+## $Id: top.am,v 1.2 2001-09-13 21:45:30 graeme Exp $
 
 
 SUBDIRS = bin doc man src tsrc tools
-
-EXTRA_DIST = COPYING.LIB THANKS
