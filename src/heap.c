@@ -32,8 +32,13 @@
 #include "utils.h"
 
 
+#if MP_INUSE_SUPPORT
+extern "C" void _Inuse_heapalloc(void *, unsigned long);
+#endif /* MP_INUSE_SUPPORT */
+
+
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.3 2000-03-15 00:38:11 graeme Exp $"
+#ident "$Id: heap.c,v 1.4 2000-04-02 15:30:40 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -130,6 +135,9 @@ MP_GLOBAL heapnode *__mp_heapalloc(heaphead *h, size_t l, size_t a)
     n->block = p;
     n->size = l;
     h->dsize += l;
+#if MP_INUSE_SUPPORT
+    _Inuse_heapalloc(p, l);
+#endif /* MP_INUSE_SUPPORT */
     return n;
 }
 
