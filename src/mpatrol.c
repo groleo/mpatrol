@@ -30,6 +30,7 @@
 #include "version.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 #if TARGET == TARGET_UNIX
@@ -43,7 +44,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.27 2000-11-02 17:51:38 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.28 2000-11-07 18:55:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -55,22 +56,22 @@
 
 typedef enum options_flags
 {
-    OF_SMALLBOUND     = '1',
-    OF_MEDIUMBOUND    = '2',
-    OF_LARGEBOUND     = '3',
     OF_ALLOCSTOP      = 'A',
     OF_ALLOCBYTE      = 'a',
-    OF_CHECK          = 'C',
-    OF_CHECKALL       = 'c',
+    OF_PAGEALLOCUPPER = 'B',
+    OF_PAGEALLOCLOWER = 'b',
+    OF_CHECKALL       = 'C',
+    OF_CHECK          = 'c',
     OF_DEFALIGN       = 'D',
     OF_DYNAMIC        = 'd',
+    OF_SHOWENV        = 'E',
     OF_PROGFILE       = 'e',
     OF_FREESTOP       = 'F',
     OF_FREEBYTE       = 'f',
     OF_SAFESIGNALS    = 'G',
     OF_USEDEBUG       = 'g',
     OF_HELP           = 'h',
-    OF_LIMIT          = 'L',
+    OF_LOGALL         = 'L',
     OF_LOGFILE        = 'l',
     OF_ALLOWOFLOW     = 'M',
     OF_USEMMAP        = 'm',
@@ -80,31 +81,32 @@ typedef enum options_flags
     OF_OFLOWBYTE      = 'o',
     OF_PROFFILE       = 'P',
     OF_PROF           = 'p',
-    OF_AUTOSAVE       = 'Q',
+    OF_FAILSEED       = 'Q',
+    OF_FAILFREQ       = 'q',
     OF_REALLOCSTOP    = 'R',
-    OF_SHOWMAP        = 'S',
-    OF_SHOWFREED      = 's',
+    OF_SHOWALL        = 'S',
+    OF_AUTOSAVE       = 's',
+    OF_THREADS        = 't',
     OF_UNFREEDABORT   = 'U',
+    OF_LIMIT          = 'u',
     OF_VERSION        = 'V',
     OF_PRESERVE       = 'v',
     OF_OFLOWWATCH     = 'w',
-    OF_PAGEALLOCUPPER = 'X',
-    OF_PAGEALLOCLOWER = 'x',
-    OF_FAILSEED       = 'Z',
-    OF_FAILFREQ       = 'z',
     OF_CHECKALLOCS    = SHORTOPT_MAX + 1,
     OF_CHECKFREES,
     OF_CHECKMEMORY,
     OF_CHECKREALLOCS,
-    OF_LOGALL,
+    OF_LARGEBOUND,
     OF_LOGALLOCS,
     OF_LOGFREES,
     OF_LOGMEMORY,
     OF_LOGREALLOCS,
-    OF_SHOWALL,
-    OF_SHOWENV,
+    OF_MEDIUMBOUND,
+    OF_SHOWFREED,
+    OF_SHOWMAP,
     OF_SHOWSYMBOLS,
-    OF_SHOWUNFREED
+    OF_SHOWUNFREED,
+    OF_SMALLBOUND
 }
 options_flags;
 
@@ -306,6 +308,9 @@ static option options_table[] =
     {"small-bound", OF_SMALLBOUND, "unsigned integer",
      "\tSpecifies the limit in bytes up to which memory allocations should be\n"
      "\tclassified as small allocations for profiling purposes.\n"},
+    {"threads", OF_THREADS, NULL,
+     "\tSpecifies that the program to be run is multithreaded if the\n"
+     "\t--dynamic option is used.\n"},
     {"unfreed-abort", OF_UNFREEDABORT, "unsigned integer",
      "\tSpecifies the minimum number of unfreed allocations at which to abort\n"
      "\tthe program just before program termination.\n"},
@@ -471,6 +476,31 @@ static void setoptions(int s)
 }
 
 
+#if MP_PRELOAD_SUPPORT
+/* Build the environment variable containing the list of libraries to preload.
+ */
+
+static char *addlibraries(char *v, ...)
+{
+    static char p[256];
+    char *s, *t;
+    va_list l;
+
+    t = p;
+    sprintf(t, "%s=%s", MP_PRELOAD_NAME, v);
+    t += strlen(t);
+    va_start(l, v);
+    while ((s = va_arg(l, char *)) != NULL)
+    {
+        sprintf(t, "%s%s", MP_PRELOAD_SEP, s);
+        t += strlen(t);
+    }
+    va_end(l);
+    return p;
+}
+#endif /* MP_PRELOAD_SUPPORT */
+
+
 #if TARGET == TARGET_UNIX
 /* Search for an executable file in the current search path.
  */
@@ -514,10 +544,10 @@ static char *execpath(char *s)
 
 int main(int argc, char **argv)
 {
-#if MP_PRELOAD_SUPPORT
-    static char p[256];
-#endif /* MP_PRELOAD_SUPPORT */
     char b[256];
+#if MP_PRELOAD_SUPPORT
+    char *p;
+#endif /* MP_PRELOAD_SUPPORT */
 #if TARGET == TARGET_UNIX
     pid_t f;
 #else /* TARGET */
@@ -528,9 +558,9 @@ int main(int argc, char **argv)
 #endif /* TARGET */
     size_t i, l;
 #endif /* TARGET */
-    int c, d, e, h, r, v, w;
+    int c, d, e, h, r, t, v, w;
 
-    d = e = h = r = v = w = 0;
+    d = e = h = r = t = v = w = 0;
     progname = argv[0];
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
@@ -685,6 +715,9 @@ int main(int argc, char **argv)
           case OF_SMALLBOUND:
             smallbound = __mp_optarg;
             break;
+          case OF_THREADS:
+            t = 1;
+            break;
           case OF_UNFREEDABORT:
             unfreedabort = __mp_optarg;
             break;
@@ -745,7 +778,10 @@ int main(int argc, char **argv)
      */
     if (d == 1)
     {
-        sprintf(p, "%s=%s", MP_PRELOAD_NAME, MP_PRELOAD_LIBS);
+        if (t == 1)
+            p = addlibraries(MP_PRELOADMT_LIBS, NULL);
+        else
+            p = addlibraries(MP_PRELOAD_LIBS, NULL);
         if (putenv(p))
         {
             fprintf(stderr, "%s: Cannot set environment variable `%s'\n",
