@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.11 2000-03-15 01:42:53 graeme Exp $"
+#ident "$Id: memory.c,v 1.12 2000-03-23 19:20:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -346,9 +346,17 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
 
     if (*l == 0)
         *l = 1;
-#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
-    TARGET == TARGET_NETWARE
+#if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX || TARGET == TARGET_NETWARE
+    /* Round up the size of the allocation to a multiple of the system page
+     * size.
+     */
     *l = __mp_roundup(*l, i->page);
+#elif TARGET == TARGET_WINDOWS
+    /* The VirtualAlloc() function on Windows only seems to allocate memory in
+     * blocks of 65536 bytes, so we round up the size of the allocation to this
+     * amount since otherwise the space would be wasted.
+     */
+    *l = __mp_roundup(*l, 0x10000);
 #elif TARGET == TARGET_AMIGA
     /* We aren't guaranteed to allocate a block of memory that is page
      * aligned on the Amiga, so we have to assume the worst case scenario
