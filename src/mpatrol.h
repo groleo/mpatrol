@@ -96,26 +96,27 @@
 #define MP_FLG_SHOWFREED     0x00000004
 #define MP_FLG_SHOWUNFREED   0x00000008
 #define MP_FLG_LOGALL        (MP_FLG_LOGALLOCS | MP_FLG_LOGREALLOCS | \
-                              MP_FLG_LOGFREES)
+                              MP_FLG_LOGFREES | MP_FLG_LOGMEMORY)
 #define MP_FLG_LOGALLOCS     0x00000010
 #define MP_FLG_LOGREALLOCS   0x00000020
 #define MP_FLG_LOGFREES      0x00000040
+#define MP_FLG_LOGMEMORY     0x00000080
 #define MP_FLG_CHECKALL      (MP_FLG_CHECKALLOCS | MP_FLG_CHECKREALLOCS | \
                               MP_FLG_CHECKFREES)
-#define MP_FLG_CHECKALLOCS   0x00000080
-#define MP_FLG_CHECKREALLOCS 0x00000100
-#define MP_FLG_CHECKFREES    0x00000200
-#define MP_FLG_SAFESIGNALS   0x00000400
-#define MP_FLG_NOPROTECT     0x00000800
-#define MP_FLG_NOFREE        0x00001000
-#define MP_FLG_PRESERVE      0x00002000
-#define MP_FLG_OFLOWWATCH    0x00004000
-#define MP_FLG_PAGEALLOC     0x00008000
-#define MP_FLG_ALLOCUPPER    0x00010000
-#define MP_FLG_USEMMAP       0x00020000
+#define MP_FLG_CHECKALLOCS   0x00000100
+#define MP_FLG_CHECKREALLOCS 0x00000200
+#define MP_FLG_CHECKFREES    0x00000400
+#define MP_FLG_SAFESIGNALS   0x00000800
+#define MP_FLG_NOPROTECT     0x00001000
+#define MP_FLG_NOFREE        0x00002000
+#define MP_FLG_PRESERVE      0x00004000
+#define MP_FLG_OFLOWWATCH    0x00008000
+#define MP_FLG_PAGEALLOC     0x00010000
+#define MP_FLG_ALLOCUPPER    0x00020000
+#define MP_FLG_USEMMAP       0x00040000
 
 
-/* The different types of memory allocation functions.
+/* The different types of memory allocation and operation functions.
  */
 
 typedef enum __mp_alloctype
@@ -137,6 +138,11 @@ typedef enum __mp_alloctype
     MP_AT_NEWVEC,    /* operator new[] */
     MP_AT_DELETE,    /* operator delete */
     MP_AT_DELETEVEC, /* operator delete[] */
+    MP_AT_MEMSET,    /* memset() */
+    MP_AT_BZERO,     /* bzero() */
+    MP_AT_MEMCPY,    /* memcpy() */
+    MP_AT_MEMMOVE,   /* memmove() */
+    MP_AT_BCOPY,     /* bcopy() */
     MP_AT_MAX
 }
 __mp_alloctype;
@@ -213,6 +219,21 @@ __mp_allocinfo;
 #ifdef cfree
 #undef cfree
 #endif /* cfree */
+#ifdef memset
+#undef memset
+#endif /* memset */
+#ifdef bzero
+#undef bzero
+#endif /* bzero */
+#ifdef memcpy
+#undef memcpy
+#endif /* memcpy */
+#ifdef memmove
+#undef memmove
+#endif /* memmove */
+#ifdef bcopy
+#undef bcopy
+#endif /* bcopy */
 
 
 #ifdef __GNUC__
@@ -243,6 +264,19 @@ __mp_allocinfo;
                           __LINE__, 0)
 #define cfree(p) __mp_free((p), MP_AT_CFREE, __PRETTY_FUNCTION__, __FILE__, \
                            __LINE__, 0)
+#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, \
+                                    __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
+#define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, \
+                                       __PRETTY_FUNCTION__, __FILE__, \
+                                       __LINE__, 0)
+#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, \
+                                     __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
+#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, \
+                                      __PRETTY_FUNCTION__, __FILE__, __LINE__, \
+                                      0)
+#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
+                                           __PRETTY_FUNCTION__, __FILE__, \
+                                           __LINE__, 0)
 
 #else /* __GNUC__ */
 
@@ -269,6 +303,16 @@ __mp_allocinfo;
                                     __FILE__, __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, NULL, __FILE__, __LINE__, 0)
 #define cfree(p) __mp_free((p), MP_AT_CFREE, NULL, __FILE__, __LINE__, 0)
+#define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, NULL, \
+                                    __FILE__, __LINE__, 0)
+#define bzero(p, l) (void) __mp_setmem((p), (l), 0, MP_AT_BZERO, NULL, \
+                                       __FILE__, __LINE__, 0)
+#define memcpy(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMCPY, NULL, \
+                                     __FILE__, __LINE__, 0)
+#define memmove(q, p, l) __mp_copymem((p), (q), (l), MP_AT_MEMMOVE, NULL, \
+                                      __FILE__, __LINE__, 0)
+#define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, NULL, \
+                                           __FILE__, __LINE__, 0)
 
 #endif /* __GNUC__ */
 
@@ -298,6 +342,15 @@ __asm void *__mp_realloc(register __a0 void *, register __d0 size_t,
 __asm void __mp_free(register __a0 void *, register __d0 __mp_alloctype,
                      register __a1 char *, register __a2 char *,
                      register __d1 unsigned long, register __d2 size_t);
+__asm void *__mp_setmem(register __a0 void *, register __d0 size_t,
+                        register __d1 unsigned char,
+                        register __d2 __mp_alloctype, register __a1 char *,
+                        register __a2 char *, register __d3 unsigned long,
+                        register __d4 size_t);
+__asm void *__mp_copymem(register __a0 void *, register __a1 void *,
+                         register __d0 size_t, register __d1 __mp_alloctype,
+                         register __a2 char *, register __a3 char *,
+                         register __d2 unsigned long, register __d3 size_t);
 __asm int __mp_info(register __a0 void *, register __a1 __mp_allocinfo *);
 __asm void __mp_memorymap(register __d0 int);
 __asm void __mp_summary(void);
@@ -318,6 +371,10 @@ char *__mp_strdup(char *, size_t, __mp_alloctype, char *, char *, unsigned long,
 void *__mp_realloc(void *, size_t, size_t, __mp_alloctype, char *, char *,
                    unsigned long, size_t);
 void __mp_free(void *, __mp_alloctype, char *, char *, unsigned long, size_t);
+void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype, char *, char *,
+                  unsigned long, size_t);
+void *__mp_copymem(void *, void *, size_t, __mp_alloctype, char *, char *,
+                   unsigned long, size_t);
 int __mp_info(void *, __mp_allocinfo *);
 void __mp_memorymap(int);
 void __mp_summary(void);

@@ -21,9 +21,9 @@
 
 
 /*
- * Dynamic memory allocation functions.  Overrides the standard library
- * definitions of these functions if they haven't already been overridden
- * by the mpatrol.h header file.
+ * Dynamic memory allocation functions and memory operation functions.
+ * Overrides the standard library definitions of these functions if they
+ * haven't already been overridden by the mpatrol.h header file.
  */
 
 
@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.2 2000-01-09 20:35:16 graeme Exp $"
+#ident "$Id: malloc.c,v 1.3 2000-01-21 00:40:56 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -163,6 +163,51 @@ void free(void *p)
 void cfree(void *p)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
+}
+
+
+/* Set a block of memory to a specific byte.
+ */
+
+void *memset(void *p, int c, size_t l)
+{
+    return __mp_setmem(p, l, c, AT_MEMSET, NULL, NULL, 0, 1);
+}
+
+
+/* Set a block of memory to the zero byte.
+ */
+
+void bzero(void *p, size_t l)
+{
+    __mp_setmem(p, l, 0, AT_BZERO, NULL, NULL, 0, 1);
+}
+
+
+/* Copy a non-overlapping block of memory from one address to another.
+ */
+
+void *memcpy(void *q, void *p, size_t l)
+{
+    return __mp_copymem(p, q, l, AT_MEMCPY, NULL, NULL, 0, 1);
+}
+
+
+/* Copy a possibly-overlapping block of memory from one address to another.
+ */
+
+void *memmove(void *q, void *p, size_t l)
+{
+    return __mp_copymem(p, q, l, AT_MEMMOVE, NULL, NULL, 0, 1);
+}
+
+
+/* Copy a possibly-overlapping block of memory from one address to another.
+ */
+
+void bcopy(void *p, void *q, size_t l)
+{
+    __mp_copymem(p, q, l, AT_BCOPY, NULL, NULL, 0, 1);
 }
 
 
