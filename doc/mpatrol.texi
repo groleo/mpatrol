@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.33 2000-01-31 20:59:19 graeme Exp $
+@c $Id: mpatrol.texi,v 1.34 2000-02-07 20:17:30 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.5
 @set VERSION 1.1.1
-@set UPDATED 31st January, 2000
+@set UPDATED 7th February, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -5640,6 +5640,23 @@ pinpoint memory corruption, memory leaks, operations on unrelated pointers and
 more.
 @end table
 
+@cindex LeakTracer
+@item
+LeakTracer
+@table @asis
+@item Author
+Erwin Andreasen (@email{erwin@@andreasen.org})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.andreasen.org/LeakTracer/}
+@item Overview
+Detects memory leaks in C++ programs by overriding @code{operator new} and
+@code{operator delete}.
+@end table
+
 @cindex Malloc Debug Library
 @item
 Malloc Debug Library
@@ -5654,6 +5671,23 @@ Various UNIX
 @uref{http://www.escape.de/users/quincunx/rmdebug.html}
 @item Overview
 Implements wrappers for the normal heap handling functions.
+@end table
+
+@cindex MCheck
+@item
+MCheck
+@table @asis
+@item Author
+Ronald Veldema (@email{rveldema@@cs.vu.nl})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://www.cs.vu.nl/~rveldema/mcheck/mcheck.html}
+@item Overview
+A memory usage and malloc checker for C and C++.  Comes with a Java application
+for browsing the trace files produced.
 @end table
 
 @cindex MemCheck
@@ -5708,6 +5742,22 @@ Various UNIX
 Disassembles an object module into system-independent assembler code, inserts
 error checking instructions, then re-assembles the code.  Can also replace
 existing malloc libraries in order to provide greater error checking.
+@end table
+
+@cindex Memprof
+@item
+Memprof
+@table @asis
+@item Author
+Owen Taylor (@email{otaylor@@redhat.com})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://people.redhat.com/otaylor/memprof/}
+@item Overview
+A tool for profiling memory usage and detecting memory leaks.
 @end table
 
 @cindex MemWatch
@@ -5774,6 +5824,24 @@ Various UNIX
 @item Overview
 Uses @code{mmap()} to allocate separate pools of memory which can be mapped onto
 files for later reuse.
+@end table
+
+@cindex MPR
+@item
+MPR
+@table @asis
+@item Author
+Taj Khattra (@email{taj.khattra@@pobox.com})
+@item License
+Free Software
+@item Platforms
+Linux
+@item Location
+@uref{http://metalab.unc.edu/pub/Linux/devel/lang/c/mpr-2.0.tar.gz}
+@item Overview
+Attempts to find memory leaks in C/C++ programs by writing a log file during
+program execution, which can then be processed for obtaining further
+information.
 @end table
 
 @cindex Mprof
@@ -5860,6 +5928,23 @@ AmigaOS
 @uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
 @item Overview
 Patches the system to check for free memory corruption.
+@end table
+
+@cindex Plumber
+@item
+Plumber
+@table @asis
+@item Author
+Owen O'Malley (@email{omalley@@ics.uci.edu})
+@item License
+GNU General Public License
+@item Platforms
+Linux, Solaris, SunOS
+@item Location
+@uref{http://www.ics.uci.edu/~softtest/plumber.html}
+@item Overview
+A tool that replaces the normal Ada and C/C++ dynamic memory allocation
+functions and detects unfreed memory blocks.
 @end table
 
 @cindex Purify
