@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.63 2001-03-04 13:14:51 graeme Exp $"
+#ident "$Id: diag.c,v 1.64 2001-03-04 14:23:34 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.63 2001-03-04 13:14:51 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.64 2001-03-04 14:23:34 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -108,37 +108,64 @@ static unsigned long errors, warnings;
 /* This array should always be kept in step with the errortype enumeration.
  */
 
-static errorinfo errordetails[ET_MAX] =
+static errorinfo errordetails[ET_MAX + 1] =
 {
-    {"NOERR"},
+    {"NOERR",
+     "no error has occurred"},
     {"ALLOVF",
      "allocation " MP_POINTER " has a corrupted overflow buffer at "
-         MP_POINTER},
-    {"ALLZER"},
-    {"BADALN"},
-    {"FRDCOR"},
-    {"FRDOPN"},
+     MP_POINTER},
+    {"ALLZER",
+     "attempt to create an allocation of size 0"},
+    {"BADALN",
+     "alignment %lu is not a power of two"},
+    {"FRDCOR",
+     "freed allocation " MP_POINTER " has memory corruption at " MP_POINTER},
+    {"FRDOPN",
+     "attempt to perform operation on freed memory"},
     {"FRDOVF",
      "freed allocation " MP_POINTER " has a corrupted overflow buffer at "
-         MP_POINTER},
-    {"FRECOR"},
-    {"FREMRK"},
-    {"FRENUL"},
-    {"FREOPN"},
-    {"ILLMEM"},
-    {"INCOMP"},
-    {"MAXALN"},
-    {"MISMAT"},
-    {"NOTALL"},
-    {"NULOPN"},
-    {"OUTMEM"},
-    {"PRVFRD"},
-    {"RNGOVF"},
-    {"RNGOVL"},
-    {"RSZNUL"},
-    {"RSZZER"},
-    {"STROVF"},
-    {"ZERALN"}
+     MP_POINTER},
+    {"FRECOR",
+     "free memory corruption at " MP_POINTER},
+    {"FREMRK",
+     "attempt to free marked memory allocation " MP_POINTER},
+    {"FRENUL",
+     "attempt to free a NULL pointer"},
+    {"FREOPN",
+     "attempt to perform operation on free memory\n"},
+    {"ILLMEM",
+     NULL},
+    {"INCOMP",
+     MP_POINTER " was allocated with %s"},
+    {"MAXALN",
+     "alignment %lu is greater than the system page size"},
+    {"MISMAT",
+     MP_POINTER " does not match allocation of " MP_POINTER},
+    {"NOTALL",
+     MP_POINTER " has not been allocated"},
+    {"NULOPN",
+     "attempt to perform operation on a NULL pointer\n"},
+    {"OUTMEM",
+     "out of memory"},
+    {"PRVFRD",
+     MP_POINTER " was freed with %s"},
+    {"RNGOVF",
+     "range [" MP_POINTER "," MP_POINTER "] overflows [" MP_POINTER ","
+     MP_POINTER "]"},
+    {"RNGOVL",
+     "range [" MP_POINTER "," MP_POINTER "] overlaps [" MP_POINTER ","
+     MP_POINTER "]"},
+    {"RSZNUL",
+     "attempt to resize a NULL pointer"},
+    {"RSZZER",
+     "attempt to resize an allocation to size 0"},
+    {"STROVF",
+     "string " MP_POINTER " overflows [" MP_POINTER "," MP_POINTER "]"},
+    {"ZERALN",
+     "alignment 0 is invalid"},
+    {"INTRNL",
+     "internal error"}
 };
 
 
