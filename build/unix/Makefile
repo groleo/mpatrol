@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.15 2000-04-25 01:12:39 graeme Exp $
+# $Id: Makefile,v 1.16 2000-04-27 18:27:38 graeme Exp $
 
 
 # Definitions
@@ -41,7 +41,7 @@ TFLAGS = -DMP_THREADS_SUPPORT
 
 LIBRARY	 = mpatrol
 VERSION	 = 1
-REVISION = 1
+REVISION = 2
 
 OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \

@@ -23,7 +23,7 @@
 
 LIBRARY MPATROL
 
-VERSION 1.1
+VERSION 1.2
 
 DESCRIPTION "controls and traces dynamic memory allocations"
 
