@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.17 1999-12-06 20:27:32 graeme Exp $
+@c $Id: mpatrol.texi,v 1.18 1999-12-06 20:50:44 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1027,6 +1027,7 @@ mpatrol in the appendices, but you may wish to try out the examples
 * Overwrites and underwrites::  Overflow buffers.
 * Using with a debugger::       Setting breakpoints.
 * Testing::                     Additional checks.
+* Utilities::                   External programs.
 @end menu
 
 @node Library behaviour, Logging and tracing, , Using mpatrol
@@ -1488,7 +1489,7 @@ functions, the source line becomes line 16 because that was the location of the
 1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
 destination.
 
-@node Testing, , Using with a debugger, Using mpatrol
+@node Testing, Utilities, Using with a debugger, Using mpatrol
 @section Testing
 @cindex testing
 
@@ -1539,6 +1540,40 @@ threshold number of expected unfreed allocations.  If the library detects a
 number of unfreed allocations higher than this then it will abort the program at
 termination so that it fails.  All tests that fail in this way can then be
 examined after the test suite finishes.
+
+@node Utilities, , Testing, Using mpatrol
+@section Utilities
+@cindex utilities
+
+On UNIX platforms, a shell script is provided which can run programs that have
+been linked with the mpatrol library using a combination of mpatrol options
+that can be set via the command line.  All of these options but one map directly
+onto their equivalent environment variable settings and exist mainly so that the
+user does not have to manually change the @env{MPATROL_OPTIONS} environment
+variable.
+
+The one option that is the exception to this is the @option{-d} option, which
+can be used to run a program under the control of the mpatrol library, even if
+it wasn't originally linked with the mpatrol library.  This can only be done on
+systems that support dynamic linking and where the dynamic linker recognises the
+@env{LD_PRELOAD} environment variable.  Even then, it can only be used when the
+program that is being run has been dynamically linked with the system C library,
+rather than statically linked.
+
+The reason for all of these limitations is that some SVR4 UNIX platforms have a
+special feature in the dynamic linker which can be told to override the symbols
+from one shared library using the symbols from another shared library at
+run-time.  In this case, it involves replacing the symbols for @code{malloc()},
+etc., in the system C library with the mpatrol versions, but only if they were
+marked as undefined in the original executable file and would therefore have to
+have been loaded from @file{libc.so}.
+
+However, if a program qualifies for use with the @option{-d} option, it means
+that you can trace all of its dynamic memory allocations as well as running it
+with any of the mpatrol library's debugging options.  This is mainly a
+@emph{toy} feature which allows you to view and manipulate the dynamic memory
+allocations of programs that you don't have the source for, but in theory it
+could be quite useful if you need to debug a previously released executable.
 
 @node Improving performance, How it works, Using mpatrol, Top
 @chapter Improving performance
