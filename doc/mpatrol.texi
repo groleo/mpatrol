@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.29 2000-01-28 01:15:33 graeme Exp $
+@c $Id: mpatrol.texi,v 1.30 2000-01-28 01:22:17 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3915,7 +3915,7 @@ requested space.  Note that this function is equivalent to
 @code{__mp_nomemory()} and will replace the handler installed by that function.
 @end table
 
-The following 5 functions are available as replacements for existing C library
+The following 7 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include @file{mpatrol.h}
 before all other header files, although on UNIX platforms they will be used
 anyway, albeit with slightly less tracing information.
