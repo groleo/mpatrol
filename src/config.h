@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.81 2001-08-23 22:46:42 graeme Exp $
+ * $Id: config.h,v 1.82 2001-08-27 22:43:58 graeme Exp $
  */
 
 
@@ -749,11 +749,7 @@
  */
 
 #ifndef MP_GUI_SUPPORT
-#if TARGET == TARGET_UNIX
-#define MP_GUI_SUPPORT 1
-#else /* TARGET */
 #define MP_GUI_SUPPORT 0
-#endif /* TARGET */
 #endif /* MP_GUI_SUPPORT */
 
 
