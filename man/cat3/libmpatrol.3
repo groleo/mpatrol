@@ -1488,12 +1488,16 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
        UUSSEEMMMMAAPP
               Specifies  that the library should use mmmmaapp instead
-              of ssbbrrkk to allocate system  memory  on  UNIX  plat-
-              forms.   This  option  should  be used if there are
-              problems when using the mpatrol library in combina-
-              tion with another malloc library which uses ssbbrrkk to
-              allocate its memory.  It is ignored on systems that
-              do not support the mmmmaapp system call.
+              of ssbbrrkk to allocate user memory on UNIX  platforms.
+              This  option  should  be used if there are problems
+              when using the mpatrol library in combination  with
+              another  malloc library which uses ssbbrrkk to allocate
+              its memory.  Memory internal to the mpatrol library
+              is  allocated with mmmmaapp on systems where it is sup-
+              ported in order to segregate it from  user  memory,
+              and  this  behaviour  is  reversed with the UUSSEEMMMMAAPP
+              option.  It is ignored on systems that do not  sup-
+              port the mmmmaapp system call.
 
 SSEEEE AALLSSOO
        mmppaattrrooll(1),   mmpprrooff(1),  mmppttrraaccee(1),  mmlleeaakk(1),  mmppssyymm(1),
@@ -1505,11 +1509,7 @@ SSEEEE AALLSSOO
 
        http://www.cbmamiga.demon.co.uk/mpatrol/
 
-AAUUTTHHOORR
-       Graeme S. Roy <graeme@epc.co.uk>
 
-CCOOPPYYRRIIGGHHTT
-       Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
 
 
@@ -1521,6 +1521,12 @@ Release 1.3               4 January 2001                       23
 
 LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
 
+
+AAUUTTHHOORR
+       Graeme S. Roy <graeme@epc.co.uk>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
        This library is free software;  you  can  redistribute  it
        and/or  modify  it under the terms of the GNU Library Gen-
@@ -1538,12 +1544,6 @@ LIBMPATROL(3)            mpatrol library            LIBMPATROL(3)
        Public  License  along with this library; if not, write to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
-
-
-
-
-
-
 
 
 
