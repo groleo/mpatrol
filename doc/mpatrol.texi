@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.109 2000-07-25 20:30:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.110 2000-07-30 23:59:00 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 25th July, 2000
+@set UPDATED 30th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -6514,6 +6514,25 @@ Call stack traversal only works with unoptimised code.
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
+@cindex DRS/NX, SPARC
+@item
+DRS/NX 5.4, SPARC V7, ELF32, @command{cc}
+@itemize @bullet
+@item
+The option @option{-DSYSTEM=SYSTEM_DRSNX} must be added to the @code{CFLAGS}
+section in the @file{Makefile} before building the library.
+@item
+The thread-safe version of the library does not work.  This is because there
+does not appear to be any evidence that this version of the operating system
+supports threads.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
 @cindex DYNIX/ptx, Intel 80x86
 @item
 DYNIX/ptx 4.5, Intel Pentium Pro, ELF32, @command{cc}
@@ -6760,6 +6779,9 @@ The mpatrol library can be compiled and run in a 64-bit environment.
 @item
 UnixWare 7.1.1, Intel Pentium II, ELF32, @command{gcc}
 @itemize @bullet
+@item
+The option @option{-DSYSTEM=SYSTEM_UNIXWARE} must be added to the @code{CFLAGS}
+section in the @file{Makefile} before building the library.
 @item
 The thread-safe version of the library does not work.
 @item
