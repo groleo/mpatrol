@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.19 2001-05-23 20:03:08 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.20 2001-06-07 18:01:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.19 2001-05-23 20:03:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.20 2001-06-07 18:01:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define VERSION "1.3" /* the current version of this program */
+#define VERSION "1.4" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -539,6 +539,77 @@ getuleb128(void)
 }
 
 
+/* Read a null-terminated string from the tracing output file.
+ */
+
+static
+char *
+getstring(void)
+{
+    static char b[1024];
+    size_t i;
+
+    for (i = 0; i < sizeof(b); i++)
+    {
+        if (!refill(1))
+        {
+            fprintf(stderr, "%s: Error reading file\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        b[i] = *bufferpos;
+        bufferpos++;
+        bufferlen--;
+        if (b[i] == '\0')
+            return b;
+    }
+    fprintf(stderr, "%s: Buffer overflow\n", progname);
+    exit(EXIT_FAILURE);
+    return NULL;
+}
+
+
+/* Read the current event's thread id, source function name, file name and line
+ * number from the tracing output file.
+ */
+
+static
+void
+getsource(unsigned long *i, char **s, char **t, unsigned long *u)
+{
+    char *a;
+
+    *s = *t = NULL;
+    *i = *u = 0;
+    /* From mpatrol release 1.4.5, the thread id, source function name, file
+     * name and line number for each allocation, reallocation and deallocation
+     * is also written to the tracing output file.
+     */
+    if (version >= 10405)
+    {
+        *i = getuleb128();
+        if (*(a = getstring()) != '\0')
+        {
+            if ((*s = (char *) malloc(strlen(a) + 1)) == NULL)
+            {
+                fprintf(stderr, "%s: Out of memory\n", progname);
+                exit(EXIT_FAILURE);
+            }
+            strcpy(*s, a);
+        }
+        if (*(a = getstring()) != '\0')
+        {
+            if ((*t = (char *) malloc(strlen(a) + 1)) == NULL)
+            {
+                fprintf(stderr, "%s: Out of memory\n", progname);
+                exit(EXIT_FAILURE);
+            }
+            strcpy(*t, a);
+        }
+        *u = getuleb128();
+    }
+}
+
+
 #if MP_GUI_SUPPORT
 /* Refresh the memory display window.
  */
@@ -687,9 +758,10 @@ readevent(void)
 {
     char s[4];
     allocation *f;
+    char *g, *h;
     void *a;
     size_t l, m;
-    unsigned long n;
+    unsigned long n, t, u;
 
     if (refill(1))
         switch (*bufferpos)
@@ -701,6 +773,7 @@ readevent(void)
             n = getuleb128();
             a = (void *) getuleb128();
             l = getuleb128();
+            getsource(&t, &g, &h, &u);
             f = newalloc(n, currentevent, a, l);
             stats.acount++;
             stats.atotal += l;
@@ -725,6 +798,10 @@ readevent(void)
                     maxslots = m;
                 fprintf(simfile, "    {%lu, %lu, 0},\n", m, l);
             }
+            if (g != NULL)
+                free(g);
+            if (h != NULL)
+                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
             {
@@ -740,13 +817,14 @@ readevent(void)
             bufferlen--;
             currentevent++;
             n = getuleb128();
+            a = (void *) getuleb128();
+            l = getuleb128();
+            getsource(&t, &g, &h, &u);
             if (f = (allocation *) __mp_search(alloctree.root, n))
             {
                 if (f->time != 0)
                     fprintf(stderr, "%s: Allocation index `%lu' has already "
                             "been freed\n", progname, n);
-                a = (void *) getuleb128();
-                l = getuleb128();
                 stats.acount++;
                 stats.atotal += l;
                 stats.fcount++;
@@ -784,6 +862,10 @@ readevent(void)
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
+            if (g != NULL)
+                free(g);
+            if (h != NULL)
+                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
                 return 0;
@@ -794,6 +876,7 @@ readevent(void)
             bufferlen--;
             currentevent++;
             n = getuleb128();
+            getsource(&t, &g, &h, &u);
             if (f = (allocation *) __mp_search(alloctree.root, n))
             {
                 if (f->time != 0)
@@ -823,6 +906,10 @@ readevent(void)
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
                         progname, n);
+            if (g != NULL)
+                free(g);
+            if (h != NULL)
+                free(h);
 #if MP_GUI_SUPPORT
             if (usegui)
                 return 0;
@@ -869,7 +956,7 @@ readevent(void)
           default:
             break;
         }
-    if (hatffile != NULL)
+    if ((hatffile != NULL) && (hatffile != stdout) && (hatffile != stderr))
         fclose(hatffile);
     if (simfile != NULL)
     {
@@ -897,7 +984,8 @@ readevent(void)
         fputs("            exit(EXIT_FAILURE);\n", simfile);
         fputs("        }\n", simfile);
         fputs("    return EXIT_SUCCESS;\n}\n", simfile);
-        fclose(simfile);
+        if ((simfile != stdout) && (simfile != stderr))
+            fclose(simfile);
     }
     getentry(s, sizeof(char), 4, 0);
     if (memcmp(s, MP_TRACEMAGIC, 4) != 0)
