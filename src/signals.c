@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.4 2000-01-09 20:35:19 graeme Exp $"
+#ident "$Id: signals.c,v 1.5 2000-01-21 00:33:21 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -89,7 +89,7 @@ static void signalhandler(int s)
          */
         a = (void *) n->si_addr;
         __mp_error(AT_MAX, "illegal memory access at address " MP_POINTER, a);
-        if (t = __mp_findnode(&h->alloc, a))
+        if (t = __mp_findnode(&h->alloc, a, 1))
             if (t->info != NULL)
                 __mp_printalloc(&h->syms, t);
             else
