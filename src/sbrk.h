@@ -40,7 +40,7 @@ extern "C"
 
 
 int brk(void *);
-void *sbrk(int);
+void *sbrk(long);
 
 
 #ifdef __cplusplus

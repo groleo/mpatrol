@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.4 2000-03-24 01:36:28 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.5 2000-07-13 23:57:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -125,7 +125,7 @@ int brk(void *p)
 /* Increase or decrease the amount of available heap space.
  */
 
-void *sbrk(int l)
+void *sbrk(long l)
 {
     void *p;
     unsigned long s;
