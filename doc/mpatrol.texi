@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.99 2000-06-29 19:21:21 graeme Exp $
+@c $Id: mpatrol.texi,v 1.100 2000-06-30 00:15:58 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,8 +19,8 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.13
-@set VERSION 1.2.4
+@set EDITION 1.14
+@set VERSION 1.2.5
 @set UPDATED 29th June, 2000
 
 @ifhtml
@@ -800,13 +800,13 @@ platforms with the @env{LD_PRELOAD} feature.
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
 use the @option{-d} option to the @file{mpatrol} command to override the default
-definitions of @code{malloc()}, etc. at run-time without having to relink your
+definitions of @code{malloc()}, etc.@: at run-time without having to relink your
 program.
 
 For example, if your program's executable file is called @file{testprog} and it
 accepts an option specifying an input file, you can force the system's dynamic
-linker to use mpatrol's versions of @code{malloc()}, etc. instead of the default
-versions by typing:
+linker to use mpatrol's versions of @code{malloc()}, etc.@: instead of the
+default versions by typing:
 
 @smallexample
 mpatrol -d ./testprog -i file
@@ -1117,7 +1117,7 @@ individual user.
 Virtual memory works by translating a virtual address (which the process uses)
 into a physical address (which the operating system uses).  It is generally
 implemented via a piece of hardware called a @emph{memory management unit}, or
-MMU.  The MMU's primary job is to translate any virtual addresses that are
+MMU@.  The MMU's primary job is to translate any virtual addresses that are
 referred to by machine instructions into physical addresses by looking up a
 table which is built by the operating system.  This table contains mappings to
 and from @emph{pages}@footnote{The size of a page varies between operating
@@ -1227,7 +1227,7 @@ allocations}), when a function is called, a copy of the caller's state
 information (including local variables and registers) is saved on the stack so
 that it can be restored when the called function returns.  On many operating
 systems there is a @emph{calling convention}@footnote{Usually part of the
-@emph{Application Binary Interface}, or ABI.} which defines the layout of such
+@emph{Application Binary Interface}, or ABI@.} which defines the layout of such
 stack entries so that code compiled in different languages and with different
 compilers can be intermixed.  This usually specifies at which stack offsets the
 stack pointer, program counter and local variables for the calling function can
@@ -2151,7 +2151,7 @@ nothing known about address 0x8000A068
 
 As you can see, anything that the mpatrol library knows about any memory
 allocation can be obtained for use in your own code, which can be very useful
-if you need to write handlers to keep track of memory allocations, etc. for
+if you need to write handlers to keep track of memory allocations, etc.@: for
 debugging purposes.  It can also be useful to have this information when running
 your program within a debugger, so you can use the @code{__mp_printinfo()}
 function to display information about a heap address if your debugger supports
@@ -2744,11 +2744,11 @@ you make to the mapped memory will be applied to the file.  This is implemented
 through the virtual memory system treating the file as a pseudo swap file and
 will therefore only use up physical memory when pages are accessed.  It also
 means that file operations can be replaced by memory read and write operations,
-leading to a very fast and efficient way of performing I/O.  Another added bonus
-of this system means that entire blocks of process memory can be written to a
-file for later re-use, just as long as the file can later be mapped to the same
-address.  This can be a lot faster than writing to and reading from a specific
-format of file.
+leading to a very fast and efficient way of performing I/O@.  Another added
+bonus of this system means that entire blocks of process memory can be written
+to a file for later re-use, just as long as the file can later be mapped to the
+same address.  This can be a lot faster than writing to and reading from a
+specific format of file.
 
 If you really don't want to keep track of dynamic memory allocations at all then
 perhaps you should consider @emph{garbage collection}.  This allows you to make
@@ -3106,9 +3106,9 @@ allocation stop:   0
 reallocation stop: 0
 free stop:         0
 unfreed abort:     0
-small boundary:    32
-medium boundary:   256
-large boundary:    2048
+small boundary:    32 bytes
+medium boundary:   256 bytes
+large boundary:    2048 bytes
 lower check range: -
 upper check range: -
 failure frequency: 0
@@ -3360,9 +3360,9 @@ example have been numbered and their descriptions appear below.
  8  reallocation stop: 0
  9  free stop:         0
 10  unfreed abort:     0
-11  small boundary:    32
-12  medium boundary:   256
-13  large boundary:    2048
+11  small boundary:    32 bytes
+12  medium boundary:   256 bytes
+13  large boundary:    2048 bytes
 14  lower check range: -
 15  upper check range: -
 16  failure frequency: 0
@@ -6515,11 +6515,6 @@ yet.  Also need to add support for building on targets and architectures where
 no operating system features are required or even available.
 
 @item
-The thread-safe code in the library doesn't yet work properly on all platforms,
-due to problems initialising the mpatrol library before a program becomes
-multi-threaded.
-
-@item
 Need to make the library re-entrant.  This could be achieved by moving the
 static variables in @file{memory.c}, @file{stack.c}, @file{mutex.c},
 @file{diag.c}, @file{option.c} and @file{sbrk.c} into the @code{infohead}
@@ -6532,14 +6527,14 @@ opened by a new process.
 @item
 Some implementations of call stack traversal are limited and will only likely
 work for unoptimised code.  A much better solution would be write the
-implementation at a lower level in assembly, but this is much less portable.
+implementations at a lower level in assembly, but this is much less portable.
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
 write one?  I can think of many applications that would benefit from such a
-library besides this one@footnote{The latest release of the GNU C library
-includes a @code{backtrace()} function which fills in an array of return
-addresses, but this requires the presence of the library and some features of
-GCC.}.
+library besides this one@footnote{Looking back at these statements about six
+months after they were written, it would appear that I have just written such a
+library judging by the number of architectures for which stack traversal is now
+supported.}.
 
 @item
 An alternative implementation for call stack traversal uses the functions
@@ -6559,6 +6554,14 @@ with call-back functions if they call mpatrol library functions, since this
 will lead to recursion.
 
 @item
+Need to store filename and line number information in all call stacks so that
+the information can be used at program termination.  May also need to display
+this information in the @code{__mp_printinfo()} function and add this
+information to the profiling output file so that @command{mprof} can make use of
+it.  Stack traces also need to be displayed when the @code{__mp_checkrange()}
+internal function fails.
+
+@item
 In object file formats that support nested symbols (such as ELF), the current
 implementation will tend to show some shortcomings.  This is because there is
 currently no nesting count in the function that deals with symbol name lookup,
@@ -6571,11 +6574,11 @@ assume that the current symbol terminates at the beginning of the next symbol in
 the virtual address space.
 
 @item
-Need to store filename and line number information in all call stacks so that
-the information can be used at program termination.  May also need to display
-this information in the @code{__mp_printinfo()} function and add this
-information to the profiling output file so that @command{mprof} can make use of
-it.
+Add functions to start and stop profiling, and perhaps also to clear the
+profiling tables and begin a new profiling output file.  In addition, support
+for the @env{PROFDIR} environment variable could be added, with functionality
+similar to the other UNIX profiling tools.  Something similar could also be done
+with the @env{LOGDIR} environment variable.
 
 @item
 Perhaps add the ability to profile memory operations such as @code{memcpy()} and
@@ -6597,17 +6600,21 @@ allocations have not been corrupted when the @option{NOFREE} and
 @option{PRESERVE} options are in use on platforms which have no memory
 protection.  This could also be extended to marking allocated memory blocks
 and then displaying what blocks have changed after a certain period from within
-a debugger.  Another idea could be to display all memory allocations, etc.
+a debugger.  Another idea could be to display all memory allocations, etc.@:
 made since a certain function was called from within a program.
 
 @item
-Improve use of watch points by allowing an option which will only install write
-watch points instead of both read and write watch points.  Not only will this
-speed up the use of watch points, but will also cause less problems with reading
-from misaligned memory allocations.
+Perhaps add the string used as an argument to @code{malloc()}, @code{calloc()},
+etc.@: to the information stored about each memory allocation.  This could aid
+greatly in debugging but might be a bit cryptic if the original source code
+involved a lot of preprocessor macros.  This could also be extended to providing
+a function that could individually label each memory allocation with a given
+string.
 
 @item
-Perhaps add memory protection to the simulated @code{sbrk} heap.
+Add support for @samp{%d} and @samp{%t} keywords (representing date and time)
+in the filenames for the mpatrol log file and profiling output file.  Also
+perhaps add time information to the details stored about each memory allocation.
 
 @item
 Add a @option{SHOWFREE} option to display a list of all free memory blocks at
@@ -6623,6 +6630,11 @@ This would be far less of a resource-hogger than the @option{NOFREE} option and
 might catch just as many errors but might be extremely hard to implement.
 
 @item
+Add an option (perhaps @option{NOINTERNAL}) to suppress the display of internal
+(recursive) memory allocations in the mpatrol log file and also prevent
+information about such allocations being written to the profiling output file.
+
+@item
 Add an extra piece of information in the log file summary which highlights the
 peak number of memory allocations in use at any one time during program
 execution.
@@ -6635,19 +6647,32 @@ same way as existing implementations, but at least there won't be link errors
 when compiling source code which uses them.
 
 @item
+Add a debugging version of the @code{alloca()} function that examines the stack
+pointer at each mpatrol library call to determine whether to clean up previous
+allocations.
+
+@item
 Perhaps add debugging/tracing versions of the string manipulation functions,
 such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
 with.  Also need to have better detection of internal and free blocks when
-displaying memory range errors.
+displaying memory range errors and possibly don't fault memory operations on
+@samp{NULL} pointers if the operation is zero bytes in length.
 
 @item
-Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc. which never
-return @samp{NULL} on failure, and perhaps also add definitions of
-@code{XtMalloc()}, @code{XtRealloc()}, etc. for X-Window programming.  Some
+Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc.@: which
+never return @samp{NULL} on failure, and perhaps also add definitions of
+@code{XtMalloc()}, @code{XtRealloc()}, etc.@: for X-Window programming.  Some
 other malloc libraries provide versions of these but perhaps they are not needed
 if they are implemented using @code{malloc()}, @code{realloc()}, etc.
+
+@item
+Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
+preventing recursive calls to @code{malloc()} each time a write to the log file
+occurs on some systems.  Example code to do this was submitted by Alexander
+Barton (@email{abarton@@innotrac.com}) and this may well be incorporated into
+the library at some point in the future.
 
 @item
 Add another library which can be linked in instead of mpatrol and replaces
@@ -6666,26 +6691,56 @@ code instrumentation.  Could also make use of the @code{etext}, @code{edata} and
 @code{end} pointers that are set at run-time on most UNIX systems.
 
 @item
-Perhaps remove the automatic logging of memory operations from programs run
-through the @command{mpatrol} command, and instead add an option to do it
-explicitly.
-
-@item
 Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a @samp{NULL} pointer.  Also, perhaps
 add an option to display the partial contents of freed and unfreed allocations
-in the mpatrol log file.
+in the mpatrol log file and also a function which can be called to dump the
+contents of a memory allocation to the log file.
+
+@item
+Perhaps add memory protection to the simulated @code{sbrk} heap.
+
+@item
+There is currently a problem when the mpatrol library encounters an illegal
+memory access on UNIX and Windows platforms, and there is a further illegal
+memory access when it is displaying the summary.  This should be prevented by
+disabling the signal handler at its first entry.
+
+@item
+Perhaps remove the automatic logging of memory operations from programs run
+through the @command{mpatrol} command, and instead add an option to do it
+explicitly.  Also, change all of the options in the command line tools to have
+long option names instead of single letters, as I am running out of letters,
+and the letters get harder to remember.
+
+@item
+An option should be added to the @command{mpatrol} command to display the
+contents of the @env{MPATROL_OPTIONS} environment variable after all command
+line options have been applied.  The @command{mpatrol} command should also
+explicitly search for the command it is to run if no directory component was
+supplied and set the @option{PROGFILE} option if it finds it.
+
+@item
+Add a script to wrap around various popular C and C++ compiler drivers so that
+linking with the mpatrol library is much less laborious.  Something similar
+could also be done with a script to attach a running mpatrol process to a
+suitable debugger.  In addition, a user-defined command or script file could be
+executed at the end of every invocation of the @command{mpatrol} command.
 
 @item
 Perhaps use GNU autoconf to automatically work out values for @file{config.h} on
 the platform it is being built on, and also use automake, libtool and install
-when building and installing files.
+when building and installing files.  Also update the @command{mupdate} shell
+script to automatically update the version numbers contained in the files in the
+@file{pkg} directory.
 
 @item
 The postscript version of the quick reference card seems to print at an unusual
 offset on some printers.  Also, the PDF version gets created with 1 inch margins
 rather than half inch margins which means that it is one inch too large in both
-dimensions.  Need to figure out what is happening in both cases.
+dimensions.  Need to figure out what is happening in both cases.  In addition,
+the mpatrol manual should also be formatted in DocBook format once a suitable
+@TeX{}info to DocBook translator is available.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
@@ -6705,6 +6760,12 @@ and if it is not it could unprotect the memory and return.
 Need to improve watch point facility in order to speed it up by an order of
 magnitudes.  This will most likely involve removing all watch points when
 entering the library and replacing them when returning to user code.
+
+@item
+Improve use of watch points by allowing an option which will only install write
+watch points instead of both read and write watch points.  Not only will this
+speed up the use of watch points, but will also cause less problems with reading
+from misaligned memory allocations.
 
 @item
 There seems to be a problem on some UNIX systems in that the @code{mprotect()}
@@ -6897,7 +6958,7 @@ by looking at Novell's developer documentation, so they may not even compile
 correctly without modification.
 
 @item
-Need to add support for building the mpatrol library as an NLM.  This is not
+Need to add support for building the mpatrol library as an NLM@.  This is not
 currently a high priority requirement as the archive library should suffice for
 most purposes.  However, if it is built as an NLM and @code{malloc()} and
 related functions are dynamically linked in some executable files then perhaps
