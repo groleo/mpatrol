@@ -30,7 +30,6 @@
 
 
 #include "mutex.h"
-#include "inter.h"
 #include <stddef.h>
 #if TARGET == TARGET_UNIX
 #include <pthread.h>
@@ -47,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.3 2000-05-22 00:27:45 graeme Exp $"
+#ident "$Id: mutex.c,v 1.4 2000-05-23 21:57:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -134,27 +133,10 @@ static mutexinit init;
 #endif /* __cplusplus */
 
 
-/* Return the identifier of the currently running thread.
- */
-
-MP_GLOBAL unsigned long __mp_threadid(void)
-{
-#if TARGET == TARGET_UNIX
-    return (unsigned long) pthread_self();
-#elif TARGET == TARGET_AMIGA
-    return (unsigned long) FindTask(NULL);
-#elif TARGET == TARGET_WINDOWS
-    return (unsigned long) GetCurrentThreadId();
-#elif TARGET == TARGET_NETWARE
-    return (unsigned long) GetThreadId();
-#endif /* TARGET */
-}
-
-
 /* Initialise the mpatrol library mutex.
  */
 
-MP_GLOBAL void __mp_newmutex(void)
+MP_GLOBAL void __mp_initmutexes(void)
 {
 #if TARGET == TARGET_AMIGA
     InitSemaphore(&lock.real.handle);
@@ -169,7 +151,7 @@ MP_GLOBAL void __mp_newmutex(void)
 /* Remove the mpatrol library mutex.
  */
 
-MP_GLOBAL void __mp_deletemutex(void)
+MP_GLOBAL void __mp_finimutexes(void)
 {
 #if TARGET == TARGET_WINDOWS
     CloseHandle(lock.real.handle);
@@ -196,10 +178,27 @@ static void lockmutex(mutex *m)
 }
 
 
+/* Unlock an mpatrol library mutex.
+ */
+
+static void unlockmutex(mutex *m)
+{
+#if TARGET == TARGET_UNIX
+    pthread_mutex_unlock(&m->handle);
+#elif TARGET == TARGET_AMIGA
+    ReleaseSemaphore(&m->handle);
+#elif TARGET == TARGET_WINDOWS
+    ReleaseMutex(m->handle);
+#elif TARGET == TARGET_NETWARE
+    SignalLocalSemaphore(m->handle);
+#endif /* TARGET */
+}
+
+
 /* Lock an mpatrol library recursive mutex.
  */
 
-MP_GLOBAL void __mp_lockrecmutex(void)
+MP_GLOBAL void __mp_lockmutex(mutextype m)
 {
     unsigned long i;
 
@@ -219,27 +218,10 @@ MP_GLOBAL void __mp_lockrecmutex(void)
 }
 
 
-/* Unlock an mpatrol library mutex.
- */
-
-static void unlockmutex(mutex *m)
-{
-#if TARGET == TARGET_UNIX
-    pthread_mutex_unlock(&m->handle);
-#elif TARGET == TARGET_AMIGA
-    ReleaseSemaphore(&m->handle);
-#elif TARGET == TARGET_WINDOWS
-    ReleaseMutex(m->handle);
-#elif TARGET == TARGET_NETWARE
-    SignalLocalSemaphore(m->handle);
-#endif /* TARGET */
-}
-
-
 /* Unlock an mpatrol library recursive mutex.
  */
 
-MP_GLOBAL void __mp_unlockrecmutex(void)
+MP_GLOBAL void __mp_unlockmutex(mutextype m)
 {
     unsigned long i;
 
@@ -256,6 +238,23 @@ MP_GLOBAL void __mp_unlockrecmutex(void)
         lock.count = 1;
     }
     unlockmutex(&lock.guard);
+}
+
+
+/* Return the identifier of the currently running thread.
+ */
+
+MP_GLOBAL unsigned long __mp_threadid(void)
+{
+#if TARGET == TARGET_UNIX
+    return (unsigned long) pthread_self();
+#elif TARGET == TARGET_AMIGA
+    return (unsigned long) FindTask(NULL);
+#elif TARGET == TARGET_WINDOWS
+    return (unsigned long) GetCurrentThreadId();
+#elif TARGET == TARGET_NETWARE
+    return (unsigned long) GetThreadId();
+#endif /* TARGET */
 }
 
 
