@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.60 2001-03-04 12:19:57 graeme Exp $"
+#ident "$Id: diag.c,v 1.61 2001-03-04 12:31:57 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.60 2001-03-04 12:19:57 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.61 2001-03-04 12:31:57 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -175,10 +175,16 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 };
 
 
+/* The last error encountered by the mpatrol library.
+ */
+
+MP_GLOBAL errortype __mp_errno;
+
+
 /* The flags used to control the diagnostics from the mpatrol library.
  */
 
-MP_GLOBAL unsigned long __mp_diagflags = 0;
+MP_GLOBAL unsigned long __mp_diagflags;
 
 
 /* Process a file name, expanding any special characters.
@@ -557,6 +563,7 @@ __mp_warn(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             fprintf(stderr, "ERROR: problems %sing file `%s'\n",
                     (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
     }
+    __mp_errno = e;
     warnings++;
 }
 
@@ -600,6 +607,7 @@ __mp_error(errortype e, alloctype f, char *n, unsigned long l, char *s, ...)
             fprintf(stderr, "ERROR: problems %sing file `%s'\n",
                     (__mp_diagflags & FLG_LIST) ? "list" : "edit", n);
     }
+    __mp_errno = e;
     errors++;
 }
 
