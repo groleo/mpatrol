@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.73 2000-05-12 18:46:26 graeme Exp $
+@c $Id: mpatrol.texi,v 1.74 2000-05-14 13:46:50 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.2.0
-@set UPDATED 12th May, 2000
+@set UPDATED 14th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -384,6 +384,9 @@ Contains 9 replacement C memory operation functions:
 @item @code{bzero()}
 @tab UNIX
 @tab Fills memory with the zero byte.
+@item @code{memccpy()}
+@tab UNIX
+@tab Copies memory up to a specific byte.
 @item @code{memcpy()}
 @tab ANSI
 @tab Copies non-overlapping memory.
@@ -3807,8 +3810,10 @@ argument represents the number of bytes to set and the third argument represents
 the actual byte to set.
 
 For @samp{MEMCOPY}, the first argument represents the source memory block, the
-second argument represents the destination memory block and the third argument
-represents the number of bytes to copy.  This is similar for @samp{MEMCMP}.
+second argument represents the destination memory block, the third argument
+represents the number of bytes to copy and the fourth argument represents a byte
+to copy up to if @code{memccpy()} is being called.  This is similar for
+@samp{MEMCMP}.
 
 For @samp{MEMFIND}, the first and second arguments represent the source memory
 block and its length, while the third and fourth arguments represent the memory
@@ -4713,7 +4718,7 @@ that this function is equivalent to @code{__mp_nomemory()} and will replace the
 handler installed by that function.
 @end table
 
-The following 9 functions are available as replacements for existing C library
+The following 10 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include @file{mpatrol.h}
 before all other header files, although on UNIX and Windows platforms (and
 AmigaOS when using @command{gcc}) they will be used anyway, albeit with slightly
@@ -4736,6 +4741,18 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be written.  This function is available for backwards
 compatibility with older C libraries and should not be used in new code.
+
+@findex memccpy
+@item @code{void *memccpy(void *dest, const void *src, int byte, size_t size)}
+Copies @var{size} bytes from @var{src} to @var{dest} and returns @samp{NULL}, or
+copies the number of bytes up to and including the first occurrence of
+@var{byte} if @var{byte} exists within the specified range and returns a pointer
+to the first byte after @var{byte}.  If @var{size} is @samp{0} or @var{src} is
+the same as @var{dest} then no bytes will be copied.  The source and destination
+ranges should not overlap, otherwise a warning will be written to the log file.
+If the operation would affect an existing memory allocation in the heap but
+would straddle that allocation's boundaries then an error message will be
+generated in the log file and no bytes will be copied.
 
 @findex memcpy
 @item @code{void *memcpy(void *dest, const void *src, size_t size)}
@@ -6250,8 +6267,8 @@ Perhaps add debugging/tracing versions of the string manipulation functions,
 such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
-with.  Also need to add replacement version of @code{memccpy()} and have better
-detection of internal and free blocks when displaying memory range errors.
+with.  Also need to have better detection of internal and free blocks when
+displaying memory range errors.
 
 @item
 Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc. which never
