@@ -46,19 +46,20 @@ typedef union symnode
 {
     struct
     {
-        treenode node;       /* internal tree node */
-        void *block;         /* pointer to block of memory */
-        size_t size;         /* size of block of memory */
+        treenode node;        /* internal tree node */
+        void *block;          /* pointer to block of memory */
+        size_t size;          /* size of block of memory */
     }
     index;
     struct
     {
-        treenode node;       /* tree node */
-        char *file;          /* file name */
-        char *name;          /* symbol name */
-        void *addr;          /* start address */
-        size_t size;         /* size of symbol */
-        unsigned long flags; /* format-dependent flags */
+        treenode node;        /* tree node */
+        char *file;           /* file name */
+        char *name;           /* symbol name */
+        void *addr;           /* start address */
+        size_t size;          /* size of symbol */
+        unsigned long offset; /* profiling table offset */
+        unsigned long flags;  /* format-dependent flags */
     }
     data;
 }
