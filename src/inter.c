@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.122 2001-05-22 19:41:15 graeme Exp $"
+#ident "$Id: inter.c,v 1.123 2001-05-22 22:43:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.122 2001-05-22 19:41:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.123 2001-05-22 22:43:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -565,6 +565,7 @@ __mp_reinit(void)
             __mp_writeprofile(&memhead.prof, !(memhead.flags & FLG_NOPROTECT));
         memhead.prof.file = __mp_proffile(&memhead.alloc.heap.memory,
                                           "%n.%p.out");
+        __mp_changetrace(&memhead.trace, __mp_tracefile(&memhead.alloc.heap.memory, "%n.%p.trace"), 0);
         if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READONLY);
     }

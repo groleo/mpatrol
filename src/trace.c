@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.13 2001-05-22 19:41:15 graeme Exp $"
+#ident "$Id: trace.c,v 1.14 2001-05-22 22:43:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.13 2001-05-22 19:41:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.14 2001-05-22 22:43:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,13 +105,22 @@ __mp_changetrace(tracehead *t, char *f, int e)
     int r;
     char s;
 
+    r = 1;
     s = t->tracing;
     if (e == 1)
         r = __mp_endtrace(t);
+    else if ((tracefile == NULL) || (tracefile == stderr) ||
+             (tracefile == stdout))
+    {
+        /* We don't want to close the stderr or stdout file streams so
+         * we just flush them instead.  If the tracing file hasn't been set,
+         * this will just flush all open output files.
+         */
+        if (fflush(tracefile))
+            r = 0;
+    }
     else if (fclose(tracefile))
         r = 0;
-    else
-        r = 1;
     t->file = f;
     t->tracing = s;
     tracefile = NULL;
