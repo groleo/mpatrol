@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.22 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: malloc.c,v 1.23 2001-01-15 21:33:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -47,7 +47,7 @@ extern "C"
 void *
 malloc(size_t l)
 {
-    return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -55,7 +55,7 @@ malloc(size_t l)
 void *
 MP_ALTFUNCNAME(malloc)(size_t l)
 {
-    return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -67,7 +67,7 @@ MP_ALTFUNCNAME(malloc)(size_t l)
 void *
 calloc(size_t l, size_t n)
 {
-    return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -75,7 +75,7 @@ calloc(size_t l, size_t n)
 void *
 MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 {
-    return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -86,7 +86,7 @@ MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 void *
 memalign(size_t a, size_t l)
 {
-    return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, 1);
+    return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -94,7 +94,7 @@ memalign(size_t a, size_t l)
 void *
 MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
 {
-    return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, 1);
+    return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -106,7 +106,7 @@ MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
 void *
 valloc(size_t l)
 {
-    return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -114,7 +114,7 @@ valloc(size_t l)
 void *
 MP_ALTFUNCNAME(valloc)(size_t l)
 {
-    return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -125,7 +125,7 @@ MP_ALTFUNCNAME(valloc)(size_t l)
 void *
 pvalloc(size_t l)
 {
-    return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -133,7 +133,7 @@ pvalloc(size_t l)
 void *
 MP_ALTFUNCNAME(pvalloc)(size_t l)
 {
-    return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -144,7 +144,7 @@ MP_ALTFUNCNAME(pvalloc)(size_t l)
 void *
 alloca(size_t l)
 {
-    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -152,7 +152,7 @@ alloca(size_t l)
 void *
 MP_ALTFUNCNAME(alloca)(size_t l)
 {
-    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -290,7 +290,7 @@ MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 void *
 realloc(void *p, size_t l)
 {
-    return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -298,7 +298,7 @@ realloc(void *p, size_t l)
 void *
 MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 {
-    return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -309,7 +309,7 @@ MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 void *
 recalloc(void *p, size_t l, size_t n)
 {
-    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -317,7 +317,7 @@ recalloc(void *p, size_t l, size_t n)
 void *
 MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 {
-    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -328,7 +328,7 @@ MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 void *
 expand(void *p, size_t l)
 {
-    return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -336,7 +336,7 @@ expand(void *p, size_t l)
 void *
 MP_ALTFUNCNAME(expand)(void *p, size_t l)
 {
-    return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, 1);
+    return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -650,7 +650,7 @@ __nw__FUi(size_t l)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
-    return __mp_alloc(l, 0, AT_NEW, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_NEW, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
@@ -670,7 +670,7 @@ __arr_nw__FUi(size_t l)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
-    return __mp_alloc(l, 0, AT_NEWVEC, NULL, NULL, 0, 1);
+    return __mp_alloc(l, 0, AT_NEWVEC, NULL, NULL, 0, NULL, 0, 1);
 }
 
 
