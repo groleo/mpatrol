@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.32 2000-11-01 00:24:05 graeme Exp $
+# $Id: mpatrol.spec,v 1.33 2000-11-13 19:12:10 graeme Exp $
 
 
 %define version 1.3.0
@@ -75,6 +75,7 @@ cp build/unix/mpatrol $RPM_BUILD_ROOT/usr/bin
 cp build/unix/mprof $RPM_BUILD_ROOT/usr/bin
 cp build/unix/mleak $RPM_BUILD_ROOT/usr/bin
 cp bin/mpsym $RPM_BUILD_ROOT/usr/bin
+cp bin/mpedit $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
