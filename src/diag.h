@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.27 2001-03-04 12:41:59 graeme Exp $
+ * $Id: diag.h,v 1.28 2001-03-04 12:50:35 graeme Exp $
  */
 
 
@@ -77,17 +77,6 @@ typedef enum errortype
     ET_MAX
 }
 errortype;
-
-
-/* The structure containing details about each error reported by the mpatrol
- * library.
- */
-
-typedef struct errordetails
-{
-    char *code; /* error abbreviation code */
-}
-errordetails;
 
 
 #ifdef __cplusplus
