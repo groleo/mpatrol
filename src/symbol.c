@@ -104,7 +104,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.30 2000-07-13 20:20:04 graeme Exp $"
+#ident "$Id: symbol.c,v 1.31 2000-07-24 19:41:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -781,11 +781,19 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
      */
     for (i = 1; i < l; i++, p++)
         /* We don't need to bother looking at undefined, absolute or common
-         * symbols, and we only need to store non-data symbols.
+         * symbols, and we only need to store non-data symbols.  However, on
+         * IRIX the section index for a symbol in a linked object file does
+         * not always refer to the ELF section it was defined in so we skip
+         * the last check.
          */
+#if SYSTEM == SYSTEM_IRIX
+        if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
+            (n != SHN_COMMON))
+#else /* SYSTEM */
         if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
             (n != SHN_COMMON) && (s = elf_getscn(e, n)) &&
             (h = elf32_getshdr(s)) && (h->sh_flags & SHF_EXECINSTR))
+#endif /* SYSTEM */
             if (!addsymbol(y, p, f, elf_strptr(e, t, p->st_name), b))
                 return 0;
     return 1;
@@ -849,11 +857,19 @@ static int addsymbols(symhead *y, Elf *e, char *a, char *f, size_t b)
      */
     for (i = 1; i < l; i++, p++)
         /* We don't need to bother looking at undefined, absolute or common
-         * symbols, and we only need to store non-data symbols.
+         * symbols, and we only need to store non-data symbols.  However, on
+         * IRIX the section index for a symbol in a linked object file does
+         * not always refer to the ELF section it was defined in so we skip
+         * the last check.
          */
+#if SYSTEM == SYSTEM_IRIX
+        if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
+            (n != SHN_COMMON))
+#else /* SYSTEM */
         if (((n = p->st_shndx) != SHN_UNDEF) && (n != SHN_ABS) &&
             (n != SHN_COMMON) && (s = elf_getscn(e, n)) &&
             (h = elf64_getshdr(s)) && (h->sh_flags & SHF_EXECINSTR))
+#endif /* SYSTEM */
             if (!addsymbol(y, p, f, elf_strptr(e, t, p->st_name), b))
                 return 0;
     return 1;
@@ -1300,28 +1316,29 @@ MP_GLOBAL int __mp_addextsymbols(symhead *y)
     }
 #elif SYSTEM == SYSTEM_IRIX
     if (l = __rld_obj_head)
-        while (l = l->next)
+        /* Determine if the shared object list we are looking at contains O32
+         * ABI object files or N32 ABI object files.
+         */
+        if (l->data == 0xFFFFFFFF)
         {
-            /* Determine if the shared object we are looking at is an O32 ABI
-             * object or an N32 ABI object.
-             */
-            i = (objectinfo *) l->data;
-            if (i->magic == 0xFFFFFFFF)
+            i = (objectinfo *) l;
+            while (i = (objectinfo *) i->next)
             {
                 s = (char *) i->name;
                 b = (long) i->ehdr - (long) i->ohdr;
                 if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
                     return 0;
             }
-            else
+        }
+        else
+            while (l = l->next)
             {
-                o = (struct obj *) i;
+                o = (struct obj *) l->data;
+                s = o->o_path;
                 b = (long) o->o_text_start - (long) o->o_base_address;
-                if ((o->o_path != NULL) && (*o->o_path != '\0') &&
-                    !__mp_addsymbols(y, o->o_path, b))
+                if ((s != NULL) && (*s != '\0') && !__mp_addsymbols(y, s, b))
                     return 0;
             }
-        }
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
     /* The imagehlp library allows us to locate the symbols contained in
