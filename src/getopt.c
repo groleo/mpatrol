@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.13 2001-07-19 22:50:01 graeme Exp $"
+#ident "$Id: getopt.c,v 1.14 2001-07-19 22:56:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.13 2001-07-19 22:50:01 graeme Exp $";
+static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.14 2001-07-19 22:56:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -167,7 +167,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
 {
     static char *t;
     option *m;
-    char *p;
+    char *b, *p;
     int r;
 
     __mp_optarg = NULL;
@@ -179,6 +179,10 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
         __mp_optindex++;
         t = NULL;
     }
+    /* Get the basename of the filename that the program was invoked with so
+     * that we can use that for any diagnostics.
+     */
+    b = __mp_basename(a[0]);
     /* If there is not a current option then attempt to locate it, otherwise
      * return EOF if there are no more options.
      */
@@ -208,7 +212,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
              */
             if ((m = findopt(t, l, &t)) == NULL)
             {
-                fprintf(stderr, "%s: Illegal option `--%s'\n", a[0], t);
+                fprintf(stderr, "%s: Illegal option `--%s'\n", b, t);
                 __mp_optindex++;
                 t = NULL;
                 return '?';
@@ -225,7 +229,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
                         (strcmp(a[__mp_optindex], "--") == 0))
                     {
                         fprintf(stderr, "%s: Option `--%s' requires an "
-                                "argument\n", a[0], m->name);
+                                "argument\n", b, m->name);
                         t = NULL;
                         return '?';
                     }
@@ -235,7 +239,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
                     __mp_optarg = t;
             else if (*t != '\0')
                 fprintf(stderr, "%s: Ignoring argument `%s' for option "
-                        "`--%s'\n", a[0], t, m->name);
+                        "`--%s'\n", b, t, m->name);
             __mp_optindex++;
             t = NULL;
             return m->value;
@@ -245,7 +249,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
      */
     if ((*t == ':') || ((p = strchr(s, *t)) == NULL))
     {
-        fprintf(stderr, "%s: Illegal option `-%c'\n", a[0], *t++);
+        fprintf(stderr, "%s: Illegal option `-%c'\n", b, *t++);
         return '?';
     }
     r = *t++;
@@ -260,7 +264,7 @@ __mp_getopt(unsigned long n, char **a, char *s, option *l)
              */
             if ((++__mp_optindex >= n) || (strcmp(a[__mp_optindex], "--") == 0))
             {
-                fprintf(stderr, "%s: Option `-%c' requires an argument\n", a[0],
+                fprintf(stderr, "%s: Option `-%c' requires an argument\n", b,
                         r);
                 t = NULL;
                 return '?';
