@@ -329,7 +329,7 @@ Further information
     notoriously difficult to reproduce and debug, and this is likely to be the
     case if you find a bug in the mpatrol library as it might be extremely hard
     to reproduce on another system.  Details on how to report bugs are given in
-    NOTES, but would be very useful if you could try to provide as much
+    the manual, but it would be very useful if you could try to provide as much
     information as possible when reporting a problem, and that includes having a
     look in the library source code to see if it's obvious what is wrong.
 
