@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.21 2001-03-04 15:57:19 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.22 2001-03-04 16:24:26 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.21 2001-03-04 15:57:19 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.22 2001-03-04 16:24:26 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -218,6 +218,12 @@ checkalloca(void *p)
             break;
     }
 }
+
+
+/* The last error encountered by the mpatrol library.
+ */
+
+errortype __mp_errno;
 
 
 /* Initialise the mpatrol library.
