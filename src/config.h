@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.79 2001-07-19 22:17:31 graeme Exp $
+ * $Id: config.h,v 1.80 2001-07-26 17:19:14 graeme Exp $
  */
 
 
@@ -52,6 +52,19 @@
 #ifndef MP_GLOBAL
 #define MP_GLOBAL
 #endif /* MP_GLOBAL */
+
+
+/* The keyword used to specify the visibility of functions and variables which
+ * are part of the library API.
+ */
+
+#ifndef MP_API
+#if TARGET == TARGET_WINDOWS
+#define MP_API __declspec(dllexport)
+#else /* TARGET */
+#define MP_API
+#endif /* TARGET */
+#endif /* MP_API */
 
 
 /* The keywords used to specify a constant variable or parameter and a variable
