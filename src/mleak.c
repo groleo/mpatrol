@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.3 2000-09-25 21:47:14 graeme Exp $"
+#ident "$Id: mleak.c,v 1.4 2000-10-03 16:17:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,11 +92,21 @@ static long fileoffset;
 static char *progname;
 
 
+/* Indicates that the unfreed memory allocation list in the log file, if it
+ * exists, should be ignored.
+ */
+
+static int ignorelist;
+
+
 /* The table describing all recognised options.
  */
 
 static option options_table[] =
 {
+    {"ignore", 'i', NULL,
+     "\tSpecifies that the list of unfreed allocations in the log file\n"
+     "\tshould be ignored.\n"},
     {"version", 'V', NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
@@ -239,11 +249,43 @@ static void readfile(void)
                 }
             }
         }
-        else if (strncmp(s, "system page size: ", 18) == 0)
-            /* If this is the beginning of the summary then there will be
-             * no more allocations or deallocations after it.
+        else if (!ignorelist && (strncmp(s, "unfreed allocations: ", 21) == 0))
+            /* If we get here then there is already a list of unfreed memory
+             * allocations in the log file.  In this case we just parse them
+             * anyway, adding any new entries to the allocation tree.
              */
-            break;
+            while (s = getline())
+            {
+                /* Parse relevant details from the unfreed allocation and
+                 * add the allocation to the allocation tree.
+                 */
+                o = fileoffset;
+                if ((strncmp(s, "    ", 4) == 0) && (t = strchr(s + 4, ' ')))
+                {
+                    /* Get the allocation address.
+                     */
+                    *t = '\0';
+                    if ((a = strtoul(s + 4, NULL, 0)) &&
+                        (*(s = t + 1) == '(') && (t = strchr(s + 1, ' ')))
+                    {
+                        /* Get the allocation size.
+                         */
+                        *t = '\0';
+                        l = strtoul(s + 1, NULL, 0);
+                        if ((s = strchr(t + 1, ':')) &&
+                            (t = strchr(s + 1, ':')))
+                        {
+                            /* Get the allocation index.
+                             */
+                            *t = '\0';
+                            n = strtoul(s + 1, NULL, 0);
+                            if (!__mp_search(alloctree.root, n))
+                                newalloc(n, a, l, o);
+                        }
+                    }
+                }
+                while ((s = getline()) && (*s != '\0'));
+            }
 }
 
 
@@ -272,22 +314,31 @@ static void printallocs(void)
          * we can format it in the same way as that displayed for the
          * SHOWUNFREED option.
          */
-        if ((s = getline()) && (strncmp(s, "ALLOC: ", 7) == 0) &&
-            (t = strchr(s + 7, '(')) && (t > s) && (*(t = t - 1) == ' '))
-        {
-            *t = '\0';
-            r = s + 7;
-            if (s = strchr(t + 2, '['))
+        if (s = getline())
+            if ((strncmp(s, "ALLOC: ", 7) == 0) &&
+                (t = strchr(s + 7, '(')) && (t > s) && (*(t = t - 1) == ' '))
             {
-                printf("    " MP_POINTER " (%lu byte%s) {%s:%lu:0} %s\n",
-                       n->addr, n->size, (n->size == 1) ? "" : "s", r,
-                       n->node.key, s);
+                *t = '\0';
+                r = s + 7;
+                if (s = strchr(t + 2, '['))
+                {
+                    printf("    " MP_POINTER " (%lu byte%s) {%s:%lu:0} %s\n",
+                           n->addr, n->size, (n->size == 1) ? "" : "s", r,
+                           n->node.key, s);
+                    while ((s = getline()) && (*s != '\0'))
+                        puts(s);
+                    if (alloctree.size > 1)
+                        putchar('\n');
+                }
+            }
+            else
+            {
+                puts(s);
                 while ((s = getline()) && (*s != '\0'))
                     puts(s);
                 if (alloctree.size > 1)
                     putchar('\n');
             }
-        }
         __mp_treeremove(&alloctree, &n->node);
         free(n);
     }
@@ -299,14 +350,19 @@ static void printallocs(void)
 
 int main(int argc, char **argv)
 {
+    char b[256];
     char *f;
     int c, e, v;
 
     e = v = 0;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "V", options_table)) != EOF)
+    while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
+             options_table)) != EOF)
         switch (c)
         {
+          case 'i':
+            ignorelist = 1;
+            break;
           case 'V':
             v = 1;
             break;
