@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.131 2001-07-25 22:54:29 graeme Exp $"
+#ident "$Id: inter.c,v 1.132 2001-07-26 16:34:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.131 2001-07-25 22:54:29 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.132 2001-07-26 16:34:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -370,11 +370,13 @@ checkalloca(loginfo *i, int f)
         if (c == 1)
         {
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(n->block, (size_t) -1, i->stack->addr);
+                memhead.prologue(n->block, (size_t) -1, i->func, i->file,
+                                 i->line, i->stack->addr);
             memhead.event++;
             __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
             if (memhead.epilogue && (memhead.recur == 1))
-                memhead.epilogue((void *) -1, i->stack->addr);
+                memhead.epilogue((void *) -1, i->func, i->file, i->line,
+                                 i->stack->addr);
         }
     }
 #if MP_FULLSTACK
@@ -861,8 +863,6 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
             k--;
         }
     }
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue((void *) -1, l, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -878,6 +878,8 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue((void *) -1, l, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -893,7 +895,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
   retry:
     p = __mp_getmemory(&memhead, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p, i.addr);
+        memhead.epilogue(p, s, t, u, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && (memhead.nomemory))
@@ -902,7 +904,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue((void *) -1, l, i.addr);
+                memhead.prologue((void *) -1, l, s, t, u, i.addr);
             if ((f != AT_NEW) && (f != AT_NEWVEC))
                 z = 1;
             goto retry;
@@ -983,8 +985,6 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             k--;
         }
     }
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -2, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -1000,6 +1000,8 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, (size_t) -2, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -1031,7 +1033,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
     else
         p = NULL;
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p, i.addr);
+        memhead.epilogue(p, s, t, u, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && memhead.nomemory)
@@ -1040,7 +1042,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(o, (size_t) -2, i.addr);
+                memhead.prologue(o, (size_t) -2, s, t, u, i.addr);
             z = 1;
             goto retry;
         }
@@ -1119,8 +1121,6 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             k--;
         }
     }
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, l, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -1136,6 +1136,8 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, l, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -1152,7 +1154,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
   retry:
     p = __mp_resizememory(&memhead, q, l, a, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue(p, i.addr);
+        memhead.epilogue(p, s, t, u, i.addr);
     if (p == NULL)
     {
         if ((z == 0) && memhead.nomemory)
@@ -1161,7 +1163,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              */
             memhead.nomemory();
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(q, l, i.addr);
+                memhead.prologue(q, l, s, t, u, i.addr);
             z = 1;
             goto retry;
         }
@@ -1218,8 +1220,6 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
             k--;
         }
     }
-    if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -1, i.addr);
     /* If no filename was passed through then attempt to read any debugging
      * information to determine the source location of the call.
      */
@@ -1235,6 +1235,8 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    if (memhead.prologue && (memhead.recur == 1))
+        memhead.prologue(p, (size_t) -1, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -1246,7 +1248,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
     memhead.event++;
     __mp_freememory(&memhead, p, f, &v);
     if (memhead.epilogue && (memhead.recur == 1))
-        memhead.epilogue((void *) -1, i.addr);
+        memhead.epilogue((void *) -1, s, t, u, i.addr);
     restoresignals();
 }
 
