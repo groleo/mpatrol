@@ -27,13 +27,16 @@
  */
 
 
-/*
- * $Id: mtrace.c,v 1.3 2001-02-23 21:14:02 graeme Exp $
- */
-
-
+#include "config.h"
 #include "mtrace.h"
 #include <stdio.h>
+
+
+#if MP_IDENT_SUPPORT
+#ident "$Id: mtrace.c,v 1.4 2001-02-23 21:49:55 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.4 2001-02-23 21:49:55 graeme Exp $";
+#endif /* MP_IDENT_SUPPORT */
 
 
 typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);

@@ -27,14 +27,17 @@
  */
 
 
-/*
- * $Id: mgauge.c,v 1.3 2001-02-23 21:09:53 graeme Exp $
- */
-
-
+#include "config.h"
 #include "mgauge.h"
 #include <stdio.h>
 #include <ctype.h>
+
+
+#if MP_IDENT_SUPPORT
+#ident "$Id: mgauge.c,v 1.4 2001-02-23 21:49:55 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *mgauge_id = "$Id: mgauge.c,v 1.4 2001-02-23 21:49:55 graeme Exp $";
+#endif /* MP_IDENT_SUPPORT */
 
 
 #define COLUMN_WIDTH  80  /* the column width in which to display the gauge */

@@ -27,12 +27,15 @@
  */
 
 
-/*
- * $Id: heapdiff.c,v 1.2 2001-02-23 20:59:48 graeme Exp $
- */
-
-
+#include "config.h"
 #include "heapdiff.h"
+
+
+#if MP_IDENT_SUPPORT
+#ident "$Id: heapdiff.c,v 1.3 2001-02-23 21:49:55 graeme Exp $"
+#else /* MP_IDENT_SUPPORT */
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.3 2001-02-23 21:49:55 graeme Exp $";
+#endif /* MP_IDENT_SUPPORT */
 
 
 #ifdef __cplusplus
