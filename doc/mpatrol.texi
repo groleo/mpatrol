@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.41 2000-03-13 22:48:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.42 2000-03-15 00:25:46 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.6
 @set VERSION 1.1.2
-@set UPDATED 14th March, 2000
+@set UPDATED 15th March, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -107,6 +107,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Overview::                    Overview of mpatrol.
 * Features::                    Features of mpatrol.
 * Installation::                Building and installing.
+* Integration::                 Debugging existing programs.
 * Memory allocations::          Background.
 * Operating system support::    Additional background.
 * Using mpatrol::               Using the library.
@@ -590,7 +591,7 @@ User documentation is currently available in @TeX{}info format as well as UNIX
 manual pages.
 @end itemize
 
-@node Installation, Memory allocations, Features, Top
+@node Installation, Integration, Features, Top
 @chapter Installation
 @cindex installation
 @cindex building the library
@@ -697,7 +698,95 @@ distribution.  You should really know what you are doing before you attempt to
 build a package, and you should also be aware that some of the package files may
 need to be modified before you begin.
 
-@node Memory allocations, Operating system support, Installation, Top
+@node Integration, Memory allocations, Installation, Top
+@chapter Integration
+@cindex integration
+
+@cindex recompilation
+The following steps should allow you to easily integrate the mpatrol library
+into an existing application, although some of them may not be available to do
+on many platforms.  They are listed in the order of number of changes required
+to modify existing code --- the last step will require a complete recompilation
+of all your code.
+
+@enumerate 1
+@item
+This step is currently only available on Solaris platforms.
+
+If your program or application has been dynamically linked with the system C
+library (@file{libc.so}) or an alternative malloc shared library then you can
+use the @option{-d} option to the @file{mpatrol} shell script to override
+the default definitions of @code{malloc()}, etc. at run-time without having to
+relink your program.
+
+For example, if your program's executable file is called @file{testprog} and it
+accepts an option specifying an input file, you can force the system's dynamic
+linker to use mpatrol's versions of @code{malloc()}, etc. instead of the default
+versions by typing:
+
+@smallexample
+mpatrol -d ./testprog -i file
+@end smallexample
+
+The resulting log file should be called @file{mpatrol.<procid>.log} by default
+(where @var{procid} is the current process id), but if no such file exists after
+running the @file{mpatrol} shell script then it will not be possible to force
+the run-time linking of mpatrol functions to your program and you will have to
+proceed to the next step.
+
+@item
+This step is currently only available on UNIX platforms.
+
+You should be able to link in the mpatrol library when linking your program
+without having to recompile any of your object files or libraries, but this will
+only be worthwhile on systems where stack tracebacks are supported, otherwise
+you should proceed to the next step since there will not be enough information
+for you to tell where the calls to dynamic memory allocation functions took
+place.
+
+Information on how to link the mpatrol library to an application is given at the
+start of the examples (@pxref{Examples}), but you should note that if your
+program does not directly call any of the functions in the mpatrol library then
+it will not be linked in and you will not see a log file being generated when
+you run it.  You can force the linking of the mpatrol library by causing
+@code{malloc()} to be undefined on the link line, usually through the use of the
+@option{-u} linker option.
+
+@item
+All of the following steps will require you to recompile some or all of your
+code so that your code calls dynamic memory allocation functions from the
+mpatrol library rather than the system C library.
+
+For this step, if you have a rough idea of where the function calls lie that you
+would like to trace or test, you need only recompile the relevant source files.
+You should modify these source files to include the @file{mpatrol.h} header file
+before any calls to dynamic memory allocation or memory operation functions.
+
+However, you should take particular care to ensure that all calls to memory
+allocation functions in the mpatrol library will be matched by calls to memory
+reallocation or deallocation functions in the mpatrol library, since if they are
+unmatched then the log file will either fill up with errors complaining about
+trying to free unknown allocations, or warnings about unfreed memory allocations
+at the end of execution.
+
+@item
+This step requires you to recompile all of your source files to include the
+@file{mpatrol.h} header file.  Obviously, this will take the longest amount of
+time to integrate, but need not require you to change any source files if the
+compiler you are using has a command line option to include a specific header
+file before any source files.
+
+For example, @command{gcc} comes with a @option{-include} option which has this
+feature, so if you had to recompile a source file called @file{test.c} then the
+following command would allow you to include @file{mpatrol.h} without having
+to modify the source file:
+
+@smallexample
+gcc -include /usr/local/include/mpatrol.h -c test.c
+@end smallexample
+@end enumerate
+
+@node Memory allocations, Operating system support, Integration, Top
 @chapter Memory allocations
 @cindex memory allocations
 
@@ -2386,11 +2475,14 @@ on the type of function that is used to allocate the memory.
 The following information contains source file details of where the call to
 @code{malloc()} came from, but is only available if the source file containing
 the call to @code{malloc()} included @file{mpatrol.h}; otherwise the fields will
-all be @samp{-}.  Because of the convoluted way this information is obtained for
-the C++ operators, you may encounter some problems in existing C++ programs when
-making direct calls to @code{operator new} for example.  However, if you want to
-disable the redefinition of the C++ operators in @file{mpatrol.h} you can define
-the preprocessor macro @code{MP_NOCPLUSPLUS} before the inclusion of that file.
+all be @samp{-}@footnote{This information may also be filled in if the
+@option{USEDEBUG} option is used and supported, and if debugging information
+about the call to @code{malloc()} is available.}.  Because of the convoluted way
+this information is obtained for the C++ operators, you may encounter some
+problems in existing C++ programs when making direct calls to
+@code{operator new} for example.  However, if you want to disable the
+redefinition of the C++ operators in @file{mpatrol.h} you can define the
+preprocessor macro @code{MP_NOCPLUSPLUS} before the inclusion of that file.
 
 @enumerate 6
 @cindex gcc
@@ -4073,8 +4165,10 @@ Installs a low-memory handler specifically for use with @code{operator new} and
 or the @samp{NULL} pointer if no handler had been previously installed.  This
 will be called repeatedly by both functions when they would normally return
 @samp{NULL}, and this loop will continue until they manage to allocate the
-requested space.  Note that this function is equivalent to
-@code{__mp_nomemory()} and will replace the handler installed by that function.
+requested space.  The default low-memory handler for the C++ operators will
+terminate the program and write an out of memory message to the log file.  Note
+that this function is equivalent to @code{__mp_nomemory()} and will replace the
+handler installed by that function.
 @end table
 
 The following 9 functions are available as replacements for existing C library
