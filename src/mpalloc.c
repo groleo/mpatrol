@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.14 2001-02-16 23:02:56 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.15 2001-02-22 20:17:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.14 2001-02-16 23:02:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.15 2001-02-22 20:17:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -235,6 +235,18 @@ __mp_init(void)
 void
 __mp_fini(void)
 {
+}
+
+
+/* Register a finalisation function to be called when __mp_fini() is called.
+ */
+
+int
+__mp_atexit(void (*f)(void))
+{
+    if (atexit(f) == -1)
+        return 0;
+    return 1;
 }
 
 
