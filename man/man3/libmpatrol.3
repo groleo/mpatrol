@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.10 2001-02-08 23:55:29 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.11 2001-02-09 00:59:06 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "9 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -50,11 +50,35 @@ void free(void *ptr);
 void cfree(void *ptr, size_t nelem, size_t size);
 void dealloca(void *ptr);
 
-void *operator new(size_t size);
-void *operator new[](size_t size);
-void operator delete(void *ptr);
-void operator delete[](void *ptr);
-void (*set_new_handler(void (*func)(void)))(void);
+void *operator new(size_t size) throw(std::bad_alloc);
+.if n \{void *operator new(size_t size, const std::nothrow_t&)
+      throw();
+\}
+.if t \{void *operator new(size_t size, const std::nothrow_t&) throw();
+\}
+void *operator new[](size_t size) throw(std::bad_alloc);
+.if n \{void *operator new[](size_t size, const std::nothrow_t&)
+      throw();
+\}
+.if t \{void *operator new[](size_t size, const std::nothrow_t&) throw();
+\}
+void operator delete(void *ptr) throw();
+.if n \{void operator delete(void *ptr, const std::nothrow_t&)
+     throw();
+\}
+.if t \{void operator delete(void *ptr, const std::nothrow_t&) throw();
+\}
+void operator delete[](void *ptr) throw();
+.if n \{void operator delete[](void *ptr, const std::nothrow_t&)
+     throw();
+\}
+.if t \{void operator delete[](void *ptr, const std::nothrow_t&) throw();
+\}
+.if n \{std::new_handler std::set_new_handler(std::new_handler func)
+                 throw();
+\}
+.if t \{std::new_handler std::set_new_handler(std::new_handler func) throw();
+\}
 
 void *memset(void *ptr, int byte, size_t size);
 void bzero(void *ptr, size_t size);
@@ -79,12 +103,17 @@ void *memchr(const void *ptr, int byte, size_t size);
 .if t \{void *memmem(const void *ptr1, size_t size1, const void *ptr2, size_t size2);
 \}
 
+unsigned long __mp_setoption(long opt, unsigned long val);
 char *__mp_function(__mp_alloctype func);
 int __mp_info(const void *ptr, __mp_allocinfo *info);
 int __mp_syminfo(const void *ptr, __mp_symbolinfo *info);
 int __mp_printinfo(const void *ptr);
 unsigned long __mp_snapshot(void);
-size_t __mp_iterate(int (*func)(void *), unsigned long event);
+.if n \{size_t __mp_iterate(int (*func)(const void *),
+                    unsigned long event);
+\}
+.if t \{size_t __mp_iterate(int (*func)(const void *), unsigned long event);
+\}
 void __mp_memorymap(int stats);
 void __mp_summary(void);
 void __mp_check(void);
@@ -233,9 +262,9 @@ pointer to the first byte of the allocation.  The pointer returned will be
 suitably aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
 will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
-the heap then the null pointer will be returned and \fBerrno\fP will be set to
-\fBENOMEM\fP.  The \fBalloca\fP function normally allocates its memory from the
-stack, with the result that all such allocations will be freed when the function
+the heap then the program will be terminated and the \fIOUTMEM\fP error will be
+given.  The \fBalloca\fP function normally allocates its memory from the stack,
+with the result that all such allocations will be freed when the function
 returns.  This version of \fBalloca\fP allocates its memory from the heap in
 order to provide better debugging, but the allocations may not necessarily be
 freed immediately when the function returns.  The allocated memory can be
@@ -304,14 +333,14 @@ byte of the allocation after copying \fIstr\fP to the newly-allocated memory.
 The pointer returned will have no alignment constraints and can be used to store
 character data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP then
 an error will be given and the null pointer will be returned.  If there is not
-enough space in the heap then the null pointer will be returned and \fBerrno\fP
-will be set to \fBENOMEM\fP.  The \fBstrdupa\fP function normally allocates its
-memory from the stack, with the result that all such allocations will be freed
-when the function returns.  This version of \fBstrdupa\fP allocates its memory
-from the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with \fBdealloca\fP, but may not be
-reallocated or deallocated in any other way.  This function is available for
+enough space in the heap then the program will be terminated and the
+\fIOUTMEM\fP error will be given.  The \fBstrdupa\fP function normally allocates
+its memory from the stack, with the result that all such allocations will be
+freed when the function returns.  This version of \fBstrdupa\fP allocates its
+memory from the heap in order to provide better debugging, but the allocations
+may not necessarily be freed immediately when the function returns.  The
+allocated memory can be deallocated explicitly with \fBdealloca\fP, but may not
+be reallocated or deallocated in any other way.  This function is available for
 backwards compatibility with older C source code and should not be used in new
 code.
 .TP
@@ -324,15 +353,15 @@ character data up to the length of \fIstr\fP.  If \fIstr\fP is \fBNULL\fP and
 \fIsize\fP is non-zero then an error will be given and the null pointer will be
 returned.  If the length of \fIstr\fP is greater than \fIsize\fP then only
 \fIsize\fP characters will be allocated and copied, with one additional byte for
-the nul character.  If there is not enough space in the heap then the null
-pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The
-\fBstrndupa\fP function normally allocates its memory from the stack, with the
-result that all such allocations will be freed when the function returns.  This
-version of \fBstrndupa\fP allocates its memory from the heap in order to provide
-better debugging, but the allocations may not necessarily be freed immediately
-when the function returns.  The allocated memory can be deallocated explicitly
-with \fBdealloca\fP, but may not be reallocated or deallocated in any other way.
- This function is available for backwards compatibility with older C source code
+the nul character.  If there is not enough space in the heap then the program
+will be terminated and the \fIOUTMEM\fP error will be given.  The \fBstrndupa\fP
+function normally allocates its memory from the stack, with the result that all
+such allocations will be freed when the function returns.  This version of
+\fBstrndupa\fP allocates its memory from the heap in order to provide better
+debugging, but the allocations may not necessarily be freed immediately when the
+function returns.  The allocated memory can be deallocated explicitly with
+\fBdealloca\fP, but may not be reallocated or deallocated in any other way.
+This function is available for backwards compatibility with older C source code
 and should not be used in new code.
 .TP
 \fBrealloc\fP
@@ -428,11 +457,12 @@ functions, but the replacements in \fImpatrol.h\fP will only be used if the
 \fBMP_NOCPLUSPLUS\fP preprocessor macro is not defined.  The replacement
 operators make use of the preprocessor in order to obtain source-level
 information.  If this causes problems then you should define the
-\fBMP_NONEWDELETE\fP preprocessor macro and use the \fBMP_NEW\fP and
-\fBMP_DELETE\fP macros instead of \fBnew\fP and \fBdelete\fP directly.  To use
-these C++ features you must include \fImpatrol.h\fP before all other header
-files, although on UNIX and Windows platforms (and AmigaOS when using \fBgcc\fP)
-they will be used anyway, albeit with slightly less tracing information:
+\fBMP_NONEWDELETE\fP preprocessor macro and use the \fBMP_NEW\fP,
+\fBMP_NEW_NOTHROW\fP and \fBMP_DELETE\fP macros instead of \fBnew\fP and
+\fBdelete\fP directly.  To use these C++ features you must include
+\fImpatrol.h\fP before all other header files, although on UNIX and Windows
+platforms (and AmigaOS when using \fBgcc\fP) they will be used anyway, albeit
+with slightly less tracing information:
 .TP
 \fBoperator new\fP
 Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
@@ -440,9 +470,10 @@ the first byte of the allocation.  The pointer returned will be suitably
 aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
 will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
-the heap then the null pointer will be returned and \fBerrno\fP will be set to
-\fBENOMEM\fP - no exceptions will be thrown.  The allocated memory must be
-deallocated with \fBoperator delete\fP.
+the heap then either the \fIstd::bad_alloc\fP exception will be thrown or the
+null pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP - the
+behaviour depends on whether the nothrow version of the operator is used.  The
+allocated memory must be deallocated with \fBoperator delete\fP.
 .TP
 \fBoperator new[]\fP
 Allocates \fIsize\fP uninitialised bytes from the heap and returns a pointer to
@@ -450,9 +481,10 @@ the first byte of the allocation.  The pointer returned will be suitably
 aligned for casting to any type and can be used to store data of up to
 \fIsize\fP bytes in length.  If \fIsize\fP is \fI0\fP then the memory allocated
 will be implicitly rounded up to \fI1\fP byte.  If there is not enough space in
-the heap then the null pointer will be returned and \fBerrno\fP will be set to
-\fBENOMEM\fP - no exceptions will be thrown.  The allocated memory must be
-deallocated with \fBoperator delete[]\fP.
+the heap then either the \fIstd::bad_alloc\fP exception will be thrown or the
+null pointer will be returned and \fBerrno\fP will be set to \fBENOMEM\fP - the
+behaviour depends on whether the nothrow version of the operator is used.  The
+allocated memory must be deallocated with \fBoperator delete[]\fP.
 .TP
 \fBoperator delete\fP
 Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
@@ -472,10 +504,8 @@ Installs a low-memory handler specifically for use with \fBoperator new\fP and
 or the null pointer if no handler had been previously installed.  This will be
 called repeatedly by both functions when they would normally return \fBNULL\fP,
 and this loop will continue until they manage to allocate the requested space.
-The default low-memory handler for the C++ operators will terminate the program
-and write an out of memory message to the log file.  Note that this function is
-equivalent to \fB__mp_nomemory\fP and will replace the handler installed by that
-function.
+Note that this function is equivalent to \fB__mp_nomemory\fP and will replace
+the handler installed by that function.
 .PP
 The following 10 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include \fImpatrol.h\fP
@@ -570,9 +600,21 @@ affect an existing memory allocation in the heap but would straddle that
 allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 .PP
-The following 20 functions are available as support routines for additional
+The following 21 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 \fImpatrol.h\fP header file:
+.TP
+\fB__mp_setoption\fP
+Sets an mpatrol option after the library has been initialised.  Options that
+require values are listed in \fImpatrol.h\fP prefixed with \fIMP_OPT_*\fP.  The
+\fIopt\fP argument should be set to one of these macros, and the \fIval\fP
+argument should be set to the option value, cast to an unsigned integer.  The
+return value will be \fI0\fP on success and \fI1\fP on failure.  Options that
+are flags are listed in \fImpatrol.h\fP prefixed with \fIMP_FLG_*\fP.  Multiple
+flags can be set or unset at once using the \fIMP_OPT_SETFLAGS\fP and
+\fIMP_OPT_UNSETFLAGS\fP options respectively, with the necessary flags specified
+in \fIval\fP.  The return value will be \fI0\fP on success and a combination of
+all of the flags that could not be set or unset on failure.
 .TP
 \fB__mp_function\fP
 Returns the name of the function corresponding to the allocation type \fIfunc\fP
@@ -831,12 +873,14 @@ will be ignored if its value is zero.  Default value: \fBAUTOSAVE\fP=\fI0\fP.
 \fBCHECK\fP=\fIunsigned range\fP
 Specifies a range of allocation indices at which to check the integrity of free
 memory and overflow buffers.  The range must be specified as no more than two
-unsigned integers separated by a dash.  If numbers on either the left side or
-the right side of the dash are omitted then they will be assumed to be \fI0\fP
-and \fIinfinity\fP respectively.  A value of \fI0\fP on its own indicates that
-no such checking will ever be performed.  This option can be used to speed up
-the execution speed of the library at the expense of checking.  Default value:
-\fBCHECK\fP=\fI0\fP.
+unsigned integers separated by a dash, followed by an optional forward slash and
+an unsigned integer specifying an event checking frequency.  If numbers on
+either the left side or the right side of the dash are omitted then they will be
+assumed to be \fI0\fP and \fIinfinity\fP respectively.  If the event checking
+frequency is omitted then it is assumed to be \fI1\fP.  A value of \fI0\fP on
+its own indicates that no such checking will ever be performed.  This option can
+be used to speed up the execution speed of the library at the expense of
+checking.  Default value: \fBCHECK\fP=\fI0\fP.
 .TP
 \fBCHECKALL\fP
 Equivalent to the \fBCHECKALLOCS\fP, \fBCHECKREALLOCS\fP, \fBCHECKFREES\fP and
