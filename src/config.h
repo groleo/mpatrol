@@ -744,6 +744,27 @@
 #endif /* MP_PROFDIR */
 
 
+/* The name of the file used to send memory allocation tracing information
+ * to.  This may be overridden at run-time using the TRACEFILE option and may
+ * contain special formatting characters.  It may also be affected by the
+ * environment variable specified in MP_TRACEDIR.
+ */
+
+#ifndef MP_TRACEFILE
+#define MP_TRACEFILE "mpatrol.trace"
+#endif /* MP_TRACEFILE */
+
+
+/* The name of the environment variable used to specify a directory into which
+ * all mpatrol tracing output files should be written.  The directory
+ * specified must actually exist.
+ */
+
+#ifndef MP_TRACEDIR
+#define MP_TRACEDIR "TRACEDIR"
+#endif /* MP_TRACEDIR */
+
+
 /* The magic sequence of bytes to use at the beginning and end of every
  * profiling output file for verification purposes.  This must be exactly
  * four bytes in length and will be truncated if it is greater than that.
