@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.39 2001-01-22 21:29:40 graeme Exp $
+# $Id: Makefile,v 1.40 2001-01-22 21:52:45 graeme Exp $
 
 
 # Definitions
@@ -56,7 +56,6 @@ ARCHTS_MPATROL	= $(MPATROL)mt.lib
 OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 ARCHIVE_MPALLOC	= $(MPALLOC).lib
-OBJECT_MPALLOC	= lib$(MPALLOC).obj
 
 
 # Rules
@@ -80,6 +79,9 @@ $(ARCHTS_MPATROL): $(MPTTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
+
+$(ARCHIVE_MPALLOC): $(MPAOBJS)
+	$(AR) -xar -o $@ $(MPAOBJS)
 
 mpatrol.nlm: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.obj getopt.obj version.obj

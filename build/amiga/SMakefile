@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.42 2001-01-22 21:29:39 graeme Exp $
+# $Id: SMakefile,v 1.43 2001-01-22 21:52:44 graeme Exp $
 
 
 # Definitions
@@ -54,7 +54,6 @@ ARCHTS_MPATROL	= $(MPATROL)mt.lib
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
 
 ARCHIVE_MPALLOC	= $(MPALLOC).lib
-OBJECT_MPALLOC	= lib$(MPALLOC).o
 
 
 # Rules
@@ -78,6 +77,9 @@ $(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/library.c
+
+$(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
+	$(AR) -n $@ REPLACE $(ARCHIVE_MPAOBJS)
 
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mpatrol.o getopt.o version.o

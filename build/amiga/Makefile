@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.40 2001-01-22 21:29:39 graeme Exp $
+# $Id: Makefile,v 1.41 2001-01-22 21:52:44 graeme Exp $
 
 
 # Definitions
@@ -55,7 +55,6 @@ ARCHTS_MPATROL	= lib$(MPATROL)mt.a
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
-OBJECT_MPALLOC	= lib$(MPALLOC).o
 
 
 # Rules
@@ -79,6 +78,9 @@ $(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
+
+$(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPAOBJS)
 
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
