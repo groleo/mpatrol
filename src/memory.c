@@ -45,17 +45,20 @@
 #define _POSIX_ARG_MAX 4096
 #endif /* _POSIX_ARG_MAX */
 #endif /* SYSTEM */
+#include <setjmp.h>
+#include <signal.h>
+#if MP_SIGINFO_SUPPORT
+#include <siginfo.h>
+#endif /* MP_SIGINFO_SUPPORT */
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
     SYSTEM == SYSTEM_OPENBSD
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS MAP_ANON
 #endif /* MAP_ANONYMOUS */
 #endif /* SYSTEM */
-#endif /* TARGET */
 #if MP_WATCH_SUPPORT
 #if SYSTEM == SYSTEM_SOLARIS
 #include <procfs.h>
@@ -78,7 +81,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.46 2001-01-24 20:34:31 graeme Exp $"
+#ident "$Id: memory.c,v 1.47 2001-01-24 22:19:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -117,6 +120,18 @@ static char memoryarray[MP_ARRAY_SIZE];
 
 static size_t memorysize;
 #endif /* MP_ARRAY_SUPPORT */
+
+
+#if TARGET == TARGET_UNIX
+static jmp_buf environment;
+#if MP_SIGINFO_SUPPORT
+static struct sigaction bushandler;
+static struct sigaction segvhandler;
+#else /* MP_SIGINFO_SUPPORT */
+static void (*bushandler)(int);
+static void (*segvhandler)(int);
+#endif /* MP_SIGINFO_SUPPORT */
+#endif /* TARGET */
 
 
 /* Determine the minimum alignment for a general-purpose memory allocation
@@ -680,6 +695,20 @@ __mp_memfree(meminfo *i, void *p, size_t l)
 }
 
 
+#if TARGET == TARGET_UNIX
+/* Handles any signals that result from illegal memory accesses whilst
+ * querying the permissions of addresses.
+ */
+
+static
+void
+memoryhandler(int s)
+{
+    longjmp(environment, 1);
+}
+#endif /* TARGET */
+
+
 /* Return the access permission of an address.
  */
 
@@ -687,20 +716,58 @@ MP_GLOBAL
 memaccess
 __mp_memquery(meminfo *i, void *p)
 {
-#if SYSTEM == SYSTEM_SOLARIS
+#if TARGET == TARGET_UNIX
+#if MP_SIGINFO_SUPPORT
+    struct sigaction i;
+#endif /* MP_SIGINFO_SUPPORT */
     char c;
-#endif /* SYSTEM */
+#endif /* TARGET */
+    memaccess r;
 
+    r = MA_READWRITE;
+#if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_SOLARIS
     /* The mincore() system call allows us to determine if a page is in core,
      * and if it is not and ENOMEM is set then it means that the page is not
      * mapped.  Unfortunately, we can't tell if it's read-only.
      */
-    p = (void *) __mp_rounddown((unsigned long) p, i->page);
-    if ((mincore((char *) p, 1, &c) == -1) && (errno == ENOMEM))
+    if ((mincore((char *) __mp_rounddown((unsigned long) p, i->page), 1, &c) ==
+         -1) && (errno == ENOMEM))
         return MA_NOACCESS;
 #endif /* SYSTEM */
-    return MA_READWRITE;
+    /* One generic way to determine the access permission of an address across
+     * all UNIX systems is to attempt to read from and write to the address and
+     * check the results using signals.
+     */
+#if MP_SIGINFO_SUPPORT
+    i.sa_flags = 0;
+    (void *) i.sa_handler = (void *) memoryhandler;
+    sigfillset(&i.sa_mask);
+    sigaction(SIGBUS, &i, &bushandler);
+    sigaction(SIGSEGV, &i, &segvhandler);
+#else /* MP_SIGINFO_SUPPORT */
+    bushandler = signal(SIGBUS, memoryhandler);
+    segvhandler = signal(SIGSEGV, memoryhandler);
+#endif /* MP_SIGINFO_SUPPORT */
+    if (setjmp(environment))
+        r = MA_NOACCESS;
+    else
+    {
+        c = *((char *) p);
+        if (setjmp(environment))
+            r = MA_READONLY;
+        else
+            *((char *) p) = c;
+    }
+#if MP_SIGINFO_SUPPORT
+    sigaction(SIGBUS, &bushandler, NULL);
+    sigaction(SIGSEGV, &segvhandler, NULL);
+#else /* MP_SIGINFO_SUPPORT */
+    signal(SIGBUS, bushandler);
+    signal(SIGSEGV, segvhandler);
+#endif /* MP_SIGINFO_SUPPORT */
+#endif /* TARGET */
+    return r;
 }
 
 
