@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.9 2000-01-28 00:35:41 graeme Exp $"
+#ident "$Id: info.c,v 1.10 2000-01-30 20:30:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -76,7 +76,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->size = h->count = h->peak = h->limit = 0;
     h->astop = h->rstop = h->fstop = h->uabort = 0;
     h->lrange = h->urange = (size_t) -1;
-    h->dtotal = h->ctotal = h->stotal = 0;
+    h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->ffreq = h->fseed = 0;
     h->prologue = NULL;
     h->epilogue = NULL;
@@ -122,7 +122,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     h->table.size = 0;
     __mp_newlist(&h->list);
     h->size = h->count = h->peak = 0;
-    h->dtotal = h->ctotal = h->stotal = 0;
+    h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
 }
 
 
@@ -682,6 +682,51 @@ MP_GLOBAL void __mp_copymemory(infohead *h, void *p, void *q, size_t l,
 }
 
 
+/* Attempt to locate the position of one block of memory in another block.
+ */
+
+MP_GLOBAL void *__mp_locatememory(infohead *h, void *p, size_t l, void *q,
+                                  size_t m, alloctype f, char *s, char *t,
+                                  unsigned long u, stackinfo *v)
+{
+    void *r;
+
+    r = NULL;
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+    {
+        /* Write an entry into the log file.
+         */
+        __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+        __mp_printsize(l);
+        __mp_diag(", " MP_POINTER ", ", q);
+        __mp_printsize(m);
+        __mp_diag(") [");
+#if MP_THREADS_SUPPORT
+        __mp_diag("%lu|", __mp_threadid());
+#endif /* MP_THREADS_SUPPORT */
+        __mp_diag("%s|%s|", (s ? s : "-"), (t ? t : "-"));
+        if (u == 0)
+            __mp_diag("-");
+        else
+            __mp_diag("%lu", u);
+        __mp_diag("]\n");
+        __mp_printstack(&h->syms, v);
+        __mp_diag("\n");
+    }
+    /* If the pointers are not NULL and do not overflow any memory blocks then
+     * proceed to start the search.
+     */
+    if (__mp_checkrange(h, p, l, f) && __mp_checkrange(h, q, m, f))
+    {
+        h->ltotal += m;
+        r = __mp_memfind(p, l, q, m);
+    }
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+        __mp_diag("returns " MP_POINTER "\n\n", r);
+    return r;
+}
+
+
 /* Compare two blocks of memory.
  */
 
@@ -690,7 +735,9 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
                                  stackinfo *v)
 {
     void *r;
+    int c;
 
+    c = 0;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
     {
         /* Write an entry into the log file.
@@ -720,10 +767,12 @@ MP_GLOBAL int __mp_comparememory(infohead *h, void *p, void *q, size_t l,
         if (r = __mp_memcompare(p, q, l))
         {
             l = (char *) r - (char *) p;
-            return (int) ((char *) p)[l] - (int) ((char *) q)[l];
+            c = (int) ((char *) p)[l] - (int) ((char *) q)[l];
         }
     }
-    return 0;
+    if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
+        __mp_diag("returns %d\n\n", c);
+    return c;
 }
 
 

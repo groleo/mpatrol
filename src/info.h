@@ -81,6 +81,8 @@ typedef enum alloctype
     AT_MEMCPY,    /* memcpy() */
     AT_MEMMOVE,   /* memmove() */
     AT_BCOPY,     /* bcopy() */
+    AT_MEMCHR,    /* memchr() */
+    AT_MEMMEM,    /* memmem() */
     AT_MEMCMP,    /* memcmp() */
     AT_BCMP,      /* bcmp() */
     AT_MAX
@@ -144,6 +146,7 @@ typedef struct infohead
     size_t lrange;                    /* lower check range */
     size_t urange;                    /* upper check range */
     size_t dtotal;                    /* total bytes compared */
+    size_t ltotal;                    /* total bytes located */
     size_t ctotal;                    /* total bytes copied */
     size_t stotal;                    /* total bytes set */
     unsigned long ffreq;              /* failure frequency */
@@ -180,6 +183,9 @@ MP_EXPORT void __mp_setmemory(infohead *, void *, size_t, unsigned char,
                               stackinfo *);
 MP_EXPORT void __mp_copymemory(infohead *, void *, void *, size_t, alloctype,
                                char *, char *, unsigned long, stackinfo *);
+MP_EXPORT void *__mp_locatememory(infohead *, void *, size_t, void *, size_t,
+                                  alloctype, char *, char *, unsigned long,
+                                  stackinfo *);
 MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, alloctype,
                                  char *, char *, unsigned long, stackinfo *);
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
