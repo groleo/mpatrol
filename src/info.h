@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.44 2001-02-22 20:24:47 graeme Exp $
+ * $Id: info.h,v 1.45 2001-02-23 22:18:52 graeme Exp $
  */
 
 
@@ -62,9 +62,10 @@
 #define FLG_NOPROTECT     32768 /* do not protect internal structures */
 
 #define FLG_FREED         1     /* allocation has been freed */
-#define FLG_PROFILED      2     /* allocation has been profiled */
-#define FLG_TRACED        4     /* allocation has been traced */
-#define FLG_INTERNAL      8     /* allocation was made inside the library */
+#define FLG_MARKED        2     /* allocation has been marked */
+#define FLG_PROFILED      4     /* allocation has been profiled */
+#define FLG_TRACED        8     /* allocation has been traced */
+#define FLG_INTERNAL      16    /* allocation was made inside the library */
 
 
 /* The different types of memory allocation and operation functions.
