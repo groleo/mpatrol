@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.34 2000-02-07 20:17:30 graeme Exp $
+@c $Id: mpatrol.texi,v 1.35 2000-02-18 01:20:30 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.5
 @set VERSION 1.1.1
-@set UPDATED 7th February, 2000
+@set UPDATED 18th February, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -204,6 +204,15 @@ which lists and explains related terms.  You may also wish to look at
 allocation principles.  It is located at
 @uref{http://gee.cs.oswego.edu/dl/html/malloc.html}.
 
+@cindex acknowledgements
+@cindex contributors
+Finally, I'd like to thank Stephan Springl (@email{springl@@bfw-online.de}) for
+his help on reading debugging information from object files via the GNU BFD
+library, and Dave Gibson (@email{david@@epc.co.uk}) for his help on writing
+thread-safe code.  Calum Wilkie (@email{calum@@epc.co.uk}) also deserves a
+mention since the idea for providing stack traces comes from a similar library
+he wrote a few years ago.
+
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
 as the library is much slower than normal malloc implementations and uses much
@@ -245,6 +254,13 @@ log file in order to keep its diagnostics separate from any that the program
 being tested might generate.  A wide variety of library settings can also be
 changed at run-time via an environment variable, thus removing the need to
 recompile or relink in order to change the library's behaviour.
+
+The mpatrol library has been designed with the intention of replacing calls to
+existing C and C++ memory allocation functions as seamlessly as possible, but
+in many cases that may not be possible and slight code modifications may be
+required.  However, a preprocessor macro containing the version of the mpatrol
+library is provided for the purposes of conditional compilation so that release
+builds and debug builds can be easily automated.
 
 @node Features, Installation, Overview, Top
 @chapter Features
@@ -2005,7 +2021,7 @@ the ANSI C or C++ calling conventions and never make assumptions about the
 function or operator you are about to call --- the standards committees went to
 great lengths to explicitly specify its behaviour.  For example, don't assume
 that the contents of a freed memory allocation will remain valid until the next
-called to @code{malloc()}, and don't assume that the contents of a newly
+call to @code{malloc()}, and don't assume that the contents of a newly
 allocated memory block will be zeroed unless you created it with
 @code{calloc()}.
 
@@ -2260,7 +2276,9 @@ returns 0x00028000 <- (11)
 Allocation type.  This generalises the type of dynamic memory operation that is
 being performed, and can be one of @samp{ALLOC}, @samp{REALLOC} or @samp{FREE}.
 This should make looking for all allocations, reallocations or frees in the log
-file a lot easier.
+file a lot easier.  Alternatively, if a memory operation function was called
+then this can also be one of @samp{MEMSET}, @samp{MEMCOPY}, @samp{MEMFIND} or
+@samp{MEMCMP}.
 
 @item
 Allocation function.  This is the name of the function that has been called to
@@ -3085,10 +3103,17 @@ For @samp{MEMCOPY}, the first argument represents the source memory block, the
 second argument represents the destination memory block and the third argument
 represents the number of bytes to copy.  This is similar for @samp{MEMCMP}.
 
-Note that as with the memory allocation functions, @samp{MEMCMP}, @samp{MEMCOPY}
-and @samp{MEMSET} are used to generalise the types of operations being performed
-and are followed by the names of the actual functions being used.  In some cases
-the functions may use a different ordering of parameters than that shown.
+For @samp{MEMFIND}, the first and second arguments represent the source memory
+block and its length, while the third and fourth arguments represent the memory
+block to search for and its length.  In the implementation for @code{memchr()},
+the byte to search for is copied to a one byte buffer and the address of that
+buffer is used as the memory block to search for.
+
+Note that as with the memory allocation functions, @samp{MEMCMP},
+@samp{MEMFIND}, @samp{MEMCOPY} and @samp{MEMSET} are used to generalise the
+types of operations being performed and are followed by the names of the actual
+functions being used.  In some cases the functions may use a different ordering
+of parameters than that shown.
 
 @node Example 6, Example 7, Example 5, Examples
 @section Incompatible function calls
