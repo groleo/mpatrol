@@ -62,7 +62,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.30 2000-07-13 20:16:41 graeme Exp $"
+#ident "$Id: memory.c,v 1.31 2000-07-14 00:07:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -682,10 +682,10 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
 
 MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
 {
-    int *w;
+    long *w;
     char *p;
     size_t i, n;
-    int b;
+    long b;
 
     /* This used to be a simple loop to compare each byte individually, but
      * that is less efficient than attempting to compare words at a time.
@@ -693,13 +693,13 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
      * number then this routine will attempt to compare as many words as
      * possible.
      */
-    if (l > sizeof(int) * sizeof(int))
+    if (l > sizeof(long) * sizeof(long))
     {
         /* Check all bytes that occur before the first word.
          */
-        if ((n = (unsigned long) t & (sizeof(int) - 1)) > 0)
+        if ((n = (unsigned long) t & (sizeof(long) - 1)) > 0)
         {
-            if ((n = sizeof(int) - n) > l)
+            if ((n = sizeof(long) - n) > l)
                 n = l;
             for (p = (char *) t, t = (char *) t + n; p < (char *) t; p++)
                 if (*p != c)
@@ -710,18 +710,18 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
             return NULL;
         /* Check all words that occur in the memory block.
          */
-        if ((n = l / sizeof(int)) > 0)
+        if ((n = l / sizeof(long)) > 0)
         {
             /* Build up the word that we will be checking against.
              */
-            for (p = (char *) &b, i = 0; i < sizeof(int); p++, i++)
+            for (p = (char *) &b, i = 0; i < sizeof(long); p++, i++)
                 *p = c;
-            for (w = (int *) t, t = (int *) t + n; w < (int *) t; w++)
+            for (w = (long *) t, t = (long *) t + n; w < (long *) t; w++)
                 if (*w != b)
                 {
                     /* Locate the exact byte that caused the test to fail.
                      */
-                    for (p = (char *) w, i = 0; i < sizeof(int); p++, i++)
+                    for (p = (char *) w, i = 0; i < sizeof(long); p++, i++)
                         if (*p != c)
                             return p;
                     /* The above loop should never exit, but just in case it
@@ -730,7 +730,7 @@ MP_GLOBAL void *__mp_memcheck(void *t, char c, size_t l)
                      */
                     return w;
                 }
-            l -= n * sizeof(int);
+            l -= n * sizeof(long);
         }
     }
     if (l == 0)
@@ -760,15 +760,15 @@ MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
      */
     if ((s == t) || (l == 0))
         return NULL;
-    n = (unsigned long) s & (sizeof(int) - 1);
-    if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
-        (l > sizeof(int) * sizeof(int)))
+    n = (unsigned long) s & (sizeof(long) - 1);
+    if ((n == ((unsigned long) t & (sizeof(long) - 1))) &&
+        (l > sizeof(long) * sizeof(long)))
     {
         /* We can only compare words if the two blocks have the same alignment.
          * This also guarantees that there is at least one word of difference
          * between the two pointers.
          */
-        if ((n > 0) && ((n = sizeof(int) - n) > l))
+        if ((n > 0) && ((n = sizeof(long) - n) > l))
             n = l;
         /* Compare all bytes that occur before the first word.
          */
@@ -783,13 +783,13 @@ MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
         }
         /* Compare all words that occur in the memory blocks.
          */
-        while (l >= sizeof(int))
+        while (l >= sizeof(long))
         {
-            if (*((int *) t) != *((int *) s))
+            if (*((long *) t) != *((long *) s))
             {
                 /* Locate the exact byte that caused the test to fail.
                  */
-                for (p = (char *) t, n = 0; n < sizeof(int); p++, n++)
+                for (p = (char *) t, n = 0; n < sizeof(long); p++, n++)
                     if (*p != ((char *) s)[n])
                         return p;
                 /* The above loop should never exit, but just in case it
@@ -798,9 +798,9 @@ MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
                  */
                 return t;
             }
-            s = (int *) s + 1;
-            t = (int *) t + 1;
-            l -= sizeof(int);
+            s = (long *) s + 1;
+            t = (long *) t + 1;
+            l -= sizeof(long);
         }
     }
     /* Compare all remaining bytes.
@@ -840,10 +840,10 @@ MP_GLOBAL void *__mp_memfind(void *t, size_t l, void *s, size_t m)
 
 MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
 {
-    int *w;
+    long *w;
     char *p;
     size_t i, n;
-    int b;
+    long b;
 
     /* This used to be a simple loop to set each byte individually, but
      * that is less efficient than attempting to set words at a time.
@@ -851,13 +851,13 @@ MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
      * number then this routine will attempt to set as many words as
      * possible.
      */
-    if (l > sizeof(int) * sizeof(int))
+    if (l > sizeof(long) * sizeof(long))
     {
         /* Set all bytes that occur before the first word.
          */
-        if ((n = (unsigned long) t & (sizeof(int) - 1)) > 0)
+        if ((n = (unsigned long) t & (sizeof(long) - 1)) > 0)
         {
-            if ((n = sizeof(int) - n) > l)
+            if ((n = sizeof(long) - n) > l)
                 n = l;
             for (p = (char *) t, t = (char *) t + n; p < (char *) t; *p++ = c);
             l -= n;
@@ -866,13 +866,13 @@ MP_GLOBAL void __mp_memset(void *t, char c, size_t l)
             return;
         /* Set all words that occur in the memory block.
          */
-        if ((n = l / sizeof(int)) > 0)
+        if ((n = l / sizeof(long)) > 0)
         {
             /* Build up the word that we will be writing to memory.
              */
-            for (p = (char *) &b, i = 0; i < sizeof(int); *p++ = c, i++);
-            for (w = (int *) t, t = (int *) t + n; w < (int *) t; *w++ = b);
-            l -= n * sizeof(int);
+            for (p = (char *) &b, i = 0; i < sizeof(long); *p++ = c, i++);
+            for (w = (long *) t, t = (long *) t + n; w < (long *) t; *w++ = b);
+            l -= n * sizeof(long);
         }
     }
     if (l == 0)
@@ -905,9 +905,9 @@ MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
          */
         s = (char *) s + l;
         t = (char *) t + l;
-        n = (unsigned long) s & (sizeof(int) - 1);
-        if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
-            (l > sizeof(int) * sizeof(int)))
+        n = (unsigned long) s & (sizeof(long) - 1);
+        if ((n == ((unsigned long) t & (sizeof(long) - 1))) &&
+            (l > sizeof(long) * sizeof(long)))
         {
             /* We can only copy words if the source and destination have the
              * same alignment.  This also guarantees that there is at least one
@@ -927,12 +927,12 @@ MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
             }
             /* Copy all words that occur in the memory block.
              */
-            while (l >= sizeof(int))
+            while (l >= sizeof(long))
             {
-                s = (int *) s - 1;
-                t = (int *) t - 1;
-                *((int *) t) = *((int *) s);
-                l -= sizeof(int);
+                s = (long *) s - 1;
+                t = (long *) t - 1;
+                *((long *) t) = *((long *) s);
+                l -= sizeof(long);
             }
         }
         /* Copy all remaining bytes.
@@ -951,15 +951,15 @@ MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
          * source block, or there is no overlap at all, so we can copy from
          * the beginning.
          */
-        n = (unsigned long) s & (sizeof(int) - 1);
-        if ((n == ((unsigned long) t & (sizeof(int) - 1))) &&
-            (l > sizeof(int) * sizeof(int)))
+        n = (unsigned long) s & (sizeof(long) - 1);
+        if ((n == ((unsigned long) t & (sizeof(long) - 1))) &&
+            (l > sizeof(long) * sizeof(long)))
         {
             /* We can only copy words if the source and destination have the
              * same alignment.  This also guarantees that there is at least one
              * word of difference between the source and destination pointers.
              */
-            if ((n > 0) && ((n = sizeof(int) - n) > l))
+            if ((n > 0) && ((n = sizeof(long) - n) > l))
                 n = l;
             /* Copy all bytes that occur before the first word.
              */
@@ -973,12 +973,12 @@ MP_GLOBAL void __mp_memcopy(void *t, void *s, size_t l)
             }
             /* Copy all words that occur in the memory block.
              */
-            while (l >= sizeof(int))
+            while (l >= sizeof(long))
             {
-                *((int *) t) = *((int *) s);
-                s = (int *) s + 1;
-                t = (int *) t + 1;
-                l -= sizeof(int);
+                *((long *) t) = *((long *) s);
+                s = (long *) s + 1;
+                t = (long *) t + 1;
+                l -= sizeof(long);
             }
         }
         /* Copy all remaining bytes.
