@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.223 2001-07-19 21:44:29 graeme Exp $
+@c $Id: mpatrol.texi,v 1.224 2001-07-19 22:16:26 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -13386,6 +13386,19 @@ Because I would most likely get lots of bug reports or queries from people who
 had forgotten that they had set some options in the environment variable and had
 then not seen the expected behaviour from the options they specified to the
 @command{mpatrol} command.
+
+@item
+Why do I get an error from the dynamic linker about not being able to locate
+@file{libiberty.so} when I use the @option{--dynamic} option with the
+@command{mpatrol} command?
+
+The GNU libiberty library is required when the mpatrol library is build with
+support for the GNU BFD library but is unfortunately only available in archive
+form on many systems.  See the section on the @command{mpatrol} command
+(@pxref{The mpatrol command}) for information on how to get around this problem,
+either by embedding the libiberty library into the mpatrol library when you are
+building it, or by converting the archive form of the libiberty library into its
+corresponding shared library version.
 
 @item
 Why does the mpatrol library not read the symbols in my executable file on
