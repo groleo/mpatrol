@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.47 2000-04-02 14:47:42 graeme Exp $
+@c $Id: mpatrol.texi,v 1.48 2000-04-03 18:15:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.8
 @set VERSION 1.1.4
-@set UPDATED 2nd April, 2000
+@set UPDATED 3rd April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -5034,7 +5034,6 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEDEBUG} option has no effect.
 @end itemize
 
-@itemize @bullet
 @item
 DG/UX 4.11, Intel Pentium Pro, ELF32, @command{gcc}
 @itemize @bullet
@@ -5296,7 +5295,7 @@ Add any support for threads in @file{mutex.c}.
 Add a new version and date format (or use an existing one) in @file{version.c}.
 
 @item
-Decide if the @code{malloc()} replacements should be used from @file{mpatrol.c}.
+Decide if the @code{malloc()} replacements should be used from @file{malloc.c}.
 
 @item
 Add a new subdirectory in the @file{build} directory that contains a
