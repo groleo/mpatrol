@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.9 2000-01-21 00:48:36 graeme Exp $"
+#ident "$Id: inter.c,v 1.10 2000-01-28 00:42:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -516,6 +516,43 @@ void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     __mp_copymemory(&memhead, p, q, l, f, s, t, u, &i);
     restoresignals();
     return q;
+}
+
+
+/* Compare two blocks of memory.
+ */
+
+#if TARGET == TARGET_AMIGA
+__asm int __mp_comparemem(register __a0 void *p, register __a1 void *q,
+                          register __d0 size_t l, register __d1 alloctype f,
+                          register __a2 char *s, register __a3 char *t,
+                          register __d2 unsigned long u, register __d3 size_t k)
+#else /* TARGET */
+int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
+                    unsigned long u, size_t k)
+#endif /* TARGET */
+{
+    stackinfo i;
+    int j, r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    /* Determine the call stack details.
+     */
+    __mp_newframe(&i);
+    if (__mp_getframe(&i))
+    {
+        j = __mp_getframe(&i);
+        while ((k > 0) && (j != 0))
+        {
+            j = __mp_getframe(&i);
+            k--;
+        }
+    }
+    r = __mp_comparememory(&memhead, p, q, l, f, s, t, u, &i);
+    restoresignals();
+    return r;
 }
 
 
