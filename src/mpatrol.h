@@ -391,17 +391,17 @@ struct mallinfo
 
 
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
-                             __LINE__, 0)
+                             __LINE__, NULL, 0, 0)
 #define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, MP_FUNCNAME, \
-                                __FILE__, __LINE__, 0)
+                                __FILE__, __LINE__, NULL, 0, 0)
 #define memalign(a, l) __mp_alloc((l), (a), MP_AT_MEMALIGN, MP_FUNCNAME, \
-                                  __FILE__, __LINE__, 0)
+                                  __FILE__, __LINE__, NULL, 0, 0)
 #define valloc(l) __mp_alloc((l), 0, MP_AT_VALLOC, MP_FUNCNAME, __FILE__, \
-                             __LINE__, 0)
+                             __LINE__, NULL, 0, 0)
 #define pvalloc(l) __mp_alloc((l), 0, MP_AT_PVALLOC, MP_FUNCNAME, __FILE__, \
-                              __LINE__, 0)
+                              __LINE__, NULL, 0, 0)
 #define alloca(l) __mp_alloc((l), 0, MP_AT_ALLOCA, MP_FUNCNAME, __FILE__, \
-                             __LINE__, 0)
+                             __LINE__, NULL, 0, 0)
 #define strdup(p) __mp_strdup((p), 0, MP_AT_STRDUP, MP_FUNCNAME, __FILE__, \
                               __LINE__, 0)
 #define strndup(p, l) __mp_strdup((p), (l), MP_AT_STRNDUP, MP_FUNCNAME, \
@@ -415,11 +415,12 @@ struct mallinfo
 #define strndupa(p, l) __mp_strdup((p), (l), MP_AT_STRNDUPA, MP_FUNCNAME, \
                                    __FILE__, __LINE__, 0)
 #define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, MP_FUNCNAME, \
-                                   __FILE__, __LINE__, 0)
+                                   __FILE__, __LINE__, NULL, 0, 0)
 #define recalloc(p, l, n) __mp_realloc((p), (l) * (n), 0, MP_AT_RECALLOC, \
-                                       MP_FUNCNAME, __FILE__, __LINE__, 0)
+                                       MP_FUNCNAME, __FILE__, __LINE__, NULL, \
+                                       0, 0)
 #define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, MP_FUNCNAME, \
-                                  __FILE__, __LINE__, 0)
+                                  __FILE__, __LINE__, NULL, 0, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define cfree(p, l, n) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, \
                                  __LINE__, 0)
@@ -459,11 +460,13 @@ extern "C"
 void __mp_init(void);
 void __mp_fini(void);
 void *__mp_alloc(size_t, size_t, __mp_alloctype, MP_CONST char *,
-                 MP_CONST char *, unsigned long, size_t);
+                 MP_CONST char *, unsigned long, MP_CONST char *, size_t,
+                 size_t);
 char *__mp_strdup(MP_CONST char *, size_t, __mp_alloctype, MP_CONST char *,
                   MP_CONST char *, unsigned long, size_t);
 void *__mp_realloc(void *, size_t, size_t, __mp_alloctype, MP_CONST char *,
-                   MP_CONST char *, unsigned long, size_t);
+                   MP_CONST char *, unsigned long, MP_CONST char *, size_t,
+                   size_t);
 void __mp_free(void *, __mp_alloctype, MP_CONST char *, MP_CONST char *,
                unsigned long, size_t);
 void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype,
@@ -502,9 +505,9 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 
 #define __mp_init() ((void) 0)
 #define __mp_fini() ((void) 0)
-#define __mp_alloc(l, a, f, s, t, u, k) ((void *) NULL)
+#define __mp_alloc(l, a, f, s, t, u, g, h, k) ((void *) NULL)
 #define __mp_strdup(p, l, f, s, t, u, k) ((char *) NULL)
-#define __mp_realloc(p, l, a, f, s, t, u, k) ((void *) NULL)
+#define __mp_realloc(p, l, a, f, s, t, u, g, h, k) ((void *) NULL)
 #define __mp_free(p, f, s, t, u, k) ((void) 0)
 #define __mp_setmem(p, l, c, f, s, t, u, k) ((void *) NULL)
 #define __mp_copymem(p, q, l, c, f, s, t, u, k) ((void *) NULL)
@@ -560,7 +563,7 @@ MP_INLINE
 void *
 operator new(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
+    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, NULL, 0, 0);
 }
 
 
@@ -571,7 +574,7 @@ MP_INLINE
 void *
 operator new[](size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
+    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, NULL, 0, 0);
 }
 
 
