@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mgauge.h,v 1.1 2001-02-16 23:02:13 graeme Exp $
+ * $Id: mgauge.h,v 1.2 2001-02-23 21:09:53 graeme Exp $
  */
 
 
@@ -64,16 +64,23 @@
 #include <mpatrol.h>
 
 
+#define mgaugestart(f, c, s, u) __mpt_mgaugestart((f), (c), (s), (u))
+#define mgaugeend() __mpt_mgaugeend()
+#define mgaugeon() __mpt_mgaugeon()
+#define mgaugeoff() __mpt_mgaugeoff()
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
-int mgaugestart(MP_CONST char *, unsigned char, unsigned long, unsigned long);
-void mgaugeend(void);
-void mgaugeon(void);
-void mgaugeoff(void);
+int __mpt_mgaugestart(MP_CONST char *, unsigned char, unsigned long,
+                      unsigned long);
+void __mpt_mgaugeend(void);
+void __mpt_mgaugeon(void);
+void __mpt_mgaugeoff(void);
 
 
 #ifdef __cplusplus

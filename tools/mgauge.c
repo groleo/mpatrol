@@ -28,7 +28,7 @@
 
 
 /*
- * $Id: mgauge.c,v 1.2 2001-02-18 18:50:44 graeme Exp $
+ * $Id: mgauge.c,v 1.3 2001-02-23 21:09:53 graeme Exp $
  */
 
 
@@ -136,7 +136,8 @@ epilogue(MP_CONST void *p, MP_CONST void *a)
  */
 
 int
-mgaugestart(MP_CONST char *f, unsigned char c, unsigned long s, unsigned long u)
+__mpt_mgaugestart(MP_CONST char *f, unsigned char c, unsigned long s,
+                  unsigned long u)
 {
     if (gauge_file != NULL)
         return 0;
@@ -174,7 +175,7 @@ mgaugestart(MP_CONST char *f, unsigned char c, unsigned long s, unsigned long u)
  */
 
 void
-mgaugeend(void)
+__mpt_mgaugeend(void)
 {
     if (gauge_file == NULL)
         return;
@@ -195,7 +196,7 @@ mgaugeend(void)
  */
 
 void
-mgaugeon(void)
+__mpt_mgaugeon(void)
 {
     if (gauge_file == NULL)
         return;
@@ -211,7 +212,7 @@ mgaugeon(void)
  */
 
 void
-mgaugeoff(void)
+__mpt_mgaugeoff(void)
 {
     if (gauge_file == NULL)
         return;

@@ -28,7 +28,7 @@
 
 
 /*
- * $Id: mtrace.c,v 1.2 2001-02-22 20:28:47 graeme Exp $
+ * $Id: mtrace.c,v 1.3 2001-02-23 21:14:02 graeme Exp $
  */
 
 
@@ -59,7 +59,8 @@ static epilogue_handler old_epilogue;
 static FILE *trace_file;
 
 
-/* Indicates whether the call to muntrace() has been planted with __mp_atexit().
+/* Indicates whether the call to __mpt_muntrace() has been planted with
+ * __mp_atexit().
  */
 
 static int trace_atexit;
@@ -172,7 +173,7 @@ epilogue(MP_CONST void *p, MP_CONST void *a)
  */
 
 void
-mtrace(void)
+__mpt_mtrace(void)
 {
     char *f;
 
@@ -183,7 +184,7 @@ mtrace(void)
     {
         if (!trace_atexit)
         {
-            __mp_atexit(muntrace);
+            __mp_atexit(__mpt_muntrace);
             trace_atexit = 1;
         }
         fputs("= Start\n", trace_file);
@@ -197,7 +198,7 @@ mtrace(void)
  */
 
 void
-muntrace(void)
+__mpt_muntrace(void)
 {
     if (trace_file == NULL)
         return;

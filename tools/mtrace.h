@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: mtrace.h,v 1.1 2001-02-15 22:20:53 graeme Exp $
+ * $Id: mtrace.h,v 1.2 2001-02-23 21:14:02 graeme Exp $
  */
 
 
@@ -49,14 +49,18 @@
 #include <mpatrol.h>
 
 
+#define mtrace() __mpt_mtrace()
+#define muntrace() __mpt_muntrace()
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
-void mtrace(void);
-void muntrace(void);
+void __mpt_mtrace(void);
+void __mpt_muntrace(void);
 
 
 #ifdef __cplusplus
