@@ -133,6 +133,8 @@ typedef struct infohead
     size_t uabort;                    /* unfreed abort minimum */
     size_t lrange;                    /* lower check range */
     size_t urange;                    /* upper check range */
+    unsigned long ffreq;              /* failure frequency */
+    unsigned long fseed;              /* failure seed */
     void (*prologue)(void *, size_t); /* prologue function */
     void (*epilogue)(void *);         /* epilogue function */
     void (*nomemory)(void);           /* low-memory handler function */
