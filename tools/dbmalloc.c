@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.7 2001-02-27 22:40:25 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.8 2001-02-27 23:03:12 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.7 2001-02-27 22:40:25 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.8 2001-02-27 23:03:12 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -250,6 +250,7 @@ callback(MP_CONST void *p, void *t)
 int
 __mpt_dbmallocoption(int c, union dbmalloptarg *v)
 {
+    char *s;
     unsigned long n;
     int r;
 
@@ -259,7 +260,11 @@ __mpt_dbmallocoption(int c, union dbmalloptarg *v)
     switch (c)
     {
       case MALLOC_ERRFILE:
-        r = __mp_setoption(MP_OPT_LOGFILE, (unsigned long) v->str);
+        if (strcmp(v->str, "-") == 0)
+            s = "stderr";
+        else
+            s = v->str;
+        r = __mp_setoption(MP_OPT_LOGFILE, (unsigned long) s);
         break;
       case MALLOC_CKCHAIN:
         if (v->i != 0)
@@ -426,11 +431,30 @@ __mp_init_dbmalloc(void)
 {
     char *v;
     dbmalloptarg a;
+    long n;
 
     if (!malloc_initialised)
     {
         malloc_initialised = 1;
         malloc_detail = 0;
+        if ((v = getenv("MALLOC_BOUNDSIZE")) && (*v != '\0'))
+        {
+            if ((n = strtol(v, NULL, 10)) < 1)
+                n = 1;
+            __mp_setoption(MP_OPT_OFLOWSIZE, n);
+        }
+        if ((v = getenv("MALLOC_FILLBYTE")) && (*v != '\0'))
+        {
+            if (((n = strtol(v, NULL, 10)) < 0) || (n > 255))
+                n = 1;
+            __mp_setoption(MP_OPT_ALLOCBYTE, n);
+        }
+        if ((v = getenv("MALLOC_FREEBYTE")) && (*v != '\0'))
+        {
+            if (((n = strtol(v, NULL, 10)) < 0) || (n > 255))
+                n = 2;
+            __mp_setoption(MP_OPT_FREEBYTE, n);
+        }
         if ((v = getenv("MALLOC_WARN")) && (*v != '\0'))
         {
             a.i = strtol(v, NULL, 10);
