@@ -19,18 +19,18 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpalloc.3,v 1.1 2001-02-08 22:35:21 graeme Exp $
+.\" $Id: libmpalloc.3,v 1.2 2001-02-11 21:10:06 graeme Exp $
 .\"
-.TH LIBMPALLOC 3 "8 February 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPALLOC 3 "11 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpalloc \- dynamic memory allocation replacement library
 .SH SYNOPSIS
 .nf
 #include <mpalloc.h>
 
-void *MP_MALLOC(size_t count, typename type);
-void *MP_CALLOC(size_t count, typename type);
-char *MP_STRDUP(const char *str);
+void *MP_MALLOC(void *ptr, size_t count, typename type);
+void *MP_CALLOC(void *ptr, size_t count, typename type);
+char *MP_STRDUP(char *ptr, const char *str);
 void *MP_REALLOC(void *ptr, size_t count, typename type);
 void MP_FREE(void *ptr);
 __mp_failhandler MP_FAILURE(__mp_failhandler func);
@@ -71,35 +71,38 @@ was being allocated.  To use these you should include the \fImpalloc.h\fP header
 file:
 .TP
 \fBMP_MALLOC\fP
-Allocates \fIcount\fP uninitialised items of type \fItype\fP from the heap and
-returns a suitably-cast pointer to the first item of the allocation.  The
-pointer returned will be suitably aligned for holding items of type \fItype\fP.
-If \fIcount\fP is \fI0\fP then it will be implicitly rounded up to \fI1\fP.  If
-there is not enough space in the heap then the program will be aborted after
-calling the allocation failure handler, which by default writes an appropriate
-error message to the standard error file stream.  The allocated memory must be
-deallocated with \fBMP_FREE\fP or reallocated with \fBMP_REALLOC\fP.
+Allocates \fIcount\fP uninitialised items of type \fItype\fP from the heap, sets
+\fIptr\fP to the result and returns a suitably-cast pointer to the first item of
+the allocation.  The pointer returned will be suitably aligned for holding items
+of type \fItype\fP.  If \fIcount\fP is \fI0\fP then it will be implicitly
+rounded up to \fI1\fP.  If there is not enough space in the heap then the
+program will be aborted after calling the allocation failure handler, which by
+default writes an appropriate error message to the standard error file stream.
+The allocated memory in \fIptr\fP must be deallocated with \fBMP_FREE\fP or
+reallocated with \fBMP_REALLOC\fP.
 .TP
 \fBMP_CALLOC\fP
-Allocates \fIcount\fP zero-initialised items of type \fItype\fP from the heap
-and returns a suitably-cast pointer to the first item of the allocation.  The
-pointer returned will be suitably aligned for holding items of type \fItype\fP.
-If \fIcount\fP is \fI0\fP then it will be implicitly rounded up to \fI1\fP.  If
-there is not enough space in the heap then the program will be aborted after
-calling the allocation failure handler, which by default writes an appropriate
-error message to the standard error file stream.  The allocated memory must be
-deallocated with \fBMP_FREE\fP or reallocated with \fBMP_REALLOC\fP.
+Allocates \fIcount\fP zero-initialised items of type \fItype\fP from the heap,
+sets \fIptr\fP to the result and returns a suitably-cast pointer to the first
+item of the allocation.  The pointer returned will be suitably aligned for
+holding items of type \fItype\fP.  If \fIcount\fP is \fI0\fP then it will be
+implicitly rounded up to \fI1\fP.  If there is not enough space in the heap then
+the program will be aborted after calling the allocation failure handler, which
+by default writes an appropriate error message to the standard error file
+stream.  The allocated memory in \fIptr\fP must be deallocated with
+\fBMP_FREE\fP or reallocated with \fBMP_REALLOC\fP.
 .TP
 \fBMP_STRDUP\fP
 Allocates exactly enough memory from the heap to duplicate \fIstr\fP (including
-the terminating nul character) and returns a suitably-cast pointer to the first
-byte of the allocation after copying \fIstr\fP to the newly-allocated memory.
-The pointer returned will have no alignment constraints and can be used to store
-character data up to the length of \fIstr\fP.  If there is not enough space in
-the heap then the program will be aborted after calling the allocation failure
-handler, which by default writes an appropriate error message to the standard
-error file stream.  The allocated memory must be deallocated with \fBMP_FREE\fP
-or reallocated with \fBMP_REALLOC\fP.
+the terminating nul character), sets \fIptr\fP to the result and returns a
+suitably-cast pointer to the first byte of the allocation after copying
+\fIstr\fP to the newly-allocated memory.  The pointer returned will have no
+alignment constraints and can be used to store character data up to the length
+of \fIstr\fP.  If there is not enough space in the heap then the program will be
+aborted after calling the allocation failure handler, which by default writes an
+appropriate error message to the standard error file stream.  The allocated
+memory in \fIptr\fP must be deallocated with \fBMP_FREE\fP or reallocated with
+\fBMP_REALLOC\fP.
 .TP
 \fBMP_REALLOC\fP
 Resizes the memory allocation beginning at \fIptr\fP to \fIcount\fP items of

@@ -3,7 +3,7 @@ Content-type: text/html
 <HTML><HEAD><TITLE>Manpage of LIBMPALLOC</TITLE>
 </HEAD><BODY>
 <H1>LIBMPALLOC</H1>
-Section: mpatrol library (3)<BR>Updated: 8 February 2001<BR><A HREF="#index">Index</A>
+Section: mpatrol library (3)<BR>Updated: 11 February 2001<BR><A HREF="#index">Index</A>
 <A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -16,9 +16,9 @@ libmpalloc - dynamic memory allocation replacement library
 <PRE>
 #include &lt;<A HREF="file:/usr/include/mpalloc.h">mpalloc.h</A>&gt;
 
-void *MP_MALLOC(size_t count, typename type);
-void *MP_CALLOC(size_t count, typename type);
-char *MP_STRDUP(const char *str);
+void *MP_MALLOC(void *ptr, size_t count, typename type);
+void *MP_CALLOC(void *ptr, size_t count, typename type);
+char *MP_STRDUP(char *ptr, const char *str);
 void *MP_REALLOC(void *ptr, size_t count, typename type);
 void MP_FREE(void *ptr);
 __mp_failhandler MP_FAILURE(__mp_failhandler func);
@@ -66,33 +66,36 @@ was being allocated.  To use these you should include the <I>mpalloc.h</I> heade
 file:
 <DL COMPACT>
 <DT><B>MP_MALLOC</B><DD>
-Allocates <I>count</I> uninitialised items of type <I>type</I> from the heap and
-returns a suitably-cast pointer to the first item of the allocation.  The
-pointer returned will be suitably aligned for holding items of type <I>type</I>.
-If <I>count</I> is <I>0</I> then it will be implicitly rounded up to <I>1</I>.  If
-there is not enough space in the heap then the program will be aborted after
-calling the allocation failure handler, which by default writes an appropriate
-error message to the standard error file stream.  The allocated memory must be
-deallocated with <B>MP_FREE</B> or reallocated with <B>MP_REALLOC</B>.
+Allocates <I>count</I> uninitialised items of type <I>type</I> from the heap, sets
+<I>ptr</I> to the result and returns a suitably-cast pointer to the first item of
+the allocation.  The pointer returned will be suitably aligned for holding items
+of type <I>type</I>.  If <I>count</I> is <I>0</I> then it will be implicitly
+rounded up to <I>1</I>.  If there is not enough space in the heap then the
+program will be aborted after calling the allocation failure handler, which by
+default writes an appropriate error message to the standard error file stream.
+The allocated memory in <I>ptr</I> must be deallocated with <B>MP_FREE</B> or
+reallocated with <B>MP_REALLOC</B>.
 <DT><B>MP_CALLOC</B><DD>
-Allocates <I>count</I> zero-initialised items of type <I>type</I> from the heap
-and returns a suitably-cast pointer to the first item of the allocation.  The
-pointer returned will be suitably aligned for holding items of type <I>type</I>.
-If <I>count</I> is <I>0</I> then it will be implicitly rounded up to <I>1</I>.  If
-there is not enough space in the heap then the program will be aborted after
-calling the allocation failure handler, which by default writes an appropriate
-error message to the standard error file stream.  The allocated memory must be
-deallocated with <B>MP_FREE</B> or reallocated with <B>MP_REALLOC</B>.
+Allocates <I>count</I> zero-initialised items of type <I>type</I> from the heap,
+sets <I>ptr</I> to the result and returns a suitably-cast pointer to the first
+item of the allocation.  The pointer returned will be suitably aligned for
+holding items of type <I>type</I>.  If <I>count</I> is <I>0</I> then it will be
+implicitly rounded up to <I>1</I>.  If there is not enough space in the heap then
+the program will be aborted after calling the allocation failure handler, which
+by default writes an appropriate error message to the standard error file
+stream.  The allocated memory in <I>ptr</I> must be deallocated with
+<B>MP_FREE</B> or reallocated with <B>MP_REALLOC</B>.
 <DT><B>MP_STRDUP</B><DD>
 Allocates exactly enough memory from the heap to duplicate <I>str</I> (including
-the terminating nul character) and returns a suitably-cast pointer to the first
-byte of the allocation after copying <I>str</I> to the newly-allocated memory.
-The pointer returned will have no alignment constraints and can be used to store
-character data up to the length of <I>str</I>.  If there is not enough space in
-the heap then the program will be aborted after calling the allocation failure
-handler, which by default writes an appropriate error message to the standard
-error file stream.  The allocated memory must be deallocated with <B>MP_FREE</B>
-or reallocated with <B>MP_REALLOC</B>.
+the terminating nul character), sets <I>ptr</I> to the result and returns a
+suitably-cast pointer to the first byte of the allocation after copying
+<I>str</I> to the newly-allocated memory.  The pointer returned will have no
+alignment constraints and can be used to store character data up to the length
+of <I>str</I>.  If there is not enough space in the heap then the program will be
+aborted after calling the allocation failure handler, which by default writes an
+appropriate error message to the standard error file stream.  The allocated
+memory in <I>ptr</I> must be deallocated with <B>MP_FREE</B> or reallocated with
+<B>MP_REALLOC</B>.
 <DT><B>MP_REALLOC</B><DD>
 Resizes the memory allocation beginning at <I>ptr</I> to <I>count</I> items of
 type <I>type</I> and returns a suitably-cast pointer to the first item of the new
@@ -176,6 +179,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 22:35:26 GMT, February 08, 2001
+Time: 21:08:37 GMT, February 11, 2001
 </BODY>
 </HTML>

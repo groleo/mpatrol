@@ -10,9 +10,9 @@ NNAAMMEE
 SSYYNNOOPPSSIISS
        #include <mpalloc.h>
 
-       void *MP_MALLOC(size_t count, typename type);
-       void *MP_CALLOC(size_t count, typename type);
-       char *MP_STRDUP(const char *str);
+       void *MP_MALLOC(void *ptr, size_t count, typename type);
+       void *MP_CALLOC(void *ptr, size_t count, typename type);
+       char *MP_STRDUP(char *ptr, const char *str);
        void *MP_REALLOC(void *ptr, size_t count, typename type);
        void MP_FREE(void *ptr);
        __mp_failhandler MP_FAILURE(__mp_failhandler func);
@@ -61,7 +61,7 @@ FFUUNNCCTTIIOONNSS
 
 
 
-Release 1.4              8 February 2001                        1
+Release 1.4              11 February 2001                       1
 
 
 
@@ -77,57 +77,57 @@ LIBMPALLOC(3)            mpatrol library            LIBMPALLOC(3)
 
        MMPP__MMAALLLLOOCC
               Allocates _c_o_u_n_t uninitialised items  of  type  _t_y_p_e
-              from  the  heap and returns a suitably-cast pointer
-              to the first item of the allocation.   The  pointer
-              returned will be suitably aligned for holding items
-              of type _t_y_p_e.  If  _c_o_u_n_t  is  _0  then  it  will  be
-              implicitly rounded up to _1.  If there is not enough
-              space in the heap then the program will be  aborted
-              after calling the allocation failure handler, which
-              by default writes an appropriate error  message  to
-              the standard error file stream.  The allocated mem-
-              ory must be deallocated with MMPP__FFRREEEE or reallocated
-              with MMPP__RREEAALLLLOOCC.
+              from the heap, sets _p_t_r to the result and returns a
+              suitably-cast pointer to  the  first  item  of  the
+              allocation.   The pointer returned will be suitably
+              aligned for holding items of type _t_y_p_e.   If  _c_o_u_n_t
+              is  _0  then  it will be implicitly rounded up to _1.
+              If there is not enough space in the heap  then  the
+              program  will  be aborted after calling the alloca-
+              tion failure handler, which by  default  writes  an
+              appropriate  error  message  to  the standard error
+              file stream.  The allocated memory in _p_t_r  must  be
+              deallocated   with   MMPP__FFRREEEE  or  reallocated  with
+              MMPP__RREEAALLLLOOCC.
 
        MMPP__CCAALLLLOOCC
               Allocates _c_o_u_n_t zero-initialised items of type _t_y_p_e
-              from the heap and returns a  suitably-cast  pointer
-              to  the  first item of the allocation.  The pointer
-              returned will be suitably aligned for holding items
-              of  type  _t_y_p_e.   If  _c_o_u_n_t  is  _0  then it will be
-              implicitly rounded up to _1.  If there is not enough
-              space  in the heap then the program will be aborted
-              after calling the allocation failure handler, which
-              by  default  writes an appropriate error message to
-              the standard error file stream.  The allocated mem-
-              ory must be deallocated with MMPP__FFRREEEE or reallocated
-              with MMPP__RREEAALLLLOOCC.
+              from the heap, sets _p_t_r to the result and returns a
+              suitably-cast pointer to  the  first  item  of  the
+              allocation.   The pointer returned will be suitably
+              aligned for holding items of type _t_y_p_e.   If  _c_o_u_n_t
+              is  _0  then  it will be implicitly rounded up to _1.
+              If there is not enough space in the heap  then  the
+              program  will  be aborted after calling the alloca-
+              tion failure handler, which by  default  writes  an
+              appropriate  error  message  to  the standard error
+              file stream.  The allocated memory in _p_t_r  must  be
+              deallocated   with   MMPP__FFRREEEE  or  reallocated  with
+              MMPP__RREEAALLLLOOCC.
 
        MMPP__SSTTRRDDUUPP
               Allocates exactly enough memory from  the  heap  to
               duplicate  _s_t_r (including the terminating nul char-
-              acter) and returns a suitably-cast pointer  to  the
-              first  byte  of the allocation after copying _s_t_r to
-              the newly-allocated memory.  The  pointer  returned
-              will  have no alignment constraints and can be used
-              to store character data up to the  length  of  _s_t_r.
-              If  there  is not enough space in the heap then the
-              program will be aborted after calling  the  alloca-
-              tion  failure  handler,  which by default writes an
-              appropriate error message  to  the  standard  error
-              file  stream.  The allocated memory must be deallo-
-              cated with MMPP__FFRREEEE or reallocated with  MMPP__RREEAALLLLOOCC.
+              acter), sets _p_t_r to the result and returns a  suit-
+              ably-cast  pointer to the first byte of the alloca-
+              tion after copying _s_t_r to the newly-allocated  mem-
+              ory.   The  pointer returned will have no alignment
+              constraints and can be used to store character data
+              up  to  the  length of _s_t_r.  If there is not enough
+              space in the heap then the program will be  aborted
+              after calling the allocation failure handler, which
+              by default writes an appropriate error  message  to
+              the standard error file stream.  The allocated mem-
+              ory in _p_t_r must  be  deallocated  with  MMPP__FFRREEEE  or
+              reallocated with MMPP__RREEAALLLLOOCC.
 
        MMPP__RREEAALLLLOOCC
               Resizes  the  memory allocation beginning at _p_t_r to
               _c_o_u_n_t items of type _t_y_p_e and  returns  a  suitably-
-              cast  pointer  to the first item of the new alloca-
-              tion after copying _p_t_r to the newly-allocated  mem-
-              ory,  which  will  be truncated if _c_o_u_n_t is smaller
 
 
 
-Release 1.4              8 February 2001                        2
+Release 1.4              11 February 2001                       2
 
 
 
@@ -136,6 +136,9 @@ Release 1.4              8 February 2001                        2
 LIBMPALLOC(3)            mpatrol library            LIBMPALLOC(3)
 
 
+              cast  pointer  to the first item of the new alloca-
+              tion after copying _p_t_r to the newly-allocated  mem-
+              ory,  which  will  be truncated if _c_o_u_n_t is smaller
               than the original number  of  items.   The  pointer
               returned will be suitably aligned for holding items
               of type _t_y_p_e.  If _p_t_r is NNUULLLL then the call will be
@@ -187,13 +190,10 @@ CCOOPPYYRRIIGGHHTT
        Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
        This library is free software;  you  can  redistribute  it
-       and/or  modify  it under the terms of the GNU Library Gen-
-       eral Public License as  published  by  the  Free  Software
-       Foundation;  either  version 2 of the License, or (at your
 
 
 
-Release 1.4              8 February 2001                        3
+Release 1.4              11 February 2001                       3
 
 
 
@@ -202,6 +202,9 @@ Release 1.4              8 February 2001                        3
 LIBMPALLOC(3)            mpatrol library            LIBMPALLOC(3)
 
 
+       and/or  modify  it under the terms of the GNU Library Gen-
+       eral Public License as  published  by  the  Free  Software
+       Foundation;  either  version 2 of the License, or (at your
        option) any later version.
 
        This library is distributed in the hope that  it  will  be
@@ -256,9 +259,6 @@ LIBMPALLOC(3)            mpatrol library            LIBMPALLOC(3)
 
 
 
-
-
-
-Release 1.4              8 February 2001                        4
+Release 1.4              11 February 2001                       4
 
 
