@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.77 2001-05-17 07:38:15 graeme Exp $
+ * $Id: config.h,v 1.78 2001-06-07 19:07:53 graeme Exp $
  */
 
 
@@ -117,6 +117,17 @@
 #define MP_ARRAY_SIZE 1048576
 #endif /* MP_ARRAY_SIZE */
 #endif /* MP_ARRAY_SUPPORT */
+
+
+/* The number of entries in the function and file name caches.  These caches
+ * are used when tracing in order to keep the size of the tracing output file
+ * down.  The caches will reuse their oldest entries when they are full.  Note
+ * that the size of the caches cannot be greater than 127 entries.
+ */
+
+#ifndef MP_NAMECACHE_SIZE
+#define MP_NAMECACHE_SIZE 32
+#endif /* MP_NAMECACHE_SIZE */
 
 
 /* The number of entries in the memory reservation cache.  This cache is used
