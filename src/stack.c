@@ -64,9 +64,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.25 2001-03-03 14:45:27 graeme Exp $"
+#ident "$Id: stack.c,v 1.26 2001-03-05 19:33:58 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.25 2001-03-03 14:45:27 graeme Exp $";
+static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.26 2001-03-05 19:33:58 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -491,7 +491,11 @@ __mp_getframe(stackinfo *p)
              * format so we must be careful when converting them to 32-bit
              * quantities.
              */
+#if SYSTEM == SYSTEM_IRIX
             p->frame = (void *) p->next.sc_regs[CXT_SP];
+#elif SYSTEM == SYSTEM_TRU64
+            p->frame = (void *) p->next.sc_regs[R_CP];
+#endif /* SYSTEM */
             p->addr = (void *) p->next.sc_pc;
             unwind(&p->next, NULL);
             r = 1;
