@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.63 2001-12-05 23:03:01 graeme Exp $
+ * $Id: info.h,v 1.64 2001-12-05 23:13:32 graeme Exp $
  */
 
 
@@ -286,24 +286,21 @@ MP_EXPORT void __mp_newinfo(infohead *);
 MP_EXPORT void __mp_deleteinfo(infohead *);
 MP_EXPORT int __mp_atinit(infohead *, void (*)(void));
 MP_EXPORT int __mp_atfini(infohead *, void (*)(void));
-MP_EXPORT void *__mp_getmemory(infohead *, size_t, size_t, alloctype,
-                               loginfo *);
-MP_EXPORT void *__mp_resizememory(infohead *, void *, size_t, size_t, alloctype,
+MP_EXPORT void *__mp_getmemory(infohead *, size_t, size_t, loginfo *);
+MP_EXPORT void *__mp_resizememory(infohead *, void *, size_t, size_t,
                                   loginfo *);
-MP_EXPORT void __mp_freememory(infohead *, void *, alloctype, loginfo *);
+MP_EXPORT void __mp_freememory(infohead *, void *, loginfo *);
 MP_EXPORT void __mp_setmemory(infohead *, void *, size_t, unsigned char,
-                              alloctype, loginfo *);
+                              loginfo *);
 MP_EXPORT void *__mp_copymemory(infohead *, void *, void *, size_t,
-                                unsigned char, alloctype, loginfo *);
+                                unsigned char, loginfo *);
 MP_EXPORT void *__mp_locatememory(infohead *, void *, size_t, void *, size_t,
-                                  alloctype, loginfo *);
-MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, alloctype,
-                                 loginfo *);
+                                  loginfo *);
+MP_EXPORT int __mp_comparememory(infohead *, void *, void *, size_t, loginfo *);
 MP_EXPORT int __mp_protectinfo(infohead *, memaccess);
 MP_EXPORT void __mp_checkinfo(infohead *, loginfo *);
-MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, alloctype, loginfo *);
-MP_EXPORT int __mp_checkstring(infohead *, char *, size_t *, alloctype,
-                               loginfo *, int);
+MP_EXPORT int __mp_checkrange(infohead *, void *, size_t, loginfo *);
+MP_EXPORT int __mp_checkstring(infohead *, char *, size_t *, loginfo *, int);
 MP_EXPORT size_t __mp_fixalign(infohead *, alloctype, size_t);
 
 
