@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.13 2000-05-02 23:05:30 graeme Exp $"
+#ident "$Id: mprof.c,v 1.14 2000-05-15 22:50:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -249,7 +249,7 @@ static int comparestack(profilenode *n, profilenode *p)
 /* Read an entry from the profiling output file.
  */
 
-static void getentry(void *d, size_t l, size_t n)
+static void getentry(void *d, size_t l, size_t n, int b)
 {
     if (fread(d, l, n, proffile) != n)
     {
@@ -269,6 +269,7 @@ static void readfile(void)
     profilenode *p;
     size_t i;
     unsigned long n;
+    int b;
 
     /* When reading the profiling output file, we assume that if it begins and
      * ends with the magic sequence of characters then it is a valid profiling
@@ -278,18 +279,26 @@ static void readfile(void)
      * program down.  However, if the file is only partially written then the
      * getentry() function will catch the error before we do something silly.
      */
-    getentry(s, sizeof(char), 4);
+    getentry(s, sizeof(char), 4, 0);
     if (memcmp(s, MP_PROFMAGIC, 4) != 0)
     {
         fprintf(stderr, "%s: Invalid file format\n", progname);
         exit(EXIT_FAILURE);
     }
-    getentry(&sbound, sizeof(size_t), 1);
-    getentry(&mbound, sizeof(size_t), 1);
-    getentry(&lbound, sizeof(size_t), 1);
+    /* The following test allows us to read profiling output files that were
+     * produced on a different processor architecture.  If the next word in the
+     * file does not contain the value 1 then we have to byte-swap any further
+     * data that we read from the file.  Note that this test only works if the
+     * word size is the same on both machines.
+     */
+    getentry(&i, sizeof(size_t), 1, 0);
+    b = (i != 1);
+    getentry(&sbound, sizeof(size_t), 1, b);
+    getentry(&mbound, sizeof(size_t), 1, b);
+    getentry(&lbound, sizeof(size_t), 1, b);
     /* Read the allocation and deallocation bins.
      */
-    getentry(&binsize, sizeof(size_t), 1);
+    getentry(&binsize, sizeof(size_t), 1, b);
     if (binsize > 0)
     {
         if (((acounts = (size_t *) malloc(binsize * sizeof(size_t))) == NULL) ||
@@ -298,10 +307,10 @@ static void readfile(void)
             fprintf(stderr, "%s: Out of memory\n", progname);
             exit(EXIT_FAILURE);
         }
-        getentry(acounts, sizeof(size_t), binsize);
-        getentry(&atotals, sizeof(size_t), 1);
-        getentry(dcounts, sizeof(size_t), binsize);
-        getentry(&dtotals, sizeof(size_t), 1);
+        getentry(acounts, sizeof(size_t), binsize, b);
+        getentry(&atotals, sizeof(size_t), 1, b);
+        getentry(dcounts, sizeof(size_t), binsize, b);
+        getentry(&dtotals, sizeof(size_t), 1, b);
         for (i = 0; i < binsize; i++)
         {
             acount += acounts[i];
@@ -320,7 +329,7 @@ static void readfile(void)
     }
     /* Read the profiling data structures.
      */
-    getentry(&datasize, sizeof(size_t), 1);
+    getentry(&datasize, sizeof(size_t), 1, b);
     if (datasize > 0)
     {
         if ((data = (profiledata *) malloc(datasize * sizeof(profiledata))) ==
@@ -331,17 +340,17 @@ static void readfile(void)
         }
         for (i = 0; i < datasize; i++)
         {
-            getentry(&n, sizeof(unsigned long), 1);
+            getentry(&n, sizeof(unsigned long), 1, b);
             d = &data[n - 1];
-            getentry(d->acount, sizeof(size_t), 4);
-            getentry(d->atotal, sizeof(size_t), 4);
-            getentry(d->dcount, sizeof(size_t), 4);
-            getentry(d->dtotal, sizeof(size_t), 4);
+            getentry(d->acount, sizeof(size_t), 4, b);
+            getentry(d->atotal, sizeof(size_t), 4, b);
+            getentry(d->dcount, sizeof(size_t), 4, b);
+            getentry(d->dtotal, sizeof(size_t), 4, b);
         }
     }
     /* Read the statistics for every call site.
      */
-    getentry(&nodesize, sizeof(size_t), 1);
+    getentry(&nodesize, sizeof(size_t), 1, b);
     if (nodesize > 0)
     {
         if ((nodes = (profilenode *) malloc(nodesize * sizeof(profilenode))) ==
@@ -352,13 +361,13 @@ static void readfile(void)
         }
         for (i = 0; i < nodesize; i++)
         {
-            getentry(&n, sizeof(unsigned long), 1);
+            getentry(&n, sizeof(unsigned long), 1, b);
             p = &nodes[n - 1];
-            getentry(&p->parent, sizeof(unsigned long), 1);
-            getentry(&p->addr, sizeof(void *), 1);
-            getentry(&p->symbol, sizeof(unsigned long), 1);
-            getentry(&p->name, sizeof(unsigned long), 1);
-            getentry(&p->data, sizeof(unsigned long), 1);
+            getentry(&p->parent, sizeof(unsigned long), 1, b);
+            getentry(&p->addr, sizeof(void *), 1, b);
+            getentry(&p->symbol, sizeof(unsigned long), 1, b);
+            getentry(&p->name, sizeof(unsigned long), 1, b);
+            getentry(&p->data, sizeof(unsigned long), 1, b);
             __mp_treeinsert(&proftree, &p->node, (unsigned long) p->addr);
             cleardata(&p->tdata);
             p->flags = 0;
@@ -366,7 +375,7 @@ static void readfile(void)
     }
     /* Read the table containing the symbol addresses.
      */
-    getentry(&i, sizeof(size_t), 1);
+    getentry(&i, sizeof(size_t), 1, b);
     if (i > 0)
     {
         if ((addrs = (void **) malloc(i * sizeof(void *))) == NULL)
@@ -374,11 +383,11 @@ static void readfile(void)
             fprintf(stderr, "%s: Out of memory\n", progname);
             exit(EXIT_FAILURE);
         }
-        getentry(addrs, sizeof(void *), i);
+        getentry(addrs, sizeof(void *), i, b);
     }
     /* Read the string table containing the symbol names.
      */
-    getentry(&i, sizeof(size_t), 1);
+    getentry(&i, sizeof(size_t), 1, b);
     if (i > 0)
     {
         if ((symbols = (char *) malloc(i * sizeof(char))) == NULL)
@@ -386,9 +395,9 @@ static void readfile(void)
             fprintf(stderr, "%s: Out of memory\n", progname);
             exit(EXIT_FAILURE);
         }
-        getentry(symbols, sizeof(char), i);
+        getentry(symbols, sizeof(char), i, 0);
     }
-    getentry(s, sizeof(char), 4);
+    getentry(s, sizeof(char), 4, 0);
     if (memcmp(s, MP_PROFMAGIC, 4) != 0)
     {
         fprintf(stderr, "%s: Invalid file format\n", progname);
