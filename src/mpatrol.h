@@ -26,6 +26,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if !MP_NOCPLUSPLUS
+#ifdef __cplusplus
+#include <new>
+#endif /* __cplusplus */
+#endif /* MP_NOCPLUSPLUS */
 #ifdef NDEBUG
 #include <mpalloc.h>
 #endif /* NDEBUG */
@@ -429,6 +434,9 @@ struct mallinfo
 #ifdef MP_NEW
 #undef MP_NEW
 #endif /* MP_NEW */
+#ifdef MP_NEW_NOTHROW
+#undef MP_NEW_NOTHROW
+#endif /* MP_NEW_NOTHROW */
 #ifdef MP_DELETE
 #undef MP_DELETE
 #endif /* MP_DELETE */
@@ -579,6 +587,7 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #define dealloca(p)
 
 #define MP_NEW new
+#define MP_NEW_NOTHROW new(std::nothrow)
 #define MP_DELETE delete
 
 #define __mp_init() ((void) 0)
@@ -609,29 +618,16 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #ifdef __cplusplus
 #ifndef NDEBUG
 
-typedef void (*new_handler)(void);
-
-
-#ifdef __GNUC__
-extern "C"
-{
-#endif /* __GNUC__ */
-
 
 /* Set the low-memory handler.
  */
 
 MP_INLINE
-new_handler
-set_new_handler(new_handler h)
+std::new_handler
+std::set_new_handler(std::new_handler h) throw()
 {
-    return __mp_nomemory(h);
+    return (std::new_handler) __mp_nomemory(h);
 }
-
-
-#ifdef __GNUC__
-}
-#endif /* __GNUC__ */
 
 
 /* Override operator new.
@@ -640,6 +636,23 @@ set_new_handler(new_handler h)
 MP_INLINE
 void *
 operator new(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
+             throw(std::bad_alloc)
+{
+    void *p;
+
+    if ((p = __mp_alloc(l, 0, MP_AT_NEW, s, t, u, NULL, 0, 0)) == NULL)
+        throw std::bad_alloc();
+    return p;
+}
+
+
+/* Override nothrow version of operator new.
+ */
+
+MP_INLINE
+void *
+operator new(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u,
+             MP_CONST std::nothrow_t&) throw()
 {
     return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, NULL, 0, 0);
 }
@@ -651,6 +664,23 @@ operator new(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 MP_INLINE
 void *
 operator new[](size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
+               throw(std::bad_alloc)
+{
+    void *p;
+
+    if ((p = __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, NULL, 0, 0)) == NULL)
+        throw std::bad_alloc();
+    return p;
+}
+
+
+/* Override nothrow version of operator new[].
+ */
+
+MP_INLINE
+void *
+operator new[](size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u,
+               MP_CONST std::nothrow_t&) throw()
 {
     return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, NULL, 0, 0);
 }
@@ -661,7 +691,22 @@ operator new[](size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u)
 
 MP_INLINE
 void
-operator delete(void *p)
+operator delete(void *p) throw()
+{
+    char *s, *t;
+    unsigned long u;
+
+    __mp_popdelstack(&s, &t, &u);
+    __mp_free(p, MP_AT_DELETE, s, t, u, 0);
+}
+
+
+/* Override nothrow version of operator delete.
+ */
+
+MP_INLINE
+void
+operator delete(void *p, MP_CONST std::nothrow_t&) throw()
 {
     char *s, *t;
     unsigned long u;
@@ -676,7 +721,22 @@ operator delete(void *p)
 
 MP_INLINE
 void
-operator delete[](void *p)
+operator delete[](void *p) throw()
+{
+    char *s, *t;
+    unsigned long u;
+
+    __mp_popdelstack(&s, &t, &u);
+    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 0);
+}
+
+
+/* Override nothrow version of operator delete[].
+ */
+
+MP_INLINE
+void
+operator delete[](void *p, MP_CONST std::nothrow_t&) throw()
 {
     char *s, *t;
     unsigned long u;
@@ -688,6 +748,7 @@ operator delete[](void *p)
 
 #if MP_NONEWDELETE
 #define MP_NEW ::new(MP_FUNCNAME, __FILE__, __LINE__)
+#define MP_NEW_NOTHROW ::new(MP_FUNCNAME, __FILE__, __LINE__, std::nothrow)
 #define MP_DELETE __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
 #else /* MP_NONEWDELETE */
 #define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
