@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.10 2000-06-29 00:30:25 graeme Exp $"
+#ident "$Id: signals.c,v 1.11 2000-06-29 18:02:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,11 +66,15 @@ typedef void (*handlerfunction)(int);
 #if MP_SIGINFO_SUPPORT
 static void signalhandler(int s, siginfo_t *n, void *p)
 #else /* MP_SIGINFO_SUPPORT */
-#if SYSTEM == SYSTEM_AIX || (SYSTEM == SYSTEM_LINUX && ARCH == ARCH_M68K)
-static void signalhandler(int s, int c, struct sigcontext *n)
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX
+#if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
+static void signalhandler(int s, struct sigcontext n)
 #else /* SYSTEM && ARCH */
-static void signalhandler(int s)
+static void signalhandler(int s, int c, struct sigcontext *n)
 #endif /* SYSTEM && ARCH */
+#else /* SYSTEM */
+static void signalhandler(int s)
+#endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
 static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
@@ -111,8 +115,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* TARGET */
     __mp_diag("\n");
 #if TARGET == TARGET_UNIX
-#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || \
-    (SYSTEM == SYSTEM_LINUX && ARCH == ARCH_M68K)
+#if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_LINUX
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -123,7 +126,11 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
          */
         a = (void *) n->si_addr;
 #else /* MP_SIGINFO_SUPPORT */
+#if SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86
+    if (&n != NULL)
+#else /* SYSTEM && ARCH */
     if (n != NULL)
+#endif /* SYSTEM && ARCH */
     {
         /* With systems that do not contain support for passing the siginfo_t
          * structure to a signal handler we need to use some other form of
@@ -133,7 +140,10 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
          */
 #if SYSTEM == SYSTEM_AIX
         a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
-#elif SYSTEM == SYSTEM_LINUX && ARCH == ARCH_M68K
+#elif SYSTEM == SYSTEM_LINUX
+#if ARCH == ARCH_IX86
+        a = (void *) n.cr2;
+#elif ARCH == ARCH_M68K
         switch ((n->sc_formatvec >> 12) & 0x0F)
         {
           case 4:
@@ -151,7 +161,10 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
             a = (void *) ((unsigned long *) (n + 1))[2];
             break;
         }
-#endif /* SYSTEM && ARCH */
+#else /* ARCH */
+        a = NULL;
+#endif /* ARCH */
+#endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
         __mp_error(AT_MAX, "illegal memory access at address " MP_POINTER, a);
         if (t = __mp_findnode(&h->alloc, a, 1))
@@ -167,7 +180,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
             __mp_diag("    " MP_POINTER " not in heap\n", a);
     }
     else
-#endif /* MP_SIGINFO_SUPPORT && SYSTEM && ARCH */
+#endif /* MP_SIGINFO_SUPPORT && SYSTEM */
         __mp_error(AT_MAX, "illegal memory access");
     /* Obtain the call stack so that we can tell where the illegal memory
      * access came from.  This relies on the assumption that the stack area
