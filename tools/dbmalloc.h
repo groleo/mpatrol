@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.11 2001-03-07 20:41:10 graeme Exp $
+ * $Id: dbmalloc.h,v 1.12 2001-03-08 22:46:47 graeme Exp $
  */
 
 
@@ -73,7 +73,7 @@
  *
  * The malloc_size() and malloc_mark() functions do not give an error
  * message if the pointer passed in does not correspond to a heap
- * allocation.  Neither of these these functions automatically perform an
+ * allocation.  Neither of these functions automatically perform an
  * integrity check of the heap.  Note that the malloc_chain_check()
  * function will never return a non-zero value - it always terminates with
  * an error message in the mpatrol log file whenever it detects heap
