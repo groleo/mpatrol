@@ -81,7 +81,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.48 2001-01-25 13:37:13 graeme Exp $"
+#ident "$Id: memory.c,v 1.49 2001-01-25 21:39:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -728,7 +728,7 @@ __mp_memquery(meminfo *i, void *p)
 
     r = MA_READWRITE;
 #if TARGET == TARGET_UNIX
-#if SYSTEM == SYSTEM_SOLARIS
+#if MP_MINCORE_SUPPORT
     /* The mincore() system call allows us to determine if a page is in core,
      * and if it is not and ENOMEM is set then it means that the page is not
      * mapped.  Unfortunately, we can't tell if it's read-only.
@@ -736,7 +736,7 @@ __mp_memquery(meminfo *i, void *p)
     if ((mincore((char *) __mp_rounddown((unsigned long) p, i->page), 1, &c) ==
          -1) && (errno == ENOMEM))
         return MA_NOACCESS;
-#endif /* SYSTEM */
+#endif /* MP_MINCORE_SUPPORT */
     /* One generic way to determine the access permission of an address across
      * all UNIX systems is to attempt to read from and write to the address and
      * check the results using signals.
