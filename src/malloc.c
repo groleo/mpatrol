@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.3 2000-01-21 00:40:56 graeme Exp $"
+#ident "$Id: malloc.c,v 1.4 2000-01-24 20:32:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -145,6 +145,15 @@ void *realloc(void *p, size_t l)
 void *recalloc(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_RECALLOC, NULL, NULL, 0, 1);
+}
+
+
+/* Resize an existing block of memory, but never relocate it.
+ */
+
+void *expand(void *p, size_t l)
+{
+    return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, 1);
 }
 
 
