@@ -353,70 +353,6 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#ifdef AMIGA
-
-__asm void __mp_init(void);
-__asm void __mp_fini(void);
-__asm void *__mp_alloc(register __d0 size_t, register __d1 size_t,
-                       register __d2 __mp_alloctype,
-                       register __a0 MP_CONST char *,
-                       register __a1 MP_CONST char *,
-                       register __d3 unsigned long, register __d4 size_t);
-__asm char *__mp_strdup(register __a0 MP_CONST char *, register __d0 size_t,
-                        register __d1 __mp_alloctype,
-                        register __a1 MP_CONST char *,
-                        register __a2 MP_CONST char *,
-                        register __d2 unsigned long, register __d3 size_t);
-__asm void *__mp_realloc(register __a0 void *, register __d0 size_t,
-                         register __d1 size_t, register __d2 __mp_alloctype,
-                         register __a1 MP_CONST char *,
-                         register __a2 MP_CONST char *,
-                         register __d3 unsigned long, register __d4 size_t);
-__asm void __mp_free(register __a0 void *, register __d0 __mp_alloctype,
-                     register __a1 MP_CONST char *,
-                     register __a2 MP_CONST char *, register __d1 unsigned long,
-                     register __d2 size_t);
-__asm void *__mp_setmem(register __a0 void *, register __d0 size_t,
-                        register __d1 unsigned char,
-                        register __d2 __mp_alloctype,
-                        register __a1 MP_CONST char *,
-                        register __a2 MP_CONST char *,
-                        register __d3 unsigned long, register __d4 size_t);
-__asm void *__mp_copymem(register __a0 MP_CONST void *, register __a1 void *,
-                         register __d0 size_t, register __d1 __mp_alloctype,
-                         register __a2 MP_CONST char *,
-                         register __a3 MP_CONST char *,
-                         register __d2 unsigned long, register __d3 size_t);
-__asm void *__mp_locatemem(register __a0 MP_CONST void *, register __d0 size_t,
-                           register __a1 MP_CONST void *, register __d1 size_t,
-                           register __d2 __mp_alloctype,
-                           register __a2 MP_CONST char *,
-                           register __a3 MP_CONST char *,
-                           register __d3 unsigned long, register __d4 size_t);
-__asm int __mp_comparemem(register __a0 MP_CONST void *,
-                          register __a1 MP_CONST void *, register __d0 size_t,
-                          register __d1 __mp_alloctype,
-                          register __a2 MP_CONST char *,
-                          register __a3 MP_CONST char *,
-                          register __d2 unsigned long, register __d3 size_t);
-__asm int __mp_info(register __a0 MP_CONST void *,
-                    register __a1 __mp_allocinfo *);
-__asm void __mp_memorymap(register __d0 int);
-__asm void __mp_summary(void);
-__asm void __mp_check(void);
-__asm void (*__mp_prologue(register __a0 void (*)(MP_CONST void *, size_t)))
-           (MP_CONST void *, size_t);
-__asm void (*__mp_epilogue(register __a0 void (*)(MP_CONST void *)))
-           (MP_CONST void *);
-__asm void (*__mp_nomemory(register __a0 void (*)(void)))(void);
-__asm void __mp_pushdelstack(register __a0 MP_CONST char *,
-                             register __a1 MP_CONST char *,
-                             register __d0 unsigned long);
-__asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
-                            register __a2 unsigned long *);
-
-#else /* AMIGA */
-
 void __mp_init(void);
 void __mp_fini(void);
 void *__mp_alloc(size_t, size_t, __mp_alloctype, MP_CONST char *,
@@ -446,8 +382,6 @@ void (*__mp_epilogue(void (*)(MP_CONST void *)))(MP_CONST void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
-
-#endif /* AMIGA */
 
 
 #ifdef __cplusplus

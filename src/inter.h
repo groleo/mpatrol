@@ -62,58 +62,6 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if TARGET == TARGET_AMIGA
-
-__asm void __mp_init(void);
-__asm void __mp_fini(void);
-__asm infohead *__mp_memhead(void);
-__asm void *__mp_alloc(register __d0 size_t, register __d1 size_t,
-                       register __d2 alloctype, register __a0 char *,
-                       register __a1 char *, register __d3 unsigned long,
-                       register __d4 size_t);
-__asm char *__mp_strdup(register __a0 char *, register __d0 size_t,
-                        register __d1 alloctype, register __a1 char *,
-                        register __a2 char *, register __d2 unsigned long,
-                        register __d3 size_t);
-__asm void *__mp_realloc(register __a0 void *, register __d0 size_t,
-                         register __d1 size_t, register __d2 alloctype,
-                         register __a1 char *, register __a2 char *,
-                         register __d3 unsigned long, register __d4 size_t);
-__asm void __mp_free(register __a0 void *, register __d0 alloctype,
-                     register __a1 char *, register __a2 char *,
-                     register __d1 unsigned long, register __d2 size_t);
-__asm void *__mp_setmem(register __a0 void *, register __d0 size_t,
-                        register __d1 unsigned char, register __d2 alloctype,
-                        register __a1 char *, register __a2 char *,
-                        register __d3 unsigned long, register __d4 size_t);
-__asm void *__mp_copymem(register __a0 void *, register __a1 void *,
-                         register __d0 size_t, register __d1 alloctype,
-                         register __a2 char *, register __a3 char *,
-                         register __d2 unsigned long, register __d3 size_t);
-__asm void *__mp_locatemem(register __a0 void *, register __d0 size_t,
-                           register __a1 void *, register __d1 size_t,
-                           register __d2 alloctype, register __a2 char *,
-                           register __a3 char *, register __d3 unsigned long,
-                           register __d4 size_t);
-__asm int __mp_comparemem(register __a0 void *, register __a1 void *,
-                          register __d0 size_t, register __d1 alloctype,
-                          register __a2 char *, register __a3 char *,
-                          register __d2 unsigned long, register __d3 size_t);
-__asm int __mp_info(register __a0 void *, register __a1 allocinfo *);
-__asm void __mp_memorymap(register __d0 int);
-__asm void __mp_summary(void);
-__asm void __mp_check(void);
-__asm void (*__mp_prologue(register __a0 void (*)(void *, size_t)))
-           (void *, size_t);
-__asm void (*__mp_epilogue(register __a0 void (*)(void *)))(void *);
-__asm void (*__mp_nomemory(register __a0 void (*)(void)))(void);
-__asm void __mp_pushdelstack(register __a0 char *, register __a1 char *,
-                             register __d0 unsigned long);
-__asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
-                            register __a2 unsigned long *);
-
-#else /* TARGET */
-
 void __mp_init(void);
 void __mp_fini(void);
 infohead *__mp_memhead(void);
@@ -141,8 +89,6 @@ void (*__mp_epilogue(void (*)(void *)))(void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
-
-#endif /* TARGET */
 
 
 #ifdef __cplusplus

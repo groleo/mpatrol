@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.17 2000-03-14 00:57:58 graeme Exp $"
+#ident "$Id: inter.c,v 1.18 2000-03-20 19:53:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -118,11 +118,7 @@ static int checkrange(unsigned long l, unsigned long n, unsigned long u)
 /* Initialise the mpatrol library.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_init(void)
-#else /* TARGET */
 void __mp_init(void)
-#endif /* TARGET */
 {
     savesignals();
     if (memhead.fini)
@@ -166,11 +162,7 @@ void __mp_init(void)
 /* Finalise the mpatrol library.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_fini(void)
-#else /* TARGET */
 void __mp_fini(void)
-#endif /* TARGET */
 {
     savesignals();
     if (memhead.init)
@@ -230,11 +222,7 @@ void __mp_fini(void)
 /* Return the memory header structure.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm infohead *__mp_memhead(void)
-#else /* TARGET */
 infohead *__mp_memhead(void)
-#endif /* TARGET */
 {
     return &memhead;
 }
@@ -243,15 +231,8 @@ infohead *__mp_memhead(void)
 /* Allocate a new block of memory of a specified size and alignment.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void *__mp_alloc(register __d0 size_t l, register __d1 size_t a,
-                       register __d2 alloctype f, register __a0 char *s,
-                       register __a1 char *t, register __d3 unsigned long u,
-                       register __d4 size_t k)
-#else /* TARGET */
 void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
                  unsigned long u, size_t k)
-#endif /* TARGET */
 {
     void *p;
     stackinfo i;
@@ -330,15 +311,8 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
 /* Allocate a new block of memory to duplicate a string.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm char *__mp_strdup(register __a0 char *p, register __d0 size_t l,
-                        register __d1 alloctype f, register __a1 char *s,
-                        register __a2 char *t, register __d2 unsigned long u,
-                        register __d3 size_t k)
-#else /* TARGET */
 char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
                   unsigned long u, size_t k)
-#endif /* TARGET */
 {
     char *o;
     stackinfo i;
@@ -405,15 +379,8 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
 /* Resize an existing block of memory to a new size and alignment.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void *__mp_realloc(register __a0 void *p, register __d0 size_t l,
-                         register __d1 size_t a, register __d2 alloctype f,
-                         register __a1 char *s, register __a2 char *t,
-                         register __d3 unsigned long u, register __d4 size_t k)
-#else /* TARGET */
 void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
                    unsigned long u, size_t k)
-#endif /* TARGET */
 {
     stackinfo i;
     int j;
@@ -467,14 +434,8 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
 /* Free an existing block of memory.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_free(register __a0 void *p, register __d0 alloctype f,
-                     register __a1 char *s, register __a2 char *t,
-                     register __d1 unsigned long u, register __d2 size_t k)
-#else /* TARGET */
 void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
                size_t k)
-#endif /* TARGET */
 {
     stackinfo i;
     int j;
@@ -525,16 +486,8 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
 /* Set a block of memory to contain a specific byte.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void *__mp_setmem(register __a0 void *p, register __d0 size_t l,
-                        register __d1 unsigned char c,
-                        register __d2 alloctype f, register __a1 char *s,
-                        register __a2 char *t, register __d3 unsigned long u,
-                        register __d4 size_t k)
-#else /* TARGET */
 void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
                   char *t, unsigned long u, size_t k)
-#endif /* TARGET */
 {
     stackinfo i;
     int j;
@@ -583,15 +536,8 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
 /* Copy a block of memory from one address to another.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void *__mp_copymem(register __a0 void *p, register __a1 void *q,
-                         register __d0 size_t l, register __d1 alloctype f,
-                         register __a2 char *s, register __a3 char *t,
-                         register __d2 unsigned long u, register __d3 size_t k)
-#else /* TARGET */
 void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
                    unsigned long u, size_t k)
-#endif /* TARGET */
 {
     stackinfo i;
     int j;
@@ -640,16 +586,8 @@ void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void *__mp_locatemem(register __a0 void *p, register __d0 size_t l,
-                           register __a1 void *q, register __d1 size_t m,
-                           register __d2 alloctype f, register __a2 char *s,
-                           register __a3 char *t, register __d3 unsigned long u,
-                           register __d4 size_t k)
-#else /* TARGET */
 void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
                      char *t, unsigned long u, size_t k)
-#endif /* TARGET */
 {
     void *r;
     stackinfo i;
@@ -706,15 +644,8 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
 /* Compare two blocks of memory.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm int __mp_comparemem(register __a0 void *p, register __a1 void *q,
-                          register __d0 size_t l, register __d1 alloctype f,
-                          register __a2 char *s, register __a3 char *t,
-                          register __d2 unsigned long u, register __d3 size_t k)
-#else /* TARGET */
 int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
                     unsigned long u, size_t k)
-#endif /* TARGET */
 {
     void *m;
     stackinfo i;
@@ -767,11 +698,7 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 /* Obtain any details about the memory block that contains a given address.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm int __mp_info(register __a0 void *p, register __a1 allocinfo *d)
-#else /* TARGET */
 int __mp_info(void *p, allocinfo *d)
-#endif /* TARGET */
 {
     addrnode *a;
     symnode *s;
@@ -828,11 +755,7 @@ int __mp_info(void *p, allocinfo *d)
  * all mpatrol library settings and statistics.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_memorymap(register __d0 int s)
-#else /* TARGET */
 void __mp_memorymap(int s)
-#endif /* TARGET */
 {
     savesignals();
     if (!memhead.init)
@@ -848,11 +771,7 @@ void __mp_memorymap(int s)
 /* Display a summary of all mpatrol library settings and statistics.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_summary(void)
-#else /* TARGET */
 void __mp_summary(void)
-#endif /* TARGET */
 {
     savesignals();
     if (!memhead.init)
@@ -866,11 +785,7 @@ void __mp_summary(void)
  * a predefined pattern.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_check(void)
-#else /* TARGET */
 void __mp_check(void)
-#endif /* TARGET */
 {
     savesignals();
     if (!memhead.init)
@@ -883,12 +798,7 @@ void __mp_check(void)
 /* Set the prologue function and return the previous setting.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void (*__mp_prologue(register __a0 void (*h)(void *, size_t)))
-           (void *, size_t)
-#else /* TARGET */
 void (*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
-#endif /* TARGET */
 {
     void (*p)(void *, size_t);
 
@@ -905,11 +815,7 @@ void (*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
 /* Set the epilogue function and return the previous setting.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void (*__mp_epilogue(register __a0 void (*h)(void *)))(void *)
-#else /* TARGET */
 void (*__mp_epilogue(void (*h)(void *)))(void *)
-#endif /* TARGET */
 {
     void (*p)(void *);
 
@@ -926,11 +832,7 @@ void (*__mp_epilogue(void (*h)(void *)))(void *)
 /* Set the low-memory handler and return the previous setting.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void (*__mp_nomemory(register __a0 void (*h)(void)))(void)
-#else /* TARGET */
 void (*__mp_nomemory(void (*h)(void)))(void)
-#endif /* TARGET */
 {
     void (*p)(void);
 
@@ -947,12 +849,7 @@ void (*__mp_nomemory(void (*h)(void)))(void)
 /* Push source level information onto the top of the delete stack.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_pushdelstack(register __a0 char *s, register __a1 char *t,
-                             register __d0 unsigned long u)
-#else /* TARGET */
 void __mp_pushdelstack(char *s, char *t, unsigned long u)
-#endif /* TARGET */
 {
     if (!memhead.init)
         __mp_init();
@@ -969,12 +866,7 @@ void __mp_pushdelstack(char *s, char *t, unsigned long u)
 /* Pop source level information off the top of the delete stack.
  */
 
-#if TARGET == TARGET_AMIGA
-__asm void __mp_popdelstack(register __a0 char **s, register __a1 char **t,
-                            register __a2 unsigned long *u)
-#else /* TARGET */
 void __mp_popdelstack(char **s, char **t, unsigned long *u)
-#endif /* TARGET */
 {
     if (!memhead.init)
         __mp_init();
