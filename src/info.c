@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.79 2001-03-07 20:15:43 graeme Exp $"
+#ident "$Id: info.c,v 1.80 2001-03-07 20:30:03 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.79 2001-03-07 20:15:43 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.80 2001-03-07 20:30:03 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -712,6 +712,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
             }
             if (p != NULL)
             {
+                h->mtotal -= d;
+                h->mtotal += l;
                 if (h->ltable.tracing)
                     leaktabentry(h, m, d, 1);
                 if (m->data.flags & FLG_PROFILED)
