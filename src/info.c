@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.52 2001-01-15 21:05:35 graeme Exp $"
+#ident "$Id: info.c,v 1.53 2001-01-15 21:58:32 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -337,8 +337,8 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                 m->data.file = v->file;
                 m->data.line = v->line;
                 m->data.stack = __mp_getaddrs(&h->addr, v->stack);
-                m->data.typestr = NULL;
-                m->data.typesize = 0;
+                m->data.typestr = v->typestr;
+                m->data.typesize = v->typesize;
                 if (h->recur > 1)
                     m->data.flags = FLG_INTERNAL;
                 else
@@ -558,8 +558,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     i->data.file = v->file;
                     i->data.line = v->line;
                     i->data.stack = __mp_getaddrs(&h->addr, v->stack);
-                    i->data.typestr = NULL;
-                    i->data.typesize = 0;
+                    i->data.typestr = m->data.typestr;
+                    i->data.typesize = m->data.typesize;
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
@@ -622,10 +622,17 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
             }
-            if ((p != NULL) && (m->data.flags & FLG_PROFILED))
+            if (p != NULL)
             {
-                __mp_profilefree(&h->prof, d, m, !(h->flags & FLG_NOPROTECT));
-                __mp_profilealloc(&h->prof, l, m, !(h->flags & FLG_NOPROTECT));
+                m->data.typestr = v->typestr;
+                m->data.typesize = v->typesize;
+                if (m->data.flags & FLG_PROFILED)
+                {
+                    __mp_profilefree(&h->prof, d, m,
+                                     !(h->flags & FLG_NOPROTECT));
+                    __mp_profilealloc(&h->prof, l, m,
+                                      !(h->flags & FLG_NOPROTECT));
+                }
             }
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
@@ -773,8 +780,6 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
             m->data.file = v->file;
             m->data.line = v->line;
             m->data.stack = __mp_getaddrs(&h->addr, v->stack);
-            m->data.typestr = NULL;
-            m->data.typesize = 0;
             m->data.flags |= FLG_FREED;
         }
         else
