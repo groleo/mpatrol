@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.115 2000-09-25 18:53:07 graeme Exp $
+@c $Id: mpatrol.texi,v 1.116 2000-09-26 11:48:30 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 25th September, 2000
+@set UPDATED 26th September, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -207,14 +207,15 @@ questions but you must first subscribe to the group before you can send mail to
 it.
 
 @cindex references
+@cindex Xanalys
 Note that this manual is not just intended to instruct readers on how to use the
 mpatrol library --- it is also written to give a detailed look at how malloc
 libraries work in general and how to improve the efficiency of existing code
 which uses them.  If this subject interests you, you may find further useful
 material at @emph{The Memory Management Reference} located at
-@uref{http://www.harlequin.com/mm/reference/}.  It has links to many documents
-and research papers in the field of memory management, and has a large glossary
-which lists and explains related terms.  You may also wish to look at
+@uref{http://www.xanalys.com/software_tools/mm/}.  It has links to many
+documents and research papers in the field of memory management, and has a large
+glossary which lists and explains related terms.  You may also wish to look at
 @emph{A Memory Allocator} by Doug Lea for information on general memory
 allocation principles.  It is located at
 @uref{http://gee.cs.oswego.edu/dl/html/malloc.html}.
@@ -8125,12 +8126,12 @@ system.  On the Amiga, Enforcer by Michael Sinz runs in the background and
 detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
-A list of over sixty five different items of software which help in debugging
+A list of over seventy different items of software which help in debugging
 dynamic memory allocation problems is given below@footnote{This list can be
 considered to be a slightly more up to date version of @cite{Debugging Tools
 for Dynamic Storage Allocation and Memory Management}
 (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
-(@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features that
+(@email{zorn@@microsoft.com}).}.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
 you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
 Electric Fence and Mprof, so I can't vouch for any of the others, although if
@@ -8184,7 +8185,7 @@ NuMega Corporation (@email{info@@numega.com})
 @item License
 Commercial Software
 @item Platforms
-MS-DOS, Windows
+Windows, MS-DOS
 @item Location
 @uref{http://www.numega.com/}
 @item Overview
@@ -8197,13 +8198,13 @@ resource leaks.
 Ccmalloc
 @table @asis
 @item Author
-Armin Biere (@email{armin@@ira.uk.de})
+Armin Biere (@email{biere@@inf.ethz.ch})
 @item License
 GNU General Public License
 @item Platforms
 Various UNIX
 @item Location
-@uref{http://iseran.ira.uka.de/~armin/ccmalloc/}
+@uref{http://www.inf.ethz.ch/personal/biere/projects/ccmalloc/}
 @item Overview
 Can interface with @command{gdb} to find memory leaks, multiple deallocations
 and memory corruptions in C or C++ programs.
@@ -8220,7 +8221,7 @@ Commercial Software
 @item Platforms
 Linux
 @item Location
-@uref{http://www.BitWagon.com/chaperon.html}
+@uref{http://www.bitwagon.com/chaperon.html}
 @item Overview
 Runs existing Intel Linux binary application programs, but checks for and
 reports bad behaviour in accessing memory.
@@ -8237,7 +8238,7 @@ GNU General Public License
 @item Platforms
 Various UNIX
 @item Location
-@uref{http://www.gnu.org/}
+@uref{http://www.gnu.org/software/checker/checker.html}
 @item Overview
 Detects illegal memory accesses when reading from uninitialised memory, writing
 to freed memory or outside memory blocks.  Also contains a garbage collector for
@@ -8290,11 +8291,27 @@ Free Software
 @item Platforms
 Various UNIX
 @item Location
-@uref{http://www.clark.net/pub/dickey/dbmalloc/dbmalloc.html}
+@uref{http://dickey.his.com/dbmalloc/dbmalloc.html}
 @item Overview
 Provides replacements for memory management library functions and provides a
 full set of debugging features which detect memory overruns and other types of
 misuse.
+@end table
+
+@item
+Dbmalloc
+@table @asis
+@item Author
+Michael McTernan (@email{mm7323@@bris.ac.uk})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.cs.bris.ac.uk/~mm7323/DbMalloc/}
+@item Overview
+A drop-in replacement for the C memory allocation functions, providing
+facilities for quickly finding memory leaks.
 @end table
 
 @cindex Debauch
@@ -8308,7 +8325,7 @@ GNU General Public License
 @item Platforms
 Linux
 @item Location
-@uref{http://quorum.tamu.edu/jon/gnu/}
+@uref{http://mackerel.tamu.edu/jon/gnu/}
 @item Overview
 A memory allocation debugger for C which will detect memory leaks, corrupted
 memory, stores to freed memory and more.
@@ -8341,7 +8358,7 @@ Gray Watson (@email{gray@@burger.letters.com})
 @item License
 Free Software
 @item Platforms
-Various UNIX, MS-DOS, Windows
+Various UNIX, Windows, MS-DOS
 @item Location
 @uref{http://www.dmalloc.com/}
 @item Overview
@@ -8355,7 +8372,7 @@ Malloc_Dbg.
 Electric Fence
 @table @asis
 @item Author
-Bruce Perens (@email{Bruce@@Pixar.com})
+Bruce Perens (@email{bruce@@pixar.com})
 @item License
 GNU General Public License
 @item Platforms
@@ -8427,7 +8444,7 @@ Hans-J. Boehm (@email{boehm@@acm.org})
 @item License
 Free Software
 @item Platforms
-Various UNIX, AmigaOS, MS-DOS, Windows, MacOS
+Various UNIX, AmigaOS, Windows, MS-DOS, MacOS
 @item Location
 @uref{http://www.hpl.hp.com/personal/Hans_Boehm/gc/}
 @item Overview
@@ -8536,7 +8553,7 @@ Jeff Dunlop
 @item License
 Free Software
 @item Platforms
-MS-DOS, Windows
+Windows, MS-DOS
 @item Location
 @uref{http://www.snippets.org/}
 @item Overview
@@ -8769,13 +8786,13 @@ provides information on memory leaks.
 MemDebug
 @table @asis
 @item Author
-Rene Schmit (@email{rene.schmit@@crpht.lu})
+Rene Schmit (@email{rene.schmit@@bss.lu})
 @item License
 Free Software
 @item Platforms
-Various UNIX, MS-DOS, Windows, MacOS
+Various UNIX, Windows, MS-DOS, MacOS
 @item Location
-@uref{ftp://ftp.crpht.lu/pub/sources/memdebug/}
+@uref{http://www.bss.lu/Memdebug/Memdebug.html}
 @item Overview
 Provides memory management error detection, memory usage error detection, memory
 usage profiling and error simulation.
@@ -8976,7 +8993,7 @@ information.
 Mprof
 @table @asis
 @item Author
-Ben Zorn (@email{zorn@@cs.colorado.edu})
+Ben Zorn (@email{zorn@@microsoft.com})
 @item License
 Free Software
 @item Platforms
@@ -9111,6 +9128,25 @@ Helps track down a wide range of memory allocation problems and is divided
 into a front end executable and a library back end.
 @end table
 
+@cindex ObjectCenter
+@cindex CenterLine Development Systems
+@item
+ObjectCenter
+@table @asis
+@item Author
+CenterLine Development Systems (@email{info@@centerline.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.centerline.com/}
+@item Overview
+Provides a C and C++ programming environment that can detect memory leaks,
+duplicate frees and illegal access errors including loads from uninitialised
+objects.
+@end table
+
 @cindex Optimizeit
 @cindex Intuitive Systems, Inc.
 @item
@@ -9198,8 +9234,40 @@ Detects orphaned buffers of dynamic memory allocations and also helps to find
 other common problems in management of dynamic storage.
 @end table
 
+@cindex SmartHeap
+@item
+SmartHeap
+@table @asis
+@item Author
+MicroQuill (@email{info@@microquill.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX, Windows, OS/2, MS-DOS, MacOS
+@item Location
+@uref{http://www.microquill.com/}
+@item Overview
+Provides optimised heap performance along with detecting memory leaks, memory
+overwrites, double-freeing, wild pointers, invalid parameters, etc.
+@end table
+
+@cindex Spotlight
+@item
+Spotlight
+@table @asis
+@item Author
+Onyx Technology (@email{sales@@onyx-tech.com})
+@item License
+Commercial Software
+@item Platforms
+MacOS
+@item Location
+@uref{http://www.onyx-tech.com/}
+@item Overview
+Performs memory protection on PowerPC executables and helps detect memory leaks.
+@end table
+
 @cindex TestCenter
-@cindex CenterLine Development Systems
 @item
 TestCenter
 @table @asis
@@ -9295,7 +9363,7 @@ Nate Eldredge (@email{neldredge@@hmc.edu})
 @item License
 GNU General Public License
 @item Platforms
-Linux, DOS
+Linux, MS-DOS
 @item Location
 @uref{http://www3.hmc.edu/~neldredge/yamd/}
 @item Overview
