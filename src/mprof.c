@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
+ * Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.33 2001-10-03 23:11:45 graeme Exp $"
+#ident "$Id: mprof.c,v 1.34 2002-01-08 20:13:59 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.33 2001-10-03 23:11:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.34 2002-01-08 20:13:59 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
