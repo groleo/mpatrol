@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.22 2000-11-06 23:48:49 graeme Exp $
+# $Id: Makefile,v 1.23 2000-11-08 01:42:44 graeme Exp $
 
 
 # Definitions
@@ -147,14 +147,14 @@ else
 	@ dvips -t landscape -Pcmz -q -o $@ $<
 endif
 
-# Build the PDF reference card from the LaTeX file using texi2dvi
+# Build the PDF reference card from the postscript file using pstill
 
-$(REFCARD).pdf: $(REFCARD).tex
+$(REFCARD).pdf: $(REFCARD).ps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ texi2dvi --pdf --language=latex --batch --clean --verbose $<
+	@ pstill -Fa4 -R270 -ctv -o $@ $<
 else
-	@ texi2dvi --pdf --language=latex --batch --clean --quiet $<
+	@ pstill -Fa4 -R270 -ct -o $@ $<
 endif
 
 all: $(DOCUMENT).txt $(DOCUMENT).info $(DOCUMENT).guide $(DOCUMENT).html \
