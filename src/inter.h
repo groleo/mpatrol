@@ -25,7 +25,7 @@
 
 
 /*
- * Library interface.  The module defines the visible interface for the
+ * Library interface.  This module defines the visible interface for the
  * mpatrol library.
  */
 
@@ -90,6 +90,11 @@ void (*__mp_epilogue(void (*)(void *)))(void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
+void chkr_set_right(void *, size_t, unsigned char);
+void chkr_copy_bitmap(void *, void *, size_t);
+void chkr_check_addr(void *, size_t, unsigned char);
+void chkr_check_str(char *, unsigned char);
+void chkr_check_exec(void *);
 
 
 #ifdef __cplusplus

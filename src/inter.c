@@ -21,8 +21,11 @@
 
 
 /*
- * Library interface.  The module defines the visible interface for the
- * mpatrol library.
+ * Library interface.  This module defines the visible interface for the
+ * mpatrol library.  It also defines replacement functions for the GNU
+ * Checker tool, which adds code to check all reads from and writes to
+ * memory when the user's code is compiled with the -fcheck-memory-usage
+ * option in the GNU compiler.
  */
 
 
@@ -43,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.52 2000-12-20 22:44:45 graeme Exp $"
+#ident "$Id: inter.c,v 1.53 2000-12-21 21:52:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1322,6 +1325,130 @@ __mp_popdelstack(char **s, char **t, unsigned long *u)
         *s = *t = NULL;
         *u = 0;
     }
+}
+
+
+/* Set the access rights for a block of memory using the checker interface.
+ */
+
+void
+chkr_set_right(void *p, size_t l, unsigned char a)
+{
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX))
+    {
+        memhead.fini = 1;
+        __mp_abort();
+    }
+    restoresignals();
+}
+
+
+/* Copy the access rights for a block of memory to another block using the
+ * checker interface.
+ */
+
+void
+chkr_copy_bitmap(void *p, void *q, size_t l)
+{
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX) ||
+        !__mp_checkrange(&memhead, q, l, AT_MAX))
+    {
+        memhead.fini = 1;
+        __mp_abort();
+    }
+    restoresignals();
+}
+
+
+/* Check a block of memory using the checker interface.
+ */
+
+void
+chkr_check_addr(void *p, size_t l, unsigned char a)
+{
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!__mp_checkrange(&memhead, p, l, AT_MAX))
+    {
+        memhead.fini = 1;
+        __mp_abort();
+    }
+    restoresignals();
+}
+
+
+/* Check a string using the checker interface.
+ */
+
+void
+chkr_check_str(char *p, unsigned char a)
+{
+    size_t l;
+
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!__mp_checkstring(&memhead, p, &l, AT_MAX, 0))
+    {
+        memhead.fini = 1;
+        __mp_abort();
+    }
+    restoresignals();
+}
+
+
+/* Check a function pointer using the checker interface.
+ */
+
+void
+chkr_check_exec(void *p)
+{
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we cannot
+     * initialise the mpatrol library and so we just return.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+        return;
+#endif /* TARGET */
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    restoresignals();
 }
 
 
