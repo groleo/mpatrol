@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.123 2001-05-22 22:43:22 graeme Exp $"
+#ident "$Id: inter.c,v 1.124 2001-05-22 22:51:00 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.123 2001-05-22 22:43:22 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.124 2001-05-22 22:51:00 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -534,6 +534,8 @@ void
 __mp_reinit(void)
 {
     char l[256];
+    allocnode *n;
+    treenode *t;
     unsigned long i;
 
     savesignals();
@@ -565,7 +567,18 @@ __mp_reinit(void)
             __mp_writeprofile(&memhead.prof, !(memhead.flags & FLG_NOPROTECT));
         memhead.prof.file = __mp_proffile(&memhead.alloc.heap.memory,
                                           "%n.%p.out");
-        __mp_changetrace(&memhead.trace, __mp_tracefile(&memhead.alloc.heap.memory, "%n.%p.trace"), 0);
+        /* Remove the traced flag from any existing memory allocations and then
+         * change the tracing output file.
+         */
+        for (t = __mp_minimum(memhead.alloc.atree.root); t != NULL;
+             t = __mp_successor(t))
+        {
+            n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
+            ((infonode *) n->info)->data.flags &= ~FLG_TRACED;
+        }
+        __mp_changetrace(&memhead.trace,
+                         __mp_tracefile(&memhead.alloc.heap.memory,
+                                        "%n.%p.trace"), 0);
         if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
             __mp_protectinfo(&memhead, MA_READONLY);
     }
