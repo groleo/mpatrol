@@ -9394,6 +9394,18 @@ version of mpatrol and the Microsoft C run-time library DLL.  Luckily, if you
 ensure that you use either both static libraries or both DLLs at the same time
 then the problem should go away.  There doesn't seem to be an easier way around
 it at this time or, for that matter, an explanation for why it happens.
+
+</p><li>Why are mpatrol library functions not called from shared libraries on AIX?
+
+<p>AIX uses static shared libraries instead of dynamic shared libraries, which
+means that all shared library bindings are resolved at link time rather than
+load time (i.e. you must specify which shared libraries resolve all of the
+undefined symbols that result when building a shared library).  If you would
+like mpatrol library functions to be called from a shared library, you must
+rebuild the shared library with <code>-lmpatrol</code> on the link line.  However,
+this means that you cannot override <code>malloc()</code>, etc., in shared libraries
+that you cannot rebuild unless you link statically with the archive library
+versions instead.
 </ol>
 
 <p><hr>

@@ -9670,6 +9670,20 @@ Linking
      way around it at this time or, for that matter, an explanation for
      why it happens.
 
+  8. Why are mpatrol library functions not called from shared libraries
+     on AIX?
+
+     AIX uses static shared libraries instead of dynamic shared
+     libraries, which means that all shared library bindings are
+     resolved at link time rather than load time (i.e. you must specify
+     which shared libraries resolve all of the undefined symbols that
+     result when building a shared library).  If you would like mpatrol
+     library functions to be called from a shared library, you must
+     rebuild the shared library with `-lmpatrol' on the link line.
+     However, this means that you cannot override `malloc()', etc., in
+     shared libraries that you cannot rebuild unless you link
+     statically with the archive library versions instead.
+
 
 File: mpatrol.info,  Node: Running,  Next: Files,  Prev: Linking,  Up: Frequently asked questions
 
@@ -13137,13 +13151,13 @@ Node: Frequently asked questions428187
 Node: Documentation428810
 Node: Building433640
 Node: Linking441254
-Node: Running445718
-Node: Files460826
-Node: Related software463822
-Ref: Related software-Footnote-1502395
-Node: References502636
-Node: Copying505229
-Node: Function index533118
-Node: Index535376
+Node: Running446475
+Node: Files461583
+Node: Related software464579
+Ref: Related software-Footnote-1503152
+Node: References503393
+Node: Copying505986
+Node: Function index533875
+Node: Index536133
 
 End Tag Table
