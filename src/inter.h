@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.27 2001-02-23 22:42:26 graeme Exp $
+ * $Id: inter.h,v 1.28 2001-02-23 22:46:42 graeme Exp $
  */
 
 
@@ -62,6 +62,7 @@ typedef struct allocinfo
     size_t typesize;       /* size of type stored in allocation */
     void *userdata;        /* user data associated with allocation */
     char freed;            /* allocation has been freed */
+    char marked;           /* allocation has been marked */
 }
 allocinfo;
 

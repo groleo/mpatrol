@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.94 2001-02-23 22:42:26 graeme Exp $
+ * $Id: mpatrol.h,v 1.95 2001-02-23 22:46:42 graeme Exp $
  */
 
 
@@ -328,6 +328,7 @@ typedef struct __mp_allocinfo
     size_t typesize;        /* size of type stored in allocation */
     void *userdata;         /* user data associated with allocation */
     char freed;             /* allocation has been freed */
+    char marked;            /* allocation has been marked */
 }
 __mp_allocinfo;
 
@@ -727,6 +728,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
 #define __mp_function(f) ((char *) NULL)
 #define __mp_setuser(p, d) ((int) 0)
+#define __mp_setmark(p) ((int) 0)
 #define __mp_info(p, d) ((int) 0)
 #define __mp_syminfo(p, d) ((int) 0)
 #define __mp_printinfo(p) ((int) 0)
