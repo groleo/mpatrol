@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.14 2000-03-07 21:33:20 graeme Exp $"
+#ident "$Id: inter.c,v 1.15 2000-03-07 22:05:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -464,6 +464,11 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
     stackinfo i;
     int j;
 
+    if (memhead.fini)
+    {
+        __mp_memset(p, c, l);
+        return p;
+    }
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -501,6 +506,11 @@ void *__mp_copymem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     stackinfo i;
     int j;
 
+    if (memhead.fini)
+    {
+        __mp_memcopy(q, p, l);
+        return q;
+    }
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -541,6 +551,17 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
     int j;
     unsigned char b;
 
+    if (f == AT_MEMCHR)
+    {
+        /* If the function that called us was memchr() then we must convert the
+         * second length to a character and set up the new pointer and length.
+         */
+        b = (unsigned char) (m & 0xFF);
+        q = (void *) &b;
+        m = 1;
+    }
+    if (memhead.fini)
+        return __mp_memfind(p, l, q, m);
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -555,15 +576,6 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
             j = __mp_getframe(&i);
             k--;
         }
-    }
-    if (f == AT_MEMCHR)
-    {
-        /* If the function that called us was memchr() then we must convert the
-         * second length to a character and set up the new pointer and length.
-         */
-        b = (unsigned char) (m & 0xFF);
-        q = (void *) &b;
-        m = 1;
     }
     r = __mp_locatememory(&memhead, p, l, q, m, f, s, t, u, &i);
     restoresignals();
@@ -584,9 +596,18 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
                     unsigned long u, size_t k)
 #endif /* TARGET */
 {
+    void *m;
     stackinfo i;
     int j, r;
 
+    if (memhead.fini)
+        if (m = __mp_memcompare(p, q, l))
+        {
+            l = (char *) m - (char *) p;
+            return (int) ((char *) p)[l] - (int) ((char *) q)[l];
+        }
+        else
+            return 0;
     savesignals();
     if (!memhead.init)
         __mp_init();
