@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.5 2000-09-25 21:01:18 graeme Exp $"
+#ident "$Id: getopt.c,v 1.6 2000-09-25 21:02:20 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -257,7 +257,7 @@ MP_GLOBAL void __mp_showopts(option *l)
     while (l->name != NULL)
     {
         if (isalnum(l->value))
-            fprintf(stderr, "    -%c", l->value)
+            fprintf(stderr, "    -%c", l->value);
         else
             fputs("      ", stderr);
         fprintf(stderr, "  --%s", l->name);
