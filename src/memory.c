@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.9 2000-01-27 21:33:14 graeme Exp $"
+#ident "$Id: memory.c,v 1.10 2000-01-30 20:29:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -681,6 +681,24 @@ MP_GLOBAL void *__mp_memcompare(void *t, void *s, size_t l)
         t = (char *) t + 1;
         l--;
     }
+    return NULL;
+}
+
+
+/* Attempt to locate the position of one block of memory in another block.
+ */
+
+MP_GLOBAL void *__mp_memfind(void *t, size_t l, void *s, size_t m)
+{
+    if (m > 0)
+        while (l >= m)
+        {
+            if ((*((char *) t) == *((char *) s)) && ((m == 1) ||
+                 (!__mp_memcompare((char *) t + 1, (char *) s + 1, m - 1))))
+                return t;
+            t = (char *) t + 1;
+            l--;
+        }
     return NULL;
 }
 
