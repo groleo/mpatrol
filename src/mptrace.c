@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.22 2001-06-07 21:36:34 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.23 2001-07-19 21:47:23 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.22 2001-06-07 21:36:34 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.23 2001-07-19 21:47:23 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -796,14 +796,17 @@ static
 void
 printsource(unsigned long i, char *s, char *t, unsigned long u)
 {
-    fputs("                       ", stdout);
-    if (i != 0)
-        fprintf(stdout, " thread %lu", i);
-    if (s != NULL)
-        fprintf(stdout, " in %s", s);
-    if ((t != NULL) && (u != 0))
-        fprintf(stdout, " at %s line %lu", t, u);
-    fputc('\n', stdout);
+    if ((i != 0) || (s != NULL) || ((t != NULL) && (u != 0)))
+    {
+        fputs("                       ", stdout);
+        if (i != 0)
+            fprintf(stdout, " thread %lu", i);
+        if (s != NULL)
+            fprintf(stdout, " in %s", s);
+        if ((t != NULL) && (u != 0))
+            fprintf(stdout, " at %s line %lu", t, u);
+        fputc('\n', stdout);
+    }
 }
 
 
