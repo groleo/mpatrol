@@ -31,7 +31,7 @@
 #include <stdio.h>
 
 
-int callback(const void *p, void *t)
+int callback(MP_CONST void *p, void *t)
 {
     __mp_allocstack *s;
     __mp_allocinfo d;

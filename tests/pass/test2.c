@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 
-void prologue(const void *p, size_t l)
+void prologue(MP_CONST void *p, size_t l)
 {
     if (p == (void *) -1)
         fprintf(stderr, "allocating %lu bytes\n", l);
@@ -48,7 +48,7 @@ void prologue(const void *p, size_t l)
 }
 
 
-void epilogue(const void *p)
+void epilogue(MP_CONST void *p)
 {
     if (p != (void *) -1)
         if (sizeof(void *) == 8)
