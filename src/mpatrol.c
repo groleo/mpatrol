@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.24 2000-10-19 19:07:13 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.25 2000-10-19 19:32:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -274,12 +274,11 @@ static option options_table[] =
     {"show-env", OF_SHOWENV, NULL,
      "\tDisplays the contents of the " MP_OPTIONS " environment variable.\n"},
     {"show-freed", OF_SHOWFREED, NULL,
-     "\tSpecifies that a summary of all of the freed and unfreed memory\n"
-     "\tallocations should be displayed at the end of program execution.\n"},
-    {"show-map", OF_SHOWMAP, NULL,
-     "\tSpecifies that a memory map of the entire heap and a summary of all\n"
-     "\tof the function symbols read from the program's executable file\n"
+     "\tSpecifies that a summary of all of the freed memory allocations\n"
      "\tshould be displayed at the end of program execution.\n"},
+    {"show-map", OF_SHOWMAP, NULL,
+     "\tSpecifies that a memory map of the entire heap should be displayed at\n"
+     "\tthe end of program execution.\n"},
     {"show-symbols", OF_SHOWSYMBOLS, NULL,
      "\tSpecifies that a summary of all of the function symbols read from\n"
      "\tthe program's executable file should be displayed at the end of\n"
