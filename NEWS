@@ -1,3 +1,28 @@
+Changes for 1.1.4 (10th April, 2000)
+
+  * The mpatrol shell script is now rewritten in C and is now also available on
+    AmigaOS, Windows and Netware as well.
+
+  * Added a new command for detecting memory leaks in the log file.
+
+  * Added a new function, __mp_printinfo(), for calling from within a debugger
+    to determine information about a specific heap address.
+
+  * Changed set_new_handler() name mangling for GNU C++.
+
+  * Fixed a typing error in inter.c for Windows platforms.
+
+  * Added a makefile compatible with Microsoft's nmake on Windows platforms.
+
+  * The filenames of some object libraries have been changed to prevent
+    conflicts when building the mpatrol command.
+
+  * Added untested support for Parasoft Inuse.
+
+  * Added new tests for freeing local and global variables and also a test to
+    highlight problems of overwriting pointer information.
+
+
 Changes for 1.1.3 (26th March, 2000)
 
   * Amiga shared library support has been removed (but it didn't work before

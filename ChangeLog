@@ -1,3 +1,158 @@
+Thu Apr  6 19:26:29 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Documented change to name of some object libraries.
+
+	* build/windows/Makefile, build/unix/Makefile, build/netware/Makefile,
+	  build/amiga/Makefile, build/amiga/SMakefile:
+	Added version module to mpatrol and memleak.
+
+	* build/windows/Makefile, build/netware/Makefile, build/amiga/SMakefile:
+	Changed the names of the object libraries to be prefixed by lib.
+
+	* build/amiga/Makefile:
+	Added dependencies for the sbrk module.  Also now use rm to remove
+	files.
+
+	* build/windows/Makefile, build/windows/NMakefile:
+	Added dependencies for sbrk.h.
+
+	* build/netware/Makefile, build/windows/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile, pkg/lha/build:
+	Added the mpatrol tool.
+
+	* build/windows/Makefile: Added -noentry when building DLLs.
+
+	* build/windows/NMakefile: New Microsoft Makefile.
+
+	* doc/mpatrol.texi:
+	Documented that all platforms now have the mpatrol command.
+
+	* src/inter.c: Force initialisation of simulated UNIX heap.
+
+	* src/mpatrol.c, src/memleak.c: Added copyright information.
+
+	* src/mpatrol.c:
+	No longer look at the current setting of the MPATROL_OPTIONS environment
+	variable.  Also fixed return value of system() when gcc is used on
+	AmigaOS.
+
+Wed Apr  5 23:57:19 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ, bin/Attic/mpatrol, pkg/tar/build, pkg/rpm/mpatrol.spec,
+	  pkg/pkg/build:
+	The mpatrol shell script is now a binary command.
+
+	* build/windows/Makefile, build/unix/Makefile, build/netware/Makefile,
+	  build/amiga/Makefile, build/amiga/SMakefile:
+	Added support for the getopt module.
+
+	* build/unix/Makefile: Added the mpatrol tool.
+
+	* doc/mpatrol.texi:
+	Documented that the mpatrol shell script is now a binary command.
+
+	* man/cat1/mpatrol.1, man/man1/mpatrol.1, doc/mpatrol.texi:
+	Existing MPATROL_OPTIONS settings are now no longer used with the
+	mpatrol command.
+
+	* man/cat1/mpatrol.1, man/man1/mpatrol.1, man/cat1/memleak.1,
+	  man/man1/memleak.1:
+	Added the -V option.
+
+	* pkg/lha/build:
+	Don't include the mpatrol shell script in the distribution.
+
+	* src/config.h:
+	Added MP_PRELOAD_SUPPORT, MP_PRELOAD_NAME and MP_PRELOAD_LIBS.
+
+	* src/getopt.h, src/getopt.c:
+	New files for parsing command line options.
+
+	* src/mpatrol.c: Converted UNIX shell script to be written in C.
+
+	* src/memleak.c: Added the -V option.
+
+Tue Apr  4 17:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def: Added __mp_printinfo.
+
+	* doc/mpatrol.texi: Added __mp_printinfo and lots more related software.
+
+	* man/cat3/mpatrol.3, man/man3/mpatrol.3: Documented __mp_printinfo().
+
+	* src/inter.h, src/inter.c, src/mpatrol.h:
+	Added the __mp_printinfo() function.
+
+Mon Apr  3 23:48:56 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/SMakefile, build/netware/Makefile,
+	  build/windows/Makefile, build/unix/Makefile:
+	Changed mpatrol.c to library.c.
+
+	* doc/Makefile: Also remove compressed tar archive for clean target.
+
+	* doc/mpatrol.texi: Documented Inuse support.
+
+	* src/info.c: Added Inuse support.
+
+	* src/diag.c:
+	Added date and time of log file generation.  Also added information
+	about the mpatrol homepage.
+
+	* src/inter.c: Added Inuse support.
+
+	* src/mpatrol.c, src/library.c: Renamed mpatrol.c to library.c.
+
+	* src/version.h, src/version.c: Added a definition for __mp_homepage.
+
+Sun Apr  2 15:38:57 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Documented the memleak command and that DG/UX now supports the
+	LD_PRELOAD feature, and updated some of the tests for C++.
+
+	* src/config.h: Provided support for Parasoft Inuse.
+
+	* src/heap.c: Added Inuse support.
+
+	* src/malloc.c: Changed set_new_handler name mangling for g++.
+
+	* tests/tutorial/test1.c, tests/tutorial/test2.c,
+	  tests/tutorial/test3.c, tests/pass/test2.c:
+	Updated some of the tests for C++.
+
+	* tests/fail/test13.c, tests/fail/test14.c:
+	New tests for freeing local and global variables.
+
+	* tests/fail/test15.c:
+	New test to highlight problems of overwriting pointer information.
+
+Fri Mar 31 08:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/SMakefile, build/netware/Makefile,
+	  build/windows/Makefile:
+	Added the memleak tool.
+
+	* build/unix/Makefile:
+	Added the memleak tool and fixed embedded shared library versions.
+
+Thu Mar 30 18:10:11 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* man/cat1/memleak.1, man/man1/memleak.1:
+	New manual page for the memleak tool.
+
+	* man/cat1/mpatrol.1, man/cat3/mpatrol.3, man/man1/mpatrol.1,
+	  man/man3/mpatrol.3:
+	Added a reference to the memleak manual page.
+
+	* pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype, pkg/tar/build,
+	  pkg/lha/build:
+	Added the memleak tool and manual pages.
+
+	* src/config.h: Added a definition for MP_BUFFER_SIZE.
+
+	* src/memleak.c: New file for detecting memory leaks in the log file.
+
 Sun Mar 26 20:26:46 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate:
