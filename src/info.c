@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.36 2000-11-03 18:27:33 graeme Exp $"
+#ident "$Id: info.c,v 1.37 2000-11-06 00:02:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -343,16 +343,25 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             (g != NULL))
             if (p != NULL)
             {
-                /* We take the address of a local variable in the calling
-                 * function in order to determine if subsequent calls are
-                 * closer to or further away from the program's entry point.
+                __mp_addhead(&h->astack, &g->node);
+                g->block = p;
+#if MP_FULLSTACK
+                /* If we support full stack tracebacks then we can more
+                 * accurately determine when we can free up any allocations
+                 * made by alloca(), strdupa() or strndupa() that are now out
+                 * of scope.
+                 */
+                g->data.frame = (void *) m->data.stack;
+#else /* MP_FULLSTACK */
+                /* Otherwise, we take the address of a local variable in the
+                 * calling function in order to determine if subsequent calls
+                 * are closer to or further away from the program's entry point.
                  * This information can later be used to free up any
                  * allocations made by alloca(), strdupa() or strndupa() that
                  * are now out of scope.
                  */
-                __mp_addhead(&h->astack, &g->node);
-                g->block = p;
                 g->data.frame = (void *) &v->frame;
+#endif /* MP_FULLSTACK */
             }
             else
                 __mp_freeslot(&h->atable, g);
