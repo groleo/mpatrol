@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.30 2001-08-23 23:08:59 graeme Exp $
+# $Id: Makefile.aix,v 1.31 2001-08-24 10:58:06 graeme Exp $
 
 
 # Definitions
@@ -165,7 +165,7 @@ mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mprof.o graph.o getopt.o list.o tree.o version.o
 
 mptrace: mptrace.o getopt.o tree.o slots.o utils.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11/lib -lXm -lXt -lX11
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -lXm -lXt -lX11
 
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
