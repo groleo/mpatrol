@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.10 2001-03-01 00:54:16 graeme Exp $"
+#ident "$Id: sbrk.c,v 1.11 2001-08-01 21:48:43 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.10 2001-03-01 00:54:16 graeme Exp $";
+static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.11 2001-08-01 21:48:43 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -111,6 +111,7 @@ initbrk(void)
 /* Set the address of the first byte beyond the end of the heap.
  */
 
+MP_API
 int
 brk(void *p)
 {
@@ -132,6 +133,7 @@ brk(void *p)
 /* Increase or decrease the amount of available heap space.
  */
 
+MP_API
 void *
 sbrk(long l)
 {

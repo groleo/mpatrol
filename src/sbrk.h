@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: sbrk.h,v 1.4 2001-02-10 16:45:39 graeme Exp $
+ * $Id: sbrk.h,v 1.5 2001-08-01 21:48:43 graeme Exp $
  */
 
 
@@ -44,8 +44,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-int brk(void *);
-void *sbrk(long);
+MP_API int brk(void *);
+MP_API void *sbrk(long);
 
 
 #ifdef __cplusplus
