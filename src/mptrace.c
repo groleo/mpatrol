@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.21 2001-06-07 21:12:21 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.22 2001-06-07 21:36:34 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.21 2001-06-07 21:12:21 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.22 2001-06-07 21:36:34 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,7 +60,8 @@ typedef enum options_flags
 {
     OF_HATFFILE = 'H',
     OF_HELP     = 'h',
-    OF_SIMFILE  = 's',
+    OF_SIMFILE  = 'S',
+    OF_SOURCE   = 's',
     OF_VERSION  = 'V',
     OF_VERBOSE  = 'v',
     OF_GUI      = 'w'
@@ -182,6 +183,13 @@ static char *progname;
  */
 
 static int verbose;
+
+
+/* Indicates if source-level information should be displayed in the tracing
+ * table if it is available.
+ */
+
+static int displaysource;
 
 
 #if MP_GUI_SUPPORT
@@ -319,6 +327,9 @@ static option options_table[] =
     {"sim-file", OF_SIMFILE, "file",
      "\tSpecifies that a trace-driven memory allocation simulation program\n"
      "\twritten in C should be written to a file.\n"},
+    {"source", OF_SOURCE, NULL,
+     "\tDisplays source-level information for each event in the tracing\n"
+     "\ttable, if available.\n"},
     {"verbose", OF_VERBOSE, NULL,
      "\tSpecifies that the tracing table should be displayed.\n"},
     {"version", OF_VERSION, NULL,
@@ -778,6 +789,24 @@ printsize(size_t l)
 }
 
 
+/* Display source-level information for a given event.
+ */
+
+static
+void
+printsource(unsigned long i, char *s, char *t, unsigned long u)
+{
+    fputs("                       ", stdout);
+    if (i != 0)
+        fprintf(stdout, " thread %lu", i);
+    if (s != NULL)
+        fprintf(stdout, " in %s", s);
+    if ((t != NULL) && (u != 0))
+        fprintf(stdout, " at %s line %lu", t, u);
+    fputc('\n', stdout);
+}
+
+
 /* Display the statistics gathered from the tracing output file.
  */
 
@@ -855,10 +884,14 @@ readevent(void)
             if (stats.usize < l)
                 stats.usize = l;
             if (verbose)
+            {
                 fprintf(stdout, "%6lu  alloc   %6lu  " MP_POINTER "  %8lu"
                         "          %6lu  %8lu\n", currentevent, n, a, l,
                         stats.acount - stats.fcount,
                         stats.atotal - stats.ftotal);
+                if (displaysource)
+                    printsource(t, g, h, u);
+            }
             if (hatffile != NULL)
                 fprintf(hatffile, "1 %lu 0x%lx\n", l, a);
             if (f->entry != NULL)
@@ -903,10 +936,14 @@ readevent(void)
                 if (stats.usize < l)
                     stats.usize = l;
                 if (verbose)
+                {
                     fprintf(stdout, "%6lu  realloc %6lu  " MP_POINTER
                             "  %8lu          %6lu  %8lu\n", currentevent, n, a,
                             l, stats.acount - stats.fcount,
                             stats.atotal - stats.ftotal);
+                    if (displaysource)
+                        printsource(t, g, h, u);
+                }
                 if (hatffile != NULL)
                     fprintf(hatffile, "4 %lu 0x%lx 0x%lx\n", l, f->addr, a);
                 if (f->entry != NULL)
@@ -947,10 +984,14 @@ readevent(void)
                 stats.fcount++;
                 stats.ftotal += f->size;
                 if (verbose)
+                {
                     fprintf(stdout, "%6lu  free    %6lu  " MP_POINTER "  %8lu  "
                             "%6lu  %6lu  %8lu\n", currentevent, n, f->addr,
                             f->size, f->time, stats.acount - stats.fcount,
                             stats.atotal - stats.ftotal);
+                    if (displaysource)
+                        printsource(t, g, h, u);
+                }
                 if (hatffile != NULL)
                     fprintf(hatffile, "2 0x%lx\n", f->addr);
                 if (f->entry != NULL)
@@ -1186,6 +1227,9 @@ main(int argc, char **argv)
             break;
           case OF_SIMFILE:
             s = __mp_optarg;
+            break;
+          case OF_SOURCE:
+            displaysource = 1;
             break;
           case OF_VERBOSE:
             verbose = 1;
