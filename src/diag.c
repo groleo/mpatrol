@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.101 2001-12-11 21:20:41 graeme Exp $"
+#ident "$Id: diag.c,v 1.102 2001-12-11 21:50:45 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.101 2001-12-11 21:20:41 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.102 2001-12-11 21:50:45 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -206,6 +206,23 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
     "memmem",
     "memcmp",
     "bcmp"
+};
+
+
+/* This array should always be kept in step with the logtype enumeration.
+ * Note that LT_MAX is used to indicate that the variant field of the loginfo
+ * structure is not used.
+ */
+
+MP_GLOBAL char *__mp_lognames[LT_MAX] =
+{
+    "ALLOC",
+    "REALLOC",
+    "FREE",
+    "MEMSET",
+    "MEMCOPY",
+    "MEMFIND",
+    "MEMCMP"
 };
 
 
@@ -1337,214 +1354,6 @@ logcall(infohead *h, loginfo *i, size_t s)
 }
 
 
-/* Log the details of a call to allocate memory.
- */
-
-static
-void
-logalloc(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("ALLOC");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (%lu, ", h->count);
-    __mp_printsize(i->variant.logalloc.size);
-    __mp_diag(", ");
-    if (i->variant.logalloc.align == 0)
-        __mp_printsize(h->alloc.heap.memory.align);
-    else
-        __mp_printsize(i->variant.logalloc.align);
-    __mp_diag(") ");
-    logcall(h, i, i->variant.logalloc.size);
-}
-
-
-/* Log the details of a call to reallocate memory.
- */
-
-static
-void
-logrealloc(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("REALLOC");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", ", i->variant.logrealloc.block);
-    __mp_printsize(i->variant.logrealloc.size);
-    __mp_diag(", ");
-    if (i->variant.logrealloc.align == 0)
-        __mp_printsize(h->alloc.heap.memory.align);
-    else
-        __mp_printsize(i->variant.logrealloc.align);
-    __mp_diag(") ");
-    logcall(h, i, i->variant.logrealloc.size);
-}
-
-
-/* Log the details of a call to deallocate memory.
- */
-
-static
-void
-logfree(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("FREE");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ") ", i->variant.logfree.block);
-    logcall(h, i, 0);
-}
-
-
-/* Log the details of a call to set memory.
- */
-
-static
-void
-logmemset(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("MEMSET");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", ", i->variant.logmemset.block);
-    __mp_printsize(i->variant.logmemset.size);
-    __mp_diag(", 0x%02X) ", i->variant.logmemset.byte);
-    logcall(h, i, 0);
-}
-
-
-/* Log the details of a call to copy memory.
- */
-
-static
-void
-logmemcopy(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("MEMCOPY");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ",
-              i->variant.logmemcopy.srcblock, i->variant.logmemcopy.dstblock);
-    __mp_printsize(i->variant.logmemcopy.size);
-    __mp_diag(", 0x%02X) ", i->variant.logmemcopy.byte);
-    logcall(h, i, 0);
-}
-
-
-/* Log the details of a call to locate memory.
- */
-
-static
-void
-logmemlocate(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("MEMFIND");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", ", i->variant.logmemlocate.block);
-    __mp_printsize(i->variant.logmemlocate.size);
-    __mp_diag(", " MP_POINTER ", ", i->variant.logmemlocate.patblock);
-    __mp_printsize(i->variant.logmemlocate.patsize);
-    __mp_diag(") ");
-    logcall(h, i, 0);
-}
-
-
-/* Log the details of a call to compare memory.
- */
-
-static
-void
-logmemcompare(infohead *h, loginfo *i)
-{
-    if (__mp_diagflags & FLG_HTML)
-    {
-        __mp_diagtag("<P>\n");
-        __mp_diagtag("<B>");
-    }
-    __mp_diag("MEMCMP");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</B>");
-    __mp_diag(": ");
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("<TT>");
-    __mp_diag("%s", __mp_functionnames[i->type]);
-    if (__mp_diagflags & FLG_HTML)
-        __mp_diagtag("</TT>");
-    __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ",
-              i->variant.logmemcompare.block1, i->variant.logmemcompare.block2);
-    __mp_printsize(i->variant.logmemcompare.size);
-    __mp_diag(") ");
-    logcall(h, i, 0);
-}
-
-
 /* Log the details of a call to the mpatrol library.
  */
 
@@ -1552,31 +1361,80 @@ MP_GLOBAL
 void
 __mp_log(infohead *h, loginfo *i)
 {
-    if ((h->recur == 1) && !i->logged)
+    if ((h->recur == 1) && (i->ltype != LT_MAX) && !i->logged)
     {
         i->logged = 1;
+        if (__mp_diagflags & FLG_HTML)
+        {
+            __mp_diagtag("<P>\n");
+            __mp_diagtag("<B>");
+        }
+        __mp_diag("%s", __mp_lognames[i->ltype]);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</B>");
+        __mp_diag(": ");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("<TT>");
+        __mp_diag("%s", __mp_functionnames[i->type]);
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("</TT>");
         switch (i->ltype)
         {
           case LT_ALLOC:
-            logalloc(h, i);
+            __mp_diag(" (%lu, ", h->count);
+            __mp_printsize(i->variant.logalloc.size);
+            __mp_diag(", ");
+            if (i->variant.logalloc.align == 0)
+                __mp_printsize(h->alloc.heap.memory.align);
+            else
+                __mp_printsize(i->variant.logalloc.align);
+            __mp_diag(") ");
+            logcall(h, i, i->variant.logalloc.size);
             break;
           case LT_REALLOC:
-            logrealloc(h, i);
+            __mp_diag(" (" MP_POINTER ", ", i->variant.logrealloc.block);
+            __mp_printsize(i->variant.logrealloc.size);
+            __mp_diag(", ");
+            if (i->variant.logrealloc.align == 0)
+                __mp_printsize(h->alloc.heap.memory.align);
+            else
+                __mp_printsize(i->variant.logrealloc.align);
+            __mp_diag(") ");
+            logcall(h, i, i->variant.logrealloc.size);
             break;
           case LT_FREE:
-            logfree(h, i);
+            __mp_diag(" (" MP_POINTER ") ", i->variant.logfree.block);
+            logcall(h, i, 0);
             break;
           case LT_SET:
-            logmemset(h, i);
+            __mp_diag(" (" MP_POINTER ", ", i->variant.logmemset.block);
+            __mp_printsize(i->variant.logmemset.size);
+            __mp_diag(", 0x%02X) ", i->variant.logmemset.byte);
+            logcall(h, i, 0);
             break;
           case LT_COPY:
-            logmemcopy(h, i);
+            __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ",
+                      i->variant.logmemcopy.srcblock,
+                      i->variant.logmemcopy.dstblock);
+            __mp_printsize(i->variant.logmemcopy.size);
+            __mp_diag(", 0x%02X) ", i->variant.logmemcopy.byte);
+            logcall(h, i, 0);
             break;
           case LT_LOCATE:
-            logmemlocate(h, i);
+            __mp_diag(" (" MP_POINTER ", ", i->variant.logmemlocate.block);
+            __mp_printsize(i->variant.logmemlocate.size);
+            __mp_diag(", " MP_POINTER ", ", i->variant.logmemlocate.patblock);
+            __mp_printsize(i->variant.logmemlocate.patsize);
+            __mp_diag(") ");
+            logcall(h, i, 0);
             break;
           case LT_COMPARE:
-            logmemcompare(h, i);
+            __mp_diag(" (" MP_POINTER ", " MP_POINTER ", ",
+                      i->variant.logmemcompare.block1,
+                      i->variant.logmemcompare.block2);
+            __mp_printsize(i->variant.logmemcompare.size);
+            __mp_diag(") ");
+            logcall(h, i, 0);
             break;
         }
     }
