@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.140 2002-01-08 20:13:59 graeme Exp $
+ * $Id: mpatrol.h,v 1.141 2002-01-08 22:29:59 graeme Exp $
  */
 
 
@@ -47,7 +47,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MPATROL_VERSION 10407
+#define MPATROL_VERSION 10408
 
 
 /* A macro for representing constant function parameters.
