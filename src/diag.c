@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.1.1.1 1999-10-03 11:25:21 graeme Exp $"
+#ident "$Id: diag.c,v 1.2 1999-10-19 19:17:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -63,6 +63,14 @@ static FILE *logfile;
  */
 
 static char buffer[256];
+
+
+/* The total warning and error counts.  These should really be reset after
+ * every initialisation of the library, but as we are not currently allowing
+ * library to be reinitialised, this doesn't matter.
+ */
+
+unsigned long warnings, errors;
 
 
 /* This array should always be kept in step with the alloctype enumeration.
@@ -215,6 +223,7 @@ MP_GLOBAL void __mp_warn(alloctype f, char *s, ...)
     vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
+    warnings++;
 }
 
 
@@ -234,6 +243,7 @@ MP_GLOBAL void __mp_error(alloctype f, char *s, ...)
     vfprintf(logfile, s, v);
     va_end(v);
     __mp_diag("\n");
+    errors++;
 }
 
 
@@ -678,7 +688,8 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
     __mp_printsize(n);
-    __mp_diag("\n");
+    __mp_diag("\ntotal warnings:    %lu", warnings);
+    __mp_diag("\ntotal errors:      %lu\n", errors);
 }
 
 
