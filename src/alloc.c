@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.11 2000-12-06 22:57:12 graeme Exp $"
+#ident "$Id: alloc.c,v 1.12 2000-12-20 22:16:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,8 +48,10 @@ extern "C"
  * freed or free blocks.
  */
 
-MP_GLOBAL void __mp_newallocs(allochead *h, size_t m, size_t s, unsigned char o,
-                              unsigned char a, unsigned char f, unsigned long u)
+MP_GLOBAL
+void
+__mp_newallocs(allochead *h, size_t m, size_t s, unsigned char o,
+               unsigned char a, unsigned char f, unsigned long u)
 {
     struct { char x; allocnode y; } z;
     long n;
@@ -88,7 +90,9 @@ MP_GLOBAL void __mp_newallocs(allochead *h, size_t m, size_t s, unsigned char o,
 /* Forget all allocated, freed or free blocks.
  */
 
-MP_GLOBAL void __mp_deleteallocs(allochead *h)
+MP_GLOBAL
+void
+__mp_deleteallocs(allochead *h)
 {
     /* We don't need to explicitly free any memory as this is dealt with
      * at a lower level by the heap manager.
@@ -111,7 +115,9 @@ MP_GLOBAL void __mp_deleteallocs(allochead *h)
 /* Allocate a new allocation node.
  */
 
-static allocnode *getnode(allochead *h)
+static
+allocnode *
+getnode(allochead *h)
 {
     allocnode *n;
     heapnode *p;
@@ -143,8 +149,9 @@ static allocnode *getnode(allochead *h)
  * and up to two new free nodes.
  */
 
-static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
-                            void *i)
+static
+allocnode *
+splitnode(allochead *h, allocnode *n, size_t l, size_t a, void *i)
 {
     allocnode *p, *q;
     size_t m, s;
@@ -262,7 +269,9 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
 /* Attempt to merge a free node with any bordering free nodes.
  */
 
-static allocnode *mergenode(allochead *h, allocnode *n)
+static
+allocnode *
+mergenode(allochead *h, allocnode *n)
 {
     allocnode *l, *r;
 
@@ -308,7 +317,9 @@ static allocnode *mergenode(allochead *h, allocnode *n)
 /* Create a new allocation node of a specified size and alignment.
  */
 
-MP_GLOBAL allocnode *__mp_getalloc(allochead *h, size_t l, size_t a, void *i)
+MP_GLOBAL
+allocnode *
+__mp_getalloc(allochead *h, size_t l, size_t a, void *i)
 {
     allocnode *n, *r, *s;
     heapnode *p;
@@ -392,7 +403,9 @@ MP_GLOBAL allocnode *__mp_getalloc(allochead *h, size_t l, size_t a, void *i)
 /* Attempt to resize an existing allocation node.
  */
 
-MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
+MP_GLOBAL
+int
+__mp_resizealloc(allochead *h, allocnode *n, size_t l)
 {
     allocnode *p;
     size_t m, s;
@@ -547,7 +560,9 @@ MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
 /* Recycle a freed allocation node.
  */
 
-static void recyclefreed(allochead *h)
+static
+void
+recyclefreed(allochead *h)
 {
     allocnode *n;
     void *p;
@@ -615,7 +630,9 @@ static void recyclefreed(allochead *h)
 /* Free an existing allocation node.
  */
 
-MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
+MP_GLOBAL
+void
+__mp_freealloc(allochead *h, allocnode *n, void *i)
 {
     void *p;
     size_t l, s;
@@ -729,7 +746,9 @@ MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
  * supplied access permission.
  */
 
-MP_GLOBAL int __mp_protectalloc(allochead *h, memaccess a)
+MP_GLOBAL
+int
+__mp_protectalloc(allochead *h, memaccess a)
 {
     allocnode *n;
     treenode *t;
@@ -763,7 +782,9 @@ MP_GLOBAL int __mp_protectalloc(allochead *h, memaccess a)
 /* Search for an allocated node which contains a given address.
  */
 
-MP_GLOBAL allocnode *__mp_findalloc(allochead *h, void *p)
+MP_GLOBAL
+allocnode *
+__mp_findalloc(allochead *h, void *p)
 {
     allocnode *n;
     treenode *t;
@@ -781,7 +802,9 @@ MP_GLOBAL allocnode *__mp_findalloc(allochead *h, void *p)
 /* Search for a freed node which contains a given address.
  */
 
-MP_GLOBAL allocnode *__mp_findfreed(allochead *h, void *p)
+MP_GLOBAL
+allocnode *
+__mp_findfreed(allochead *h, void *p)
 {
     allocnode *n;
     treenode *t;
@@ -800,7 +823,9 @@ MP_GLOBAL allocnode *__mp_findfreed(allochead *h, void *p)
  * its allocation or as part of an overflow buffer.
  */
 
-MP_GLOBAL allocnode *__mp_findnode(allochead *h, void *p, size_t s)
+MP_GLOBAL
+allocnode *
+__mp_findnode(allochead *h, void *p, size_t s)
 {
     allocnode *n;
     treenode *t;

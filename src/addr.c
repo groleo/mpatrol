@@ -32,7 +32,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: addr.c,v 1.5 2000-12-06 22:57:12 graeme Exp $"
+#ident "$Id: addr.c,v 1.6 2000-12-20 22:11:08 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -46,7 +46,9 @@ extern "C"
  * becomes empty.
  */
 
-MP_GLOBAL void __mp_newaddrs(addrhead *h, heaphead *e)
+MP_GLOBAL
+void
+__mp_newaddrs(addrhead *h, heaphead *e)
 {
     struct { char x; addrnode y; } z;
     long n;
@@ -68,7 +70,9 @@ MP_GLOBAL void __mp_newaddrs(addrhead *h, heaphead *e)
 /* Forget all data currently in the stack address table.
  */
 
-MP_GLOBAL void __mp_deleteaddrs(addrhead *h)
+MP_GLOBAL
+void
+__mp_deleteaddrs(addrhead *h)
 {
     /* We don't need to explicitly free any memory as this is dealt with
      * at a lower level by the heap manager.
@@ -86,7 +90,9 @@ MP_GLOBAL void __mp_deleteaddrs(addrhead *h)
 /* Allocate a new address node.
  */
 
-static addrnode *getaddrnode(addrhead *h)
+static
+addrnode *
+getaddrnode(addrhead *h)
 {
     addrnode *n;
     heapnode *p;
@@ -115,7 +121,9 @@ static addrnode *getaddrnode(addrhead *h)
 /* Allocate new address nodes for the supplied call stack.
  */
 
-MP_GLOBAL addrnode *__mp_getaddrs(addrhead *h, stackinfo *p)
+MP_GLOBAL
+addrnode *
+__mp_getaddrs(addrhead *h, stackinfo *p)
 {
     addrnode *m, *n;
     stackinfo s;
@@ -158,7 +166,9 @@ MP_GLOBAL addrnode *__mp_getaddrs(addrhead *h, stackinfo *p)
 /* Free up an entire call stack of address nodes.
  */
 
-MP_GLOBAL void __mp_freeaddrs(addrhead *h, addrnode *n)
+MP_GLOBAL
+void
+__mp_freeaddrs(addrhead *h, addrnode *n)
 {
     addrnode *m;
 
@@ -175,7 +185,9 @@ MP_GLOBAL void __mp_freeaddrs(addrhead *h, addrnode *n)
  * supplied access permission.
  */
 
-MP_GLOBAL int __mp_protectaddrs(addrhead *h, memaccess a)
+MP_GLOBAL
+int
+__mp_protectaddrs(addrhead *h, memaccess a)
 {
     addrnode *n;
 
@@ -205,7 +217,9 @@ MP_GLOBAL int __mp_protectaddrs(addrhead *h, memaccess a)
 /* Recursively compare the return addresses of two call stacks.
  */
 
-MP_GLOBAL stackcompare __mp_compareaddrs(addrnode *n, addrnode *p)
+MP_GLOBAL
+stackcompare
+__mp_compareaddrs(addrnode *n, addrnode *p)
 {
     stackcompare r;
 
