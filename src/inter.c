@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.57 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: inter.c,v 1.58 2001-01-03 18:24:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -104,7 +104,6 @@ static int *initsection = &__mp_initsection;
  */
 
 static void initlibrary(void) __attribute__((__constructor__));
-static void finilibrary(void) __attribute__((__destructor__));
 
 static
 void
@@ -116,12 +115,16 @@ initlibrary(void)
     __mp_init();
 }
 
+#if !MP_USE_ATEXIT
+static void finilibrary(void) __attribute__((__destructor__));
+
 static
 void
 finilibrary(void)
 {
     __mp_fini();
 }
+#endif /* MP_USE_ATEXIT */
 #elif defined(__cplusplus)
 /* C++ provides a way to initialise the mpatrol library before main() is
  * called and terminate it after exit() is called.  Note that if the C++
@@ -139,10 +142,12 @@ static struct initlibrary
 #endif /* MP_THREADS_SUPPORT */
         __mp_init();
     }
+#if !MP_USE_ATEXIT
     ~initlibrary()
     {
         __mp_fini();
     }
+#endif /* MP_USE_ATEXIT */
 }
 meminit;
 #endif /* __cplusplus */
@@ -338,15 +343,15 @@ __mp_init(void)
 #if MP_INUSE_SUPPORT
         _Inuse_init(0, 0);
 #endif /* MP_INUSE_SUPPORT */
-#if !MP_INIT_SUPPORT && !defined(__GNUC__) && !defined(__cplusplus)
-        /* We will have to terminate the library using atexit() since there
-         * is no support for .init/.fini functions, constructor/destructor
-         * functions or C++.  This is usually OK to do but there may be
-         * problems if the mpatrol library is terminated before all memory
-         * allocations are freed.
+#if MP_USE_ATEXIT
+        /* We will have to terminate the library using atexit() since either
+         * this has been explicitly specified or there is no support for
+         * .init/.fini functions, constructor/destructor functions or C++.
+         * This is usually OK to do but there may be problems if the mpatrol
+         * library is terminated before all memory allocations are freed.
          */
         atexit(__mp_fini);
-#endif /* MP_INIT_SUPPORT && __GNUC__ && __cplusplus */
+#endif /* MP_USE_ATEXIT */
         /* Read any options from the specified environment variable.
          */
         __mp_parseoptions(&memhead);

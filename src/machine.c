@@ -66,8 +66,10 @@ __mp_initsection:
 #endif /* MP_THREADS_SUPPORT */
 	call	__mp_init
 
+#if !MP_USE_ATEXIT
 	.section .fini,"ax"
 	call	__mp_fini
+#endif /* MP_USE_ATEXIT */
 #elif ARCH == ARCH_M68K
 /* Define the __mp_initsection variable.
  */
@@ -92,8 +94,10 @@ __mp_initsection:
 #endif /* MP_THREADS_SUPPORT */
 	jbsr	__mp_init
 
+#if !MP_USE_ATEXIT
 	.section .fini,"ax",@progbits
 	jbsr	__mp_fini
+#endif /* MP_USE_ATEXIT */
 #elif ARCH == ARCH_M88K
 /* Define the __mp_initsection variable.
  */
@@ -118,8 +122,10 @@ ___mp_initsection:
 #endif /* MP_THREADS_SUPPORT */
 	bsr	___mp_init
 
+#if !MP_USE_ATEXIT
 	section	.fini,"ax",#progbits
 	bsr	___mp_fini
+#endif /* MP_USE_ATEXIT */
 #elif ARCH == ARCH_SPARC
 /* Define the __mp_initsection variable.
  */
@@ -146,9 +152,11 @@ __mp_initsection:
 	call	__mp_init
 	nop
 
+#if !MP_USE_ATEXIT
 	.section ".fini",#alloc,#execinstr
 	call	__mp_fini
 	nop
+#endif /* MP_USE_ATEXIT */
 #endif /* ARCH */
 #endif /* MP_INIT_SUPPORT */
 
