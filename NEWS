@@ -10,7 +10,17 @@ Changes for 1.3.0
   * Finally fixed the determination of the address of an illegal memory access
     on IRIX platforms and added support for the SGI N32 object file format.
 
+  * Added long options to the external commands and added --help.
+
+  * Added the ability to read the unfreed allocations table from the log file
+    with the mleak command and also added the -i option.
+
   * Added a new section to the mpatrol manual on diagnostic messages.
+
+  * The ASCII version of the mpatrol manual is now provided with the main
+    distribution.
+
+  * Added a new definition file for the Windows thread-safe DLL.
 
   * Made the tests work on 64-bit platforms.
 

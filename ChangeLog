@@ -1,24 +1,75 @@
-Thu Aug 31 20:44:14 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-10-09  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/getopt.c: Changed the format of the quick reference table.
+
+	* src/mpatrol.c, src/mleak.c, src/mprof.c: Added the --help option.
+
+2000-10-03  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/getopt.c, src/getopt.h: Added the __mp_shortopts() function.
+
+	* src/mpatrol.c, src/mprof.c:
+	Now call __mp_shortopts to get the short option string.
+
+	* src/mleak.c:
+	Added the ability to read the unfreed allocations table from the log
+	file and also added the -i option.
+
+2000-09-28  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/Makefile:
+	Removed mpatrol.txt from the documentation archive as it now comes with
+	the main mpatrol archive.
+
+	* doc/mpatrol.texi: Don't do anything with Xt functions.
+
+	* doc/mpatrol.txt:
+	Now provide the ASCII manual as part of the main distribution.
+
+2000-09-26  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added lots more related software and updated some of the links.
+
+2000-09-25  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/mpatrolmt.def,
+	  build/windows/NMakefile:
+	Added new definition file for the thread-safe DLL.
+
+	* doc/mpatrol.texi:
+	Added reference to MULTI and documented Red Hat 6.1 threads don't work.
+
+	* src/getopt.c, src/getopt.h:
+	Added long option support and __mp_showopts().  Added a description
+	field to the options structure.
+
+	* src/mleak.c, src/mprof.c: Revised options handling.
+
+	* src/mpatrol.c:
+	Now call __mp_showopts().  Changed the options table format.
+
+2000-08-31  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more related software and documented a bit about choice of
 	ALLOCBYTE, FREEBYTE and OFLOWBYTE settings.  Added the CHECKMEMORY
 	option.
 
-	* doc/refcard.tex, man/cat1/mpatrol.1, man/cat3/mpatrol.3,
-	  man/man1/mpatrol.1, man/man3/mpatrol.3:
-	Documented the CHECKMEMORY option.
+	* doc/refcard.tex, man/cat3/mpatrol.3, man/cat1/mpatrol.1,
+	  man/man3/mpatrol.3, man/man1/mpatrol.1:
+	Added the CHECKMEMORY option.
 
 	* src/info.c, src/info.h: Added support for the CHECKMEMORY option.
 
 	* src/option.c, src/option.h, src/mpatrol.h:
 	Added the CHECKMEMORY option.
 
-Tue Aug 29 00:09:34 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-08-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Expanded the related software section.
 
-Mon Jul 31 23:48:04 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-31  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added watch support for IRIX.
 
@@ -34,7 +85,7 @@ Mon Jul 31 23:48:04 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/signals.c: Fixed detection of illegal memory accesses on IRIX.
 
-Sun Jul 30 23:59:00 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added support for ICL DRS/NX.
@@ -46,15 +97,15 @@ Sun Jul 30 23:59:00 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/symbol.c:
 	Added support for DRS/NX.
 
-Wed Jul 26 22:02:56 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.h: Added definition of an allocanode.
 
-Tue Jul 25 20:30:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-25  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented CHECK=0 and NOPROTECT with PROF.
 
-Mon Jul 24 20:02:08 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
 	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
@@ -64,16 +115,16 @@ Mon Jul 24 20:02:08 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c: Added support for SGI N32 object files.
 
-Thu Jul 20 18:15:37 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-20  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added a section on diagnostic messages.
 
-Tue Jul 18 23:26:37 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* tests/pass/test2.c, tests/pass/test4.c:
 	Added 64-bit support when displaying pointers.
 
-Mon Jul 17 23:40:03 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-17  Graeme Roy  <graeme@epc.co.uk>
 
 	* README:
 	Changed FAQ to frequently asked questions as it's now in the manual.
@@ -94,7 +145,7 @@ Mon Jul 17 23:40:03 2000  Graeme Roy  <graeme@epc.co.uk>
 	Fixed regression when displaying the summary after a crash and also made
 	the signal-handler thread-safe.
 
-Sun Jul 16 23:58:17 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-16  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented the changes to the NOFREE option.
 
@@ -120,13 +171,13 @@ Sun Jul 16 23:58:17 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mpatrol.c: The -n option now takes an argument.
 
-Fri Jul 14 00:16:40 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.c:
 	Added a way to obtain the program name from the stack on 64-bit SPARC
 	platforms.  Changed all ints to longs in memory operation functions.
 
-Thu Jul 13 23:57:26 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added information about compiling on a 64-bit environment.
 
@@ -164,19 +215,19 @@ Thu Jul 13 23:57:26 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/sbrk.c, src/sbrk.h:
 	Changed the parameter of sbrk() from an int to a long.
 
-Wed Jul 12 00:16:32 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/zip/build.bat, pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build,
 	  pkg/pkg/prototype, pkg/lha/build:
 	Include the tests in the packages.
 
-Tue Jul 11 23:49:00 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-11  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/alloc.c:
 	Fixed a bug within __mp_resizealloc() when allocations are pages and
 	an allocation is increased in size using space from a free block.
 
-Fri Jul  7 10:45:32 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/README: Changed mpatrol.doc to mpatrol.txt.
 
@@ -188,7 +239,7 @@ Fri Jul  7 10:45:32 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/zip/build.bat: New build script for ZIP distributions.
 
-Sun Jul  2 22:40:52 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-07-02  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Documented that the address of an illegal memory access can now be
@@ -198,7 +249,7 @@ Sun Jul  2 22:40:52 2000  Graeme Roy  <graeme@epc.co.uk>
 	Added a way of determining the address of an illegal memory access on
 	LynxOS.
 
-Thu Jun 29 19:24:58 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/unix/Makefile:
 	Changed lint rules to work with lints that don't support the -C option.
@@ -221,12 +272,12 @@ Thu Jun 29 19:24:58 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/signals.c:
 	Added detection of location of illegal memory access on Linux.
 
-Wed Jun 28 23:54:18 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-28  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/signals.c:
 	Added detection of the address of an illegal memory access on AIX.
 
-Mon Jun 26 23:06:12 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented IRIX siginfo support.
 
@@ -243,7 +294,7 @@ Mon Jun 26 23:06:12 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/signals.c: Added handling of SIGBUS on UNIX platforms as well.
 
-Fri Jun 23 20:17:02 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:
 	Documented automatic name demangling, USEDEBUG and imagehlp.lib on
@@ -266,7 +317,7 @@ Fri Jun 23 20:17:02 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.c, src/inter.c: New interface for __mp_newframe().
 
-Thu Jun 22 23:56:54 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Documented that problem with USEDEBUG and BFD has now been fixed.
@@ -277,13 +328,13 @@ Thu Jun 22 23:56:54 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c: Added support for reading symbols on Windows platforms.
 
-Wed Jun 21 13:08:51 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Documented that AIX and LynxOS have been tested with XCOFF object file
 	reader.
 
-Tue Jun 20 18:07:07 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-20  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented XCOFF and ELF64 object file formats.
 
@@ -297,11 +348,11 @@ Tue Jun 20 18:07:07 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/symbol.c:
 	Added direct XCOFF support and provisional support for ELF64.
 
-Sun Jun 18 09:43:06 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented problems making library thread-safe.
 
-Fri Jun 16 17:55:41 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-17  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Documented that thread-safety available on lots more platforms, and
@@ -321,7 +372,7 @@ Fri Jun 16 17:55:41 2000  Graeme Roy  <graeme@epc.co.uk>
 	Added a non-NULL second argument to pthread_join() since LynxOS
 	requires it.
 
-Thu Jun 15 20:27:05 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-15  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
 	  build/netware/Makefile, build/amiga/SMakefile, build/amiga/Makefile:
@@ -342,7 +393,7 @@ Thu Jun 15 20:27:05 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/machine.c, src/machine.h:
 	Added support for calling functions from the .init section of ELF files.
 
-Mon Jun 12 21:54:19 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Removed references to problems on HP/UX as they are now fixed.
 
@@ -372,7 +423,7 @@ Mon Jun 12 21:54:19 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/machine.c, src/machine.h:
 	New files containing processor-dependent assembler routines.
 
-Thu Jun  8 18:37:12 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-08  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented SINIX and UnixWare support.
 
@@ -386,7 +437,7 @@ Thu Jun  8 18:37:12 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c: Added shared library support for SINIX and UnixWare.
 
-Wed Jun  7 21:55:29 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Documented libexc.so on IRIX.
 
@@ -402,13 +453,13 @@ Wed Jun  7 21:55:29 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/strtab.c, src/strtab.h: Changed MP_HASHTABSIZE to MP_HASHTAB_SIZE.
 
-Mon Jun  5 20:28:57 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-05  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented IRIX MIPS stack traversal.
 
 	* src/stack.c, src/stack.h: Added MIPS stack traversal.
 
-Thu Jun  1 21:29:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-06-01  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Documented potential problems on HP/UX.
 
@@ -429,7 +480,7 @@ Thu Jun  1 21:29:46 2000  Graeme Roy  <graeme@epc.co.uk>
 	Recursive mutexes were working after all - it was just the mutex
 	initialisation code that wasn't working as expected!
 
-Wed May 31 20:48:47 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-31  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
 	  build/netware/Makefile, build/amiga/SMakefile, build/amiga/Makefile:
@@ -443,7 +494,7 @@ Wed May 31 20:48:47 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c: Added support for IRIX N32 shared objects.
 
-Tue May 30 19:33:21 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added stack traversal support for RS/6000 and PowerPC.  Symbols can now
@@ -460,7 +511,7 @@ Tue May 30 19:33:21 2000  Graeme Roy  <graeme@epc.co.uk>
 	Added support for XCOFF symbol names.  Added support for reading shared
 	library symbols on IRIX.
 
-Mon May 29 18:04:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented Intel LynxOS now supported.
 
@@ -474,7 +525,7 @@ Mon May 29 18:04:30 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/mutex.c:
 	Removed recursive mutexes as they are too much bother to get working.
 
-Wed May 24 00:42:07 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mutex.c: Improved recursive mutexes.
 
@@ -482,7 +533,7 @@ Wed May 24 00:42:07 2000  Graeme Roy  <graeme@epc.co.uk>
 	Now always lock and unlock the library mutexes in savesignals() and
 	restoresignals() since the mutexes are now recursive.
 
-Tue May 23 23:10:27 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
 	  build/netware/Makefile, build/amiga/SMakefile, build/amiga/Makefile:
@@ -502,18 +553,18 @@ Tue May 23 23:10:27 2000  Graeme Roy  <graeme@epc.co.uk>
 	Adapted to work with new style mutex module.  Call __mp_finimutexes()
 	only if we are cleaning up the end for systems that require it.
 
-Mon May 22 00:27:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mutex.h, src/mutex.c: Added recursive mutexes.
 
-Thu May 18 23:25:01 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/config.h: Added MP_PROCFS_CMDNAME.
 
 	* src/memory.c:
 	Added better way of determining the program name under Linux.
 
-Tue May 16 23:25:04 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-16  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented the ALLOWOFLOW option.
 
@@ -537,7 +588,7 @@ Tue May 16 23:25:04 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mprof.c: Added explicit casting to characters in byteswap().
 
-Mon May 15 23:37:48 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-15  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added information about frame pointers.
 
@@ -564,7 +615,7 @@ Mon May 15 23:37:48 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/library.c:
 	Added the sbrk module for AmigaOS with GCC and Windows platforms.
 
-Sun May 14 23:48:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpatrol.def: Added memccpy().
 
@@ -597,11 +648,11 @@ Sun May 14 23:48:46 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/diag.c, src/diag.h, src/info.c, src/profile.c, src/option.c:
 	Added a meminfo header to __mp_logfile() and __mp_proffile().
 
-Sat May 13 09:56:06 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Mentioned the reference card.
 
-Fri May 12 19:01:12 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* README: Added information on the reference card.
 
@@ -622,7 +673,7 @@ Fri May 12 19:01:12 2000  Graeme Roy  <graeme@epc.co.uk>
 	  pkg/lha/build:
 	Added the quick reference card.
 
-Thu May 11 21:08:36 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-11  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:
 	Mentioned -fno-inline-functions and how to suppress diagnostic messages.
@@ -652,10 +703,10 @@ Thu May 11 21:08:36 2000  Graeme Roy  <graeme@epc.co.uk>
 	profiling information file.
 
 	* src/inter.c:
-	The comparison in memcmp() should be between unsigned chars and not plain
-	chars.
+	The comparison in memcmp() should be between unsigned chars and not
+	plain chars.
 
-Wed May 10 23:59:26 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-10  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi, man/man3/mpatrol.3, man/cat3/mpatrol.3,
 	  src/mpatrol.h, src/malloc.c:
@@ -690,7 +741,7 @@ Wed May 10 23:59:26 2000  Graeme Roy  <graeme@epc.co.uk>
 	* tests/fail/test11.c, tests/fail/test12.c:
 	The option is PAGEALLOC and not PAGESIZE.
 
-Mon May  8 21:53:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-08  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
 	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
@@ -710,7 +761,7 @@ Mon May  8 21:53:30 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/diag.c, src/diag.h, src/info.c, src/inter.c:
 	Changed __mp_alloctypenames[] to __mp_functionnames[].
 
-Thu May  4 20:21:49 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-04  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/unix/Makefile: Added lint support.
 
@@ -730,11 +781,11 @@ Thu May  4 20:21:49 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/malloc.c, src/mpatrol.h:
 	cfree() takes two additional arguments, similar to calloc().
 
-Wed May  3 00:20:14 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-03  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added more information on profiling.
 
-Tue May  2 23:05:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-02  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added information on the format of the profiling output file.
@@ -742,7 +793,7 @@ Tue May  2 23:05:30 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/mprof.c:
 	Need to always read the symbol name string table, even if it is size 1.
 
-Mon May  1 21:57:17 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-05-01  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added the profiling chapter.
 
@@ -762,7 +813,7 @@ Mon May  1 21:57:17 2000  Graeme Roy  <graeme@epc.co.uk>
 	* tests/profile/test2.c:
 	Added new profiling test with a fix for the previous test.
 
-Sun Apr 30 23:59:16 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* man/man1/mpatrol.1, man/cat1/mpatrol.1: Added the profiling options.
 
@@ -779,7 +830,7 @@ Sun Apr 30 23:59:16 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mprof.c: Added the memory leak table.
 
-Thu Apr 27 19:07:37 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-27  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Documented IRIX support.  Changed memleak to mleak.
 
@@ -799,7 +850,7 @@ Thu Apr 27 19:07:37 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mprof.c: Added support for symbol offsets.
 
-Wed Apr 26 23:24:00 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c, src/symbol.h: Added an index into the profiling table.
 
@@ -809,7 +860,7 @@ Wed Apr 26 23:24:00 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/mprof.c:
 	Added the cleardata() function and temporary data for sorting.
 
-Tue Apr 25 23:40:11 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-25  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
 	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
@@ -819,7 +870,7 @@ Tue Apr 25 23:40:11 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mprof.c: Added the direct allocation table.
 
-Mon Apr 24 19:24:38 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
 	  pkg/lha/build, build/windows/NMakefile, build/windows/Makefile,
@@ -849,7 +900,7 @@ Mon Apr 24 19:24:38 2000  Graeme Roy  <graeme@epc.co.uk>
 	New tool for displaying profiling information from a profiling output
 	file produced by the mpatrol library.
 
-Sun Apr 23 23:23:56 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.c, src/slots.c, src/option.c:
 	Added some explicit casting for compiling with C++.
@@ -858,7 +909,7 @@ Sun Apr 23 23:23:56 2000  Graeme Roy  <graeme@epc.co.uk>
 	Changed the list field to ilist.  Added support for full call graphs.
 	The profdata structures are now only allocated for leaf call sites.
 
-Thu Apr 20 23:45:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-20  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
 	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
@@ -886,7 +937,7 @@ Thu Apr 20 23:45:46 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mpatrol.c: Added the -1, -2, -3 and -Q options.
 
-Wed Apr 19 23:24:41 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-19  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
 	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
@@ -914,7 +965,7 @@ Wed Apr 19 23:24:41 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/library.c: Added the profile module.
 
-Tue Apr 18 23:55:26 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
 	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
@@ -926,7 +977,7 @@ Tue Apr 18 23:55:26 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/profile.c, src/profile.h: New files for memory profiling.
 
-Thu Apr 13 19:15:11 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more related software and described how to embed object file
@@ -940,13 +991,13 @@ Thu Apr 13 19:15:11 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/malloc.c, src/mpatrol.h:
 	Made set_new_handler() have extern "C" linkage for G++.
 
-Tue Apr 11 21:48:34 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-11  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/Makefile, build/windows/NMakefile: Removed -noentry.
 
 	* doc/mpatrol.texi: Added documentation on the GNU C library.
 
-Thu Apr  6 19:26:29 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-06  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Documented change to name of some object libraries.
 
@@ -984,7 +1035,7 @@ Thu Apr  6 19:26:29 2000  Graeme Roy  <graeme@epc.co.uk>
 	variable.  Also fixed return value of system() when gcc is used on
 	AmigaOS.
 
-Wed Apr  5 23:57:19 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-05  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ, bin/Attic/mpatrol, pkg/tar/build, pkg/rpm/mpatrol.spec,
 	  pkg/pkg/build:
@@ -1020,7 +1071,7 @@ Wed Apr  5 23:57:19 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memleak.c: Added the -V option.
 
-Tue Apr  4 17:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-04  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpatrol.def: Added __mp_printinfo.
 
@@ -1031,7 +1082,7 @@ Tue Apr  4 17:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/inter.h, src/inter.c, src/mpatrol.h:
 	Added the __mp_printinfo() function.
 
-Mon Apr  3 23:48:56 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-03  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/SMakefile, build/netware/Makefile,
 	  build/windows/Makefile, build/unix/Makefile:
@@ -1053,7 +1104,7 @@ Mon Apr  3 23:48:56 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/version.h, src/version.c: Added a definition for __mp_homepage.
 
-Sun Apr  2 15:38:57 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-02  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Documented the memleak command and that DG/UX now supports the
@@ -1075,7 +1126,7 @@ Sun Apr  2 15:38:57 2000  Graeme Roy  <graeme@epc.co.uk>
 	* tests/fail/test15.c:
 	New test to highlight problems of overwriting pointer information.
 
-Fri Mar 31 08:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-31  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/Makefile, build/amiga/SMakefile, build/netware/Makefile,
 	  build/windows/Makefile:
@@ -1084,7 +1135,7 @@ Fri Mar 31 08:50:20 2000  Graeme Roy  <graeme@epc.co.uk>
 	* build/unix/Makefile:
 	Added the memleak tool and fixed embedded shared library versions.
 
-Thu Mar 30 18:10:11 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* man/cat1/memleak.1, man/man1/memleak.1:
 	New manual page for the memleak tool.
@@ -1101,12 +1152,12 @@ Thu Mar 30 18:10:11 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memleak.c: New file for detecting memory leaks in the log file.
 
-Sun Mar 26 20:26:46 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate:
 	Used colons instead of tabs as field separators for rcs2log.
 
-Fri Mar 24 01:37:57 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added lots more questions and answers.
 
@@ -1119,7 +1170,7 @@ Fri Mar 24 01:37:57 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* tests/fail/test12.c: New test for pre-read errors.
 
-Thu Mar 23 21:30:15 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* README: Mentioned that Windows now overrides malloc() as well.
 
@@ -1151,13 +1202,13 @@ Thu Mar 23 21:30:15 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mpatrol.c: Include malloc.c if on Windows platforms as well.
 
-Wed Mar 22 19:17:47 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/lha/build: Added Amiga LhA distribution archive build script.
 
 	* src/symbol.c: Always now include stdlib.h and string.h.
 
-Tue Mar 21 21:56:06 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* README:
 	Mentioned that malloc() is automatically overridden when using AmigaOS
@@ -1177,7 +1228,7 @@ Tue Mar 21 21:56:06 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/inter.c: Don't call __mp_init() from memory operation functions.
 
-Mon Mar 20 23:45:09 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-20  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Removed mention of Amiga shared library.
 
@@ -1201,7 +1252,7 @@ Mon Mar 20 23:45:09 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/mpatrol.c:
 	Added replacements for malloc() when compiling on Amiga with GCC.
 
-Wed Mar 15 01:42:53 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-15  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added a chapter on integration.
 
@@ -1218,7 +1269,7 @@ Wed Mar 15 01:42:53 2000  Graeme Roy  <graeme@epc.co.uk>
 	  src/heap.c:
 	Made use of MP_ALLOCFACTOR.
 
-Tue Mar 14 00:57:58 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/inter.c:
 	Added ability to determine source level information from call if
@@ -1227,7 +1278,7 @@ Tue Mar 14 00:57:58 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/malloc.c: Added special mangling for GNU C++ operators.
 
-Mon Mar 13 22:48:55 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/Makefile, build/netware/Makefile, build/amiga/SMakefile,
 	  build/unix/Makefile:
@@ -1238,7 +1289,7 @@ Mon Mar 13 22:48:55 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/strtab.c, src/strtab.h, src/diag.c:
 	Added slots and a list for internal nodes for the hash table.
 
-Thu Mar  9 22:11:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-09  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added the section on building.
 
@@ -1254,11 +1305,11 @@ Thu Mar  9 22:11:30 2000  Graeme Roy  <graeme@epc.co.uk>
 	* pkg/tar/build:
 	Initial revision for building a tape archive distribution.
 
-Wed Mar  8 01:18:00 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-08  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Updated with all the recent changes.
 
-Tue Mar  7 22:10:59 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/windows/mpatrol.def, build/amiga/mpatrol_lib.fd:
 	Added __mp_pushdelstack() and __mp_popdelstack().
@@ -1286,12 +1337,12 @@ Tue Mar  7 22:10:59 2000  Graeme Roy  <graeme@epc.co.uk>
 	Documented the USEDEBUG option and added const to some function
 	prototypes.
 
-Mon Mar  6 21:45:43 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-06  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mpatrol.h:
 	Added MP_CONST and made many pointer parameters constant.
 
-Fri Mar  3 01:24:51 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-03  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more platforms on which mpatrol has been tested.
@@ -1299,13 +1350,13 @@ Fri Mar  3 01:24:51 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/diag.c, src/diag.h:
 	Modify return address in print symbol when looking for line numbers.
 
-Wed Mar  1 00:54:53 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-03-01  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/diag.c: Added source level information to __mp_printsymbol().
 
 	* src/option.c, src/option.h, src/mpatrol.h: Added the USEDEBUG option.
 
-Tue Feb 29 23:08:31 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c:
 	Added __mp_closesymbols() and support for caching BFD library handles.
@@ -1318,13 +1369,13 @@ Tue Feb 29 23:08:31 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/inter.c: Added a call to __mp_closesymbols().
 
-Thu Feb 24 00:58:32 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Fixed problem when the allocation count gets incremented more than once
 	before being stored in an infonode if internal allocations are made.
 
-Tue Feb 22 22:29:47 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-22  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	The C++ operators now have source level information associated with
@@ -1349,13 +1400,13 @@ Tue Feb 22 22:29:47 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* tests/pass/test7.c: New C++ test for operators new and delete.
 
-Fri Feb 18 01:20:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added some information on the Amiga version of mpatrol.
 
 	* doc/mpatrol.texi: Added information on contributors.
 
-Thu Feb 10 21:27:50 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-10  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Changed order of deletion of symbols, addrs and allocs since we may need
@@ -1364,11 +1415,11 @@ Thu Feb 10 21:27:50 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/symbol.c, src/symbol.h: Added the __mp_findsource() function.
 
-Mon Feb  7 20:17:30 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-04-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added more related software.
 
-Mon Jan 31 21:06:39 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-31  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/Makefile: Added a target to build mpatrol_doc.tar.gz.
 
@@ -1377,7 +1428,7 @@ Mon Jan 31 21:06:39 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/utils.c, src/utils.h: Added __mp_squareroot().
 
-Sun Jan 30 21:26:39 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
 	Added __mp_locatemem().
@@ -1407,7 +1458,7 @@ Sun Jan 30 21:26:39 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/mpatrol.h, src/malloc.c:
 	Added the memchr() and memmem() functions.
 
-Fri Jan 28 01:24:33 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-28  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
 	Added __mp_comparemem().
@@ -1432,7 +1483,7 @@ Fri Jan 28 01:24:33 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/malloc.c, src/mpatrol.h: Added memcmp() and bcmp().
 
-Thu Jan 27 21:33:14 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-27  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.c, src/memory.h: Added __mp_memcompare().
 
@@ -1446,13 +1497,13 @@ Thu Jan 27 21:33:14 2000  Graeme Roy  <graeme@epc.co.uk>
 	  tests/tutorial/test3.c:
 	New tutorial files.
 
-Tue Jan 25 01:41:53 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-25  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/mpatrol_pragmas.h: Added __mp_setmem() and __mp_copymem().
 
 	* tests/pass/test6.c: New memory operation test.
 
-Mon Jan 24 21:20:53 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-24  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:
 	New information about non-fatal errors and added information on C++
@@ -1490,7 +1541,7 @@ Mon Jan 24 21:20:53 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/version.c: Updated to version 1.1.0.
 
-Fri Jan 21 01:11:45 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/alloc.c, src/alloc.h:
 	Added an extra argument to __mp_findnode() for detecting if a node lies
@@ -1515,22 +1566,22 @@ Fri Jan 21 01:11:45 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* tests/fail/test10.c: New test showing the erroneous use of memcpy().
 
-Tue Jan 18 00:41:34 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Listed more of the potential run-time problems.
 
-Thu Jan 13 00:40:24 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi, README:
 	Added information about the new discussion group at eGroups.com.
 
-Wed Jan 12 01:08:50 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more information about SAFESIGNALS and more items of related
 	software.
 
-Tue Jan 11 00:56:11 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-11  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Added the FILES section.
 
@@ -1542,7 +1593,7 @@ Tue Jan 11 00:56:11 2000  Graeme Roy  <graeme@epc.co.uk>
 	* pkg/rpm/mpatrol.spec, pkg/pkg/prototype, pkg/pkg/build:
 	Changed the suffix of the ASCII documentation from .doc to .txt.
 
-Sun Jan  9 22:08:18 2000  Graeme Roy  <graeme@epc.co.uk>
+2000-01-09  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/SMakefile, build/netware/Makefile, build/unix/Makefile,
 	  build/windows/Makefile, build/windows/mpatrol.def:
@@ -1565,7 +1616,7 @@ Sun Jan  9 22:08:18 2000  Graeme Roy  <graeme@epc.co.uk>
 	* src/signals.c, src/signals.h:
 	Added extra flag to indicate if signals have been saved or not.
 
-Thu Dec 23 18:50:55 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-12-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more related software and removed authors from the concept index.
@@ -1579,7 +1630,7 @@ Thu Dec 23 18:50:55 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/option.h: Added OPT_* definitions for use with mallopt().
 
-Tue Dec 21 21:43:21 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-12-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added reference to the memory management reference.
 
@@ -1593,7 +1644,7 @@ Tue Dec 21 21:43:21 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/mpatrol.h: Added options and flags for use with mallopt().
 
-Mon Dec 20 22:06:49 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-12-20  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added a section on using the library functions.
 
@@ -1606,7 +1657,7 @@ Mon Dec 20 22:06:49 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.h, src/memory.c: Added __mp_memset() and __mp_memcopy().
 
-Mon Dec  6 20:50:44 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-12-06  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added the utilities section and also documented the pkg directory and
@@ -1615,27 +1666,27 @@ Mon Dec  6 20:50:44 1999  Graeme Roy  <graeme@epc.co.uk>
 	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
 	Added information about core file sizes.
 
-Mon Nov 29 20:15:50 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-29  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/pkg/build, pkg/pkg/prototype, pkg/pkg/pkginfo:
 	New files for use when building a PKG package.
 
-Sun Nov 28 15:10:28 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-28  Graeme Roy  <graeme@epc.co.uk>
 
 	* pkg/rpm/build, pkg/rpm/mpatrol.spec:
 	New files for use when building an RPM package.
 
-Sat Nov 27 16:23:59 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-27  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added the how it works chapter.
 
-Fri Nov 26 14:35:45 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-26  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added the overwrites and underwrites, testing, library behaviour and
 	general errors sections.
 
-Thu Nov 25 18:09:43 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-25  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mpatrol: Added the -Z and -z options.
 
@@ -1668,13 +1719,13 @@ Thu Nov 25 18:09:43 1999  Graeme Roy  <graeme@epc.co.uk>
 	Changed __mp_trap() to do nothing so that it can be used as a breakpoint
 	target within a debugger.
 
-Tue Nov 23 20:25:58 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-23  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added more things to do and also added a list of related software for
 	the Amiga.
 
-Sun Nov 21 14:22:03 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* NOTES:
 	Removed this file as its contents are now in the manual.
@@ -1685,7 +1736,7 @@ Sun Nov 21 14:22:03 1999  Graeme Roy  <graeme@epc.co.uk>
 	Added the library performance section along with updated performance
 	figures.
 
-Thu Nov 18 20:04:12 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* README, NOTES:
 	Removed a lot of text from these files as it is now in the manual.
@@ -1695,19 +1746,19 @@ Thu Nov 18 20:04:12 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added the operating system support section.
 
-Tue Nov 16 01:07:15 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-16  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi:
 	Added information about manual layout and changed Examples appendix to a
 	chapter.
 
-Mon Nov 15 21:34:03 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-15  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi: Added the section on memory allocations.
 
 	* doc/Makefile: Now use makeguide to build the AmigaGuide document.
 
-Sun Nov 14 18:14:11 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi, doc/Makefile:
 	Added the mpatrol logo to the various document formats.
@@ -1717,7 +1768,7 @@ Sun Nov 14 18:14:11 1999  Graeme Roy  <graeme@epc.co.uk>
 	New image files containing the mpatrol logo, which are required by the
 	various documentation formats.
 
-Wed Nov 10 20:49:19 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-10  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate: Added ability to update NEWS with latest changes as well.
 
@@ -1727,14 +1778,14 @@ Wed Nov 10 20:49:19 1999  Graeme Roy  <graeme@epc.co.uk>
 	New TeXinfo manual for the library, and a Makefile to build various
 	documentation formats from it.
 
-Sun Nov  7 13:24:44 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-11-07  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/memory.c:
 	Added the getmemory() function for implementing a simulated heap.
 
 	* src/config.h: Added support for allocating memory from a static array.
 
-Thu Oct 21 21:57:48 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-21  Graeme Roy  <graeme@epc.co.uk>
 
 	* README, NOTES, EXAMPLES: Added information about the CHECK option.
 
@@ -1754,7 +1805,7 @@ Thu Oct 21 21:57:48 1999  Graeme Roy  <graeme@epc.co.uk>
 	* src/option.h, src/option.c:
 	Added the readrange() function and the CHECK option.
 
-Tue Oct 19 19:23:11 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-19  Graeme Roy  <graeme@epc.co.uk>
 
 	* EXAMPLES:
 	Added information about the total warnings and errors displayed at
@@ -1780,7 +1831,7 @@ Tue Oct 19 19:23:11 1999  Graeme Roy  <graeme@epc.co.uk>
 	Improved __mp_memcheck() to be much more efficient for large blocks of
 	memory.
 
-Sun Oct 17 11:30:12 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-17  Graeme Roy  <graeme@epc.co.uk>
 
 	* NOTES: Added library performance figures and more related software.
 
@@ -1788,11 +1839,11 @@ Sun Oct 17 11:30:12 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* EXAMPLES: Added note about not using the library in release builds.
 
-Fri Oct 15 00:14:46 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-15  Graeme Roy  <graeme@epc.co.uk>
 
 	* README: Documented the USEMMAP option.
 
-Thu Oct 14 23:59:42 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-14  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/option.c:
 	Added the USEMMAP option for UNIX platforms that support mmap().
@@ -1807,11 +1858,11 @@ Thu Oct 14 23:59:42 1999  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/config.h: Added MP_MMAP_SUPPORT and MP_MMAP_FILENAME.
 
-Wed Oct 13 21:22:30 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-13  Graeme Roy  <graeme@epc.co.uk>
 
 	* EXAMPLES: New file for illustrating how to use the library.
 
-Tue Oct 12 19:18:30 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-12  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/alloc.c:
 	Fixed the problem in splitnode() whereby the free node would be lost if
@@ -1822,12 +1873,12 @@ Tue Oct 12 19:18:30 1999  Graeme Roy  <graeme@epc.co.uk>
 	Don't attempt to read from _DYNAMIC if its address is NULL, since that
 	will be the case if the program is statically linked.
 
-Sun Oct 10 10:21:00 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-10  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate:
 	Only update ChangeLog if it has changed since the last release.
 
-Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-05  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/info.c:
 	Fixed a bug in __mp_checkinfo() when all allocations are pages and no
@@ -1838,7 +1889,7 @@ Tue Oct  5 17:35:19 1999  Graeme Roy  <graeme@epc.co.uk>
 	Fixed a bug in __mp_newframe() if using MP_BUILTINSTACK_SUPPORT when the
 	loop went round one too many times, causing an infinite loop.
 
-Sun Oct  3 22:50:22 1999  Graeme Roy  <graeme@epc.co.uk>
+1999-10-03  Graeme Roy  <graeme@epc.co.uk>
 
 	* src/inter.c:
 	Fixed problem in __mp_info() where the check for a known memory block
