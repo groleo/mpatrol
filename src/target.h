@@ -151,7 +151,11 @@
 #define FORMAT FORMAT_ELF32
 #endif /* SYSTEM */
 #else /* FORMAT */
+#if TARGET == TARGET_AMIGA && defined(__GNUC__)
+#define FORMAT FORMAT_BFD
+#else /* TARGET && __GNUC__ */
 #define FORMAT FORMAT_NONE
+#endif /* TARGET && __GNUC__ */
 #endif /* FORMAT */
 #endif /* FORMAT */
 
