@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.10 2000-04-30 15:06:25 graeme Exp $"
+#ident "$Id: mprof.c,v 1.11 2000-04-30 15:47:18 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -712,6 +712,9 @@ static void leaktable(void)
                 __mp_treeinsert(&temptree, &n->tnode, a);
         }
     }
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
+         n = (profilenode *) __mp_successor(&n->node))
+        n->flags = 0;
     for (t = __mp_maximum(temptree.root); t != NULL; t = __mp_predecessor(t))
     {
         n = (profilenode *) ((char *) t - offsetof(profilenode, tnode));
@@ -746,8 +749,31 @@ static void leaktable(void)
             fprintf(stdout, "%6.2f  %8lu  %6.2f  %6lu  %6.2f  %8lu  %6lu  ",
                     g, a, e, b, f, j, k);
         }
+        printsymbol(n);
+        fputc('\n', stdout);
+        p = n;
+        for (i = 1; (maxstack == 0) || (i < maxstack); i++)
+        {
+            if (p->parent == 0)
+                break;
+            p = &nodes[p->parent - 1];
+            printchar(' ', 60);
+            printsymbol(p);
+            fputc('\n', stdout);
+        }
         cleardata(d);
     }
+    e = ((double) (acount - dcount) / (double) acount) * 100.0;
+    f = ((double) (atotal - dtotal) / (double) atotal) * 100.0;
+    if (temptree.size != 0)
+        fputc('\n', stdout);
+    if (showcounts)
+        fprintf(stdout, "        %6lu  %6.2f  %8lu  %6.2f  %6lu  %8lu  total\n",
+                acount - dcount, e, atotal - dtotal, f, acount, atotal);
+    else
+        fprintf(stdout, "        %8lu  %6.2f  %6lu  %6.2f  %8lu  %6lu  total\n",
+                atotal - dtotal, f, acount - dcount, e, atotal, acount);
+    __mp_newtree(&temptree);
 }
 
 
