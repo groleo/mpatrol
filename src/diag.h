@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.29 2001-03-04 15:45:41 graeme Exp $
+ * $Id: diag.h,v 1.30 2001-03-04 16:05:25 graeme Exp $
  */
 
 
@@ -45,6 +45,8 @@
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
+ * This must be kept up to date with the definition of __mp_errortype in
+ * mpatrol.h.
  */
 
 typedef enum errortype

@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.106 2001-03-04 15:57:19 graeme Exp $
+ * $Id: mpatrol.h,v 1.107 2001-03-04 16:05:25 graeme Exp $
  */
 
 
@@ -259,6 +259,41 @@
 
 typedef void *__mp_failhandler;
 #endif /* MP_MPALLOC_H */
+
+
+/* The different types of warnings and errors reported by the mpatrol library.
+ */
+
+typedef enum __mp_errortype
+{
+    MP_ET_NONE,   /* no error */
+    MP_ET_ALLOVF, /* allocation overflow */
+    MP_ET_ALLZER, /* allocation too small */
+    MP_ET_BADALN, /* illegal alignment */
+    MP_ET_FRDCOR, /* freed memory corruption */
+    MP_ET_FRDOPN, /* illegal operation on freed memory */
+    MP_ET_FRDOVF, /* freed allocation overflow */
+    MP_ET_FRECOR, /* free memory corruption */
+    MP_ET_FREMRK, /* freeing a marked allocation */
+    MP_ET_FRENUL, /* freeing a NULL pointer */
+    MP_ET_FREOPN, /* illegal operation on free memory */
+    MP_ET_ILLMEM, /* illegal memory access */
+    MP_ET_INCOMP, /* incompatible functions */
+    MP_ET_MAXALN, /* alignment too large */
+    MP_ET_MISMAT, /* allocated pointer mismatch */
+    MP_ET_NOTALL, /* no such allocation */
+    MP_ET_NULOPN, /* illegal operation on a NULL pointer */
+    MP_ET_OUTMEM, /* out of memory */
+    MP_ET_PRVFRD, /* allocation already freed */
+    MP_ET_RNGOVF, /* range overflow */
+    MP_ET_RNGOVL, /* range overlap */
+    MP_ET_RSZNUL, /* reallocating a NULL pointer */
+    MP_ET_RSZZER, /* reallocation too small */
+    MP_ET_STROVF, /* string overflow */
+    MP_ET_ZERALN, /* alignment too small */
+    MP_ET_MAX
+}
+__mp_errortype;
 
 
 /* The different types of memory allocation and operation functions.
