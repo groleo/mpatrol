@@ -47,9 +47,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.71 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: inter.c,v 1.72 2001-02-05 23:45:49 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.71 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.72 2001-02-05 23:45:49 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1278,6 +1278,14 @@ __mp_printinfo(void *p)
     fprintf(stderr, "    start of block:     " MP_POINTER "\n", n->block);
     fprintf(stderr, "    size of block:      %lu byte%s\n", n->size,
             (n->size == 1) ? "" : "s");
+    fprintf(stderr, "    stored type:        %s\n",
+            m->data.typestr ? m->data.typestr : "<unknown>");
+    fputs("    stored type size:   ", stderr);
+    if (m->data.typesize)
+        fprintf(stderr, "%lu byte%s\n", m->data.typesize,
+                (m->data.typesize == 1) ? "" : "s");
+    else
+        fputs("<unknown>\n", stderr);
     if (m->data.flags & FLG_FREED)
         fputs("    freed by:           ", stderr);
     else
