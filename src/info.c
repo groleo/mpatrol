@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.15 2000-04-03 13:07:30 graeme Exp $"
+#ident "$Id: info.c,v 1.16 2000-04-19 00:03:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -71,6 +71,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
                    MP_FREEBYTE, 0);
     __mp_newaddrs(&h->addr, &h->alloc.heap);
     __mp_newsymbols(&h->syms, &h->alloc.heap);
+    __mp_newprofile(&h->prof);
     /* Determine the minimum alignment for an allocation information node
      * on this system and force the alignment to be a power of two.  This
      * information is used when initialising the slot table.
@@ -123,6 +124,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
      */
     __mp_closelogfile();
     h->log = NULL;
+    __mp_deleteprofile(&h->prof);
     __mp_deletesymbols(&h->syms);
     __mp_deleteaddrs(&h->addr);
     __mp_deleteallocs(&h->alloc);

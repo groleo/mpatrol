@@ -33,7 +33,7 @@
 
 #include "config.h"
 #include "addr.h"
-#include "alloc.h"
+#include "profile.h"
 #include "signals.h"
 #include "symbol.h"
 
@@ -146,6 +146,7 @@ typedef struct infohead
     addrhead addr;                    /* stack address table */
     symhead syms;                     /* symbol table */
     sighead signals;                  /* signal handler table */
+    profhead prof;                    /* profiling information */
     slottable table;                  /* table of information nodes */
     listhead list;                    /* internal allocation list */
     size_t size;                      /* internal allocation total */
