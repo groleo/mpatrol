@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.222 2001-06-13 22:57:13 graeme Exp $
+@c $Id: mpatrol.texi,v 1.223 2001-07-19 21:44:29 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.10
-@set VERSION 1.4.5
-@set UPDATED 13th June, 2001
+@set EDITION 2.11
+@set VERSION 1.4.6
+@set UPDATED 19th July, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -13727,7 +13727,7 @@ system.  On the Amiga, Enforcer by Michael Sinz runs in the background and
 detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
-A list of over eighty different items of software which help in debugging
+A list of over ninety different items of software which help in debugging
 dynamic memory allocation problems is given below@footnote{This list can be
 considered to be a slightly more up to date version of @cite{Debugging Tools
 for Dynamic Storage Allocation and Memory Management}
@@ -13877,6 +13877,26 @@ VMS
 @item Overview
 Provides debugging versions of the C run-time library memory allocation
 routines, with support for stack tracebacks and page protection.
+@end table
+
+@cindex CMM (Customisable Memory Manager)
+@item
+CMM (Customisable Memory Manager)
+@table @asis
+@item Author
+Giuseppe Attardi (@email{attardi@@di.unipi.it}),
+Tito Flagella (@email{tito@@di.unipi.it}) and
+Pietro Iglio (@email{iglio@@di.unipi.it})
+@item License
+Free Software
+@item Platforms
+Various UNIX, Windows, MacOS, DOS
+@item Location
+@uref{ftp://ftp.di.unipi.ti/pub/project/posso/cmm/}
+@item Overview
+A memory management facility supporting memory intensive applications in C++,
+with support for multiple heaps (each one optionally implementing a different
+storage discipline) and garbage collection.
 @end table
 
 @cindex CSRI malloc
@@ -14118,6 +14138,22 @@ used as a plug-in replacement for @code{malloc()}, but can also be used to
 detect memory leaks.
 @end table
 
+@cindex GCAlloc
+@item
+GCAlloc
+@table @asis
+@item Author
+Joel Bartlett (@email{bartlett@@decwrl.dec.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{ftp://gatekeeper.dec.com/pub/DEC/CCgc/}
+@item Overview
+A highly-portable generational, mostly-copying garbage collector for C++.
+@end table
+
 @cindex GlowCode
 @cindex Electric Software, Inc.
 @item
@@ -14222,6 +14258,23 @@ Provides a general-purpose dynamic memory allocation debugging package with
 symbolic stack traceback.
 @end table
 
+@cindex IDH
+@item
+IDH
+@table @asis
+@item Author
+Ivan Skytte Jorgensen (@email{isj@@image.dk})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.platypus.adsl.dk/idh/index.html/}
+@item Overview
+Detects most overwrites, stale pointers, wild pointers, double-free and invalid
+mix of heap management functions.
+@end table
+
 @cindex Insure++
 @cindex Parasoft
 @item
@@ -14309,6 +14362,26 @@ Various UNIX
 @item Overview
 A simple shell script that monitors the system looking for processes which leak
 memory.
+@end table
+
+@cindex LeakBug
+@item
+LeakBug
+@table @asis
+@item Author
+Christian Hammond (@email{chipx86@@portaldesign.net}),
+Domenico Andreoli (@email{cavok@@filibusta.crema.unimi.it}) and
+Gerry Jo Jellestad (@email{gerry@@c64.org})
+@item License
+GNU General Public License
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.gnupdate.org/}
+@item Overview
+A memory leak tracer that specializes in detecting leaks from a program's own
+calls to @code{malloc()}, @code{strdup()}, etc, but does not detect leaks from
+outside libraries.
 @end table
 
 @cindex Leakers
