@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.25 2000-01-13 00:40:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.26 2000-01-24 00:05:02 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 13th January, 2000
+@set UPDATED 23rd January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -339,6 +339,27 @@ Contains 4 replacement C++ dynamic memory allocation functions:
 @end multitable
 
 @item
+Contains 5 replacement C memory operation functions:
+
+@multitable @columnfractions .2 .1 .7
+@item @code{memset()}
+@tab ANSI
+@tab Fills memory with a specific byte.
+@item @code{bzero()}
+@tab UNIX
+@tab Fills memory with the zero byte.
+@item @code{memcpy()}
+@tab ANSI
+@tab Copies non-overlapping memory.
+@item @code{memmove()}
+@tab ANSI
+@tab Copies possibly-overlapping memory.
+@item @code{bcopy()}
+@tab UNIX
+@tab Copies possibly-overlapping memory.
+@end multitable
+
+@item
 Contains support for a user-defined low-memory handler function, including a
 replacement for the C++ function, @code{set_new_handler()}.
 
@@ -426,6 +447,13 @@ the free memory pool.  This is useful for detecting if use is being made of
 freed memory just after a memory allocation has been freed.  The contents of
 the memory allocation can either be preserved or can be pre-filled with a value
 in order to detect illegal writes to the freed memory allocation.
+
+@item
+Calls to memory operation functions (such as @code{memset()} or @code{memcpy()})
+have their arguments checked to ensure that they do not pass null pointers or
+attempt to read or write memory straddling the boundary of a previously
+allocated memory block.  Tracing from all such functions can also optionally
+be written to the log file.
 
 @item
 The internal data structures used by the library are kept separate from the
@@ -951,7 +979,9 @@ time, but on some systems this can be improved by copying a word at a time.
 Unfortunately, care has to be taken when reading and writing such words as the
 equivalent bytes may not be aligned on word boundaries.  Technically, reading
 additional bytes before or after a memory allocation when they share the same
-word is legal, but when using watch points such errors will be picked up.
+word is legal, but when using watch points such errors will be picked up.  The
+mpatrol library replaces most of the memory operation functions provided by the
+system libraries with safer versions, although they may not be as efficient.
 
 An operating system with virtual memory is usually going to run ever so slightly
 slower than an operating system without it@footnote{Due to the overhead of
@@ -1145,10 +1175,10 @@ reallocations and deallocations performed by your program, use the
 library functions, and a full description of the format of such tracing is given
 in Example 1 (@pxref{Example 1}).  Alternatively, you may select one or more
 types of functions to be traced using the @option{LOGALLOCS},
-@option{LOGREALLOCS} and @option{LOGFREES} options if you feel that the log file
-is too large when @option{LOGALL} is used.  By default all diagnostics from the
-mpatrol library get sent to @file{mpatrol.log} in the current directory, but
-this can be changed using the @option{LOGFILE} option.
+@option{LOGREALLOCS}, @option{LOGFREES} and @option{LOGMEMORY} options if you
+feel that the log file is too large when @option{LOGALL} is used.  By default
+all diagnostics from the mpatrol library get sent to @file{mpatrol.log} in the
+current directory, but this can be changed using the @option{LOGFILE} option.
 
 @cindex library settings
 @cindex settings
@@ -1319,6 +1349,12 @@ instruction before it is executed.  However, this is a very thorough way of
 checking for overflows and is unlikely to miss anything, although there may be
 problems with misaligned memory accesses when using watch points
 (@pxref{Virtual memory}).
+
+Note that from release 1.1.0 of mpatrol, the library comes with replacement
+functions for many memory operation functions, such as @code{memset()} and
+@code{memcpy()}.  These new functions provide additional checks to ensure that
+if a memory operation is being performed on a memory block, the operation will
+not read or write before or beyond the boundaries of that block.
 
 To conclude, if you suspect your program has a piece of code which is performing
 illegal memory underwrites or overwrites to a memory allocation you should use
@@ -2078,8 +2114,9 @@ then running a program that has been linked with the library.
 * Example 2::                   Detecting incorrect reuse of freed memory.
 * Example 3::                   Detecting use of free memory.
 * Example 4::                   Using overflow buffers.
-* Example 5::                   Incompatible function calls.
-* Example 6::                   Additional useful information.
+* Example 5::                   Bad memory operations.
+* Example 6::                   Incompatible function calls.
+* Example 7::                   Additional useful information.
 @end menu
 
 @node Example 1, Example 2, , Examples
@@ -2934,6 +2971,55 @@ it accesses a watch point area.  Slowing the program down by a factor of 10,000
 is not uncommon on some systems when the @option{OFLOWWATCH} option is used.
 
 @node Example 5, Example 6, Example 4, Examples
+@section Bad memory operations
+
+In C there are several basic memory operation functions that are often called
+to perform tasks such as clearing memory, copying memory, etc.  The mpatrol
+library contains replacements for these which allow for better checking of their
+arguments to prevent reading and writing past the boundaries of existing memory
+allocations.  The following source can be found in @file{tests/fail/test9.c}.
+
+@smallexample
+23  /*
+24   * Allocates a block of 16 bytes and then attempts to zero the contents of
+25   * the block.  However, a zero byte is also written 1 byte before and 1
+26   * byte after the allocated block, resulting in an error in the log file.
+27   */
+
+
+30  #include "mpatrol.h"
+
+
+33  int main(void)
+34  @{
+35      char *p;
+36
+37      if (p = (char *) malloc(16))
+38      @{
+39          memset(p - 1, 0, 18);
+40          free(p);
+41      @}
+42      return EXIT_SUCCESS;
+43  @}
+@end smallexample
+
+When this is compiled and run, the following should appear in the log file.
+
+@smallexample
+ERROR: memset: range [0x00027FFF,0x00028010] overflows [0x00028000,0x0002800F]
+    0x00028000 (16 bytes) @{malloc:13:0@} [main|test9.c|37]
+        0x00010B18 main
+        0x00010A0C _start
+@end smallexample
+
+As you can see, the library detected that the @code{memset()} function would
+have written past the boundaries of the memory allocation and reported this to
+you.  It then proceeded to ignore the request to copy the memory and continued
+with the execution of the program.  Note that this will only be done for known
+memory allocations.  Reading and writing past the boundaries of static and stack
+memory allocations cannot be detected in this way.
+
+@node Example 6, Example 7, Example 5, Examples
 @section Incompatible function calls
 
 This example illustrates how the mpatrol library checks for calls to
@@ -2990,7 +3076,7 @@ matched by calls to @code{operator delete[]} and not @code{operator delete}.
 Hence, the library reports this as an error and does not free the memory
 allocation.
 
-@node Example 6, , Example 5, Examples
+@node Example 7, , Example 6, Examples
 @section Additional useful information
 
 @cindex memory leaks
@@ -3377,7 +3463,7 @@ will be freed.  All of the previous contents will be destroyed.
 Frees the memory allocation beginning at @var{ptr} so the memory can be reused
 by another call to allocate memory.  If @var{ptr} is @samp{NULL} then no memory
 will be freed.  All of the previous contents will be destroyed.  This function
-is available for backwards compatibilty with older C libraries and
+is available for backwards compatibility with older C libraries and
 @code{calloc()} and should not be used in new code.
 @end table
 
@@ -3432,6 +3518,58 @@ will be called repeatedly by both functions when they would normally return
 @samp{NULL}, and this loop will continue until they manage to allocate the
 requested space.  Note that this function is equivalent to
 @code{__mp_nomemory()} and will replace the handler installed by that function.
+@end table
+
+The following 5 functions are available as replacements for existing C library
+memory operation functions.  To use these you must include @file{mpatrol.h}
+before all other header files, although on UNIX platforms they will be used
+anyway, albeit with slightly less tracing information.
+
+@table @asis
+@findex memset
+@item @code{void *memset(void *ptr, int byte, size_t size)}
+Writes @var{size} bytes of value @var{byte} to the memory location beginning at
+@var{ptr} and returns @var{ptr}.  If @var{size} is @samp{0} then no bytes will
+be written.  If the operation would affect an existing memory allocation in the
+heap but would straddle that allocation's boundaries then an error message will
+be generated in the log file and no bytes will be written.
+
+@findex bzero
+@item @code{void bzero(void *ptr, size_t size)}
+Writes @var{size} zero bytes to the memory location beginning at @var{ptr}.  If
+@var{size} is @samp{0} then no bytes will be written.  If the operation would
+affect an existing memory allocation in the heap but would straddle that
+allocation's boundaries then an error message will be generated in the log file
+and no bytes will be written.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
+
+@findex memcpy
+@item @code{void *memcpy(void *dest, void *src, size_t size)}
+Copies @var{size} bytes from @var{src} to @var{dest} and returns @var{dest}.  If
+@var{size} is @samp{0} or @var{src} is the same as @var{dest} then no bytes will
+be copied.  The source and destination ranges should not overlap, otherwise a
+warning will be written to the log file.  If the operation would affect an
+existing memory allocation in the heap but would straddle that allocation's
+boundaries then an error message will be generated in the log file and no bytes
+will be copied.
+
+@findex memmove
+@item @code{void *memmove(void *dest, void *src, size_t size)}
+Copies @var{size} bytes from @var{src} to @var{dest} and returns @var{dest}.  If
+@var{size} is @samp{0} or @var{src} is the same as @var{dest} then no bytes will
+be copied.  If the operation would affect an existing memory allocation in the
+heap but would straddle that allocation's boundaries then an error message will
+be generated in the log file and no bytes will be copied.
+
+@findex bcopy
+@item @code{void bcopy(void *src, void *dest, size_t size)}
+Copies @var{size} bytes from @var{src} to @var{dest}.  If @var{size} is @samp{0}
+or @var{src} is the same as @var{dest} then no bytes will be copied.  If the
+operation would affect an existing memory allocation in the heap but would
+straddle that allocation's boundaries then an error message will be generated in
+the log file and no bytes will be copied.  This function is available for
+backwards compatibility with older C libraries and should not be used in new
+code.
 @end table
 
 The following 7 functions are available as support routines for additional
@@ -3678,8 +3816,8 @@ ignored if its value is zero.  Default value: @option{LIMIT=0}.
 
 @cindex LOGALL
 @item @option{LOGALL}
-Equivalent to the @option{LOGALLOCS}, @option{LOGREALLOCS} and @option{LOGFREES}
-options specified together.
+Equivalent to the @option{LOGALLOCS}, @option{LOGREALLOCS}, @option{LOGFREES}
+and @option{LOGMEMORY} options specified together.
 
 @cindex LOGALLOCS
 @item @option{LOGALLOCS}
@@ -3702,6 +3840,13 @@ stream.  Default value: @option{LOGFILE=mpatrol.log}.
 Specifies that all memory deallocations are to be logged and sent to the log
 file.  Note that any memory deallocations made internally by the library will
 not be logged.
+
+@cindex LOGMEMORY
+@item @option{LOGMEMORY}
+Specifies that all memory operations are to be logged and sent to the log file.
+These operations will be made by calls to functions such as @code{memset()} and
+@code{memcpy()}.  Note that any memory operations made internally by the library
+will not be logged.
 
 @cindex LOGREALLOCS
 @item @option{LOGREALLOCS}
@@ -4402,11 +4547,12 @@ most likely unable to reproduce most of the system-specific bugs.  A bug report
 that comes with an associated fix will be most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
-to @email{mpatrol@@cbmamiga.demon.co.uk}.  If you are planning to implement an
-enhancement, let me know first in case I am (or someone else is) working towards
-the same goal --- that way, work won't be wasted.  If you wish to send me source
-code changes please send the changes as context diffs or in an e-mail attachment
-as a compressed tar archive.
+to @email{mpatrol@@cbmamiga.demon.co.uk} or the mpatrol discussion group at
+@uref{http://www.egroups.com/group/mpatrol/}.  If you are planning to implement
+an enhancement, let me know first in case I am (or someone else is) working
+towards the same goal --- that way, work won't be wasted.  If you wish to send
+me source code changes please send the changes as context diffs or in an e-mail
+attachment as a compressed tar archive.
 
 @menu
 * Generic notes::               Notes for all platforms.
@@ -4534,10 +4680,11 @@ but at least there won't be link errors when compiling source code which uses
 them.
 
 @item
-Perhaps add debugging/tracing versions of the memory and string manipulation
-functions, such as @code{memcpy()} and @code{strcmp()}.  These could perform
-additional checks if the source or destination was a known address in the heap,
-but would require a lot more functions to be written within the library.
+Perhaps add debugging/tracing versions of the string manipulation functions,
+such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
+the memory operation functions.  The only problem with this would be locale
+support, but perhaps it might be easier just to assume the C locale to begin
+with.
 
 @item
 Script files similar to the @command{mpatrol} shell script provided for UNIX
