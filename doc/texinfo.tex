@@ -3,6 +3,12 @@
 % Load plain if necessary, i.e., if running under initex.
 \expandafter\ifx\csname fmtname\endcsname\relax\input plain\fi
 %
+% Load thumbpdf support if running under pdftex.
+\ifx\pdfoutput\undefined
+\else
+\input thumbpdf.sty
+\fi
+%
 \def\texinfoversion{2000-10-18.06}
 %
 % Copyright (C) 1985, 86, 88, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 2000
