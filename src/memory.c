@@ -54,7 +54,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.1.1.1 1999-10-03 11:25:22 graeme Exp $"
+#ident "$Id: memory.c,v 1.2 1999-10-14 18:58:39 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -232,12 +232,18 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
     i->align = minalign();
     i->page = pagesize();
     i->prog = progname();
+    /* On UNIX, we initially set the memory mapped file handle to be -1 as we
+     * default to using sbrk(), even on systems that support the mmap() function
+     * call.  We only set this to point to the memory mapped file if the USEMMAP
+     * option has been found when parsing the library options.
+     */
+    i->mfile = -1;
 #if MP_WATCH_SUPPORT
     sprintf(b, "%s/%lu/%s", MP_PROCFS_DIRNAME, __mp_processid(),
             MP_PROCFS_CTLNAME);
-    i->file = open(b, O_WRONLY);
+    i->wfile = open(b, O_WRONLY);
 #else /* MP_WATCH_SUPPORT */
-    i->file = -1;
+    i->wfile = -1;
 #endif /* MP_WATCH_SUPPORT */
 }
 
@@ -247,11 +253,18 @@ MP_GLOBAL void __mp_newmemory(meminfo *i)
 
 MP_GLOBAL void __mp_endmemory(meminfo *i)
 {
-#if MP_WATCH_SUPPORT
-    if (i->file != -1)
+#if MP_MMAP_SUPPORT
+    if (i->mfile != -1)
     {
-        close(i->file);
-        i->file = -1;
+        close(i->mfile);
+        i->mfile = -1;
+    }
+#endif /* MP_MMAP_SUPPORT */
+#if MP_WATCH_SUPPORT
+    if (i->wfile != -1)
+    {
+        close(i->wfile);
+        i->wfile = -1;
     }
 #endif /* MP_WATCH_SUPPORT */
 }
@@ -302,34 +315,51 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
 #if TARGET == TARGET_UNIX
     /* UNIX has a contiguous heap for a process, but we are not guaranteed to
      * have full control over it, so we must assume that each separate memory
-     * allocation is independent.  We also try to ensure that all of our
-     * memory allocations are blocks of pages.
+     * allocation is independent.  If we are using sbrk() to allocate memory
+     * then we also try to ensure that all of our memory allocations are blocks
+     * of pages.
      */
-    if (((t = sbrk(0)) == (void *) -1) || ((p = sbrk(*l)) == (void *) -1))
-        p = NULL;
-    else
+#if MP_MMAP_SUPPORT
+    /* Decide if we are using mmap() or sbrk() to allocate the memory.  It's
+     * not recommended that we do both as they could conflict in nasty ways.
+     */
+    if (i->mfile != -1)
     {
-        if (p < t)
-            /* The heap has grown down, which is quite unusual except on some
-             * weird systems where the stack grows up.
-             */
-            n = (unsigned long) p - __mp_rounddown((unsigned long) p, i->page);
+        if ((p = mmap(NULL, *l, PROT_READ | PROT_WRITE, MAP_PRIVATE, i->mfile,
+              0)) == (void *) -1)
+            p = NULL;
+    }
+    else
+#endif /* MP_MMAP_SUPPORT */
+    {
+        if (((t = sbrk(0)) == (void *) -1) || ((p = sbrk(*l)) == (void *) -1))
+            p = NULL;
         else
-            n = __mp_roundup((unsigned long) p, i->page) - (unsigned long) p;
-        if (n > 0)
-            /* We need to allocate a little more memory in order to make the
-             * allocation page-aligned.
-             */
-            if ((p = sbrk(n)) == (void *) -1)
-            {
-                /* We failed to allocate more memory, but we try to be nice
-                 * and return our original allocation.
+        {
+            if (p < t)
+                /* The heap has grown down, which is quite unusual except on
+                 * some weird systems where the stack grows up.
                  */
-                sbrk(-*l);
-                p = NULL;
-            }
-            else if (p >= t)
-                p = (char *) p + n - i->page;
+                n = (unsigned long) p - __mp_rounddown((unsigned long) p,
+                                                       i->page);
+            else
+                n = __mp_roundup((unsigned long) p, i->page) -
+                    (unsigned long) p;
+            if (n > 0)
+                /* We need to allocate a little more memory in order to make the
+                 * allocation page-aligned.
+                 */
+                if ((p = sbrk(n)) == (void *) -1)
+                {
+                    /* We failed to allocate more memory, but we try to be nice
+                     * and return our original allocation.
+                     */
+                    sbrk(-*l);
+                    p = NULL;
+                }
+                else if (p >= t)
+                    p = (char *) p + n - i->page;
+        }
     }
 #elif TARGET == TARGET_AMIGA
     p = AllocMem(*l, MEMF_ANY | MEMF_CLEAR);
@@ -339,10 +369,10 @@ MP_GLOBAL void *__mp_memalloc(meminfo *i, size_t *l, size_t a)
     p = NXPageAlloc(*l / i->page, 0);
 #endif /* TARGET */
 #if TARGET == TARGET_UNIX || TARGET == TARGET_NETWARE
-    /* UNIX and Netware do not zero the allocated memory, so we do this here
-     * for predictable behaviour.
+    /* UNIX's sbrk() and Netware's NXPageAlloc() do not zero the allocated
+     * memory, so we do this here for predictable behaviour.
      */
-    if (p != NULL)
+    if ((i->mfile == -1) && (p != NULL))
         memset(p, 0, *l);
 #endif /* TARGET */
     if (p == NULL)
@@ -372,10 +402,12 @@ MP_GLOBAL void __mp_memfree(meminfo *i, void *p, size_t l)
     t = (void *) __mp_rounddown((unsigned long) p, i->page);
 #endif /* TARGET */
 #if TARGET == TARGET_UNIX
-    /* We can't shrink the break point since someone else might have
-     * allocated memory in between our allocations.  The next best thing
-     * is to unmap our freed allocations so that they no longer need to
-     * be handled by the virtual memory system.
+    /* If we used sbrk() to allocate this memory then we can't shrink the
+     * break point since someone else might have allocated memory in between
+     * our allocations.  The next best thing is to unmap our freed allocations
+     * so that they no longer need to be handled by the virtual memory system.
+     * If we used mmap() to allocate this memory then we don't need to worry
+     * about the above problem.
      */
     l = __mp_roundup(l + ((char *) p - (char *) t), i->page);
     mprotect(t, l, PROT_NONE);
@@ -451,8 +483,8 @@ MP_GLOBAL int __mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
         w.data.pr_wflags = WA_WRITE | WA_TRAPAFTER;
     else
         w.data.pr_wflags = 0;
-    if ((i->file == -1) ||
-        (write(i->file, (void *) &w, sizeof(watchcmd)) != sizeof(watchcmd)))
+    if ((i->wfile == -1) ||
+        (write(i->wfile, (void *) &w, sizeof(watchcmd)) != sizeof(watchcmd)))
         return 0;
 #endif /* MP_WATCH_SUPPORT */
     return 1;
