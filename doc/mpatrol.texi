@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.76 2000-05-15 20:11:06 graeme Exp $
+@c $Id: mpatrol.texi,v 1.77 2000-05-15 23:34:12 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2266,6 +2266,42 @@ The boundaries which distinguish between these allocation sizes can be
 controlled via the @option{SMALLBOUND}, @option{MEDIUMBOUND} and
 @option{LARGEBOUND} options, but they default to 32, 256 and 2048 bytes
 respectively, which should suffice for most circumstances.
+
+@cindex mprof
+The @command{mprof} command is a tool designed to read a profiling output file
+produced by the mpatrol library and display the profiling information that was
+obtained.  The profiling information includes summaries of all of the memory
+allocations listed by size and the function that allocated them and a list of
+memory leaks with the call stack of the allocating function.
+
+Along with the options listed below, the @command{mprof} command takes one
+optional argument which must be a valid mpatrol profiling output filename but
+if it is omitted then it will use @file{mpatrol.out} as the name of the file to
+use.  If the filename argument is given as @samp{-} then the standard input
+file stream will be used as the profiling output file.
+
+@table @asis
+@item @option{-a}
+Specifies that different call sites from within the same function are to be
+differentiated and that the names of all functions should be displayed with
+their call site offset in bytes.  This affects the direct allocation and memory
+leak tables.
+
+@item @option{-c}
+Specifies that certain tables should be sorted by the number of allocations or
+deallocations rather than the total number of bytes allocated or deallocated.
+This affects the direct allocation and memory leak tables.
+
+@item @option{-n} <@var{depth}>
+Specifies the maximum stack depth to use when calculating if one call site has
+the same call stack as another call site.  This also specifies the maximum
+number of functions to display in a call stack.  If @var{depth} is @samp{0} then
+the call stack depth will be unlimited in size.  The default call stack depth
+is @samp{1}.  This affects the memory leak table.
+
+@item @option{-V}
+Displays the version number of the @command{mprof} command.
+@end table
 
 We'll now look at an example of using the mpatrol library to profile the dynamic
 memory allocations in a program.  However, remember that this example will only
@@ -5643,6 +5679,12 @@ components.
 @itemize @bullet
 @item
 4 bytes containing the characters @samp{M}, @samp{P}, @samp{T} and @samp{L}.
+
+@item
+1 unsigned integer representing the value @samp{1}.  This is used by
+@command{mprof} to determine the endianness of the processor that produced the
+profiling output file so that it can decide whether to perform byte-swapping on
+the input data.
 
 @item
 3 unsigned integers containing the small, medium and large allocation bounds.
