@@ -4127,7 +4127,7 @@ program using the following commands:
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol
 
    * If the mpatrol library was built with support for the COFF or
-     XCOFF object file format access library:
+     XCOFF object file format access library (not on LynxOS systems):
 
           cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lld
 
@@ -4221,7 +4221,7 @@ library, the `MPATROL_OPTIONS' environment variable should be set to be
 `LOGALL' and the program should be executed, generating the following
 output in `mpatrol.log'.
 
-     @(#) mpatrol 1.3.4 (01/01/25)
+     @(#) mpatrol 1.4.0 (01/02/20)
      Copyright (C) 1997-2001 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
@@ -4231,7 +4231,15 @@ output in `mpatrol.log'.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Thu Jan 25 22:26:31 2001
+     Log file generated on Tue Feb 20 21:56:05 2001
+     
+     read 310 symbols from /usr/lib/libmpatrol.so.1.4
+     read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so
+     read 2634 symbols from /lib/libc.so.6
+     read 1142 symbols from /usr/lib/libstdc++-libc6.1-1.so.2
+     read 695 symbols from /lib/libm.so.6
+     read 178 symbols from /lib/ld-linux.so.2
+     read 158 symbols from ./test1
      
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
              0x0804942F main+31
@@ -4264,8 +4272,9 @@ output in `mpatrol.log'.
      small boundary:    32 bytes
      medium boundary:   256 bytes
      large boundary:    2048 bytes
-     lower check range: -
-     upper check range: -
+     lower check range: 0
+     upper check range: 0
+     check frequency:   1
      failure frequency: 0
      failure seed:      972951591
      prologue function: <unset>
@@ -4275,21 +4284,21 @@ output in `mpatrol.log'.
      profiling file:    mpatrol.out
      tracing file:      mpatrol.trace
      program filename:  ./test1
-     symbols read:      3711
+     symbols read:      5764
      autosave count:    0
      freed queue size:  0
      allocation count:  52
-     allocation peak:   32 (426176 bytes)
+     allocation peak:   20 (427512 bytes)
      allocation limit:  0 bytes
      allocated blocks:  7 (1528 bytes)
      freed blocks:      0 (0 bytes)
-     free blocks:       8 (494088 bytes)
-     internal blocks:   46 (323584 bytes)
-     total heap usage:  819200 bytes
+     free blocks:       4 (432648 bytes)
+     internal blocks:   33 (540672 bytes)
+     total heap usage:  974848 bytes
      total compared:    0 bytes
      total located:     2 bytes
-     total copied:      19450 bytes
-     total set:         374704 bytes
+     total copied:      32176 bytes
+     total set:         582856 bytes
      total warnings:    0
      total errors:      1
 
@@ -4341,9 +4350,9 @@ new' for example.  However, if you want to disable the redefinition of
 the C++ operators in `mpatrol.h' you can define the preprocessor macro
 `MP_NOCPLUSPLUS' before the inclusion of that file.  Alternatively, you
 may wish to define the `MP_NONEWDELETE' preprocessor macro in order to
-use `MP_NEW' and `MP_DELETE' instead of `new' and `delete'.  That way
-you can combine calls to mpatrol's operators and the standard
-operators.  Just make sure you don't mix them!
+use `MP_NEW', `MP_NEW_NOTHROW' and `MP_DELETE' instead of `new' and
+`delete'.  That way you can combine calls to mpatrol's operators and
+the standard operators.  Just make sure you don't mix them!
 
    If you are running on a system on which mpatrol supports full
 symbolic stack tracebacks the following information may still be useful
@@ -4500,34 +4509,35 @@ above example have been numbered and their descriptions appear below.
      11  small boundary:    32 bytes
      12  medium boundary:   256 bytes
      13  large boundary:    2048 bytes
-     14  lower check range: -
-     15  upper check range: -
-     16  failure frequency: 0
-     17  failure seed:      972951591
-     18  prologue function: <unset>
-     19  epilogue function: <unset>
-     20  handler function:  <unset>
-     21  log file:          mpatrol.log
-     22  profiling file:    mpatrol.out
-     23  tracing file:      mpatrol.trace
-     24  program filename:  ./test1
-     25  symbols read:      3711
-     26  autosave count:    0
-     27  freed queue size:  0
-     28  allocation count:  52
-     29  allocation peak:   32 (426176 bytes)
-     30  allocation limit:  0 bytes
-     31  allocated blocks:  7 (1528 bytes)
-     32  freed blocks:      0 (0 bytes)
-     33  free blocks:       8 (494088 bytes)
-     34  internal blocks:   46 (323584 bytes)
-     35  total heap usage:  819200 bytes
-     36  total compared:    0 bytes
-     37  total located:     2 bytes
-     38  total copied:      19450 bytes
-     39  total set:         374704 bytes
-     40  total warnings:    0
-     41  total errors:      1
+     14  lower check range: 0
+     15  upper check range: 0
+     16  check frequency:   1
+     17  failure frequency: 0
+     18  failure seed:      972951591
+     19  prologue function: <unset>
+     20  epilogue function: <unset>
+     21  handler function:  <unset>
+     22  log file:          mpatrol.log
+     23  profiling file:    mpatrol.out
+     24  tracing file:      mpatrol.trace
+     25  program filename:  ./test1
+     26  symbols read:      5764
+     27  autosave count:    0
+     28  freed queue size:  0
+     29  allocation count:  52
+     30  allocation peak:   20 (427512 bytes)
+     31  allocation limit:  0 bytes
+     32  allocated blocks:  7 (1528 bytes)
+     33  freed blocks:      0 (0 bytes)
+     34  free blocks:       4 (432648 bytes)
+     35  internal blocks:   33 (540672 bytes)
+     36  total heap usage:  974848 bytes
+     37  total compared:    0 bytes
+     38  total located:     2 bytes
+     39  total copied:      32176 bytes
+     40  total set:         582856 bytes
+     41  total warnings:    0
+     42  total errors:      1
 
   1. System page size.  This value is used on some platforms when
      allocating and protecting system memory.
@@ -4589,18 +4599,22 @@ above example have been numbered and their descriptions appear below.
 
  14. Lower check range.
 
- 15. Upper check range.  These values specify the range of allocation
+ 15. Upper check range.
+
+ 16. Check frequency.  These values specify the range of allocation
      indices through which the library will physically check every area
-     of free memory and every overflow buffer for errors.  A dash
-     specifies that either the lower or upper range is infinite, but if
-     they are both zero then no such checking will ever be performed,
-     thus speeding up execution speed dramatically.  The library
-     defaults to performing checks for every allocation index.  These
-     can be changed at run-time using the `CHECK' option.
+     of free memory and every overflow buffer for errors, along with
+     the frequency at which to make the checks.  A dash specifies that
+     either the lower or upper range is infinite, but if they are both
+     zero then no such checking will ever be performed, thus speeding
+     up execution speed dramatically.  The check frequency indicates the
+     number of memory allocation events that must occur in between
+     checking the heap.  The library defaults to performing no such
+     checks.  This can be changed at run-time using the `CHECK' option.
 
- 16. Failure frequency.
+ 17. Failure frequency.
 
- 17. Failure seed.  These values are used to specify if random memory
+ 18. Failure seed.  These values are used to specify if random memory
      allocation failures should occur during program execution, for the
      purposes of stress testing a program.  If the failure frequency is
      zero then no random failures will occur, but if it is greater than
@@ -4612,11 +4626,11 @@ above example have been numbered and their descriptions appear below.
      of the same program with the same failure frequencies and the same
      failure seeds will generate exactly the same sequence of failures.
 
- 18. Prologue function.
+ 19. Prologue function.
 
- 19. Epilogue function.
+ 20. Epilogue function.
 
- 20. Handler function.  These values contain addresses or names of
+ 21. Handler function.  These values contain addresses or names of
      functions that have been installed as callback functions for the
      library.  These functions, if set, will be called from the library
      at appropriate times during program execution in order to handle
@@ -4624,31 +4638,31 @@ above example have been numbered and their descriptions appear below.
      `__mp_prologue()', `__mp_epilogue()' and `__mp_nomemory()'
      functions.
 
- 21. Log file.  Simply contains the name of the file where all mpatrol
+ 22. Log file.  Simply contains the name of the file where all mpatrol
      library diagnostics go to.  It can be changed at run-time using
      the `LOGFILE' option.
 
- 22. Profiling file.  Contains the name of the file where all of the
+ 23. Profiling file.  Contains the name of the file where all of the
      mpatrol library memory allocation profiling information goes when
      the `PROF' option is used.  It can be changed at run-time using
      the `PROFFILE' option.
 
- 23. Tracing file.  Contains the name of the file where all of the
+ 24. Tracing file.  Contains the name of the file where all of the
      mpatrol library memory allocation tracing information goes when
      the `TRACE' option is used.  It can be changed at run-time using
      the `TRACEFILE' option.
 
- 24. Program filename.  Contains the full pathname to the program's
+ 25. Program filename.  Contains the full pathname to the program's
      executable file.  This is used by the mpatrol library to read the
      symbol table in order to provide symbolic information in function
      call stacks.  It can be changed at run-time using the `PROGFILE'
      option.
 
- 25. Symbols read.  This value contains the total number of symbols
+ 26. Symbols read.  This value contains the total number of symbols
      read from a program's executable file and/or the dynamic linker,
      if applicable.
 
- 26. Autosave count.  This value contains the frequency at which the
+ 27. Autosave count.  This value contains the frequency at which the
      mpatrol library should periodically write the profiling data to
      the profiling output file.  When the total number of profiled
      memory allocations and deallocations is a multiple of this number
@@ -4656,37 +4670,37 @@ above example have been numbered and their descriptions appear below.
      profiling output file.  It can be changed at run-time using the
      `AUTOSAVE' option.
 
- 27. Freed queue size.  This value contains the maximum number of freed
+ 28. Freed queue size.  This value contains the maximum number of freed
      memory allocations that will be stored in the freed queue if the
      `NOFREE' option is used.  Once the freed queue becomes full then
      the oldest freed allocation in the queue will be returned to the
      free memory pool for reuse every time an existing memory
      allocation is freed.  If this value is zero then the freed queue
-     will never become full.  It can be changed at run-time using the
-     `NOFREE' option.
+     will never contain any freed allocations.  It can be changed at
+     run-time using the `NOFREE' option.
 
- 28. Allocation count.  This value contains the total number of memory
+ 29. Allocation count.  This value contains the total number of memory
      allocations that were created by the mpatrol library.  This value
      may be more than expected if the mpatrol library makes any memory
      allocations during initialisation.
 
- 29. Allocation peak.  This value contains the peak memory usage set by
+ 30. Allocation peak.  This value contains the peak memory usage set by
      the program when running; the peak number of memory allocations,
      and also the peak number of bytes allocated in parentheses (the
      two numbers may peak at different times throughout the lifetime of
      the program).  This value may be more than expected if the mpatrol
      library makes any memory allocations during initialisation.
 
- 30. Allocation limit.  This value is used to limit the amount of
+ 31. Allocation limit.  This value is used to limit the amount of
      memory that can be allocated by a program, which can be useful for
      stress-testing in simulated low memory conditions.  It can be
      changed at run-time using the `LIMIT' option.
 
- 31. Allocated blocks.
+ 32. Allocated blocks.
 
- 32. Freed blocks.
+ 33. Freed blocks.
 
- 33. Free blocks.  These values contain the total number of allocated,
+ 34. Free blocks.  These values contain the total number of allocated,
      freed and free blocks at the time the summary was produced.  A
      freed block is an allocated block that has been freed but has not
      been returned to the free memory list for later allocation.  These
@@ -4697,7 +4711,7 @@ above example have been numbered and their descriptions appear below.
      program's executable file and any shared libraries that it
      requires.
 
- 34. Internal blocks.  This value contains the total number of memory
+ 35. Internal blocks.  This value contains the total number of memory
      blocks (of varying sizes) that have been allocated from the system
      for the mpatrol library to use internally.  These memory blocks
      will be write-protected on systems that support memory protection
@@ -4705,16 +4719,16 @@ above example have been numbered and their descriptions appear below.
      structures.  This can be overridden at run-time using the
      `NOPROTECT' option in order to speed up program execution slightly.
 
- 35. Total heap usage.  This value contains the total amount of system
+ 36. Total heap usage.  This value contains the total amount of system
      heap memory that has been allocated by the mpatrol library.
 
- 36. Total compared.
+ 37. Total compared.
 
- 37. Total located.
+ 38. Total located.
 
- 38. Total copied.
+ 39. Total copied.
 
- 39. Total set.  These values contain the total number of bytes that
+ 40. Total set.  These values contain the total number of bytes that
      have been tracked by the mpatrol library in byte comparison
      operations (such as `memcmp()'), byte location operations (such as
      `memchr()', byte copy operations (such as `memcpy()') and byte set
@@ -4722,9 +4736,9 @@ above example have been numbered and their descriptions appear below.
      into account any other such operations that occur outwith these
      functions, such as loading and storing from machine instructions.
 
- 40. Total warnings.
+ 41. Total warnings.
 
- 41. Total errors.  The library keeps a count of the total number of
+ 42. Total errors.  The library keeps a count of the total number of
      warnings and errors it has displayed so that you can quickly work
      out this information at program termination.
 
@@ -4803,7 +4817,7 @@ from it and return `NULL'.
 the above situation by using the `NOFREE' option.  This prevents the
 library from returning any freed allocations to the free memory pool,
 by preserving any information about them and marking them as freed.  If
-you add the `NOFREE=0' option to the `MPATROL_OPTIONS' environment
+you add the `NOFREE=1' option to the `MPATROL_OPTIONS' environment
 variable you should see the following entries in `mpatrol.log' instead.
 
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test2.c|36]
@@ -4840,25 +4854,26 @@ variable you should see the following entries in `mpatrol.log' instead.
 knows all of the details about the freed memory allocation and when it
 was freed.
 
-   The `NOFREE=0' option tends to use up much more system memory than
-normal since it effectively instructs the mpatrol library to allocate
-new memory for every single memory allocation or reallocation.  It can
-also slow down program execution when overflow buffers are used, since
-with each new memory allocation the library needs to check more and
-more overflow buffers every time it is called.  However, it can be
-quite useful for problems such as this one.  The test in
-`tests/fail/test3.c' has a similar situation.
+   The `NOFREE' option can potentially use up much more system memory
+than normal if it is given a large numerical argument since it
+effectively instructs the mpatrol library to allocate new memory for
+every single memory allocation or reallocation.  It can also slow down
+program execution when overflow buffers are used, since with each new
+memory allocation the library needs to check more and more overflow
+buffers every time it is called.  However, with a low numerical
+argument it can be quite useful for problems such as this one.  The
+test in `tests/fail/test3.c' has a similar situation.
 
    The numerical argument specified with the `NOFREE' option indicates
 the number of recently-freed memory allocations that are to be delayed
 from being returned to the free memory pool, with a value of zero
-meaning that no freed memory allocations will ever be reused.
+meaning that all freed memory allocations will immediately be reused.
 Obviously, in an ideal world it would be nice to be able to specify
-`NOFREE=0' all the time, but this will gradually use up more and more
-memory since no system heap memory will ever be reused.  Supplying a
-different number to the `NOFREE' option allows you to make a compromise
-by storing the details of only the most recently-freed memory
-allocations.  How many details you wish to store is up to you.
+`NOFREE='_huge-number_ all the time, but this will gradually use up
+more and more memory since no system heap memory will ever be reused.
+Supplying a smaller number to the `NOFREE' option allows you to make a
+compromise by storing the details of only the most recently-freed
+memory allocations.  How many details you wish to store is up to you.
 
    Normally, the `NOFREE' option will cause the library to fill all
 freed memory allocations with the free byte.  However, the original
@@ -4910,9 +4925,13 @@ last example, but make sure that `PRESERVE' is not set.
    The library was able to detect that something had been written into
 free memory and could report on the memory allocation that was
 overwritten.  However, these checks are only performed whenever a
-function in the mpatrol library is called.  In the example above, the
+function in the mpatrol library is called if the `CHECK' option is
+used, or at the end of program execution.  In the example above, the
 code which wrote into free memory could have been miles away from where
-the library detected the error.
+the library detected the error since we were not using the `CHECK'
+option.  However, adding `CHECK=-' to the `MPATROL_OPTIONS' environment
+variable doesn't really help much since the next mpatrol function that
+is called is the one to terminate the library anyway.
 
    On platforms that support memory protection, the library also
 supports the `PAGEALLOC' option.  This option instructs the library to
@@ -5020,10 +5039,10 @@ would be detected.
 ===========================
 
    This example illustrates the use of overflow buffers and so the
-`MPATROL_OPTIONS' environment variable should have `OFLOWSIZE=2' added
-to it.  However, turn off any `PAGEALLOC' options for the purposes of
-this example.  The test is located in `tests/fail/test5.c', and
-`tests/fail/test6.c' is very similar.
+`MPATROL_OPTIONS' environment variable should have `OFLOWSIZE=2' and
+`CHECK=-' added to it.  However, turn off any `PAGEALLOC' options for
+the purposes of this example.  The test is located in
+`tests/fail/test5.c', and `tests/fail/test6.c' is very similar.
 
      23  /*
      24   * Allocates a block of 16 bytes and then copies a string of 16
@@ -5064,11 +5083,12 @@ possible about where the corruption occurred.  Along with showing you a
 memory dump of the overflow buffer that was corrupted, it also shows
 you the allocation to which the overflow buffer belongs.
 
-   Using overflow buffers can reduce the speed of program execution
-since the library has to check every buffer whenever it is called, and
-if the buffers are larger then they'll take longer to check and will
-use up more memory.  However, larger buffers mean that there is less
-chance of the program writing past one memory allocation into another.
+   Using overflow buffers and the `CHECK=-' option can reduce the speed
+of program execution since the library has to check every buffer
+whenever it is called, and if the buffers are larger then they'll take
+longer to check and will use up more memory.  However, larger buffers
+mean that there is less chance of the program writing past one memory
+allocation into another.
 
    Alternatively, the `CHECK' option can be used to limit the number of
 checks that the library has to perform, thus speeding up program
@@ -5079,7 +5099,9 @@ the current allocation index falls within the specified range.  This
 feature can be used when there is a suspicion that free memory
 corruption or overflow buffer corruption occurs at a certain point
 during program execution, but checking them at every library call would
-take too long.
+take too long.  You can also specify a frequency at which to check the
+heap using the `CHECK' option.  This can be used when attempting to
+narrow down the search for where heap corruption occurs.
 
    On systems which support software watch points, there is an extra
 option called `OFLOWWATCH' which allows additional memory protection.
@@ -5107,30 +5129,30 @@ memory.
 an example of a read from memory which overflows a memory allocation's
 boundaries.
 
-         23  /*
-         24   * Allocates a single byte of memory and then attempts to read the
-         25   * byte as a word, resulting in some uninitialised bytes being read.
-         26   * This can sometimes be detected with PAGEALLOC=UPPER but can always
-         27   * be detected with OFLOWWATCH or by using the -fcheck-memory-usage
-         28   * option of gcc.
-         29   */
+     23  /*
+     24   * Allocates a single byte of memory and then attempts to read the
+     25   * byte as a word, resulting in some uninitialised bytes being read.
+     26   * This can sometimes be detected with PAGEALLOC=UPPER but can always
+     27   * be detected with OFLOWWATCH or by using the -fcheck-memory-usage
+     28   * option of gcc.
+     29   */
      
      
-         32  #include "mpatrol.h"
+     32  #include "mpatrol.h"
      
      
-         35  int main(void)
-         36  {
-         37      int *p;
-         38      int r;
+     35  int main(void)
+     36  {
+     37      int *p;
+     38      int r;
      
-         40      if (p = (int *) calloc(1, 1))
-         41      {
-         42          r = p[0];
-         43          free(p);
-         44      }
-         45      return EXIT_SUCCESS;
-         46  }
+     40      if (p = (int *) calloc(1, 1))
+     41      {
+     42          r = p[0];
+     43          free(p);
+     44      }
+     45      return EXIT_SUCCESS;
+     46  }
 
    For this example, the above test must be compiled with `gcc' with the
 `-fcheck-memory-usage' option on the compiler command line and linked
@@ -5308,88 +5330,88 @@ having full call stack traceback support, although they will work
    The first test simply illustrates the use of `alloca()' and how its
 memory allocations are freed when they are no longer in use.
 
-       23  /*
-       24   * Tests alloca() and related functions via nested function calls.
-       25   * The final output should be a horizontal pyramid of plus signs
-       26   * followed by a horizontal pyramid of minus signs.
-       27   */
+      23  /*
+      24   * Tests alloca() and related functions via nested function calls.
+      25   * The final output should be a horizontal pyramid of plus signs
+      26   * followed by a horizontal pyramid of minus signs.
+      27   */
      
      
-       30  #include "mpatrol.h"
-       31  #include <stdio.h>
+      30  #include "mpatrol.h"
+      31  #include <stdio.h>
      
      
-       34  char *f1(char *s)
-       35  {
-       36      char *t;
-       37      size_t l;
+      34  char *f1(char *s)
+      35  {
+      36      char *t;
+      37      size_t l;
      
-       39      l = strlen(s) + 1;
-       40      if ((t = (char *) alloca(l + 1)) == NULL)
-       41          return NULL;
-       42      memcpy(t, s, l);
-       43      t[l - 1] = t[l - 2];
-       44      t[l] = '\0';
-       45      return strdup(t);
-       46  }
-     
-     
-       49  char *f2(char *s)
-       50  {
-       51      char *t;
-       52      size_t l;
-     
-       54      l = strlen(s) - 1;
-       55      if ((t = (char *) alloca(l + 1)) == NULL)
-       56          return NULL;
-       57      memcpy(t, s, l + 1);
-       58      t[l] = '\0';
-       59      return strdup(t);
-       60  }
+      39      l = strlen(s) + 1;
+      40      if ((t = (char *) alloca(l + 1)) == NULL)
+      41          return NULL;
+      42      memcpy(t, s, l);
+      43      t[l - 1] = t[l - 2];
+      44      t[l] = '\0';
+      45      return strdup(t);
+      46  }
      
      
-       63  int f(char *s, size_t l)
-       64  {
-       65      char *t;
-       66      size_t i;
+      49  char *f2(char *s)
+      50  {
+      51      char *t;
+      52      size_t l;
      
-       68      puts(s);
-       69      for (i = 0; i < l; i++)
-       70      {
-       71          if (((t = f1(s)) == NULL) ||
-       72              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
-       73              return 0;
-       74          strcpy(s, t);
-       75          free(t);
-       76          puts(s);
-       77      }
-       78      for (i = 0; i < l; i++)
-       79      {
-       80          if (((t = f2(s)) == NULL) ||
-       81              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
-       82              return 0;
-       83          strcpy(s, t);
-       84          free(t);
-       85          puts(s);
-       86      }
-       87      return 1;
-       88  }
+      54      l = strlen(s) - 1;
+      55      if ((t = (char *) alloca(l + 1)) == NULL)
+      56          return NULL;
+      57      memcpy(t, s, l + 1);
+      58      t[l] = '\0';
+      59      return strdup(t);
+      60  }
      
      
-       91  int main(void)
-       92  {
-       93      char *s;
+      63  int f(char *s, size_t l)
+      64  {
+      65      char *t;
+      66      size_t i;
      
-       95      s = strdupa("+");
-       96      if (!f(s, 4))
-       97          exit(EXIT_FAILURE);
-       98      dealloca(s);
-       99      s = strdupa("-");
-      100      if (!f(s, 4))
-      101          exit(EXIT_FAILURE);
-      102      dealloca(s);
-      103      return EXIT_SUCCESS;
-      104  }
+      68      puts(s);
+      69      for (i = 0; i < l; i++)
+      70      {
+      71          if (((t = f1(s)) == NULL) ||
+      72              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
+      73              return 0;
+      74          strcpy(s, t);
+      75          free(t);
+      76          puts(s);
+      77      }
+      78      for (i = 0; i < l; i++)
+      79      {
+      80          if (((t = f2(s)) == NULL) ||
+      81              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
+      82              return 0;
+      83          strcpy(s, t);
+      84          free(t);
+      85          puts(s);
+      86      }
+      87      return 1;
+      88  }
+     
+     
+      91  int main(void)
+      92  {
+      93      char *s;
+     
+      95      s = strdupa("+");
+      96      if (!f(s, 4))
+      97          exit(EXIT_FAILURE);
+      98      dealloca(s);
+      99      s = strdupa("-");
+     100      if (!f(s, 4))
+     101          exit(EXIT_FAILURE);
+     102      dealloca(s);
+     103      return EXIT_SUCCESS;
+     104  }
 
    When compiled and run, you should get the following output.
 
@@ -5417,7 +5439,7 @@ variable set to `LOGALLOCS' and `LOGFREES', you should see the
 following in the newly-generated `mpatrol.log' file.  Note that the
 `...' marks text that has been removed.
 
-     ALLOC: strdupa (1, 2 bytes, 1 byte) [main|test8.c|95]
+     ALLOC: strdupa (1, 2 bytes, 1 byte) [main|test8.c|95] (char x 2)
              0x000138F0 main+52
              0x00013350 _start+100
      
@@ -5431,7 +5453,7 @@ following in the newly-generated `mpatrol.log' file.  Note that the
      
      returns 0x0008C008
      
-     ALLOC: strdup (3, 3 bytes, 1 byte) [f1|test8.c|45]
+     ALLOC: strdup (3, 3 bytes, 1 byte) [f1|test8.c|45] (char x 3)
              0x00013584 f1+260
              0x000136D8 f+68
              0x00013904 main+72
@@ -5501,7 +5523,7 @@ following in the newly-generated `mpatrol.log' file.  Note that the
              0x000139C8 main+268
              0x00013350 _start+100
      
-         0x0008C000 (2 bytes) {strdupa:26:0} [main|test8.c|99]
+         0x0008C000 (2 bytes) {strdupa:26:0} [main|test8.c|99] (char x 2)
              0x00013974 main+184
              0x00013350 _start+100
 
@@ -5572,7 +5594,7 @@ normal heap allocations.
      61  }
 
    If you compile and run this example with the `MPATROL_OPTIONS'
-environment variable containing the options `LOGALL' and `NOFREE=0' you
+environment variable containing the options `LOGALL' and `NOFREE=1' you
 should see the following in `mpatrol.log'.
 
      ALLOC: alloca (1, 5 bytes, 8 bytes) [f|test16.c|38]
@@ -5630,8 +5652,8 @@ functions will never show up in the list of unfreed memory allocations.
    This last example illustrates the various `SHOW' options that are
 available for displaying additional information from the mpatrol
 library at program termination.  It also shows how to easily detect
-memory leaks.  Use the `OFLOWSIZE=16', `NOFREE=0' and `SHOWALL' options
-in `MPATROL_OPTIONS' before running.
+memory leaks.  Use the `OFLOWSIZE=16', `NOFREE=16' and `SHOWALL'
+options in `MPATROL_OPTIONS' before running.
 
       1  /*
       2   * Introduces a memory leak by clobbering a pointer with a new
@@ -5825,11 +5847,8 @@ also given, otherwise there would be no details on freed memory
 allocations.  All of these entries show where the allocation was freed,
 which can be useful if you quickly needed to see where an allocation
 was freed.  The `SHOWFREED' option also displays this information.
-Note that if the argument supplied to the `NOFREE' option was zero then
-this list will show the details of every single freed memory allocation
-that occurred during the lifetime of the program; otherwise it will be
-limited to the size of the freed queue and will show only the most
-recently-freed items.
+Note that the list will be limited to the size of the freed queue and
+will show only the most recently-freed items.
 
    As this example was run on UNIX, the mpatrol library replaces the
 default implementations of `malloc()', `free()', etc.  As can be seen
