@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.22 2000-10-19 17:22:10 graeme Exp $"
+#ident "$Id: mprof.c,v 1.23 2000-11-14 23:58:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -116,6 +116,12 @@ typedef struct edge
     unsigned char flags; /* temporary flags */
 }
 edge;
+
+
+/* The version of the mpatrol library which produced the profiling output file.
+ */
+
+static unsigned long version;
 
 
 /* The total number of allocations and deallocations.
@@ -421,6 +427,23 @@ static void readfile(void)
      */
     getentry(&i, sizeof(size_t), 1, 0);
     b = (i != 1);
+    /* Get the version number of the mpatrol library which produced the
+     * profiling output file.  The profiling file format changed to include the
+     * version number at mpatrol 1.3.0 so we can't reliably read files produced
+     * before then.  We also assume that we can't read files produced by later
+     * versions of mpatrol.
+     */
+    getentry(&version, sizeof(unsigned long), 1, b);
+    if (version < 10300)
+    {
+        fprintf(stderr, "%s: Profiling file version too old\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    else if (version / 100 > MP_VERNUM / 100)
+    {
+        fprintf(stderr, "%s: Profiling file version too new\n", progname);
+        exit(EXIT_FAILURE);
+    }
     getentry(&sbound, sizeof(size_t), 1, b);
     getentry(&mbound, sizeof(size_t), 1, b);
     getentry(&lbound, sizeof(size_t), 1, b);
