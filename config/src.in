@@ -78,6 +78,8 @@ libmpatrol_la_LDFLAGS = -release @VERSION@
 
 libmpalloc_la_LDFLAGS = -release @VERSION@
 
+@XSUPPORT_TRUE@mptrace_LDFLAGS = $(X_LIBS) $(X_PRE_LIBS) -lXm -lXt -lXp -lXext -lX11 $(X_EXTRA_LIBS)
+
 bin_PROGRAMS = mpatrol mprof mptrace mleak
 
 lib_LTLIBRARIES = libmpatrol.la libmpalloc.la
@@ -141,7 +143,6 @@ mptrace_OBJECTS =  mptrace.$(OBJEXT) getopt.$(OBJEXT) tree.$(OBJEXT) \
 slots.$(OBJEXT) utils.$(OBJEXT) version.$(OBJEXT)
 mptrace_LDADD = $(LDADD)
 mptrace_DEPENDENCIES = 
-mptrace_LDFLAGS = 
 mleak_OBJECTS =  mleak.$(OBJEXT) getopt.$(OBJEXT) tree.$(OBJEXT) \
 version.$(OBJEXT)
 mleak_LDADD = $(LDADD)
