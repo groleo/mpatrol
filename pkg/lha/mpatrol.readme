@@ -1,6 +1,6 @@
 Short:    Memory allocation debug library. V1.4.6.
-Uploader: graeme@epc.co.uk (Graeme Roy)
-Author:   graeme@epc.co.uk (Graeme Roy)
+Uploader: graeme.roy@analog.com (Graeme Roy)
+Author:   graeme.roy@analog.com (Graeme Roy)
 Type:     dev/debug
 
 The mpatrol library is yet another link library that attempts to diagnose

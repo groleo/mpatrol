@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # PKG package specification file
 
 
-# $Id: pkginfo,v 1.28 2001-08-02 20:41:32 graeme Exp $
+# $Id: pkginfo,v 1.29 2001-08-23 22:51:02 graeme Exp $
 
 
 PKG=GSRmptrl
@@ -30,7 +30,7 @@ ARCH=sparc
 VERSION=1.4.6
 CATEGORY=application
 DESC=Attempts to diagnose run-time errors that are caused by the wrong use of dynamically allocated memory, and provides a comprehensive and configurable log of all dynamic memory operations that occurred during the lifetime of a program.
-VENDOR=Graeme S. Roy <graeme@epc.co.uk>
+VENDOR=Graeme S. Roy <graeme.roy@analog.com>
 EMAIL=mpatrol@cbmamiga.demon.co.uk
 BASEDIR=/usr/local
 CLASSES=none

@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
+# Copyright (C) 1997-2001 Graeme S. Roy <graeme.roy@analog.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.69 2001-08-02 20:41:33 graeme Exp $
+# $Id: mpatrol.spec,v 1.70 2001-08-23 22:51:04 graeme Exp $
 
 
 %define libversion 1.4
@@ -37,7 +37,7 @@ Source0: http://www.cbmamiga.demon.co.uk/mpatrol/files/%{name}_%{version}.tar.gz
 URL: http://www.cbmamiga.demon.co.uk/mpatrol/
 Buildroot: %{_tmppath}/%{name}-root
 Prereq: /sbin/install-info /sbin/ldconfig
-Packager: Graeme S. Roy <graeme@epc.co.uk>
+Packager: Graeme S. Roy <graeme.roy@analog.com>
 
 
 %description
