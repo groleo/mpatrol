@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.16 2001-05-22 22:07:12 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.17 2001-05-22 22:25:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.16 2001-05-22 22:07:12 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.17 2001-05-22 22:25:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -324,19 +324,22 @@ newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
-    if (__mp_search(alloctree.root, i))
+    if (n = (allocation *) __mp_search(alloctree.root, i))
     {
-        fprintf(stderr, "%s: Allocation index `%lu' has been allocated twice\n",
-                progname, i);
-        exit(EXIT_FAILURE);
+        if (n->time == 0)
+            fprintf(stderr, "%s: Allocation index `%lu' has been allocated "
+                    "twice without being freed\n", progname, i);
     }
-    if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
+    else
     {
-        fprintf(stderr, "%s: Out of memory\n", progname);
-        exit(EXIT_FAILURE);
+        if ((n = (allocation *) malloc(sizeof(allocation))) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        __mp_treeinsert(&alloctree, &n->node, i);
+        n->event = e;
     }
-    __mp_treeinsert(&alloctree, &n->node, i);
-    n->event = e;
     if (simfile != NULL)
     {
         if ((n->entry = __mp_getslot(&table)) == NULL)
