@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.5 2000-12-06 22:36:22 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.6 2000-12-07 00:12:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -136,16 +136,16 @@ static Widget appwidget, mainwidget, drawwidget;
 static Pixmap pixmap;
 
 
-/* The X graphics contexts for unallocated, free and allocated memory.
+/* The X graphics contexts for unallocated, internal, free and allocated memory.
  */
 
-static GC ungc, frgc, algc;
+static GC ungc, ingc, frgc, algc;
 
 
-/* The colours for unallocated, free and allocated memory.
+/* The colours for unallocated, internal, free and allocated memory.
  */
 
-static Pixel uncol, frcol, alcol;
+static Pixel uncol, incol, frcol, alcol;
 
 
 /* The width and height (in pixels) of the window and the drawing area.
@@ -186,10 +186,12 @@ static XtResource resources[] =
      (Cardinal) &frcol, XmRString, (XtPointer) "white"},
     {"height", XmCHeight, XmRShort, sizeof(Dimension),
      (Cardinal) &height, XmRImmediate, (XtPointer) 512},
+    {"internal", XmCColor, XmRPixel, sizeof(Pixel),
+     (Cardinal) &incol, XmRString, (XtPointer) "red"},
     {"space", "Space", XmRInt, sizeof(unsigned long),
      (Cardinal) &addrspace, XmRImmediate, (XtPointer) 4},
     {"unalloc", XmCColor, XmRPixel, sizeof(Pixel),
-     (Cardinal) &uncol, XmRString, (XtPointer) "gray50"},
+     (Cardinal) &uncol, XmRString, (XtPointer) "blue"},
     {"view-height", XmCHeight, XmRShort, sizeof(Dimension),
      (Cardinal) &vheight, XmRImmediate, (XtPointer) 256},
     {"view-width", XmCWidth, XmRShort, sizeof(Dimension),
@@ -208,6 +210,7 @@ static XrmOptionDescRec options[] =
     {"-delay", "delay", XrmoptionSepArg, NULL},
     {"-free", "free", XrmoptionSepArg, NULL},
     {"-height", "height", XrmoptionSepArg, NULL},
+    {"-internal", "internal", XrmoptionSepArg, NULL},
     {"-space", "space", XrmoptionSepArg, NULL},
     {"-unalloc", "unalloc", XrmoptionSepArg, NULL},
     {"-viewheight", "view-height", XrmoptionSepArg, NULL},
@@ -527,6 +530,36 @@ static int readevent(void)
 #else /* MP_GUI_SUPPORT */
             return 1;
 #endif /* MP_GUI_SUPPORT */
+          case 'H':
+            bufferpos++;
+            bufferlen--;
+            a = (void *) getuleb128();
+            l = getuleb128();
+            fprintf(stdout, "        reserve         " MP_POINTER "  %lu\n", a,
+                    l);
+#if MP_GUI_SUPPORT
+            if (addrbase == NULL)
+                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
+            drawmemory(a, l, frgc);
+            return 0;
+#else /* MP_GUI_SUPPORT */
+            return 1;
+#endif /* MP_GUI_SUPPORT */
+          case 'I':
+            bufferpos++;
+            bufferlen--;
+            a = (void *) getuleb128();
+            l = getuleb128();
+            fprintf(stdout, "        internal        " MP_POINTER "  %lu\n", a,
+                    l);
+#if MP_GUI_SUPPORT
+            if (addrbase == NULL)
+                addrbase = (void *) __mp_rounddown((unsigned long) a, 1024);
+            drawmemory(a, l, ingc);
+            return 0;
+#else /* MP_GUI_SUPPORT */
+            return 1;
+#endif /* MP_GUI_SUPPORT */
           default:
             break;
         }
@@ -710,6 +743,9 @@ int main(int argc, char **argv)
      */
     g.foreground = uncol;
     ungc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
+                     &g);
+    g.foreground = incol;
+    ingc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
                      &g);
     g.foreground = frcol;
     frgc = XCreateGC(appdisplay, RootWindowOfScreen(appscreen), GCForeground,
