@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.219 2001-05-30 22:55:45 graeme Exp $
+@c $Id: mpatrol.texi,v 1.220 2001-05-30 23:23:25 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.9
 @set VERSION 1.4.4
-@set UPDATED 30th May, 2001
+@set UPDATED 31st May, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -5853,7 +5853,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.4.4 (01/05/30)
+@@(#) mpatrol 1.4.4 (01/05/31)
 Copyright (C) 1997-2001 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -5870,7 +5870,7 @@ processor word size:    32-bit
 object file format:     BFD
 dynamic linker type:    SVR4
 
-Log file generated on Wed May 30 23:57:23 2001
+Log file generated on Thu May 31 00:07:03 2001
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.4
 read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so

@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.44 2001-05-30 22:56:09 graeme Exp $"
+#ident "$Id: version.c,v 1.45 2001-05-30 23:18:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.44 2001-05-30 22:56:09 graeme Exp $";
+static MP_CONST MP_VOLATILE char *version_id = "$Id: version.c,v 1.45 2001-05-30 23:18:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -50,19 +50,19 @@ extern "C"
 
 /* SCCS identification string and American date format.
  */
-MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (01/05/30)";
+MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (01/05/31)";
 
 #elif TARGET == TARGET_AMIGA
 
 /* Amiga identification string and European date format.
  */
-MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (30.05.01)";
+MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (31.05.01)";
 
 #else /* TARGET */
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (30 May 2001)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (31 May 2001)";
 
 #endif /* TARGET */
 
