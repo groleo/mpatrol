@@ -35,14 +35,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <time.h>
 #if MP_MMAP_SUPPORT
 #include <fcntl.h>
 #endif /* MP_MMAP_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.4 1999-11-25 16:15:38 graeme Exp $"
+#ident "$Id: option.c,v 1.5 1999-11-25 16:31:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -509,10 +508,7 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         i = OE_BADNUMBER;
                     else
                     {
-                        if (n == 0)
-                            h->fseed = (unsigned long) time(NULL);
-                        else
-                            h->fseed = n;
+                        h->fseed = n;
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "FREEBYTE"))
