@@ -25,13 +25,14 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.141 2002-01-08 22:29:59 graeme Exp $
+ * $Id: mpatrol.h,v 1.142 2002-03-11 23:51:49 graeme Exp $
  */
 
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stddef.h>
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
 #include <new>
@@ -76,7 +77,6 @@
 
 
 /* A macro for determining the alignment of a type at compile-time.
- * This resolves to 0 if the compiler has no mechanism for doing this.
  */
 
 #ifndef MP_ALIGN
@@ -85,7 +85,7 @@
 #elif defined(__GNUC__)
 #define MP_ALIGN(t) __alignof__(t)
 #else /* __EDG__ && __GNUC__ */
-#define MP_ALIGN(t) 0
+#define MP_ALIGN(t) offsetof(struct {char x; t y;}, y)
 #endif /* __EDG__ && __GNUC__ */
 #endif /* MP_ALIGN */
 
