@@ -35,9 +35,14 @@ void prologue(const void *p, size_t l)
     if (p == (void *) -1)
         fprintf(stderr, "allocating %lu bytes\n", l);
     else if (l == (size_t) -1)
-        fprintf(stderr, "freeing allocation 0x%08lX\n", p);
+        if (sizeof(void *) == 8)
+            fprintf(stderr, "freeing allocation 0x%016lX\n", p);
+        else
+            fprintf(stderr, "freeing allocation 0x%08lX\n", p);
     else if (l == (size_t) -2)
         fprintf(stderr, "duplicating string `%s'\n", p);
+    else if (sizeof(void *) == 8)
+        fprintf(stderr, "reallocating allocation 0x%016lX to %lu bytes\n", p, l);
     else
         fprintf(stderr, "reallocating allocation 0x%08lX to %lu bytes\n", p, l);
 }
@@ -46,7 +51,10 @@ void prologue(const void *p, size_t l)
 void epilogue(const void *p)
 {
     if (p != (void *) -1)
-        fprintf(stderr, "allocation returns 0x%08lX\n", p);
+        if (sizeof(void *) == 8)
+            fprintf(stderr, "allocation returns 0x%016lX\n", p);
+        else
+            fprintf(stderr, "allocation returns 0x%08lX\n", p);
 }
 
 

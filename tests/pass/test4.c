@@ -37,10 +37,16 @@ void display(void *p)
 
     if (!__mp_info(p, &d))
     {
-        fprintf(stderr, "nothing known about address 0x%08lX\n", p);
+        if (sizeof(void *) == 8)
+            fprintf(stderr, "nothing known about address 0x%016lX\n", p);
+        else
+            fprintf(stderr, "nothing known about address 0x%08lX\n", p);
         return;
     }
-    fprintf(stderr, "block:   0x%08lX\n", d.block);
+    if (sizeof(void *) == 8)
+        fprintf(stderr, "block:   0x%016lX\n", d.block);
+    else
+        fprintf(stderr, "block:   0x%08lX\n", d.block);
     fprintf(stderr, "size:    %lu\n", d.size);
     fprintf(stderr, "type:    %lu\n", d.type);
     fprintf(stderr, "alloc:   %lu\n", d.alloc);
@@ -50,7 +56,10 @@ void display(void *p)
     fprintf(stderr, "line:    %lu\n", d.line);
     for (s = d.stack; s != NULL; s = s->next)
     {
-        fprintf(stderr, "\t0x%08lX: ", s->addr);
+        if (sizeof(void *) == 8)
+            fprintf(stderr, "\t0x%016lX: ", s->addr);
+        else
+            fprintf(stderr, "\t0x%08lX: ", s->addr);
         fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
     }
     fprintf(stderr, "freed:   %d\n", d.freed);
