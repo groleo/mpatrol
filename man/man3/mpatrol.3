@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.20 2000-04-30 23:46:40 graeme Exp $
+.\" $Id: mpatrol.3,v 1.21 2000-05-01 00:10:29 graeme Exp $
 .\"
 .TH MPATROL 3 "30 April 2000" "Release 1.2" "mpatrol library"
 .SH NAME
@@ -634,7 +634,7 @@ Displays a quick-reference option summary to the \fBstderr\fP file stream.
 \fBLARGEBOUND\fP=\fIunsigned integer\fP
 Specifies the limit in bytes up to which memory allocations should be classified
 as large allocations for profiling purposes.  This limit must be greater than
-the small and medium bounds.  Default value: \fBLARGEBOUND\fP=\fI1024\fP.
+the small and medium bounds.  Default value: \fBLARGEBOUND\fP=\fI2048\fP.
 .TP
 \fBLIMIT\fP=\fIunsigned integer\fP
 Specifies the limit in bytes at which all memory allocations should fail if the
