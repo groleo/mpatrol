@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.83 2000-05-30 19:33:21 graeme Exp $
+@c $Id: mpatrol.texi,v 1.84 2000-05-31 18:55:00 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.10
 @set VERSION 1.2.1
-@set UPDATED 30th May, 2000
+@set UPDATED 31st May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2812,6 +2812,21 @@ functionality.  New modules have already been added, such as the @emph{stack},
 allocation can be added to the @emph{allocation information} module in
 @file{src/info.h} and @file{src/info.c} without having to change much code in
 any other files.
+
+Platform-dependent code has been isolated to specific modules, and feature
+macros are entirely defined and controlled from @file{config.h} and
+@file{target.h}.  The source code has been written so as to make it as easy as
+possible to compile the library on new platforms at the first attempt, although
+any additional features that the platform supports will then have to be
+explicitly enabled in the code.
+
+Of the UNIX platforms that the mpatrol library runs on, Solaris and Linux
+proved to be the easiest to port to, with well documented and easily accessible
+programming interfaces to operating system features.  Unfortunately, the
+non-UNIX ports proved a lot harder to write and do not contain as many of the
+useful features that the UNIX ports have, although sometimes not because they
+cannot ever support them, but because there would be a huge amount of work
+involved.
 
 @node Examples, Tutorial, How it works, Top
 @chapter Examples
@@ -6509,11 +6524,7 @@ currently be used to specify the program name at run-time.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
-read via @code{dlopen()}.  Also, on IRIX platforms no symbols can currently be
-read from any N32 shared libraries that were used by a program --- only O32
-shared libraries are recognised.  This is because it currently doesn't appear to
-be possible to determine the base address that an N32 shared library was loaded
-at using the new data structures.
+read via @code{dlopen()}.
 
 @item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
