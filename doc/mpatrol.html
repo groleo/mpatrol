@@ -115,7 +115,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.5 of the mpatrol manual for version
-1.4.0, 25th January, 2001.
+1.3.5, 6th February, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -207,12 +207,13 @@ to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
 to <a href="mailto:mpatrol@cbmamiga.demon.co.uk">mpatrol@cbmamiga.demon.co.uk</a>.  I'd be very interested in hearing any
 success stories with using mpatrol to debug programs, since I get very little
 feedback apart from the occasional bug report.  The mpatrol library is also
-registered at FreshMeat (<a href="http://freshmeat.net/">http://freshmeat.net/</a>) and several other
+registered at FreshMeat (<a href="http://freshmeat.net/projects/mpatrol/">http://freshmeat.net/projects/mpatrol/</a>) and
+SourceForge (<a href="http://sourceforge.net/projects/mpatrol/">http://sourceforge.net/projects/mpatrol/</a>) and several other
 software sites so you can receive notification of updates there as well.  I
 normally only check my e-mail about once or twice a week, so don't expect an
 immediate response.  I can also be reached at <a href="mailto:graeme@epc.co.uk">graeme@epc.co.uk</a> but that
-is my work e-mail address.  There is now also a discussion group at
-<a href="http://www.egroups.com/group/mpatrol/">http://www.egroups.com/group/mpatrol/</a> where you can post mpatrol-related
+is my work e-mail address.  There is also a discussion group at
+<a href="http://groups.yahoo.com/group/mpatrol/">http://groups.yahoo.com/group/mpatrol/</a> where you can post mpatrol-related
 questions but you must first subscribe to the group before you can send mail to
 it.
 
@@ -388,7 +389,8 @@ allocated on the heap.
 <td>Explicitly frees temporary memory.
 <br></tr></table>
 
-<li>Contains 4 replacement C++ dynamic memory allocation operators:
+<li>Contains 4 replacement C++ dynamic memory allocation operators (in both
+<em>throw</em> and <em>nothrow</em> forms):
 
 <p><table><tr align="left"><td><code>operator new</code>
 <td>Allocates memory. 
@@ -1606,18 +1608,18 @@ Up:<a rel=up href="#Using%20mpatrol">Using mpatrol</a>
 
 <h2>7.3 General errors</h2>
 
-<p>By default, the mpatrol library follows the guidelines for ANSI C regarding the
-behaviour of the dynamic memory allocation and memory operation functions it
-replaces<a rel=footnote href="#fn-20"><sup>20</sup></a>.  This means that calling <code>malloc()</code> with a size of zero is
-allowed, for example.  However, warnings can be generated for all of these
-types of calls by using the <code>CHECKALL</code> option.  The <code>CHECKALLOCS</code>
-option warns only about calls to <code>malloc()</code> and similar functions with a
-size of zero, the <code>CHECKREALLOCS</code> option warns only about calls to
-<code>realloc()</code> and similar functions with either a null pointer or a size of
-zero, and the <code>CHECKFREES</code> option warns only about calls to <code>free()</code>
-and similar functions with a null pointer.  The <code>CHECKMEMORY</code> option
-gives an error if a zero-size memory operation is performed on a <code>NULL</code>
-pointer -- this is normally allowed by default.
+<p>By default, the mpatrol library follows the guidelines for ANSI C and C++
+regarding the behaviour of the dynamic memory allocation and memory operation
+functions it replaces.  This means that calling <code>malloc()</code> with a size of
+zero is allowed, for example.  However, warnings can be generated for all of
+these types of calls by using the <code>CHECKALL</code> option.  The
+<code>CHECKALLOCS</code> option warns only about calls to <code>malloc()</code> and
+similar functions with a size of zero, the <code>CHECKREALLOCS</code> option warns
+only about calls to <code>realloc()</code> and similar functions with either a null
+pointer or a size of zero, and the <code>CHECKFREES</code> option warns only about
+calls to <code>free()</code> and similar functions with a null pointer.  The
+<code>CHECKMEMORY</code> option gives an error if a zero-size memory operation is
+performed on a <code>NULL</code> pointer -- this is normally allowed by default.
 
 <p>All newly-allocated memory can be pre-filled with a specified byte by using the
 <code>ALLOCBYTE</code> option.  This can be used to catch out code that expects
@@ -1656,7 +1658,7 @@ the original contents can be read from but not written to.
 
 <p>Note that if the argument specified with the <code>NOFREE</code> option is non-zero
 then the mpatrol library will store all recently-freed memory allocations in a
-queue<a rel=footnote href="#fn-21"><sup>21</sup></a>.  Once the queue has filled to the point specified with
+queue<a rel=footnote href="#fn-20"><sup>20</sup></a>.  Once the queue has filled to the point specified with
 the <code>NOFREE</code> option then all subsequent calls to free memory will result
 in the most recently-freed memory allocation being placed at the end of the
 queue and the freed memory allocation at the beginning of the queue will be
@@ -1695,7 +1697,7 @@ using the mpatrol library since it keeps its internal structures separate, and
 write-protects them on systems that support memory protection.
 
 <p>In order to identify such errors, it is possible to place special
-buffers<a rel=footnote href="#fn-22"><sup>22</sup></a> on either side of every memory allocation, and these will be pre-filled
+buffers<a rel=footnote href="#fn-21"><sup>21</sup></a> on either side of every memory allocation, and these will be pre-filled
 with a specified byte.  Before every mpatrol library call, the library will
 check the integrity of every such overflow buffer in order to check for a memory
 underwrite or overwrite.  Depending on the number of allocations and size of
@@ -1728,7 +1730,7 @@ It also rounds up the size of every overflow buffer to a multiple of the system
 page size so that every memory allocation occupies its own set of pages of
 virtual memory and no two memory allocations occupy the same page of virtual
 memory.  The overflow buffers are then read and write protected so that any
-memory accesses to them will generate an error<a rel=footnote href="#fn-23"><sup>23</sup></a>.  Following on from the previous section, the <code>PAGEALLOC</code>
+memory accesses to them will generate an error<a rel=footnote href="#fn-22"><sup>22</sup></a>.  Following on from the previous section, the <code>PAGEALLOC</code>
 option also causes free memory to be read and write protected as well since that
 will also occupy non-overlapping virtual memory pages.
 
@@ -1849,7 +1851,7 @@ in the <code>MPATROL_OPTIONS</code> environment variable before running the debu
 your program.  Alternatively, your debugger may have a command that allows you
 to modify your environment during debugging, but you're just as well setting the
 environment variable before you run the debugger as it shouldn't make any
-difference<a rel=footnote href="#fn-24"><sup>24</sup></a>.
+difference<a rel=footnote href="#fn-23"><sup>23</sup></a>.
 
 <p>After you get to the debugger command prompt, you should set a breakpoint at the
 <code>__mp_trap()</code> function.  This is the function that gets called when the
@@ -1877,7 +1879,7 @@ then you'll have saved yourself a lot of time by using this method.
 However, it is only for tutorial purposes and the same effect could easily be
 achieved by breaking at line 18 in a debugger because in this case it is obvious
 from the code and the mpatrol log file where it is going wrong.  In real
-programs this is hardly ever the case<a rel=footnote href="#fn-25"><sup>25</sup></a>.
+programs this is hardly ever the case<a rel=footnote href="#fn-24"><sup>24</sup></a>.
 
 <pre> 1  /*
  2   * Allocates 1000 blocks of 16 bytes, freeing each block immediately
@@ -2007,7 +2009,7 @@ address 0x080620E8 located in allocated block:
 <p>Some debuggers, such as <code>gdb</code>, also allow you to define your own
 commands for use in a debugging session.  The following example defines a
 new <code>gdb</code> command called <code>printalloc</code> which calls
-<code>__mp_printinfo()</code><a rel=footnote href="#fn-26"><sup>26</sup></a>:
+<code>__mp_printinfo()</code><a rel=footnote href="#fn-25"><sup>25</sup></a>:
 
 <pre>(gdb) define printalloc
 Type commands for definition of "printalloc".
@@ -2042,7 +2044,7 @@ testing a program under simulated low memory conditions to see how it handles
 such errors.  Of course, you should set the heap limit to a value less than the
 amount of actual available memory otherwise this option will have no effect. 
 Note that the mpatrol library may use up a small amount of heap memory when it
-initialises itself<a rel=footnote href="#fn-27"><sup>27</sup></a> so the value passed
+initialises itself<a rel=footnote href="#fn-26"><sup>26</sup></a> so the value passed
 to the <code>LIMIT</code> option may need to be set slightly higher than you would
 normally expect.
 
@@ -2059,7 +2061,7 @@ on exactly the same memory allocations.  If this is zero then the failure seed
 will itself be set randomly, but you can see its value when the summary is
 displayed at program termination.
 
-<p>When running <em>batch tests</em><a rel=footnote href="#fn-28"><sup>28</sup></a> it is sometimes useful to be able to detect if there have been
+<p>When running <em>batch tests</em><a rel=footnote href="#fn-27"><sup>27</sup></a> it is sometimes useful to be able to detect if there have been
 any memory leaks.  Such leaks should normally be distinguished from code which
 has purposely not freed the memory that it allocated, so there may be a certain
 expected number of unfreed allocations at program termination.  It may be that
@@ -2339,10 +2341,10 @@ with <code>FORMAT=FORMAT_COFF</code> or <code>FORMAT=FORMAT_XCOFF</code> support
 must be told to preload the COFF access library (normally <code>libld.so</code>).  If
 it was built with <code>FORMAT=FORMAT_ELF32</code> or <code>FORMAT=FORMAT_ELF64</code>
 support then it must be told to preload the ELF access library (normally
-<code>libelf.so</code>)<a rel=footnote href="#fn-29"><sup>29</sup></a>. 
+<code>libelf.so</code>)<a rel=footnote href="#fn-28"><sup>28</sup></a>. 
 If it was built with <code>FORMAT=FORMAT_BFD</code> support then it must be told to
 preload the GNU BFD access libraries (normally <code>libbfd.so</code> and
-<code>libiberty.so</code>)<a rel=footnote href="#fn-30"><sup>30</sup></a>.  However, if these libraries only exist on your
+<code>libiberty.so</code>)<a rel=footnote href="#fn-29"><sup>29</sup></a>.  However, if these libraries only exist on your
 system in archive form then you must build <code>libmpatrol.so</code> with these extra
 libraries incorporated into it so that there are no dependencies on them at
 run-time.  However, there may well be problems if the resulting shared library
@@ -3051,7 +3053,7 @@ index   bytes   s  m  l  x     bytes   s  m  l  x  function
 
 <p>The names of the functions displayed in the above tables now have a byte offset
 appended to them to indicate at what position in the function a call to allocate
-memory occurred<a rel=footnote href="#fn-31"><sup>31</sup></a>.  Now it is possible to see that the first call to allocate memory
+memory occurred<a rel=footnote href="#fn-30"><sup>30</sup></a>.  Now it is possible to see that the first call to allocate memory
 from within <code>new_pair()</code> has had all of its memory freed, but the second
 call (from <code>strdup()</code>) has had none of its memory freed.
 
@@ -3122,7 +3124,7 @@ commands that come with GraphViz.  The resulting graphs will show the
 relationships between each function, its parents and its children, and will also
 show the number of bytes that were allocated along the edges of the call graph,
 but this can be changed to the number of calls if the <code>--counts</code> option
-is used<a rel=footnote href="#fn-32"><sup>32</sup></a>.  A call graph showing unfreed memory
+is used<a rel=footnote href="#fn-31"><sup>31</sup></a>.  A call graph showing unfreed memory
 instead of allocated memory can be generated by adding the <code>--leaks</code>
 option. 
 The following graph illustrates the use of these options with the above example. 
@@ -3226,7 +3228,7 @@ C preprocessor, the majority of memory allocations are used for macro
 processing, with a sizable chunk being allocated for reading include files. 
 You may also notice the dotted lines that connect the <code>rescan()</code>,
 <code>handle_directive()</code>, <code>do_include()</code> and <code>finclude()</code>
-functions<a rel=footnote href="#fn-33"><sup>33</sup></a>.  These
+functions<a rel=footnote href="#fn-32"><sup>32</sup></a>.  These
 show a cycle in the call graph where each of these functions may have been
 involved in one or more recursive calls.  The labels for such dotted edges may
 not be entirely accurate since <code>mprof</code> will only count allocated memory
@@ -3338,7 +3340,7 @@ mpatrol tracing output filename but if it is omitted then it will use
 is given as <code>-</code> then the standard input file stream will be used as the
 tracing output file.
 
-<p>The <code>mptrace</code> command will normally be built with GUI<a rel=footnote href="#fn-34"><sup>34</sup></a> support on UNIX platforms that are running X Windows.  This
+<p>The <code>mptrace</code> command will normally be built with GUI<a rel=footnote href="#fn-33"><sup>33</sup></a> support on UNIX platforms that are running X Windows.  This
 means that a graphical memory map display of the heap will be shown in a window
 every time <code>mptrace</code> is run.  This display is updated every time a new
 event is read from the tracing output file and by default uses the colour red
@@ -3447,7 +3449,7 @@ cc1.log        collect2.trace gcc.log        ld.trace
 files for <code>as</code> and <code>ld</code> so we'll delete them.  We can now use
 <code>mptrace</code> to decode each of the tracing output files produced and write
 their contents in tabular form to the standard output file stream, which can be
-redirected to a file for later viewing<a rel=footnote href="#fn-35"><sup>35</sup></a>.  You can find these tracing output files in the <code>extra</code>
+redirected to a file for later viewing<a rel=footnote href="#fn-34"><sup>34</sup></a>.  You can find these tracing output files in the <code>extra</code>
 directory in the mpatrol distribution.
 
 <pre>bash$ rm as.log as.trace ld.log ld.trace
@@ -3545,7 +3547,7 @@ it was reallocated.
 <p>The first few entries in the table show that the mpatrol library started by
 allocating memory from the heap for its own purposes before reserving 8192 bytes
 for the memory allocations made by the object file access library for reading
-the symbols from the executable file and shared libraries<a rel=footnote href="#fn-36"><sup>36</sup></a>.  Most of the further internal heap reservation events are due
+the symbols from the executable file and shared libraries<a rel=footnote href="#fn-35"><sup>35</sup></a>.  Most of the further internal heap reservation events are due
 to the mpatrol library having to store details for all of the relevant symbols
 that it could read at program startup.  The more symbols that there are, the
 more memory that must be used to store them.  Note that the heap reservation
@@ -3639,7 +3641,7 @@ because there may be a more efficient way of dealing with dynamic memory
 allocations.  Indeed, there may even be a more efficient malloc library
 available for you to use.
 
-<p>If you need to allocate lots of blocks of the same size<a rel=footnote href="#fn-37"><sup>37</sup></a>, but you won't know the number of blocks you'll require until
+<p>If you need to allocate lots of blocks of the same size<a rel=footnote href="#fn-36"><sup>36</sup></a>, but you won't know the number of blocks you'll require until
 run-time then you could take the easy approach by simply allocating a new block
 of memory for each occurrence.  However, this is going to create a lot of
 (typically small) memory blocks that the underlying malloc library will have to
@@ -3708,7 +3710,7 @@ take a sizable chunk of processor time depending on how large the program is, so
 it is not really an option for real-time programming.  It is also very
 platform-dependent as it examines very low-level structures within a process in
 order to determine which pointers point to which memory allocations.  But there
-is at least one garbage collector<a rel=footnote href="#fn-38"><sup>38</sup></a> that works well with C and C++ and acts
+is at least one garbage collector<a rel=footnote href="#fn-37"><sup>37</sup></a> that works well with C and C++ and acts
 as a replacement for <code>malloc()</code> and <code>free()</code>, so it may be the ideal
 solution for you.
 
@@ -3740,13 +3742,13 @@ allocations.
 first, most basic rule is to <em>always</em> check the return values from
 <code>malloc()</code> and related functions.  <em>Never</em> assume that a call to
 <code>malloc()</code> will succeed, because you're unlikely to be able to read the
-future<a rel=footnote href="#fn-39"><sup>39</sup></a>.  Alternatively, use (or write) an <code>xmalloc()</code> or similar function,
+future<a rel=footnote href="#fn-38"><sup>38</sup></a>.  Alternatively, use (or write) an <code>xmalloc()</code> or similar function,
 which calls <code>malloc()</code> but never returns <code>NULL</code> since it will abort
 instead.  With the C++ operators it is slightly different because some versions
 use exceptions to indicate failure, so you should always provide a handler to
 deal with this eventuality.
 
-<p>Never use <em>features</em><a rel=footnote href="#fn-40"><sup>40</sup></a> of
+<p>Never use <em>features</em><a rel=footnote href="#fn-39"><sup>39</sup></a> of
 specific malloc libraries if you want your code to be portable.  Always follow
 the ANSI C or C++ calling conventions and never make assumptions about the
 function or operator you are about to call -- the standards committees went to
@@ -4143,7 +4145,7 @@ on the type of function that is used to allocate the memory.
 <p>The following information contains source file details of where the call to
 <code>malloc()</code> came from, but is only available if the source file containing
 the call to <code>malloc()</code> included <code>mpatrol.h</code>; otherwise the fields will
-all be <code>-</code><a rel=footnote href="#fn-41"><sup>41</sup></a>. 
+all be <code>-</code><a rel=footnote href="#fn-40"><sup>40</sup></a>. 
 Because of the convoluted way this information is obtained for the C++
 operators, you may encounter some problems in existing C++ programs when making
 direct calls to <code>operator new</code> for example.  However, if you want to
@@ -4996,7 +4998,7 @@ allocations.  The following source can be found in <code>tests/fail/test9.c</cod
 <p>As you can see, the library detected that the <code>memset()</code> function would
 have written past the boundaries of the memory allocation and reported this to
 you.  It then proceeded to ignore the request to copy the memory and continued
-with the execution of the program<a rel=footnote href="#fn-42"><sup>42</sup></a>.  Note that this will only be done for known memory
+with the execution of the program<a rel=footnote href="#fn-41"><sup>41</sup></a>.  Note that this will only be done for known memory
 allocations.  Reading and writing past the boundaries of static and stack memory
 allocations cannot be detected in this way.
 
@@ -5853,11 +5855,11 @@ why bother trying to debug it?
 major error that is likely to prevent it from running portably on other systems. 
 However, for the purposes of this tutorial, we'll pretend that we've just been
 handed the source code for this program and have not worked on it before.  So
-let's now try to compile and link it with the mpatrol library<a rel=footnote href="#fn-43"><sup>43</sup></a>.
+let's now try to compile and link it with the mpatrol library<a rel=footnote href="#fn-42"><sup>42</sup></a>.
 
 <p>First, add the inclusion of <code>mpatrol.h</code> to line 34 so that we can replace
 calls to <code>malloc()</code> and <code>free()</code> with their mpatrol
-equivalents<a rel=footnote href="#fn-44"><sup>44</sup></a>.  Then, recompile the program and link it with the
+equivalents<a rel=footnote href="#fn-43"><sup>43</sup></a>.  Then, recompile the program and link it with the
 mpatrol library.  This time, running it with even the simplest of non-empty
 input lines should cause it to abort!
 
@@ -5895,7 +5897,7 @@ returns 0x08067FF4
 function call was <code>malloc()</code> called from <code>strtoupper()</code>.  If we add
 the option <code>OFLOWSIZE=8</code> to the <code>MPATROL_OPTIONS</code> environment
 variable then we get slightly more information about which memory allocation was
-affected<a rel=footnote href="#fn-45"><sup>45</sup></a>.
+affected<a rel=footnote href="#fn-44"><sup>44</sup></a>.
 
 <pre>ERROR: [ALLOVF]: allocation 0x08071E34 has a corrupted overflow buffer at
                  0x08071E36
@@ -5969,7 +5971,7 @@ The program is running.  Exit anyway? (y or n) y
 
 <p>After loading the program into <code>gdb</code>, we need to break at <code>main()</code>
 so that we can run to a point where all of the shared library symbols have been
-loaded into memory<a rel=footnote href="#fn-46"><sup>46</sup></a>.  We can then set another
+loaded into memory<a rel=footnote href="#fn-45"><sup>45</sup></a>.  We can then set another
 breakpoint at <code>__mp_trap()</code> and continue until allocation 68 has been
 reached.
 
@@ -5979,7 +5981,7 @@ this example we can quickly step back to the <code>strtoupper()</code> function 
 We then set a watch point on address <code>0x8071e36</code>, which is the address of
 the memory location that has been causing the problems.  After continuing, the
 debugger stops at line 46, but this is more likely to be line 45 since that is
-where a zero byte is being written to<a rel=footnote href="#fn-47"><sup>47</sup></a>.
+where a zero byte is being written to<a rel=footnote href="#fn-46"><sup>46</sup></a>.
 
 <p>So, we have located the problem, which is simply a case of not allocating
 enough memory to contain the copied string <em>and</em> the terminating zero byte. 
@@ -7657,11 +7659,14 @@ standards allow this behaviour, and it is really only a portability issue.
 <br><dt>Type
 <dd>Error
 <br><dt>Cause
-<dd>The <code>operator new</code> or <code>operator new[]</code> C++ operator was called to
-allocate memory, but no more memory was available to allocate and no low-memory
-handler was installed.  This error can also be caused by a call to
-<code>xmalloc()</code> and related functions, or <code>MP_MALLOC</code> and related
-functions when they would otherwise return a <code>NULL</code> pointer. 
+<dd>The <code>alloca()</code>, <code>xmalloc()</code> or <code>MP_MALLOC()</code> families of
+functions were called to allocate memory, but no more memory was available to
+allocate and the low-memory handler, if installed, could not free up sufficient
+memory.  This error can also be caused by a call to the <code>operator new</code> or
+<code>operator new[]</code> C++ operators (not the <em>nothrow</em> versions) when they
+would otherwise return a <code>NULL</code> pointer and the mpatrol library was
+compiled with a C compiler (which means that it cannot throw a <code>bad_alloc</code>
+exception). 
 <br><dt>Additional
 <dd>The library summary. 
 <br><dt>Result
@@ -7917,7 +7922,7 @@ Up:<a rel=up href="#Top">Top</a>
 <h1>Appendix F File formats</h1>
 
 <p>The formats of the profiling and tracing output files that are produced by the
-mpatrol library are described here<a rel=footnote href="#fn-48"><sup>48</sup></a>.
+mpatrol library are described here<a rel=footnote href="#fn-47"><sup>47</sup></a>.
 
 <ul>
 <li><a href="#Profiling%20file%20format">Profiling file format</a>:        Profiling output file layout. 
@@ -8145,9 +8150,6 @@ required on <code>a.out</code>-based systems.
 to work correctly, giving spurious errors in the log file. 
 <li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
 to the lack of an <code>nl</code> command on the system. 
-<li>The <code>hexwords</code> command needs to be changed to use
-<code>/usr/share/dict/words</code> instead of <code>/usr/dict/words</code> as the default
-dictionary. 
 </ul>
 
 <li>HP/UX 10.20, HP PA/RISC 9000, BFD, <code>gcc</code>
@@ -8171,14 +8173,14 @@ work properly if more than 50 memory allocations exist at one time.
 <li>Stack traversal may be unreliable from signal-handlers. 
 </ul>
 
-<li>Red Hat Linux 6.0, Intel Pentium III, BFD, <code>gcc</code>
+<li>Red Hat Linux 6.0, Intel Pentium III, BFD, <code>g++</code>
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command does not work
 unless <code>libiberty.so</code> is available. 
 </ul>
 
-<li>Red Hat Linux 6.1, Intel Pentium III, BFD, <code>gcc</code>
+<li>Red Hat Linux 6.1, Intel Pentium III, BFD, <code>g++</code>
 <ul>
 <li>The thread-safe version of the library does not work due to the system threads
 library calling <code>malloc()</code> and <code>bzero()</code> recursively. 
@@ -8187,7 +8189,7 @@ library calling <code>malloc()</code> and <code>bzero()</code> recursively.
 unless <code>libiberty.so</code> is available. 
 </ul>
 
-<li>Red Hat Linux 6.2, Intel Pentium III, BFD, <code>gcc</code>
+<li>Red Hat Linux 6.2, Intel Pentium III, BFD, <code>g++</code>
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command does not work
@@ -8319,23 +8321,23 @@ be added to <code>CFLAGS</code> in the <code>Makefile</code>.
 <li>The <code>USEDEBUG</code> option has no effect. 
 </ul>
 
-<li>Solaris 7, SPARC V9, BFD, <code>gcc</code>
+<li>Solaris 7, SPARC V9, BFD, <code>g++</code>
 <ul>
 <li>The mpatrol library can be compiled and run in a 64-bit environment. 
 </ul>
 
-<li>Solaris 7, SPARC V9, ELF32/ELF64, <code>gcc</code>
+<li>Solaris 7, SPARC V9, ELF32/ELF64, <code>g++</code>
 <ul>
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The mpatrol library can be compiled and run in a 64-bit environment. 
 </ul>
 
-<li>Solaris 8, SPARC V9, BFD, <code>gcc</code>
+<li>Solaris 8, SPARC V9, BFD, <code>g++</code>
 <ul>
 <li>The mpatrol library can be compiled and run in a 64-bit environment. 
 </ul>
 
-<li>Solaris 8, SPARC V9, ELF32/ELF64, <code>gcc</code>
+<li>Solaris 8, SPARC V9, ELF32/ELF64, <code>g++</code>
 <ul>
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The mpatrol library can be compiled and run in a 64-bit environment. 
@@ -8386,7 +8388,7 @@ section in the <code>Makefile</code> before building the library.
 work. 
 </ul>
 
-<li>Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C/C++
+<li>Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C++
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
@@ -8514,7 +8516,7 @@ bug report that comes with an associated fix will be most welcome.
 
 <p>Enhancement requests and source code containing enhancements should also be sent
 to <a href="mailto:mpatrol@cbmamiga.demon.co.uk">mpatrol@cbmamiga.demon.co.uk</a> or the mpatrol discussion group at
-<a href="http://www.egroups.com/group/mpatrol/">http://www.egroups.com/group/mpatrol/</a>.  If you are planning to implement
+<a href="http://groups.yahoo.com/group/mpatrol/">http://groups.yahoo.com/group/mpatrol/</a>.  If you are planning to implement
 an enhancement, let me know first in case I am (or someone else is) working
 towards the same goal -- that way, work won't be wasted.  If you wish to send
 me source code changes please send the changes as context diffs or in an e-mail
@@ -8537,13 +8539,14 @@ Up:<a rel=up href="#Notes">Notes</a>
 <h2>H.1 Notes for all platforms</h2>
 
 <ul>
-<li>C++ support is still fairly limited, and will possibly only work for older C++
-code due to the way the operators are overridden (i.e. there are no exceptions
-versions of the functions).  Also, explicit references to <code>operator new</code>
-rather than <code>new</code> are likely to result in compilation errors, and the way
-that source level information is obtained for <code>operator delete</code> means that
-the resulting code will not be thread-safe.  It might also be an idea to provide
-an allocation class from which user-defined memory allocators can be derived.
+<li>Overriding the C++ operators to get source-level information using the
+preprocessor is still a bit dodgy and isn't likely to get much better, so
+<code>MP_NONEWDELETE</code> may have to be used a lot.  Explicit references to
+<code>operator new</code> rather than <code>new</code> are likely to result in compilation
+errors, and the way that source level information is obtained for
+<code>operator delete</code> means that the resulting code will not be thread-safe. 
+It might also be an idea to provide an allocation class from which user-defined
+memory allocators can be derived.
 
 <li>Need to add support for other 64-bit processors in addition to the existing
 SPARC V9 support.  This shouldn't be too hard, but I haven't got access to such
@@ -8572,9 +8575,9 @@ work for unoptimised code.  A much better solution would be write the
 implementations at a lower level in assembly, but this is much less portable. 
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
-write one<a rel=footnote href="#fn-49"><sup>49</sup></a>?  I
+write one<a rel=footnote href="#fn-48"><sup>48</sup></a>?  I
 can think of many applications that would benefit from such a library besides
-this one<a rel=footnote href="#fn-50"><sup>50</sup></a>.
+this one<a rel=footnote href="#fn-49"><sup>49</sup></a>.
 
 <li>An alternative implementation for call stack traversal uses the functions
 <code>__builtin_frame_address()</code> and <code>__builtin_return_address()</code> that are
@@ -8596,12 +8599,11 @@ bytes that stack frames should differ by should be platform-dependent since the
 current value is way too high.
 
 <li>Add a function to display a stack trace of the current call stack to a file
-stream and another function to walk all current memory allocations invoking a
-callback function for each one encountered.  Note that there is still an issue
-with callback functions if they call mpatrol library functions, since this
-will lead to recursion.  Callback functions could also be defined for
-<code>__malloc_hook()</code>, <code>__realloc_hook()</code> and <code>__free_hook()</code> in much
-the same way as for the GNU C library.
+stream.  Note that there is still an issue with callback functions if they call
+mpatrol library functions, since this will lead to recursion.  Callback
+functions could also be defined for <code>__malloc_hook()</code>,
+<code>__realloc_hook()</code> and <code>__free_hook()</code> in much the same way as for the
+GNU C library.
 
 <li>Need to store filename and line number information in all call stacks so that
 the information can be used at program termination.  May also need to display
@@ -8703,20 +8705,11 @@ support, but perhaps it might be easier just to assume the C locale to begin
 with.  Also need to have better detection of internal and free blocks when
 displaying memory range errors.
 
-<li>Perhaps add definitions of <code>xmalloc()</code>, <code>xrealloc()</code>, etc. which
-never return <code>NULL</code> on failure.
-
 <li>Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to <code>malloc()</code> each time a write to the log file
 occurs on some systems.  Example code to do this was submitted by Alexander
 Barton (<a href="mailto:abarton@innotrac.com">abarton@innotrac.com</a>) and this may well be incorporated into
 the library at some point in the future.
-
-<li>Add functions to write diagnostics to the mpatrol log file from within program
-code.  These could include displaying call stacks and dumping contents of
-memory allocations.  The <code>__mp_edit()</code> and <code>__mp_list()</code> functions
-could be added to give functionality similar to the <code>EDIT</code> and
-<code>LIST</code> options at any time during program execution.
 
 <li>The <code>LOG*</code> options could be extended to take a list of specific functions
 to log.  They could also only log operations spanning a range of addresses or
@@ -8725,13 +8718,6 @@ allocation indices as well.
 <li>Add an option to limit the size of each memory allocation to a maximum number
 of bytes.  This could be useful if a memory allocation function is called with
 an uninitialised variable.
-
-<li>Add another library which can be linked in instead of mpatrol and replaces
-all calls to <code>__mp_alloc()</code>, etc., with the original calls to
-<code>malloc()</code> and related functions.  This would be very useful for quickly
-removing all mpatrol functionality for perhaps even a release build, and might
-be useful for implementing functions such as <code>memalign()</code> which don't
-exist on many systems.
 
 <li>Add assertion macros to <code>mpatrol.h</code> that can be used in program code. 
 These could be used to assert that pointers have not been freed or are valid
@@ -8762,8 +8748,7 @@ provide much finer-grained error-checking.
 <li>Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a <code>NULL</code> pointer.  Also, perhaps
 add an option to display the partial contents of freed and unfreed allocations
-in the mpatrol log file and also a function which can be called to dump the
-contents of a memory allocation to the log file.
+in the mpatrol log file.
 
 <li>Perhaps add memory protection to the simulated <code>sbrk</code> heap.
 
@@ -9236,6 +9221,25 @@ the standardisation of the C++ language but some compilers may not yet have
 support for them.  It may be that you have to use a special compiler option to
 enable support for these operators, but if not you will probably have to edit
 <code>mpatrol.h</code> to temporarily allow your files to compile.
+
+</p><li>I tried both of the above suggestions, but I still can't get my C++ source code
+to compile.  I'm using an old C++ compiler so could that be a problem?
+
+<p>Yes.  The <code>mpatrol.h</code> header file defines new versions of the C++ dynamic
+memory allocation operators using exceptions and namespaces as required by the
+ANSI C++ standard.  If your C++ compiler has no support for these then you
+should compile your C++ source files with <code>MP_NOCPLUSPLUS</code> defined.
+
+</p><li>I'm calling <code>operator new</code> (not the <em>nothrow</em> version) from my C++
+source code but when my program runs out of memory the <code>OUTMEM</code> error is
+given in the mpatrol log file rather than throwing a <code>bad_alloc</code> exception. 
+Why is this?
+
+<p>Sounds like the mpatrol library was built with a C compiler.  In order for the
+mpatrol versions of <code>operator new</code> and <code>operator new[]</code> to throw an
+exception when they run out of memory, the mpatrol library must have been built
+with a C++ compiler.  The <code>OUTMEM</code> error is only given when there is no way
+to throw an exception.
 
 </p><li>Why am I unable to call the mpatrol version of <code>alloca()</code>?  I only ever
 seem to call the default version.
@@ -9782,7 +9786,7 @@ detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
 <p>A list of over eighty different items of software which help in debugging
-dynamic memory allocation problems is given below<a rel=footnote href="#fn-51"><sup>51</sup></a>.  They all provide some of the features that
+dynamic memory allocation problems is given below<a rel=footnote href="#fn-50"><sup>50</sup></a>.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
 you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
 Electric Fence and Mprof, so I can't vouch for any of the others, although if
@@ -12410,6 +12414,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>Solaris malloc libraries: <a href="#Related%20software">Related software</a>
 <li>Solaris, Intel 80x86: <a href="#Supported%20systems">Supported systems</a>
 <li>Solaris, SPARC: <a href="#Supported%20systems">Supported systems</a>
+<li>SourceForge: <a href="#Foreword">Foreword</a>
 <li>Spotlight: <a href="#Related%20software">Related software</a>
 <li>stack: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>stack memory allocations: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
@@ -12590,152 +12595,147 @@ effectively a single process running all user programs as threads.</p>
 1.0 it was enabled by default.</p>
 
 <li><a name="fn-20"></a>
-<p>I attempted to do the same for the ANSI C++ memory allocation
-operators but there are still namespace and exception handling issues to be
-resolved.</p>
-
-<li><a name="fn-21"></a>
 <p>In the case of <code>NOFREE=0</code> a double negative does not make
 a positive.  The zero indicates that all memory allocations will not really be
 freed for later reuse.</p>
 
-<li><a name="fn-22"></a>
+<li><a name="fn-21"></a>
 <p>Commonly known as <em>overflow buffers</em> or <em>fence
 posts</em>.</p>
 
-<li><a name="fn-23"></a>
+<li><a name="fn-22"></a>
 <p>This is a feature that
 was first used by Electric Fence (see <a href="#Related%20software">Related software</a>) to track down memory
 corruption.</p>
 
-<li><a name="fn-24"></a>
+<li><a name="fn-23"></a>
 <p>Unless you've linked the debugger with the mpatrol
 library.</p>
 
-<li><a name="fn-25"></a>
+<li><a name="fn-24"></a>
 <p>The other reason that this
 program is simple is because a proper example would generally involve crashing
 the program, but on AmigaOS and Netware that would also involve crashing the
 system -- not something you'd want to do whilst trying this out.</p>
 
-<li><a name="fn-26"></a>
+<li><a name="fn-25"></a>
 <p>A sample GDB command file for use with
 mpatrol can be found in <code>extra/.gdbinit</code>.</p>
 
-<li><a name="fn-27"></a>
+<li><a name="fn-26"></a>
 <p>Actually, it's not really the mpatrol library that
 uses the memory but the object file access libraries since they call
 <code>malloc()</code> to allocate any memory that they require.</p>
 
-<li><a name="fn-28"></a>
+<li><a name="fn-27"></a>
 <p>A set of tests that run without user
 intervention.</p>
 
-<li><a name="fn-29"></a>
+<li><a name="fn-28"></a>
 <p>A freely available version of the ELF access library,
 libelf, can be downloaded from <a href="ftp://sunsite.unc.edu/pub/Linux/libs/">ftp://sunsite.unc.edu/pub/Linux/libs/</a>.</p>
 
-<li><a name="fn-30"></a>
+<li><a name="fn-29"></a>
 <p>The GNU BFD access library can be downloaded from
 <a href="ftp://ftp.gnu.org/">ftp://ftp.gnu.org/</a>.</p>
 
-<li><a name="fn-31"></a>
+<li><a name="fn-30"></a>
 <p>If no symbols could be read from the program's
 executable file, or if the corresponding symbol could not be determined, then
 the function names will be replaced with the code addresses at which the calls
 took place.</p>
 
-<li><a name="fn-32"></a>
+<li><a name="fn-31"></a>
 <p>Cycles in the graph are marked by dashed lines along the
 relevant edges instead of solid lines.</p>
 
-<li><a name="fn-33"></a>
+<li><a name="fn-32"></a>
 <p>You might also have noticed the dotted lines connecting
 <code>do_spec_1()</code> and <code>handle_braces()</code> in the previous graph.</p>
 
-<li><a name="fn-34"></a>
+<li><a name="fn-33"></a>
 <p>Graphical
 User Interface.</p>
 
-<li><a name="fn-35"></a>
+<li><a name="fn-34"></a>
 <p>If you are running a GUI version
 of <code>mptrace</code> you will need to close the window after each file has been
 decoded.</p>
 
-<li><a name="fn-36"></a>
+<li><a name="fn-35"></a>
 <p>The actual
 allocation events from this do not appear since they were internal memory
 allocations.</p>
 
-<li><a name="fn-37"></a>
+<li><a name="fn-36"></a>
 <p>Such as for use
 in a linked list.</p>
 
-<li><a name="fn-38"></a>
+<li><a name="fn-37"></a>
 <p>A freely distributably library
 called GC (see <a href="#Related%20software">Related software</a>).</p>
 
-<li><a name="fn-39"></a>
+<li><a name="fn-38"></a>
 <p>If you can, why are you reading this -- you've already read
 it!</p>
 
-<li><a name="fn-40"></a>
+<li><a name="fn-39"></a>
 <p>Whether they are documented or not.</p>
 
-<li><a name="fn-41"></a>
+<li><a name="fn-40"></a>
 <p>This information may also be filled in if the
 <code>USEDEBUG</code> option or the <code>mpsym</code> command is used and supported,
 and if debugging information about the call to <code>malloc()</code> is available.</p>
 
-<li><a name="fn-42"></a>
+<li><a name="fn-41"></a>
 <p>The error can be turned into a
 warning with the <code>ALLOWOFLOW</code> option which will also force the operation
 to be performed.</p>
 
-<li><a name="fn-43"></a>
+<li><a name="fn-42"></a>
 <p>On UNIX
 systems with dynamic linking it might also be possible to run the program under
 the <code>mpatrol</code> command with its <code>--dynamic</code> option without having
 to recompile or relink, but compiling and linking with the mpatrol library is a
 more generic solution across different platforms.</p>
 
-<li><a name="fn-44"></a>
+<li><a name="fn-43"></a>
 <p>This is not strictly necessary on UNIX and Windows
 platforms (and AmigaOS when using <code>gcc</code>), but it does give us more
 debugging information.</p>
 
-<li><a name="fn-45"></a>
+<li><a name="fn-44"></a>
 <p>Note that the start address of the allocation has changed
 slightly since we added padding around it with the <code>OFLOWSIZE</code> option.</p>
 
-<li><a name="fn-46"></a>
+<li><a name="fn-45"></a>
 <p>This is really only necessary when the mpatrol
 library has been built as a shared library.</p>
 
-<li><a name="fn-47"></a>
+<li><a name="fn-46"></a>
 <p>This is not necessarily the fault
 of the debugger or the debugging information generated by the compiler since
 on most platforms such watch points can only be caught after they occur, hence
 most debuggers show the next statement to be executed rather than the current
 one.</p>
 
-<li><a name="fn-48"></a>
+<li><a name="fn-47"></a>
 <p>The file <code>extra/magic</code> contains
 a UNIX <em>magic</em> file excerpt for automatically identifying an mpatrol log
 file, an mpatrol profiling output file and an mpatrol tracing output file with
 the <code>file</code> command.</p>
 
-<li><a name="fn-49"></a>
+<li><a name="fn-48"></a>
 <p>There is currently a library called StackTrace written by
 Bjorn Reese which invokes a debugger to generate a stack traceback on certain
 UNIX platforms.  This method would be too slow for mpatrol to use though.</p>
 
-<li><a name="fn-50"></a>
+<li><a name="fn-49"></a>
 <p>Looking back at these statements about six months after they
 were written, it would appear that I have just written such a library judging by
 the number of architectures for which stack traversal is now supported.</p>
 
-<li><a name="fn-51"></a>
+<li><a name="fn-50"></a>
 <p>This list can be
 considered to be a slightly more up to date version of <cite>Debugging Tools
 for Dynamic Storage Allocation and Memory Management</cite>

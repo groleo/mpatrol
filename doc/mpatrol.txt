@@ -3,8 +3,8 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 25th
-January, 2001.
+   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -41,8 +41,8 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 25th
-January, 2001.
+   This is edition 2.5 of the mpatrol manual for version 1.3.5, 6th
+February, 2001.
 
 Foreword
 ********
@@ -103,14 +103,15 @@ compliments, etc.) should be sent to <mpatrol@cbmamiga.demon.co.uk>.
 I'd be very interested in hearing any success stories with using
 mpatrol to debug programs, since I get very little feedback apart from
 the occasional bug report.  The mpatrol library is also registered at
-FreshMeat (`http://freshmeat.net/') and several other software sites so
-you can receive notification of updates there as well.  I normally only
-check my e-mail about once or twice a week, so don't expect an
-immediate response.  I can also be reached at <graeme@epc.co.uk> but
-that is my work e-mail address.  There is now also a discussion group at
-`http://www.egroups.com/group/mpatrol/' where you can post
-mpatrol-related questions but you must first subscribe to the group
-before you can send mail to it.
+FreshMeat (`http://freshmeat.net/projects/mpatrol/') and SourceForge
+(`http://sourceforge.net/projects/mpatrol/') and several other software
+sites so you can receive notification of updates there as well.  I
+normally only check my e-mail about once or twice a week, so don't
+expect an immediate response.  I can also be reached at
+<graeme@epc.co.uk> but that is my work e-mail address.  There is also a
+discussion group at `http://groups.yahoo.com/group/mpatrol/' where you
+can post mpatrol-related questions but you must first subscribe to the
+group before you can send mail to it.
 
    Finally, I'd like to thank Stephan Springl (<springl@bfw-online.de>)
 for his help on reading debugging information from object files via the
@@ -245,7 +246,8 @@ out.
      `cfree()'     old     Frees memory allocated by `calloc()'.
      `dealloca()'  new     Explicitly frees temporary memory.
 
-   * Contains 4 replacement C++ dynamic memory allocation operators:
+   * Contains 4 replacement C++ dynamic memory allocation operators (in
+     both _throw_ and _nothrow_ forms):
 
      `operator new'       Allocates memory.
      `operator new[]'     Allocates memory for an array.
@@ -1495,18 +1497,18 @@ output files from the mpatrol library will get placed by setting the
 ==================
 
    By default, the mpatrol library follows the guidelines for ANSI C
-regarding the behaviour of the dynamic memory allocation and memory
-operation functions it replaces(1).  This means that calling `malloc()'
-with a size of zero is allowed, for example.  However, warnings can be
-generated for all of these types of calls by using the `CHECKALL'
-option.  The `CHECKALLOCS' option warns only about calls to `malloc()'
-and similar functions with a size of zero, the `CHECKREALLOCS' option
-warns only about calls to `realloc()' and similar functions with either
-a null pointer or a size of zero, and the `CHECKFREES' option warns
-only about calls to `free()' and similar functions with a null pointer.
-The `CHECKMEMORY' option gives an error if a zero-size memory
-operation is performed on a `NULL' pointer -- this is normally allowed
-by default.
+and C++ regarding the behaviour of the dynamic memory allocation and
+memory operation functions it replaces.  This means that calling
+`malloc()' with a size of zero is allowed, for example.  However,
+warnings can be generated for all of these types of calls by using the
+`CHECKALL' option.  The `CHECKALLOCS' option warns only about calls to
+`malloc()' and similar functions with a size of zero, the
+`CHECKREALLOCS' option warns only about calls to `realloc()' and
+similar functions with either a null pointer or a size of zero, and the
+`CHECKFREES' option warns only about calls to `free()' and similar
+functions with a null pointer.  The `CHECKMEMORY' option gives an error
+if a zero-size memory operation is performed on a `NULL' pointer --
+this is normally allowed by default.
 
    All newly-allocated memory can be pre-filled with a specified byte
 by using the `ALLOCBYTE' option.  This can be used to catch out code
@@ -1548,7 +1550,7 @@ from but not written to.
 
    Note that if the argument specified with the `NOFREE' option is
 non-zero then the mpatrol library will store all recently-freed memory
-allocations in a queue(2).  Once the queue has filled to the point
+allocations in a queue(1).  Once the queue has filled to the point
 specified with the `NOFREE' option then all subsequent calls to free
 memory will result in the most recently-freed memory allocation being
 placed at the end of the queue and the freed memory allocation at the
@@ -1560,11 +1562,7 @@ have to keep track of a larger number of memory allocations.
 
    ---------- Footnotes ----------
 
-   (1) I attempted to do the same for the ANSI C++ memory allocation
-operators but there are still namespace and exception handling issues
-to be resolved.
-
-   (2) In the case of `NOFREE=0' a double negative does not make a
+   (1) In the case of `NOFREE=0' a double negative does not make a
 positive.  The zero indicates that all memory allocations will not
 really be freed for later reuse.
 
@@ -7598,12 +7596,15 @@ error occurred.
           Error
 
     Cause
-          The `operator new' or `operator new[]' C++ operator was
-          called to allocate memory, but no more memory was available
-          to allocate and no low-memory handler was installed.  This
-          error can also be caused by a call to `xmalloc()' and related
-          functions, or `MP_MALLOC' and related functions when they
-          would otherwise return a `NULL' pointer.
+          The `alloca()', `xmalloc()' or `MP_MALLOC()' families of
+          functions were called to allocate memory, but no more memory
+          was available to allocate and the low-memory handler, if
+          installed, could not free up sufficient memory.  This error
+          can also be caused by a call to the `operator new' or
+          `operator new[]' C++ operators (not the _nothrow_ versions)
+          when they would otherwise return a `NULL' pointer and the
+          mpatrol library was compiled with a C compiler (which means
+          that it cannot throw a `bad_alloc' exception).
 
     Additional
           The library summary.
@@ -8081,10 +8082,6 @@ supported on that system.
         * The `mpedit' command does not support the `--listing' option
           due to the lack of an `nl' command on the system.
 
-        * The `hexwords' command needs to be changed to use
-          `/usr/share/dict/words' instead of `/usr/dict/words' as the
-          default dictionary.
-
    * HP/UX 10.20, HP PA/RISC 9000, BFD, `gcc'
         * The thread-safe version of the library does not work.  This
           is because there does not appear to be any evidence that this
@@ -8108,13 +8105,13 @@ supported on that system.
 
         * Stack traversal may be unreliable from signal-handlers.
 
-   * Red Hat Linux 6.0, Intel Pentium III, BFD, `gcc'
+   * Red Hat Linux 6.0, Intel Pentium III, BFD, `g++'
         * The `OFLOWWATCH' option has no effect.
 
         * The `--dynamic' option to the `mpatrol' command does not work
           unless `libiberty.so' is available.
 
-   * Red Hat Linux 6.1, Intel Pentium III, BFD, `gcc'
+   * Red Hat Linux 6.1, Intel Pentium III, BFD, `g++'
         * The thread-safe version of the library does not work due to
           the system threads library calling `malloc()' and `bzero()'
           recursively.
@@ -8124,7 +8121,7 @@ supported on that system.
         * The `--dynamic' option to the `mpatrol' command does not work
           unless `libiberty.so' is available.
 
-   * Red Hat Linux 6.2, Intel Pentium III, BFD, `gcc'
+   * Red Hat Linux 6.2, Intel Pentium III, BFD, `g++'
         * The `OFLOWWATCH' option has no effect.
 
         * The `--dynamic' option to the `mpatrol' command does not work
@@ -8277,21 +8274,21 @@ supported on that system.
 
         * The `USEDEBUG' option has no effect.
 
-   * Solaris 7, SPARC V9, BFD, `gcc'
+   * Solaris 7, SPARC V9, BFD, `g++'
         * The mpatrol library can be compiled and run in a 64-bit
           environment.
 
-   * Solaris 7, SPARC V9, ELF32/ELF64, `gcc'
+   * Solaris 7, SPARC V9, ELF32/ELF64, `g++'
         * The `USEDEBUG' option has no effect.
 
         * The mpatrol library can be compiled and run in a 64-bit
           environment.
 
-   * Solaris 8, SPARC V9, BFD, `gcc'
+   * Solaris 8, SPARC V9, BFD, `g++'
         * The mpatrol library can be compiled and run in a 64-bit
           environment.
 
-   * Solaris 8, SPARC V9, ELF32/ELF64, `gcc'
+   * Solaris 8, SPARC V9, ELF32/ELF64, `g++'
         * The `USEDEBUG' option has no effect.
 
         * The mpatrol library can be compiled and run in a 64-bit
@@ -8363,7 +8360,7 @@ supported on that system.
         * The `mpsym', `mpedit' and `hexwords' commands do not work.
 
    * Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual
-     C/C++
+     C++
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEMMAP' option has no effect.
@@ -8464,7 +8461,7 @@ that comes with an associated fix will be most welcome.
 
    Enhancement requests and source code containing enhancements should
 also be sent to <mpatrol@cbmamiga.demon.co.uk> or the mpatrol
-discussion group at `http://www.egroups.com/group/mpatrol/'.  If you
+discussion group at `http://groups.yahoo.com/group/mpatrol/'.  If you
 are planning to implement an enhancement, let me know first in case I
 am (or someone else is) working towards the same goal -- that way, work
 won't be wasted.  If you wish to send me source code changes please
@@ -8474,11 +8471,11 @@ compressed tar archive.
 H.1 Notes for all platforms
 ===========================
 
-   * C++ support is still fairly limited, and will possibly only work
-     for older C++ code due to the way the operators are overridden
-     (i.e. there are no exceptions versions of the functions).  Also,
-     explicit references to `operator new' rather than `new' are likely
-     to result in compilation errors, and the way that source level
+   * Overriding the C++ operators to get source-level information using
+     the preprocessor is still a bit dodgy and isn't likely to get much
+     better, so `MP_NONEWDELETE' may have to be used a lot.  Explicit
+     references to `operator new' rather than `new' are likely to
+     result in compilation errors, and the way that source level
      information is obtained for `operator delete' means that the
      resulting code will not be thread-safe.  It might also be an idea
      to provide an allocation class from which user-defined memory
@@ -8542,13 +8539,11 @@ H.1 Notes for all platforms
      current value is way too high.
 
    * Add a function to display a stack trace of the current call stack
-     to a file stream and another function to walk all current memory
-     allocations invoking a callback function for each one encountered.
-     Note that there is still an issue with callback functions if they
-     call mpatrol library functions, since this will lead to recursion.
-     Callback functions could also be defined for `__malloc_hook()',
-     `__realloc_hook()' and `__free_hook()' in much the same way as for
-     the GNU C library.
+     to a file stream.  Note that there is still an issue with callback
+     functions if they call mpatrol library functions, since this will
+     lead to recursion.  Callback functions could also be defined for
+     `__malloc_hook()', `__realloc_hook()' and `__free_hook()' in much
+     the same way as for the GNU C library.
 
    * Need to store filename and line number information in all call
      stacks so that the information can be used at program termination.
@@ -8662,22 +8657,12 @@ H.1 Notes for all platforms
      better detection of internal and free blocks when displaying
      memory range errors.
 
-   * Perhaps add definitions of `xmalloc()', `xrealloc()', etc. which
-     never return `NULL' on failure.
-
    * Perhaps reimplement the standard I/O library for internal use by
      mpatrol, thus preventing recursive calls to `malloc()' each time a
      write to the log file occurs on some systems.  Example code to do
      this was submitted by Alexander Barton (<abarton@innotrac.com>)
      and this may well be incorporated into the library at some point
      in the future.
-
-   * Add functions to write diagnostics to the mpatrol log file from
-     within program code.  These could include displaying call stacks
-     and dumping contents of memory allocations.  The `__mp_edit()' and
-     `__mp_list()' functions could be added to give functionality
-     similar to the `EDIT' and `LIST' options at any time during
-     program execution.
 
    * The `LOG*' options could be extended to take a list of specific
      functions to log.  They could also only log operations spanning a
@@ -8686,13 +8671,6 @@ H.1 Notes for all platforms
    * Add an option to limit the size of each memory allocation to a
      maximum number of bytes.  This could be useful if a memory
      allocation function is called with an uninitialised variable.
-
-   * Add another library which can be linked in instead of mpatrol and
-     replaces all calls to `__mp_alloc()', etc., with the original
-     calls to `malloc()' and related functions.  This would be very
-     useful for quickly removing all mpatrol functionality for perhaps
-     even a release build, and might be useful for implementing
-     functions such as `memalign()' which don't exist on many systems.
 
    * Add assertion macros to `mpatrol.h' that can be used in program
      code.  These could be used to assert that pointers have not been
@@ -8727,9 +8705,7 @@ H.1 Notes for all platforms
    * Add an option to specify that all failed memory allocations should
      abort (or at least give a warning) instead of returning a `NULL'
      pointer.  Also, perhaps add an option to display the partial
-     contents of freed and unfreed allocations in the mpatrol log file
-     and also a function which can be called to dump the contents of a
-     memory allocation to the log file.
+     contents of freed and unfreed allocations in the mpatrol log file.
 
    * Perhaps add memory protection to the simulated `sbrk' heap.
 
@@ -9200,7 +9176,29 @@ I.2 Building
      support for these operators, but if not you will probably have to
      edit `mpatrol.h' to temporarily allow your files to compile.
 
-  5. Why am I unable to call the mpatrol version of `alloca()'?  I only
+  5. I tried both of the above suggestions, but I still can't get my
+     C++ source code to compile.  I'm using an old C++ compiler so
+     could that be a problem?
+
+     Yes.  The `mpatrol.h' header file defines new versions of the C++
+     dynamic memory allocation operators using exceptions and
+     namespaces as required by the ANSI C++ standard.  If your C++
+     compiler has no support for these then you should compile your C++
+     source files with `MP_NOCPLUSPLUS' defined.
+
+  6. I'm calling `operator new' (not the _nothrow_ version) from my C++
+     source code but when my program runs out of memory the `OUTMEM'
+     error is given in the mpatrol log file rather than throwing a
+     `bad_alloc' exception.  Why is this?
+
+     Sounds like the mpatrol library was built with a C compiler.  In
+     order for the mpatrol versions of `operator new' and `operator
+     new[]' to throw an exception when they run out of memory, the
+     mpatrol library must have been built with a C++ compiler.  The
+     `OUTMEM' error is only given when there is no way to throw an
+     exception.
+
+  7. Why am I unable to call the mpatrol version of `alloca()'?  I only
      ever seem to call the default version.
 
      Most implementations of the `alloca()' function are compiler
@@ -9217,7 +9215,7 @@ I.2 Building
      must be included after it, otherwise it may redefine `alloca()'
      back to the default version.
 
-  6. Why do some of the `Makefile's contain the `-fno-inline-functions'
+  8. Why do some of the `Makefile's contain the `-fno-inline-functions'
      option as part of `OFLAGS'?
 
      The `-fno-inline-functions' option is a `gcc'-specific option
@@ -9229,7 +9227,7 @@ I.2 Building
      function call stack traversal may not work properly unless this
      option (or equivalent) is used for all compiled code.
 
-  7. What does the `MP_ALIGN' definition in `mpatrol.h' do?
+  9. What does the `MP_ALIGN' definition in `mpatrol.h' do?
 
      It is a preprocessor macro function that is used to return the
      minimum alignment in bytes required for a specified type at
@@ -9239,7 +9237,7 @@ I.2 Building
      feature that can be used to determine the minimum alignment of a
      type at compile-time.  For all others, this macro evaluates to `0'.
 
-  8. What does the `MP_INLINE' definition in `mpatrol.h' do?
+ 10. What does the `MP_INLINE' definition in `mpatrol.h' do?
 
      It is used in the definition of the debugging versions of the C++
      operators in `mpatrol.h' so that they are inlined correctly.  We
@@ -9257,7 +9255,7 @@ I.2 Building
      platforms the `extern inline' function definition will have a weak
      visibility and so will not clash with library functions.
 
-  9. Why do I get different stack traces in the mpatrol log file from
+ 11. Why do I get different stack traces in the mpatrol log file from
      the C++ operators in `mpatrol.h' when optimisation is turned on
      and off in the compiler?
 
@@ -9269,7 +9267,7 @@ I.2 Building
      top of its stack, even though it will be removed in the inlined
      case.
 
- 10. How do I build the `mptrace' command with GUI support?
+ 12. How do I build the `mptrace' command with GUI support?
 
      The GUI support for the `mptrace' command is currently written to
      use Motif and X Windows and so can only be built on systems with
@@ -12995,6 +12993,8 @@ Solaris, Intel 80x86:
           See ``Appendix G Supported systems''.
 Solaris, SPARC:                                    
           See ``Appendix G Supported systems''.
+SourceForge:                                       
+          See ``Foreword''.
 Spotlight:                                         
           See ``Appendix J Related software''.
 stack:                                              See 5.2.

@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.171 2001-02-01 21:03:42 graeme Exp $
+@c $Id: mpatrol.texi,v 1.172 2001-02-06 19:50:22 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -36,8 +36,8 @@
 
 @c Remember to change these after each revision!
 @set EDITION 2.5
-@set VERSION 1.4.0
-@set UPDATED 25th January, 2001
+@set VERSION 1.3.5
+@set UPDATED 6th February, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -210,18 +210,20 @@ about mpatrol.
 @cindex getting updates
 @cindex updates
 @cindex FreshMeat
+@cindex SourceForge
 The latest version of the mpatrol library and this manual can always be found at
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/}, and any correspondence relating
 to mpatrol (bug reports, enhancement requests, compliments, etc.) should be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk}.  I'd be very interested in hearing any
 success stories with using mpatrol to debug programs, since I get very little
 feedback apart from the occasional bug report.  The mpatrol library is also
-registered at FreshMeat (@uref{http://freshmeat.net/}) and several other
+registered at FreshMeat (@uref{http://freshmeat.net/projects/mpatrol/}) and
+SourceForge (@uref{http://sourceforge.net/projects/mpatrol/}) and several other
 software sites so you can receive notification of updates there as well.  I
 normally only check my e-mail about once or twice a week, so don't expect an
 immediate response.  I can also be reached at @email{graeme@@epc.co.uk} but that
-is my work e-mail address.  There is now also a discussion group at
-@uref{http://www.egroups.com/group/mpatrol/} where you can post mpatrol-related
+is my work e-mail address.  There is also a discussion group at
+@uref{http://groups.yahoo.com/group/mpatrol/} where you can post mpatrol-related
 questions but you must first subscribe to the group before you can send mail to
 it.
 
@@ -410,7 +412,8 @@ Contains 18 replacement C dynamic memory allocation functions:
 @end multitable
 
 @item
-Contains 4 replacement C++ dynamic memory allocation operators:
+Contains 4 replacement C++ dynamic memory allocation operators (in both
+@emph{throw} and @emph{nothrow} forms):
 
 @multitable @columnfractions .3 .7
 @item @code{operator new}
@@ -1799,20 +1802,18 @@ setting the @env{TRACEDIR} environment variable.
 @section General errors
 @cindex general errors
 
-By default, the mpatrol library follows the guidelines for ANSI C regarding the
-behaviour of the dynamic memory allocation and memory operation functions it
-replaces@footnote{I attempted to do the same for the ANSI C++ memory allocation
-operators but there are still namespace and exception handling issues to be
-resolved.}.  This means that calling @code{malloc()} with a size of zero is
-allowed, for example.  However, warnings can be generated for all of these
-types of calls by using the @option{CHECKALL} option.  The @option{CHECKALLOCS}
-option warns only about calls to @code{malloc()} and similar functions with a
-size of zero, the @option{CHECKREALLOCS} option warns only about calls to
-@code{realloc()} and similar functions with either a null pointer or a size of
-zero, and the @option{CHECKFREES} option warns only about calls to @code{free()}
-and similar functions with a null pointer.  The @option{CHECKMEMORY} option
-gives an error if a zero-size memory operation is performed on a @samp{NULL}
-pointer --- this is normally allowed by default.
+By default, the mpatrol library follows the guidelines for ANSI C and C++
+regarding the behaviour of the dynamic memory allocation and memory operation
+functions it replaces.  This means that calling @code{malloc()} with a size of
+zero is allowed, for example.  However, warnings can be generated for all of
+these types of calls by using the @option{CHECKALL} option.  The
+@option{CHECKALLOCS} option warns only about calls to @code{malloc()} and
+similar functions with a size of zero, the @option{CHECKREALLOCS} option warns
+only about calls to @code{realloc()} and similar functions with either a null
+pointer or a size of zero, and the @option{CHECKFREES} option warns only about
+calls to @code{free()} and similar functions with a null pointer.  The
+@option{CHECKMEMORY} option gives an error if a zero-size memory operation is
+performed on a @samp{NULL} pointer --- this is normally allowed by default.
 
 @cindex allocation byte
 @cindex free byte
@@ -8323,11 +8324,14 @@ The memory operation fails and execution continues.
 @item Type
 Error
 @item Cause
-The @code{operator new} or @code{operator new[]} C++ operator was called to
-allocate memory, but no more memory was available to allocate and no low-memory
-handler was installed.  This error can also be caused by a call to
-@code{xmalloc()} and related functions, or @code{MP_MALLOC} and related
-functions when they would otherwise return a @samp{NULL} pointer.
+The @code{alloca()}, @code{xmalloc()} or @code{MP_MALLOC()} families of
+functions were called to allocate memory, but no more memory was available to
+allocate and the low-memory handler, if installed, could not free up sufficient
+memory.  This error can also be caused by a call to the @code{operator new} or
+@code{operator new[]} C++ operators (not the @emph{nothrow} versions) when they
+would otherwise return a @samp{NULL} pointer and the mpatrol library was
+compiled with a C compiler (which means that it cannot throw a @code{bad_alloc}
+exception).
 @item Additional
 The library summary.
 @item Result
@@ -8889,10 +8893,6 @@ to work correctly, giving spurious errors in the log file.
 @item
 The @command{mpedit} command does not support the @option{--listing} option due
 to the lack of an @command{nl} command on the system.
-@item
-The @command{hexwords} command needs to be changed to use
-@file{/usr/share/dict/words} instead of @file{/usr/dict/words} as the default
-dictionary.
 @end itemize
 
 @cindex HP/UX, HP PA/RISC
@@ -8930,7 +8930,7 @@ Stack traversal may be unreliable from signal-handlers.
 @cindex Red Hat
 @cindex Linux, Intel 80x86
 @item
-Red Hat Linux 6.0, Intel Pentium III, BFD, @command{gcc}
+Red Hat Linux 6.0, Intel Pentium III, BFD, @command{g++}
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
@@ -8940,7 +8940,7 @@ unless @file{libiberty.so} is available.
 @end itemize
 
 @item
-Red Hat Linux 6.1, Intel Pentium III, BFD, @command{gcc}
+Red Hat Linux 6.1, Intel Pentium III, BFD, @command{g++}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work due to the system threads
@@ -8953,7 +8953,7 @@ unless @file{libiberty.so} is available.
 @end itemize
 
 @item
-Red Hat Linux 6.2, Intel Pentium III, BFD, @command{gcc}
+Red Hat Linux 6.2, Intel Pentium III, BFD, @command{g++}
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
@@ -9154,14 +9154,14 @@ The @option{USEDEBUG} option has no effect.
 @end itemize
 
 @item
-Solaris 7, SPARC V9, BFD, @command{gcc}
+Solaris 7, SPARC V9, BFD, @command{g++}
 @itemize @bullet
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
-Solaris 7, SPARC V9, ELF32/ELF64, @command{gcc}
+Solaris 7, SPARC V9, ELF32/ELF64, @command{g++}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
@@ -9170,14 +9170,14 @@ The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
-Solaris 8, SPARC V9, BFD, @command{gcc}
+Solaris 8, SPARC V9, BFD, @command{g++}
 @itemize @bullet
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
 
 @item
-Solaris 8, SPARC V9, ELF32/ELF64, @command{gcc}
+Solaris 8, SPARC V9, ELF32/ELF64, @command{g++}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
@@ -9267,7 +9267,7 @@ work.
 @cindex Microsoft
 @cindex Windows, Intel 80x86
 @item
-Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C/C++
+Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C++
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
@@ -9413,7 +9413,7 @@ bug report that comes with an associated fix will be most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk} or the mpatrol discussion group at
-@uref{http://www.egroups.com/group/mpatrol/}.  If you are planning to implement
+@uref{http://groups.yahoo.com/group/mpatrol/}.  If you are planning to implement
 an enhancement, let me know first in case I am (or someone else is) working
 towards the same goal --- that way, work won't be wasted.  If you wish to send
 me source code changes please send the changes as context diffs or in an e-mail
@@ -9434,13 +9434,14 @@ attachment as a compressed tar archive.
 
 @itemize @bullet
 @item
-C++ support is still fairly limited, and will possibly only work for older C++
-code due to the way the operators are overridden (i.e.@: there are no exceptions
-versions of the functions).  Also, explicit references to @code{operator new}
-rather than @code{new} are likely to result in compilation errors, and the way
-that source level information is obtained for @code{operator delete} means that
-the resulting code will not be thread-safe.  It might also be an idea to provide
-an allocation class from which user-defined memory allocators can be derived.
+Overriding the C++ operators to get source-level information using the
+preprocessor is still a bit dodgy and isn't likely to get much better, so
+@code{MP_NONEWDELETE} may have to be used a lot.  Explicit references to
+@code{operator new} rather than @code{new} are likely to result in compilation
+errors, and the way that source level information is obtained for
+@code{operator delete} means that the resulting code will not be thread-safe.
+It might also be an idea to provide an allocation class from which user-defined
+memory allocators can be derived.
 
 @item
 Need to add support for other 64-bit processors in addition to the existing
@@ -9504,12 +9505,11 @@ current value is way too high.
 
 @item
 Add a function to display a stack trace of the current call stack to a file
-stream and another function to walk all current memory allocations invoking a
-callback function for each one encountered.  Note that there is still an issue
-with callback functions if they call mpatrol library functions, since this
-will lead to recursion.  Callback functions could also be defined for
-@code{__malloc_hook()}, @code{__realloc_hook()} and @code{__free_hook()} in much
-the same way as for the GNU C library.
+stream.  Note that there is still an issue with callback functions if they call
+mpatrol library functions, since this will lead to recursion.  Callback
+functions could also be defined for @code{__malloc_hook()},
+@code{__realloc_hook()} and @code{__free_hook()} in much the same way as for the
+GNU C library.
 
 @item
 Need to store filename and line number information in all call stacks so that
@@ -9629,22 +9629,11 @@ with.  Also need to have better detection of internal and free blocks when
 displaying memory range errors.
 
 @item
-Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc.@: which
-never return @samp{NULL} on failure.
-
-@item
 Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to @code{malloc()} each time a write to the log file
 occurs on some systems.  Example code to do this was submitted by Alexander
 Barton (@email{abarton@@innotrac.com}) and this may well be incorporated into
 the library at some point in the future.
-
-@item
-Add functions to write diagnostics to the mpatrol log file from within program
-code.  These could include displaying call stacks and dumping contents of
-memory allocations.  The @code{__mp_edit()} and @code{__mp_list()} functions
-could be added to give functionality similar to the @option{EDIT} and
-@option{LIST} options at any time during program execution.
 
 @item
 The @option{LOG*} options could be extended to take a list of specific functions
@@ -9655,14 +9644,6 @@ allocation indices as well.
 Add an option to limit the size of each memory allocation to a maximum number
 of bytes.  This could be useful if a memory allocation function is called with
 an uninitialised variable.
-
-@item
-Add another library which can be linked in instead of mpatrol and replaces
-all calls to @code{__mp_alloc()}, etc., with the original calls to
-@code{malloc()} and related functions.  This would be very useful for quickly
-removing all mpatrol functionality for perhaps even a release build, and might
-be useful for implementing functions such as @code{memalign()} which don't
-exist on many systems.
 
 @item
 Add assertion macros to @file{mpatrol.h} that can be used in program code.
@@ -9698,8 +9679,7 @@ provide much finer-grained error-checking.
 Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a @samp{NULL} pointer.  Also, perhaps
 add an option to display the partial contents of freed and unfreed allocations
-in the mpatrol log file and also a function which can be called to dump the
-contents of a memory allocation to the log file.
+in the mpatrol log file.
 
 @item
 Perhaps add memory protection to the simulated @code{sbrk} heap.
@@ -10223,6 +10203,27 @@ the standardisation of the C++ language but some compilers may not yet have
 support for them.  It may be that you have to use a special compiler option to
 enable support for these operators, but if not you will probably have to edit
 @file{mpatrol.h} to temporarily allow your files to compile.
+
+@item
+I tried both of the above suggestions, but I still can't get my C++ source code
+to compile.  I'm using an old C++ compiler so could that be a problem?
+
+Yes.  The @file{mpatrol.h} header file defines new versions of the C++ dynamic
+memory allocation operators using exceptions and namespaces as required by the
+ANSI C++ standard.  If your C++ compiler has no support for these then you
+should compile your C++ source files with @code{MP_NOCPLUSPLUS} defined.
+
+@item
+I'm calling @code{operator new} (not the @emph{nothrow} version) from my C++
+source code but when my program runs out of memory the @samp{OUTMEM} error is
+given in the mpatrol log file rather than throwing a @code{bad_alloc} exception.
+Why is this?
+
+Sounds like the mpatrol library was built with a C compiler.  In order for the
+mpatrol versions of @code{operator new} and @code{operator new[]} to throw an
+exception when they run out of memory, the mpatrol library must have been built
+with a C++ compiler.  The @samp{OUTMEM} error is only given when there is no way
+to throw an exception.
 
 @item
 Why am I unable to call the mpatrol version of @code{alloca()}?  I only ever
