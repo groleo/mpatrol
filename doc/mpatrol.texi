@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.100 2000-06-30 00:15:58 graeme Exp $
+@c $Id: mpatrol.texi,v 1.101 2000-07-02 22:40:52 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.14
 @set VERSION 1.2.5
-@set UPDATED 29th June, 2000
+@set UPDATED 2nd July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -6127,8 +6127,6 @@ There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
 @item
-The address of an illegal memory access cannot be determined.
-@item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
@@ -6146,8 +6144,6 @@ There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
 @item
-The address of an illegal memory access cannot be determined.
-@item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
@@ -6163,8 +6159,6 @@ The @option{USEMMAP} option has no effect.
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
-@item
-The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
@@ -6182,8 +6176,6 @@ The @option{USEMMAP} option has no effect.
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
-@item
-The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
@@ -6303,9 +6295,6 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
-The @code{memalign()} and similar functions do not align allocations to
-anything more than 8 bytes.
-@item
 Limited support for call stack traversal.
 @item
 Limited support for reading symbols.
@@ -6329,9 +6318,6 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
-@item
-The @code{memalign()} and similar functions do not align allocations to
-anything more than 8 bytes.
 @item
 No support for call stack traversal.
 @item
@@ -6741,6 +6727,12 @@ rather than half inch margins which means that it is one inch too large in both
 dimensions.  Need to figure out what is happening in both cases.  In addition,
 the mpatrol manual should also be formatted in DocBook format once a suitable
 @TeX{}info to DocBook translator is available.
+
+@item
+Perhaps add benchmark tests for dynamic memory allocation functions and memory
+operation functions.  Obviously the mpatrol library would perform much worse
+than normal malloc libraries, but it would help to see just how much worse so
+that speed improvements could be made.
 @end itemize
 
 @node UNIX notes, Amiga notes, Generic notes, Notes
@@ -6777,8 +6769,7 @@ There is currently a problem in that the call stack displayed from within the
 illegal memory access signal handler is not necessarily accurate with respect to
 the function at the top of the stack.  In addition, signal handlers shouldn't
 technically call I/O functions in case of additional signals being caught so
-this may need to be improved.  Also, a way needs to be found to determine the
-address of an illegal memory access on LynxOS platforms.
+this may need to be improved.
 
 @item
 Need to add a way of initialising the thread-safe version of the library when
@@ -6830,6 +6821,9 @@ Perhaps add support for reading HP/UX executable files and libraries in the SOM
 object file format without needing to use the GNU BFD library.
 
 @item
+Add support for BSD systems and other non-System V UNIX operating systems.
+
+@item
 There is a problem on later Linux releases where the @code{_DYNAMIC} symbol
 is defined in @file{elf.h}, thus resulting in a conflicting definition when
 compiling @file{symbol.c}.
@@ -6863,9 +6857,9 @@ these functions, thus getting the @option{-d} option in the @command{mpatrol}
 command to work.
 
 @item
-Need to fix the problem where the maximum guaranteed alignment of a memory
-allocation is 8 bytes.  This currently affects the @code{memalign()} and related
-functions.
+Need to fix the problem where the maximum guaranteed alignment of an internal
+mpatrol library memory allocation is 8 bytes.  However, this limitation does
+not affect the @code{memalign()} and related functions.
 
 @item
 Need to add proper support for call stack traversal for both the Motorola 680x0
