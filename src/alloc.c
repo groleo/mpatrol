@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.1.1.1 1999-10-03 11:25:21 graeme Exp $"
+#ident "$Id: alloc.c,v 1.2 1999-10-12 19:17:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -140,9 +140,20 @@ static allocnode *getnode(allochead *h)
 static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
                             void *i)
 {
-    allocnode *p;
+    allocnode *p, *q;
     size_t m, s;
 
+    /* We choose the worst case scenario here and allocate new nodes for
+     * both the left and right nodes.  This is so that we can easily recover
+     * from lack of system memory at this point rather than rebuild the
+     * original free node if we discover that we are out of memory later.
+     */
+    if (((p = getnode(h)) == NULL) || ((q = getnode(h)) == NULL))
+    {
+        if (p != NULL)
+            __mp_freeslot(&h->table, p);
+        return NULL;
+    }
     /* Remove the free node from the free tree.
      */
     __mp_treeremove(&h->ftree, &n->tnode);
@@ -156,8 +167,6 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
         ((m = __mp_roundup((unsigned long) n->block, a) -
           (unsigned long) n->block) > 0))
     {
-        if ((p = getnode(h)) == NULL)
-            return NULL;
         __mp_prepend(&h->list, &n->lnode, &p->lnode);
         __mp_treeinsert(&h->ftree, &p->tnode, m);
         p->block = (char *) n->block - h->oflow;
@@ -167,6 +176,8 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
         n->size -= m;
         h->fsize += m;
     }
+    else
+        __mp_freeslot(&h->table, p);
     /* If we are allocating pages then the effective block size is the
      * original size rounded up to a multiple of the system page size.
      */
@@ -180,16 +191,16 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
      */
     if ((m = n->size - s) > 0)
     {
-        if ((p = getnode(h)) == NULL)
-            return NULL;
-        __mp_insert(&h->list, &n->lnode, &p->lnode);
-        __mp_treeinsert(&h->ftree, &p->tnode, m);
-        p->block = (char *) n->block + s + h->oflow;
-        p->size = m;
-        p->info = NULL;
+        __mp_insert(&h->list, &n->lnode, &q->lnode);
+        __mp_treeinsert(&h->ftree, &q->tnode, m);
+        q->block = (char *) n->block + s + h->oflow;
+        q->size = m;
+        q->info = NULL;
         n->size = s;
         h->fsize += m;
     }
+    else
+        __mp_freeslot(&h->table, q);
     /* Initialise the details of the newly allocated node and insert it in
      * the allocation tree.
      */
