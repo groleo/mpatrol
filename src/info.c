@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.95 2001-12-06 00:19:02 graeme Exp $"
+#ident "$Id: info.c,v 1.96 2001-12-06 00:48:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.95 2001-12-06 00:19:02 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.96 2001-12-06 00:48:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -317,8 +317,11 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
     p = NULL;
     h->count++;
     c = h->count;
+    v->ltype = LT_ALLOC;
+    v->variant.logalloc.size = l;
+    v->variant.logalloc.align = a;
     if ((h->flags & FLG_LOGALLOCS) && (h->recur == 1))
-        __mp_logalloc(h, l, a, v);
+        __mp_logalloc(h, v);
     if ((c == h->astop) && (h->rstop == 0))
     {
         /* Abort at the specified allocation index.
@@ -331,7 +334,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
     if ((h->flags & FLG_CHECKALLOCS) && (l == 0))
     {
         if (h->recur == 1)
-            __mp_logalloc(h, l, a, v);
+            __mp_logalloc(h, v);
         __mp_warn(ET_ALLZER, v->type, v->file, v->line, NULL);
         __mp_diag("\n");
     }
@@ -346,7 +349,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if (h->recur == 1)
-                    __mp_logalloc(h, l, a, v);
+                    __mp_logalloc(h, v);
                 __mp_warn(ET_ZERALN, v->type, v->file, v->line, NULL);
                 __mp_diag("\n");
             }
@@ -357,7 +360,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if (h->recur == 1)
-                    __mp_logalloc(h, l, a, v);
+                    __mp_logalloc(h, v);
                 __mp_warn(ET_BADALN, v->type, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
@@ -368,7 +371,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
             if (h->flags & FLG_CHECKALLOCS)
             {
                 if (h->recur == 1)
-                    __mp_logalloc(h, l, a, v);
+                    __mp_logalloc(h, v);
                 __mp_warn(ET_MAXALN, v->type, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
@@ -504,14 +507,18 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
     size_t d;
     unsigned long t;
 
+    v->ltype = LT_REALLOC;
+    v->variant.logrealloc.block = p;
+    v->variant.logrealloc.size = l;
+    v->variant.logrealloc.align = a;
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
-        __mp_logrealloc(h, p, l, a, v);
+        __mp_logrealloc(h, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if (h->recur == 1)
-                __mp_logrealloc(h, p, l, a, v);
+                __mp_logrealloc(h, v);
             __mp_warn(ET_RSZNUL, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -524,7 +531,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
          */
         m = (infonode *) n->info;
         if (h->recur == 1)
-            __mp_logrealloc(h, p, l, a, v);
+            __mp_logrealloc(h, v);
         __mp_error(ET_PRVFRD, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -537,7 +544,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
         /* We know nothing about this block of memory.
          */
         if (h->recur == 1)
-            __mp_logrealloc(h, p, l, a, v);
+            __mp_logrealloc(h, v);
         __mp_error(ET_NOTALL, v->type, v->file, v->line, NULL, p);
         __mp_diag("\n");
         p = NULL;
@@ -548,7 +555,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
          * address of the block we know about.
          */
         if (h->recur == 1)
-            __mp_logrealloc(h, p, l, a, v);
+            __mp_logrealloc(h, v);
         __mp_error(ET_MISMAT, v->type, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -562,7 +569,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
          * alloca(), strdupa(), strndupa(), operator new or operator new[].
          */
         if (h->recur == 1)
-            __mp_logrealloc(h, p, l, a, v);
+            __mp_logrealloc(h, v);
         __mp_error(ET_INCOMP, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -574,7 +581,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
         if (h->flags & FLG_CHECKREALLOCS)
         {
             if (h->recur == 1)
-                __mp_logrealloc(h, p, l, a, v);
+                __mp_logrealloc(h, v);
             __mp_warn(ET_RSZZER, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -768,14 +775,16 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
     unsigned long t;
     int o;
 
+    v->ltype = LT_FREE;
+    v->variant.logfree.block = p;
     if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
-        __mp_logfree(h, p, v);
+        __mp_logfree(h, v);
     if (p == NULL)
     {
         if (h->flags & FLG_CHECKFREES)
         {
             if (h->recur == 1)
-                __mp_logfree(h, p, v);
+                __mp_logfree(h, v);
             __mp_warn(ET_FRENUL, v->type, v->file, v->line, NULL);
             __mp_diag("\n");
         }
@@ -788,7 +797,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
          */
         m = (infonode *) n->info;
         if (h->recur == 1)
-            __mp_logfree(h, p, v);
+            __mp_logfree(h, v);
         __mp_error(ET_PRVFRD, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -800,7 +809,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
         /* We know nothing about this block of memory.
          */
         if (h->recur == 1)
-            __mp_logfree(h, p, v);
+            __mp_logfree(h, v);
         __mp_error(ET_NOTALL, v->type, v->file, v->line, NULL, p);
         __mp_diag("\n");
     }
@@ -810,7 +819,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
          * address of the block we know about.
          */
         if (h->recur == 1)
-            __mp_logfree(h, p, v);
+            __mp_logfree(h, v);
         __mp_error(ET_MISMAT, v->type, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -830,7 +839,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
          * the function used to free the block.
          */
         if (h->recur == 1)
-            __mp_logfree(h, p, v);
+            __mp_logfree(h, v);
         __mp_error(ET_INCOMP, v->type, v->file, v->line, NULL, p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
@@ -841,7 +850,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
         /* An attempt was made to free a marked memory allocation.
          */
         if (h->recur == 1)
-            __mp_logfree(h, p, v);
+            __mp_logfree(h, v);
         __mp_error(ET_FREMRK, v->type, v->file, v->line, NULL, p);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
