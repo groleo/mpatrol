@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.75 2001-08-23 23:08:59 graeme Exp $
+# $Id: Makefile,v 1.76 2001-08-24 10:41:06 graeme Exp $
 
 
 # Definitions
@@ -39,7 +39,7 @@ VPATH  = $(SOURCE):$(TOOLS)
 GUISUP	= false
 
 ifeq ($(GUISUP),true)
-CFLAGS	= -I$(SOURCE) -I$(TOOLS) -I/usr/X11R6/include -DMP_GUI_SUPPORT=1
+CFLAGS	= -I$(SOURCE) -I$(TOOLS) -I/usr/X11R6/include -I/usr/X11R5/include -I/usr/X11/include -I/usr/X/include -DMP_GUI_SUPPORT=1
 else
 CFLAGS	= -I$(SOURCE) -I$(TOOLS) -DMP_GUI_SUPPORT=0
 endif
@@ -199,7 +199,7 @@ mprof: mprof.o graph.o getopt.o list.o tree.o version.o
 
 mptrace: mptrace.o getopt.o tree.o slots.o utils.o version.o
 ifeq ($(GUISUP),true)
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11R6/lib -lXm -lXt -lX11
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o -L/usr/X11R6/lib -L/usr/X11R5/lib -L/usr/X11/lib -L/usr/X/lib -lXm -lXt -lX11
 else
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mptrace.o getopt.o tree.o slots.o utils.o version.o
 endif
