@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.21 2000-05-23 21:56:51 graeme Exp $
+# $Id: Makefile,v 1.22 2000-05-31 20:48:45 graeme Exp $
 
 
 # Definitions
@@ -184,7 +184,8 @@ info.t.o info.s.t.o info.t.ln: $(SOURCE)/info.c $(SOURCE)/info.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/mutex.h $(SOURCE)/utils.h $(SOURCE)/profile.h
 stack.o stack.s.o stack.ln stack.t.o stack.s.t.o stack.t.ln: $(SOURCE)/stack.c \
-	$(SOURCE)/stack.h $(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/stack.h $(SOURCE)/memory.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h
 addr.o addr.s.o addr.ln addr.t.o addr.s.t.o addr.t.ln: $(SOURCE)/addr.c \
 	$(SOURCE)/addr.h $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
