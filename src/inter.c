@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.139 2001-08-01 21:19:45 graeme Exp $"
+#ident "$Id: inter.c,v 1.140 2001-08-01 22:27:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.139 2001-08-01 21:19:45 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.140 2001-08-01 22:27:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -370,7 +370,7 @@ checkalloca(loginfo *i, int f)
         if (c == 1)
         {
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(n->block, (size_t) -1, i->func, i->file,
+                memhead.prologue(n->block, (size_t) -1, 0, i->func, i->file,
                                  i->line, i->stack->addr);
             memhead.event++;
             __mp_freememory(&memhead, n->block, AT_ALLOCA, i);
@@ -888,7 +888,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue((void *) -1, l, s, t, u, i.addr);
+        memhead.prologue((void *) -1, l, a, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -913,7 +913,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue((void *) -1, l, s, t, u, i.addr);
+                memhead.prologue((void *) -1, l, a, s, t, u, i.addr);
             if ((f != AT_NEW) && (f != AT_NEWVEC))
                 z = 1;
             goto retry;
@@ -1011,7 +1011,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -2, s, t, u, i.addr);
+        memhead.prologue(p, (size_t) -2, 1, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -1052,7 +1052,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
              */
             memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(o, (size_t) -2, s, t, u, i.addr);
+                memhead.prologue(o, (size_t) -2, 1, s, t, u, i.addr);
             z = 1;
             goto retry;
         }
@@ -1148,7 +1148,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, l, s, t, u, i.addr);
+        memhead.prologue(p, l, a, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;
@@ -1174,7 +1174,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              */
             memhead.nomemory(s, t, u, i.addr);
             if (memhead.prologue && (memhead.recur == 1))
-                memhead.prologue(q, l, s, t, u, i.addr);
+                memhead.prologue(q, l, a, s, t, u, i.addr);
             z = 1;
             goto retry;
         }
@@ -1248,7 +1248,7 @@ __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
     if (memhead.prologue && (memhead.recur == 1))
-        memhead.prologue(p, (size_t) -1, s, t, u, i.addr);
+        memhead.prologue(p, (size_t) -1, 0, s, t, u, i.addr);
     v.func = s;
     v.file = t;
     v.line = u;

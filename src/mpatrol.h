@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.133 2001-07-26 16:51:10 graeme Exp $
+ * $Id: mpatrol.h,v 1.134 2001-08-01 22:27:44 graeme Exp $
  */
 
 
@@ -279,9 +279,9 @@ typedef void *__mp_failhandler;
 /* The types of the prologue, epilogue and low memory handlers.
  */
 
-typedef void (*__mp_prologuehandler)(MP_CONST void *, size_t, MP_CONST char *,
-                                     MP_CONST char *, unsigned long,
-                                     MP_CONST void *);
+typedef void (*__mp_prologuehandler)(MP_CONST void *, size_t, size_t,
+                                     MP_CONST char *, MP_CONST char *,
+                                     unsigned long, MP_CONST void *);
 typedef void (*__mp_epiloguehandler)(MP_CONST void *, MP_CONST char *,
                                      MP_CONST char *, unsigned long,
                                      MP_CONST void *);
