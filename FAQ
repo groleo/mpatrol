@@ -249,7 +249,7 @@ their corresponding answers or solutions.
 
  5. FILES
 
- Q. Why is there a libmpatrol.o target in the UNIX Makefile?
+ Q. Why is there a libmpatrol.o target in the UNIX and Amiga GCC Makefiles?
 
  A. This is simply used to build the mpatrol library as one large object file
     for full incorporation into other libraries and was used during the
@@ -259,8 +259,8 @@ their corresponding answers or solutions.
     instead.  Because all of the source files are compiled at once, there may be
     conflicts with system header files when malloc() and its related functions
     are being compiled, which is why such an object file is not built by
-    default.  Note that the Amiga Makefile uses mpatrol.o and the Windows and
-    Netware Makefiles use mpatrol.obj.
+    default.  Note that the Amiga SAS/C Makefile uses mpatrol.o and the Windows
+    and Netware Makefiles use mpatrol.obj.
 
  Q. What are the CVS subdirectories that come with the mpatrol distribution?
 
