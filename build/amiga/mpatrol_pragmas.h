@@ -46,6 +46,8 @@
 #pragma libcall MPatrolBase __mp_prologue 72 801
 #pragma libcall MPatrolBase __mp_epilogue 78 801
 #pragma libcall MPatrolBase __mp_nomemory 7e 801
+#pragma libcall MPatrolBase __mp_pushdelstack 84 09803
+#pragma libcall MPatrolBase __mp_popdelstack 8a A9803
 
 
 #endif /* MPatrolBase_INLINE */
