@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.42 2001-02-22 19:38:34 graeme Exp $
+ * $Id: info.h,v 1.43 2001-02-22 20:01:53 graeme Exp $
  */
 
 
@@ -243,6 +243,8 @@ typedef struct infohead
                      void *);         /* prologue function */
     void (*epilogue)(void *, void *); /* epilogue function */
     void (*nomemory)(void);           /* low-memory handler function */
+    void (*finis)(void)[MP_MAXFINIS]; /* finalisation functions */
+    size_t finicount;                 /* finalisation function count */
     char *log;                        /* log filename */
     delstack dels[MP_MAXDELSTACK];    /* delete stack */
     long delpos;                      /* delete stack pointer */
