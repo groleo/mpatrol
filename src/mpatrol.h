@@ -33,7 +33,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MPATROL_VERSION 10008
+#define MPATROL_VERSION 10100
 
 
 /* Options for backwards compatibility with other versions of mallopt().  They
@@ -132,6 +132,7 @@ typedef enum __mp_alloctype
     MP_AT_STRNSAVE,  /* strnsave() */
     MP_AT_REALLOC,   /* realloc() */
     MP_AT_RECALLOC,  /* recalloc() */
+    MP_AT_EXPAND,    /* expand() */
     MP_AT_FREE,      /* free() */
     MP_AT_CFREE,     /* cfree() */
     MP_AT_NEW,       /* operator new */
@@ -213,6 +214,9 @@ __mp_allocinfo;
 #ifdef recalloc
 #undef recalloc
 #endif /* recalloc */
+#ifdef expand
+#undef expand
+#endif /* expand */
 #ifdef free
 #undef free
 #endif /* free */
@@ -260,6 +264,8 @@ __mp_allocinfo;
                                    __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
 #define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, \
                                     __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
+#define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, \
+                                  __PRETTY_FUNCTION__, __FILE__, __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, __PRETTY_FUNCTION__, __FILE__, \
                           __LINE__, 0)
 #define cfree(p) __mp_free((p), MP_AT_CFREE, __PRETTY_FUNCTION__, __FILE__, \
@@ -301,6 +307,8 @@ __mp_allocinfo;
                                    __LINE__, 0)
 #define recalloc(p, l) __mp_realloc((p), (l), 0, MP_AT_RECALLOC, NULL, \
                                     __FILE__, __LINE__, 0)
+#define expand(p, l) __mp_realloc((p), (l), 0, MP_AT_EXPAND, NULL, __FILE__, \
+                                  __LINE__, 0)
 #define free(p) __mp_free((p), MP_AT_FREE, NULL, __FILE__, __LINE__, 0)
 #define cfree(p) __mp_free((p), MP_AT_CFREE, NULL, __FILE__, __LINE__, 0)
 #define memset(p, c, l) __mp_setmem((p), (l), (c), MP_AT_MEMSET, NULL, \
