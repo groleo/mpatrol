@@ -21,13 +21,14 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.20 2000-10-25 22:51:06 graeme Exp $
+# $Id: prototype,v 1.21 2000-10-31 23:05:49 graeme Exp $
 
 
 d none bin 0775 bin bin
 f none bin/mpatrol 0775 bin bin
 f none bin/mprof 0775 bin bin
 f none bin/mleak 0775 bin bin
+f none bin/mpsym 0775 bin bin
 d none doc 0775 bin bin
 d none doc/mpatrol 0775 bin bin
 f none doc/mpatrol/README 0664 bin bin
