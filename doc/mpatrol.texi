@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.188 2001-02-21 13:38:01 graeme Exp $
+@c $Id: mpatrol.texi,v 1.189 2001-02-22 19:04:19 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.5
-@set VERSION 1.4.0
-@set UPDATED 21st February, 2001
+@set EDITION 2.6
+@set VERSION 1.4.1
+@set UPDATED 22nd February, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2895,8 +2895,7 @@ function fills in a data structure with selected statistics for examination in
 user code.
 
 @node Tools, Utilities, Library functions, Using mpatrol
-@section Additional tools
-@cindex additional tools
+@section Tools
 @cindex tools
 @cindex extensions
 
@@ -5642,6 +5641,13 @@ away from where the library detected the error since we were not using the
 @option{CHECK} option.  However, adding @option{CHECK=-} to the
 @env{MPATROL_OPTIONS} environment variable doesn't really help much since the
 next mpatrol function that is called is the one to terminate the library anyway.
+
+Note that using the @option{CHECK} option is equivalent to calling
+@code{__mp_check()} when each mpatrol library function is called, or at the
+range and frequency specified in the values passed to the @option{CHECK} option.
+If you suspect that heap corruption is occurring in a part of your code where
+there is a large gap between mpatrol library calls, you can try to narrow the
+problem down by adding a few calls to @code{__mp_check()}.
 
 On platforms that support memory protection, the library also supports the
 @option{PAGEALLOC} option.  This option instructs the library to force every
