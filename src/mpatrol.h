@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.117 2001-03-07 20:33:54 graeme Exp $
+ * $Id: mpatrol.h,v 1.118 2001-03-10 17:53:47 graeme Exp $
  */
 
 
@@ -258,9 +258,9 @@
  * combination of the flags can be passed as its third parameter.
  */
 
-#define MP_LT_ALLOCATED 1
-#define MP_LT_FREED     2
-#define MP_LT_UNFREED   3
+#define MP_LT_ALLOCATED 0
+#define MP_LT_FREED     1
+#define MP_LT_UNFREED   2
 
 #define MP_LT_COUNTS    1
 #define MP_LT_BOTTOM    2
