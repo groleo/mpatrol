@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.57 2001-07-25 22:40:57 graeme Exp $
+ * $Id: info.h,v 1.58 2001-07-26 15:08:57 graeme Exp $
  */
 
 
@@ -74,8 +74,9 @@
 /* The types of the prologue, epilogue and low memory handlers.
  */
 
-typedef void (*prologuehandler)(void *, size_t, void *);
-typedef void (*epiloguehandler)(void *, void *);
+typedef void (*prologuehandler)(void *, size_t, char *, char *, unsigned long,
+                                void *);
+typedef void (*epiloguehandler)(void *, char *, char *, unsigned long, void *);
 typedef void (*nomemoryhandler)(void);
 
 
