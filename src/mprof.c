@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.6 2000-04-25 23:40:11 graeme Exp $"
+#ident "$Id: mprof.c,v 1.7 2000-04-26 00:12:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -63,10 +63,12 @@ profiledata;
 typedef struct profilenode
 {
     treenode node;        /* tree node */
+    treenode tnode;       /* temporary tree node */
     unsigned long parent; /* parent node */
     void *addr;           /* return address */
     unsigned long symbol; /* associated symbol */
     unsigned long data;   /* profiling data */
+    profiledata tdata;    /* temporary profiling data */
 }
 profilenode;
 
@@ -143,6 +145,12 @@ static size_t sbound, mbound, lbound;
 static treeroot proftree;
 
 
+/* The tree containing temporary profiling details for all call sites.
+ */
+
+static treeroot temptree;
+
+
 /* The profiling output file produced by mpatrol.
  */
 
@@ -153,6 +161,40 @@ static FILE *proffile;
  */
 
 static char *progname;
+
+
+/* Clear the statistics for a set of profiling data.
+ */
+
+static void cleardata(profiledata *a)
+{
+    size_t i;
+
+    for (i = 0; i < 4; i++)
+    {
+        a->acount[i] = 0;
+        a->dcount[i] = 0;
+        a->atotal[i] = 0;
+        a->dtotal[i] = 0;
+    }
+}
+
+
+/* Sum the statistics from two sets of profiling data.
+ */
+
+static void sumdata(profiledata *a, profiledata *b)
+{
+    size_t i;
+
+    for (i = 0; i < 4; i++)
+    {
+        a->acount[i] += b->acount[i];
+        a->dcount[i] += b->dcount[i];
+        a->atotal[i] += b->atotal[i];
+        a->dtotal[i] += b->dtotal[i];
+    }
+}
 
 
 /* Read an entry from the profiling output file.
@@ -268,6 +310,7 @@ static void readfile(void)
             getentry(&p->symbol, sizeof(unsigned long), 1);
             getentry(&p->data, sizeof(unsigned long), 1);
             __mp_treeinsert(&proftree, &p->node, (unsigned long) p->addr);
+            cleardata(&p->tdata);
         }
     }
     /* Read the string table containing the symbol names.
@@ -317,28 +360,13 @@ static void printdata(size_t *d, size_t t)
         else
         {
             n = ((double) d[i] / (double) t) * 100.0;
-            if (n >= 99.5)
+            if (n <= 0.5)
+                fputs("  .", stdout);
+            else if (n >= 99.5)
                 fputs(" %%", stdout);
             else
                 fprintf(stdout, " %2.0f", n);
         }
-}
-
-
-/* Sum the statistics from two sets of profiling data.
- */
-
-static void sumdata(profiledata *a, profiledata *b)
-{
-    size_t i;
-
-    for (i = 0; i < 4; i++)
-    {
-        a->acount[i] += b->acount[i];
-        a->dcount[i] += b->dcount[i];
-        a->atotal[i] += b->atotal[i];
-        a->dtotal[i] += b->dtotal[i];
-    }
 }
 
 
@@ -432,8 +460,8 @@ static void directtable(void)
         if (n->data != 0)
         {
             d = data[n->data - 1];
-            while ((p->addr == n->addr) ||
-                   ((p->symbol != 0) && (p->symbol == n->symbol)))
+            while ((p != NULL) && ((p->addr == n->addr) ||
+                   ((p->symbol != 0) && (p->symbol == n->symbol))))
             {
                 n = p;
                 p = (profilenode *) __mp_successor(&n->node);
@@ -446,7 +474,10 @@ static void directtable(void)
                 a += d.atotal[i];
                 b += d.dtotal[i];
                 c += d.acount[i];
+                d.dcount[i] = d.acount[i] - d.dcount[i];
+                d.dtotal[i] = d.atotal[i] - d.dtotal[i];
             }
+            b = a - b;
             fprintf(stdout, "%6.2f  %8lu ",
                     ((double) a / (double) atotal) * 100.0, a);
             printdata(d.atotal, atotal);
@@ -515,6 +546,7 @@ int main(int argc, char **argv)
     symbols = NULL;
     sbound = mbound = lbound = 0;
     __mp_newtree(&proftree);
+    __mp_newtree(&temptree);
     if (strcmp(f, "-") == 0)
         proffile = stdin;
     else if ((proffile = fopen(f, "rb")) == NULL)
