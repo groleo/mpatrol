@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: version.c,v 1.18 2000-03-26 20:54:37 graeme Exp $"
+#ident "$Id: version.c,v 1.19 2000-04-03 18:34:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,6 +66,7 @@ MP_GLOBAL char *__mp_version = MP_VERSION " (26 March 2000)";
 
 
 MP_GLOBAL char *__mp_copyright = "Copyright (C) 1997-2000 Graeme S. Roy";
+MP_GLOBAL char *__mp_homepage = "http://www.cbmamiga.demon.co.uk/mpatrol";
 
 
 #ifdef __cplusplus

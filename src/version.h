@@ -40,6 +40,7 @@ extern "C"
 
 MP_EXPORT char *__mp_version;
 MP_EXPORT char *__mp_copyright;
+MP_EXPORT char *__mp_homepage;
 
 
 #ifdef __cplusplus
