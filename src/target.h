@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.25 2001-03-03 14:49:54 graeme Exp $
+ * $Id: target.h,v 1.26 2001-03-05 19:31:44 graeme Exp $
  */
 
 
@@ -369,6 +369,7 @@
 #define __EXTENSIONS__ 1
 #elif SYSTEM == SYSTEM_TRU64
 #define _OSF_SOURCE 1
+#define _XOPEN_SOURCE_EXTENDED 1
 #endif /* SYSTEM */
 #endif /* TARGET */
 
