@@ -2355,7 +2355,10 @@ traversal must be supported in the mpatrol library and all of the
 program's symbols must have been successfully read by the mpatrol
 library before the program was run.  The library will attempt to
 compensate if either of these requirements are not met, but the
-displayed tables may contain less meaningful information.
+displayed tables may contain less meaningful information.  Cycles that
+appear in the allocation call graph are due to recursion and are
+currently dealt with by only recording the memory allocations once
+along the call stack.
 
    Memory allocation profiling is disabled by default, but can be
 enabled using the `PROF' option.  This writes all of the profiling data
@@ -2601,12 +2604,12 @@ which sizes of data structures are allocated most during program
 execution, and where changes might be made to make more efficient use
 of the dynamically allocated memory.
 
-   As can be seen from the allocation bin table, 8 allocations of 2
-bytes, 99 allocations of 3 bytes, 118 allocations of 4 bytes, 31
+   As can be seen from the allocation bin table, 9 allocations of 2
+bytes, 105 allocations of 3 bytes, 121 allocations of 4 bytes, 21
 allocations of 5 bytes and 256 allocations of 8 bytes were made during
 the execution of the program.  However, all of these memory allocations
 except the 8 byte allocations were still not freed by the time the
-program terminated, resulting in a total memory leak of 940 bytes.
+program terminated, resulting in a total memory leak of 922 bytes.
 
    The next table shown is the direct allocation table which lists all
 of the functions that allocated memory and how much memory they
@@ -2625,8 +2628,8 @@ displayed.
 for seeing exactly which functions in a program directly perform memory
 allocation, and can quickly highlight where optimisations can be made
 or where functions might be making unnecessary allocations.  In the
-example, this table shows us that 2988 bytes were allocated over 512
-calls by `new_pair()' and that 940 bytes were left unfreed at program
+example, this table shows us that 2970 bytes were allocated over 512
+calls by `new_pair()' and that 922 bytes were left unfreed at program
 termination.  All of the allocations that were made by `new_pair()'
 were between 1 and 32 bytes in size.
 
@@ -2725,6 +2728,35 @@ like:
 by freeing the string as well as the structure at line 77.  A version
 of the above program that does not contain the memory leak can be found
 in `tests/profile/test2.c'.
+
+   The final table that is displayed is the allocation call graph,
+which shows the relationship between a particular function in the call
+graph, the functions that called it (parents), and the functions that
+it called (children).  Every function that appears in the allocation
+call graph is displayed with a particular index that can be used to
+cross-reference it.  The functions which called a particular function
+are displayed directly above it, while the functions that the function
+called are displayed directly below it.  In the above example,
+`_start()' called `main()', which then called `new_pair()' which
+allocated the memory.
+
+   The memory that has been allocated by a function (either directly,
+or indirectly by its children) for its parents is shown in the details
+for the parent functions, showing both a breakdown of the allocated
+memory and a breakdown of the unfreed memory.  This also occurs for the
+child functions.  If a function does not directly allocate memory then
+the total memory allocated for its parents will equal the total memory
+allocated by its children.  However, if a parent or child function is
+part of a cycle in the call graph then a `(*)' will appear in the
+leftmost column of the call graph.  In that case the total incoming
+memory may not necessarily equal the total outgoing memory for the main
+function.
+
+   In the example above when the `--addresses' option is used, it
+should be clear that `new_pair()+20' allocates 2048 bytes for `main()',
+while `new_pair()+140' allocates 922 bytes for `main()'.  The `main()'
+function itself allocates 2970 bytes for `_start()' overall via the
+`new_pair()' function.
 
    As a final demonstration of mpatrol's profiling features we will
 attempt to profile a real application in order to see where the memory
@@ -11097,6 +11129,7 @@ CHECKMEMORY:
           See ``Appendix B Environment''.
 CHECKREALLOCS:                                     
           See ``Appendix B Environment''.
+children:                                           See 8.
 CISC:                                               See 6.2.
 clean (make target):                                See 3.
 clobber (make target):                              See 3.
@@ -11123,6 +11156,7 @@ CSRI malloc:
           See ``Appendix J Related software''.
 CVS:                                               
           See ``I.5 Files''.
+cycles:                                             See 8.
 data sections:                                      See 5.1.
 Dbmalloc:                                          
           See ``Appendix J Related software''.
@@ -11656,6 +11690,7 @@ parallel programming:                               See 6.3.
 parameter variables:                                See 5.2.
 Parasoft:                                          
           See ``Appendix J Related software''.
+parents:                                            See 8.
 Pascal:                                             See 5.
 PATH:                                              
           See ``I.3 Linking''.

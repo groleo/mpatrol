@@ -2466,7 +2466,9 @@ memory allocation profiling support, call stack traversal must be supported in
 the mpatrol library and all of the program's symbols must have been successfully
 read by the mpatrol library before the program was run.  The library will
 attempt to compensate if either of these requirements are not met, but the
-displayed tables may contain less meaningful information.
+displayed tables may contain less meaningful information.  Cycles that appear in
+the allocation call graph are due to recursion and are currently dealt with by
+only recording the memory allocations once along the call stack.
 
 <p>Memory allocation profiling is disabled by default, but can be enabled using
 the <code>PROF</code> option.  This writes all of the profiling data to a file
@@ -2711,12 +2713,12 @@ of data structures are allocated most during program execution, and where
 changes might be made to make more efficient use of the dynamically allocated
 memory.
 
-<p>As can be seen from the allocation bin table, 8 allocations of 2 bytes, 99
-allocations of 3 bytes, 118 allocations of 4 bytes, 31 allocations of 5 bytes
+<p>As can be seen from the allocation bin table, 9 allocations of 2 bytes, 105
+allocations of 3 bytes, 121 allocations of 4 bytes, 21 allocations of 5 bytes
 and 256 allocations of 8 bytes were made during the execution of the program. 
 However, all of these memory allocations except the 8 byte allocations were
 still not freed by the time the program terminated, resulting in a total memory
-leak of 940 bytes.
+leak of 922 bytes.
 
 <p>The next table shown is the direct allocation table which lists all of the
 functions that allocated memory and how much memory they allocated.  The
@@ -2733,8 +2735,8 @@ Percentages of 0% are not displayed.
 <p>The information displayed in the direct allocation table is useful for seeing
 exactly which functions in a program directly perform memory allocation, and can
 quickly highlight where optimisations can be made or where functions might be
-making unnecessary allocations.  In the example, this table shows us that 2988
-bytes were allocated over 512 calls by <code>new_pair()</code> and that 940 bytes were
+making unnecessary allocations.  In the example, this table shows us that 2970
+bytes were allocated over 512 calls by <code>new_pair()</code> and that 922 bytes were
 left unfreed at program termination.  All of the allocations that were made by
 <code>new_pair()</code> were between 1 and 32 bytes in size.
 
@@ -2835,6 +2837,33 @@ options looks like:
 the string as well as the structure at line 77.  A version of the above
 program that does not contain the memory leak can be found in
 <code>tests/profile/test2.c</code>.
+
+<p>The final table that is displayed is the allocation call graph, which shows the
+relationship between a particular function in the call graph, the functions that
+called it (parents), and the functions that it called (children).  Every
+function that appears in the allocation call graph is displayed with a
+particular index that can be used to cross-reference it.  The functions which
+called a particular function are displayed directly above it, while the
+functions that the function called are displayed directly below it.  In the
+above example, <code>_start()</code> called <code>main()</code>, which then called
+<code>new_pair()</code> which allocated the memory.
+
+<p>The memory that has been allocated by a function (either directly, or indirectly
+by its children) for its parents is shown in the details for the parent
+functions, showing both a breakdown of the allocated memory and a breakdown of
+the unfreed memory.  This also occurs for the child functions.  If a function
+does not directly allocate memory then the total memory allocated for its
+parents will equal the total memory allocated by its children.  However, if a
+parent or child function is part of a cycle in the call graph then a <code>(*)</code>
+will appear in the leftmost column of the call graph.  In that case the total
+incoming memory may not necessarily equal the total outgoing memory for the main
+function.
+
+<p>In the example above when the <code>--addresses</code> option is used, it should be
+clear that <code>new_pair()+20</code> allocates 2048 bytes for <code>main()</code>, while
+<code>new_pair()+140</code> allocates 922 bytes for <code>main()</code>.  The <code>main()</code>
+function itself allocates 2970 bytes for <code>_start()</code> overall via the
+<code>new_pair()</code> function.
 
 <p>As a final demonstration of mpatrol's profiling features we will attempt to
 profile a real application in order to see where the memory allocations come
@@ -10773,6 +10802,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>CHECKFREES: <a href="#Environment">Environment</a>
 <li>CHECKMEMORY: <a href="#Environment">Environment</a>
 <li>CHECKREALLOCS: <a href="#Environment">Environment</a>
+<li>children: <a href="#Profiling">Profiling</a>
 <li>CISC: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>clean (make target): <a href="#Installation">Installation</a>
 <li>clobber (make target): <a href="#Installation">Installation</a>
@@ -10791,6 +10821,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>csh: <a href="#The%20mpatrol%20command">The mpatrol command</a>
 <li>CSRI malloc: <a href="#Related%20software">Related software</a>
 <li>CVS: <a href="#Files">Files</a>
+<li>cycles: <a href="#Profiling">Profiling</a>
 <li>data sections: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>Dbmalloc: <a href="#Related%20software">Related software</a>
 <li>Debauch: <a href="#Related%20software">Related software</a>
@@ -11143,6 +11174,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>parallel programming: <a href="#Threads">Threads</a>
 <li>parameter variables: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>Parasoft: <a href="#Related%20software">Related software</a>
+<li>parents: <a href="#Profiling">Profiling</a>
 <li>Pascal: <a href="#Memory%20allocations">Memory allocations</a>
 <li>PATH: <a href="#Linking">Linking</a>
 <li>PE: <a href="#Examples">Examples</a>
