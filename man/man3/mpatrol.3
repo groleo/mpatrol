@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.10 2000-01-28 01:24:02 graeme Exp $
+.\" $Id: mpatrol.3,v 1.11 2000-01-30 21:04:17 graeme Exp $
 .\"
-.TH MPATROL 3 "28 January 2000" "Release 1.1" "mpatrol library"
+.TH MPATROL 3 "30 January 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -56,6 +56,9 @@ void *memmove(void *dest, void *src, size_t size);
 void bcopy(void *src, void *dest, size_t size);
 int memcmp(void *ptr1, void *ptr2, size_t size);
 int bcmp(void *ptr1, void *ptr2, size_t size);
+void *memchr(void *ptr, int byte, size_t size);
+void *memmem(void *ptr1, size_t size1, void *ptr2,
+             size_t size2);
 
 int __mp_info(void *ptr, __mp_allocinfo *info);
 void __mp_memorymap(int stats);
@@ -316,7 +319,7 @@ and this loop will continue until they manage to allocate the requested space.
 Note that this function is equivalent to \fB__mp_nomemory\fP and will replace
 the handler installed by that function.
 .PP
-The following 7 functions are available as replacements for existing C library
+The following 9 functions are available as replacements for existing C library
 memory operation functions.  To use these you must include \fImpatrol.h\fP
 before all other header files, although on UNIX platforms they will be used
 anyway, albeit with slightly less tracing information:
@@ -379,6 +382,23 @@ existing memory allocation in the heap but would straddle that allocation's
 boundaries then an error message will be generated in the log file and no bytes
 will be compared.  This function is available for backwards compatibility with
 older C libraries and should not be used in new code.
+.TP
+\fBmemchr\fP
+Searches up to \fIsize\fP bytes in \fIptr\fP for the first occurrence of
+\fIbyte\fP and returns a pointer to it or \fBNULL\fP if no such byte occurs.  If
+\fIsize\fP is \fB0\fP then no bytes will be searched.  If the operation would
+affect an existing memory allocation in the heap but would straddle that
+allocation's boundaries then an error message will be generated in the log file
+and no bytes will be searched.
+.TP
+\fBmemmem\fP
+Searches up to \fIsize1\fP bytes in \fIptr1\fP for the first occurrence of
+\fIptr2\fP (which is exactly \fIsize2\fP bytes in length) and returns a pointer
+to it or \fBNULL\fP if no such sequence of bytes occur.  If \fIsize1\fP or
+\fIsize2\fP is \fB0\fP then no bytes will be searched.  If the operation would
+affect an existing memory allocation in the heap but would straddle that
+allocation's boundaries then an error message will be generated in the log file
+and no bytes will be searched.
 .PP
 The following 7 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
