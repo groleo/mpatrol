@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.99 2001-03-03 14:46:27 graeme Exp $"
+#ident "$Id: inter.c,v 1.100 2001-03-04 13:57:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.99 2001-03-03 14:46:27 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.100 2001-03-04 13:57:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -740,7 +740,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
-            __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+            __mp_error(ET_OUTMEM, f, t, u, NULL);
             memhead.fini = 1;
             __mp_abort();
         }
@@ -875,7 +875,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
-            __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+            __mp_error(ET_OUTMEM, f, t, u, NULL);
             memhead.fini = 1;
             __mp_abort();
         }
@@ -994,7 +994,7 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
-            __mp_error(ET_OUTMEM, f, t, u, "out of memory");
+            __mp_error(ET_OUTMEM, f, t, u, NULL);
             memhead.fini = 1;
             __mp_abort();
         }

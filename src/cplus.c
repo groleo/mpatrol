@@ -40,9 +40,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.5 2001-02-27 19:38:36 graeme Exp $"
+#ident "$Id: cplus.c,v 1.6 2001-03-04 13:57:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.5 2001-02-27 19:38:36 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.6 2001-03-04 13:57:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -120,7 +120,7 @@ __nw__FUi(size_t l)
         h->recur++;
         __mp_printsummary(h);
         __mp_diag("\n");
-        __mp_error(ET_OUTMEM, AT_NEW, NULL, 0, "out of memory");
+        __mp_error(ET_OUTMEM, AT_NEW, NULL, 0, NULL);
         h->fini = 1;
         __mp_abort();
 #endif /* __cplusplus */
@@ -185,7 +185,7 @@ __nwa__FUi(size_t l)
         h->recur++;
         __mp_printsummary(h);
         __mp_diag("\n");
-        __mp_error(ET_OUTMEM, AT_NEWVEC, NULL, 0, "out of memory");
+        __mp_error(ET_OUTMEM, AT_NEWVEC, NULL, 0, NULL);
         h->fini = 1;
         __mp_abort();
 #endif /* __cplusplus */
