@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.24 2000-06-26 23:18:36 graeme Exp $
+# $Id: build,v 1.25 2000-06-29 00:35:01 graeme Exp $
 
 
 version=1.2.3
@@ -94,14 +94,14 @@ cp ../../man/man3/mpatrol.3 man/man3
 # Create the package within a package directory structure.
 
 rm -rf GSRmptrl
-pkgmk -d. -r. GSRmptrl
+pkgmk -d`pwd` -r`pwd` GSRmptrl
 rm -rf bin doc include info lib man
 
 
 # Convert the package directory structure to a package file.
 
 rm -f mpatrol-$version.pkg
-pkgtrans -s . mpatrol-$version.pkg GSRmptrl
+pkgtrans -s`pwd` mpatrol-$version.pkg GSRmptrl
 rm -rf GSRmptrl
 
 
