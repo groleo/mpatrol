@@ -1,3 +1,56 @@
+2000-12-24  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.txt, doc/mpatrol.guide, doc/mpatrol.html,
+	  doc/mpatrol.info, doc/mpatrol.texi:
+	Added two more items of related software.
+
+	* pkg/sdux/mpatrol.psf, pkg/pkg/prototype: Added new tests.
+
+	* src/inter.c: Use debug information if available for checker functions.
+
+	* tests/fail/test17.c, tests/fail/test18.c:
+	New test for -fcheck-memory-usage.
+
+2000-12-22  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.c, src/info.h:
+	Added file and line number information to __mp_checkrange() and
+	__mp_checkstring().
+
+	* src/inter.c:
+	Added more information to the calls to __mp_checkrange() and
+	__mp_checkstring().
+
+2000-12-21  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/mpatrol.def, build/windows/mpatrolmt.def:
+	Added the Checker interface functions.
+
+	* src/diag.c, src/diag.h:
+	Changed the __mp_log* functions to use the loginfo structure.
+
+	* src/info.c, src/info.h: Changed the functions to use loginfo.
+
+	* src/inter.c, src/inter.h:
+	Added the first implementation of the Checker functions.  Now use the
+	loginfo structure.
+
+2000-12-20  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, doc/mpatrol.txt, doc/mpatrol.guide,
+	  doc/mpatrol.html, doc/mpatrol.info:
+	Added information about MTrace.
+
+	* build/windows/main.c, src/utils.c, src/tree.c, src/trace.c,
+	  src/symbol.c, src/strtab.c, src/stack.c, src/slots.c, src/signals.c,
+	  src/sbrk.c, src/profile.c, src/option.c, src/mutex.c, src/mptrace.c,
+	  src/mprof.c, src/mpatrol.h, src/mpatrol.c, src/mleak.c, src/memory.c,
+	  src/malloc.c, src/list.c, src/inter.c, src/info.c, src/heap.c,
+	  src/graph.c, src/getopt.c, src/diag.c, src/alloc.c, src/addr.c:
+	Changed the function declarations to the GNU-style.
+
+	* src/utils.c: Fixed LEB128 calculations for 64-bit platforms.
+
 2000-12-18  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/README, doc/Makefile: Added the tracing image files.
