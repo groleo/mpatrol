@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.8 2001-02-27 23:03:12 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.9 2001-02-28 23:14:20 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.8 2001-02-27 23:03:12 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dbmalloc_id = "$Id: dbmalloc.c,v 1.9 2001-02-28 23:14:20 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -430,7 +430,7 @@ void
 __mp_init_dbmalloc(void)
 {
     char *v;
-    dbmalloptarg a;
+    union dbmalloptarg a;
     long n;
 
     if (!malloc_initialised)

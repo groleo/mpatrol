@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.7 2001-02-27 23:17:11 graeme Exp $
+ * $Id: dbmalloc.h,v 1.8 2001-02-28 23:14:20 graeme Exp $
  */
 
 
@@ -158,8 +158,8 @@ union dbmalloptarg
 
 #define dbmallinit() __mp_init_dbmalloc()
 #define dbmallopt(c, v) __mpt_dbmallocoption((c), (v))
-#define malloc_chain_check(f) __mpt_dbmallocchaincheck(MP_FUNCNAME, __FILE__, \
-                                                       __LINE__)
+#define malloc_chain_check(f) __mpt_dbmallocchaincheck((f), MP_FUNCNAME, \
+                                                       __FILE__, __LINE__)
 #define malloc_dump(f) __mpt_dbmallocdump(f)
 #define malloc_list(f, l, u) __mpt_dbmalloclist((f), (l), (u))
 #define malloc_inuse(h) __mpt_dbmallocinuse(h)
