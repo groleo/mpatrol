@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.15 2001-04-26 22:57:28 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.16 2001-05-22 22:07:12 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.15 2001-04-26 22:57:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.16 2001-05-22 22:07:12 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -706,7 +706,7 @@ readevent(void)
             {
                 if ((m = slotentry(f)) > maxslots)
                     maxslots = m;
-                fprintf(simfile, "    {%lu, %lu},\n", m, l);
+                fprintf(simfile, "    {%lu, %lu, 0},\n", m, l);
             }
 #if MP_GUI_SUPPORT
             if (usegui)
@@ -748,8 +748,7 @@ readevent(void)
                 if (f->entry != NULL)
                 {
                     m = slotentry(f);
-                    fprintf(simfile, "    {%lu, 0},\n", m);
-                    fprintf(simfile, "    {%lu, %lu},\n", m, l);
+                    fprintf(simfile, "    {%lu, %lu, 1},\n", m, l);
                 }
 #if MP_GUI_SUPPORT
                 if (usegui)
@@ -788,7 +787,7 @@ readevent(void)
                 stats.ftotal += f->size;
                 if (f->entry != NULL)
                 {
-                    fprintf(simfile, "    {%lu, 0},\n", slotentry(f));
+                    fprintf(simfile, "    {%lu, 0, 0},\n", slotentry(f));
                     __mp_freeslot(&table, f->entry);
                     f->entry = NULL;
                 }
@@ -848,12 +847,22 @@ readevent(void)
         }
     if (simfile != NULL)
     {
-        fputs("    {0, 0}\n};\n\n\n", simfile);
+        fputs("    {0, 0, 0}\n};\n\n\n", simfile);
         fputs("int main(void)\n{\n", simfile);
         fprintf(simfile, "    void *p[%lu];\n", maxslots);
         fputs("    event *e;\n\n", simfile);
         fputs("    for (e = events; e->index != 0; e++)\n", simfile);
-        fputs("        if (e->size == 0)\n", simfile);
+        fputs("        if (e->resize)\n", simfile);
+        fputs("        {\n", simfile);
+        fputs("            if ((p[e->index - 1] = realloc(p[e->index - 1], "
+              "e->size)) == NULL)\n", simfile);
+        fputs("            {\n", simfile);
+        fputs("                fputs(\"out of memory\\n\", stderr);\n",
+                                     simfile);
+        fputs("                exit(EXIT_FAILURE);\n", simfile);
+        fputs("            }\n", simfile);
+        fputs("        }\n", simfile);
+        fputs("        else if (e->size == 0)\n", simfile);
         fputs("            free(p[e->index - 1]);\n", simfile);
         fputs("        else if ((p[e->index - 1] = malloc(e->size)) == NULL)\n",
               simfile);
@@ -1068,6 +1077,7 @@ main(int argc, char **argv)
         fputs("typedef struct event\n{\n", simfile);
         fputs("    unsigned long index;\n", simfile);
         fputs("    unsigned long size;\n", simfile);
+        fputs("    char resize;\n", simfile);
         fputs("}\nevent;\n\n\n", simfile);
         fputs("static event events[] =\n{\n", simfile);
     }
