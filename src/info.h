@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.65 2001-12-06 00:08:49 graeme Exp $
+ * $Id: info.h,v 1.66 2001-12-06 00:25:56 graeme Exp $
  */
 
 
@@ -156,14 +156,36 @@ allocanode;
 
 typedef struct loginfo
 {
-    alloctype type;     /* type of memory allocation */
-    char *func;         /* calling function name */
-    char *file;         /* file name in which call took place */
-    unsigned long line; /* line number at which call took place */
-    stackinfo *stack;   /* call stack details */
-    char *typestr;      /* type stored in allocation */
-    size_t typesize;    /* size of type stored in allocation */
-    char logged;        /* logged flag */
+    alloctype type;       /* type of memory allocation */
+    union
+    {
+        struct
+        {
+            size_t size;  /* size */
+            size_t align; /* alignment */
+        }
+        logalloc;
+        struct
+        {
+            void *block;  /* memory block */
+            size_t size;  /* size */
+            size_t align; /* alignment */
+        }
+        logrealloc;
+        struct
+        {
+            void *block;  /* memory block */
+        }
+        logfree;
+    }
+    variant;
+    char *func;           /* calling function name */
+    char *file;           /* file name in which call took place */
+    unsigned long line;   /* line number at which call took place */
+    stackinfo *stack;     /* call stack details */
+    char *typestr;        /* type stored in allocation */
+    size_t typesize;      /* size of type stored in allocation */
+    char logged;          /* logged flag */
 }
 loginfo;
 
