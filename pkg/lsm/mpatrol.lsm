@@ -1,6 +1,6 @@
 Begin4
 Title:          mpatrol
-Version:        1.2.6
+Version:        1.3.0
 Entered-date:   2000-07-18
 Description:    A link library that attempts to diagnose run-time errors that
                 are caused by the wrong use of dynamically allocated memory.
@@ -22,9 +22,9 @@ Keywords:       mpatrol malloc realloc free new delete library allocate
 Author:         graeme@epc.co.uk (Graeme S. Roy)
 Maintained-by:  graeme@epc.co.uk (Graeme S. Roy)
 Primary-site:   www.cbmamiga.demon.co.uk mpatrol/files
-                322K mpatrol_1.2.6.tar.gz
+                322K mpatrol_1.3.0.tar.gz
                 1.8M mpatrol_doc.tar.gz
-Alternate-site: metalab.unc.edu pub/Linux/devel
-                322K mpatrol-1.2.6.tar.gz
+Alternate-site: metalab.unc.edu pub/Linux/devel/lang/c
+                322K mpatrol-1.3.0.tar.gz
 Copying-policy: GPL
 End

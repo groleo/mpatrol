@@ -24,11 +24,11 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.29 2000-07-17 23:38:05 graeme Exp $
+# $Id: build,v 1.30 2000-07-18 22:59:03 graeme Exp $
 
 
-version=1.2.6
-libversion=1.2
+version=1.3.0
+libversion=1.3
 
 
 # Build the mpatrol library.
