@@ -21,7 +21,7 @@
 ; Amiga shell script to build an LhA distribution file
 
 
-; $Id: build,v 1.30 2000-12-14 17:59:20 graeme Exp $
+; $Id: build,v 1.31 2000-12-14 18:10:09 graeme Exp $
 
 
 ; Build both the GCC and SAS/C versions of the mpatrol library.
@@ -35,8 +35,9 @@ CD //pkg/lha
 
 
 ; Create the distribution directory structure and copy the necessary
-; files into it.  This assumes that the Texinfo manual has already been
-; processed into the different documentation formats.
+; files into it.  This assumes that the Texinfo manual, reference card
+; and manual pages have already been processed into the different
+; documentation formats.
 
 Delete mpatrol ALL FORCE QUIET >NIL:
 MakeDir mpatrol
