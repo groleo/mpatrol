@@ -62,7 +62,7 @@ Notes for all platforms
 
   * An alternative implementation for call stack traversal uses the functions
     __builtin_frame_address() and __builtin_return_address() that are available
-    when the library is compiled with GCC.  However, they can only traverse a
+    when the library is compiled with gcc.  However, they can only traverse a
     number of stack frames at compile-time, not run-time so there is a maximum
     number of stack frames that can be traversed at any one time.  The
     implementation depends on both of these builtin functions returning NULL
@@ -110,10 +110,7 @@ Notes for all platforms
     available on.  Perhaps this could even be extended to a common executable
     command that is written in C.
 
-  * TeXinfo documentation should be written, containing most of the information
-    from the UNIX manual pages as well most of the text from EXAMPLES.  TeXinfo
-    documentation can be converted to wide variety of documentation formats.
-    Also add an FAQ.
+  * Add a document containing frequently asked questions.
 
   * Perhaps use a configure script to automatically work out values for config.h
     on the platform it is being built on, and provide locations for installing
@@ -206,7 +203,7 @@ Notes for Windows platforms
   * Need to add support for reading symbols from Windows executable files.  Also
     need to add support for reading symbols from any DLLs that are required by
     the program.  This may be possible in a limited fashion by using the GNU BFD
-    library, but may only work with code compiled with GCC.
+    library, but may only work with code compiled with gcc.
 
   * It is currently not possible to override the definitions of malloc(), etc.,
     without including the mpatrol.h header file first.  This is because the
@@ -233,7 +230,7 @@ Notes for Netware platforms
   * Need to add support for reading symbols from Netware load modules.  Also
     need to add support for reading symbols from any NLMs that are required by
     the program.  This may be possible in a limited fashion by using the GNU BFD
-    library, but may only work with code compiled with GCC.
+    library, but may only work with code compiled with gcc.
 
   * Need to investigate if it is safe (or even possible) to override the
     definitions of malloc(), etc., without including the mpatrol.h header file
@@ -357,7 +354,7 @@ Related software
     have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
     Fence, so I can't vouch for any of the others, although if you have any
     recommendations feel free to let me know so I can add them to this list.  In
-    particular, there seems to be shortage of such programs for AmigaOS and
+    particular, there seems to be a shortage of such programs for AmigaOS and
     Netware platforms.
 
       * BoundsChecker
@@ -384,7 +381,7 @@ Related software
             Location:  http://www.gnu.org/
             Overview:  Detects illegal memory accesses when reading from
                        uninitialised memory, writing to freed memory or outside
-                       memory blocks.  Also contains a garbage detector for
+                       memory blocks.  Also contains a garbage collector for
                        detecting memory leaks.
 
       * Dbmalloc
