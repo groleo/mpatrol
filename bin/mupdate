@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.17 2001-09-05 21:08:10 graeme Exp $
+# $Id: mupdate,v 1.18 2001-10-03 22:46:10 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -52,29 +52,28 @@ release="$newver.$newrev.$newcnt"
 
 
 # Change the mpatrol.h and version.h header files in order to update the
-# MPATROL_VERSION and MP_VERNUM preprocessor macros with the latest version
-# of the library.
+# MPATROL_VERSION, MP_VERNUM and MP_VERSION preprocessor macros with the latest
+# version of the library.
 
-oldversion=`printf %d%02d%02d $oldver $oldrev $oldcnt`
-newversion=`printf %d%02d%02d $newver $newrev $newcnt`
+oldvernum=`printf %d%02d%02d $oldver $oldrev $oldcnt`
+newvernum=`printf %d%02d%02d $newver $newrev $newcnt`
 
-sed "s/MPATROL_VERSION $oldversion/MPATROL_VERSION $newversion/" src/mpatrol.h \
-    >src/mpatrol.h.new
+oldversion="$oldver\\.$oldrev\\.$oldcnt"
+newversion="$newver\\.$newrev\\.$newcnt"
+
+sed "s/MPATROL_VERSION $oldvernum/MPATROL_VERSION $newvernum/" \
+    src/mpatrol.h >src/mpatrol.h.new
 mv src/mpatrol.h.new src/mpatrol.h
 cvs commit -m "Updated to version $release" src/mpatrol.h >/dev/null 2>&1
 
-sed "s/MP_VERNUM $oldversion/MP_VERNUM $newversion/" src/version.h \
-    >src/version.h.new
+sed -e "s/MP_VERNUM $oldvernum/MP_VERNUM $newvernum/" \
+    -e "s/MP_VERSION \"mpatrol $oldversion\"/MP_VERSION \"mpatrol $newversion\"/" \
+    src/version.h >src/version.h.new
 mv src/version.h.new src/version.h
 cvs commit -m "Updated to version $release" src/version.h >/dev/null 2>&1
 
 
-# Change the version.c source file in order to update the MP_VERSION
-# preprocessor macro with the latest version of the library, and also to update
-# the release date strings.
-
-oldversion="$oldver\\.$oldrev\\.$oldcnt"
-newversion="$newver\\.$newrev\\.$newcnt"
+# Change the version.c source file in order to update the release date strings.
 
 olddate1=`date -d"$olddate" +"(%y\\/%m\\/%d)"`
 olddate2=`date -d"$olddate" +"(%d\\.%m\\.%y)"`
@@ -84,11 +83,10 @@ newdate1=`date -d"$newdate" +"(%y\\/%m\\/%d)"`
 newdate2=`date -d"$newdate" +"(%d\\.%m\\.%y)"`
 newdate3=`date -d"$newdate" +"(%d %B %Y)"`
 
-sed -e "s/MP_VERSION \"mpatrol $oldversion\"/MP_VERSION \"mpatrol $newversion\"/" \
-    -e "s/MP_VERSION \" $olddate1\"/MP_VERSION \" $newdate1\"/" \
+sed -e "s/MP_VERSION \" $olddate1\"/MP_VERSION \" $newdate1\"/" \
     -e "s/MP_VERSION \" $olddate2\"/MP_VERSION \" $newdate2\"/" \
-    -e "s/MP_VERSION \" $olddate3\"/MP_VERSION \" $newdate3\"/" src/version.c \
-    >src/version.c.new
+    -e "s/MP_VERSION \" $olddate3\"/MP_VERSION \" $newdate3\"/" \
+    src/version.c >src/version.c.new
 mv src/version.c.new src/version.c
 cvs commit -m "Updated to version $release" src/version.c >/dev/null 2>&1
 
