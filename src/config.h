@@ -490,6 +490,16 @@
 #endif /* MP_PROFFILE */
 
 
+/* The magic sequence of bytes to use at the beginning and end of every
+ * profiling output file for verification purposes.  This must be exactly
+ * four bytes in length and will be truncated if it is greater than that.
+ */
+
+#ifndef MP_PROFMAGIC
+#define MP_PROFMAGIC "MPTL"
+#endif /* MP_PROFMAGIC */
+
+
 /* The overflow buffer size in bytes.  This may be overridden at run-time
  * using the OFLOWSIZE option.  The default is zero since this setting
  * may dramatically increase execution time if it is non-zero.
