@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 29th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 31st
 October, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 29th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 31st
 October, 2000.
 
 Foreword
@@ -1638,25 +1638,29 @@ you will see the following near the bottom of the file.
 
      ...
      
-     ALLOC: malloc (1000, 16 bytes, 2 bytes) [main|test.c|16]
-             0x80000D8E main
-             0x80000D24 _start
+     ALLOC: malloc (1000, 16 bytes, 4 bytes) [main|test.c|16]
+             0x08049449 main+57
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     returns 0x80033000
+     returns 0x080620E8
      
-     FREE: free (0x80033000) [main|test.c|17]
-             0x80000DBE main
-             0x80000D24 _start
+     FREE: free (0x080620E8) [main|test.c|17]
+             0x08049470 main+96
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-         0x80033000 (16 bytes) {malloc:1000:0} [main|test.c|16]
-             0x80000D8E main
-             0x80000D24 _start
+         0x080620E8 (16 bytes) {malloc:1000:0} [main|test.c|16]
+             0x08049449 main+57
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     FREE: free (0x80033000) [main|test.c|18]
-             0x80000DE8 main
-             0x80000D24 _start
+     FREE: free (0x080620E8) [main|test.c|18]
+             0x08049491 main+129
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     ERROR: free: 0x80033000 has not been allocated
+     ERROR: free: 0x080620E8 has not been allocated
      
      ...
 
@@ -1670,24 +1674,24 @@ prompt and so anything that appears on that line after that should be
 typed as a command.
 
      (gdb) break __mp_trap
-     Breakpoint 1 at 0x80004026
+     Breakpoint 1 at 0x804ee83
      (gdb) run
      Starting program: a.out
-     Breakpoint 1, 0x80004026 in __mp_trap()
+     Breakpoint 1, 0x804ee83 in __mp_trap()
      (gdb) backtrace
-     #0  0x80004026 in __mp_trap()
-     #1  0x800027ec in __mp_getmemory()
-     #2  0x80001138 in __mp_alloc()
-     #3  0x80000d8e in main() at test.c:16
+     #0  0x804ee83 in __mp_trap()
+     #1  0x804c61b in __mp_getmemory()
+     #2  0x8049894 in __mp_alloc()
+     #3  0x8049449 in main() at test.c:16
      (gdb) finish
-     Run till exit from #0  0x80004026 in __mp_trap()
-     0x800027ec in __mp_getmemory()
+     Run till exit from #0  0x804ee83 in __mp_trap()
+     0x804c61b in __mp_getmemory()
      (gdb) finish
-     Run till exit from #0  0x800027ec in __mp_getmemory()
-     0x80001138 in __mp_alloc()
+     Run till exit from #0  0x804c61b in __mp_getmemory()
+     0x8049894 in __mp_alloc()
      (gdb) finish
-     Run till exit from #0  0x80001138 in __mp_alloc()
-     0x80000d8e in main() at test.c:16
+     Run till exit from #0  0x8049894 in __mp_alloc()
+     0x8049449 in main() at test.c:16
      16              if (p = malloc(16))
      (gdb) step
      17                  free(p);
@@ -1696,7 +1700,7 @@ typed as a command.
      (gdb) step
      18          free(p);
      (gdb) quit
-     The program is running.  Quit anyway (and kill it)? (y or n) y
+     The program is running.  Exit anyway? (y or n) y
 
    After setting the breakpoint and running the program, the debugger
 halts at `__mp_trap()'.  Because `__mp_trap()' is a function within the
@@ -1715,9 +1719,9 @@ have been possible to print out information about the pointer `p' at
 line 17 from within `gdb':
 
      (gdb) call __mp_printinfo(p)
-     address 0x80033000 located in allocated block:
-         start of block:     0x80033000
-         size of block:      2 bytes
+     address 0x080620E8 located in allocated block:
+         start of block:     0x080620E8
+         size of block:      16 bytes
          allocated by:       malloc
          allocation index:   1000
          reallocation index: 0
@@ -1725,8 +1729,9 @@ line 17 from within `gdb':
          called from file:   test.c
          called at line:     16
          function call stack:
-             0x80000D8E main
-             0x80000D24 _start
+             0x08049449 main
+             0x4007C9CB __libc_start_main
+             0x08049381 _start
 
    Some debuggers, such as `gdb', also allow you to define your own
 commands for use in a debugging session.  The following example defines
@@ -1892,20 +1897,21 @@ example illustrates this (it can be found in `tests/pass/test4.c').
    When this is compiled and run, it should give the following output,
 although the pointers are likely to be different.
 
-     block:   0x8000A068
+     block:   0x080620E8
      size:    16
      type:    0
-     alloc:   10
+     alloc:   52
      realloc: 0
      func:    func2
      file:    test4.c
-     line:    64
-              0x80000BEC: func2
-              0x80000C3E: func1
-              0x80000C48: main
-              0x800009E8: _start
+     line:    73
+              0x0804960B: func2
+              0x08049658: func1
+              0x08049664: main
+              0x4007C9CB: __libc_start_main
+              0x08049381: _start
      freed:   0
-     nothing known about address 0x8000A068
+     nothing known about address 0x080620E8
 
    As you can see, anything that the mpatrol library knows about any
 memory allocation can be obtained for use in your own code, which can
@@ -1974,13 +1980,13 @@ found in `tests/pass/test2.c'.
 the following output.
 
      allocating 16 bytes
-     allocation returns 0x8000A068
-     reallocating allocation 0x8000A068 to 32 bytes
-     allocation returns 0x8000A068
-     freeing allocation 0x8000A068
+     allocation returns 0x080620E8
+     reallocating allocation 0x080620E8 to 32 bytes
+     allocation returns 0x080620E8
+     freeing allocation 0x080620E8
      duplicating string `test'
-     allocation returns 0x8000A068
-     freeing allocation 0x8000A068
+     allocation returns 0x080620E5
+     freeing allocation 0x080620E5
 
    Along with being able to install prologue and epilogue functions,
 you can also install a low-memory handler with the `__mp_nomemory()'
@@ -2918,7 +2924,7 @@ library, the `MPATROL_OPTIONS' environment variable should be set to be
 `LOGALL' and the program should be executed, generating the following
 output in `mpatrol.log'.
 
-     @(#) mpatrol 1.3.0 (00/07/18)
+     @(#) mpatrol 1.3.0 (00/07/17)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
@@ -2928,25 +2934,28 @@ output in `mpatrol.log'.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Tue Jul 18 23:22:54 2000
+     Log file generated on Tue Oct 31 00:18:17 2000
      
-     ALLOC: malloc (13, 16 bytes, 8 bytes) [main|test1.c|36]
-             0x00010AE0 main
-             0x000109D4 _start
+     ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
+             0x0804942F main+31
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     returns 0x00028000
+     returns 0x080620E8
      
-     FREE: free (0x00028001) [main|test1.c|37]
-             0x00010B24 main
-             0x000109D4 _start
+     FREE: free (0x080620E9) [main|test1.c|37]
+             0x08049457 main+71
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     ERROR: free: 0x00028001 does not match allocation of 0x00028000
-         0x00028000 (16 bytes) {malloc:13:0} [main|test1.c|36]
-             0x00010AE0 main
-             0x000109D4 _start
+     ERROR: free: 0x080620E9 does not match allocation of 0x080620E8
+         0x080620E8 (16 bytes) {malloc:52:0} [main|test1.c|36]
+             0x0804942F main+31
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
-     system page size:  8192 bytes
-     default alignment: 8 bytes
+     system page size:  4096 bytes
+     default alignment: 4 bytes
      overflow size:     0 bytes
      overflow byte:     0xAA
      allocation byte:   0xFF
@@ -2961,28 +2970,28 @@ output in `mpatrol.log'.
      lower check range: -
      upper check range: -
      failure frequency: 0
-     failure seed:      533453
+     failure seed:      972951591
      prologue function: <unset>
      epilogue function: <unset>
      handler function:  <unset>
      log file:          mpatrol.log
      profiling file:    mpatrol.out
      program filename:  ./test1
-     symbols read:      3240
+     symbols read:      3711
      autosave count:    0
      freed queue size:  0
-     allocation count:  13
-     allocation peak:   4720 bytes
+     allocation count:  52
+     allocation peak:   426176 bytes
      allocation limit:  0 bytes
-     allocated blocks:  1 (16 bytes)
+     allocated blocks:  7 (1528 bytes)
      freed blocks:      0 (0 bytes)
-     free blocks:       1 (8176 bytes)
-     internal blocks:   25 (204800 bytes)
-     total heap usage:  212992 bytes
+     free blocks:       8 (494088 bytes)
+     internal blocks:   46 (323584 bytes)
+     total heap usage:  819200 bytes
      total compared:    0 bytes
-     total located:     0 bytes
-     total copied:      0 bytes
-     total set:         0 bytes
+     total located:     2 bytes
+     total copied:      19450 bytes
+     total set:         374704 bytes
      total warnings:    0
      total errors:      1
 
@@ -2993,11 +3002,12 @@ items with a number that corresponds to the descriptions below.
       (1)    (2)   (3)    (4)       (5)     (6)    (7)  (8)
        |      |     |      |         |       |      |    |
        V      V     V      V         V       V      V    V
-     ALLOC: malloc (13, 16 bytes, 8 bytes) [main|test1.c|36]
-      (9) -> 0x00010AE0 main
-             0x000109D4 _start <- (10)
+     ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
+      (9) -> 0x0804942F main+31
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33 <- (10)
      
-     returns 0x00028000 <- (11)
+     returns 0x080620E8 <- (11)
 
   1. Allocation type.  This generalises the type of dynamic memory
      operation that is being performed, and can be one of `ALLOC',
@@ -3057,7 +3067,9 @@ bottom-most entry should be the entry-point for the process.
      and then only if there is an entry in the symbol table
      corresponding to the return address.  C++ function names may still
      be in their mangled form, but this can be easily rectified by
-     processing the log file with a C++ name demangler.
+     processing the log file with a C++ name demangler.  The number
+     after the plus sign is the offset in bytes from the beginning of
+     the function.
 
    The following information is only available when the allocation type
 is `ALLOC' or `REALLOC' since it makes no sense when applied to `FREE'.
@@ -3074,25 +3086,27 @@ file.
 which attempts to free the memory allocated by `malloc()', but supplies
 the wrong address.
 
-   The first three lines should be self-explanatory as they are very
+   The first four lines should be self-explanatory as they are very
 similar to those described above for `malloc()'.  However, the next
 lines signal that a terminal error has occurred in the program, so I've
 annotated them as before.
 
-     FREE: free (0x00028001) [main|test1.c|37]
-             0x00010B24 main
-             0x000109D4 _start
+     FREE: free (0x080620E9) [main|test1.c|37]
+             0x08049457 main+71
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
      
       (1)   (2)
        |     |
        V     V
-     ERROR: free: 0x00028001 does not match allocation of 0x00028000
+     ERROR: free: 0x080620E9 does not match allocation of 0x080620E8
             (3)        (4)       (5)  (6)(7)  (8)    (9)  (10)
              |          |         |    |  |    |      |    |
              V          V         V    V  V    V      V    V
-         0x00028000 (16 bytes) {malloc:13:0} [main|test1.c|36]
-     (11) -> 0x00010AE0 main
-             0x000109D4 _start
+         0x080620E8 (16 bytes) {malloc:52:0} [main|test1.c|36]
+     (11) -> 0x0804942F main+31
+             0x4007C9CB __libc_start_main+255
+             0x08049381 _start+33
 
   1. Error severity.  The mpatrol library has two different severities
      of error: `WARNING' and `ERROR'.  The first is always recoverable,
@@ -3156,8 +3170,8 @@ used during the execution of the program.
    The various settings and statistics displayed by the library for the
 above example have been numbered and their descriptions appear below.
 
-      1  system page size:  8192 bytes
-      2  default alignment: 8 bytes
+      1  system page size:  4096 bytes
+      2  default alignment: 4 bytes
       3  overflow size:     0 bytes
       4  overflow byte:     0xAA
       5  allocation byte:   0xFF
@@ -3172,28 +3186,28 @@ above example have been numbered and their descriptions appear below.
      14  lower check range: -
      15  upper check range: -
      16  failure frequency: 0
-     17  failure seed:      533453
+     17  failure seed:      972951591
      18  prologue function: <unset>
      19  epilogue function: <unset>
      20  handler function:  <unset>
      21  log file:          mpatrol.log
      22  profiling file:    mpatrol.out
      23  program filename:  ./test1
-     24  symbols read:      3240
+     24  symbols read:      3711
      25  autosave count:    0
      26  freed queue size:  0
-     27  allocation count:  13
-     28  allocation peak:   4720 bytes
+     27  allocation count:  52
+     28  allocation peak:   426176 bytes
      29  allocation limit:  0 bytes
-     30  allocated blocks:  1 (16 bytes)
+     30  allocated blocks:  7 (1528 bytes)
      31  freed blocks:      0 (0 bytes)
-     32  free blocks:       1 (8176 bytes)
-     33  internal blocks:   25 (204800 bytes)
-     34  total heap usage:  212992 bytes
+     32  free blocks:       8 (494088 bytes)
+     33  internal blocks:   46 (323584 bytes)
+     34  total heap usage:  819200 bytes
      35  total compared:    0 bytes
-     36  total located:     0 bytes
-     37  total copied:      0 bytes
-     38  total set:         0 bytes
+     36  total located:     2 bytes
+     37  total copied:      19450 bytes
+     38  total set:         374704 bytes
      39  total warnings:    0
      40  total errors:      1
 
@@ -4285,7 +4299,7 @@ after the last successful memory allocation.
      strtoupper(s=0x80009008 "test") at test1.c:46
      46          return t;
      (gdb) quit
-     The program is running.  Quit anyway (and kill it)? (y or n) y
+     The program is running.  Exit anyway? (y or n) y
 
    After loading the program into `gdb', we need to break at `main()'
 so that we can run to a point where all of the shared library symbols
