@@ -35,3 +35,4 @@ man
 src
 tsrc
 tools
+*.tar.gz
