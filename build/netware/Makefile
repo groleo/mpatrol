@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.36 2001-01-22 20:40:13 graeme Exp $
+# $Id: Makefile,v 1.37 2001-01-22 20:58:45 graeme Exp $
 
 
 # Definitions
@@ -39,10 +39,10 @@ TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
 
-OBJECTS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
+MPTOBJS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
 	   diag.obj option.obj profile.obj trace.obj inter.obj version.obj
-TOBJECTS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
+MPTTOBJS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   heap.ts.obj alloc.ts.obj info.ts.obj stack.ts.obj addr.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
 	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
@@ -63,14 +63,14 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 .c.ts.obj:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(ARCHIVE_MPATROL): $(OBJECTS)
-	$(AR) -xar -o $@ $(OBJECTS)
+$(ARCHIVE_MPATROL): $(MPTOBJS)
+	$(AR) -xar -o $@ $(MPTOBJS)
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(ARCHTS_MPATROL): $(TOBJECTS)
-	$(AR) -xar -o $@ $(TOBJECTS)
+$(ARCHTS_MPATROL): $(MPTTOBJS)
+	$(AR) -xar -o $@ $(MPTTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
@@ -90,7 +90,7 @@ mleak.nlm: mleak.obj getopt.obj tree.obj version.obj
 all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol.nlm mprof.nlm mptrace.nlm mleak.nlm
 
 clean:
-	-@ rm -f $(OBJECTS) $(TOBJECTS) 2>&1 >/dev/null
+	-@ rm -f $(MPTOBJS) $(MPTTOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.37 2001-01-22 20:40:11 graeme Exp $
+# $Id: Makefile,v 1.38 2001-01-22 20:58:44 graeme Exp $
 
 
 # Definitions
@@ -38,10 +38,10 @@ TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
 
-ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+ARCHIVE_MPTOBJS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
 		  profile.o trace.o inter.o malloc.o sbrk.o version.o
-ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
+ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
@@ -62,14 +62,14 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.o
 .c.t.o:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
-	$(AR) cr $@ $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPTOBJS)
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
-	$(AR) cr $@ $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
+	$(AR) cr $@ $(ARCHTS_MPTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
@@ -89,7 +89,7 @@ mleak: mleak.o getopt.o tree.o version.o
 all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol mprof mptrace mleak
 
 clean:
-	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean

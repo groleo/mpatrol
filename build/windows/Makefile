@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.44 2001-01-22 20:40:15 graeme Exp $
+# $Id: Makefile,v 1.45 2001-01-22 20:58:47 graeme Exp $
 
 
 # Definitions
@@ -40,21 +40,21 @@ TFLAGS = -DMP_THREADS_SUPPORT
 
 MPATROL	= mpatrol
 
-ARCHIVE_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
+ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
 		  signals.obj diag.obj option.obj profile.obj trace.obj \
 		  inter.obj malloc.obj sbrk.obj version.obj
-SHARED_OBJECTS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
+SHARED_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
 		  signals.obj diag.obj option.obj profile.obj trace.obj \
 		  inter.obj malloc.obj sbrk.obj main.obj version.obj
-ARCHTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
+ARCHTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
 		  sbrk.ts.obj version.ts.obj
-SHARTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
+SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
@@ -79,20 +79,20 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 .c.ts.obj:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
-$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
-	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
+	$(AR) -nologo -out:$@ $(ARCHIVE_MPTOBJS)
 
-$(SHARED_MPATROL): $(SHARED_OBJECTS) $(MPATROL).def
-	$(LD) -dll -nologo -def:$(MPATROL).def -out:$@ $(SHARED_OBJECTS) -defaultlib:imagehlp
+$(SHARED_MPATROL): $(SHARED_MPTOBJS) $(MPATROL).def
+	$(LD) -dll -nologo -def:$(MPATROL).def -out:$@ $(SHARED_MPTOBJS) -defaultlib:imagehlp
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
 
-$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
-	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
+	$(AR) -nologo -out:$@ $(ARCHTS_MPTOBJS)
 
-$(SHARTS_MPATROL): $(SHARTS_OBJECTS) $(MPATROL)mt.def
-	$(LD) -dll -nologo -def:$(MPATROL)mt.def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
+$(SHARTS_MPATROL): $(SHARTS_MPTOBJS) $(MPATROL)mt.def
+	$(LD) -dll -nologo -def:$(MPATROL)mt.def -out:$@ $(SHARTS_MPTOBJS) -defaultlib:imagehlp
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
@@ -113,8 +113,8 @@ all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 	mpatrol.exe mprof.exe mptrace.exe mleak.exe
 
 clean:
-	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPTOBJS) $(SHARTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean

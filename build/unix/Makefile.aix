@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.4 2001-01-22 20:40:14 graeme Exp $
+# $Id: Makefile.aix,v 1.5 2001-01-22 20:58:46 graeme Exp $
 
 
 # Definitions
@@ -41,17 +41,17 @@ TFLAGS	= -DMP_THREADS_SUPPORT
 
 MPATROL	 = mpatrol
 
-OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
-TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
 
-ARCHIVE_OBJECTS	= $(OBJECTS) machine.o
-LINT_OBJECTS	= $(OBJECTS:.o=.n.ln)
-ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
-LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
+ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
+LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)
+ARCHTS_MPTOBJS	= $(MPTTOBJS:.o=.t.o) machine.t.o
+LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= shr.o
@@ -81,31 +81,31 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 	$(LINT) $(CFLAGS) $(TFLAGS) -c $<
 	-@ mv -f `basename $@ .t.ln`.ln $@
 
-$(ARCHIVE_MPATROL): $(SHARED_MPATROL) $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(SHARED_MPATROL) $(ARCHIVE_MPTOBJS)
 	-@ rm -f $@ 2>&1 >/dev/null
-	$(AR) cr $@ $(SHARED_MPATROL) $(ARCHIVE_OBJECTS)
+	$(AR) cr $@ $(SHARED_MPATROL) $(ARCHIVE_MPTOBJS)
 
-$(SHARED_MPATROL): $(ARCHIVE_OBJECTS) $(MPATROL).exp
-	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHIVE_OBJECTS)
+$(SHARED_MPATROL): $(ARCHIVE_MPTOBJS) $(MPATROL).exp
+	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHIVE_MPTOBJS)
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(LINT_MPATROL): $(LINT_OBJECTS)
-	$(LINT) -o $(MPATROL) $(LINT_OBJECTS)
+$(LINT_MPATROL): $(LINT_MPTOBJS)
+	$(LINT) -o $(MPATROL) $(LINT_MPTOBJS)
 
-$(ARCHTS_MPATROL): $(SHARTS_MPATROL) $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(SHARTS_MPATROL) $(ARCHTS_MPTOBJS)
 	-@ rm -f $@ 2>&1 >/dev/null
-	$(AR) cr $@ $(SHARTS_MPATROL) $(ARCHTS_OBJECTS)
+	$(AR) cr $@ $(SHARTS_MPATROL) $(ARCHTS_MPTOBJS)
 
-$(SHARTS_MPATROL): $(ARCHTS_OBJECTS) $(MPATROL).exp
-	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHTS_OBJECTS) -lpthreads
+$(SHARTS_MPATROL): $(ARCHTS_MPTOBJS) $(MPATROL).exp
+	$(LD) -bmodtype:SRE -bexport:$(MPATROL).exp -bnoentry -o $@ $(ARCHTS_MPTOBJS) -lpthreads
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(LINTTS_MPATROL): $(LINTTS_OBJECTS)
-	$(LINT) -o $(MPATROL)mt $(LINTTS_OBJECTS)
+$(LINTTS_MPATROL): $(LINTTS_MPTOBJS)
+	$(LINT) -o $(MPATROL)mt $(LINTTS_MPTOBJS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s
@@ -135,8 +135,8 @@ all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
 
 clean:
-	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f $(LINT_OBJECTS) $(LINTTS_OBJECTS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean

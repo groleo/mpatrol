@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.46 2001-01-22 20:40:14 graeme Exp $
+# $Id: Makefile,v 1.47 2001-01-22 20:58:46 graeme Exp $
 
 
 # Definitions
@@ -45,19 +45,19 @@ MPATROL	 = mpatrol
 VERSION	 = 1
 REVISION = 3
 
-OBJECTS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
-TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
 
-ARCHIVE_OBJECTS	= $(OBJECTS) machine.o
-SHARED_OBJECTS	= $(OBJECTS:.o=.s.o) machine.s.o
-LINT_OBJECTS	= $(OBJECTS:.o=.n.ln)
-ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
-SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o) machine.s.t.o
-LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
+ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
+SHARED_MPTOBJS	= $(MPTOBJS:.o=.s.o) machine.s.o
+LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)
+ARCHTS_MPTOBJS	= $(MPTTOBJS:.o=.t.o) machine.t.o
+SHARTS_MPTOBJS	= $(MPTTOBJS:.o=.s.t.o) machine.s.t.o
+LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= lib$(MPATROL).so
@@ -93,11 +93,11 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 	$(LINT) $(CFLAGS) $(TFLAGS) -y -c $<
 	-@ mv -f `basename $@ .t.ln`.ln $@
 
-$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
-	$(AR) cr $@ $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPTOBJS)
 
-$(SHARED_MPATROL).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
-	$(LD) $(LDFLAGS) -o $@ $(SHARED_OBJECTS)
+$(SHARED_MPATROL).$(VERSION).$(REVISION): $(SHARED_MPTOBJS)
+	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPTOBJS)
 
 $(SHARED_MPATROL): $(SHARED_MPATROL).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
@@ -105,14 +105,14 @@ $(SHARED_MPATROL): $(SHARED_MPATROL).$(VERSION).$(REVISION)
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(LINT_MPATROL): $(LINT_OBJECTS)
-	$(LINT) -o $(MPATROL) $(LINT_OBJECTS)
+$(LINT_MPATROL): $(LINT_MPTOBJS)
+	$(LINT) -o $(MPATROL) $(LINT_MPTOBJS)
 
-$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
-	$(AR) cr $@ $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
+	$(AR) cr $@ $(ARCHTS_MPTOBJS)
 
-$(SHARTS_MPATROL).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
-	$(LD) $(LDFLAGS) -o $@ $(SHARTS_OBJECTS)
+$(SHARTS_MPATROL).$(VERSION).$(REVISION): $(SHARTS_MPTOBJS)
+	$(LD) $(LDFLAGS) -o $@ $(SHARTS_MPTOBJS)
 
 $(SHARTS_MPATROL): $(SHARTS_MPATROL).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
@@ -120,8 +120,8 @@ $(SHARTS_MPATROL): $(SHARTS_MPATROL).$(VERSION).$(REVISION)
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(LINTTS_MPATROL): $(LINTTS_OBJECTS)
-	$(LINT) -o $(MPATROL)mt $(LINTTS_OBJECTS)
+$(LINTTS_MPATROL): $(LINTTS_MPTOBJS)
+	$(LINT) -o $(MPATROL)mt $(LINTTS_MPTOBJS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s
@@ -161,9 +161,9 @@ all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
 
 clean:
-	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f $(LINT_OBJECTS) $(LINTTS_OBJECTS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPTOBJS) $(SHARTS_MPTOBJS) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPTOBJS) $(LINTTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean

@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.39 2001-01-22 20:40:11 graeme Exp $
+# $Id: SMakefile,v 1.40 2001-01-22 20:58:44 graeme Exp $
 
 
 # Definitions
@@ -37,10 +37,10 @@ TFLAGS = DEF MP_THREADS_SUPPORT=1
 
 MPATROL	= mpatrol
 
-ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+ARCHIVE_MPTOBJS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
 		  profile.o trace.o inter.o version.o
-ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
+ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o version.t.o
@@ -61,14 +61,14 @@ OBJTS_MPATROL	= lib$(MPATROL)mt.o
 .c.t.o:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $<
 
-$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
-	$(AR) -n $@ REPLACE $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
+	$(AR) -n $@ REPLACE $(ARCHIVE_MPTOBJS)
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/library.c
 
-$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
-	$(AR) -n $@ REPLACE $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
+	$(AR) -n $@ REPLACE $(ARCHTS_MPTOBJS)
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/library.c
@@ -88,7 +88,7 @@ mleak: mleak.o getopt.o tree.o version.o
 all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol mprof mptrace mleak
 
 clean:
-	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
+	-@ Delete $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) FORCE >NIL:
 	-@ Delete mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o FORCE >NIL:
 
 clobber: clean
