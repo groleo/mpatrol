@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.33 2000-07-31 23:46:45 graeme Exp $"
+#ident "$Id: memory.c,v 1.34 2000-11-02 22:34:21 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -188,11 +188,12 @@ static size_t pagesize(void)
 
 static int stackdirection(void *p)
 {
-    int n;
+    unsigned long n;
 
+    n = (unsigned long) &p;
     if (p == NULL)
         return stackdirection(&n);
-    else if (&n < (int *) p)
+    else if (&n < (unsigned long *) p)
         return -1;
     else
         return 1;
