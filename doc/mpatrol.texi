@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.5 1999-11-16 01:05:13 graeme Exp $
+@c $Id: mpatrol.texi,v 1.6 1999-11-18 19:19:48 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -19,9 +19,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 1.0
-@set VERSION 1.0.5
-@set UPDATED 16th November, 1999
+@set EDITION 1.1
+@set VERSION 1.0.6
+@set UPDATED 18th November, 1999
 
 @ifhtml
 @image{images/mpatrol}
@@ -108,6 +108,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Features::                    Features of mpatrol.
 * Installation::                Building and installing.
 * Memory allocations::          Background.
+* Operating system support::    Additional background.
 * Examples::                    Examples of usage.
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
@@ -232,7 +233,6 @@ Written for UNIX, AmigaOS, Windows and Netware platforms.
 @cindex library, shared
 @cindex thread-safe library
 @cindex library, thread-safe
-@cindex object file
 @item
 Can be built as archive, shared and/or thread-safe libraries on systems that
 support them, or even as one large object file.
@@ -583,7 +583,7 @@ you will have to generate them yourself using an appropriate tool and then
 install or print them.
 @end enumerate
 
-@node Memory allocations, Examples, Installation, Top
+@node Memory allocations, Operating system support, Installation, Top
 @chapter Memory allocations
 @cindex memory allocations
 
@@ -754,7 +754,228 @@ useful warnings about using uninitialised variables, using freed memory, running
 off the end of a dynamically-allocated array, etc.  It is these types of memory
 allocation problems that the mpatrol library loves to get its teeth into!
 
-@node Examples, Functions, Memory allocations, Top
+@node Operating system support, Examples, Memory allocations, Top
+@chapter Operating system support
+@cindex operating systems
+
+@cindex memory management interface
+@cindex embedded systems
+@cindex systems, embedded
+Beneath every malloc library's public interface there is the underlying
+operating system's memory management interface.  This provides features which
+can be as simple as giving processes the ability to allocate a new block of
+memory for themselves, or it can offer advanced features such as protecting
+areas of memory from being read or written.  Some embedded systems have no
+operating systems and hence no support for dynamic memory allocation, and so the
+malloc library must instead allocate blocks of memory from a fixed-sized array.
+The mpatrol library can be built to support all of the above types of system,
+but the more features an operating system can provide it with, the more it can
+do.
+
+@cindex address space
+On operating systems such as UNIX and Windows, all dynamic memory allocation
+requests from a process are dealt with by using a feature called @emph{virtual
+memory}.  This means that a process cannot perform illegal requests without
+them being denied, which protects the other running processes and the operating
+system from being affected by such errors.  However, on AmigaOS and Netware
+platforms there is no virtual memory support and so all processes effectively
+share the same address space as the operating system and any other running
+processes.  This means that one process can accidentally write into the data
+structures of another process, usually causing the other process to fail and
+bring down the system.  In addition, a process which allocates a lot of memory
+will result in there being less available memory for other running processes,
+and in extreme cases the operating system itself.
+
+@menu
+* Virtual memory::                  Addition facilities.
+* Call stacks and symbol tables::   Tracing information.
+@end menu
+
+@node Virtual memory, Call stacks and symbol tables, , Operating system support
+@section Virtual memory
+@cindex virtual memory
+@cindex memory, virtual
+
+@cindex physical memory
+@cindex memory, physical
+@emph{Virtual memory} is an operating system feature that was originally used to
+provide large usable address spaces for every process on machines that had very
+little physical memory.  It is used by an operating system to
+fool@footnote{Well, perhaps that's too harsh a word, but it will certainly seem
+that way to a process running on a 32-bit UNIX system with only 4 megabytes of
+physical memory, and yet it will be able to read from and write to over 4
+gigabytes of virtual memory!} a running process into believing that it can
+allocate a vast amount of memory for its own purposes, although whether it is
+allowed to or not depends on the operating system and the permissions of the
+individual user.
+
+@cindex virtual address
+@cindex address, virtual
+@cindex physical address
+@cindex address, physical
+@cindex memory management unit
+@cindex MMU
+@cindex system page size
+@cindex page size
+@cindex page
+Virtual memory works by translating a virtual address (which the process uses)
+into a physical address (which the operating system uses).  It is generally
+implemented via a piece of hardware called a @emph{memory management unit}, or
+MMU.  The MMU's primary job is to translate any virtual addresses that are
+referred to by machine instructions into physical addresses by looking up a
+table which is built by the operating system.  This table contains mappings to
+and from @emph{pages}@footnote{The size of a page varies between operating
+systems and processor architectures, but they are generally around 4 or 8
+kilobytes in size, and are always a power of two.} rather than bytes since it
+would otherwise be very inefficient to handle mappings between individual bytes.
+As a result, every virtual memory operation operates on pages, which are
+indivisible and are always aligned to the system page size.
+
+@cindex swapping
+@cindex swap file
+@cindex swap in
+@cindex swap out
+Even though each process can now see a huge address space, what happens when it
+attempts to allocate more pages than actually physically exist, or allocate an
+additional page of memory when all of the physical pages are in use by it and
+other processes?  This problem is solved by the operating system temporarily
+saving one or more of the least-used pages (which might not necessarily belong
+that that process) to a special place in the file system called a @emph{swap
+file}, and mapping the new pages to the physical addresses where the old pages
+once resided.  The old pages which have been @emph{swapped out} are no longer
+currently accessible, but their location in the swap file is noted in the
+translation table.
+
+@cindex page fault
+@cindex fault, page
+@cindex thrashing
+However, if one of the pages that has been swapped out is accessed again, a
+@emph{page fault} occurs at the instruction which referred to the address and
+the operating system catches this and reloads the page from the swap file,
+possibly having to swap out another page to make space for the new one.  If this
+occurs too often then the operating system can slow down, having to constantly
+swap in and swap out the same pages over and over again.  Such a problem is
+called @emph{thrashing} and can only really be overcome by using less virtual
+memory or buying more physical memory.
+
+@cindex memory mapped files
+@cindex mapping files
+@cindex files, mapping
+It is also possible to take advantage of the virtual memory system's
+interaction between physical memory and the file system in program code, since
+mapping an existing file to memory means that the usual file I/O operations can
+be replaced with memory read and write operations.  The operating system will
+work out the optimum way to read and write any buffers and it means that only
+one copy of the file exists in both physical memory and the file system.  Note
+that this is how @emph{shared libraries}@footnote{DLLs on Windows platforms.}
+on UNIX platforms are generally implemented, with each individual process that
+uses the shared library having it mapped to somewhere in its address space.
+
+@cindex memory protection
+@cindex read protection
+@cindex write protection
+Another major feature of virtual memory is its ability to read protect and write
+protect individual pages of process memory.  This means that the operating
+system can control access to different parts of the address space for each
+process, and also means that a process can read and/or write protect an area of
+memory when it wants to ensure that it won't ever read or write to it again.  If
+an illegal memory access is detected then a @emph{signal} will be sent to the
+process, which can either be caught and handled or will otherwise terminate the
+process.  Note that as with all virtual memory operations, this ability to
+protect memory only applies to pages, so that it is not possible to protect
+individual bytes.
+
+@cindex watch points
+However, some versions of UNIX have programmable software @emph{watch points}
+which are implemented at operating system level.  These are normally used by
+debuggers to watch a specified area of memory that is expected to be read from
+or written to, but can just as easily be used to implement memory protection at
+byte level.  Unfortunately, as this feature is implemented in
+software@footnote{The operating system is still considered software.} rather
+than in hardware, watch points tend to be incredibly slow, mainly as a result of
+the operating system having to check every instruction before it is executed.
+
+An operating system with virtual memory is usually going to run ever so slightly
+slower than an operating system without it@footnote{Due to the overhead of
+having to translate every address and swap in and out pages --- although memory
+mapped files will usually be more efficient than using normal file operations on
+a system without virtual memory.}, but the advantages of virtual memory far
+outweigh the disadvantages, especially when used for debugging purposes.
+
+@node Call stacks and symbol tables, , Virtual memory, Operating system support
+@section Call stacks and symbol tables
+@cindex function call stacks
+@cindex call stacks
+@cindex symbol tables
+@cindex symbols
+
+@cindex calling convention
+@cindex application binary interface
+@cindex ABI
+As stated in the section on stack memory allocations (@pxref{Stack memory
+allocations}), when a function is called, a copy of the caller's state
+information (including local variables and registers) is saved on the stack so
+that it can be restored when the called function returns.  On many operating
+systems there is a @emph{calling convention}@footnote{Usually part of the
+@emph{Application Binary Interface}, or ABI.} which defines the layout of such
+stack entries so that code compiled in different languages and with different
+compilers can be intermixed.  This usually specifies at which stack offsets the
+stack pointer, program counter and local variables for the calling function can
+be found, although on some processor architectures the function calling
+conventions are specified by the hardware and so the operating system must use
+these instead.
+
+@cindex stack tracebacks
+@cindex tracebacks
+On systems that have consistent calling conventions, it is usually possible to
+perform call stack @emph{tracebacks} from within the current function in order
+to determine the stack of function calls that led to the current function.  This
+is extremely useful for debugging purposes and is done by examining the current
+stack frame to see if there is a pointer to the previous stack frame.  If there
+is, then it can be followed to find out all of the state information about the
+calling function.  This can be repeated until there are no more stack frames.
+This is generally how this information is determined by debuggers when a call
+stack traceback is requested.
+
+@cindex program counter
+@cindex return address
+In addition to the pointer to the previous stack frame, the saved state
+information also always contains the saved program counter register, which
+contains either the address of the instruction that performed the function call,
+or the address of the instruction at which to continue execution when the
+called function returns@footnote{Also known as the @emph{return address}.}.
+This information can be used to identify which function performed the call,
+since the address of the instruction must lie between the start and end of one
+of the functions in the process.
+
+@cindex object files
+@cindex executable files
+However, in order to determine this symbolic information, it must be possible to
+find out where the start and end addresses of all of the functions in the
+process are.  This can usually only be read from object files, since they
+contain the symbol tables that were used by the linker to generate the final
+executable file for the program@footnote{This information can also be determined
+from compiler-generated debugging information, but that is another
+story@dots{}}.  The object file's symbol tables normally contain information
+about the start address, size, name and visibility of every symbol that was
+defined, but this depends on the format of the object file and if the symbol
+tables have been stripped from the final executable file.
+
+@cindex dynamic linking
+@cindex dynamic linker
+@cindex shared libraries
+@cindex dynamic link libraries
+@cindex DLLs
+On systems that support shared libraries, additional work must be done to
+determine the symbolic information for all of the functions which have been
+defined in them.  The symbols for functions that are defined in shared libraries
+normally appear as undefined symbols in the executable file for the program and
+so must be searched in the system in order to get the necessary information.  It
+is usually necessary to liaise with the @emph{dynamic linker}@footnote{Which is
+the part of the operating system that performs the run-time linking of shared
+libraries.} on many systems.
+
+@node Examples, Functions, Operating system support, Top
 @chapter Examples
 @cindex examples
 @cindex tutorial
@@ -982,8 +1203,6 @@ Filename in which call to @code{malloc()} took place.
 Line number at which call to @code{malloc()} took place.
 @end enumerate
 
-@cindex function call stack
-@cindex call stack
 @cindex entry-point
 The following information contains function call stack details of where the
 call to @code{malloc()} came from, but is only available if the mpatrol library
@@ -992,7 +1211,6 @@ the function which called @code{malloc()} and the bottom-most entry should be
 the entry-point for the process.
 
 @enumerate 9
-@cindex return address
 @item
 Address of function call.  This is normally the address of the machine
 instruction immediately after the function call instruction, also known as the
@@ -1157,8 +1375,6 @@ example have been numbered and their descriptions appear below.
 @end smallexample
 
 @enumerate 1
-@cindex system page size
-@cindex page size
 @item
 System page size.  This value is used on some platforms when allocating and
 protecting system memory.
@@ -1256,8 +1472,6 @@ Log file.  Simply contains the name of the file where all mpatrol library
 diagnostics go to.  It can be changed at run-time using the @option{LOGFILE}
 option.
 
-@cindex symbol table
-@cindex symbolic information
 @item
 Program filename.  Contains the full pathname to the program's executable file.
 This is used by the mpatrol library to read the symbol table in order to
@@ -1492,8 +1706,6 @@ checks are only performed whenever a function in the mpatrol library is called.
 In the example above, the code which wrote into free memory could have been
 miles away from where the library detected the error.
 
-@cindex memory protection
-@cindex virtual memory
 On platforms that support memory protection, the library also supports the
 @option{PAGEALLOC} option.  This option instructs the library to force every
 single memory allocation to have a size which is a multiple of the system page
@@ -1667,7 +1879,6 @@ free memory corruption or overflow buffer corruption occurs at a certain point
 during program execution, but checking them at every library call would take too
 long.
 
-@cindex watch points
 On systems which support software watch points, there is an extra option called
 @option{OFLOWWATCH} which allows additional memory protection.  Watch points
 allow individual bytes to be read and/or write protected as opposed to just
@@ -2589,7 +2800,6 @@ commands that have been linked with the mpatrol library.
 mpatrol [options] <command> [arguments]
 @end smallexample
 
-@cindex dynamic linking
 The @command{mpatrol} command is used to set various mpatrol library
 @var{options} when running @var{command} with its @var{arguments}.  In most
 cases, @var{command} must have been linked with the mpatrol library, unless the
@@ -2634,7 +2844,6 @@ allocations, which must be a power of two.
 
 @cindex -d
 @cindex LD_PRELOAD
-@cindex dynamic linker
 @item @option{-d}
 Specifies that the @env{LD_PRELOAD} environment variable should be set so that
 even programs that were not compiled with the mpatrol library can be traced, but
@@ -3308,12 +3517,16 @@ currently running.
 @cindex programs
 
 A list of software which helps in debugging dynamic memory allocation problems
-is given below.  They all provide some of the features that mpatrol contains and
-you may wish to use one of them to solve your problem if you have trouble using
-mpatrol.  I have only ever used Dbmalloc and Electric Fence, so I can't vouch
-for any of the others, although if you have any recommendations feel free to let
-me know so I can add them to this list.  In particular, there seems to be a
-shortage of such programs for AmigaOS and Netware platforms.
+is given below@footnote{This list can be considered to be a slightly more up to
+date version of @cite{Debugging Tools for Dynamic Storage Allocation and Memory
+Management} (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben
+Zorn (@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features
+that mpatrol contains and you may wish to use one of them to solve your problem
+if you have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
+Fence, so I can't vouch for any of the others, although if you have any
+recommendations feel free to let me know so I can add them to this list.  In
+particular, there seems to be a shortage of such programs for AmigaOS and
+Netware platforms.
 
 @cindex BoundsChecker
 @cindex NuMega Corporation
@@ -3554,6 +3767,25 @@ Provides memory management error detection, memory usage error detection, memory
 usage profiling and error simulation.
 @end table
 
+@cindex Memory Advisor
+@cindex PLATINUM Technology
+@item
+Memory Advisor
+@table @asis
+@item Author
+PLATINUM Technology (@email{info@@platinum.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.platinum.com/}
+@item Overview
+Disassembles an object module into system-independent assembler code, inserts
+error checking instructions, then re-assembles the code.  Can also replace
+existing malloc libraries in order to provide greater error checking.
+@end table
+
 @cindex Mmalloc
 @cindex Haertel, Mike
 @cindex Fish, Fred
@@ -3626,6 +3858,24 @@ MacOS
 @item Overview
 Runs in the background as a control panel and detects various memory errors
 which can then be caught and run under a debugger.
+@end table
+
+@cindex ZeroFault
+@cindex Kernel Group, The
+@item
+ZeroFault
+@table @asis
+@item Author
+The Kernel Group (@email{info@@zerofault.com})
+@item License
+Commercial Software
+@item Platforms
+AIX UNIX
+@item Location
+@uref{http://www.zerofault.com/}
+@item Overview
+Uses run-time emulator technology to provide run-time error checking and memory
+leak detection.
 @end table
 @end itemize
 
