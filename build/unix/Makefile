@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.54 2001-02-05 21:42:24 graeme Exp $
+# $Id: Makefile,v 1.55 2001-02-05 22:01:24 graeme Exp $
 
 
 # Definitions
@@ -369,8 +369,9 @@ $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/malloc.c \
-	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/trace.c \
-	$(SOURCE)/trace.h $(SOURCE)/version.c
+	$(SOURCE)/cplus.c $(SOURCE)/profile.c $(SOURCE)/profile.h \
+	$(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/machine.h \
+	$(SOURCE)/version.c
 $(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
@@ -382,9 +383,9 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/strtab.c $(SOURCE)/symbol.c $(SOURCE)/signals.c \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
-	$(SOURCE)/inter.c $(SOURCE)/malloc.c $(SOURCE)/profile.c \
-	$(SOURCE)/profile.h $(SOURCE)/trace.c $(SOURCE)/trace.h \
-	$(SOURCE)/version.c
+	$(SOURCE)/inter.c $(SOURCE)/malloc.c $(SOURCE)/cplus.c \
+	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/trace.c \
+	$(SOURCE)/trace.h $(SOURCE)/machine.h $(SOURCE)/version.c
 mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
