@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.116 2000-09-26 11:48:30 graeme Exp $
+@c $Id: mpatrol.texi,v 1.117 2000-09-28 08:25:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -7213,10 +7213,7 @@ displaying memory range errors.
 
 @item
 Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc.@: which
-never return @samp{NULL} on failure, and perhaps also add definitions of
-@code{XtMalloc()}, @code{XtRealloc()}, etc.@: for X-Window programming.  Some
-other malloc libraries provide versions of these but perhaps they are not needed
-if they are implemented using @code{malloc()}, @code{realloc()}, etc.
+never return @samp{NULL} on failure.
 
 @item
 Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
