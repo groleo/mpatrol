@@ -28,6 +28,9 @@
 
 #include "signals.h"
 #include "diag.h"
+#if MP_THREADS_SUPPORT
+#include "mutex.h"
+#endif /* MP_THREADS_SUPPORT */
 #include "inter.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.12 2000-07-02 22:16:31 graeme Exp $"
+#ident "$Id: signals.c,v 1.13 2000-07-17 21:02:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -97,7 +100,15 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
     if (r->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
         return EXCEPTION_CONTINUE_SEARCH;
 #endif /* TARGET */
+#if MP_THREADS_SUPPORT
+    /* Attempt to lock the library data structures if we are thread-safe.
+     * Hopefully this will never result in a deadlock since we should block
+     * until all other threads have finished manipulating memory allocations.
+     */
+    __mp_lockmutex(MT_MAIN);
+#endif /* MP_THREADS_SUPPORT */
     h = __mp_memhead();
+    h->recur++;
     __mp_printsummary(h);
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT && MP_WATCH_SUPPORT
