@@ -25,7 +25,7 @@
 # that can be written as hexadecimal numbers
 
 
-# $Id: hexwords,v 1.1 2001-01-03 21:24:37 graeme Exp $
+# $Id: hexwords,v 1.2 2001-02-05 21:05:18 graeme Exp $
 
 
 # Program version.
@@ -197,6 +197,14 @@ then
     shift
 else
     dictfile="/usr/dict/words"
+    if [ ! -f "$dictfile" ]
+    then
+        dictfile="/usr/lib/dict/words"
+        if [ ! -f "$dictfile" ]
+        then
+            dictfile="/usr/share/dict/words"
+        fi
+    fi
 fi
 
 if [ $# != 0 ]
