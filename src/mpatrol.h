@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.86 2001-02-14 00:02:54 graeme Exp $
+ * $Id: mpatrol.h,v 1.87 2001-02-14 22:54:29 graeme Exp $
  */
 
 
@@ -138,11 +138,31 @@
 #ifdef M_KEEP
 #undef M_KEEP
 #endif /* M_KEEP */
+#ifdef M_TRIM_THRESHOLD
+#undef M_TRIM_THRESHOLD
+#endif /* M_TRIM_THRESHOLD */
+#ifdef M_TOP_PAD
+#undef M_TOP_PAD
+#endif /* M_TOP_PAD */
+#ifdef M_MMAP_THRESHOLD
+#undef M_MMAP_THRESHOLD
+#endif /* M_MMAP_THRESHOLD */
+#ifdef M_MMAP_MAX
+#undef M_MMAP_MAX
+#endif /* M_MMAP_MAX */
+#ifdef M_CHECK_ACTION
+#undef M_CHECK_ACTION
+#endif /* M_CHECK_ACTION */
 
-#define M_MXFAST 1
-#define M_NLBLKS 2
-#define M_GRAIN  3
-#define M_KEEP   4
+#define M_MXFAST         1
+#define M_NLBLKS         2
+#define M_GRAIN          3
+#define M_KEEP           4
+#define M_TRIM_THRESHOLD 5
+#define M_TOP_PAD        6
+#define M_MMAP_THRESHOLD 7
+#define M_MMAP_MAX       8
+#define M_CHECK_ACTION   9
 
 
 /* Options that can be set using mallopt().  They all correspond to their
