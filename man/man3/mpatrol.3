@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.5 1999-11-25 17:17:40 graeme Exp $
+.\" $Id: mpatrol.3,v 1.6 1999-12-06 20:26:17 graeme Exp $
 .\"
-.TH MPATROL 3 "25 November 1999" "Release 1.0" "mpatrol library"
+.TH MPATROL 3 "6 December 1999" "Release 1.0" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -387,6 +387,11 @@ On UNIX platforms, if there were no calls to memory allocation functions before
 \fI\-lmpatrol\fP appears on the link line then the mpatrol library will not be
 linked in.  However, this can be overridden by placing \fI\-umalloc\fP just
 before that point.
+.PP
+You may also wish to set your core file size limit to be zero before running
+any programs linked with the mpatrol library as the extra memory that the
+library uses can make such files much larger than normal, and if you are
+planning on using a symbolic debugger then you won't need the core files anyway.
 .SH ENVIRONMENT
 The library can read certain options at run-time from an environment variable
 called \fBMPATROL_OPTIONS\fP.  This variable must contain one or more valid
