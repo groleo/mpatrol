@@ -61,7 +61,7 @@ OOPPTTIIOONNSS
 
 
 
-Release 1.2                12 May 2000                          1
+Release 1.2                16 May 2000                          1
 
 
 
@@ -117,17 +117,17 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               [LLOOGGFFIILLEE]   Specifies  an alternative file in which
               to place all diagnostics from the mpatrol  library.
 
+       --MM     [AALLLLOOWWOOFFLLOOWW]   Specifies that a warning rather than
+              an error should be produced if any memory operation
+              function overflows the boundaries of a memory allo-
+              cation, and that the operation should still be per-
+              formed.
+
        --mm     [UUSSEEMMMMAAPP]   Specifies  that  the library should use
-              mmmmaapp(()) instead of ssbbrrkk(()) to allocate system memory.
-
-       --NN     [NNOOPPRROOTTEECCTT]   Specifies  that the mpatrol library's
-              internal data structures should not be  made  read-
-              only after every memory allocation, reallocation or
-              deallocation.
 
 
 
-Release 1.2                12 May 2000                          2
+Release 1.2                16 May 2000                          2
 
 
 
@@ -135,6 +135,13 @@ Release 1.2                12 May 2000                          2
 
 MPATROL(1)               mpatrol library               MPATROL(1)
 
+
+              mmmmaapp(()) instead of ssbbrrkk(()) to allocate system memory.
+
+       --NN     [NNOOPPRROOTTEECCTT]   Specifies  that the mpatrol library's
+              internal data structures should not be  made  read-
+              only after every memory allocation, reallocation or
+              deallocation.
 
        --nn     [NNOOFFRREEEE]  Specifies that the mpatrol library should
               keep  all reallocated and freed memory allocations.
@@ -183,17 +190,10 @@ MPATROL(1)               mpatrol library               MPATROL(1)
               unfreed allocations at which to abort  the  program
               just before program termination.
 
-       --VV     Displays the version number of the mmppaattrrooll command.
-
-       --vv     [PPRREESSEERRVVEE]  Specifies that any reallocated or freed
-              memory  allocations  should preserve their original
-              contents.
-
-       --ww     [OOFFLLOOWWWWAATTCCHH]   Specifies  that  watch  point  areas
 
 
 
-Release 1.2                12 May 2000                          3
+Release 1.2                16 May 2000                          3
 
 
 
@@ -202,6 +202,13 @@ Release 1.2                12 May 2000                          3
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+       --VV     Displays the version number of the mmppaattrrooll command.
+
+       --vv     [PPRREESSEERRVVEE]  Specifies that any reallocated or freed
+              memory  allocations  should preserve their original
+              contents.
+
+       --ww     [OOFFLLOOWWWWAATTCCHH]   Specifies  that  watch  point  areas
               should  be  used  for  overflow buffers rather than
               filling with the overflow byte.
 
@@ -249,6 +256,18 @@ CCOOPPYYRRIIGGHHTT
        PURPOSE.  See the GNU Library General Public  License  for
        more details.
 
+
+
+
+Release 1.2                16 May 2000                          4
+
+
+
+
+
+MPATROL(1)               mpatrol library               MPATROL(1)
+
+
        You should have received a copy of the GNU Library General
        Public License along with this library; if not,  write  to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
@@ -259,6 +278,53 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.2                12 May 2000                          4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Release 1.2                16 May 2000                          5
 
 
