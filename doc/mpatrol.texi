@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.27 2000-01-24 21:01:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.28 2000-01-27 01:51:02 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 24th January, 2000
+@set UPDATED 27th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -113,6 +113,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Improving performance::       Life beyond mpatrol.
 * How it works::                Implementation details.
 * Examples::                    Examples of usage.
+* Tutorial::                    Complete example.
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
 * Options::                     Command line options.
@@ -1073,7 +1074,7 @@ libraries.} on many systems.
 This chapter contains a general description of all of the features of mpatrol
 and how to use them effectively.  You'll also find a complete reference for
 mpatrol in the appendices, but you may wish to try out the examples
-(@pxref{Examples}) before reading further.
+(@pxref{Examples}) and the tutorial (@pxref{Tutorial}) before reading further.
 
 @menu
 * Library behaviour::           Miscellaneous information.
@@ -2053,10 +2054,9 @@ Extra information about each memory allocation can be added to the
 @emph{allocation information} module in @file{src/info.h} and @file{src/info.c}
 without having to change much code in any other files.
 
-@node Examples, Functions, How it works, Top
+@node Examples, Tutorial, How it works, Top
 @chapter Examples
 @cindex examples
-@cindex tutorial
 
 Following are a set of examples that are intended to illustrate what exactly is
 possible with the mpatrol library and how to go about using it effectively.
@@ -3011,7 +3011,7 @@ allocations.  The following source can be found in @file{tests/fail/test9.c}.
 33  int main(void)
 34  @{
 35      char *p;
-36
+
 37      if (p = (char *) malloc(16))
 38      @{
 39          memset(p - 1, 0, 18);
@@ -3296,7 +3296,356 @@ unfreed allocations: 2 (108 bytes)
         0x80000944 _start
 @end smallexample
 
-@node Functions, Environment, Examples, Top
+@node Tutorial, Functions, Examples, Top
+@chapter Tutorial
+@cindex tutorial
+
+In this chapter we'll look at a real example of using the mpatrol library to
+debug a program.  All of the following building and debugging steps were
+performed on a Linux/m68k machine so the details may differ slightly on
+your system, but the concepts should remain the same.  However, on systems
+without virtual memory some of the steps may actually cause the machine to lock
+up or crash so be aware of this if you are running such a system --- you may be
+safer just reading this tutorial rather than attempting it!
+
+The program we are going to look at is a simple filter which processes its
+standard input and displays the processed information on its standard output.
+In this case the program converts all lowercase characters to uppercase and
+removes any blank lines.  The source for the program is given below, but can
+also be found in @file{tests/tutorial/test1.c}.
+
+@smallexample
+23  /*
+24   * Reads the standard input file stream, converts all lowercase
+25   * characters to uppercase, and displays all non-empty lines to the
+26   * standard output file stream.
+27   */
+
+
+30  #include <stdio.h>
+31  #include <stdlib.h>
+32  #include <string.h>
+33  #include <ctype.h>
+
+
+36  char *strtoupper(char *s)
+37  @{
+38      char *t;
+39      size_t i, l;
+
+41      l = strlen(s);
+42      t = (char *) malloc(l);
+43      for (i = 0; i < l; i++)
+44          t[i] = toupper(s[i]);
+45      t[i] = '\0';
+46      return t;
+47  @}
+
+
+50  int main(void)
+51  @{
+52      char *b, *s;
+
+54      b = malloc(BUFSIZ);
+55      while (gets(b))
+56      @{
+57          s = strtoupper(b);
+58          if (*s != '\0')
+59          @{
+60              puts(s);
+61              free(s);
+62          @}
+63      @}
+64      free(b);
+65      return EXIT_SUCCESS;
+66  @}
+@end smallexample
+
+If you quickly skimmed over the above code then you might have noticed some
+rather obvious errors, but there are also some less obvious ones hidden there
+as well.  After compiling and linking with the system C compiler and libraries
+it successfully runs, even when its source code is piped to it.  So if it runs,
+why bother trying to debug it?
+
+The short answer to that is that this program does in fact contain one rather
+major error that is likely to prevent it from running portably on other systems.
+However, for the purposes of this tutorial, we'll pretend that we've just been
+handed the source code for this program and have not worked on it before.  So
+let's now try to compile and link it with the mpatrol library@footnote{On UNIX
+systems with dynamic linking it might also be possible to run the program under
+the mpatrol shell script with its @option{-d} option without having to recompile
+or relink, but compiling and linking with the mpatrol library is a more generic
+solution across different platforms.}.
+
+First, add the inclusion of @file{mpatrol.h} to line 34 so that we can replace
+calls to @code{malloc()} and @code{free()} with their mpatrol
+equivalents@footnote{This is not strictly necessary on UNIX platforms, but it
+does give us more debugging information.}.  Then, recompile the program and link
+it with the mpatrol library.  This time, running it with even the simplest of
+non-empty input lines should cause it to abort!
+
+If you look at the @file{mpatrol.log} file produced, you should see something
+along the lines of the following at the end of the log file.
+
+@smallexample
+
+ERROR: free memory corruption at 0x8000706C
+        0x8000706C  00555555 55555555 55555555 55555555  .UUUUUUUUUUUUUUU
+        0x8000707C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000708C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000709C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070AC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070BC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070CC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070DC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070EC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x800070FC  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000710C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000711C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000712C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000713C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000714C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+        0x8000715C  55555555 55555555 55555555 55555555  UUUUUUUUUUUUUUUU
+@end smallexample
+
+This tells us that something has written a zero byte into free memory at
+location @samp{0x8000706C}.  Unfortunately, the library only caught it at the
+next call to one of its functions so it had already happened somewhere in
+between the last call and the current call.  Turning on the @option{LOGALL}
+option in the @env{MPATROL_OPTIONS} environment variable allows us to see the
+last successful function call to the mpatrol library.
+
+@smallexample
+ALLOC: malloc (50, 8192 bytes, 2 bytes) [main|test1.c|54]
+        0x80000A30 main
+        0x80000944 _start
+
+returns 0x80009000
+
+ALLOC: malloc (51, 4 bytes, 2 bytes) [strtoupper|test1.c|42]
+        0x800009AE strtoupper
+        0x80000A54 main
+        0x80000944 _start
+
+returns 0x80007068
+@end smallexample
+
+Unfortunately, this only tells us that the last successful mpatrol library
+function call was @code{malloc()} called from @code{strtoupper()}.  If we add
+the option @option{OFLOWSIZE=8} to the @env{MPATROL_OPTIONS} environment
+variable then we get slightly more information about which memory allocation was
+affected@footnote{Note that the start address of the allocation has changed
+slightly since we added padding around it with the @option{OFLOWSIZE} option.}.
+
+@smallexample
+ERROR: allocation 0x80007080 has a corrupted overflow buffer at 0x80007084
+        0x80007084  00AAAAAA AAAAAAAA                    ........
+
+    0x80007080 (4 bytes) @{malloc:51:0@} [strtoupper|test1.c|42]
+        0x800009AE strtoupper
+        0x80000A54 main
+        0x80000944 _start
+@end smallexample
+
+Now we can make a better guess about what is happening.  Since the start of
+the upper overflow buffer of allocation 51 has been written to, we can assume
+that something has written one byte beyond the end of that memory allocation.
+You can probably see where that is happening now by looking at the code, but
+let's try to be even more sure that this is what is wrong.
+
+The only foolproof way to do this is to add a software watch point to keep an
+eye on the address that is being written to.  This can normally only be done
+within a debugger, but on systems that support programmable software watch
+points, the @option{OFLOWWATCH} option can be used to do the same thing.  For
+the sake of generality, we'll use the debugger watch point approach, in this
+case with @command{gdb}.  In order for the following example to work correctly
+you'll need to add the @option{ALLOCSTOP=51} option to the
+@env{MPATROL_OPTIONS} environment variable so that we can stop just after the
+last successful memory allocation.
+
+@smallexample
+(gdb) break main
+Breakpoint 1 at 0x80000a10: file test1.c, line 54.
+(gdb) run
+Starting program: a.out
+Breakpoint 1, main() at test1.c:54
+54          b = malloc(BUFSIZ);
+(gdb) break __mp_trap
+Breakpoint 2 at 0xc00182ac
+(gdb) continue
+Continuing.
+test
+Breakpoint 2, 0xc00182ac in __mp_trap()
+(gdb) backtrace
+#0  0xc00182ac in __mp_trap()
+#1  0xc0016494 in __mp_getmemory()
+#2  0xc001a618 in __mp_alloc()
+#3  0x800009ae in strtoupper(s=0x80009008 "test") at test1.c:42
+#4  0x80000a54 in main() at test1.c:57
+(gdb) step
+Single stepping until exit from function __mp_trap,
+which has no line number information.
+0xc0016494 in __mp_getmemory()
+(gdb) step
+Single stepping until exit from function __mp_getmemory,
+which has no line number information.
+0xc001a618 in __mp_alloc()
+(gdb) step
+Single stepping until exit from function __mp_alloc,
+which has no line number information.
+strtoupper(s=0x80009008 "test") at test1.c:43
+43          for (i = 0; i < l; i++)
+(gdb) watch *0x80007084
+Watchpoint 3: *2147512452
+(gdb) continue
+Continuing.
+Watchpoint 3: *2147512452
+Old value = -1431655766
+New value = 11184810
+strtoupper(s=0x80009008 "test") at test1.c:46
+46          return t;
+(gdb) quit
+The program is running.  Quit anyway (and kill it)? (y or n) y
+@end smallexample
+
+After loading the program into @command{gdb}, we need to break at @code{main()}
+so that we can run to a point where all of the shared library symbols have been
+loaded into memory@footnote{This is only necessary when the mpatrol library has
+been built as a shared library.}.  We can then set another breakpoint at
+@code{__mp_trap()} and continue until allocation 51 has been reached.
+
+Because the mpatrol library has not been built with debugging information in
+this example we can quickly step back to the @code{strtoupper()} function since
+@command{gdb} won't step through functions that have no debugging information.
+We then set a watch point on address @samp{0x80007084}, which is the address of
+the memory location that has been causing the problems.  After continuing, the
+debugger stops at line 46, but this is more likely to be line 45 since that is
+where a zero byte is being written to@footnote{This is not necessarily the fault
+of the debugger or the debugging information generated by the compiler since
+most debuggers show the next statement to be executed rather than the current
+one.}.
+
+So, we have located the problem, which is simply a case of not allocating
+enough memory to contain the copied string @emph{and} the terminating zero byte.
+We can also improve the @code{strtoupper()} function by checking the pointer
+returned by @code{malloc()} to see if it is @samp{NULL}, and if so simply exit
+with an error.  You can try running the program with the @option{FAILFREQ}
+option to see how it would originally behave in a low memory situation.
+
+The following listing shows the above modifications that we have made to our
+program.  It can also be found in @file{tests/tutorial/test2.c}.
+
+@smallexample
+23  /*
+24   * Reads the standard input file stream, converts all lowercase
+25   * characters to uppercase, and displays all non-empty lines to the
+26   * standard output file stream.
+27   */
+
+
+30  #include <stdio.h>
+31  #include <stdlib.h>
+32  #include <string.h>
+33  #include <ctype.h>
+34  #include "mpatrol.h"
+
+
+37  char *strtoupper(char *s)
+38  @{
+39      char *t;
+40      size_t i, l;
+
+42      l = strlen(s);
+43      if ((t = (char *) malloc(l + 1)) == NULL)
+44      @{
+45          fputs("strtoupper: out of memory\n", stderr);
+46          exit(EXIT_FAILURE);
+47      @}
+48      for (i = 0; i < l; i++)
+49          t[i] = toupper(s[i]);
+50      t[i] = '\0';
+51      return t;
+52  @}
+
+
+55  int main(void)
+56  @{
+57      char *b, *s;
+
+59      b = malloc(BUFSIZ);
+60      while (gets(b))
+61      @{
+62          s = strtoupper(b);
+63          if (*s != '\0')
+64          @{
+65              puts(s);
+66              free(s);
+67          @}
+68      @}
+69      free(b);
+70      return EXIT_SUCCESS;
+71  @}
+@end smallexample
+
+Leaving aside the obvious problem with @code{gets()} and the general
+inefficiency of the algorithm, we could assume that our program works safely
+now and we can release it to the outside world.  However, a user soon reports
+a problem with our program steadily using more and more memory during its
+execution when processing very large files.
+
+This is generally attributable to a memory leak and so we can use the
+@option{SHOWUNFREED} option to try to detect where the memory leak is coming
+from.  Following is some example output from the mpatrol log file when our
+program is run and is given a relatively small text file as input.
+
+@smallexample
+unfreed allocations: 6 (109 bytes)
+    0x80007000 (104 bytes) @{malloc:1:0@} [-|-|-]
+        0xC008DB4A _IO_fopen
+        0xC00183DC __mp_openlogfile
+        0xC001A3A4 __mp_init
+        0xC001A584 __mp_alloc
+        0x80000A98 main
+        0x80000980 _start
+
+    0x80007068 (1 byte) @{malloc:52:0@} [strtoupper|test2.c|43]
+        0x800009EE strtoupper
+        0x80000ABC main
+        0x80000980 _start
+
+    0x8000706A (1 byte) @{malloc:54:0@} [strtoupper|test2.c|43]
+        0x800009EE strtoupper
+        0x80000ABC main
+        0x80000980 _start
+
+    0x8000706C (1 byte) @{malloc:56:0@} [strtoupper|test2.c|43]
+        0x800009EE strtoupper
+        0x80000ABC main
+        0x80000980 _start
+
+    0x8000706E (1 byte) @{malloc:58:0@} [strtoupper|test2.c|43]
+        0x800009EE strtoupper
+        0x80000ABC main
+        0x80000980 _start
+
+    0x80007070 (1 byte) @{malloc:60:0@} [strtoupper|test2.c|43]
+        0x800009EE strtoupper
+        0x80000ABC main
+        0x80000980 _start
+@end smallexample
+
+We can discount the first entry since that is obviously coming from when the
+mpatrol library first initialises itself.  However, all of the other entries
+appear to be coming from line 43 within @code{strtoupper()} and appear to be
+only 1 byte in length.  At that point in the code, the only possible reason
+for allocating 1 byte is when the string is empty and so that must mean that
+we are not freeing memory that contains empty strings.  Looking at line 66 we
+can see that @code{free()} is only ever called for non-empty strings and
+therefore if we move the call to @code{free()} outside the test for an empty
+string we will fix the memory leak.  The file @file{tests/tutorial/test3.c}
+contains the source for the final program.
+
+@node Functions, Environment, Tutorial, Top
 @appendix Functions
 @cindex functions
 
