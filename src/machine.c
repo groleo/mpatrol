@@ -162,7 +162,8 @@ __mp_initsection:
 
 
 #if !MP_BUILTINSTACK_SUPPORT
-#if MP_LIBRARYSTACK_SUPPORT && SYSTEM == SYSTEM_HPUX
+#if MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
 /* A similar function to this also resides in the system traceback library,
  * libcl, but it must belong to the executable module rather than reside in
  * a shared library, hence its inclusion here.
@@ -193,7 +194,9 @@ __mp_frameinfo
 	.PROCEND
 	.EXPORT	__mp_frameinfo,CODE,PRIV_LEV=3
 	.END
-#elif !MP_LIBRARYSTACK_SUPPORT && ARCH == ARCH_MIPS
+#endif /* SYSTEM */
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#if ARCH == ARCH_MIPS
 /* Not all MIPS platforms have the getcontext() function, and even those that
  * do may not enter the correct return address into the ucontext_t structure.
  * So, unfortunately we have to provide assembler routines to obtain the
@@ -225,5 +228,23 @@ __mp_returnaddress:
 	move	$2,$31
 	j	$31
 	.end	__mp_returnaddress
-#endif /* MP_LIBRARYSTACK_SUPPORT && SYSTEM && ARCH */
+#elif ARCH == ARCH_SPARC
+#if SYSTEM == SYSTEM_SUNOS
+/* SunOS platforms do not have the getcontext() function so unfortunately we
+ * have to provide an assembler routine to obtain the stack pointer.
+ */
+
+
+/* Obtain the stack pointer for the current function.
+ */
+
+	.text
+	.global	___mp_stackpointer
+___mp_stackpointer:
+	ta	0x03
+	retl
+	mov	%sp,%o0
+#endif /* SYSTEM */
+#endif /* ARCH */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT */

@@ -48,19 +48,21 @@
 #if MP_SIGINFO_SUPPORT
 #include <siginfo.h>
 #endif /* MP_SIGINFO_SUPPORT */
+#if SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_SOLARIS
 #if ARCH == ARCH_SPARC
 #include <ucontext.h>
 #ifndef R_SP
 #define R_SP REG_SP
 #endif /* R_SP */
 #endif /* ARCH */
+#endif /* SYSTEM */
 #endif /* TARGET */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.22 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: stack.c,v 1.23 2001-01-15 19:05:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -344,14 +346,22 @@ static
 unsigned long *
 getframe(void)
 {
+#if SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_SOLARIS
     ucontext_t c;
+#endif /* SYSTEM */
+    unsigned long a;
 
+#if SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_SOLARIS
     if (getcontext(&c) == -1)
         return NULL;
+    a = c.uc_mcontext.gregs[R_SP];
+#else /* SYSTEM */
+    a = __mp_stackpointer();
+#endif /* SYSTEM */
 #if ENVIRON == ENVIRON_64
-    return (unsigned long *) (c.uc_mcontext.gregs[R_SP] + 0x7FF) + 14;
+    return (unsigned long *) (a + 0x7FF) + 14;
 #else /* ENVIRON */
-    return (unsigned long *) c.uc_mcontext.gregs[R_SP] + 14;
+    return (unsigned long *) a + 14;
 #endif /* ENVIRON */
 }
 #endif /* ARCH */

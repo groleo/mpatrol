@@ -47,12 +47,20 @@ extern int __mp_initsection;
 
 
 #if !MP_BUILTINSTACK_SUPPORT
-#if MP_LIBRARYSTACK_SUPPORT && SYSTEM == SYSTEM_HPUX
+#if MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
 void __mp_frameinfo(void *);
-#elif !MP_LIBRARYSTACK_SUPPORT && ARCH == ARCH_MIPS
+#endif /* SYSTEM */
+#else /* MP_LIBRARYSTACK_SUPPORT */
+#if ARCH == ARCH_MIPS
 unsigned int __mp_stackpointer(void);
 unsigned int __mp_returnaddress(void);
-#endif /* MP_LIBRARYSTACK_SUPPORT && SYSTEM && ARCH */
+#elif ARCH == ARCH_SPARC
+#if SYSTEM == SYSTEM_SUNOS
+unsigned int __mp_stackpointer(void);
+#endif /* SYSTEM */
+#endif /* ARCH */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
