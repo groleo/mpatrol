@@ -1,3 +1,78 @@
+Sun Jan 30 21:26:39 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
+	Added __mp_locatemem().
+
+	* build/amiga/mpatrol_pragmas.h:
+	Added __mp_comparemem() and __mp_locatemem().
+
+	* doc/README:
+	Added explanation about the different types of documentation formats.
+
+	* doc/mpatrol.texi:
+	Added more information about the format of memory operation functions
+	tracing and the memchr() and memmem() functions.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Added memchr() and memmem().
+
+	* pkg/pkg/build: Also remove all object files generated during build.
+
+	* src/memory.c, src/memory.h: Added the __mp_memfind() function.
+
+	* src/info.c, src/info.h: Added the __mp_locatememory() function.
+
+	* src/diag.c: Added memchr() and memmem().
+
+	* src/inter.c, src/inter.h: Added the __mp_locatemem() function.
+
+	* src/mpatrol.h, src/malloc.c:
+	Added the memchr() and memmem() functions.
+
+Fri Jan 28 01:24:33 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/mpatrol_lib.fd, build/windows/mpatrol.def:
+	Added __mp_comparemem().
+
+	* doc/mpatrol.texi: Added documentation on memcmp() and bcmp().
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3: Added memcmp() and bcmp().
+
+	* src/info.c:
+	Added __mp_comparememory() and also added a count for the total number
+	of bytes that have been compared.
+
+	* src/info.h:
+	Added __mp_comparememory(), memory operation types for memcmp() and
+	bcmp() and added a counter for the total number of bytes compared.
+
+	* src/diag.c:
+	Added names for memcmp() and bcmp() and added the bytes compared total
+	to the summary.
+
+	* src/inter.c, src/inter.h: Added the __mp_comparememory() function.
+
+	* src/malloc.c, src/mpatrol.h: Added memcmp() and bcmp().
+
+Thu Jan 27 21:33:14 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/memory.c, src/memory.h: Added __mp_memcompare().
+
+	* src/malloc.c:
+	Added gcc-specific prototype for memcpy() since the builtin requires
+	const.
+
+	* doc/mpatrol.texi: Added the tutorial.
+
+	* tests/tutorial/test1.c, tests/tutorial/test2.c,
+	  tests/tutorial/test3.c:
+	New tutorial files.
+
+Tue Jan 25 01:41:53 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/mpatrol_pragmas.h: Added __mp_setmem() and __mp_copymem().
+
+	* tests/pass/test6.c: New memory operation test.
+
 Mon Jan 24 21:20:53 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ:
@@ -92,8 +167,8 @@ Sun Jan  9 22:08:18 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/amiga/SMakefile, build/netware/Makefile, build/unix/Makefile,
 	  build/windows/Makefile, build/windows/mpatrol.def:
-	Updated the library revision and prevented the object libraries from being
-	built when the all target is used.
+	Updated the library revision and prevented the object libraries from
+	being built when the all target is used.
 
 	* FAQ: Added information about signals being ignored.
 
