@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.103 2000-07-13 21:41:47 graeme Exp $
+@c $Id: mpatrol.texi,v 1.104 2000-07-16 23:51:13 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.15
 @set VERSION 1.2.6
-@set UPDATED 13th July, 2000
+@set UPDATED 16th July, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -525,7 +525,10 @@ All freed memory allocations can optionally be prevented from being returned to
 the free memory pool.  This is useful for detecting if use is being made of
 freed memory just after a memory allocation has been freed.  The contents of
 the memory allocation can either be preserved or can be pre-filled with a value
-in order to detect illegal writes to the freed memory allocation.
+in order to detect illegal writes to the freed memory allocation.  In addition,
+only a specified number of recently-freed memory allocations can be prevented
+from being returned to the free memory pool.  Any older freed memory allocations
+will then eventually be reused.
 
 @item
 Calls to memory operation functions (such as @code{memset()} or @code{memcpy()})
@@ -1633,15 +1636,17 @@ freed memory.
 @cindex prevent freeing memory
 @cindex free memory
 @cindex freed memory
-Alternatively, the mpatrol library can be instructed to keep all freed memory
-allocations so that its diagnostics can be clearer about which freed allocation
-a piece of code is erroneously trying to access.  This is controlled with the
-@option{NOFREE} option, but since it never reuses any freed allocations it can
-result in a lot more heap memory being used.  Note that this option
-distinguishes between @emph{free} memory and @emph{freed} memory.  @emph{Free}
-memory is unallocated memory that has been taken from the system heap.
-@emph{Freed} memory is a freed memory allocation, with all of the original
-details of the allocation preserved.
+Alternatively, the mpatrol library can be instructed to keep all (or a certain
+number of recent) freed memory allocations so that its diagnostics can be
+clearer about which freed allocation a piece of code is erroneously trying to
+access.  This is controlled with the @option{NOFREE} option, which accepts an
+argument specifying the maximum number of recently-freed memory allocations to
+prevent being reused.  If the argument is zero then no freed memory allocations
+will ever be reused, thus resulting in a lot more heap memory being used.  Note
+that this option distinguishes between @emph{free} memory and @emph{freed}
+memory.  @emph{Free} memory is unallocated memory that has been taken from the
+system heap.  @emph{Freed} memory is a freed memory allocation, with all of the
+original details of the allocation preserved.
 
 @cindex preserve freed contents
 Normally, the @option{NOFREE} option will fill the freed allocation with the
@@ -1653,6 +1658,20 @@ then the freed allocation will have its contents both read and write protected
 so that nothing can access them.  If the @option{PRESERVE} option is used in
 this case then the freed allocation will only be made write-protected so that
 the original contents can be read from but not written to.
+
+Note that if the argument specified with the @option{NOFREE} option is non-zero
+then the mpatrol library will store all recently-freed memory allocations in a
+queue@footnote{In the case of @option{NOFREE=0} a double negative does not make
+a positive.  The zero indicates that all memory allocations will not really be
+freed for later reuse.}.  Once the queue has filled to the point specified with
+the @option{NOFREE} option then all subsequent calls to free memory will result
+in the most recently-freed memory allocation being placed at the end of the
+queue and the freed memory allocation at the beginning of the queue will be
+returned to the free memory pool for later reuse.  Obviously, the larger the
+freed queue size, the better chance of detecting attempts to access
+previously-freed memory, but unfortunately more memory will be used up and the
+mpatrol library will have to keep track of a larger number of memory
+allocations.
 
 @node Overwrites and underwrites, Using with a debugger, General errors, Using mpatrol
 @section Overwrites and underwrites
@@ -3131,6 +3150,7 @@ profiling file:    mpatrol.out
 program filename:  ./test1
 symbols read:      3240
 autosave count:    0
+freed queue size:  0
 allocation count:  13
 allocation peak:   4720 bytes
 allocation limit:  0 bytes
@@ -3385,20 +3405,21 @@ example have been numbered and their descriptions appear below.
 23  program filename:  ./test1
 24  symbols read:      3240
 25  autosave count:    0
-26  allocation count:  13
-27  allocation peak:   4720 bytes
-28  allocation limit:  0 bytes
-29  allocated blocks:  1 (16 bytes)
-30  freed blocks:      0 (0 bytes)
-31  free blocks:       1 (8176 bytes)
-32  internal blocks:   25 (204800 bytes)
-33  total heap usage:  212992 bytes
-34  total compared:    0 bytes
-35  total located:     0 bytes
-36  total copied:      0 bytes
-37  total set:         0 bytes
-38  total warnings:    0
-39  total errors:      1
+26  freed queue size:  0
+27  allocation count:  13
+28  allocation peak:   4720 bytes
+29  allocation limit:  0 bytes
+30  allocated blocks:  1 (16 bytes)
+31  freed blocks:      0 (0 bytes)
+32  free blocks:       1 (8176 bytes)
+33  internal blocks:   25 (204800 bytes)
+34  total heap usage:  212992 bytes
+35  total compared:    0 bytes
+36  total located:     0 bytes
+37  total copied:      0 bytes
+38  total set:         0 bytes
+39  total warnings:    0
+40  total errors:      1
 @end smallexample
 
 @enumerate 1
@@ -3535,6 +3556,16 @@ the total number of profiled memory allocations and deallocations is a multiple
 of this number then the current profiling information will be written to the
 profiling output file.  It can be changed at run-time using the
 @option{AUTOSAVE} option.
+
+@cindex freed queue
+@item
+Freed queue size.  This value contains the maximum number of freed memory
+allocations that will be stored in the freed queue if the @option{NOFREE} option
+is used.  Once the freed queue becomes full then the oldest freed allocation in
+the queue will be returned to the free memory pool for reuse every time an
+existing memory allocation is freed.  If this value is zero then the freed queue
+will never become full.  It can be changed at run-time using the @option{NOFREE}
+option.
 
 @item
 Allocation count.  This value contains the total number of memory allocations
@@ -3680,7 +3711,7 @@ It is possible for mpatrol to give even more useful diagnostics in the above
 situation by using the @option{NOFREE} option.  This prevents the library from
 returning any freed allocations to the free memory pool, by preserving any
 information about them and marking them as freed.  If you add the
-@option{NOFREE} option to the @env{MPATROL_OPTIONS} environment variable you
+@option{NOFREE=0} option to the @env{MPATROL_OPTIONS} environment variable you
 should see the following entries in @file{mpatrol.log} instead.
 
 @smallexample
@@ -3713,7 +3744,7 @@ returns 0x00000000
 Note the extra information reported by @code{realloc()} since the library knows
 all of the details about the freed memory allocation and when it was freed.
 
-The @option{NOFREE} option tends to use up much more system memory than normal
+The @option{NOFREE=0} option tends to use up much more system memory than normal
 since it effectively instructs the mpatrol library to allocate new memory for
 every single memory allocation or reallocation.  It can also slow down program
 execution when overflow buffers are used, since with each new memory allocation
@@ -4111,7 +4142,7 @@ allocation.
 This last example illustrates the various @option{SHOW} options that are
 available for displaying additional information from the mpatrol library at
 program termination.  It also shows how to easily detect memory leaks.  Use the
-@option{OFLOWSIZE=16}, @option{NOFREE} and @option{SHOWALL} options in
+@option{OFLOWSIZE=16}, @option{NOFREE=0} and @option{SHOWALL} options in
 @env{MPATROL_OPTIONS} before running.
 
 @smallexample
@@ -4245,7 +4276,11 @@ only possible because the @option{NOFREE} option was also given, otherwise there
 would be no details on freed memory allocations.  All of these entries show
 where the allocation was freed, which can be useful if you quickly needed to see
 where an allocation was freed.  The @option{SHOWFREED} option also displays this
-information.
+information.  Note that if the argument supplied to the @option{NOFREE} option
+was zero then this list will show the details of every single freed memory
+allocation that occurred during the lifetime of the program; otherwise it will
+be limited to the size of the freed queue and will show only the most
+recently-freed items.
 
 As this example was run on UNIX, the mpatrol library replaces the default
 implementations of @code{malloc()}, @code{free()}, etc.  As can be seen below,
@@ -5365,14 +5400,16 @@ the small bound but less than the large bound.  Default value:
 @option{MEDIUMBOUND=256}.
 
 @cindex NOFREE
-@item @option{NOFREE}
-Specifies that the mpatrol library should keep all reallocated and freed memory
-allocations.  Such freed memory allocations will then be flagged as freed and
-can be used by the library to provide better diagnostics.  However, as no system
-memory will ever be reused by the mpatrol library, this option can quickly lead
-to a shortage of available system memory for a process.  Note that this option
-will always force a memory reallocation to return a pointer to newly-allocated
-memory, but the @code{expand()} function will never be affected by this option.
+@item @option{NOFREE}=<@var{unsigned-integer}>
+Specifies that a number of recently-freed memory allocations should be prevented
+from being returned to the free memory pool.  Such freed memory allocations will
+then be flagged as freed and can be used by the library to provide better
+diagnostics.  However, if the size of the freed queue is specified as zero then
+no system memory will ever be reused by the mpatrol library, which can quickly
+lead to a shortage of available system memory for a process.  Note that this
+option will always force a memory reallocation to return a pointer to
+newly-allocated memory, but the @code{expand()} function will never be affected
+by this option.
 
 @cindex NOPROTECT
 @item @option{NOPROTECT}
@@ -5670,9 +5707,9 @@ structures should not be made read-only after every memory allocation,
 reallocation or deallocation.
 
 @cindex -n
-@item @option{-n}
-[@option{NOFREE}]  Specifies that the mpatrol library should keep all
-reallocated and freed memory allocations.
+@item @option{-n} <@var{unsigned-integer}>
+[@option{NOFREE}]  Specifies that a number of recently-freed memory allocations
+should be prevented from being returned to the free memory pool.
 
 @cindex -O
 @item @option{-O} <@var{unsigned-integer}>
@@ -5797,19 +5834,19 @@ Running with basic options:
 Running when all freed memory allocations are kept:
 
 @multitable @columnfractions .6 .15 .15
-@item @option{NOFREE}
+@item @option{NOFREE=0}
 @tab 0.943
 @tab 0.506
-@item @option{NOFREE OFLOWSIZE=2}
+@item @option{NOFREE=0 OFLOWSIZE=2}
 @tab 1.026
 @tab 0.579
-@item @option{NOFREE OFLOWSIZE=8}
+@item @option{NOFREE=0 OFLOWSIZE=8}
 @tab 1.091
 @tab 0.645
-@item @option{NOFREE PAGEALLOC=LOWER}
+@item @option{NOFREE=0 PAGEALLOC=LOWER}
 @tab 8.013
 @tab 7.598
-@item @option{NOFREE PAGEALLOC=UPPER}
+@item @option{NOFREE=0 PAGEALLOC=UPPER}
 @tab 8.026
 @tab 7.616
 @end multitable
@@ -5818,19 +5855,19 @@ Running when all freed memory allocations are kept and their contents are
 preserved:
 
 @multitable @columnfractions .6 .15 .15
-@item @option{NOFREE PRESERVE}
+@item @option{NOFREE=0 PRESERVE}
 @tab 0.719
 @tab 0.292
-@item @option{NOFREE PRESERVE OFLOWSIZE=2}
+@item @option{NOFREE=0 PRESERVE OFLOWSIZE=2}
 @tab 0.792
 @tab 0.367
-@item @option{NOFREE PRESERVE OFLOWSIZE=8}
+@item @option{NOFREE=0 PRESERVE OFLOWSIZE=8}
 @tab 0.850
 @tab 0.419
-@item @option{NOFREE PRESERVE PAGEALLOC=LOWER}
+@item @option{NOFREE=0 PRESERVE PAGEALLOC=LOWER}
 @tab 8.043
 @tab 7.616
-@item @option{NOFREE PRESERVE PAGEALLOC=UPPER}
+@item @option{NOFREE=0 PRESERVE PAGEALLOC=UPPER}
 @tab 8.052
 @tab 7.631
 @end multitable
@@ -6628,12 +6665,6 @@ program termination for debugging purposes to view memory fragmentation.  If
 that option is added then perhaps @option{SHOWALL} should only be equivalent to
 @option{SHOWFREE}, @option{SHOWFREED} and @option{SHOWUNFREED}, and
 @option{SHOWMAP} and @option{SHOWSYMBOLS} should be explicitly given.
-
-@item
-Add an option, similar to @option{NOFREE}, that would prevent a freed memory
-allocation from being used until a certain number of memory allocations later.
-This would be far less of a resource-hogger than the @option{NOFREE} option and
-might catch just as many errors but might be extremely hard to implement.
 
 @item
 Add an option (perhaps @option{NOINTERNAL}) to suppress the display of internal
