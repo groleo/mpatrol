@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.10 2000-11-08 01:15:06 graeme Exp $
+% $Id: refcard.tex,v 1.11 2000-11-09 22:54:38 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -39,6 +39,7 @@
 \setlength{\oddsidemargin}{-.5in}
 \setlength{\evensidemargin}{-.5in}
 \setlength{\topmargin}{-.5in}
+\renewcommand{\baselinestretch}{.9}
 
 % Define new commands for formatting the headings and options.
 
@@ -248,12 +249,6 @@ Specifies the limit in bytes up to which memory allocations should be classified
 as large allocations for profiling purposes.
 \end{description}
 
-\end{multicols}
-
-\pagebreak
-
-\begin{multicols}{3}
-
 \vskip 12pt
 \heading{C dynamic memory allocation functions}
 \vskip 6pt
@@ -269,6 +264,8 @@ as large allocations for profiling purposes.
 \hfill Allocates page-aligned memory.
 \item[\function{pvalloc}]
 \hfill Allocates a number of pages.
+\item[\function{alloca}]
+\hfill Allocates temporary memory.
 \item[\function{strdup}]
 \hfill Duplicates a string.
 \item[\function{strndup}]
@@ -276,6 +273,10 @@ as large allocations for profiling purposes.
 \item[\function{strsave}]
 \hfill Duplicates a string.
 \item[\function{strnsave}]
+\hfill Duplicates a string with a maximum length.
+\item[\function{strdupa}]
+\hfill Duplicates a string.
+\item[\function{strndupa}]
 \hfill Duplicates a string with a maximum length.
 \item[\function{realloc}]
 \hfill Resizes memory.
@@ -287,6 +288,8 @@ as large allocations for profiling purposes.
 \hfill Frees memory.
 \item[\function{cfree}]
 \hfill Frees memory allocated by \function{calloc}.
+\item[\function{dealloca}]
+\hfill Explicitly frees temporary memory.
 \end{description}
 
 \vskip 12pt
@@ -454,6 +457,9 @@ Displays the contents of the \texttt{MPATROL\_OPTIONS} environment variable.
 \hfill See \option{SHOWUNFREED}.
 \item[\flagpar{small-bound}{unsigned integer}]
 \hfill See \option{SMALLBOUND}.
+\item[\flag{threads}]
+Specifies that the program to be run is multithreaded if the \flag{dynamic}
+option is used.
 \item[\flagpar{unfreed-abort}{unsigned integer}]
 \hfill See \option{UNFREEDABORT}.
 \item[\flag{use-debug}]
@@ -504,6 +510,17 @@ Specifies that the list of unfreed allocations in the log file should be
 ignored.
 \item[\flag{version}]
 Displays the version number of the \command{mleak} command.
+\end{description}
+
+\vskip 12pt
+\heading{mpsym command options}
+\vskip 6pt
+
+\begin{description}
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flag{version}]
+Displays the version number of the \command{mpsym} command.
 \end{description}
 
 \vskip 12pt
