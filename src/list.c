@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: list.c,v 1.2 2000-01-09 20:35:15 graeme Exp $"
+#ident "$Id: list.c,v 1.3 2000-12-20 22:49:34 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -47,7 +47,9 @@ extern "C"
  * easier.
  */
 
-MP_GLOBAL void __mp_newlist(listhead *l)
+MP_GLOBAL
+void
+__mp_newlist(listhead *l)
 {
     l->head = (listnode *) &l->tail;
     l->tail = NULL;
@@ -59,7 +61,9 @@ MP_GLOBAL void __mp_newlist(listhead *l)
 /* Add a new node to the beginning of a list.
  */
 
-MP_GLOBAL void __mp_addhead(listhead *l, listnode *n)
+MP_GLOBAL
+void
+__mp_addhead(listhead *l, listnode *n)
 {
     listnode *t;
 
@@ -75,7 +79,9 @@ MP_GLOBAL void __mp_addhead(listhead *l, listnode *n)
 /* Add a new node to the end of a list.
  */
 
-MP_GLOBAL void __mp_addtail(listhead *l, listnode *n)
+MP_GLOBAL
+void
+__mp_addtail(listhead *l, listnode *n)
 {
     listnode *t;
 
@@ -91,7 +97,9 @@ MP_GLOBAL void __mp_addtail(listhead *l, listnode *n)
 /* Insert a new node before an existing node in a list.
  */
 
-MP_GLOBAL void __mp_prepend(listhead *l, listnode *p, listnode *n)
+MP_GLOBAL
+void
+__mp_prepend(listhead *l, listnode *p, listnode *n)
 {
     listnode *t;
 
@@ -107,7 +115,9 @@ MP_GLOBAL void __mp_prepend(listhead *l, listnode *p, listnode *n)
 /* Insert a new node after an existing node in a list.
  */
 
-MP_GLOBAL void __mp_insert(listhead *l, listnode *p, listnode *n)
+MP_GLOBAL
+void
+__mp_insert(listhead *l, listnode *p, listnode *n)
 {
     listnode *t;
 
@@ -123,7 +133,9 @@ MP_GLOBAL void __mp_insert(listhead *l, listnode *p, listnode *n)
 /* Remove an existing node from the list it belongs to.
  */
 
-MP_GLOBAL void __mp_remove(listhead *l, listnode *n)
+MP_GLOBAL
+void
+__mp_remove(listhead *l, listnode *n)
 {
     n->prev->next = n->next;
     n->next->prev = n->prev;
@@ -135,7 +147,9 @@ MP_GLOBAL void __mp_remove(listhead *l, listnode *n)
  * or NULL if the list is empty.
  */
 
-MP_GLOBAL listnode *__mp_remhead(listhead *l)
+MP_GLOBAL
+listnode *
+__mp_remhead(listhead *l)
 {
     listnode *t;
 
@@ -153,7 +167,9 @@ MP_GLOBAL listnode *__mp_remhead(listhead *l)
  * or NULL if the list is empty.
  */
 
-MP_GLOBAL listnode *__mp_remtail(listhead *l)
+MP_GLOBAL
+listnode *
+__mp_remtail(listhead *l)
 {
     listnode *t;
 

@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.51 2000-12-10 22:36:33 graeme Exp $"
+#ident "$Id: inter.c,v 1.52 2000-12-20 22:44:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -103,7 +103,9 @@ static int *initsection = &__mp_initsection;
 static void initlibrary(void) __attribute__((__constructor__));
 static void finilibrary(void) __attribute__((__destructor__));
 
-static void initlibrary(void)
+static
+void
+initlibrary(void)
 {
 #if MP_THREADS_SUPPORT
     __mp_initmutexes();
@@ -111,7 +113,9 @@ static void initlibrary(void)
     __mp_init();
 }
 
-static void finilibrary(void)
+static
+void
+finilibrary(void)
 {
     __mp_fini();
 }
@@ -145,7 +149,9 @@ meminit;
  * library data structures if we are thread-safe.
  */
 
-static void savesignals(void)
+static
+void
+savesignals(void)
 {
 #if MP_THREADS_SUPPORT
     __mp_lockmutex(MT_MAIN);
@@ -166,7 +172,9 @@ static void savesignals(void)
  * structures if we are thread-safe.
  */
 
-static void restoresignals(void)
+static
+void
+restoresignals(void)
 {
     /* Only perform this step if we are not doing a recursive call.
      */
@@ -181,7 +189,9 @@ static void restoresignals(void)
 /* Check that a specified integer lies in a given range.
  */
 
-static int checkrange(unsigned long l, unsigned long n, unsigned long u)
+static
+int
+checkrange(unsigned long l, unsigned long n, unsigned long u)
 {
     /* If the lower and upper bounds are zero then the integer never lies in
      * the given range.
@@ -200,7 +210,9 @@ static int checkrange(unsigned long l, unsigned long n, unsigned long u)
 /* Check the alloca allocation stack for any allocations that should be freed.
  */
 
-static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
+static
+void
+checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
 {
     allocanode *n, *p;
 #if MP_FULLSTACK
@@ -302,7 +314,8 @@ static void checkalloca(char *s, char *t, unsigned long u, stackinfo *v, int f)
 /* Initialise the mpatrol library.
  */
 
-void __mp_init(void)
+void
+__mp_init(void)
 {
     savesignals();
     if (memhead.fini)
@@ -365,7 +378,8 @@ void __mp_init(void)
 /* Finalise the mpatrol library.
  */
 
-void __mp_fini(void)
+void
+__mp_fini(void)
 {
     stackinfo i;
 
@@ -450,7 +464,8 @@ void __mp_fini(void)
 /* Return the memory header structure.
  */
 
-infohead *__mp_memhead(void)
+infohead *
+__mp_memhead(void)
 {
     return &memhead;
 }
@@ -459,8 +474,9 @@ infohead *__mp_memhead(void)
 /* Allocate a new block of memory of a specified size and alignment.
  */
 
-void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
-                 unsigned long u, size_t k)
+void *
+__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
+           size_t k)
 {
     void *p;
     stackinfo i;
@@ -557,8 +573,9 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
 /* Allocate a new block of memory to duplicate a string.
  */
 
-char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
-                  unsigned long u, size_t k)
+char *
+__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
+            size_t k)
 {
     char *o;
     stackinfo i;
@@ -659,8 +676,9 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
 /* Resize an existing block of memory to a new size and alignment.
  */
 
-void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
-                   unsigned long u, size_t k)
+void *
+__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
+             unsigned long u, size_t k)
 {
 #if TARGET == TARGET_WINDOWS
     void *q;
@@ -742,8 +760,8 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
 /* Free an existing block of memory.
  */
 
-void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
-               size_t k)
+void
+__mp_free(void *p, alloctype f, char *s, char *t, unsigned long u, size_t k)
 {
     stackinfo i;
     int j;
@@ -802,8 +820,9 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
 /* Set a block of memory to contain a specific byte.
  */
 
-void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
-                  char *t, unsigned long u, size_t k)
+void *
+__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s, char *t,
+            unsigned long u, size_t k)
 {
     stackinfo i;
     int j;
@@ -851,8 +870,9 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
 /* Copy a block of memory from one address to another.
  */
 
-void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
-                   char *s, char *t, unsigned long u, size_t k)
+void *
+__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
+             char *t, unsigned long u, size_t k)
 {
     void *r;
     stackinfo i;
@@ -912,8 +932,9 @@ void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
-                     char *t, unsigned long u, size_t k)
+void *
+__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
+               char *t, unsigned long u, size_t k)
 {
     void *r;
     stackinfo i;
@@ -969,8 +990,9 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
 /* Compare two blocks of memory.
  */
 
-int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
-                    unsigned long u, size_t k)
+int
+__mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
+                unsigned long u, size_t k)
 {
     void *m;
     stackinfo i;
@@ -1023,7 +1045,8 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 /* Obtain any details about the memory block that contains a given address.
  */
 
-int __mp_info(void *p, allocinfo *d)
+int
+__mp_info(void *p, allocinfo *d)
 {
     addrnode *a;
     symnode *s;
@@ -1081,7 +1104,8 @@ int __mp_info(void *p, allocinfo *d)
  * the standard error file stream instead of the log file.
  */
 
-int __mp_printinfo(void *p)
+int
+__mp_printinfo(void *p)
 {
     addrnode *a;
     symnode *s;
@@ -1155,7 +1179,8 @@ int __mp_printinfo(void *p)
  * all mpatrol library settings and statistics.
  */
 
-void __mp_memorymap(int s)
+void
+__mp_memorymap(int s)
 {
     savesignals();
     if (!memhead.init)
@@ -1171,7 +1196,8 @@ void __mp_memorymap(int s)
 /* Display a summary of all mpatrol library settings and statistics.
  */
 
-void __mp_summary(void)
+void
+__mp_summary(void)
 {
     savesignals();
     if (!memhead.init)
@@ -1185,7 +1211,8 @@ void __mp_summary(void)
  * a predefined pattern.
  */
 
-void __mp_check(void)
+void
+__mp_check(void)
 {
     stackinfo i;
 
@@ -1207,7 +1234,8 @@ void __mp_check(void)
 /* Set the prologue function and return the previous setting.
  */
 
-void (*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
+void
+(*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
 {
     void (*p)(void *, size_t);
 
@@ -1224,7 +1252,8 @@ void (*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
 /* Set the epilogue function and return the previous setting.
  */
 
-void (*__mp_epilogue(void (*h)(void *)))(void *)
+void
+(*__mp_epilogue(void (*h)(void *)))(void *)
 {
     void (*p)(void *);
 
@@ -1241,7 +1270,8 @@ void (*__mp_epilogue(void (*h)(void *)))(void *)
 /* Set the low-memory handler and return the previous setting.
  */
 
-void (*__mp_nomemory(void (*h)(void)))(void)
+void
+(*__mp_nomemory(void (*h)(void)))(void)
 {
     void (*p)(void);
 
@@ -1258,7 +1288,8 @@ void (*__mp_nomemory(void (*h)(void)))(void)
 /* Push source level information onto the top of the delete stack.
  */
 
-void __mp_pushdelstack(char *s, char *t, unsigned long u)
+void
+__mp_pushdelstack(char *s, char *t, unsigned long u)
 {
     if (!memhead.init)
         __mp_init();
@@ -1275,7 +1306,8 @@ void __mp_pushdelstack(char *s, char *t, unsigned long u)
 /* Pop source level information off the top of the delete stack.
  */
 
-void __mp_popdelstack(char **s, char **t, unsigned long *u)
+void
+__mp_popdelstack(char **s, char **t, unsigned long *u)
 {
     if (!memhead.init)
         __mp_init();
