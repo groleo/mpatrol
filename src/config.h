@@ -49,6 +49,17 @@
 #endif /* MP_GLOBAL */
 
 
+/* Indicates if preprocessor macro versions of some internal library routines
+ * should be used instead of their function equivalents in order to increase
+ * run-time efficiency.  This might not be desirable if the library needs to be
+ * run under a debugger.
+ */
+
+#ifndef MP_MACROROUTINES
+#define MP_MACROROUTINES 1
+#endif /* MP_MACROROUTINES */
+
+
 /* Indicates if all of the heap memory used by the library should be
  * deleted when the process exits.  This should not be set on systems that
  * make dynamic memory allocations after exit() or reference freed memory
