@@ -53,7 +53,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT int __mp_newtrace(tracehead *, meminfo *);
+MP_EXPORT void __mp_newtrace(tracehead *, meminfo *);
 MP_EXPORT int __mp_endtrace(tracehead *);
 MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t);
 MP_EXPORT void __mp_tracefree(tracehead *, unsigned long);
