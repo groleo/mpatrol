@@ -1,0 +1,8 @@
+.cvsignore
+bin
+doc
+extra
+man
+src
+tsrc
+tools
