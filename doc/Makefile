@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.20 2000-10-26 23:21:36 graeme Exp $
+# $Id: Makefile,v 1.21 2000-11-06 19:37:16 graeme Exp $
 
 
 # Definitions
@@ -76,9 +76,9 @@ $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/gcc.jpg \
 	images/cpp.jpg images/cc1.jpg images/collect2.jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ texi2html -top_file $@ -split node -menu -number -verbose $<
+	@ texi2html -top_file $@ -split section -menu -number -verbose $<
 else
-	@ texi2html -top_file $@ -split node -menu -number $<
+	@ texi2html -top_file $@ -split section -menu -number $<
 endif
 else
 # Build the HTML file from the Texinfo file using makeinfo
@@ -175,9 +175,7 @@ $(DOCUMENT)_doc.tar.gz: all README
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
-ifeq ($(SPLITHTML),true)
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
-endif
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
 	-@ rm -f $(REFCARD).dvi $(REFCARD).ps $(REFCARD).pdf >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT)_doc.tar.gz >/dev/null 2>&1
