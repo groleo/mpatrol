@@ -1,3 +1,25 @@
+Changes for 1.0.6 (25th November, 1999)
+
+  * Removed the NOTES, INSTALL and EXAMPLES files as their contents are now
+    entirely in the mpatrol manual.
+
+  * Added the operating system support, using mpatrol, improving performance and
+    library performance chapters to the mpatrol manual.
+
+  * Added lots of software for AmigaOS to the related software section in the
+    mpatrol manual.
+
+  * Added new library performance figures.
+
+  * Added the FAILFREQ and FAILSEED options.
+
+  * The __mp_trap() function now does nothing so that it can be used as a
+    breakpoint target in a debugger.
+
+  * Increased the maximum size of the MPATROL_OPTIONS environment variable from
+    256 to 1024 bytes.
+
+
 Changes for 1.0.5 (16th November, 1999)
 
   * Added TeXinfo documentation which can be translated to on-line manuals in
