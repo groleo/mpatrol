@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.14 2000-03-15 00:43:39 graeme Exp $"
+#ident "$Id: info.c,v 1.15 2000-04-03 13:07:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -45,6 +45,13 @@
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+#if MP_INUSE_SUPPORT
+void _Inuse_malloc(void *, unsigned long);
+void _Inuse_realloc(void *, void *, unsigned long);
+void _Inuse_free(void *);
+#endif /* MP_INUSE_SUPPORT */
 
 
 /* Initialise the fields of an infohead so that the mpatrol library
@@ -274,6 +281,9 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                     __mp_memset(p, 0, l);
                 else
                     __mp_memset(p, h->alloc.abyte, l);
+#if MP_INUSE_SUPPORT
+                _Inuse_malloc(p, l);
+#endif /* MP_INUSE_SUPPORT */
             }
             else
                 __mp_freeslot(&h->table, m);
@@ -434,6 +444,9 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     i->data.stack = __mp_getaddrs(&h->addr, v);
                     i->data.freed = 1;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+#if MP_INUSE_SUPPORT
+                    _Inuse_realloc(n->block, r->block, l);
+#endif /* MP_INUSE_SUPPORT */
                     __mp_freealloc(&h->alloc, n, i);
                     p = r->block;
                 }
@@ -459,11 +472,18 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+#if MP_INUSE_SUPPORT
+                    _Inuse_realloc(n->block, r->block, l);
+#endif /* MP_INUSE_SUPPORT */
                     __mp_freealloc(&h->alloc, n, NULL);
                     p = r->block;
                 }
                 else
                     p = NULL;
+#if MP_INUSE_SUPPORT
+            else
+                _Inuse_realloc(n->block, n->block, l);
+#endif /* MP_INUSE_SUPPORT */
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
             if ((p != NULL) && (l > d))
@@ -592,6 +612,9 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
             __mp_freeslot(&h->table, m);
             m = NULL;
         }
+#if MP_INUSE_SUPPORT
+        _Inuse_free(p);
+#endif /* MP_INUSE_SUPPORT */
         __mp_freealloc(&h->alloc, n, m);
         if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READONLY);
