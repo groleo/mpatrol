@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.84 2001-09-26 22:47:28 graeme Exp $"
+#ident "$Id: diag.c,v 1.85 2001-09-26 23:16:31 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.84 2001-09-26 22:47:28 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.85 2001-09-26 23:16:31 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -516,17 +516,17 @@ __mp_openlogfile(char *s)
 #endif /* HAVE_CONFIG_H && SETVBUF_REVERSED */
     if (__mp_diagflags & FLG_HTML)
     {
-        __mp_diag("<HTML>\n");
-        __mp_diag(" <HEAD>\n");
-        __mp_diag("  <TITLE>\n");
+        __mp_diagtag("<HTML>\n");
+        __mp_diagtag(" <HEAD>\n");
+        __mp_diagtag("  <TITLE>\n");
         __mp_diag("   mpatrol log\n");
-        __mp_diag("  </TITLE>\n");
-        __mp_diag(" </HEAD>\n");
-        __mp_diag(" <BODY>\n");
-        __mp_diag("  <H3>\n");
+        __mp_diagtag("  </TITLE>\n");
+        __mp_diagtag(" </HEAD>\n");
+        __mp_diagtag(" <BODY>\n");
+        __mp_diagtag("  <H3>\n");
         __mp_diag("   mpatrol log\n");
-        __mp_diag("  </H3>\n");
-        __mp_diag("  <P>\n");
+        __mp_diagtag("  </H3>\n");
+        __mp_diagtag("  <P>\n");
     }
     return 1;
 }
@@ -544,8 +544,8 @@ __mp_closelogfile(void)
     r = 1;
     if (__mp_diagflags & FLG_HTML)
     {
-        __mp_diag(" </BODY>\n");
-        __mp_diag("</HTML>\n");
+        __mp_diagtag(" </BODY>\n");
+        __mp_diagtag("</HTML>\n");
     }
     if ((logfile == NULL) || (logfile == stderr) || (logfile == stdout))
     {
@@ -577,6 +577,19 @@ __mp_diag(char *s, ...)
     va_start(v, s);
     vfprintf(logfile, s, v);
     va_end(v);
+}
+
+
+/* Sends an HTML tag to the log file.
+ */
+
+MP_GLOBAL
+void
+__mp_diagtag(char *s)
+{
+    if (logfile == NULL)
+        __mp_openlogfile(NULL);
+    fputs(s, logfile);
 }
 
 

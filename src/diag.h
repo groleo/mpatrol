@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.38 2001-09-26 21:58:22 graeme Exp $
+ * $Id: diag.h,v 1.39 2001-09-26 23:16:31 graeme Exp $
  */
 
 
@@ -115,6 +115,7 @@ MP_EXPORT char *__mp_tracefile(meminfo *, char *);
 MP_EXPORT int __mp_openlogfile(char *);
 MP_EXPORT int __mp_closelogfile(void);
 MP_EXPORT void __mp_diag(char *, ...);
+MP_EXPORT void __mp_diagtag(char *);
 MP_EXPORT void __mp_warn(errortype, alloctype, char *, unsigned long, char *,
                          ...);
 MP_EXPORT void __mp_error(errortype, alloctype, char *, unsigned long, char *,
