@@ -28,8 +28,33 @@ VERSION 1.3
 DESCRIPTION "dynamic memory allocation replacement library"
 
 EXPORTS
-	__mp_setfailhandler	@1
-	__mp_xmalloc		@2
-	__mp_xcalloc		@3
-	__mp_xstrdup		@4
-	__mp_xrealloc		@5
+	__mp_init		@1
+	__mp_fini		@2
+	__mp_alloc		@3
+	__mp_strdup		@4
+	__mp_realloc		@5
+	__mp_free		@6
+	__mp_setmem		@7
+	__mp_copymem		@8
+	__mp_comparemem		@9
+	__mp_locatemem		@10
+	__mp_info		@11
+	__mp_printinfo		@12
+	__mp_memorymap		@13
+	__mp_summary		@14
+	__mp_check		@15
+	__mp_prologue		@16
+	__mp_epilogue		@17
+	__mp_nomemory		@18
+	__mp_pushdelstack	@19
+	__mp_popdelstack	@20
+	chkr_set_right		@21
+	chkr_copy_bitmap	@22
+	chkr_check_addr		@23
+	chkr_check_str		@24
+	chkr_check_exec		@25
+	__mp_setfailhandler	@100
+	__mp_xmalloc		@101
+	__mp_xcalloc		@102
+	__mp_xstrdup		@103
+	__mp_xrealloc		@104

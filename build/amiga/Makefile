@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.42 2001-01-25 22:56:30 graeme Exp $
+# $Id: Makefile,v 1.43 2001-02-01 20:46:19 graeme Exp $
 
 
 # Definitions
@@ -46,8 +46,8 @@ ARCHTS_MPTOBJS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
-ARCHIVE_MPAOBJS	= mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
-		  mprealloc.o
+ARCHIVE_MPAOBJS	= mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o \
+		  mpstrdup.o mprealloc.o
 
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 OBJECT_MPATROL	= lib$(MPATROL).o
@@ -223,6 +223,12 @@ sbrk.o sbrk.t.o: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpalloc.o: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
+	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h
 mpfailure.o: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.o: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \

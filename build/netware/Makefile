@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.41 2001-01-25 22:56:32 graeme Exp $
+# $Id: Makefile,v 1.42 2001-02-01 20:46:20 graeme Exp $
 
 
 # Definitions
@@ -47,8 +47,8 @@ MPTTOBJS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   heap.ts.obj alloc.ts.obj info.ts.obj stack.ts.obj addr.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
 	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
-MPAOBJS	 = mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj mpstrdup.obj \
-	   mprealloc.obj
+MPAOBJS	 = mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
+	   mpstrdup.obj mprealloc.obj
 
 ARCHIVE_MPATROL	= $(MPATROL).lib
 OBJECT_MPATROL	= lib$(MPATROL).obj
@@ -220,6 +220,12 @@ inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/trace.h $(SOURCE)/machine.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
+	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h
 mpfailure.obj: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.obj: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \

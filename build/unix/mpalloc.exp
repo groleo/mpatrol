@@ -21,6 +21,31 @@
 * AIX Shared Library Exports
 
 
+__mp_init
+__mp_fini
+__mp_alloc
+__mp_strdup
+__mp_realloc
+__mp_free
+__mp_setmem
+__mp_copymem
+__mp_comparemem
+__mp_locatemem
+__mp_info
+__mp_printinfo
+__mp_memorymap
+__mp_summary
+__mp_check
+__mp_prologue
+__mp_epilogue
+__mp_nomemory
+__mp_pushdelstack
+__mp_popdelstack
+chkr_set_right
+chkr_copy_bitmap
+chkr_check_addr
+chkr_check_str
+chkr_check_exec
 __mp_setfailhandler
 __mp_xmalloc
 __mp_xcalloc

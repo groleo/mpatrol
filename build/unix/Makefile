@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.51 2001-01-25 13:35:25 graeme Exp $
+# $Id: Makefile,v 1.52 2001-02-01 20:46:21 graeme Exp $
 
 
 # Definitions
@@ -52,7 +52,8 @@ MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
-MPAOBJS	 = mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o mprealloc.o
+MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
+	   mprealloc.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 SHARED_MPTOBJS	= $(MPTOBJS:.o=.s.o) machine.s.o
@@ -333,6 +334,13 @@ version.o version.s.o version.n.ln version.t.o version.s.t.o version.t.ln: \
 	$(SOURCE)/target.h
 machine.o machine.s.o machine.t.o machine.s.t.o: $(SOURCE)/machine.c \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpalloc.o mpalloc.s.o mpalloc.n.ln: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/signals.h \
+	$(SOURCE)/mpalloc.h
 mpfailure.o mpfailure.s.o mpfailure.n.ln: $(SOURCE)/mpfailure.c \
 	$(SOURCE)/mpalloc.h $(SOURCE)/config.h $(SOURCE)/target.h
 mpsetfail.o mpsetfail.s.o mpsetfail.n.ln: $(SOURCE)/mpsetfail.c \

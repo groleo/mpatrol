@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.48 2001-01-25 23:03:29 graeme Exp $
+# $Id: Makefile,v 1.49 2001-02-01 20:46:22 graeme Exp $
 
 
 # Definitions
@@ -61,8 +61,8 @@ SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
 		  sbrk.ts.obj main.ts.obj version.ts.obj
-ARCHIVE_MPAOBJS	= mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
-		  mpstrdup.obj mprealloc.obj
+ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
+		  mpcalloc.obj mpstrdup.obj mprealloc.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll
@@ -261,6 +261,12 @@ main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/trace.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
+mpalloc.obj: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/trace.h \
+	$(SOURCE)/signals.h $(SOURCE)/mpalloc.h
 mpfailure.obj: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mpsetfail.obj: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \

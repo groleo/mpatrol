@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.10 2001-01-25 22:56:36 graeme Exp $
+# $Id: Makefile.aix,v 1.11 2001-02-01 20:46:21 graeme Exp $
 
 
 # Definitions
@@ -50,7 +50,8 @@ MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o trace.o inter.o malloc.o version.o
-MPAOBJS	 = mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o mprealloc.o
+MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
+	   mprealloc.o
 
 ARCHIVE_MPTOBJS	= $(MPTOBJS) machine.o
 LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)
@@ -294,6 +295,13 @@ malloc.o malloc.n.ln malloc.t.o malloc.t.ln: $(SOURCE)/malloc.c \
 version.o version.n.ln version.t.o version.t.ln: $(SOURCE)/version.c \
 	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
 machine.o machine.t.o: $(SOURCE)/machine.c $(SOURCE)/config.h $(SOURCE)/target.h
+mpalloc.o mpalloc.n.ln: $(SOURCE)/mpalloc.c $(SOURCE)/inter.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/trace.h $(SOURCE)/signals.h \
+	$(SOURCE)/mpalloc.h
 mpfailure.o mpfailure.n.ln: $(SOURCE)/mpfailure.c $(SOURCE)/mpalloc.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 mpsetfail.o mpsetfail.n.ln: $(SOURCE)/mpsetfail.c $(SOURCE)/mpalloc.h \
