@@ -1,3 +1,20 @@
+Changes for 1.3.0
+
+  * Added the CHECKMEMORY option for displaying an error for each zero-size
+    memory operation on a NULL pointer.
+
+  * ICL DRS/NX is now supported.
+
+  * The OFLOWWATCH option is now supported on IRIX.
+
+  * Finally fixed the determination of the address of an illegal memory access
+    on IRIX platforms and added support for the SGI N32 object file format.
+
+  * Added a new section to the mpatrol manual on diagnostic messages.
+
+  * Made the tests work on 64-bit platforms.
+
+
 Changes for 1.2.6 (18th July, 2000)
 
   * The NOFREE option now takes an argument which specifies the maximum number

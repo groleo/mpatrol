@@ -1,3 +1,78 @@
+Thu Aug 31 20:44:14 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more related software and documented a bit about choice of
+	ALLOCBYTE, FREEBYTE and OFLOWBYTE settings.  Added the CHECKMEMORY
+	option.
+
+	* doc/refcard.tex, man/cat1/mpatrol.1, man/cat3/mpatrol.3,
+	  man/man1/mpatrol.1, man/man3/mpatrol.3:
+	Documented the CHECKMEMORY option.
+
+	* src/info.c, src/info.h: Added support for the CHECKMEMORY option.
+
+	* src/option.c, src/option.h, src/mpatrol.h:
+	Added the CHECKMEMORY option.
+
+Tue Aug 29 00:09:34 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Expanded the related software section.
+
+Mon Jul 31 23:48:04 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added watch support for IRIX.
+
+	* src/config.h:
+	Revised /proc support, added watch support for IRIX and removed siginfo
+	support from IRIX again.
+
+	* src/target.h: Added detection of 64-bit MIPS on IRIX.
+
+	* src/memory.c:
+	Added watch support for IRIX, and figured out way to get the program
+	name on DRS/NX.
+
+	* src/signals.c: Fixed detection of illegal memory accesses on IRIX.
+
+Sun Jul 30 23:59:00 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added support for ICL DRS/NX.
+
+	* src/config.h, src/target.h:
+	Added support for ICL DRS/NX and removed automatic detection of
+	UnixWare.
+
+	* src/symbol.c:
+	Added support for DRS/NX.
+
+Wed Jul 26 22:02:56 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.h: Added definition of an allocanode.
+
+Tue Jul 25 20:30:46 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented CHECK=0 and NOPROTECT with PROF.
+
+Mon Jul 24 20:02:08 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/NMakefile, build/windows/Makefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added graph module for mprof.
+
+	* src/graph.c, src/graph.h: New files for building a directed graph.
+
+	* src/symbol.c: Added support for SGI N32 object files.
+
+Thu Jul 20 18:15:37 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Added a section on diagnostic messages.
+
+Tue Jul 18 23:26:37 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* tests/pass/test2.c, tests/pass/test4.c:
+	Added 64-bit support when displaying pointers.
+
 Mon Jul 17 23:40:03 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* README:
