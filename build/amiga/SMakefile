@@ -1,0 +1,226 @@
+# mpatrol
+# A library for controlling and tracing dynamic memory allocations.
+# Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Library General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU Library General Public
+# License along with this library; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+
+
+# SAS/C Makefile to compile on AmigaOS with SAS/C
+
+
+# $Id: SMakefile,v 1.1 1999-10-04 23:45:28 graeme Exp $
+
+
+# Definitions
+
+CC = SC
+AR = OML
+LD = SLink
+
+SOURCE = //src
+
+CFLAGS = PARMS=BOTH STKEXT NOVER IDIR $(SOURCE)
+OFLAGS = OPT STRMER
+SFLAGS = LIBCODE
+TFLAGS = DEF MP_THREADS_SUPPORT=1
+
+LIBRARY	 = mpatrol
+VERSION	 = 1
+REVISION = 0
+
+ARCHIVE_OBJECTS	= list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
+		  stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
+		  inter.o version.o
+SHARED_OBJECTS	= list.s.o tree.s.o slots.s.o utils.s.o memory.s.o heap.s.o \
+		  alloc.s.o info.s.o stack.s.o addr.s.o strtab.s.o symbol.s.o \
+		  signals.s.o diag.s.o option.s.o inter.s.o version.s.o
+ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
+		  alloc.t.o info.t.o stack.t.o addr.t.o strtab.t.o symbol.t.o \
+		  signals.t.o mutex.t.o diag.t.o option.t.o inter.t.o \
+		  version.t.o
+SHARTS_OBJECTS	= list.s.t.o tree.s.t.o slots.s.t.o utils.s.t.o memory.s.t.o \
+		  heap.s.t.o alloc.s.t.o info.s.t.o stack.s.t.o addr.s.t.o \
+		  strtab.s.t.o symbol.s.t.o signals.s.t.o mutex.s.t.o \
+		  diag.s.t.o option.s.t.o inter.s.t.o version.s.t.o
+
+ARCHIVE_LIBRARY	= $(LIBRARY).lib
+SHARED_LIBRARY	= $(LIBRARY).library
+OBJECT_LIBRARY	= $(LIBRARY).o
+ARCHTS_LIBRARY	= $(LIBRARY)mt.lib
+SHARTS_LIBRARY	= $(LIBRARY)mt.library
+OBJTS_LIBRARY	= $(LIBRARY)mt.o
+
+
+# Rules
+
+.SUFFIXES: .c .o .s.o .t.o .s.t.o
+
+.c.o:
+	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $<
+
+.c.s.o:
+	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) OBJNAME $@ $<
+
+.c.t.o:
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $<
+
+.c.s.t.o:
+	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) $(TFLAGS) OBJNAME $@ $<
+
+$(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
+	$(AR) -n $@ REPLACE $(ARCHIVE_OBJECTS)
+
+$(SHARED_LIBRARY): $(SHARED_OBJECTS)
+	$(LD) SMALLCODE SMALLDATA NODEBUG NOICONS BATCH QUIET \
+	      LIBVERSION $(VERSION) LIBREVISION $(REVISION) \
+	      LIBID "mpatrol" LIBFD $(LIBRARY)_lib.fd TO $@ \
+	      FROM LIB:libent.o LIB:libinitr.o $(SHARED_OBJECTS) LIB LIB:sc.lib
+
+$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
+	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+
+$(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
+	$(AR) -n $@ REPLACE $(ARCHTS_OBJECTS)
+
+$(SHARTS_LIBRARY): $(SHARTS_OBJECTS)
+	$(LD) SMALLCODE SMALLDATA NODEBUG NOICONS BATCH QUIET \
+	      LIBVERSION $(VERSION) LIBREVISION $(REVISION) \
+	      LIBID "mpatrol" LIBFD $(LIBRARY)_lib.fd TO $@ \
+	      FROM LIB:libent.o LIB:libinitr.o $(SHARTS_OBJECTS) LIB LIB:sc.lib
+
+$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+
+all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(OBJECT_LIBRARY) \
+	$(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) $(OBJTS_LIBRARY)
+
+clean:
+	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
+	-@ Delete $(SHARED_OBJECTS) $(SHARTS_OBJECTS) FORCE >NIL:
+
+clobber: clean
+	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
+	-@ Delete $(SHARED_LIBRARY) $(SHARTS_LIBRARY) FORCE >NIL:
+	-@ Delete $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) FORCE >NIL:
+
+
+# Dependencies
+
+list.o list.s.o list.t.o list.s.t.o: $(SOURCE)/list.c $(SOURCE)/list.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+tree.o tree.s.o tree.t.o tree.s.t.o: $(SOURCE)/tree.c $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+slots.o slots.s.o slots.t.o slots.s.t.o: $(SOURCE)/slots.c $(SOURCE)/slots.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/utils.h
+utils.o utils.s.o utils.t.o utils.s.t.o: $(SOURCE)/utils.c $(SOURCE)/utils.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+memory.o memory.s.o memory.t.o memory.s.t.o: $(SOURCE)/memory.c \
+	$(SOURCE)/memory.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/stack.h $(SOURCE)/utils.h
+heap.o heap.s.o heap.t.o heap.s.t.o: $(SOURCE)/heap.c $(SOURCE)/heap.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/utils.h
+alloc.o alloc.s.o alloc.t.o alloc.s.t.o: $(SOURCE)/alloc.c $(SOURCE)/alloc.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/utils.h
+info.o info.s.o: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/utils.h
+info.t.o info.s.t.o: $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
+	$(SOURCE)/mutex.h $(SOURCE)/utils.h
+stack.o stack.s.o stack.t.o stack.s.t.o: $(SOURCE)/stack.c $(SOURCE)/stack.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+addr.o addr.s.o addr.t.o addr.s.t.o: $(SOURCE)/addr.c $(SOURCE)/addr.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/utils.h
+strtab.o strtab.s.o strtab.t.o strtab.s.t.o: $(SOURCE)/strtab.c \
+	$(SOURCE)/strtab.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/utils.h
+symbol.o symbol.s.o symbol.t.o symbol.s.t.o: $(SOURCE)/symbol.c \
+	$(SOURCE)/symbol.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/utils.h
+signals.o signals.s.o signals.t.o signals.s.t.o: $(SOURCE)/signals.c \
+	$(SOURCE)/signals.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/diag.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/inter.h
+mutex.t.o mutex.s.t.o: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/inter.h $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h
+diag.o diag.s.o diag.t.o diag.s.t.o: $(SOURCE)/diag.c $(SOURCE)/diag.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
+	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
+	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/utils.h $(SOURCE)/version.h
+option.o option.s.o option.t.o option.s.t.o: $(SOURCE)/option.c \
+	$(SOURCE)/option.h $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
+	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/diag.h $(SOURCE)/utils.h
+inter.o inter.s.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
+	$(SOURCE)/option.h
+inter.t.o inter.s.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
+	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
+	$(SOURCE)/mutex.h $(SOURCE)/option.h
+version.o version.s.o version.t.o version.s.t.o: $(SOURCE)/version.c \
+	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
+$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
+	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
+	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
+	$(SOURCE)/stack.h $(SOURCE)/heap.c $(SOURCE)/heap.h $(SOURCE)/alloc.c \
+	$(SOURCE)/alloc.h $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/diag.h $(SOURCE)/stack.c $(SOURCE)/addr.c $(SOURCE)/strtab.c \
+	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
+	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
+	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/version.c
+$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
+	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
+	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
+	$(SOURCE)/stack.h $(SOURCE)/heap.c $(SOURCE)/heap.h $(SOURCE)/alloc.c \
+	$(SOURCE)/alloc.h $(SOURCE)/info.c $(SOURCE)/info.h $(SOURCE)/addr.h \
+	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
+	$(SOURCE)/diag.h $(SOURCE)/mutex.h $(SOURCE)/stack.c $(SOURCE)/addr.c \
+	$(SOURCE)/strtab.c $(SOURCE)/symbol.c $(SOURCE)/signals.c \
+	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
+	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
+	$(SOURCE)/inter.c $(SOURCE)/version.c

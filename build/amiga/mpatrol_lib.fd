@@ -1,0 +1,38 @@
+* mpatrol
+* A library for controlling and tracing dynamic memory allocations.
+* Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Library General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Library General Public License for more details.
+*
+* You should have received a copy of the GNU Library General Public
+* License along with this library; if not, write to the Free
+* Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+* MA 02111-1307, USA.
+*
+* Shared Library Function Definitions
+*
+##base _MPatrolBase
+##bias 30
+##public
+__mp_init()()
+__mp_fini()()
+__mp_alloc(a,b,c,d,e,f,g)(D0,D1,D2,A0,A1,D3,D4)
+__mp_strdup(a,b,c,d,e,f,g)(A0,D0,D1,A1,A2,D2,D3)
+__mp_realloc(a,b,c,d,e,f,g,h)(A0,D0,D1,D2,A1,A2,D3,D4)
+__mp_free(a,b,c,d,e,f)(A0,D0,A1,A2,D1,D2)
+__mp_info(a,b)(A0,A1)
+__mp_memorymap(a)(D0)
+__mp_summary()()
+__mp_check()()
+__mp_prologue(a)(A0)
+__mp_epilogue(a)(A0)
+__mp_nomemory(a)(A0)
+##end
