@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 9th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 9th
 November, 2000.
 
 * Menu:
@@ -267,7 +267,7 @@ out.
      `expand()'    old     Resizes memory but does not relocate it.
      `free()'      ANSI    Frees memory.
      `cfree()'     old     Frees memory allocated by `calloc()'.
-     `dealloca()'  old     Explicitly frees temporary memory.
+     `dealloca()'  new     Explicitly frees temporary memory.
 
    * Contains 4 replacement C++ dynamic memory allocation functions:
 
@@ -5371,11 +5371,11 @@ used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is `NULL' then the `NULL' pointer
-     will be returned.  If there is not enough space in the heap then
-     the `NULL' pointer will be returned and `errno' will be set to
-     `ENOMEM'.  The allocated memory must be deallocated with `free()'
-     or reallocated with `realloc()'.
+     to the length of STR.  If STR is `NULL' then an error will be
+     given and the `NULL' pointer will be returned.  If there is not
+     enough space in the heap then the `NULL' pointer will be returned
+     and `errno' will be set to `ENOMEM'.  The allocated memory must be
+     deallocated with `free()' or reallocated with `realloc()'.
 
 `char *strndup(const char *str, size_t size)'
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5383,15 +5383,16 @@ used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is `NULL' then the `NULL' pointer
-     will be returned.  If the length of STR is greater than SIZE then
-     only SIZE characters will be allocated and copied, with one
-     additional byte for the nul character.  If there is not enough
-     space in the heap then the `NULL' pointer will be returned and
-     `errno' will be set to `ENOMEM'.  The allocated memory must be
-     deallocated with `free()' or reallocated with `realloc()'.  This
-     function is available for backwards compatibility with older C
-     libraries and should not be used in new code.
+     to the length of STR.  If STR is `NULL' and SIZE is non-zero then
+     an error will be given and the `NULL' pointer will be returned.
+     If the length of STR is greater than SIZE then only SIZE
+     characters will be allocated and copied, with one additional byte
+     for the nul character.  If there is not enough space in the heap
+     then the `NULL' pointer will be returned and `errno' will be set to
+     `ENOMEM'.  The allocated memory must be deallocated with `free()'
+     or reallocated with `realloc()'.  This function is available for
+     backwards compatibility with older C libraries and should not be
+     used in new code.
 
 `char *strsave(const char *str)'
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5399,13 +5400,13 @@ used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is `NULL' then the `NULL' pointer
-     will be returned.  If there is not enough space in the heap then
-     the `NULL' pointer will be returned and `errno' will be set to
-     `ENOMEM'.  The allocated memory must be deallocated with `free()'
-     or reallocated with `realloc()'.  This function is available for
-     backwards compatibility with older C libraries and should not be
-     used in new code.
+     to the length of STR.  If STR is `NULL' then an error will be
+     given and the `NULL' pointer will be returned.  If there is not
+     enough space in the heap then the `NULL' pointer will be returned
+     and `errno' will be set to `ENOMEM'.  The allocated memory must be
+     deallocated with `free()' or reallocated with `realloc()'.  This
+     function is available for backwards compatibility with older C
+     libraries and should not be used in new code.
 
 `char *strnsave(const char *str, size_t size)'
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5413,15 +5414,16 @@ used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is `NULL' then the `NULL' pointer
-     will be returned.  If the length of STR is greater than SIZE then
-     only SIZE characters will be allocated and copied, with one
-     additional byte for the nul character.  If there is not enough
-     space in the heap then the `NULL' pointer will be returned and
-     `errno' will be set to `ENOMEM'.  The allocated memory must be
-     deallocated with `free()' or reallocated with `realloc()'.  This
-     function is available for backwards compatibility with older C
-     libraries and should not be used in new code.
+     to the length of STR.  If STR is `NULL' and SIZE is non-zero then
+     an error will be given and the `NULL' pointer will be returned.
+     If the length of STR is greater than SIZE then only SIZE
+     characters will be allocated and copied, with one additional byte
+     for the nul character.  If there is not enough space in the heap
+     then the `NULL' pointer will be returned and `errno' will be set to
+     `ENOMEM'.  The allocated memory must be deallocated with `free()'
+     or reallocated with `realloc()'.  This function is available for
+     backwards compatibility with older C libraries and should not be
+     used in new code.
 
 `char *strdupa(const char *str)'
      Allocates exactly enough temporary memory from the heap to
@@ -5429,19 +5431,19 @@ used.
      returns a pointer to the first byte of the allocation after
      copying STR to the newly-allocated memory.  The pointer returned
      will have no alignment constraints and can be used to store
-     character data up to the length of STR.  If STR is `NULL' then the
-     `NULL' pointer will be returned.  If there is not enough space in
-     the heap then the `NULL' pointer will be returned and `errno' will
-     be set to `ENOMEM'.  The `strdupa()' function normally allocates
-     its memory from the stack, with the result that all such
-     allocations will be freed when the function returns.  This version
-     of `strdupa()' allocates its memory from the heap in order to
-     provide better debugging, but the allocations may not necessarily
-     be freed immediately when the function returns.  The allocated
-     memory can be deallocated explicitly with `dealloca()', but may
-     not be reallocated or deallocated in any other way.  This function
-     is available for backwards compatibility with older C source code
-     and should not be used in new code.
+     character data up to the length of STR.  If STR is `NULL' then an
+     error will be given and the `NULL' pointer will be returned.  If
+     there is not enough space in the heap then the `NULL' pointer will
+     be returned and `errno' will be set to `ENOMEM'.  The `strdupa()'
+     function normally allocates its memory from the stack, with the
+     result that all such allocations will be freed when the function
+     returns.  This version of `strdupa()' allocates its memory from
+     the heap in order to provide better debugging, but the allocations
+     may not necessarily be freed immediately when the function
+     returns.  The allocated memory can be deallocated explicitly with
+     `dealloca()', but may not be reallocated or deallocated in any
+     other way.  This function is available for backwards compatibility
+     with older C source code and should not be used in new code.
 
 `char *strndupa(const char *str, size_t size)'
      Allocates exactly enough temporary memory from the heap to
@@ -5449,12 +5451,13 @@ used.
      returns a pointer to the first byte of the allocation after
      copying STR to the newly-allocated memory.  The pointer returned
      will have no alignment constraints and can be used to store
-     character data up to the length of STR.  If STR is `NULL' then the
-     `NULL' pointer will be returned.  If the length of STR is greater
-     than SIZE then only SIZE characters will be allocated and copied,
-     with one additional byte for the nul character.  If there is not
-     enough space in the heap then the `NULL' pointer will be returned
-     and `errno' will be set to `ENOMEM'.  The `strndupa()' function
+     character data up to the length of STR.  If STR is `NULL' and SIZE
+     is non-zero then an error will be given and the `NULL' pointer
+     will be returned.  If the length of STR is greater than SIZE then
+     only SIZE characters will be allocated and copied, with one
+     additional byte for the nul character.  If there is not enough
+     space in the heap then the `NULL' pointer will be returned and
+     `errno' will be set to `ENOMEM'.  The `strndupa()' function
      normally allocates its memory from the stack, with the result that
      all such allocations will be freed when the function returns.
      This version of `strndupa()' allocates its memory from the heap in
@@ -7845,6 +7848,12 @@ File: mpatrol.info,  Node: Amiga notes,  Next: Windows notes,  Prev: UNIX notes,
 Notes for Amiga platforms
 =========================
 
+   The Amiga has now been re-released as a completely new machine which
+comes with a completely new operating system.  As a result, I will not
+be implementing any of the following features (or fixing any of the
+following problems) in mpatrol for the old AmigaOS.  Support for the
+new AmigaOS may be added in the future.
+
    * Perhaps add support for building mpatrol as an Amiga shared
      library.  I attempted to do this in a previous release of mpatrol,
      but it would have involved too many source changes to get working
@@ -7858,7 +7867,9 @@ Notes for Amiga platforms
    * Need to fix the problem where the maximum guaranteed alignment of
      an internal mpatrol library memory allocation is 8 bytes.
      However, this limitation does not affect the `memalign()' and
-     related functions.
+     related functions, and should not have any effect on the running
+     of mpatrol since no datatypes require an alignment of more than 8
+     bytes.
 
    * Need to add proper support for call stack traversal for both the
      Motorola 680x0 and PowerPC processor architectures.  When `gcc' is
@@ -7931,6 +7942,12 @@ File: mpatrol.info,  Node: Netware notes,  Prev: Windows notes,  Up: Notes
 
 Notes for Netware platforms
 ===========================
+
+   There doesn't appear to have been any interest in the Netware
+version of mpatrol and as a result I will not be implementing any of
+the following features (or fixing any of the following problems) in
+mpatrol for Netware.  I don't even have access to a Netware machine so
+someone else would have had to have done it anyway.
 
    * The library has not yet been built (let alone tested) on Netware
      platforms.  The names of the system functions that the library
@@ -10789,33 +10806,33 @@ Ref: Tutorial-Footnote-3244195
 Ref: Tutorial-Footnote-4244332
 Ref: Tutorial-Footnote-5244431
 Node: Functions244712
-Node: Environment274624
-Node: Options292367
-Node: Diagnostic messages302300
-Node: Library performance316737
-Node: Profiling file format319239
-Ref: Profiling file format-Footnote-1322526
-Node: Supported systems322706
-Node: New system support335515
-Node: New processor support336711
-Node: New file format support337394
-Node: Notes337784
-Node: Generic notes339395
-Ref: Generic notes-Footnote-1352907
-Node: UNIX notes353129
-Node: Amiga notes357723
-Node: Windows notes360664
-Node: Netware notes361814
-Node: Frequently asked questions363778
-Node: Documentation364401
-Node: Building368194
-Node: Linking372952
-Node: Running377224
-Node: Files389850
-Node: Related software392438
-Ref: Related software-Footnote-1426189
-Node: References426430
-Node: Function index429030
-Node: Index431291
+Node: Environment274862
+Node: Options292605
+Node: Diagnostic messages302538
+Node: Library performance316975
+Node: Profiling file format319477
+Ref: Profiling file format-Footnote-1322764
+Node: Supported systems322944
+Node: New system support335753
+Node: New processor support336949
+Node: New file format support337632
+Node: Notes338022
+Node: Generic notes339633
+Ref: Generic notes-Footnote-1353145
+Node: UNIX notes353367
+Node: Amiga notes357961
+Node: Windows notes361352
+Node: Netware notes362502
+Node: Frequently asked questions364792
+Node: Documentation365415
+Node: Building369208
+Node: Linking373966
+Node: Running378238
+Node: Files390864
+Node: Related software393452
+Ref: Related software-Footnote-1427203
+Node: References427444
+Node: Function index430044
+Node: Index432305
 
 End Tag Table

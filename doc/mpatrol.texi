@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.130 2000-11-08 01:31:26 graeme Exp $
+@c $Id: mpatrol.texi,v 1.131 2000-11-09 19:30:05 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 8th November, 2000
+@set UPDATED 9th November, 2000
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -364,7 +364,7 @@ Contains 18 replacement C dynamic memory allocation functions:
 @tab old
 @tab Frees memory allocated by @code{calloc()}.
 @item @code{dealloca()}
-@tab old
+@tab new
 @tab Explicitly frees temporary memory.
 @end multitable
 
@@ -5714,11 +5714,11 @@ Allocates exactly enough memory from the heap to duplicate @var{str} (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying @var{str} to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of @var{str}.  If @var{str} is @samp{NULL} then the
-@samp{NULL} pointer will be returned.  If there is not enough space in the heap
-then the @samp{NULL} pointer will be returned and @code{errno} will be set to
-@code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} or
-reallocated with @code{realloc()}.
+data up to the length of @var{str}.  If @var{str} is @samp{NULL} then an error
+will be given and the @samp{NULL} pointer will be returned.  If there is not
+enough space in the heap then the @samp{NULL} pointer will be returned and
+@code{errno} will be set to @code{ENOMEM}.  The allocated memory must be
+deallocated with @code{free()} or reallocated with @code{realloc()}.
 
 @findex strndup
 @item @code{char *strndup(const char *str, size_t size)}
@@ -5726,15 +5726,15 @@ Allocates exactly enough memory from the heap to duplicate @var{str} (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying @var{str} to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of @var{str}.  If @var{str} is @samp{NULL} then the
-@samp{NULL} pointer will be returned.  If the length of @var{str} is greater
-than @var{size} then only @var{size} characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the @samp{NULL} pointer will be returned and @code{errno} will be
-set to @code{ENOMEM}.  The allocated memory must be deallocated with
-@code{free()} or reallocated with @code{realloc()}.  This function is available
-for backwards compatibility with older C libraries and should not be used in new
-code.
+data up to the length of @var{str}.  If @var{str} is @samp{NULL} and @var{size}
+is non-zero then an error will be given and the @samp{NULL} pointer will be
+returned.  If the length of @var{str} is greater than @var{size} then only
+@var{size} characters will be allocated and copied, with one additional byte for
+the nul character.  If there is not enough space in the heap then the
+@samp{NULL} pointer will be returned and @code{errno} will be set to
+@code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} or
+reallocated with @code{realloc()}.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
 
 @findex strsave
 @item @code{char *strsave(const char *str)}
@@ -5742,12 +5742,13 @@ Allocates exactly enough memory from the heap to duplicate @var{str} (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying @var{str} to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of @var{str}.  If @var{str} is @samp{NULL} then the
-@samp{NULL} pointer will be returned.  If there is not enough space in the heap
-then the @samp{NULL} pointer will be returned and @code{errno} will be set to
-@code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} or
-reallocated with @code{realloc()}.  This function is available for backwards
-compatibility with older C libraries and should not be used in new code.
+data up to the length of @var{str}.  If @var{str} is @samp{NULL} then an error
+will be given and the @samp{NULL} pointer will be returned.  If there is not
+enough space in the heap then the @samp{NULL} pointer will be returned and
+@code{errno} will be set to @code{ENOMEM}.  The allocated memory must be
+deallocated with @code{free()} or reallocated with @code{realloc()}.  This
+function is available for backwards compatibility with older C libraries and
+should not be used in new code.
 
 @findex strnsave
 @item @code{char *strnsave(const char *str, size_t size)}
@@ -5755,15 +5756,15 @@ Allocates exactly enough memory from the heap to duplicate @var{str} (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying @var{str} to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of @var{str}.  If @var{str} is @samp{NULL} then the
-@samp{NULL} pointer will be returned.  If the length of @var{str} is greater
-than @var{size} then only @var{size} characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the @samp{NULL} pointer will be returned and @code{errno} will be
-set to @code{ENOMEM}.  The allocated memory must be deallocated with
-@code{free()} or reallocated with @code{realloc()}.  This function is available
-for backwards compatibility with older C libraries and should not be used in new
-code.
+data up to the length of @var{str}.  If @var{str} is @samp{NULL} and @var{size}
+is non-zero then an error will be given and the @samp{NULL} pointer will be
+returned.  If the length of @var{str} is greater than @var{size} then only
+@var{size} characters will be allocated and copied, with one additional byte for
+the nul character.  If there is not enough space in the heap then the
+@samp{NULL} pointer will be returned and @code{errno} will be set to
+@code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} or
+reallocated with @code{realloc()}.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
 
 @findex strdupa
 @item @code{char *strdupa(const char *str)}
@@ -5772,17 +5773,17 @@ Allocates exactly enough temporary memory from the heap to duplicate @var{str}
 byte of the allocation after copying @var{str} to the newly-allocated memory.
 The pointer returned will have no alignment constraints and can be used to store
 character data up to the length of @var{str}.  If @var{str} is @samp{NULL} then
-the @samp{NULL} pointer will be returned.  If there is not enough space in the
-heap then the @samp{NULL} pointer will be returned and @code{errno} will be set
-to @code{ENOMEM}.  The @code{strdupa()} function normally allocates its memory
-from the stack, with the result that all such allocations will be freed when the
-function returns.  This version of @code{strdupa()} allocates its memory from
-the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with @code{dealloca()}, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+an error will be given and the @samp{NULL} pointer will be returned.  If there
+is not enough space in the heap then the @samp{NULL} pointer will be returned
+and @code{errno} will be set to @code{ENOMEM}.  The @code{strdupa()} function
+normally allocates its memory from the stack, with the result that all such
+allocations will be freed when the function returns.  This version of
+@code{strdupa()} allocates its memory from the heap in order to provide better
+debugging, but the allocations may not necessarily be freed immediately when the
+function returns.  The allocated memory can be deallocated explicitly with
+@code{dealloca()}, but may not be reallocated or deallocated in any other way.
+This function is available for backwards compatibility with older C source code
+and should not be used in new code.
 
 @findex strndupa
 @item @code{char *strndupa(const char *str, size_t size)}
@@ -5790,20 +5791,21 @@ Allocates exactly enough temporary memory from the heap to duplicate @var{str}
 (including the terminating nul character) and returns a pointer to the first
 byte of the allocation after copying @var{str} to the newly-allocated memory.
 The pointer returned will have no alignment constraints and can be used to store
-character data up to the length of @var{str}.  If @var{str} is @samp{NULL} then
-the @samp{NULL} pointer will be returned.  If the length of @var{str} is greater
-than @var{size} then only @var{size} characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the @samp{NULL} pointer will be returned and @code{errno} will be
-set to @code{ENOMEM}.  The @code{strndupa()} function normally allocates its
-memory from the stack, with the result that all such allocations will be freed
-when the function returns.  This version of @code{strndupa()} allocates its
-memory from the heap in order to provide better debugging, but the allocations
-may not necessarily be freed immediately when the function returns.  The
-allocated memory can be deallocated explicitly with @code{dealloca()}, but may
-not be reallocated or deallocated in any other way.  This function is available
-for backwards compatibility with older C source code and should not be used in
-new code.
+character data up to the length of @var{str}.  If @var{str} is @samp{NULL} and
+@var{size} is non-zero then an error will be given and the @samp{NULL} pointer
+will be returned.  If the length of @var{str} is greater than @var{size} then
+only @var{size} characters will be allocated and copied, with one additional
+byte for the nul character.  If there is not enough space in the heap then the
+@samp{NULL} pointer will be returned and @code{errno} will be set to
+@code{ENOMEM}.  The @code{strndupa()} function normally allocates its memory
+from the stack, with the result that all such allocations will be freed when the
+function returns.  This version of @code{strndupa()} allocates its memory from
+the heap in order to provide better debugging, but the allocations may not
+necessarily be freed immediately when the function returns.  The allocated
+memory can be deallocated explicitly with @code{dealloca()}, but may not be
+reallocated or deallocated in any other way.  This function is available for
+backwards compatibility with older C source code and should not be used in new
+code.
 
 @findex realloc
 @item @code{void *realloc(void *ptr, size_t size)}
@@ -8438,6 +8440,12 @@ and possibly also a package in the HP/UX package format.
 @cindex notes for Amiga platforms
 @cindex Amiga notes
 
+The Amiga has now been re-released as a completely new machine which comes with
+a completely new operating system.  As a result, I will not be implementing
+any of the following features (or fixing any of the following problems) in
+mpatrol for the old AmigaOS.  Support for the new AmigaOS may be added in the
+future.
+
 @itemize @bullet
 @item
 Perhaps add support for building mpatrol as an Amiga shared library.  I
@@ -8452,7 +8460,9 @@ these functions, thus getting the @option{--dynamic} option in the
 @item
 Need to fix the problem where the maximum guaranteed alignment of an internal
 mpatrol library memory allocation is 8 bytes.  However, this limitation does
-not affect the @code{memalign()} and related functions.
+not affect the @code{memalign()} and related functions, and should not have any
+effect on the running of mpatrol since no datatypes require an alignment of more
+than 8 bytes.
 
 @item
 Need to add proper support for call stack traversal for both the Motorola 680x0
@@ -8535,6 +8545,12 @@ Perhaps add an @command{InstallShield} installation script with icons.
 @appendixsec Notes for Netware platforms
 @cindex notes for Netware platforms
 @cindex Netware notes
+
+There doesn't appear to have been any interest in the Netware version of mpatrol
+and as a result I will not be implementing any of the following features (or
+fixing any of the following problems) in mpatrol for Netware.  I don't even have
+access to a Netware machine so someone else would have had to have done it
+anyway.
 
 @itemize @bullet
 @item

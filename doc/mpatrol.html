@@ -101,7 +101,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.0 of the mpatrol manual for version
-1.3.0, 8th November, 2000.
+1.3.0, 9th November, 2000.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -346,7 +346,7 @@ allocated on the heap.
 <td>old
 <td>Frees memory allocated by <code>calloc()</code>. 
 <br></tr><tr align="left"><td><code>dealloca()</code>
-<td>old
+<td>new
 <td>Explicitly frees temporary memory.
 <br></tr></table>
 
@@ -5297,53 +5297,54 @@ code.
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying <var>str</var> to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then the
-<code>NULL</code> pointer will be returned.  If there is not enough space in the heap
-then the <code>NULL</code> pointer will be returned and <code>errno</code> will be set to
-<code>ENOMEM</code>.  The allocated memory must be deallocated with <code>free()</code> or
-reallocated with <code>realloc()</code>.
+data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then an error
+will be given and the <code>NULL</code> pointer will be returned.  If there is not
+enough space in the heap then the <code>NULL</code> pointer will be returned and
+<code>errno</code> will be set to <code>ENOMEM</code>.  The allocated memory must be
+deallocated with <code>free()</code> or reallocated with <code>realloc()</code>.
 
 <br><dt><code>char *strndup(const char *str, size_t size)</code>
 <dd>Allocates exactly enough memory from the heap to duplicate <var>str</var> (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying <var>str</var> to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then the
-<code>NULL</code> pointer will be returned.  If the length of <var>str</var> is greater
-than <var>size</var> then only <var>size</var> characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be
-set to <code>ENOMEM</code>.  The allocated memory must be deallocated with
-<code>free()</code> or reallocated with <code>realloc()</code>.  This function is available
-for backwards compatibility with older C libraries and should not be used in new
-code.
+data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> and <var>size</var>
+is non-zero then an error will be given and the <code>NULL</code> pointer will be
+returned.  If the length of <var>str</var> is greater than <var>size</var> then only
+<var>size</var> characters will be allocated and copied, with one additional byte for
+the nul character.  If there is not enough space in the heap then the
+<code>NULL</code> pointer will be returned and <code>errno</code> will be set to
+<code>ENOMEM</code>.  The allocated memory must be deallocated with <code>free()</code> or
+reallocated with <code>realloc()</code>.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
 
 <br><dt><code>char *strsave(const char *str)</code>
 <dd>Allocates exactly enough memory from the heap to duplicate <var>str</var> (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying <var>str</var> to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then the
-<code>NULL</code> pointer will be returned.  If there is not enough space in the heap
-then the <code>NULL</code> pointer will be returned and <code>errno</code> will be set to
-<code>ENOMEM</code>.  The allocated memory must be deallocated with <code>free()</code> or
-reallocated with <code>realloc()</code>.  This function is available for backwards
-compatibility with older C libraries and should not be used in new code.
+data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then an error
+will be given and the <code>NULL</code> pointer will be returned.  If there is not
+enough space in the heap then the <code>NULL</code> pointer will be returned and
+<code>errno</code> will be set to <code>ENOMEM</code>.  The allocated memory must be
+deallocated with <code>free()</code> or reallocated with <code>realloc()</code>.  This
+function is available for backwards compatibility with older C libraries and
+should not be used in new code.
 
 <br><dt><code>char *strnsave(const char *str, size_t size)</code>
 <dd>Allocates exactly enough memory from the heap to duplicate <var>str</var> (including
 the terminating nul character) and returns a pointer to the first byte of the
 allocation after copying <var>str</var> to the newly-allocated memory.  The pointer
 returned will have no alignment constraints and can be used to store character
-data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then the
-<code>NULL</code> pointer will be returned.  If the length of <var>str</var> is greater
-than <var>size</var> then only <var>size</var> characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be
-set to <code>ENOMEM</code>.  The allocated memory must be deallocated with
-<code>free()</code> or reallocated with <code>realloc()</code>.  This function is available
-for backwards compatibility with older C libraries and should not be used in new
-code.
+data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> and <var>size</var>
+is non-zero then an error will be given and the <code>NULL</code> pointer will be
+returned.  If the length of <var>str</var> is greater than <var>size</var> then only
+<var>size</var> characters will be allocated and copied, with one additional byte for
+the nul character.  If there is not enough space in the heap then the
+<code>NULL</code> pointer will be returned and <code>errno</code> will be set to
+<code>ENOMEM</code>.  The allocated memory must be deallocated with <code>free()</code> or
+reallocated with <code>realloc()</code>.  This function is available for backwards
+compatibility with older C libraries and should not be used in new code.
 
 <br><dt><code>char *strdupa(const char *str)</code>
 <dd>Allocates exactly enough temporary memory from the heap to duplicate <var>str</var>
@@ -5351,37 +5352,38 @@ code.
 byte of the allocation after copying <var>str</var> to the newly-allocated memory. 
 The pointer returned will have no alignment constraints and can be used to store
 character data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then
-the <code>NULL</code> pointer will be returned.  If there is not enough space in the
-heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be set
-to <code>ENOMEM</code>.  The <code>strdupa()</code> function normally allocates its memory
-from the stack, with the result that all such allocations will be freed when the
-function returns.  This version of <code>strdupa()</code> allocates its memory from
-the heap in order to provide better debugging, but the allocations may not
-necessarily be freed immediately when the function returns.  The allocated
-memory can be deallocated explicitly with <code>dealloca()</code>, but may not be
-reallocated or deallocated in any other way.  This function is available for
-backwards compatibility with older C source code and should not be used in new
-code.
+an error will be given and the <code>NULL</code> pointer will be returned.  If there
+is not enough space in the heap then the <code>NULL</code> pointer will be returned
+and <code>errno</code> will be set to <code>ENOMEM</code>.  The <code>strdupa()</code> function
+normally allocates its memory from the stack, with the result that all such
+allocations will be freed when the function returns.  This version of
+<code>strdupa()</code> allocates its memory from the heap in order to provide better
+debugging, but the allocations may not necessarily be freed immediately when the
+function returns.  The allocated memory can be deallocated explicitly with
+<code>dealloca()</code>, but may not be reallocated or deallocated in any other way. 
+This function is available for backwards compatibility with older C source code
+and should not be used in new code.
 
 <br><dt><code>char *strndupa(const char *str, size_t size)</code>
 <dd>Allocates exactly enough temporary memory from the heap to duplicate <var>str</var>
 (including the terminating nul character) and returns a pointer to the first
 byte of the allocation after copying <var>str</var> to the newly-allocated memory. 
 The pointer returned will have no alignment constraints and can be used to store
-character data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> then
-the <code>NULL</code> pointer will be returned.  If the length of <var>str</var> is greater
-than <var>size</var> then only <var>size</var> characters will be allocated and copied,
-with one additional byte for the nul character.  If there is not enough space in
-the heap then the <code>NULL</code> pointer will be returned and <code>errno</code> will be
-set to <code>ENOMEM</code>.  The <code>strndupa()</code> function normally allocates its
-memory from the stack, with the result that all such allocations will be freed
-when the function returns.  This version of <code>strndupa()</code> allocates its
-memory from the heap in order to provide better debugging, but the allocations
-may not necessarily be freed immediately when the function returns.  The
-allocated memory can be deallocated explicitly with <code>dealloca()</code>, but may
-not be reallocated or deallocated in any other way.  This function is available
-for backwards compatibility with older C source code and should not be used in
-new code.
+character data up to the length of <var>str</var>.  If <var>str</var> is <code>NULL</code> and
+<var>size</var> is non-zero then an error will be given and the <code>NULL</code> pointer
+will be returned.  If the length of <var>str</var> is greater than <var>size</var> then
+only <var>size</var> characters will be allocated and copied, with one additional
+byte for the nul character.  If there is not enough space in the heap then the
+<code>NULL</code> pointer will be returned and <code>errno</code> will be set to
+<code>ENOMEM</code>.  The <code>strndupa()</code> function normally allocates its memory
+from the stack, with the result that all such allocations will be freed when the
+function returns.  This version of <code>strndupa()</code> allocates its memory from
+the heap in order to provide better debugging, but the allocations may not
+necessarily be freed immediately when the function returns.  The allocated
+memory can be deallocated explicitly with <code>dealloca()</code>, but may not be
+reallocated or deallocated in any other way.  This function is available for
+backwards compatibility with older C source code and should not be used in new
+code.
 
 <br><dt><code>void *realloc(void *ptr, size_t size)</code>
 <dd>Resizes the memory allocation beginning at <var>ptr</var> to <var>size</var> bytes and
@@ -7626,6 +7628,12 @@ Up:<a rel=up href="#Notes">Notes</a>
 
 <h2>H.3 Notes for Amiga platforms</h2>
 
+<p>The Amiga has now been re-released as a completely new machine which comes with
+a completely new operating system.  As a result, I will not be implementing
+any of the following features (or fixing any of the following problems) in
+mpatrol for the old AmigaOS.  Support for the new AmigaOS may be added in the
+future.
+
 <ul>
 <li>Perhaps add support for building mpatrol as an Amiga shared library.  I
 attempted to do this in a previous release of mpatrol, but it would have
@@ -7638,7 +7646,9 @@ these functions, thus getting the <code>--dynamic</code> option in the
 
 <li>Need to fix the problem where the maximum guaranteed alignment of an internal
 mpatrol library memory allocation is 8 bytes.  However, this limitation does
-not affect the <code>memalign()</code> and related functions.
+not affect the <code>memalign()</code> and related functions, and should not have any
+effect on the running of mpatrol since no datatypes require an alignment of more
+than 8 bytes.
 
 <li>Need to add proper support for call stack traversal for both the Motorola 680x0
 and PowerPC processor architectures.  When <code>gcc</code> is being used then
@@ -7715,6 +7725,12 @@ Up:<a rel=up href="#Notes">Notes</a>
 <br>
 
 <h2>H.5 Notes for Netware platforms</h2>
+
+<p>There doesn't appear to have been any interest in the Netware version of mpatrol
+and as a result I will not be implementing any of the following features (or
+fixing any of the following problems) in mpatrol for Netware.  I don't even have
+access to a Netware machine so someone else would have had to have done it
+anyway.
 
 <ul>
 <li>The library has not yet been built (let alone tested) on Netware platforms.  The

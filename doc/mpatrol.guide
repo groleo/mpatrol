@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 9th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 8th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 9th
 November, 2000.
 
 
@@ -283,7 +283,7 @@ out.
      @{b}expand()@{ub}      old     Resizes memory but does not relocate it.
      @{b}free()@{ub}        ANSI    Frees memory.
      @{b}cfree()@{ub}       old     Frees memory allocated by @{b}calloc()@{ub}.
-     @{b}dealloca()@{ub}    old     Explicitly frees temporary memory.
+     @{b}dealloca()@{ub}    new     Explicitly frees temporary memory.
 
    * Contains 4 replacement C++ dynamic memory allocation functions:
 
@@ -5512,11 +5512,11 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is @{b}NULL@{ub} then the @{b}NULL@{ub} pointer will
-     be returned.  If there is not enough space in the heap then the
-     @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.
-     The allocated memory must be deallocated with @{b}free()@{ub} or
-     reallocated with @{b}realloc()@{ub}.
+     to the length of STR.  If STR is @{b}NULL@{ub} then an error will be given
+     and the @{b}NULL@{ub} pointer will be returned.  If there is not enough
+     space in the heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub}
+     will be set to @{b}ENOMEM@{ub}.  The allocated memory must be deallocated
+     with @{b}free()@{ub} or reallocated with @{b}realloc()@{ub}.
 
 @{b}char *strndup(const char *str, size_t size)@{ub}
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5524,15 +5524,16 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is @{b}NULL@{ub} then the @{b}NULL@{ub} pointer will
-     be returned.  If the length of STR is greater than SIZE then only
-     SIZE characters will be allocated and copied, with one additional
-     byte for the nul character.  If there is not enough space in the
-     heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set
-     to @{b}ENOMEM@{ub}.  The allocated memory must be deallocated with @{b}free()@{ub}
-     or reallocated with @{b}realloc()@{ub}.  This function is available for
-     backwards compatibility with older C libraries and should not be
-     used in new code.
+     to the length of STR.  If STR is @{b}NULL@{ub} and SIZE is non-zero then an
+     error will be given and the @{b}NULL@{ub} pointer will be returned.  If the
+     length of STR is greater than SIZE then only SIZE characters will
+     be allocated and copied, with one additional byte for the nul
+     character.  If there is not enough space in the heap then the @{b}NULL@{ub}
+     pointer will be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The
+     allocated memory must be deallocated with @{b}free()@{ub} or reallocated
+     with @{b}realloc()@{ub}.  This function is available for backwards
+     compatibility with older C libraries and should not be used in new
+     code.
 
 @{b}char *strsave(const char *str)@{ub}
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5540,13 +5541,13 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is @{b}NULL@{ub} then the @{b}NULL@{ub} pointer will
-     be returned.  If there is not enough space in the heap then the
-     @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.
-     The allocated memory must be deallocated with @{b}free()@{ub} or
-     reallocated with @{b}realloc()@{ub}.  This function is available for
-     backwards compatibility with older C libraries and should not be
-     used in new code.
+     to the length of STR.  If STR is @{b}NULL@{ub} then an error will be given
+     and the @{b}NULL@{ub} pointer will be returned.  If there is not enough
+     space in the heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub}
+     will be set to @{b}ENOMEM@{ub}.  The allocated memory must be deallocated
+     with @{b}free()@{ub} or reallocated with @{b}realloc()@{ub}.  This function is
+     available for backwards compatibility with older C libraries and
+     should not be used in new code.
 
 @{b}char *strnsave(const char *str, size_t size)@{ub}
      Allocates exactly enough memory from the heap to duplicate STR
@@ -5554,15 +5555,16 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      the first byte of the allocation after copying STR to the
      newly-allocated memory.  The pointer returned will have no
      alignment constraints and can be used to store character data up
-     to the length of STR.  If STR is @{b}NULL@{ub} then the @{b}NULL@{ub} pointer will
-     be returned.  If the length of STR is greater than SIZE then only
-     SIZE characters will be allocated and copied, with one additional
-     byte for the nul character.  If there is not enough space in the
-     heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set
-     to @{b}ENOMEM@{ub}.  The allocated memory must be deallocated with @{b}free()@{ub}
-     or reallocated with @{b}realloc()@{ub}.  This function is available for
-     backwards compatibility with older C libraries and should not be
-     used in new code.
+     to the length of STR.  If STR is @{b}NULL@{ub} and SIZE is non-zero then an
+     error will be given and the @{b}NULL@{ub} pointer will be returned.  If the
+     length of STR is greater than SIZE then only SIZE characters will
+     be allocated and copied, with one additional byte for the nul
+     character.  If there is not enough space in the heap then the @{b}NULL@{ub}
+     pointer will be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The
+     allocated memory must be deallocated with @{b}free()@{ub} or reallocated
+     with @{b}realloc()@{ub}.  This function is available for backwards
+     compatibility with older C libraries and should not be used in new
+     code.
 
 @{b}char *strdupa(const char *str)@{ub}
      Allocates exactly enough temporary memory from the heap to
@@ -5570,19 +5572,19 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      returns a pointer to the first byte of the allocation after
      copying STR to the newly-allocated memory.  The pointer returned
      will have no alignment constraints and can be used to store
-     character data up to the length of STR.  If STR is @{b}NULL@{ub} then the
-     @{b}NULL@{ub} pointer will be returned.  If there is not enough space in the
-     heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set
-     to @{b}ENOMEM@{ub}.  The @{b}strdupa()@{ub} function normally allocates its memory
-     from the stack, with the result that all such allocations will be
-     freed when the function returns.  This version of @{b}strdupa()@{ub}
-     allocates its memory from the heap in order to provide better
-     debugging, but the allocations may not necessarily be freed
-     immediately when the function returns.  The allocated memory can
-     be deallocated explicitly with @{b}dealloca()@{ub}, but may not be
-     reallocated or deallocated in any other way.  This function is
-     available for backwards compatibility with older C source code and
-     should not be used in new code.
+     character data up to the length of STR.  If STR is @{b}NULL@{ub} then an
+     error will be given and the @{b}NULL@{ub} pointer will be returned.  If
+     there is not enough space in the heap then the @{b}NULL@{ub} pointer will
+     be returned and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The @{b}strdupa()@{ub}
+     function normally allocates its memory from the stack, with the
+     result that all such allocations will be freed when the function
+     returns.  This version of @{b}strdupa()@{ub} allocates its memory from the
+     heap in order to provide better debugging, but the allocations may
+     not necessarily be freed immediately when the function returns.
+     The allocated memory can be deallocated explicitly with
+     @{b}dealloca()@{ub}, but may not be reallocated or deallocated in any other
+     way.  This function is available for backwards compatibility with
+     older C source code and should not be used in new code.
 
 @{b}char *strndupa(const char *str, size_t size)@{ub}
      Allocates exactly enough temporary memory from the heap to
@@ -5590,19 +5592,20 @@ otherwise the debugging version of @{b}alloca()@{ub} will not be used.
      returns a pointer to the first byte of the allocation after
      copying STR to the newly-allocated memory.  The pointer returned
      will have no alignment constraints and can be used to store
-     character data up to the length of STR.  If STR is @{b}NULL@{ub} then the
-     @{b}NULL@{ub} pointer will be returned.  If the length of STR is greater
-     than SIZE then only SIZE characters will be allocated and copied,
-     with one additional byte for the nul character.  If there is not
-     enough space in the heap then the @{b}NULL@{ub} pointer will be returned
-     and @{b}errno@{ub} will be set to @{b}ENOMEM@{ub}.  The @{b}strndupa()@{ub} function normally
-     allocates its memory from the stack, with the result that all such
-     allocations will be freed when the function returns.  This version
-     of @{b}strndupa()@{ub} allocates its memory from the heap in order to
-     provide better debugging, but the allocations may not necessarily
-     be freed immediately when the function returns.  The allocated
-     memory can be deallocated explicitly with @{b}dealloca()@{ub}, but may not
-     be reallocated or deallocated in any other way.  This function is
+     character data up to the length of STR.  If STR is @{b}NULL@{ub} and SIZE
+     is non-zero then an error will be given and the @{b}NULL@{ub} pointer will
+     be returned.  If the length of STR is greater than SIZE then only
+     SIZE characters will be allocated and copied, with one additional
+     byte for the nul character.  If there is not enough space in the
+     heap then the @{b}NULL@{ub} pointer will be returned and @{b}errno@{ub} will be set
+     to @{b}ENOMEM@{ub}.  The @{b}strndupa()@{ub} function normally allocates its memory
+     from the stack, with the result that all such allocations will be
+     freed when the function returns.  This version of @{b}strndupa()@{ub}
+     allocates its memory from the heap in order to provide better
+     debugging, but the allocations may not necessarily be freed
+     immediately when the function returns.  The allocated memory can
+     be deallocated explicitly with @{b}dealloca()@{ub}, but may not be
+     reallocated or deallocated in any other way.  This function is
      available for backwards compatibility with older C source code and
      should not be used in new code.
 
@@ -8028,6 +8031,12 @@ Notes for UNIX platforms
 Notes for Amiga platforms
 =========================
 
+   The Amiga has now been re-released as a completely new machine which
+comes with a completely new operating system.  As a result, I will not
+be implementing any of the following features (or fixing any of the
+following problems) in mpatrol for the old AmigaOS.  Support for the
+new AmigaOS may be added in the future.
+
    * Perhaps add support for building mpatrol as an Amiga shared
      library.  I attempted to do this in a previous release of mpatrol,
      but it would have involved too many source changes to get working
@@ -8041,7 +8050,9 @@ Notes for Amiga platforms
    * Need to fix the problem where the maximum guaranteed alignment of
      an internal mpatrol library memory allocation is 8 bytes.
      However, this limitation does not affect the @{b}memalign()@{ub} and
-     related functions.
+     related functions, and should not have any effect on the running
+     of mpatrol since no datatypes require an alignment of more than 8
+     bytes.
 
    * Need to add proper support for call stack traversal for both the
      Motorola 680x0 and PowerPC processor architectures.  When @{b}gcc@{ub} is
@@ -8123,6 +8134,12 @@ Notes for Windows platforms
 
 Notes for Netware platforms
 ===========================
+
+   There doesn't appear to have been any interest in the Netware
+version of mpatrol and as a result I will not be implementing any of
+the following features (or fixing any of the following problems) in
+mpatrol for Netware.  I don't even have access to a Netware machine so
+someone else would have had to have done it anyway.
 
    * The library has not yet been built (let alone tested) on Netware
      platforms.  The names of the system functions that the library
