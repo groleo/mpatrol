@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.25 2000-11-14 17:55:45 graeme Exp $
+# $Id: Makefile,v 1.26 2000-11-15 22:36:12 graeme Exp $
 
 
 # Definitions
@@ -31,8 +31,9 @@ SHELL = /bin/sh
 DOCUMENT = mpatrol
 REFCARD  = refcard
 
-SPLITHTML = false
-VERBOSE   = false
+SPLITHTML  = false
+THUMBNAILS = true
+VERBOSE    = false
 
 
 # Rules
@@ -127,6 +128,19 @@ ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
 else
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
+endif
+ifeq ($(THUMBNAILS),true)
+ifeq ($(VERBOSE),true)
+	@ thumbpdf --verbose $@
+	-@ rm -f $@ >/dev/null 2>&1
+	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
+	-@ rm -f thumbdta.tex >/dev/null 2>&1
+else
+	@ thumbpdf --quiet $@
+	-@ rm -f $@ >/dev/null 2>&1
+	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
+	-@ rm -f thumbdta.tex >/dev/null 2>&1
+endif
 endif
 
 # Build the DVI reference card from the LaTeX file using texi2dvi
