@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.20 2000-05-18 23:25:01 graeme Exp $"
+#ident "$Id: memory.c,v 1.21 2000-05-29 16:37:54 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -254,6 +254,9 @@ static char *progname(void)
 #if ARCH == ARCH_IX86
 #if SYSTEM == SYSTEM_LINUX
         if (p = (unsigned int *) p[4])
+            return (char *) *p;
+#elif SYSTEM == SYSTEM_LYNXOS
+        if (p = (unsigned int *) p[3])
             return (char *) *p;
 #else /* SYSTEM */
         if (p = (unsigned int *) p[3])
