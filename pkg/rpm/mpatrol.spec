@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.15 2000-04-30 17:59:05 graeme Exp $
+# $Id: mpatrol.spec,v 1.16 2000-05-11 00:08:08 graeme Exp $
 
 
 %define version 1.2.0
@@ -86,6 +86,7 @@ cp doc/mpatrol.html $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/mpatrol.dvi $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/mpatrol.ps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
+cp doc/images/mpatrol.txt $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp doc/images/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
