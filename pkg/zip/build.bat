@@ -24,7 +24,7 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.17 2000-12-03 23:03:49 graeme Exp $
+rem $Id: build.bat,v 1.18 2000-12-13 23:41:57 graeme Exp $
 
 
 set version=1.3.1
@@ -105,19 +105,21 @@ mkdir mpatrol\man
 mkdir mpatrol\man\cat1
 copy ..\..\man\cat1\mpatrol.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mprof.1 mpatrol\man\cat1
+copy ..\..\man\cat1\mptrace.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mleak.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mpsym.1 mpatrol\man\cat1
 copy ..\..\man\cat1\mpedit.1 mpatrol\man\cat1
 mkdir mpatrol\man\man1
 copy ..\..\man\man1\mpatrol.1 mpatrol\man\man1
 copy ..\..\man\man1\mprof.1 mpatrol\man\man1
+copy ..\..\man\man1\mptrace.1 mpatrol\man\man1
 copy ..\..\man\man1\mleak.1 mpatrol\man\man1
 copy ..\..\man\man1\mpsym.1 mpatrol\man\man1
 copy ..\..\man\man1\mpedit.1 mpatrol\man\man1
 mkdir mpatrol\man\cat3
-copy ..\..\man\cat3\mpatrol.3 mpatrol\man\cat3
+copy ..\..\man\cat3\libmpatrol.3 mpatrol\man\cat3
 mkdir mpatrol\man\man3
-copy ..\..\man\man3\mpatrol.3 mpatrol\man\man3
+copy ..\..\man\man3\libmpatrol.3 mpatrol\man\man3
 mkdir mpatrol\tests
 mkdir mpatrol\tests\pass
 copy ..\..\tests\pass\test*.c mpatrol\tests\pass

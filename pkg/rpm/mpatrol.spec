@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.42 2000-12-03 23:03:44 graeme Exp $
+# $Id: mpatrol.spec,v 1.43 2000-12-13 23:41:50 graeme Exp $
 
 
 %define libversion 1.3
@@ -89,11 +89,12 @@ install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpatrol.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mprof.1 $RPM_BUILD_ROOT/%{_mandir}/man1
+install -m644 man/man1/mptrace.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mleak.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpsym.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/mpedit.1 $RPM_BUILD_ROOT/%{_mandir}/man1
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
-install -m644 man/man3/mpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
+install -m644 man/man3/libmpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 
 %files

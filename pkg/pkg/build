@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.42 2000-12-03 23:03:43 graeme Exp $
+# $Id: build,v 1.43 2000-12-13 23:41:48 graeme Exp $
 
 
 version=1.3.1
@@ -115,11 +115,12 @@ cp ../../build/unix/llib-lmpatrolmt.ln lib
 mkdir -p man/man1
 cp ../../man/man1/mpatrol.1 man/man1
 cp ../../man/man1/mprof.1 man/man1
+cp ../../man/man1/mptrace.1 man/man1
 cp ../../man/man1/mleak.1 man/man1
 cp ../../man/man1/mpsym.1 man/man1
 cp ../../man/man1/mpedit.1 man/man1
 mkdir -p man/man3
-cp ../../man/man3/mpatrol.3 man/man3
+cp ../../man/man3/libmpatrol.3 man/man3
 
 
 # Create the package within a package directory structure.

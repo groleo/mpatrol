@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.4 2000-12-03 23:03:46 graeme Exp $
+# $Id: mpatrol.psf,v 1.5 2000-12-13 23:41:52 graeme Exp $
 
 
 product
@@ -125,10 +125,11 @@ product
 	directory		mpatrol/man/man1=/usr/local/man/man1
 	file			mpatrol.1
 	file			mprof.1
+	file			mptrace.1
 	file			mleak.1
 	file			mpsym.1
 	file			mpedit.1
 	directory		mpatrol/man/man3=/usr/local/man/man3
-	file			mpatrol.3
+	file			libmpatrol.3
     end
 end
