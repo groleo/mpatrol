@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.26 2000-05-14 12:51:42 graeme Exp $"
+#ident "$Id: diag.c,v 1.27 2000-05-14 22:09:01 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -119,7 +119,7 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 /* Process a file name, expanding any special characters.
  */
 
-static void processfile(char *s, char *b, size_t l)
+static void processfile(meminfo *m, char *s, char *b, size_t l)
 {
     size_t i;
 
@@ -148,13 +148,13 @@ static void processfile(char *s, char *b, size_t l)
  * Note that this function is not currently re-entrant.
  */
 
-MP_GLOBAL char *__mp_logfile(char *s)
+MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
 {
     static char b[256];
 
     if (s == NULL)
         s = MP_LOGFILE;
-    processfile(s, b, sizeof(b));
+    processfile(m, s, b, sizeof(b));
     return b;
 }
 
@@ -163,13 +163,13 @@ MP_GLOBAL char *__mp_logfile(char *s)
  * Note that this function is not currently re-entrant.
  */
 
-MP_GLOBAL char *__mp_proffile(char *s)
+MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
 {
     static char b[256];
 
     if (s == NULL)
         s = MP_PROFFILE;
-    processfile(s, b, sizeof(b));
+    processfile(m, s, b, sizeof(b));
     return b;
 }
 
