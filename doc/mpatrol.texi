@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.3 1999-11-15 20:01:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.4 1999-11-15 21:34:03 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -107,6 +107,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Overview::                    Overview of mpatrol.
 * Features::                    Features of mpatrol.
 * Installation::                Building and installing.
+* Memory allocations::          Background.
 * Examples::                    Examples of usage.
 * Functions::                   Library functions.
 * Environment::                 Library run-time options.
@@ -136,6 +137,7 @@ a crawl depending on which options you use.  However, the end results are likely
 to be accurate and reliable, and in most cases the library will run quite
 happily at a sane speed.
 
+@cindex warranty
 The mpatrol library is by no means the only library of its kind.  Solaris 7 has
 no less that 6 different malloc libraries, and there are plenty available as
 freeware or as commercial products.  Try to keep in mind that mpatrol comes with
@@ -155,6 +157,7 @@ includes having a look in the library source code to see if it's obvious what is
 wrong.
 
 @cindex contacting the author
+@cindex author, contacting
 @cindex getting updates
 @cindex updates
 The latest version of the mpatrol library and this manual can always be found at
@@ -174,9 +177,11 @@ Edinburgh, Scotland.
 @chapter Overview
 @cindex overview
 
-@cindex mpatrol library
 @cindex mpatrol
+@cindex mpatrol library
+@cindex library, mpatrol
 @cindex run-time errors
+@cindex errors, run-time
 The mpatrol library is yet another link library that attempts to diagnose
 run-time errors that are caused by the wrong use of dynamically allocated
 memory.  If you don't know what the @code{malloc()} function or @code{operator
@@ -201,7 +206,7 @@ recompile or relink in order to change the library's behaviour.
 
 @node Features, Installation, Overview, Top
 @chapter Features
-@cindex library features
+@cindex mpatrol features
 @cindex features
 
 An overall list of features contained in the mpatrol library is given below.
@@ -213,13 +218,18 @@ does is to read the documentation and try it out.
 Written for UNIX, AmigaOS, Windows and Netware platforms.
 
 @cindex archive library
+@cindex library, archive
 @cindex shared library
+@cindex library, shared
 @cindex thread-safe library
+@cindex library, thread-safe
+@cindex object file
 @item
 Can be built as archive, shared and/or thread-safe libraries on systems that
 support them, or even as one large object file.
 
 @cindex best fit
+@cindex allocation algorithm
 @item
 Details of memory allocations and free memory are stored internally as a tree
 structure for speed and also to allow the best fit allocation algorithm to be
@@ -321,6 +331,7 @@ Options exist to log details of every memory allocation, reallocation or
 deallocation when they occur.
 
 @cindex trap signal
+@cindex signal, trap
 @item
 Options exist to halt the program at a specific memory allocation, reallocation
 or deallocation on systems that support the trap signal.  This can be extremely
@@ -470,10 +481,11 @@ User documentation is currently available in @TeX{}info format as well as UNIX
 manual pages.
 @end itemize
 
-@node Installation, Examples, Features, Top
+@node Installation, Memory allocations, Features, Top
 @chapter Installation
 @cindex installation
 @cindex building the library
+@cindex library, building
 
 @cindex Amiga 4000/040
 The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
@@ -496,6 +508,11 @@ for your system.
 @cindex OFLAGS
 @cindex SFLAGS
 @cindex TFLAGS
+@cindex compiling
+@cindex compiler
+@cindex linking
+@cindex linker
+@cindex optimisation
 @item
 Edit the @file{Makefile} in that directory and check that it is using the
 appropriate compiler and build tools.  The @code{CC} macro specifies the
@@ -508,6 +525,7 @@ a shared library and the @code{TFLAGS} macro specifies options to be passed to
 the compiler when building a thread-safe library.  You may also need to change
 the library names and library build commands on different systems.
 
+@cindex make
 @cindex all (make target)
 @cindex clean (make target)
 @cindex clobber (make target)
@@ -519,6 +537,7 @@ object files from the current directory, while the @samp{clobber} target also
 removes all libraries that have been built from the current directory.
 
 @cindex symbolic links
+@cindex links, symbolic
 @item
 Copy all of the libraries that have been built into your local library
 directory.  If there were symbolic links created in the @file{build} directory
@@ -544,6 +563,8 @@ manual pages while the @file{cat*} subdirectories contain the formatted manual
 pages.
 
 @cindex @TeX{}info
+@cindex documentation
+@cindex printing
 @item
 Go up one directory level into the @file{doc} directory and examine the files
 located there.  The @file{mpatrol.texi} file contains the @TeX{}info source for
@@ -553,7 +574,178 @@ you will have to generate them yourself using an appropriate tool and then
 install or print them.
 @end enumerate
 
-@node Examples, Functions, Installation, Top
+@node Memory allocations, Examples, Installation, Top
+@chapter Memory allocations
+@cindex memory allocations
+
+@cindex C
+@cindex C++
+@cindex Pascal
+@cindex BASIC
+@cindex FORTRAN
+In the C and C++ programming languages there are generally three different types
+of memory allocation that can be used to hold the contents of variables.  Other
+programming languages such as Pascal, BASIC and FORTRAN also support some of
+these types of allocation, although their implementations may be slightly
+different.
+
+@menu
+* Static memory allocations::   Fixed location, fixed size.
+* Stack memory allocations::    Variable location, fixed size.
+* Dynamic memory allocations::  Variable location, variable size.
+@end menu
+
+@node Static memory allocations, Stack memory allocations, , Memory allocations
+@section Static memory allocations
+@cindex static memory allocations
+@cindex memory allocations, static
+
+@cindex file scope variables
+@cindex variables, file scope
+@cindex local static variables
+@cindex variables, local static
+The first type of memory allocation is known as a @emph{static memory
+allocation}, which corresponds to file scope variables and local static
+variables.  The addresses and sizes of these allocations are fixed at the time
+of compilation@footnote{Or more accurately, at link time.} and so they can be
+placed in a fixed-sized data area which then corresponds to a section within the
+final linked executable file.  Such memory allocations are called static because
+they do not vary in location or size during the lifetime of the program.
+
+@cindex data sections
+@cindex sections
+@cindex BSS
+There can be many types of data sections within an executable file; the three
+most common are normal data, BSS data and read-only data.  BSS data contains
+variables and arrays which are to be initialised to zero at run-time and so is
+treated as a special case, since the actual contents of the section need not be
+stored in the executable file.  Read-only data consists of constant variables
+and arrays whose contents are guaranteed not to change when a program is being
+run.  For example, on a typical SVR4 UNIX system the following variable
+definitions would result in them being placed in the following sections:
+
+@smallexample
+int a;           /* BSS data */
+int b = 1;       /* normal data */
+const int c = 2; /* read-only data */
+@end smallexample
+
+@cindex tentative declarations
+@cindex declarations, tentative
+@cindex common variables
+In C the first example would be considered a @emph{tentative} declaration, and
+if there was no subsequent definition of that variable in the current
+translation unit then it would become a @emph{common} variable in the resulting
+object file.  When the object file gets linked with other object files, any
+common variables with the same name become one variable, or take their
+definition from a non-tentative definition of that variable.  In the former
+case, the variable is placed in the BSS section.  Note that C++ has no support
+for tentative declarations.
+
+As all static memory allocations have sizes and address offsets that are known
+at compile-time and are explicitly initialised, there is very little that can go
+wrong with them.  Data can be read or written past the end of such variables,
+but that is a common problem with all memory allocations and is generally easy
+to locate in that case.  On systems that separate read-only data from normal
+data, writing to a read-only variable can be quickly diagnosed at run-time.
+
+@node Stack memory allocations, Dynamic memory allocations, Static memory allocations, Memory allocations
+@section Stack memory allocations
+@cindex stack memory allocations
+@cindex memory allocations, stack
+
+@cindex parameter variables
+@cindex variables, parameter
+@cindex call-by-value
+@cindex non-static local variables
+@cindex variables, non-static local
+The second type of memory allocation is known as a @emph{stack memory
+allocation}, which corresponds to non-static local variables and call-by-value
+parameter variables.  The sizes of these allocations are fixed at the time of
+compilation but their addresses will vary depending on when the function which
+defines them is called.  Their contents are not immediately initialised, and
+must be explicitly initialised by the programmer upon entry to the function or
+when they become visible in scope.
+
+@cindex stack
+@cindex registers
+Such memory allocations are placed in a system memory area called the
+@emph{stack}, which is allocated per process@footnote{Or per thread on some
+systems.} and generally grows down in memory.  When a function is called, the
+state of the calling function must be preserved so that when the called function
+returns, the calling function can resume execution.  That state is stored on the
+stack, including all local variables and parameters.  The compiler generates
+code to increase the size of the stack upon entry to a function, and decrease
+the size of the stack upon exit from a function, as well as saving and restoring
+the values of registers.
+
+There are a few common problems using stack memory allocations, and most
+generally involve uninitialised variables, which a good compiler can usually
+diagnose at compile-time.  Some compilers also have options to initialise all
+local variables with a bit pattern so that uninitialised stack variables will
+cause program faults at run-time.  As with static memory allocations, there can
+be problems with reading or writing past the end of stack variables, but as
+their sizes are fixed these can usually easily be located.
+
+@node Dynamic memory allocations, , Stack memory allocations, Memory allocations
+@section Dynamic memory allocations
+@cindex dynamic memory allocations
+@cindex memory allocations, dynamic
+
+The last type of memory allocation is known as a @emph{dynamic memory
+allocation}, which corresponds to memory allocated via @code{malloc()} or
+@code{operator new[]}.  The sizes, addresses and contents of such memory vary
+at run-time and so can cause a lot of problems when trying to diagnose a fault
+in a program.  These memory allocations are called dynamic memory allocations
+because their location and size can vary throughout the lifetime of a program.
+
+@cindex heap
+@cindex garbage collector
+@cindex ML
+Such memory allocations are placed in a system memory area called the
+@emph{heap}, which is allocated per process on some systems, but on others may
+be allocated directly from the system in scattered blocks.  Unlike memory
+allocated on the stack, memory allocated on the heap is not freed when a
+function or scope is exited and so must be explicitly freed by the programmer.
+The pattern of allocations and deallocations is not guaranteed to be (and is not
+really expected to be) linear and so the functions that allocate memory from the
+heap must be able to efficiently reuse freed memory and resize existing
+allocated memory on request.  In some programming languages there is support for
+a @emph{garbage collector}, which attempts to automatically free memory that has
+had all references to it removed, but this has traditionally not been very
+popular for programming languages such as C and C++, and has been more widely
+used in functional languages like ML@footnote{There is currently at least one
+garbage collection package available for C and C++ (@pxref{Related software}).}.
+
+Because dynamic memory allocations are performed at run-time rather than
+compile-time, they are outwith the domain of the compiler and must be
+implemented in a run-time package, usually as a set of functions within a
+linker library.  Such a package manages the heap in such a way as to abstract
+its underlying structure from the programmer, providing a common interface to
+heap management on different systems.  However, this @emph{malloc library} must
+decide whether to implement a fast memory allocator, a space-conserving memory
+allocator, or a bit of both.  It must also try to keep its own internal tables
+to a minimum so as to conserve memory, but this means that it has very little
+capability to diagnose errors if any occur.
+
+@cindex alloca
+@cindex variable length arrays
+In some compiler implementations there is a builtin function called
+@code{alloca()}.  This is a dynamic memory allocation function that allocates
+memory from the stack rather than the heap, and so the memory is automatically
+freed when the function that called it returns.  This is a non-standard feature
+that is not guaranteed to be present in a compiler, and indeed may not be
+possible to implement on some systems.  However, some compilers now support
+variable length arrays which provide roughly the same functionality.
+
+As can be seen from the above paragraphs, dynamic memory allocations are the
+types of memory allocations that can cause the most problems in a program since
+almost nothing about them can be used by the compiler to give the programmer
+useful warnings about using uninitialised variables, using freed memory, running
+off the end of a dynamically-allocated array, etc.  It is these types of memory
+allocation problems that the mpatrol library loves to get its teeth into!
+
+@node Examples, Functions, Memory allocations, Top
 @appendix Examples
 @cindex examples
 @cindex tutorial
@@ -620,6 +812,7 @@ then running a program that has been linked with the library.
 @node Example 1, Example 2, , Examples
 @appendixsec Getting started
 
+@cindex crash
 The first example we'll look at is when the argument in a call to @code{free()}
 doesn't match the return value from @code{malloc()}, even though the intention
 is to free the memory that was allocated by @code{malloc()}.  This example is in
@@ -974,6 +1167,7 @@ to crash due to bus errors which are caused by reading from or writing to
 misaligned data.
 
 @cindex overflow buffers
+@cindex buffers, overflow
 @cindex overflow size
 @item
 Overflow size.  This value is the size used by one overflow buffer.  If this is
@@ -998,6 +1192,8 @@ allocation byte is used to fill newly-allocated memory (except from
 blocks or freed memory allocations.  These can be changed at run-time using the
 @option{OFLOWBYTE}, @option{ALLOCBYTE} and @option{FREEBYTE} options.
 
+@cindex debugger
+@cindex halting the library
 @item
 Allocation stop.
 @item
@@ -1008,6 +1204,7 @@ inside a debugger whenever a specified allocation index is allocated,
 reallocated or freed.  These can be changed at run-time using the
 @option{ALLOCSTOP}, @option{REALLOCSTOP} and @option{FREESTOP} options.
 
+@cindex unfreed allocations
 @item
 Unfreed abort.  This value is used when the program terminates and is used by
 the library to check if there are more than a given number of unfreed memory
@@ -1027,14 +1224,16 @@ to performing checks for every allocation index.  These can be changed at
 run-time using the @option{CHECK} option.
 
 @cindex callback functions
-@cindex handlers
+@cindex functions, callback
+@cindex handler functions
+@cindex functions, handler
 @cindex prologue function
 @item
 Prologue function.
 @cindex epilogue function
 @item
 Epilogue function.
-@cindex handler function
+@cindex low memory handler function
 @item
 Handler function.  These values contain addresses or names of functions that
 have been installed as callback functions for the library.  These functions, if
@@ -1066,11 +1265,13 @@ that were created by the mpatrol library.  This value may be more than expected
 if the mpatrol library makes any memory allocations during initialisation.
 
 @cindex peak memory usage
+@cindex memory usage
 @item
 Allocation peak.  This value contains the peak memory usage set by the program
 when running.  This value may be more than expected if the mpatrol library makes
 any memory allocations during initialisation.
 
+@cindex limiting available memory
 @item
 Allocation limit.  This value is used to limit the amount of memory that can be
 allocated by a program, which can be useful for stress-testing in simulated low
@@ -1079,14 +1280,14 @@ option.
 
 @cindex memory blocks
 @cindex blocks
-@cindex allocated blocks
-@cindex freed blocks
-@cindex free blocks
 @item
+@cindex allocated blocks
 Allocated blocks.
 @item
+@cindex freed blocks
 Freed blocks.
 @item
+@cindex free blocks
 Free blocks.  These values contain the total number of allocated, freed and
 free blocks at the time the summary was produced.  A freed block is an allocated
 block that has been freed but has not been returned to the free memory list for
@@ -1102,6 +1303,7 @@ support memory protection in order to prevent the program from corrupting the
 library's data structures.  This can be overridden at run-time using the
 @option{NOPROTECT} option in order to speed up program execution slightly.
 
+@cindex heap usage
 @item
 Total heap usage.  This value contains the total amount of system heap memory
 that has been allocated by the mpatrol library.
@@ -1434,6 +1636,7 @@ ERROR: allocation 0x00029E28 has a corrupted overflow buffer at 0x00029E27
 @end smallexample
 
 @cindex memory dump
+@cindex dumping memory
 Once again, the library attempts to show you as much detail as possible about
 where the corruption occurred.  Along with showing you a memory dump of the
 overflow buffer that was corrupted, it also shows you the allocation to which
@@ -2094,6 +2297,10 @@ option keywords from the list below and must be no longer than 256 characters in
 length.  If @env{MPATROL_OPTIONS} is unset or empty then the default settings
 will be used.
 
+@cindex binary
+@cindex octal
+@cindex decimal
+@cindex hexadecimal
 The syntax for options specified within the @env{MPATROL_OPTIONS} environment
 variable is @samp{OPTION} or @samp{OPTION=VALUE}, where @samp{OPTION} is a
 keyword from the list below and @samp{VALUE} is the setting for that option.  If
