@@ -44,9 +44,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.17 2001-05-22 22:25:56 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.18 2001-05-23 12:33:32 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.17 2001-05-22 22:25:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.18 2001-05-23 12:33:32 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -58,11 +58,12 @@ static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.17 2001-05-22
 
 typedef enum options_flags
 {
-    OF_HELP    = 'h',
-    OF_SIMFILE = 's',
-    OF_VERSION = 'V',
-    OF_VERBOSE = 'v',
-    OF_GUI     = 'w'
+    OF_HATFFILE = 'H',
+    OF_HELP     = 'h',
+    OF_SIMFILE  = 's',
+    OF_VERSION  = 'V',
+    OF_VERBOSE  = 'v',
+    OF_GUI      = 'w'
 }
 options_flags;
 
@@ -150,6 +151,12 @@ static statistics stats;
  */
 
 static FILE *tracefile;
+
+
+/* The HATF file produced from the tracing output file.
+ */
+
+static FILE *hatffile;
 
 
 /* The simulation file produced from the tracing output file.
@@ -297,6 +304,9 @@ static option options_table[] =
 {
     {"gui", OF_GUI, NULL,
      "\tDisplays the GUI (if supported).\n"},
+    {"hatf-file", OF_HATFFILE, "file",
+     "\tSpecifies that the trace should also be written to a file in Heap\n"
+     "\tAllocation Trace Format (HATF).\n"},
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
     {"sim-file", OF_SIMFILE, "file",
@@ -705,6 +715,8 @@ readevent(void)
                 stats.lsize = l;
             if (stats.usize < l)
                 stats.usize = l;
+            if (hatffile != NULL)
+                fprintf(hatffile, "1 %lu 0x%lx\n", l, a);
             if (f->entry != NULL)
             {
                 if ((m = slotentry(f)) > maxslots)
@@ -748,6 +760,8 @@ readevent(void)
                     stats.lsize = l;
                 if (stats.usize < l)
                     stats.usize = l;
+                if (hatffile != NULL)
+                    fprintf(hatffile, "4 %lu 0x%lx 0x%lx\n", l, f->addr, a);
                 if (f->entry != NULL)
                 {
                     m = slotentry(f);
@@ -788,6 +802,8 @@ readevent(void)
                             f->time);
                 stats.fcount++;
                 stats.ftotal += f->size;
+                if (hatffile != NULL)
+                    fprintf(hatffile, "2 0x%lx\n", f->addr);
                 if (f->entry != NULL)
                 {
                     fprintf(simfile, "    {%lu, 0, 0},\n", slotentry(f));
@@ -848,6 +864,8 @@ readevent(void)
           default:
             break;
         }
+    if (hatffile != NULL)
+        fclose(hatffile);
     if (simfile != NULL)
     {
         fputs("    {0, 0, 0}\n};\n\n\n", simfile);
@@ -976,7 +994,7 @@ main(int argc, char **argv)
 {
     struct { char x; void *y; } z;
     char b[256];
-    char *f, *s;
+    char *f, *s, *t;
 #if MP_GUI_SUPPORT
     XGCValues g;
 #endif /* MP_GUI_SUPPORT */
@@ -989,7 +1007,7 @@ main(int argc, char **argv)
     XtVaGetApplicationResources(appwidget, NULL, resources, XtNumber(resources),
                                 NULL);
 #endif /* MP_GUI_SUPPORT */
-    s = NULL;
+    s = t = NULL;
     e = h = v = 0;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
@@ -1000,6 +1018,9 @@ main(int argc, char **argv)
 #if MP_GUI_SUPPORT
             usegui = 1;
 #endif /* MP_GUI_SUPPORT */
+            break;
+          case OF_HATFFILE:
+            t = __mp_optarg;
             break;
           case OF_HELP:
             h = 1;
@@ -1083,6 +1104,24 @@ main(int argc, char **argv)
         fputs("    char resize;\n", simfile);
         fputs("}\nevent;\n\n\n", simfile);
         fputs("static event events[] =\n{\n", simfile);
+    }
+    if (t != NULL)
+    {
+        if (strcmp(t, "stdout") == 0)
+            hatffile = stdout;
+        else if (strcmp(t, "stderr") == 0)
+            hatffile = stderr;
+        else if ((hatffile = fopen(t, "w")) == NULL)
+        {
+            fprintf(stderr, "%s: Cannot open file `%s'\n", progname, t);
+            exit(EXIT_FAILURE);
+        }
+        fprintf(hatffile, "## Tracename: %s\n", t);
+        fputs("## Author: Unknown\n", hatffile);
+        fputs("## Date: Unknown\n", hatffile);
+        fputs("## DTDURL: hatf.dtd\n", hatffile);
+        fprintf(hatffile, "## Description: Converted to HATF by %s %s.\n\n",
+                progname, VERSION);
     }
     readfile();
 #if MP_GUI_SUPPORT
