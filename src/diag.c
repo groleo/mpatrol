@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.69 2001-03-05 18:58:29 graeme Exp $"
+#ident "$Id: diag.c,v 1.70 2001-03-05 20:24:24 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.69 2001-03-05 18:58:29 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.70 2001-03-05 20:24:24 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1265,13 +1265,13 @@ printleakinfo(tablenode *n, int o, int c)
 
 MP_GLOBAL
 void
-__mp_printleaktab(infohead *h, size_t l, int o, int c, int r)
+__mp_printleaktab(infohead *h, size_t l, int o, unsigned char f)
 {
     tablenode *n;
     treenode *t;
     char *s;
 
-    __mp_sortleaktab(&h->ltable, o, c);
+    __mp_sortleaktab(&h->ltable, o, (f & FLG_COUNTS));
     if ((l == 0) || (l > h->ltable.tree.size))
         l = h->ltable.tree.size;
     if (o == SOPT_ALLOCATED)
@@ -1286,9 +1286,9 @@ __mp_printleaktab(infohead *h, size_t l, int o, int c, int r)
         return;
     }
     __mp_diag("%s %lu %s memory %s in leak table:\n\n",
-              (r == 0) ? "bottom" : "top", l, s,
+              (f & FLG_BOTTOM) ? "bottom" : "top", l, s,
               (l == 1) ? "entry" : "entries");
-    if (c != 0)
+    if (f & FLG_COUNTS)
     {
         __mp_diag("     count     bytes  location\n");
         __mp_diag("    ------  --------  --------\n");
@@ -1298,19 +1298,19 @@ __mp_printleaktab(infohead *h, size_t l, int o, int c, int r)
         __mp_diag("       bytes   count  location\n");
         __mp_diag("    --------  ------  --------\n");
     }
-    if (r == 0)
+    if (f & FLG_BOTTOM)
         for (t = __mp_minimum(h->ltable.tree.root); (t != NULL) && (l != 0);
              t = __mp_successor(t), l--)
         {
             n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
-            printleakinfo(n, o, c);
+            printleakinfo(n, o, (f & FLG_COUNTS));
         }
     else
         for (t = __mp_maximum(h->ltable.tree.root); (t != NULL) && (l != 0);
              t = __mp_predecessor(t), l--)
         {
             n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
-            printleakinfo(n, o, c);
+            printleakinfo(n, o, (f & FLG_COUNTS));
         }
     __mp_diag("\n");
 }
