@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.7 2001-03-06 01:45:24 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.8 2001-03-06 02:07:56 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.7 2001-03-06 01:45:24 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.8 2001-03-06 02:07:56 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -437,10 +437,8 @@ callback(MP_CONST void *p, void *t)
 {
     char b[1024];
     char s[81];
-    char *f;
     listinfo *i;
     __mp_allocinfo d;
-    unsigned long l;
 
     if (!__mp_info(p, &d))
         return 0;
@@ -461,35 +459,34 @@ callback(MP_CONST void *p, void *t)
         {
             if (d.file != NULL)
             {
-                sprintf(b, "%s:%lu", d.file, d.line);
-                f = d.file;
-                l = d.line;
+                if (i->details)
+                    sprintf(b, "%s:%lu", d.file, d.line);
+                __mp_addallocentry(d.file, d.line, d.size);
             }
             else if (d.func != NULL)
             {
-                strcpy(b, d.func);
-                f = d.func;
-                l = 0;
+                if (i->details)
+                    strcpy(b, d.func);
+                __mp_addallocentry(d.func, 0, d.size);
             }
             else if (d.stack == NULL)
             {
-                strcpy(b, "unknown");
-                f = NULL;
-                l = 0;
+                if (i->details)
+                    strcpy(b, "unknown");
+                __mp_addallocentry(NULL, 0, d.size);
             }
             else if (d.stack->name != NULL)
             {
-                strcpy(b, d.stack->name);
-                f = d.stack->name;
-                l = 0;
+                if (i->details)
+                    strcpy(b, d.stack->name);
+                __mp_addallocentry(d.stack->name, 0, d.size);
             }
             else
             {
-                sprintf(b, "ra=%#lx", d.stack->addr);
-                f = NULL;
-                l = (unsigned long) d.stack->addr;
+                if (i->details)
+                    sprintf(b, "ra=%#lx", d.stack->addr);
+                __mp_addallocentry(NULL, (unsigned long) d.stack->addr, d.size);
             }
-            __mp_addallocentry(f, l, d.size);
             if (i->details)
             {
                 __mpt_dmallocmessage(" %s: '%#lx' (%lu byte%s) from '%s'\n",
@@ -734,7 +731,12 @@ __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
     i.unfreed = (u != 0) ? 1 : 0;
     i.freed = (f != 0) ? 1 : 0;
     i.details = (d != 0) ? 1 : 0;
-    if (__mp_iterate(callback, &i, m))
+    __mp_clearleaktable();
+    __mp_iterate(callback, &i, m);
+    __mp_leaktable(0, 0, 0);
+    __mp_diag("\n");
+    __mp_clearleaktable();
+    if ((i.kcount != 0) || (i.ucount != 0))
     {
         if (i.kcount != 0)
             __mpt_dmallocmessage(" known memory: %lu pointer%s, %lu byte%s\n",
