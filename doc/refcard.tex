@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.11 2000-11-09 22:54:38 graeme Exp $
+% $Id: refcard.tex,v 1.12 2000-11-16 21:41:50 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -39,7 +39,6 @@
 \setlength{\oddsidemargin}{-.5in}
 \setlength{\evensidemargin}{-.5in}
 \setlength{\topmargin}{-.5in}
-\renewcommand{\baselinestretch}{.9}
 
 % Define new commands for formatting the headings and options.
 
@@ -68,6 +67,11 @@ more valid option keywords from the list below and must be no longer than 1024
 characters in length.  If \texttt{MPATROL\_OPTIONS} is unset or empty then the
 default settings will be used.
 
+The \texttt{LOGDIR} and \texttt{PROFDIR} environment variables are also read in
+order to determine where the log file and profiling output file should go.  Note
+that if they are set then the default filenames for the log file and the
+profiling output file will also be changed.
+
 \vskip 12pt
 \heading{Library behaviour}
 \vskip 6pt
@@ -81,6 +85,12 @@ containing the program's symbols.
 \item[\optionpar{CHECK}{unsigned range}]
 Specifies a range of allocation indices at which to check the integrity of free
 memory and overflow buffers.
+\item[\option{EDIT}]
+Specifies that a text editor should be invoked to edit any relevant source files
+that are associated with any warnings or errors when they occur.
+\item[\option{LIST}]
+Specifies that a context listing should be shown for any relevant source files
+that are associated with any warnings or errors when they occur.
 \item[\optionpar{DEFALIGN}{unsigned integer}]
 Specifies the default alignment for general-purpose memory allocations, which
 must be a power of two.
@@ -250,6 +260,24 @@ as large allocations for profiling purposes.
 \end{description}
 
 \vskip 12pt
+
+All of the function definitions in \texttt{mpatrol.h} can be disabled by
+defining the \texttt{NDEBUG} preprocessor macro, which is the same macro used
+to control the behaviour of the \function{assert} function.  If \texttt{NDEBUG}
+is defined then no macro redefinition of functions will take place and all
+special mpatrol library functions will evaluate to empty statements.  It is
+intended that the \texttt{NDEBUG} preprocessor macro be defined in release
+builds.
+
+There may be problems during preprocessing when the preprocessor macros defining
+the replacement C$++$ operators in \texttt{mpatrol.h} are used.  If this is the
+case then either the \texttt{MP\_NOCPLUSPLUS} preprocessor macro can be defined
+to disable all C$++$ support, or the \texttt{MP\_NONEWDELETE} preprocessor macro
+can be defined to prevent the debugging versions of \texttt{operator new} and
+\texttt{operator delete} from being used by default.  The preprocessor macros
+\texttt{MP\_NEW} and \texttt{MP\_DELETE} will then have to be used instead.
+
+\vskip 12pt
 \heading{C dynamic memory allocation functions}
 \vskip 6pt
 
@@ -360,6 +388,15 @@ as large allocations for profiling purposes.
 \end{description}
 
 \vskip 12pt
+
+The commands that are distributed with the mpatrol library all parse their
+command line options in a similar way to the UNIX \function{getopt} function.
+Only the long names of the options are shown here.  If an option has a single
+character equivalent it will be listed in the \flag{help} output.  Options that
+accept numeric arguments can have their value specified in binary, octal,
+decimal or hexadecimal notation.
+
+\vskip 12pt
 \heading{mpatrol command options}
 \vskip 6pt
 
@@ -389,6 +426,8 @@ as large allocations for profiling purposes.
 \item[\flag{dynamic}]
 Specifies that programs which were not linked with the mpatrol library should
 also be traced, but only if they were dynamically linked.
+\item[\flag{edit}]
+\hfill See \option{EDIT}.
 \item[\flagpar{fail-freq}{unsigned integer}]
 \hfill See \option{FAILFREQ}.
 \item[\flagpar{fail-seed}{unsigned integer}]
@@ -403,6 +442,8 @@ Displays a quick-reference option summary.
 \hfill See \option{LARGEBOUND}.
 \item[\flagpar{limit}{unsigned integer}]
 \hfill See \option{LIMIT}.
+\item[\flag{list}]
+\hfill See \option{LIST}.
 \item[\flag{log-all}]
 \hfill See \option{LOGALL}.
 \item[\flag{log-allocs}]
@@ -521,6 +562,30 @@ Displays the version number of the \command{mleak} command.
 Displays a quick-reference option summary.
 \item[\flag{version}]
 Displays the version number of the \command{mpsym} command.
+\end{description}
+
+\vskip 12pt
+\heading{mpedit command options}
+\vskip 6pt
+
+The \command{mpedit} command recognises the \texttt{EDITOR} environment variable
+which can be used to specify the text editor that it should use to edit source
+files.  It also recognises the \texttt{MPATROL\_SOURCEPATH} environment variable
+which can be used to specify a colon-separated list of directories that should
+be used to help search for source files.
+
+\begin{description}
+\item[\flagpar{editor}{filename}]
+Specifies the text editor to use.
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flag{listing}]
+Displays a context listing of the source line instead of invoking the text
+editor.
+\item[\flagpar{source-dir}{directory}]
+Adds a directory to the search path used to locate the source file.
+\item[\flag{version}]
+Displays the version number of the \command{mpedit} command.
 \end{description}
 
 \vskip 12pt
