@@ -32,6 +32,14 @@
 #include "config.h"
 
 
+/* The version of the mpatrol library.  The version is of the format vrrff,
+ * where v represents the version number, rr represents the revision number
+ * and ff represents the bug fix count.
+ */
+
+#define MP_VERNUM 10300
+
+
 #ifdef __cplusplus
 extern "C"
 {
