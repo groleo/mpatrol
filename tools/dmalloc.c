@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.5 2001-03-04 18:08:49 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.6 2001-03-04 22:17:35 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.5 2001-03-04 18:08:49 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.6 2001-03-04 22:17:35 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -730,6 +730,8 @@ __mpt_dmallocstrerror(__mp_errortype e)
 {
     MP_CONST char *s;
 
+    if (!malloc_initialised)
+        __mp_init_dmalloc();
     if ((s = __mp_strerror(e)) == NULL)
         s = "errno value is not valid";
     return s;
