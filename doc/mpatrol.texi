@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.111 2000-07-31 23:48:04 graeme Exp $
+@c $Id: mpatrol.texi,v 1.112 2000-08-29 00:09:34 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 31st July, 2000
+@set UPDATED 29th August, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -8018,6 +8018,71 @@ updates the @file{NEWS} and @file{ChangeLog} files.
 @cindex similar programs
 @cindex programs
 
+The mpatrol library was designed to solve most common heap-related problems,
+but there may be some cases where a different approach is needed, or a
+commercial package is required.  I have attempted to provide an overview of
+the different types of malloc libraries and memory debuggers available below,
+along with a comprehensive list of related software.
+
+The most basic type of heap debugging system simply requires the redefinition
+of @code{malloc()}, @code{realloc()} and @code{free()} (and related functions)
+with debugging versions that record the file and line number at which
+allocations occur.  This might require modifications to the source code in order
+to call these new functions or it can be done through preprocessor macros which
+will require all source files using the memory allocation functions to be
+recompiled.  Such a system will most likely live on top of the existing system
+malloc library, but will provide an additional layer with which to store more
+information for debugging purposes.  MEM by Walter Bright is a good example of
+this type of library.
+
+On many operating systems it is usually possible to write replacements for the
+normal memory allocation routines and place them in a library so that they can
+be linked in to override the system malloc library without requiring
+recompilation of any source files.  Such malloc libraries must take control of
+the heap directly and so usually contain more features, including being able to
+track memory leaks and place fence posts around allocations.  Dbmalloc by Conor
+P. Cahill and Dmalloc by Gray Watson are two of the most popular of these types
+of libraries since they are available on a wide range of platforms.  Electric
+Fence by Bruce Perens also makes use of the memory protection facilities found
+in UNIX systems in order to force programs that access free or freed memory or
+read or write beyond the bounds of a memory allocation to crash at the point
+that the illegal memory access is made, rather than crashing at the next memory
+allocation.
+
+@cindex instrumentation
+For debugging all memory access errors (not just those on the heap) it is
+necessary to modify (instrument) the machine code that is to be run so that each
+individual load from memory and store to memory will be checked.  One method of
+doing this is to modify the code produced by a compiler (such as is done by
+Checker written by Tristan Gingold) but this has the disadvantage of only
+working within the object files that have been produced by that compiler.  It is
+also possible to modify the source code itself using source to source
+translation (such as is done by Parasoft Insure++) or instrument all accesses to
+memory in assembler source files (as performed by APurify written by Samuel
+Devulder).  However, both of these methods suffer from the same drawback as
+compiler-generated instrumentation.  Yet another alternative is to wait until
+link-time and then instrument the individual object files and libraries before
+they are linked into an executable file.  This is effectively what Purify from
+Rational Software does, although Memory Advisor from PLATINUM Technology does
+roughly the same except that it disassembles the object files into a
+platform-independent format before instrumenting them.
+
+@cindex memory debugger
+Rather than modifying a program in order to add debugging code, it is sometimes
+possible to use a dedicated memory debugger in order to quickly catch any
+problems.  ZeroFault from The Kernel Group debugs all memory-related operations
+in a program while it is running, whilst AProbe from OC Systems allows users to
+dynamically add probe modules at run-time in order to locate errors or perform
+profiling.  If such a memory debugger is not available for your system, you may
+still be able to dynamically link a malloc library into your application at
+run-time if the operating system supports it.  NJAMD by Mike Perry makes
+extensive use of this feature on some UNIX systems.  On operating systems that
+do not support virtual memory but have hardware memory protection, it is
+sometimes possible to trap memory errors before they bring down the whole
+system.  On the Amiga, Enforcer by Michael Sinz runs in the background and
+detects many common memory access errors in running applications, whilst on the
+Macintosh, QC by Onyx Technology provides roughly the same functionality.
+
 A list of over sixty different items of software which help in debugging dynamic
 memory allocation problems is given below@footnote{This list can be considered
 to be a slightly more up to date version of @cite{Debugging Tools for Dynamic
@@ -8025,13 +8090,32 @@ Storage Allocation and Memory Management}
 (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
 (@email{zorn@@cs.colorado.edu}).}.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
-you have trouble using mpatrol.  I have only ever used Dbmalloc and Electric
-Fence, so I can't vouch for any of the others, although if you have any
-recommendations feel free to let me know so I can add them to this list.  In
-particular, there seems to be a shortage of such programs for Netware platforms.
+you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
+Electric Fence and Mprof, so I can't vouch for any of the others, although if
+you have any recommendations feel free to let me know so I can add them to this
+list.  In particular, there seems to be a shortage of such programs for Netware
+platforms.
+
+@cindex AProbe
+@cindex OC Systems
+@itemize @bullet
+@item
+AProbe
+@table @asis
+@item Author
+OC Systems (@email{info@@ocsystems.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.aprobe.com/}
+@item Overview
+Instruments a program using Dynamic Action Linking in order to track down memory
+corruption and monitor memory usage, among other things.
+@end table
 
 @cindex APurify
-@itemize @bullet
 @item
 APurify
 @table @asis
@@ -8534,6 +8618,23 @@ Various UNIX
 @uref{ftp://ftp.uu.net/usenet/comp.sources.unix/volume18/malloc-trace.Z}
 @item Overview
 A malloc package with call stack tracebacks.
+@end table
+
+@cindex MalTrace
+@item
+MalTrace
+@table @asis
+@item Author
+Michael Schwartz (@email{schwartz@@cs.washington.edu})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.mit.edu/afs/sipb/user/tytso/News/maltrace}
+@item Overview
+Traces all calls to @code{malloc()} and @code{free()} in order to detect memory
+leaks.
 @end table
 
 @cindex MCheck
@@ -9054,6 +9155,22 @@ AmigaOS
 @uref{http://wuarchive.wustl.edu/~aminet/dirs/dev_debug.html}
 @item Overview
 Runs in the background checking free memory for corruption.
+@end table
+
+@cindex YaMa
+@item
+YaMa
+@table @asis
+@item Author
+Venkatesha Murthy G. (@email{gvmt@@vsnl.com})
+@item License
+Free Software
+@item Platforms
+Linux
+@item Location
+@uref{http://www.geocities.com/ipsgvm/libyama/}
+@item Overview
+A memory allocator with leak tracing and some anti-heap corruption facilities.
 @end table
 
 @cindex YAMD (Yet Another Malloc Debugger)
