@@ -44,13 +44,13 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.41 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.42 2001-09-27 23:13:40 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.41 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.42 2001-09-27 23:13:40 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
-#define PROGVERSION "2.5" /* the current version of this program */
+#define PROGVERSION "2.6" /* the current version of this program */
 
 
 /* The flags used to parse the command line options.
@@ -72,6 +72,7 @@ typedef enum options_flags
     OF_FREEBYTE       = 'f',
     OF_SAFESIGNALS    = 'G',
     OF_USEDEBUG       = 'g',
+    OF_HTML           = 'H',
     OF_HELP           = 'h',
     OF_LIST           = 'i',
     OF_THREADS        = 'j',
@@ -170,7 +171,7 @@ static int allowoflow, prof, trace;
 static int safesignals, noprotect;
 static int checkfork, preserve;
 static int oflowwatch, usemmap;
-static int usedebug, editlist;
+static int usedebug, editlist, html;
 
 
 /* The table describing all recognised options.
@@ -236,6 +237,8 @@ static option options_table[] =
      "\tbeing freed.\n"},
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
+    {"html", OF_HTML, NULL,
+     "\tSpecifies that the log file should be formatted in HTML.\n"},
     {"large-bound", OF_LARGEBOUND, "unsigned integer",
      "\tSpecifies the limit in bytes up to which memory allocations should be\n"
      "\tclassified as large allocations for profiling purposes.\n"},
@@ -444,6 +447,8 @@ setoptions(int s)
         addoption("FREEBYTE", freebyte, 0);
     if (freestop)
         addoption("FREESTOP", freestop, 0);
+    if (html)
+        addoption("HTML", NULL, 0);
     if (largebound)
         addoption("LARGEBOUND", largebound, 0);
     if (leaktable)
@@ -696,6 +701,9 @@ main(int argc, char **argv)
             break;
           case OF_HELP:
             h = 1;
+            break;
+          case OF_HTML:
+            html = 1;
             break;
           case OF_LARGEBOUND:
             largebound = __mp_optarg;
