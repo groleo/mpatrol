@@ -26,6 +26,7 @@
  */
 
 
+#include "tree.h"
 #include "getopt.h"
 #include "version.h"
 #include <stdio.h>
@@ -34,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.3 2000-04-24 19:24:38 graeme Exp $"
+#ident "$Id: mprof.c,v 1.4 2000-04-25 01:06:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -61,6 +62,7 @@ profiledata;
 
 typedef struct profilenode
 {
+    treenode node;        /* tree node */
     unsigned long parent; /* parent node */
     void *addr;           /* return address */
     unsigned long symbol; /* associated symbol */
@@ -135,6 +137,12 @@ static char *symbols;
 static size_t sbound, mbound, lbound;
 
 
+/* The tree containing information about each call site.
+ */
+
+static treeroot sitetree;
+
+
 /* The profiling output file produced by mpatrol.
  */
 
@@ -145,6 +153,59 @@ static FILE *proffile;
  */
 
 static char *progname;
+
+
+/* Sum the statistics from two sets of profiling data.
+ */
+
+static void sumdata(profiledata *a, profiledata *b)
+{
+    size_t i;
+
+    for (i = 0; i < 4; i++)
+    {
+        a->acount[i] += b->acount[i];
+        a->dcount[i] += b->dcount[i];
+        a->atotal[i] += b->atotal[i];
+        a->dtotal[i] += b->dtotal[i];
+    }
+}
+
+
+/* Display a set of profiling data.
+ */
+
+static void printdata(size_t *d, size_t t)
+{
+    size_t i;
+    double n;
+
+    if (t == 0)
+        fputs("  -  -  -  -", stdout);
+    else
+        for (i = 0; i < 4; i++)
+        {
+            n = ((double) d[i] / (double) t) * 100.0;
+            if (n >= 99.5)
+                fputs(" %%", stdout);
+            else if (n <= 0.5)
+                fputs("  -", stdout);
+            else
+                fprintf(stdout, " %2.0f", n);
+        }
+}
+
+
+/* Display a character a specified number of times.
+ */
+
+static void printchar(char c, size_t n)
+{
+    size_t i;
+
+    for (i = 0; i < n; i++)
+        fputc(c, stdout);
+}
 
 
 /* Read an entry from the profiling output file.
@@ -259,6 +320,7 @@ static void readfile(void)
             getentry(&p->addr, sizeof(void *), 1);
             getentry(&p->symbol, sizeof(unsigned long), 1);
             getentry(&p->data, sizeof(unsigned long), 1);
+            __mp_treeinsert(&sitetree, &p->node, (unsigned long) p->addr);
         }
     }
     /* Read the string table containing the symbol names.
@@ -279,18 +341,6 @@ static void readfile(void)
         fprintf(stderr, "%s: Invalid file format\n", progname);
         exit(EXIT_FAILURE);
     }
-}
-
-
-/* Display a character a specified number of times.
- */
-
-static void printchar(char c, size_t n)
-{
-    size_t i;
-
-    for (i = 0; i < n; i++)
-        fputc(c, stdout);
 }
 
 
@@ -333,9 +383,15 @@ static void bintable(void)
                 d = b * (i + 1);
             }
             e = ((double) a / (double) acount) * 100.0;
-            f = ((double) b / (double) (acount - dcount)) * 100.0;
+            if (acount != dcount)
+                f = ((double) b / (double) (acount - dcount)) * 100.0;
+            else
+                f = 0.0;
             g = ((double) c / (double) atotal) * 100.0;
-            h = ((double) d / (double) (atotal - dtotal)) * 100.0;
+            if (atotal != dtotal)
+                h = ((double) d / (double) (atotal - dtotal)) * 100.0;
+            else
+                h = 0.0;
             fprintf(stdout, " %s %4lu  %6lu  %6.2f  %8lu  %6.2f  "
                     "%6lu  %6.2f  %8lu  %6.2f\n",
                     (i == binsize - 1) ? ">=" : "  ",
@@ -347,6 +403,63 @@ static void bintable(void)
     fprintf(stdout, "   total  %6lu          %8lu          "
             "%6lu          %8lu\n", acount, atotal,
             acount - dcount, atotal - dtotal);
+}
+
+
+/* Display the direct allocation table.
+ */
+
+static void directtable(void)
+{
+    profilenode *n, *p;
+    profiledata d;
+    size_t i;
+    unsigned long a, b, c;
+
+    printchar(' ', 29);
+    fputs("DIRECT ALLOCATIONS\n\n", stdout);
+    printchar(' ', 14);
+    fputs("allocated", stdout);
+    printchar(' ', 15);
+    fputs("unfreed\n", stdout);
+    printchar(' ', 8);
+    printchar('-', 21);
+    fputs("  ", stdout);
+    printchar('-', 21);
+    fputs("\n     %     bytes   s  m  l  x     "
+          "bytes   s  m  l  x   calls  function\n\n", stdout);
+    for (n = (profilenode *) __mp_minimum(sitetree.root); n != NULL; n = p)
+    {
+        p = (profilenode *) __mp_successor(&n->node);
+        if (n->data != 0)
+        {
+            d = data[n->data - 1];
+            while ((p->addr == n->addr) ||
+                   ((p->symbol != 0) && (p->symbol == n->symbol)))
+            {
+                n = p;
+                p = (profilenode *) __mp_successor(&n->node);
+                sumdata(&d, &data[n->data - 1]);
+            }
+            a = b = c = 0;
+            for (i = 0; i < 4; i++)
+            {
+                a += d.atotal[i];
+                b += d.dtotal[i];
+                c += d.acount[i];
+            }
+            fprintf(stdout, "%6.2f  %8lu ",
+                    ((double) a / (double) atotal) * 100.0, a);
+            printdata(d.atotal, a);
+            fprintf(stdout, "  %8lu ", b);
+            printdata(d.dtotal, b);
+            fprintf(stdout, "  %6lu  ", c);
+            if (n->symbol != 0)
+                fprintf(stdout, "%s\n", symbols + n->symbol);
+            else
+                fprintf(stdout, MP_POINTER "\n", n->addr);
+        }
+    }
 }
 
 
@@ -402,6 +515,7 @@ int main(int argc, char **argv)
     nodesize = 0;
     symbols = NULL;
     sbound = mbound = lbound = 0;
+    __mp_newtree(&sitetree);
     if (strcmp(f, "-") == 0)
         proffile = stdin;
     else if ((proffile = fopen(f, "rb")) == NULL)
@@ -412,6 +526,8 @@ int main(int argc, char **argv)
     readfile();
     fclose(proffile);
     bintable();
+    fputs("\n\n", stdout);
+    directtable();
     if (acounts != NULL)
         free(acounts);
     if (dcounts != NULL)
