@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.14 2000-06-12 21:54:19 graeme Exp $
+# $Id: NMakefile,v 1.15 2000-06-15 20:27:05 graeme Exp $
 
 
 # Definitions
@@ -180,8 +180,12 @@ signals.obj signals.ts_obj: $(SOURCE)/signals.c $(SOURCE)/signals.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/inter.h $(SOURCE)/profile.h
-mutex.ts_obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+mutex.ts_obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/inter.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/machine.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 diag.obj: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

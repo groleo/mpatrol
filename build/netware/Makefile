@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.20 2000-06-12 21:54:15 graeme Exp $
+# $Id: Makefile,v 1.21 2000-06-15 20:27:01 graeme Exp $
 
 
 # Definitions
@@ -149,8 +149,12 @@ signals.obj signals.ts.obj: $(SOURCE)/signals.c $(SOURCE)/signals.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/inter.h $(SOURCE)/profile.h
-mutex.ts.obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+mutex.ts.obj: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/inter.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/machine.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 diag.obj: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \

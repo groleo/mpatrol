@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.21 2000-06-12 21:54:13 graeme Exp $
+# $Id: Makefile,v 1.22 2000-06-15 20:26:58 graeme Exp $
 
 
 # Definitions
@@ -146,8 +146,12 @@ signals.o signals.t.o: $(SOURCE)/signals.c $(SOURCE)/signals.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/inter.h $(SOURCE)/profile.h
-mutex.t.o: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/config.h \
-	$(SOURCE)/target.h
+mutex.t.o: $(SOURCE)/mutex.c $(SOURCE)/mutex.h $(SOURCE)/inter.h \
+	$(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
+	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/addr.h \
+	$(SOURCE)/stack.h $(SOURCE)/profile.h $(SOURCE)/symbol.h \
+	$(SOURCE)/strtab.h $(SOURCE)/signals.h $(SOURCE)/machine.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 diag.o: $(SOURCE)/diag.c $(SOURCE)/diag.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
