@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.28 2001-02-28 00:18:50 graeme Exp $
+# $Id: mpatrol.psf,v 1.29 2001-03-01 00:57:10 graeme Exp $
 
 
 product
@@ -173,6 +173,7 @@ product
 	file			mpdebug.h
 	directory		mpatrol/include/mpatrol=/usr/local/include/mpatrol
 	file			dbmalloc.h
+	file			dmalloc.h
 	file			heapdiff.h
 	file			mgauge.h
 	file			mtrace.h
