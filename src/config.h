@@ -100,6 +100,17 @@
 #endif /* MP_ARRAY_SUPPORT */
 
 
+/* The multiple of pages to allocate from the heap every time a new block of
+ * internal memory is required.  The higher the value, the less distinct
+ * internal blocks to keep track of, but the potential for more memory wastage
+ * if not all of the block is required.
+ */
+
+#ifndef MP_ALLOCFACTOR
+#define MP_ALLOCFACTOR 2
+#endif /* MP_ALLOCFACTOR */
+
+
 /* Indicates if all of the heap memory used by the library should be
  * deleted when the process exits.  This should not be set on systems that
  * make dynamic memory allocations after exit() or reference freed memory
