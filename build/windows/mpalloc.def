@@ -23,45 +23,51 @@
 
 LIBRARY MPALLOC
 
-VERSION 1.3
+VERSION 1.4
 
 DESCRIPTION "dynamic memory allocation replacement library"
 
 EXPORTS
 	__mp_init		@1
 	__mp_fini		@2
-	__mp_alloc		@3
-	__mp_strdup		@4
-	__mp_realloc		@5
-	__mp_free		@6
-	__mp_setmem		@7
-	__mp_copymem		@8
-	__mp_comparemem		@9
-	__mp_locatemem		@10
-	__mp_info		@11
-	__mp_printinfo		@12
-	__mp_snapshot		@13
-	__mp_iterate		@14
-	__mp_memorymap		@15
-	__mp_summary		@16
-	__mp_check		@17
-	__mp_prologue		@18
-	__mp_epilogue		@19
-	__mp_nomemory		@20
-	__mp_pushdelstack	@21
-	__mp_popdelstack	@22
-	__mp_printf		@23
-	__mp_logmemory		@24
-	__mp_logstack		@25
-	__mp_edit		@26
-	__mp_list		@27
-	chkr_set_right		@28
-	chkr_copy_bitmap	@29
-	chkr_check_addr		@30
-	chkr_check_str		@31
-	chkr_check_exec		@32
-	__mp_setfailhandler	@33
-	__mp_xmalloc		@34
-	__mp_xcalloc		@35
-	__mp_xstrdup		@36
-	__mp_xrealloc		@37
+	__mp_setoption		@3
+	__mp_alloc		@4
+	__mp_strdup		@5
+	__mp_realloc		@6
+	__mp_free		@7
+	__mp_setmem		@8
+	__mp_copymem		@9
+	__mp_comparemem		@10
+	__mp_locatemem		@11
+	__mp_function		@12
+	__mp_info		@13
+	__mp_syminfo		@14
+	__mp_printinfo		@15
+	__mp_snapshot		@16
+	__mp_iterate		@17
+	__mp_memorymap		@18
+	__mp_summary		@19
+	__mp_check		@20
+	__mp_prologue		@21
+	__mp_epilogue		@22
+	__mp_nomemory		@23
+	__mp_pushdelstack	@24
+	__mp_popdelstack	@25
+	__mp_printf		@26
+	__mp_vprintf		@27
+	__mp_logmemory		@28
+	__mp_logstack		@29
+	__mp_logaddr		@30
+	__mp_edit		@31
+	__mp_list		@32
+	__mp_view		@33
+	chkr_set_right		@34
+	chkr_copy_bitmap	@35
+	chkr_check_addr		@36
+	chkr_check_str		@37
+	chkr_check_exec		@38
+	__mp_setfailhandler	@39
+	__mp_xmalloc		@40
+	__mp_xcalloc		@41
+	__mp_xstrdup		@42
+	__mp_xrealloc		@43
