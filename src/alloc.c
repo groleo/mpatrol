@@ -31,11 +31,10 @@
 
 #include "alloc.h"
 #include "utils.h"
-#include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.2 1999-10-12 19:17:24 graeme Exp $"
+#ident "$Id: alloc.c,v 1.3 1999-12-21 20:23:46 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -220,7 +219,7 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
             if (h->flags & FLG_OFLOWWATCH)
                 __mp_memwatch(&h->heap.memory, n->block, m, MA_NOACCESS);
             else
-                memset(n->block, h->obyte, m);
+                __mp_memset(n->block, h->obyte, m);
             n->block = (char *) n->block + m;
             n->size -= m;
         }
@@ -232,7 +231,7 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
                 __mp_memwatch(&h->heap.memory, (char *) n->block + l, m,
                               MA_NOACCESS);
             else
-                memset((char *) n->block + l, h->obyte, m);
+                __mp_memset((char *) n->block + l, h->obyte, m);
         n->size = l;
     }
     else if (h->flags & FLG_OFLOWWATCH)
@@ -244,8 +243,8 @@ static allocnode *splitnode(allochead *h, allocnode *n, size_t l, size_t a,
     }
     else
     {
-        memset((char *) n->block - h->oflow, h->obyte, h->oflow);
-        memset((char *) n->block + n->size, h->obyte, h->oflow);
+        __mp_memset((char *) n->block - h->oflow, h->obyte, h->oflow);
+        __mp_memset((char *) n->block + n->size, h->obyte, h->oflow);
     }
     __mp_treeinsert(&h->atree, &n->tnode, (unsigned long) n->block);
     h->asize += n->size;
@@ -351,7 +350,7 @@ MP_GLOBAL allocnode *__mp_getalloc(allochead *h, size_t l, size_t a, void *i)
         if (h->flags & FLG_PAGEALLOC)
             __mp_memprotect(&h->heap.memory, p->block, p->size, MA_NOACCESS);
         else
-            memset(p->block, h->fbyte, p->size);
+            __mp_memset(p->block, h->fbyte, p->size);
         /* Insert the new memory block into the correct position in the
          * memory block list.  This is vital for merging free nodes.
          */
@@ -513,7 +512,7 @@ MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
         if (h->flags & FLG_PAGEALLOC)
             __mp_memprotect(&h->heap.memory, p->block, s, MA_NOACCESS);
         else
-            memset(p->block, h->fbyte, s);
+            __mp_memset(p->block, h->fbyte, s);
         __mp_treeinsert(&h->ftree, &p->tnode, p->size);
         h->fsize += s;
     }
@@ -524,13 +523,13 @@ MP_GLOBAL int __mp_resizealloc(allochead *h, allocnode *n, size_t l)
             __mp_memwatch(&h->heap.memory, (char *) n->block + l, s,
                           MA_NOACCESS);
         else
-            memset((char *) n->block + l, h->obyte, s);
+            __mp_memset((char *) n->block + l, h->obyte, s);
     }
     else if (h->flags & FLG_OFLOWWATCH)
         __mp_memwatch(&h->heap.memory, (char *) n->block + l, h->oflow,
                       MA_NOACCESS);
     else
-        memset((char *) n->block + l, h->obyte, h->oflow);
+        __mp_memset((char *) n->block + l, h->obyte, h->oflow);
     n->size = l;
     h->asize += d;
     return 1;
@@ -599,7 +598,7 @@ MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
                 __mp_memprotect(&h->heap.memory, n->block, n->size,
                                 MA_NOACCESS);
         else if (!(h->flags & FLG_PRESERVE))
-            memset(n->block, h->fbyte, n->size);
+            __mp_memset(n->block, h->fbyte, n->size);
         __mp_treeinsert(&h->gtree, &n->tnode, (unsigned long) n->block);
         h->gsize += n->size;
     }
@@ -634,7 +633,7 @@ MP_GLOBAL void __mp_freealloc(allochead *h, allocnode *n, void *i)
         n->size += h->oflow << 1;
         n->info = NULL;
         if (!(h->flags & FLG_PAGEALLOC))
-            memset(n->block, h->fbyte, n->size);
+            __mp_memset(n->block, h->fbyte, n->size);
         __mp_treeinsert(&h->ftree, &n->tnode, n->size);
         h->fsize += n->size;
         mergenode(h, n);
