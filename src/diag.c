@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.10 2000-03-01 00:54:53 graeme Exp $"
+#ident "$Id: diag.c,v 1.11 2000-03-03 01:14:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -354,7 +354,7 @@ MP_GLOBAL void __mp_printloc(infonode *n)
 /* Display the name of a symbol associated with a particular address.
  */
 
-MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
+MP_GLOBAL void __mp_printsymbol(symhead *y, void *a, long m)
 {
     symnode *n;
     char *r, *s, *t;
@@ -364,6 +364,15 @@ MP_GLOBAL void __mp_printsymbol(symhead *y, void *a)
         r = n->data.name;
     else
         r = NULL;
+    /* If the address we are locating is a return address then we may
+     * wish to further modify it when looking for an associated source line
+     * since we may get the line number wrong otherwise.  Unfortunately,
+     * different machines have different sized instructions, so it is not
+     * really possible to get the exact address of the calling instruction.
+     * However, simply deducting one byte from the return address should do
+     * the trick for the purposes of this search.
+     */
+    a = (char *) a + m;
     __mp_findsource(y, a, &s, &t, &u);
     if (r != NULL)
         __mp_diag("%s", r);
@@ -408,7 +417,7 @@ MP_GLOBAL void __mp_printaddrs(symhead *y, addrnode *n)
     {
         __mp_diag("\t" MP_POINTER " ", n->data.addr);
         if (n->data.name == NULL)
-            __mp_printsymbol(y, n->data.addr);
+            __mp_printsymbol(y, n->data.addr, -1);
         else
             __mp_diag("%s", n->data.name);
         __mp_diag("\n");
@@ -428,12 +437,12 @@ MP_GLOBAL void __mp_printstack(symhead *y, stackinfo *p)
     if ((p->frame != NULL) && (p->addr != NULL))
     {
         __mp_diag("\t" MP_POINTER " ", p->addr);
-        __mp_printsymbol(y, p->addr);
+        __mp_printsymbol(y, p->addr, -1);
         __mp_diag("\n");
         while (__mp_getframe(p) && (p->addr != NULL))
         {
             __mp_diag("\t" MP_POINTER " ", p->addr);
-            __mp_printsymbol(y, p->addr);
+            __mp_printsymbol(y, p->addr, -1);
             __mp_diag("\n");
         }
     }
@@ -669,7 +678,7 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     else
     {
         __mp_diag(MP_POINTER " [", h->prologue);
-        __mp_printsymbol(&h->syms, (void *) h->prologue);
+        __mp_printsymbol(&h->syms, (void *) h->prologue, 0);
         __mp_diag("]");
     }
     __mp_diag("\nepilogue function: ");
@@ -678,7 +687,7 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     else
     {
         __mp_diag(MP_POINTER " [", h->epilogue);
-        __mp_printsymbol(&h->syms, (void *) h->epilogue);
+        __mp_printsymbol(&h->syms, (void *) h->epilogue, 0);
         __mp_diag("]");
     }
     __mp_diag("\nhandler function:  ");
@@ -687,7 +696,7 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
     else
     {
         __mp_diag(MP_POINTER " [", h->nomemory);
-        __mp_printsymbol(&h->syms, (void *) h->nomemory);
+        __mp_printsymbol(&h->syms, (void *) h->nomemory, 0);
         __mp_diag("]");
     }
     __mp_diag("\nlog file:          ");
