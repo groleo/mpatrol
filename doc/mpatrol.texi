@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.114 2000-08-31 20:41:52 graeme Exp $
+@c $Id: mpatrol.texi,v 1.115 2000-09-25 18:53:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.0
 @set VERSION 1.3.0
-@set UPDATED 31st August, 2000
+@set UPDATED 25th September, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -666,13 +666,13 @@ manual pages and a quick reference card.
 @cindex Amiga 4000/040
 @cindex Dell Inspiron 7500
 The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
-3.1.  I then installed RedHat Linux 5.1 on my Amiga and added support for
+3.1.  I then installed Red Hat Linux 5.1 on my Amiga and added support for
 Linux/m68k.  I've now just recently purchased a Dell Inspiron 7500 Notebook PC
-and put my Amiga in retirement, so development will now continue on RedHat Linux
-6 and above on the Intel platform.  I've tried my best to make it as easy as
-possible to build and install mpatrol on any system, but it isn't likely to run
-smoothly for everybody.  However, there shouldn't be any major problems if you
-perform the following steps.
+and put my Amiga in retirement, so development will now continue on Red Hat
+Linux 6.2 and above on the Intel platform.  I've tried my best to make it as
+easy as possible to build and install mpatrol on any system, but it isn't
+likely to run smoothly for everybody.  However, there shouldn't be any major
+problems if you perform the following steps.
 
 @enumerate 1
 @item
@@ -6612,21 +6612,10 @@ The @option{USEDEBUG} option has no effect.
 Stack traversal may be unreliable from signal-handlers.
 @end itemize
 
-@cindex RedHat
+@cindex Red Hat
 @cindex Linux, Intel 80x86
 @item
-RedHat Linux 6.0, Intel Pentium III, BFD, @command{gcc}
-@itemize @bullet
-@item
-The @option{OFLOWWATCH} option has no effect.
-@item
-The @option{-d} option to the @command{mpatrol} command does not work unless
-@file{libiberty.so} is available.
-@end itemize
-
-@cindex Linux, Motorola 680x0
-@item
-RedHat Linux 5.1, Motorola 68040, BFD, @command{gcc}
+Red Hat Linux 6.1, Intel Pentium III, BFD, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work due to the system threads
@@ -6639,7 +6628,31 @@ The @option{-d} option to the @command{mpatrol} command does not work unless
 @end itemize
 
 @item
-RedHat Linux 5.1, Motorola 68040, ELF32, @command{gcc}
+Red Hat Linux 6.2, Intel Pentium III, BFD, @command{gcc}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libiberty.so} is available.
+@end itemize
+
+@cindex Linux, Motorola 680x0
+@item
+Red Hat Linux 5.1, Motorola 68040, BFD, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work due to the system threads
+library calling @code{malloc()} and @code{bzero()} recursively.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{-d} option to the @command{mpatrol} command does not work unless
+@file{libiberty.so} is available.
+@end itemize
+
+@item
+Red Hat Linux 5.1, Motorola 68040, ELF32, @command{gcc}
 @itemize @bullet
 @item
 The thread-safe version of the library does not work due to the system threads
@@ -7005,9 +7018,9 @@ Bugs should be reported to @email{mpatrol@@cbmamiga.demon.co.uk} along with the
 details of the operating system, processor architecture and object file format
 that the mpatrol library is being used with --- and don't forget to include the
 version of the mpatrol library you are using!  Keep in mind that I only have
-access to a Pentium III Notebook PC running RedHat Linux 6 and Windows 98, so I
-will be most likely unable to reproduce most of the system-specific bugs.  A bug
-report that comes with an associated fix will be most welcome.
+access to a Pentium III Notebook PC running Red Hat Linux 6.2 and Windows 98, so
+I will be most likely unable to reproduce most of the system-specific bugs.  A
+bug report that comes with an associated fix will be most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
 to @email{mpatrol@@cbmamiga.demon.co.uk} or the mpatrol discussion group at
@@ -9044,6 +9057,24 @@ AmigaOS
 @item Overview
 Provides access to the MMU in modern Amigas so that features such as virtual
 memory can be implemented.
+@end table
+
+@cindex MULTI
+@cindex Green Hills Software, Inc.
+@item
+MULTI
+@table @asis
+@item Author
+Green Hills Software, Inc. (@email{sales@@ghs.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://www.ghs.com}
+@item Overview
+Inserts special checks into a program to watch for and report a broad variety
+of run-time errors, including freeing unallocated memory and memory leaks.
 @end table
 
 @cindex Mungwall
