@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.26 2000-11-14 18:43:31 graeme Exp $
+# $Id: prototype,v 1.27 2000-11-18 15:11:22 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -52,6 +52,9 @@ f none doc/mpatrol/images/mpatrol.txt 0664 bin bin
 f none doc/mpatrol/images/mpatrol.jpg 0664 bin bin
 f none doc/mpatrol/images/mpatrol.eps 0664 bin bin
 f none doc/mpatrol/images/mpatrol.pdf 0664 bin bin
+f none doc/mpatrol/images/test.jpg 0664 bin bin
+f none doc/mpatrol/images/test.eps 0664 bin bin
+f none doc/mpatrol/images/test.pdf 0664 bin bin
 f none doc/mpatrol/images/gcc.jpg 0664 bin bin
 f none doc/mpatrol/images/gcc.eps 0664 bin bin
 f none doc/mpatrol/images/gcc.pdf 0664 bin bin
