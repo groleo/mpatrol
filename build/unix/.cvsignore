@@ -1,0 +1,10 @@
+.cvsignore
+*.o
+*.ln
+*.a
+*.so
+*.so.*
+mpatrol
+mprof
+mptrace
+mleak

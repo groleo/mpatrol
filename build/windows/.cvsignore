@@ -1,0 +1,7 @@
+.cvsignore
+*.obj
+*.ts_obj
+*.lib
+*.dll
+*.exp
+*.exe
