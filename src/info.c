@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.60 2001-02-08 00:02:44 graeme Exp $"
+#ident "$Id: info.c,v 1.61 2001-02-09 00:49:48 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.60 2001-02-08 00:02:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.61 2001-02-09 00:49:48 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -276,7 +276,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                           "invalid");
                 __mp_diag("\n");
             }
-            a = 1;
+            a = h->alloc.heap.memory.align;
         }
         else if (!__mp_ispoweroftwo(a))
         {
