@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.9 2001-03-06 02:39:07 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.10 2001-03-06 19:39:29 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.9 2001-03-06 02:39:07 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.10 2001-03-06 19:39:29 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -725,6 +725,7 @@ __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
 {
     char *s;
     listinfo i;
+    int t;
 
     if (!malloc_initialised)
         __mp_init_dmalloc();
@@ -742,22 +743,25 @@ __mpt_dmalloclogchanged(unsigned long m, int u, int f, int d)
     i.unfreed = (u != 0) ? 1 : 0;
     i.freed = (f != 0) ? 1 : 0;
     i.details = (d != 0) ? 1 : 0;
+    t = __mp_stopleaktable();
     __mp_clearleaktable();
     __mp_iterate(callback, &i, m);
-    if (u != 0)
+    if (i.unfreed)
     {
         __mp_printf("\n");
-        __mp_leaktable(0, 2, 0);
+        __mp_leaktable(0, MP_LT_UNFREED, 0);
     }
-    if (f != 0)
+    if (i.freed)
     {
         __mp_printf("\n");
-        __mp_leaktable(0, 1, 0);
+        __mp_leaktable(0, MP_LT_FREED, 0);
     }
     __mp_clearleaktable();
+    if (t != 0)
+        __mp_startleaktable();
     if ((i.kcount != 0) || (i.ucount != 0))
     {
-        __mp_printf("\n");
+        __mpt_dmallocmessage("\n");
         if (i.kcount != 0)
             __mpt_dmallocmessage(" known memory: %lu pointer%s, %lu byte%s\n",
                                  i.kcount, (i.kcount == 1) ? "" : "s", i.ktotal,
