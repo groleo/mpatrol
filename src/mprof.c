@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.21 2000-10-17 18:12:36 graeme Exp $"
+#ident "$Id: mprof.c,v 1.22 2000-10-19 17:22:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -52,6 +52,7 @@ typedef enum options_flags
     OF_COUNTS     = 'c',
     OF_GRAPHFILE  = 'g',
     OF_HELP       = 'h',
+    OF_LEAKS      = 'l',
     OF_STACKDEPTH = 'n',
     OF_VERSION    = 'V'
 }
@@ -96,9 +97,10 @@ profilenode;
 
 typedef struct vertex
 {
-    treenode node;      /* tree node */
-    graphnode gnode;    /* graph node */
-    profilenode *pnode; /* profiling node */
+    treenode node;       /* tree node */
+    graphnode gnode;     /* graph node */
+    profilenode *pnode;  /* profiling node */
+    unsigned long index; /* vertex index */
 }
 vertex;
 
@@ -108,7 +110,8 @@ vertex;
 
 typedef struct edge
 {
-    graphedge node;      /* edge node */
+    listnode node;       /* list node */
+    graphedge gnode;     /* edge node */
     profiledata data;    /* profiling data */
     unsigned char flags; /* temporary flags */
 }
@@ -199,6 +202,12 @@ static treeroot proftree;
 static treeroot temptree;
 
 
+/* The list of edges in the allocation call graph.
+ */
+
+static listhead edgelist;
+
+
 /* The allocation call graph.
  */
 
@@ -237,6 +246,13 @@ static int useaddresses;
 static int showcounts;
 
 
+/* Indicates if memory leaks rather than memory allocations should be written
+ * to the graph specification file.
+ */
+
+static int showleaks;
+
+
 /* Indicates the maximum stack depth to use when comparing function call
  * stacks for the memory leak table.
  */
@@ -262,6 +278,9 @@ static option options_table[] =
      "\tgraph specification file for later visualisation with dot.\n"},
     {"help", OF_HELP, NULL,
      "\tDisplays this quick-reference option summary.\n"},
+    {"leaks", OF_LEAKS, NULL,
+     "\tSpecifies that memory leaks rather than memory allocations are to be\n"
+     "\twritten to the graph specification file.\n"},
     {"stack-depth", OF_STACKDEPTH, "depth",
      "\tSpecifies the maximum stack depth to display and also use when\n"
      "\tcalculating if one call site has the same call stack as another call\n"
@@ -588,6 +607,7 @@ static vertex *addvertex(profilenode *n)
         __mp_treeinsert(&temptree, &v->node, n->symbol);
     __mp_addnode(&graph, &v->gnode);
     v->pnode = n;
+    v->index = 0;
     return v;
 }
 
@@ -604,10 +624,143 @@ static edge *addedge(graphnode *p, graphnode *c)
         fprintf(stderr, "%s: Out of memory\n", progname);
         exit(EXIT_FAILURE);
     }
-    __mp_addedge(&graph, &e->node, p, c);
+    __mp_addtail(&edgelist, &e->node);
+    __mp_addedge(&graph, &e->gnode, p, c);
     cleardata(&e->data);
     e->flags = 0;
     return e;
+}
+
+
+/* Build the allocation call graph.
+ */
+
+static void buildgraph(void)
+{
+    profilenode *n, *p;
+    vertex *u, *v;
+    edge *e;
+    graphedge *g;
+    profiledata d;
+
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
+         n = (profilenode *) __mp_successor(&n->node))
+        if ((n->data != 0) && !(n->flags & 1))
+        {
+            cleardata(&d);
+            sumdata(&d, &data[n->data - 1]);
+            p = (profilenode *) __mp_successor(&n->node);
+            while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
+                     (p->symbol != 0) && (p->symbol == n->symbol))))
+            {
+                if ((p->data != 0) && !(p->flags & 1) && comparestack(n, p, 1))
+                {
+                    sumdata(&d, &data[p->data - 1]);
+                    p->flags |= 1;
+                }
+                p = (profilenode *) __mp_successor(&p->node);
+            }
+            p = n;
+            if (useaddresses)
+                u = (vertex *) __mp_search(temptree.root,
+                                           (unsigned long) p->addr);
+            else
+                u = (vertex *) __mp_search(temptree.root, p->symbol);
+            if (u == NULL)
+                u = addvertex(p);
+            if ((g = __mp_findedge(&graph, &u->gnode, &graph.end)) == NULL)
+                e = addedge(&u->gnode, &graph.end);
+            else
+                e = (edge *) ((char *) g - offsetof(edge, gnode));
+            sumdata(&e->data, &d);
+            u->pnode->flags |= 2;
+            for (v = u; p->parent != 0; u = v)
+            {
+                p = &nodes[p->parent - 1];
+                if (useaddresses)
+                    v = (vertex *) __mp_search(temptree.root,
+                                               (unsigned long) p->addr);
+                else
+                    v = (vertex *) __mp_search(temptree.root, p->symbol);
+                if (v == NULL)
+                    v = addvertex(p);
+                if ((g = __mp_findedge(&graph, &v->gnode, &u->gnode)) == NULL)
+                    e = addedge(&v->gnode, &u->gnode);
+                else
+                    e = (edge *) ((char *) g - offsetof(edge, gnode));
+                /* Find out if we've been here before.  If we have then we have
+                 * detected a cycle in the call graph and we should not
+                 * contribute anything to the current edge since we have done so
+                 * already.  However, we mark the edge as being part of a cycle
+                 * since it is useful to know this later on.
+                 */
+                if (v->pnode->flags & 2)
+                    e->flags |= 2;
+                else
+                {
+                    sumdata(&e->data, &d);
+                    v->pnode->flags |= 2;
+                }
+            }
+            if ((g = __mp_findedge(&graph, &graph.start, &v->gnode)) == NULL)
+                e = addedge(&graph.start, &v->gnode);
+            else
+                e = (edge *) ((char *) g - offsetof(edge, gnode));
+            sumdata(&e->data, &d);
+            /* Clear all of the flags from the current call stack that we used
+             * to determine cycles in the call graph.
+             */
+            p = n;
+            do
+            {
+                if (useaddresses)
+                    v = (vertex *) __mp_search(temptree.root,
+                                               (unsigned long) p->addr);
+                else
+                    v = (vertex *) __mp_search(temptree.root, p->symbol);
+                v->pnode->flags &= ~2;
+                if (p->parent != 0)
+                    p = &nodes[p->parent - 1];
+                else
+                    p = NULL;
+            }
+            while (p != NULL);
+        }
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
+         n = (profilenode *) __mp_successor(&n->node))
+        n->flags = 0;
+}
+
+
+/* Delete the allocation call graph.
+ */
+
+static void deletegraph(void)
+{
+    vertex *n, *v;
+    edge *e, *m;
+
+    /* Remove the nodes from the graph and free up the memory that they
+     * inhabit.  This is done by traversing the tree rather than the graph
+     * in order to avoid deleting nodes that result in other nodes being
+     * inaccessible.
+     */
+    for (v = (vertex *) __mp_minimum(temptree.root); v != NULL; v = n)
+    {
+        n = (vertex *) __mp_successor(&v->node);
+        __mp_treeremove(&temptree, &v->node);
+        __mp_removenode(&graph, &v->gnode);
+        free(v);
+    }
+    /* Remove the edges from the graph.  The graph is now empty following
+     * the removal of the nodes in the previous loop, so we just need to
+     * free the memory that each edge uses.
+     */
+    for (e = (edge *) edgelist.head; m = (edge *) e->node.next; e = m)
+    {
+        __mp_remove(&edgelist, &e->node);
+        free(e);
+    }
 }
 
 
@@ -949,96 +1102,78 @@ static void leaktable(void)
 }
 
 
-/* Build the allocation call graph.
+/* Display the allocation call graph.
  */
 
-static void buildgraph(void)
+static void callgraph(void)
 {
-    profilenode *n, *p;
+    listnode *l;
     vertex *u, *v;
     edge *e;
-    profiledata d;
+    graphedge *g;
+    size_t i;
 
-    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
-         n = (profilenode *) __mp_successor(&n->node))
-        if ((n->data != 0) && !(n->flags & 1))
+    i = 1;
+    printchar(' ', 29);
+    fputs("ALLOCATION CALL GRAPH\n\n", stdout);
+    printchar(' ', 28);
+    fprintf(stdout, "(number of vertices: %lu)\n\n", temptree.size);
+    /* Compute the index for each vertex in the graph.  This is currently
+     * done after the graph has been completely constructed so that the
+     * ordering can be done by code address.  It has to be done before we
+     * start displaying the graph since each vertex will contain forward
+     * references to its parents and children.
+     */
+    for (v = (vertex *) __mp_minimum(temptree.root); v != NULL;
+         v = (vertex *) __mp_successor(&v->node))
+        v->index = i++;
+    for (v = (vertex *) __mp_minimum(temptree.root); v != NULL;
+         v = (vertex *) __mp_successor(&v->node))
+    {
+        /* Calculate the details of the parents.
+         */
+        for (l = v->gnode.parents.head; l->next != NULL; l = l->next)
         {
-            cleardata(&d);
-            sumdata(&d, &data[n->data - 1]);
-            p = (profilenode *) __mp_successor(&n->node);
-            while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
-                     (p->symbol != 0) && (p->symbol == n->symbol))))
-            {
-                if ((p->data != 0) && !(p->flags & 1) && comparestack(n, p, 1))
-                {
-                    sumdata(&d, &data[p->data - 1]);
-                    p->flags |= 1;
-                }
-                p = (profilenode *) __mp_successor(&p->node);
-            }
-            p = n;
-            if (useaddresses)
-                u = (vertex *) __mp_search(temptree.root,
-                                           (unsigned long) p->addr);
-            else
-                u = (vertex *) __mp_search(temptree.root, p->symbol);
-            if (u == NULL)
-                u = addvertex(p);
-            if (!(e = (edge *) __mp_findedge(&graph, &u->gnode, &graph.end)))
-                e = addedge(&u->gnode, &graph.end);
-            sumdata(&e->data, &d);
-            u->pnode->flags |= 2;
-            for (v = u; p->parent != 0; u = v)
-            {
-                p = &nodes[p->parent - 1];
-                if (useaddresses)
-                    v = (vertex *) __mp_search(temptree.root,
-                                               (unsigned long) p->addr);
-                else
-                    v = (vertex *) __mp_search(temptree.root, p->symbol);
-                if (v == NULL)
-                    v = addvertex(p);
-                if (!(e = (edge *) __mp_findedge(&graph, &v->gnode, &u->gnode)))
-                    e = addedge(&v->gnode, &u->gnode);
-                /* Find out if we've been here before.  If we have then we have
-                 * detected a cycle in the call graph and we should not
-                 * contribute anything to the current edge since we have done so
-                 * already.  However, we mark the edge as being part of a cycle
-                 * since it is useful to know this later on.
-                 */
-                if (v->pnode->flags & 2)
-                    e->flags |= 2;
-                else
-                {
-                    sumdata(&e->data, &d);
-                    v->pnode->flags |= 2;
-                }
-            }
-            if (!(e = (edge *) __mp_findedge(&graph, &graph.start, &v->gnode)))
-                e = addedge(&graph.start, &v->gnode);
-            sumdata(&e->data, &d);
-            /* Clear all of the flags from the current call stack that we used
-             * to determine cycles in the call graph.
+            /* The following three lines are a bit excessive and result from
+             * using class-based programming in C.  These conversions would be
+             * automatically calculated by the compiler if we were using C++
+             * classes.
              */
-            p = n;
-            do
+            g = (graphedge *) ((char *) l - offsetof(graphedge, pnode));
+            e = (edge *) ((char *) g - offsetof(edge, gnode));
+            u = (vertex *) ((char *) e->gnode.parent - offsetof(vertex, gnode));
+            if (&u->gnode != &graph.start)
             {
-                if (useaddresses)
-                    v = (vertex *) __mp_search(temptree.root,
-                                               (unsigned long) p->addr);
-                else
-                    v = (vertex *) __mp_search(temptree.root, p->symbol);
-                v->pnode->flags &= ~2;
-                if (p->parent != 0)
-                    p = &nodes[p->parent - 1];
-                else
-                    p = NULL;
+                printchar(' ', 4);
+                printsymbol(stdout, u->pnode);
+                fprintf(stdout, " [%lu]\n", u->index);
             }
-            while (p != NULL);
         }
-    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL;
-         n = (profilenode *) __mp_successor(&n->node))
-        n->flags = 0;
+        printchar(' ', 8);
+        printsymbol(stdout, v->pnode);
+        fprintf(stdout, " [%lu]\n", v->index);
+        /* Calculate the details of the children.
+         */
+        for (l = v->gnode.children.head; l->next != NULL; l = l->next)
+        {
+            /* The following three lines are a bit excessive and result from
+             * using class-based programming in C.  These conversions would be
+             * automatically calculated by the compiler if we were using C++
+             * classes.
+             */
+            g = (graphedge *) ((char *) l - offsetof(graphedge, cnode));
+            e = (edge *) ((char *) g - offsetof(edge, gnode));
+            u = (vertex *) ((char *) e->gnode.child - offsetof(vertex, gnode));
+            if (&u->gnode != &graph.end)
+            {
+                printchar(' ', 4);
+                printsymbol(stdout, u->pnode);
+                fprintf(stdout, " [%lu]\n", u->index);
+            }
+        }
+        if (v->index != temptree.size)
+            fputc('\n', stdout);
+    }
 }
 
 
@@ -1050,35 +1185,59 @@ static void writegraph(profilenode *p, graphnode *n)
     listnode *l;
     vertex *v;
     edge *e;
+    graphedge *g;
     size_t i, t;
 
     for (l = n->children.head; l->next != NULL; l = l->next)
     {
-        e = (edge *) ((char *) l - offsetof(graphedge, cnode));
-        v = (vertex *) ((char *) e->node.child - offsetof(vertex, gnode));
+        /* The following three lines are a bit excessive and result from
+         * using class-based programming in C.  These conversions would be
+         * automatically calculated by the compiler if we were using C++
+         * classes.
+         */
+        g = (graphedge *) ((char *) l - offsetof(graphedge, cnode));
+        e = (edge *) ((char *) g - offsetof(edge, gnode));
+        v = (vertex *) ((char *) e->gnode.child - offsetof(vertex, gnode));
         if (!(e->flags & 1))
         {
             e->flags |= 1;
             for (i = t = 0; i < 4; i++)
                 if (showcounts)
+                {
                     t += e->data.acount[i];
+                    if (showleaks)
+                        t -= e->data.dcount[i];
+                }
                 else
+                {
                     t += e->data.atotal[i];
-            fputs("    \"", graphfile);
-            if (p == NULL)
-                fputs("START", graphfile);
-            else
-                printsymbol(graphfile, p);
-            fputs("\" -> \"", graphfile);
-            if (&v->gnode == &graph.end)
-                fputs("ALLOC", graphfile);
-            else
-                printsymbol(graphfile, v->pnode);
-            fprintf(graphfile, "\" [label = \"%lu%s\"];\n", t,
-                    (e->flags & 2) ? "*" : "");
+                    if (showleaks)
+                        t -= e->data.dtotal[i];
+                }
+            if ((t > 0) || !showleaks)
+            {
+                fputs("    \"", graphfile);
+                if (p == NULL)
+                    fputs("START", graphfile);
+                else
+                    printsymbol(graphfile, p);
+                fputs("\" -> \"", graphfile);
+                if (&v->gnode == &graph.end)
+                    fputs("ALLOC", graphfile);
+                else
+                    printsymbol(graphfile, v->pnode);
+                fprintf(graphfile, "\" [label = \"%lu\"", t);
+                if (e->flags & 2)
+                    fputs(", style = dotted", graphfile);
+                fputs("];\n", graphfile);
+            }
             writegraph(v->pnode, &v->gnode);
         }
     }
+    if (p == NULL)
+        for (e = (edge *) edgelist.head; e->node.next != NULL;
+             e = (edge *) e->node.next)
+            e->flags &= ~1;
 }
 
 
@@ -1111,6 +1270,9 @@ int main(int argc, char **argv)
             break;
           case OF_HELP:
             h = 1;
+            break;
+          case OF_LEAKS:
+            showleaks = 1;
             break;
           case OF_STACKDEPTH:
             if (!__mp_getnum(progname, __mp_optarg, (long *) &maxstack, 1))
@@ -1167,6 +1329,7 @@ int main(int argc, char **argv)
     sbound = mbound = lbound = 0;
     __mp_newtree(&proftree);
     __mp_newtree(&temptree);
+    __mp_newlist(&edgelist);
     __mp_newgraph(&graph);
     if (strcmp(f, "-") == 0)
         proffile = stdin;
@@ -1182,6 +1345,7 @@ int main(int argc, char **argv)
     directtable();
     fputs("\n\n", stdout);
     leaktable();
+    fputs("\n\n", stdout);
     /* The reason that the allocation call graph is not used for the direct
      * allocation and memory leak tables is that the code to build and display
      * the allocation call graph was added much later.  Rather than convert
@@ -1189,6 +1353,7 @@ int main(int argc, char **argv)
      * already worked and only use the call graph for any new tables.
      */
     buildgraph();
+    callgraph();
     if (g != NULL)
     {
         if (strcmp(g, "stdout") == 0)
@@ -1204,12 +1369,16 @@ int main(int argc, char **argv)
         {
             fprintf(graphfile, "/* produced by %s %s from %s */\n\n", progname,
                     VERSION, f);
-            fputs("digraph \"allocation call graph\"\n{\n", graphfile);
+            if (showleaks)
+                fputs("digraph \"memory leak call graph\"\n{\n", graphfile);
+            else
+                fputs("digraph \"allocation call graph\"\n{\n", graphfile);
             writegraph(NULL, &graph.start);
             fputs("}\n", graphfile);
             fclose(graphfile);
         }
     }
+    deletegraph();
     if (acounts != NULL)
         free(acounts);
     if (dcounts != NULL)
