@@ -66,7 +66,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.37 2001-01-02 22:12:56 graeme Exp $"
+#ident "$Id: memory.c,v 1.38 2001-01-02 22:53:59 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -517,10 +517,10 @@ __mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
      * of pages.
      */
 #if MP_MMAP_SUPPORT
-    /* Decide if we are using mmap() or sbrk() to allocate the memory.  It's
-     * not recommended that we do both as they could conflict in nasty ways.
+    /* Decide if we are using mmap() or sbrk() to allocate the memory.  Requests
+     * for user memory will be allocated in the opposite way to internal memory.
      */
-    if (i->mfile != -1)
+    if ((i->mfile != -1) == (u != 0))
     {
 #if MP_MMAP_ANONYMOUS
         if ((p = mmap(NULL, *l, PROT_READ | PROT_WRITE,
