@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.193 2001-03-04 20:43:08 graeme Exp $
+@c $Id: mpatrol.texi,v 1.194 2001-03-07 18:46:37 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.7
 @set VERSION 1.4.2
-@set UPDATED 4th March, 2001
+@set UPDATED 7th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -318,16 +318,16 @@ does is to read the documentation and try it out.
 Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms.
 Contains direct support for (and takes advantage of most of the features of)
 AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD, HP/UX, IRIX, Linux, LynxOS, NetBSD,
-OpenBSD, SINIX, Solaris, SunOS and UnixWare.  Also contains target-specific
-code to take advantage of Intel 80x86, Motorola 680x0 and 88xx0, MIPS,
-HP PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
+OpenBSD, SINIX, Solaris, SunOS, Tru64 and UnixWare.  Also contains
+target-specific code to take advantage of Alpha, Intel 80x86, Motorola 680x0
+and 88xx0, MIPS, HP PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
 
 @item
 Has the ability to read symbols from executable files and shared libraries in
 the @file{a.out}, COFF, XCOFF, ELF32, ELF64 and Windows Portable Executable file
 formats, and if the GNU BFD library is available then the mpatrol library can
 read symbols from all of the file formats that it has support for as well.  Can
-also liase with AIX, BSD-based, HP/UX, IRIX, SVR4-based and Windows dynamic
+also liase with AIX, BSD-based, HP/UX, IRIX, OSF, SVR4-based and Windows dynamic
 linkers in order to find out information about shared libraries.
 
 @item
@@ -522,15 +522,22 @@ replacement operator names may be used so that the existing operators will still
 work.
 
 @item
+Contains support for automatically registering any functions whose names begin
+with @samp{__mp_init_} and @samp{__mp_fini_} to be called when the mpatrol
+library is initialised and terminated respectively.  A function is also provided
+to register additional functions to be called when the mpatrol library
+terminates.
+
+@item
 Contains support for user-defined prologue and epilogue callback functions,
 which get called before and after every memory allocation, reallocation or
 deallocation.
 
 @item
 A function is provided to return as much information as possible about a given
-memory allocation, and can be called at any time during program execution.  A
-similar function is also provided for calling from within a debugger and an
-example command file is provided for use with @command{gdb}.
+memory allocation or free block, and can be called at any time during program
+execution.  A similar function is also provided for calling from within a
+debugger and an example command file is provided for use with @command{gdb}.
 
 @item
 A function is provided to display library settings and heap usage statistics,
@@ -753,8 +760,15 @@ the differences in heap allocation details between that point and a later point
 in the program.
 
 @item
-A function is provided to iterate across all of the current heap allocations
-and call a user-defined callback function for each one it finds.
+Functions are provided to iterate across all of the current heap allocations
+and call a user-defined callback function for each one they find.
+
+@item
+A leak table is provided, which records a flat profile of memory allocation
+behaviour between two points in a program and is keyed by source file location.
+Memory allocation events can either be recorded in the leak table automatically
+via a run-time option or the leak table can be manipulated through several
+functions.
 
 @item
 Functions are provided to write user-defined information directly to the mpatrol
@@ -849,6 +863,13 @@ easy as possible to build and install mpatrol on any system, but it isn't
 likely to run smoothly for everybody.  However, there shouldn't be any major
 problems if you perform the following steps.
 
+@cindex CHECKSUMS
+@cindex md5sum
+Note that if you want to check the integrity of the files that came with the
+mpatrol distribution you can use the @file{CHECKSUMS} file in the @file{mpatrol}
+base directory.  You must have the @command{md5sum} command installed on your
+system in order to make use of this file.
+
 @enumerate 1
 @item
 Go into the @file{build} directory and then into the appropriate subdirectory
@@ -907,11 +928,16 @@ with any program that uses mpatrol.
 
 @cindex symbolic links
 @cindex links, symbolic
+@cindex ldconfig
 @item
 Copy all of the libraries that have been built into your local library
 directory.  If there were symbolic links created in the @file{build} directory
 then these should be recreated in the local library directory rather than simply
-copying them.
+copying them.  You may need to run a command such as @command{ldconfig} in order
+for the system to recognise the newly-installed libraries, and you may also need
+to add the filename of the directory containing the newly-installed libraries to
+an environment variable such as @env{LD_LIBRARY_PATH} if you installed the
+libraries in a non-standard location.
 
 @item
 Copy the @command{mpatrol}, @command{mprof}, @command{mptrace} and
@@ -989,6 +1015,13 @@ some of the package files may need to be modified before you begin.
 In addition, a Linux Software Map index file exists in the @file{pkg/lsm}
 directory.
 
+@cindex extra
+Note that the @file{extra} directory that comes with the mpatrol distribution
+contains several prototype configuration files for certain third-party programs.
+These files should be examined so that you can decide whether to integrate their
+contents into your existing configuration files.  The purpose of each file is
+described in the relevant sections of this manual.
+
 @node Integration, Memory allocations, Installation, Top
 @chapter Integration
 @cindex integration
@@ -1016,7 +1049,7 @@ of all your code.
 @enumerate 1
 @item
 This step is currently only available on DYNIX/ptx, FreeBSD, IRIX, Linux,
-NetBSD, OpenBSD and Solaris platforms and on DG/UX 4.20MU07@footnote{Also
+NetBSD, OpenBSD, Solaris and Tru64 platforms and on DG/UX 4.20MU07@footnote{Also
 available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06
 with patch dgux_R4.20MU06.p08.} or later platforms with the @env{LD_PRELOAD}
 feature.
@@ -1063,6 +1096,11 @@ it will not be linked in and you will not see a log file being generated when
 you run it.  You can force the linking of the mpatrol library by causing
 @code{malloc()} to be undefined on the link line, usually through the use of the
 @option{-u} linker option.
+
+If your program is multithreaded then you must use the thread-safe version of
+the mpatrol library and possibly also link in the system threads library as
+well.  Not doing this will usually result in your program failing somewhere in
+the mpatrol library code.
 
 @item
 All of the following steps will require you to recompile some or all of your
@@ -1174,12 +1212,19 @@ quick way to remove the mpatrol library but will not result in very efficient
 code.
 
 @item
-The other option is to recompile all of the source files which include the
+The next option is to recompile all of the source files which include the
 @file{mpatrol.h} header file, but this time define the @code{NDEBUG}
 preprocessor macro.  This automatically disables the redefinition of
 @code{malloc()}, etc.@: and prevents calls being made to any mpatrol library
 functions.  Obviously, this option is the most time-consuming of the two, but
 will result in the complete removal of all references to the mpatrol library.
+
+@item
+The final option is to guard all of the mpatrol-specific code in your program
+with a preprocessor macro, possibly called @code{HAVE_MPATROL}, and then
+recompiling all of your source code with this macro undefined.  This is the best
+option but relies on you having originally made these changes when you first
+started integrating the mpatrol library into your program.
 @end enumerate
 
 Note that if you used the @code{AM_WITH_MPATROL} Automake macro as detailed in
@@ -1949,6 +1994,19 @@ any symbolic information that the mpatrol library managed to obtain from any
 executable files and libraries that were relevant to the program being tested.
 All of the above five options can be selected with the @option{SHOWALL} option.
 
+@cindex leak table
+For the purpose of detecting memory leaks, you can instruct the mpatrol library
+to automatically log every memory allocation event into a special hash table
+called the leak table with the @option{LEAKTABLE} option.  This option will then
+cause the mpatrol library to display a sorted summary of all of the memory leaks
+or unfreed memory allocations to the mpatrol log file when the program
+terminates.  The leak table is indexed by the source file and line number where
+memory allocation events occur, but if this information is not available then
+either the function name or the return address will be used instead.  Note that
+this option differs from the @option{SHOWUNFREED} option in that it will
+summarise where the leaks came from rather than show the full details of each
+individual unfreed memory allocation.
+
 Because the log file can contain verbose information about memory allocations,
 reallocations, deallocations and operations, it can end up being too large if
 all such information is being logged for a large program.  To get around this,
@@ -2386,6 +2444,7 @@ address 0x080620E8 located in allocated block:
     allocation index:   1000
     reallocation index: 0
     modification event: 1999
+    flags:              none
     calling function:   main
     called from file:   test.c
     called at line:     16
@@ -2488,11 +2547,25 @@ the @code{__mp_setoption()} function returns a failure indicator in these cases.
 You can read the setting of any mpatrol library option with the corresponding
 function, @code{__mp_getoption()}.
 
+@cindex __mp_init_ functions
+@cindex __mp_fini_ functions
+On systems that support it, global functions (with C linkage) in an executable
+file or shared library whose names begin with @samp{__mp_init_} will be noted
+when the mpatrol library first starts up and is reading the symbols.  Such
+functions will then be called as soon as the mpatrol library is initialised,
+which can be useful if the initialisation occurs before @code{main()} is called.
+These functions must accept no arguments and must return no value.  Note that
+this feature will have no effect if the symbol table is stripped from the
+executable file or shared library before the program is run, and the order in
+which such functions will be called if there are more than one is unspecified.
+The @code{__mp_atexit()} function can be used to register functions that should
+be called when the mpatrol library terminates.
+
 It is possible to obtain a great deal of information about an existing memory
-allocation using the @code{__mp_info()} function.  This takes an address as an
-argument and fills in any details about its corresponding memory allocation in
-a supplied structure.  The following example illustrates this (it can be found
-in @file{tests/pass/test4.c}).
+allocation or free block using the @code{__mp_info()} function.  This takes an
+address as an argument and fills in any details about its corresponding memory
+allocation in a supplied structure.  The following example illustrates this (it
+can be found in @file{tests/pass/test4.c}).
 
 @smallexample
  23  /*
@@ -2511,7 +2584,7 @@ in @file{tests/pass/test4.c}).
  36      __mp_allocinfo d;
  37      __mp_symbolinfo i;
 
- 39      if (!__mp_info(p, &d))
+ 39      if (!__mp_info(p, &d) || !d.allocated)
  40      @{
  41          fprintf(stderr, "nothing known about address 0x%0*lX\n",
  42                  sizeof(void *) * 2, p);
@@ -2630,10 +2703,19 @@ calling functions from the command prompt.  Note that the textual representation
 of the @code{type} field returned by the @code{__mp_info()} function can be
 obtained by calling @code{__mp_function()}.
 
-The @code{userdata} field shown above can be set for any memory allocation with
-the @code{__mp_setuser()} function.  This can have any value and is not
-interpreted by the mpatrol library.  It was added for user code to associate
-its own data with memory allocations.
+The mpatrol library records the error code from the most recently encountered
+warning or error in the @code{__mp_errno} global variable.  This variable can be
+read and compared with the known error codes listed in @file{mpatrol.h}.  It can
+also be reset to zero before calling any mpatrol library function in order to
+check to see if a warning or error was encountered during the call.  A string
+representation of the error message corresponding to any mpatrol error code can
+be obtained by calling the @code{__mp_strerror()} function with the specific
+code.
+
+The @code{userdata} field shown in the previous example can be set for any
+memory allocation with the @code{__mp_setuser()} function.  This can have any
+value and is not interpreted by the mpatrol library.  It was added for user code
+to associate its own data with memory allocations.
 
 You may also have noticed the use of @code{__mp_syminfo()} in the above example.
 This function is very similar to the @code{__mp_info()} function except that
@@ -2747,7 +2829,9 @@ done by invoking the @code{__mp_iterate()} function with a callback function
 which is called once per allocation with the start address of the memory block
 being passed as the argument to the callback function.  Any further information
 about the memory allocation can then be obtained via the @code{__mp_info()}
-function.
+function.  Note that the @code{__mp_iterateall()} function does the same as the
+@code{__mp_iterate()} function except that it also includes all free memory
+blocks and memory allocations that are internal to the mpatrol library.
 
 Differences in the heap allocations (their details, not their contents) between
 a previous point in a program's execution and the current point of execution can
@@ -2777,7 +2861,7 @@ memory leaks very easily, as the following example (found in
  36      __mp_allocstack *s;
  37      __mp_allocinfo d;
 
- 39      if (!__mp_info(p, &d))
+ 39      if (!__mp_info(p, &d) || !d.allocated)
  40      @{
  41          fprintf(stderr, "nothing known about address 0x%0*lX\n",
  42                  sizeof(void *) * 2, p);
@@ -2870,7 +2954,6 @@ following list of memory leaks that were located between the points of calling
 Detected 10 memory leaks (5860 bytes)
 @end smallexample
 
-@cindex heapdiff
 The @file{tools} directory in the mpatrol distribution contains two files called
 @file{heapdiff.c} and @file{heapdiff.h} which demonstrate the use of
 @code{__mp_snapshot()} and @code{__mp_iterate()} to find localised memory leaks.
@@ -2881,15 +2964,33 @@ by @code{__mp_iterate()}, and such allocations can be freed as well.  The only
 restriction is that the callback function should never free a memory allocation
 that it has not allocated itself.
 
+An alternative way to detect differences in the heap between two points in a
+program's execution is to make use of the leak table.  This is a hash table that
+stores the number and size of memory allocations and deallocations referenced
+by the source file and line number where they occur@footnote{If that information
+is not available then the function name or return address will be used
+instead.}.  The leak table can be cleared with a call to
+@code{__mp_clearleaktable()} and can be displayed with a call to
+@code{__mp_leaktable()}, which will display a sorted summary of the allocated,
+freed or unfreed memory entries stored in the leak table.  Memory allocation
+events can be automatically logged in the leak table by calling
+@code{__mp_startleaktable()} but this behaviour can be disabled by calling
+@code{__mp_stopleaktable()}.  Additional entries can be manually added to the
+leak table with @code{__mp_addallocentry()} and @code{__mp_addfreeentry()}.
+
 If you wish to write your own diagnostics to the mpatrol log file from within
 your source code then you can do so with the @code{__mp_printf()} and
 @code{__mp_vprintf()} functions, which are the functional equivalents of
 @code{printf()} and @code{vprintf()}.  They prefix every line written to the
 log file with @samp{>}, partly for making it clear where user diagnostics occur
 and partly to avoid problems with external utilities that parse the mpatrol log
-file.  It is also possible to write out a memory dump in hexadecimal format, a
-stack trace at the current point in execution and details of a memory allocation
-to the log file in standard format using the @code{__mp_logmemory()},
+file.  The @code{__mp_locprintf()} and @code{__mp_vlocprintf()} functions are
+equivalent functions that also display the source file and line number from
+where they were called along with a stack trace, if available.
+
+It is also possible to write out a memory dump in hexadecimal format, a stack
+trace at the current point in execution and details of a memory allocation to
+the log file in standard format using the @code{__mp_logmemory()},
 @code{__mp_logstack()} and @code{__mp_logaddr()} functions respectively.
 
 You can also take advantage of the @command{mpedit} command from within the
@@ -2937,7 +3038,200 @@ If you've written a useful extension to mpatrol then you might wish to submit
 it for inclusion in the next release of mpatrol.  Even if it's just for a
 specific application, there might be other users out there that may benefit
 from it.  You'll even get a credit in the manual!  Note that any documentation
-should be written in the associated header file.
+should also be written in the associated header file.
+
+@menu
+* dbmalloc::                    Dbmalloc-compatible functions.
+* dmalloc::                     Dmalloc-compatible functions.
+* heapdiff::                    Determining heap differences.
+* mgauge::                      Memory allocation gauge.
+* mtrace::                      Memory allocation tracing.
+@end menu
+
+@node dbmalloc, dmalloc, , Tools
+@subsection Dbmalloc-compatible functions
+@cindex Dbmalloc
+
+This file provides Dbmalloc-compatible functions which are built on top of the
+mpatrol library.  They are compatible with the last known public release of
+Dbmalloc (patch level 14), but only the Dbmalloc-specific functions are defined
+here, leaving the overriding of standard functions up to the mpatrol library.
+As the mpatrol library does not currrently override the C library string
+functions and the X toolkit heap allocation functions, neither does this file.
+
+The @code{dbmallopt()} function does not support the setting of all of the
+Dbmalloc options.  In fact, most of them do not make sense when applied to the
+mpatrol library.  Some of them have slightly changed behaviour due to the
+mapping process and some of them cannot be implemented due to the mpatrol
+library having been initialised beforehand.
+
+The @code{malloc_dump()} function does not support the full recognition of the
+@option{MALLOC_DETAIL} option in that it does not display the additional columns
+and summary that the Dbmalloc library does.  This is because this would make no
+sense when applied to the mpatrol library, but it does still affect whether
+freed allocations are shown in the listing (although the details for such
+allocations are slightly different, and there are no entries displayed for free
+memory blocks).
+
+The output for the @code{malloc_dump()} and @code{malloc_list()} functions is
+almost identical to that of the Dbmalloc library except for a slight change in
+the pointer format when displaying the address of each memory allocation.  The
+stack information is obtained differently as well, since the mpatrol library
+records symbolic stack tracebacks for each memory allocation.  As a result,
+@code{malloc_enter()} and @code{malloc_leave()} do nothing and the return
+address in a stack frame is displayed if no associated symbol name, file and
+line number could be determined.  Parentheses are not printed at the end of
+symbol names so that they can be processed properly by a C++ demangler if
+necessary.  Passing a file descriptor of @samp{0} to @code{malloc_dump()} or
+@code{malloc_list()} results in the output being sent to the mpatrol log file.
+
+The @code{malloc_inuse()} function does not deduct any memory used by marked
+allocations, contrary to the behaviour of the Dbmalloc library.  In addition,
+the @code{malloc_size()} and @code{malloc_mark()} functions do not give an error
+message if the pointer passed in does not correspond to a heap allocation.
+Neither of these three functions automatically perform an integrity check of the
+heap.  Note that the @code{malloc_chain_check()} function will never return a
+non-zero value --- it always terminates with an error message in the mpatrol log
+file whenever it detects heap corruption.  As a result, the
+@code{malloc_abort()} function is not used.
+
+This file is initialised via the mpatrol library's initialiser function feature,
+which means that if the @code{__mp_init_dbmalloc()} function is noted by the
+mpatrol symbol manager then it will be called when the mpatrol library is being
+initialised.  If this feature is not supported then the @code{dbmallinit()}
+function must be called as early on as possible, otherwise this file will not be
+initialised until one of its functions are called.
+
+@node dmalloc, heapdiff, dbmalloc, Tools
+@subsection Dmalloc-compatible functions
+@cindex Dmalloc
+
+This file provides Dmalloc-compatible functions which are built on top of the
+mpatrol library.  They are compatible with the 4.8.2 release of Dmalloc, but
+only the Dmalloc-specific functions are defined here, leaving the overriding of
+standard functions up to the mpatrol library.  As the mpatrol library does not
+currrently override the C library string functions, neither does this file.  In
+addition, the Dmalloc distribution comes with definitions for
+@code{xmemalign()}, @code{xvalloc()} and @code{xrecalloc()}, neither of which
+are defined by this file or by the mpatrol library.
+
+This module is intended to work with the existing @command{dmalloc} command,
+which sets the contents of the @env{DMALLOC_OPTIONS} environment variable
+according to any specified command-line options.  The four documented Dmalloc
+global variables are also defined, although the two address variables are not
+acted upon and changing the @code{dmalloc_logpath} variable has no effect yet.
+The @code{dmalloc_errno} variable is mapped onto the @code{__mp_errno} variable
+and so the @code{dmalloc_strerror()} function always returns strings that are
+specific to the mpatrol library.  Note that unlike the actual Dmalloc library,
+this file is not threadsafe, and the @option{lockon} option has no effect.  In
+addition, the @code{start} option ignores the @samp{file:line} syntax and uses
+allocation indices rather than events.
+
+The @code{dmalloc_debug()} function does not support the setting of all of the
+Dmalloc flags, although this file defines preprocessor macros for each of them,
+something which is not currently done in the @file{dmalloc.h} file in the
+Dmalloc distribution.  In fact, many of them do not make sense when applied to
+the mpatrol library.  Some of them have slightly changed behaviour due to the
+mapping process and some of them cannot be implemented due to the mpatrol
+library having been initialised beforehand.
+
+The @code{dmalloc_verify()} and @code{dmalloc_examine()} functions do not give
+an error message if the pointer passed in does not correspond to a heap
+allocation, and the latter function does not automatically perform an integrity
+check of the heap.  The @code{malloc_verify()} function has not been included in
+this implementation since it is functionally identical to
+@code{dmalloc_verify()}.  Note that the @code{dmalloc_verify()} function will
+only ever return @code{DMALLOC_VERIFY_ERROR} if the pointer to be checked is not
+null and is invalid --- it always terminates with an error message in the
+mpatrol log file whenever the pointer to be checked is null and it has detected
+heap corruption.  The information currently passed to any tracker functions does
+not include source file and line number information.
+
+The @code{dmalloc_log_heap_map()} and @code{dmalloc_log_stats()} functions map
+on to the @code{__mp_memorymap()} and @code{__mp_summary()} functions and so
+have entirely different display formats.  The @code{dmalloc_log_unfreed()} and
+@code{dmalloc_log_changed()} functions have similar display formats to the
+original Dmalloc library, but the summary tables are displayed differently and
+will display symbol names if they are available and filename and line number
+information isn't.  The @code{dmalloc_message()} and @code{dmalloc_vmessage()}
+functions write tracing to the mpatrol log file prefixed by three fields of
+optional information, which can be controlled by the @samp{LOG_*} macros when
+building this module.
+
+This file is initialised via the mpatrol library's initialiser function feature,
+which means that if the @code{__mp_init_dmalloc()} function is noted by the
+mpatrol symbol manager then it will be called when the mpatrol library is being
+initialised.  If this feature is not supported then the @code{dmalloc_init()}
+function must be called as early on as possible, otherwise this file will not be
+initialised until one of its functions are called.
+
+@node heapdiff, mgauge, dmalloc, Tools
+@subsection Determining heap differences
+@cindex heapdiff
+
+This file defines @code{heapdiffstart()} and @code{heapdiffend()}, which must be
+called in matching pairs.  They both take a @code{heapdiff} object as their
+first parameter, which must still be in scope when the matching call to
+@code{heapdiffend()} is made.  The @code{heapdiff} object is initialised at the
+call to @code{heapdiffstart()} and is finalised when @code{heapdiffend()} is
+called.  It must not be modified in between and should be treated as an opaque
+type.  @code{heapdiffend()} can only be called once per @code{heapdiff} object
+before requiring that the @code{heapdiff} object be reinitialised through a
+call to @code{heapdiffstart()}.
+
+The second parameter to @code{heapdiffstart()} specifies a set of flags that can
+be used to control what is written to the mpatrol log.  A list of all unfreed
+memory allocations can be logged with the @code{HD_UNFREED} flag and a list of
+all freed memory allocations can be logged with the @code{HD_FREED} flag,
+although the latter makes use of the @option{NOFREE} option and can incur a
+large performance and space penalty, and also relies on the @option{NOFREE}
+option being unmodified between the calls to @code{heapdiffstart()} and
+@code{heapdiffend()}.  Note that marked allocations are not normally logged but
+this can be changed by adding the @code{HD_MARKED} flag.
+
+By default, only a minimal amount of detail is logged for each allocation, but
+this can be changed with the @code{HD_FULL} flag to log full details for each
+allocation.  If the filename and line number for an allocation is known and the
+@option{EDIT} or @option{LIST} option is being used then using @code{HD_VIEW}
+will edit or list the relevant source file at the correct line number, but only
+if the @option{EDIT} or @option{LIST} options are supported.
+
+@node mgauge, mtrace, heapdiff, Tools
+@subsection Memory allocation gauge
+@cindex mgauge
+
+This file defines @code{mgaugestart()}, @code{mgaugeend()}, @code{mgaugeon()}
+and @code{mgaugeoff()} which produce and control a simple memory allocation
+gauge in a terminal window.  The gauge is displayed in textual form using the
+standard I/O library rather than using a graphics library.  Since it is updated
+in real-time, it makes no sense to send the output of the gauge to a file.  Only
+one gauge can be in use at any one time.
+
+The first argument to @code{mgaugestart()} is the filename of the file to write
+the gauge to.  As mentioned before, this should be a terminal file that can be
+displayed in real-time, such as @file{/dev/pts*} on UNIX systems or
+@file{CON:#?} on AmigaOS.  If it is a null pointer then the standard error file
+stream will be used.
+
+The second argument to @code{mgaugestart()} specifies the character that will be
+used to represent allocated memory.  If this is given as whitespace, @samp{|}
+or @samp{+} then @samp{#} will be used instead.  The third argument specifies
+the number of bytes that the gauge represents.  If the total allocated memory
+exceeds this then @samp{+} will be appended to the gauge.  The final argument
+specifies the frequency of memory allocation events at which the gauge should be
+updated.  If it is specified as zero then all events will cause the gauge to be
+updated.
+
+@node mtrace, , mgauge, Tools
+@subsection Memory allocation tracing
+@cindex mtrace
+
+This file defines @code{mtrace()} and @code{muntrace()}, two functions which
+enable and disable memory allocation tracing respectively.  These should be
+called in matching pairs but will have no effect unless the @env{MALLOC_TRACE}
+environment variable is set to the filename of the trace file to use.  The
+resulting trace files can be processed by the @command{mtrace} perl script which
+is distributed with the GNU C library.
 
 @node Utilities, , Tools, Using mpatrol
 @section Utilities
@@ -4411,8 +4705,6 @@ documentation for that tool remarks that it was written as a quick and dirty
 hack.  The @command{mptrace} command is hopefully more stable and contains a lot
 more functionality.
 
-@cindex mtrace
-@cindex mgauge
 The mpatrol library can also generate trace files in a format that is compatible
 with the GNU @code{mtrace()} option.  The code to do this is built on top of the
 mpatrol library and is in @file{tools/mtrace.c} and @file{tools/mtrace.h}.  Such
@@ -4457,7 +4749,6 @@ virtual memory there are less likely to be page faults if you need to access or
 traverse all of the blocks you have created.
 
 @cindex arenas
-@cindex Digital UNIX
 @cindex amalloc
 A memory allocation concept that is similar to this is called an @emph{arena}.
 This datatype requires functions which are built on top of the existing malloc
@@ -4465,8 +4756,8 @@ library functions and which associate each memory allocation with a particular
 arena.  An arena can have as many allocations added to it as required, but
 allocations cannot usually be freed until the whole arena is freed.  Note that
 there are not really any generic implementations of arenas that are available as
-everyone tends to write their own version when they require it, although Digital
-UNIX and SGI IRIX systems do come with an arena library called @emph{amalloc}.
+everyone tends to write their own version when they require it, although SGI
+IRIX systems do come with an arena library called @emph{amalloc}.
 
 @cindex slot tables
 However, what if you don't plan to free all of the blocks at the same time?  A
@@ -4801,11 +5092,11 @@ cl -I/mpatrol/include -MD -Zi <file> -link -libpath:/mpatrol/lib
 If you need to link with other libraries, make sure that they don't contain
 definitions of @code{malloc()}, etc.@:, or if they do then you must ensure that
 the mpatrol library appears before them on the link line.  Note also that if the
-mpatrol library was built on IRIX with the @code{MP_LIBRARYSTACK_SUPPORT}
-preprocessor macro defined, then the @file{libexc} library must be linked in as
-well.  You should also check the section on supported systems
-(@pxref{Supported systems}) to see if there are any other issues on the platform
-that you are using.
+mpatrol library was built on Tru64, or on IRIX with the
+@code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro defined, then the
+@file{libexc} library must be linked in as well.  You should also check the
+section on supported systems (@pxref{Supported systems}) to see if there are any
+other issues on the platform that you are using.
 
 You should also know how to set an environment variable on your specific system.
 Again, this varies from system to system and also depends on the command line
@@ -7896,11 +8187,18 @@ and no bytes will be searched.
 @node Functions 6, , Functions 5, Functions
 @section mpatrol library functions
 
-The following 24 functions are available as support routines for additional
+The following 36 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
+@findex __mp_atexit
 @table @asis
+@item @code{int __mp_atexit(void (*func)(void))}
+Installs a function to be called when the mpatrol library terminates.  Up to 32
+such functions can be registered and will be called in reverse order of
+registration.  Returns @samp{1} on success or @samp{0} if @var{func} could not
+be registered.
+
 @findex __mp_setoption
 @item @code{unsigned long __mp_setoption(long opt, unsigned long val)}
 Sets the value of an mpatrol option after the library has been initialised.
@@ -7925,8 +8223,14 @@ unsigned integer, otherwise @samp{0} will be returned.  If @var{opt} is
 be returned in @var{val}.  If @var{opt} is @code{MP_OPT_UNSETFLAGS} then all of
 the mpatrol library flags that are not set will be returned in @var{val}.
 
+@findex __mp_strerror
+@item @code{const char *__mp_strerror(__mp_errortype err)}
+Returns the error message corresponding to the error code @var{err} or
+@samp{NULL} if no such error code exists.  The most recent error code recorded
+by the mpatrol library can be obtained by examining @code{__mp_errno}.
+
 @findex __mp_function
-@item @code{char *__mp_function(__mp_alloctype func)}
+@item @code{const char *__mp_function(__mp_alloctype func)}
 Returns the name of the function corresponding to the allocation type @var{func}
 or @samp{NULL} if no such allocation type exists.
 
@@ -7939,8 +8243,17 @@ allocation for its entire lifetime unless overridden by a subsequent call to
 @code{__mp_setuser()}.  As such, the user data must be valid for the entire
 lifetime of the memory allocation, perhaps even after the allocation has been
 freed if the @option{NOFREE} option is being used.  This function returns
-@samp{1} if there is an allocated (or freed) memory block containing @var{ptr},
-and @samp{0} otherwise.
+@samp{1} if there is an allocated memory block containing @var{ptr}, and
+@samp{0} otherwise.
+
+@findex __mp_setmark
+@item @code{int __mp_setmark(const void *ptr)}
+Sets the marked flag for the memory allocation containing @var{ptr}, indicating
+that the memory allocation cannot be freed (but can be reallocated) and thus
+will not be listed as a memory leak.  This function returns @samp{1} if there is
+an allocated memory block containing @var{ptr}, and @samp{0} otherwise.  Note
+that a memory allocation made by @code{alloca()}, @code{strdupa()} or
+@code{strndupa()} may not be marked.
 
 @findex __mp_info
 @cindex allocation information
@@ -7948,8 +8261,11 @@ and @samp{0} otherwise.
 @item @code{int __mp_info(const void *ptr, __mp_allocinfo *info)}
 Obtains information about a specific memory allocation by placing statistics
 about @var{ptr} in @var{info}.  If @var{ptr} does not belong to a previously
-allocated memory allocation then @samp{0} will be returned, otherwise @samp{1}
-will be returned and @var{info} will contain the following information:
+allocated memory allocation or free memory block then @samp{0} will be returned,
+otherwise @samp{1} will be returned and @var{info} will contain the following
+information (note that a free memory block will only contain the @code{block}
+and @code{size} fields and can be identified by not having the @code{allocated}
+flag set):
 
 @multitable @columnfractions .2 .8
 @item @emph{Field}
@@ -7982,8 +8298,18 @@ will be returned and @var{info} will contain the following information:
 @tab Size of type stored in allocation.
 @item @code{userdata}
 @tab User data associated with allocation.
+@item @code{allocated}
+@tab Indicates if allocation was allocated.
 @item @code{freed}
 @tab Indicates if allocation has been freed.
+@item @code{marked}
+@tab Indicates if allocation has been marked.
+@item @code{profiled}
+@tab Indicates if allocation has been profiled.
+@item @code{traced}
+@tab Indicates if allocation has been traced.
+@item @code{internal}
+@tab Indicates if allocation is internal.
 @end multitable
 
 @findex __mp_syminfo
@@ -8014,9 +8340,9 @@ symbol then @samp{0} will be returned, otherwise @samp{1} will be returned and
 @item @code{int __mp_printinfo(const void *ptr)}
 Displays information about a specific memory allocation containing @var{ptr} to
 the standard error file stream.  If @var{ptr} does not belong to a previously
-allocated memory allocation then @samp{0} will be returned, otherwise @samp{1}
-will be returned.  This function is intended to be called from within a
-debugger.
+allocated memory allocation or free memory block then @samp{0} will be returned,
+otherwise @samp{1} will be returned.  This function is intended to be called
+from within a debugger.
 
 @findex __mp_snapshot
 @item @code{unsigned long __mp_snapshot(void)}
@@ -8036,6 +8362,79 @@ above zero then @code{__mp_iterate()} will return the number of times @var{func}
 returned a non-zero number after the iteration process has stopped.  The
 @var{data} argument is passed directly to @var{func} as its second argument and
 is not read by the mpatrol library.
+
+@findex __mp_iterateall
+@item @code{size_t __mp_iterateall(int (*func)(const void *, void *), void *data)}
+Iterates over all of the current allocated and freed memory allocations and any
+free memory blocks, calling @var{func} with the start address of every memory
+allocation or free block.  If @var{func} is @samp{NULL} then
+@code{__mp_printinfo()} will be used as the callback function.  If @var{func}
+returns a negative number then the iteration process will be stopped
+immediately.  If @var{func} returns a positive number above zero then
+@code{__mp_iterate()} will return the number of times @var{func} returned a
+non-zero number after the iteration process has stopped.  The @var{data}
+argument is passed directly to @var{func} as its second argument and is not read
+by the mpatrol library.  Note that unlike @code{__mp_iterate()}, this function
+will also include internal memory allocations made by the mpatrol library and is
+intended for walking the entire heap.
+
+@findex __mp_addallocentry
+@item @code{int __mp_addallocentry(const char *file, unsigned long line, size_t size)}
+Adds an entry representing an allocation of size @var{size} to the leak table.
+The allocation will be associated with a source filename of @var{file} and a
+line number of @var{line} if the former is non-@samp{NULL} and the latter is
+non-zero.  If @var{file} is non-@samp{NULL} and @var{line} is @samp{0} then
+@var{file} represents the name of the function that made the allocation.  If
+@var{file} is @samp{NULL} and @var{line} is non-zero then @var{line} represents
+the code address at which the allocation was made.  If @var{file} is @samp{NULL}
+and @var{line} is @samp{0} then the location of the allocation is unknown.
+Returns @samp{1} on success and @samp{0} if there was no more memory available
+to add another entry to the leak table.
+
+@findex __mp_addfreeentry
+@item @code{int __mp_addfreeentry(const char *file, unsigned long line, size_t size)}
+Adds an entry representing a deallocation of size @var{size} to the leak table.
+The deallocation will be associated with a source filename of @var{file} and a
+line number of @var{line} if the former is non-@samp{NULL} and the latter is
+non-zero.  If @var{file} is non-@samp{NULL} and @var{line} is @samp{0} then
+@var{file} represents the name of the function that made the deallocation.  If
+@var{file} is @samp{NULL} and @var{line} is non-zero then @var{line} represents
+the code address at which the deallocation was made.  If @var{file} is
+@samp{NULL} and @var{line} is @samp{0} then the location of the deallocation is
+unknown.  Returns @samp{1} on success and @samp{0} if there was no existing
+allocation from the same location in the leak table.
+
+@findex __mp_clearleaktable
+@item @code{void __mp_clearleaktable(void)}
+Deletes all of the existing entries in the leak table, making it empty.  This
+will also affect the behaviour of the @option{LEAKTABLE} option since that
+option will then only be able to show a summary of the entries in the leak table
+that were collected after the last call to this function rather than from the
+start of program execution.
+
+@findex __mp_startleaktable
+@item @code{int __mp_startleaktable(void)}
+Starts the automatic logging of all memory allocations, reallocations and
+deallocations to the leak table.  Returns @samp{1} if such logging was already
+being performed and @samp{0} otherwise.
+
+@findex __mp_stopleaktable
+@item @code{int __mp_stopleaktable(void)}
+Stops the automatic logging of all memory allocations, reallocations and
+deallocations to the leak table.  Returns @samp{1} if such logging was already
+being performed and @samp{0} otherwise.
+
+@findex __mp_leaktable
+@item @code{void __mp_leaktable(size_t size, int opt, unsigned char flags)}
+Displays a summary of up to @var{size} entries from the leak table, or all
+entries if @var{size} is @samp{0}.  If @var{opt} is @code{MP_LT_ALLOCATED} then
+all allocated entries will be displayed, if @var{opt} is @code{MP_LT_FREED} then
+all freed entries will be displayed and if @var{opt} is @code{MP_LT_UNFREED}
+then all unfreed entries will be displayed.  The summary is normally sorted in
+descending order of total bytes from each entry, but this can be changed by
+setting @var{flags} to any combination of @code{MP_LT_COUNTS} (to sort by the
+number of occurrences in each entry) and @code{MP_LT_BOTTOM} (to sort in
+ascending order).
 
 @findex __mp_memorymap
 @item @code{void __mp_memorymap(int stats)}
@@ -8152,6 +8551,23 @@ Writes format string @var{fmt} with variable argument list @var{args} to the log
 file, with each line prefixed by @samp{>}.  The final length of the string that
 is written to the log file must not exceed 1024 characters.  Returns the number
 of characters written, or a negative number upon error.
+
+@findex __mp_locprintf
+@item @code{void __mp_locprintf(const char *fmt, ...)}
+Writes format string @var{fmt} with variable arguments to the log file, with
+each line prefixed by @samp{>}.  The final length of the string that is written
+to the log file must not exceed 1024 characters.  It also writes information to
+the log file about where the call to this function was made, which includes the
+source file location and the call stack if they are available.
+
+@findex __mp_vlocprintf
+@item @code{void __mp_vlocprintf(const char *fmt, va_list args)}
+Writes format string @var{fmt} with variable argument list @var{args} to the log
+file, with each line prefixed by @samp{>}.  The final length of the string that
+is written to the log file must not exceed 1024 characters.  It also writes
+information to the log file about where the call to this function was made,
+which includes the source file location and the call stack if they are
+available.
 
 @findex __mp_logmemory
 @item @code{void __mp_logmemory(const void *ptr, size_t size)}
@@ -8359,6 +8775,14 @@ Displays a quick-reference option summary to the @code{stderr} file stream.
 Specifies the limit in bytes up to which memory allocations should be classified
 as large allocations for profiling purposes.  This limit must be greater than
 the small and medium bounds.  Default value: @option{LARGEBOUND=2048}.
+
+@cindex LEAKTABLE
+@item @option{LEAKTABLE}
+Specifies that the leak table should be automatically used and a leak table
+summary should be displayed at the end of program execution.  The summary shows
+a flat profile of all unfreed memory allocations since the start of the program,
+or since the last call to @code{__mp_clearleaktable()} if that function was
+called.
 
 @cindex LIMIT
 @item @option{LIMIT}=<@var{unsigned-integer}>
@@ -8787,6 +9211,11 @@ Displays a quick-reference option summary.
 [@option{LARGEBOUND}]  Specifies the limit in bytes up to which memory
 allocations should be classified as large allocations for profiling purposes.
 
+@cindex --leak-table
+@item @option{--leak-table}
+[@option{LEAKTABLE}] Specifies that the leak table should be automatically used
+and a leak table summary should be displayed at the end of program execution.
+
 @cindex --limit
 @item @option{--limit} <@var{unsigned-integer}>
 [@option{LIMIT}]  Specifies the limit in bytes at which all memory allocations
@@ -9159,6 +9588,26 @@ memory will be write protected.
 The library summary and the contents of the free memory block.
 @item Result
 Execution terminates.
+@end table
+
+@cindex FREMRK
+@item
+@samp{FREMRK}
+@table @asis
+@item Message
+@samp{attempt to free marked allocation %1}
+@item Type
+Error
+@item @samp{%1}
+The pointer to the memory allocation that has been requested to be freed.
+@item Cause
+An attempt was made to free a marked memory allocation.  This is not allowed
+since any memory allocations that have been marked indicate to the mpatrol
+library that they should remain allocated for the duration of the program.
+@item Additional
+The log file entry and information about the original memory allocation.
+@item Result
+No memory allocation will be freed and execution continues.
 @end table
 
 @cindex FRENUL
@@ -9806,6 +10255,9 @@ will build the mpatrol library as an AIX shared library.  The shared library
 will be embedded within the mpatrol archive library as is done with the system
 libraries.
 @item
+The @code{__mp_init_} initialisation function feature does not work since
+function entry points need to be referenced through the TOC.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @end itemize
 
@@ -10070,6 +10522,9 @@ There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
 @item
+The @code{__mp_init_} initialisation function feature does not work since
+function entry points need to be referenced through the TOC.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mpsym} command does not work if @command{perl} is not installed due
@@ -10095,6 +10550,9 @@ not work in the @command{mpedit} command.
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
+@item
+The @code{__mp_init_} initialisation function feature does not work since
+function entry points need to be referenced through the TOC.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
@@ -10235,6 +10693,8 @@ Limited support for reading symbols.
 @item
 No detection of illegal memory accesses.
 @item
+The @code{__mp_init_} initialisation function feature does not work.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mptrace} command has no GUI.
@@ -10273,6 +10733,8 @@ which does not place @code{set_new_hander()} in the @code{std} namespace.  The
 @file{mpatrol.h} header file and the @file{cplus.c} source file will need to be
 changed accordingly.
 @item
+The @code{__mp_init_} initialisation function feature does not work.
+@item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
 The @command{mptrace} command has no GUI.
@@ -10300,6 +10762,8 @@ changed accordingly.
 @item
 There is currently a problem when mixing the archive library version of
 mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa.
+@item
+The @code{__mp_init_} initialisation function feature does not work.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @item
@@ -10869,10 +11333,9 @@ command.  Also add a way to specify editor options to the @command{mpedit}
 command.
 
 @item
-Add support for Digital UNIX, SCO UNIX, Ultrix and other non-System V UNIX
-operating systems.  Also test on NetBSD, OpenBSD and SunOS as support has been
-written for these systems but is untested.  The SunOS port requires an ANSI C
-compiler, though.
+Add support for SCO UNIX, Ultrix and other non-System V UNIX operating systems.
+Also test on NetBSD, OpenBSD and SunOS as support has been written for these
+systems but is untested.  The SunOS port requires an ANSI C compiler, though.
 
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not always
@@ -11290,6 +11753,18 @@ first call the @code{alloca()}.  If @code{alloca.h} is also being included then
 @code{mpatrol.h} must be included after it, otherwise it may redefine
 @code{alloca()} back to the default version.
 
+@item
+Why do I get @code{xmalloc()} as a multiply-defined symbol when I link with the
+archive version of the mpatrol library?
+
+If the mpatrol library was built with @code{FORMAT=FORMAT_BFD} then it is
+because the libiberty library contains definitions of the @code{xmalloc()}
+family of functions as well.  You should rebuild the mpatrol library without
+the definitions of the relevant @code{xmalloc()} functions in @file{malloc.c}.
+You're also likely to get this error if you link with the archive version of
+the mpatrol library and one or more of the @code{xmalloc()} family of functions
+is defined in another archive library that you are linking with.
+
 @cindex inline functions
 @item
 Why do some of the @file{Makefile}s contain the @option{-fno-inline-functions}
@@ -11388,14 +11863,14 @@ thread-safe version of mpatrol then you may also need to link with the system
 threads library.
 
 @item
-Why do I still get undefined symbols on HP/UX, IRIX or Windows platforms,
+Why do I still get undefined symbols on HP/UX, IRIX, Tru64 or Windows platforms,
 despite following the above instructions?
 
 If the symbol is called @code{U_get_previous_frame} on HP/UX then you still need
 to link with the system stack traceback library, @file{libcl.sl}.  If the
-symbols are called @code{exc_setjmp} and @code{unwind} on IRIX and you defined
-the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro when building the mpatrol
-library then you still need to link with the system exception library,
+symbols are called @code{exc_setjmp} and @code{unwind} on IRIX or Tru64 and you
+defined the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macro when building the
+mpatrol library then you still need to link with the system exception library,
 @file{libexc.so}.  If the symbols all begin with @code{Sym} on Windows platforms
 then you still need to link with the system symbol access library,
 @file{imagehlp.lib}.
@@ -12055,7 +12530,6 @@ profiling support and detection of memory leaks.  Also comes with a graphical
 tool to display a dynamic picture of the heap.
 @end table
 
-@cindex Dbmalloc
 @item
 Dbmalloc
 @table @asis
@@ -12139,7 +12613,6 @@ Various UNIX, Windows
 A set of classes for debugging dynamic memory problems in Objective C.
 @end table
 
-@cindex Dmalloc
 @cindex Malloc_Dbg
 @item
 Dmalloc
@@ -12965,7 +13438,6 @@ use of uninitialised memory and out of range block accesses as well as lots of
 tracing facilities.
 @end table
 
-@cindex MTrace
 @item
 MTrace
 @table @asis
