@@ -405,17 +405,21 @@
 
 /* Indicates if the operating system provides support routines for traversing
  * call stacks in an external library.  This is currently only available for
- * HP/UX and IRIX, but the IRIX unwind() library routine calls malloc() and
- * free() so the non-library method of call stack traversal is used instead as
- * it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
+ * HP/UX, IRIX and Windows, but the IRIX unwind() library routine calls malloc()
+ * and free() so the non-library method of call stack traversal is used instead
+ * as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
  */
 
 #ifndef MP_LIBRARYSTACK_SUPPORT
-#if !MP_BUILTINSTACK_SUPPORT && SYSTEM == SYSTEM_HPUX
+#if !MP_BUILTINSTACK_SUPPORT
+#if (TARGET == TARGET_UNIX && SYSTEM == SYSTEM_HPUX) || TARGET == TARGET_WINDOWS
 #define MP_LIBRARYSTACK_SUPPORT 1
-#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#else /* TARGET && SYSTEM */
 #define MP_LIBRARYSTACK_SUPPORT 0
-#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* TARGET && SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT */
+#define MP_LIBRARYSTACK_SUPPORT 0
+#endif /* MP_BUILTINSTACK_SUPPORT */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 
 
