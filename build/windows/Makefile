@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.59 2001-02-21 12:06:30 graeme Exp $
+# $Id: Makefile,v 1.60 2001-02-23 21:58:47 graeme Exp $
 
 
 # Definitions
@@ -367,6 +367,9 @@ graph.obj: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
-heapdiff.obj: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h
-mgauge.obj: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h
-mtrace.obj: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h
+heapdiff.obj: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mgauge.obj: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mtrace.obj: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h

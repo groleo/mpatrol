@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.63 2001-02-21 12:15:51 graeme Exp $
+# $Id: Makefile,v 1.64 2001-02-23 21:58:46 graeme Exp $
 
 
 # Definitions
@@ -440,6 +440,8 @@ graph.o: $(SOURCE)/graph.c $(SOURCE)/graph.h $(SOURCE)/list.h \
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 heapdiff.o heapdiff.n.ln: $(TOOLS)/heapdiff.c $(TOOLS)/heapdiff.h \
-	$(SOURCE)/mpatrol.h
-mgauge.o mgauge.n.ln: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h
-mtrace.o mtrace.n.ln: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h
+	$(SOURCE)/mpatrol.h $(SOURCE)/config.h $(SOURCE)/target.h
+mgauge.o mgauge.n.ln: $(TOOLS)/mgauge.c $(TOOLS)/mgauge.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+mtrace.o mtrace.n.ln: $(TOOLS)/mtrace.c $(TOOLS)/mtrace.h $(SOURCE)/mpatrol.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
