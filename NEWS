@@ -1,3 +1,18 @@
+Changes for 1.2.1
+
+  * Intel LynxOS is now supported.
+
+  * Added stack traversal support for PA/RISC, RS/6000 and PowerPC.
+
+  * Added ability to determine the program name on AIX and LynxOS.
+
+  * Added a better way of determining the program name under Linux.
+
+  * Symbols can now be read from IRIX shared libraries.
+
+  * Added a Linux Software Map index file.
+
+
 Changes for 1.2.0 (16th May, 2000)
 
   * Added memory allocation profiling, which behaves in a similar way to mprof.
