@@ -33,14 +33,18 @@
 
 
 #include "tree.h"
+#include "getopt.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memleak.c,v 1.1 2000-03-30 17:49:23 graeme Exp $"
+#ident "$Id: memleak.c,v 1.2 2000-04-05 17:50:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
+
+
+#define VERSION "1.1" /* the current version of this program */
 
 
 /* Structure containing the allocation details and log file offset for a
@@ -284,20 +288,37 @@ static void printallocs(void)
 int main(int argc, char **argv)
 {
     char *f;
+    int c, e, v;
 
+    e = v = 0;
     progname = argv[0];
-    if (argc > 2)
+    while ((c = __mp_getopt(argc, argv, "V")) != EOF)
+        switch (c)
+        {
+          case 'V':
+            v = 1;
+            break;
+          default:
+            e = 1;
+            break;
+        }
+    argc -= __mp_optindex;
+    if (v == 1)
+        fprintf(stderr, "%s %s\n", progname, VERSION);
+    if ((argc > 1) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [file]\n", progname);
+        fprintf(stderr, "Usage: %s [-V] [file]\n", progname);
         exit(EXIT_FAILURE);
     }
-    if (argc == 2)
-        f = argv[1];
+    if (argc == 1)
+        f = argv[__mp_optindex];
     else
         f = MP_LOGFILE;
     __mp_newtree(&alloctree);
     alloctotal = 0;
-    if ((logfile = fopen(f, "r")) == NULL)
+    if (strcmp(f, "-") == 0)
+        logfile = stdin;
+    else if ((logfile = fopen(f, "r")) == NULL)
     {
         fprintf(stderr, "%s: Cannot open file `%s'\n", progname, f);
         exit(EXIT_FAILURE);
