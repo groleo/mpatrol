@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: library.c,v 1.2 2000-04-19 00:42:43 graeme Exp $"
+#ident "$Id: library.c,v 1.3 2000-05-15 23:37:48 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -61,5 +61,8 @@
 #if TARGET == TARGET_UNIX || (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
     TARGET == TARGET_WINDOWS
 #include "malloc.c"
+#if TARGET != TARGET_UNIX
+#include "sbrk.c"
+#endif /* TARGET */
 #endif /* TARGET && __GNUC__ */
 #include "version.c"
