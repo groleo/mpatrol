@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.28 2000-05-14 13:25:28 graeme Exp $"
+#ident "$Id: info.c,v 1.29 2000-05-14 22:17:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -89,7 +89,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     h->prologue = NULL;
     h->epilogue = NULL;
     h->nomemory = NULL;
-    h->log = __mp_logfile(NULL);
+    h->log = __mp_logfile(&h->alloc.heap.memory, NULL);
     h->delpos = 0;
 #if MP_PROTECT_SUPPORT
     h->flags = 0;
