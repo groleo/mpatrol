@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.7 2000-03-15 00:44:43 graeme Exp $"
+#ident "$Id: strtab.c,v 1.8 2000-06-07 20:08:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,7 +59,7 @@ MP_GLOBAL void __mp_newstrtab(strtab *t, heaphead *h)
     t->heap = h;
     n = (char *) &w.y - &w.x;
     __mp_newslots(&t->table, sizeof(hashentry), __mp_poweroftwo(n));
-    for (i = 0; i < MP_HASHTABSIZE; i++)
+    for (i = 0; i < MP_HASHTAB_SIZE; i++)
         __mp_newlist(&t->slots[i]);
     __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
@@ -85,7 +85,7 @@ MP_GLOBAL void __mp_deletestrtab(strtab *t)
     t->heap = NULL;
     t->table.free = NULL;
     t->table.size = 0;
-    for (i = 0; i < MP_HASHTABSIZE; i++)
+    for (i = 0; i < MP_HASHTAB_SIZE; i++)
         __mp_newlist(&t->slots[i]);
     __mp_newlist(&t->list);
     __mp_newtree(&t->tree);
@@ -109,7 +109,7 @@ static unsigned long hash(char *s)
             h ^= g;
         }
     }
-    return h % MP_HASHTABSIZE;
+    return h % MP_HASHTAB_SIZE;
 }
 
 
