@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.6 2001-03-04 22:17:35 graeme Exp $"
+#ident "$Id: dmalloc.c,v 1.7 2001-03-06 01:45:24 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.6 2001-03-04 22:17:35 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.7 2001-03-06 01:45:24 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -437,8 +437,10 @@ callback(MP_CONST void *p, void *t)
 {
     char b[1024];
     char s[81];
+    char *f;
     listinfo *i;
     __mp_allocinfo d;
+    unsigned long l;
 
     if (!__mp_info(p, &d))
         return 0;
@@ -455,24 +457,49 @@ callback(MP_CONST void *p, void *t)
             i->ucount++;
             i->utotal += d.size;
         }
-        if (i->details && ((d.file != NULL) ||
-             (malloc_flags & DMALLOC_LOG_KNOWN)))
+        if ((d.file != NULL) || !(malloc_flags & DMALLOC_LOG_KNOWN))
         {
             if (d.file != NULL)
+            {
                 sprintf(b, "%s:%lu", d.file, d.line);
+                f = d.file;
+                l = d.line;
+            }
+            else if (d.func != NULL)
+            {
+                strcpy(b, d.func);
+                f = d.func;
+                l = 0;
+            }
             else if (d.stack == NULL)
+            {
                 strcpy(b, "unknown");
+                f = NULL;
+                l = 0;
+            }
             else if (d.stack->name != NULL)
+            {
                 strcpy(b, d.stack->name);
+                f = d.stack->name;
+                l = 0;
+            }
             else
+            {
                 sprintf(b, "ra=%#lx", d.stack->addr);
-            __mpt_dmallocmessage(" %s: '%#lx' (%lu byte%s) from '%s'\n",
-                                 d.freed ? "freed" : "not freed", d.block,
-                                 d.size, (d.size == 1) ? "" : "s", b);
-            if (malloc_flags & DMALLOC_LOG_NONFREE_SPACE)
-                __mpt_dmallocmessage("  dump of '%#lx': '%s'\n", d.block,
-                                     bytestring(s, 20, (char *) d.block,
-                                                d.size));
+                f = NULL;
+                l = (unsigned long) d.stack->addr;
+            }
+            __mp_addallocentry(f, l, d.size);
+            if (i->details)
+            {
+                __mpt_dmallocmessage(" %s: '%#lx' (%lu byte%s) from '%s'\n",
+                                     d.freed ? "freed" : "not freed", d.block,
+                                     d.size, (d.size == 1) ? "" : "s", b);
+                if (malloc_flags & DMALLOC_LOG_NONFREE_SPACE)
+                    __mpt_dmallocmessage("  dump of '%#lx': '%s'\n", d.block,
+                                         bytestring(s, 20, (char *) d.block,
+                                                    d.size));
+            }
         }
         return 1;
     }

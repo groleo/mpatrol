@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dmalloc.h,v 1.6 2001-03-04 18:03:38 graeme Exp $
+ * $Id: dmalloc.h,v 1.7 2001-03-06 01:45:24 graeme Exp $
  */
 
 
@@ -84,12 +84,12 @@
  * the __mp_memorymap() and __mp_summary() functions and so have entirely
  * different display formats.  The dmalloc_log_unfreed() and
  * dmalloc_log_changed() functions have similar display formats to the
- * original Dmalloc library, but do not display summary tables and will
- * display symbol names if they are available and filename and line number
- * information isn't.  The dmalloc_message() and dmalloc_vmessage()
- * functions write tracing to the mpatrol log file prefixed by three
- * fields of optional information, which can be controlled by the LOG_*
- * macros when building this module.
+ * original Dmalloc library, but the summary tables are displayed
+ * differently and will display symbol names if they are available and
+ * filename and line number information isn't.  The dmalloc_message() and
+ * dmalloc_vmessage() functions write tracing to the mpatrol log file
+ * prefixed by three fields of optional information, which can be
+ * controlled by the LOG_* macros when building this module.
  *
  * This file is initialised via the mpatrol library's initialiser function
  * feature, which means that if the __mp_init_dmalloc() function is noted
