@@ -33,10 +33,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if MP_GUI_SUPPORT
+#include <Xm/Xm.h>
+#include <Xm/DrawingA.h>
+#include <Xm/ScrolledW.h>
+#endif /* MP_GUI_SUPPORT */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.3 2000-12-04 19:08:39 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.4 2000-12-06 01:07:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -98,6 +103,63 @@ static FILE *tracefile;
  */
 
 static char *progname;
+
+
+#if MP_GUI_SUPPORT
+/* The X toolkit context for this application.
+ */
+
+static XtAppContext appcontext;
+
+
+/* The X widgets for the application shell, main application and drawing area.
+ */
+
+static Widget appwidget, mainwidget, drawwidget;
+
+
+/* The X pixmap for the backup drawing area.
+ */
+
+static Pixmap pixmap;
+
+
+/* The X display and screen pointers for this application.
+ */
+
+static Display *appdisplay;
+static Screen *appscreen;
+
+
+/* The X colours for the background, free memory and allocated memory.
+ */
+
+static Pixel bgcol, frcol, alcol;
+
+
+/* The width and height (in pixels) of the drawing area.
+ */
+
+static Dimension width, height;
+
+
+/* The X resources for this application.
+ */
+
+static XtResource resources[] =
+{
+    {"bgcol", XmCBackground, XmRPixel, sizeof(Pixel), (Cardinal) &bgcol,
+     XmRString, "Blue"},
+    {"frcol", XmCForeground, XmRPixel, sizeof(Pixel), (Cardinal) &frcol,
+     XmRString, "White"},
+    {"alcol", XmCForeground, XmRPixel, sizeof(Pixel), (Cardinal) &alcol,
+     XmRString, "Black"},
+    {"width", "Width", XmRShort, sizeof(Dimension), (Cardinal) &width,
+     XmRImmediate, (String) 512},
+    {"height", "Height", XmRShort, sizeof(Dimension), (Cardinal) &height,
+     XmRImmediate, (String) 1024}
+};
+#endif /* MP_GUI_SUPPORT */
 
 
 /* The table describing all recognised options.
@@ -404,6 +466,12 @@ int main(int argc, char **argv)
     char *f;
     int c, e, h, v;
 
+#if MP_GUI_SUPPORT
+    appwidget = XtVaAppInitialize(&appcontext, "MPTrace", NULL, 0, &argc, argv,
+                                  NULL, NULL);
+    XtGetApplicationResources(appwidget, NULL, resources, XtNumber(resources),
+                              NULL, 0);
+#endif /* MP_GUI_SUPPORT */
     e = h = v = 0;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
@@ -460,8 +528,24 @@ int main(int argc, char **argv)
     }
     bufferpos = buffer;
     bufferlen = 0;
+#if MP_GUI_SUPPORT
+    mainwidget = XtVaCreateManagedWidget("main", xmScrolledWindowWidgetClass,
+                                         appwidget, XmNscrollingPolicy,
+                                         XmAUTOMATIC, XmNscrollBarDisplayPolicy,
+                                         XmAS_NEEDED, NULL);
+    drawwidget = XtVaCreateManagedWidget("draw", xmDrawingAreaWidgetClass,
+                                         mainwidget, XmNwidth, width, XmNheight,
+                                         height, NULL);
+    appdisplay = XtDisplay(appwidget);
+    appscreen = XtScreen(mainwidget);
+    pixmap = XCreatePixmap(appdisplay, RootWindowOfScreen(appscreen), width,
+                           height, DefaultDepthOfScreen(appscreen));
+    XtRealizeWidget(appwidget);
+    XtAppMainLoop(appcontext);
+#else /* MP_GUI_SUPPORT */
     readfile();
     freeallocs();
     fclose(tracefile);
+#endif /* MP_GUI_SUPPORT */
     return EXIT_SUCCESS;
 }
