@@ -121,6 +121,16 @@
 #endif /* MP_BUFFER_SIZE */
 
 
+/* The number of allocation bins to use when profiling.  Details of memory
+ * allocations of all sizes up to the bin size will be recorded in a table and
+ * written to the profiling output file at program termination.
+ */
+
+#ifndef MP_BIN_SIZE
+#define MP_BIN_SIZE 1024
+#endif /* MP_BIN_SIZE */
+
+
 /* The multiple of pages to allocate from the heap every time a new block of
  * internal memory is required.  The higher the value, the less distinct
  * internal blocks to keep track of, but the potential for more memory wastage
