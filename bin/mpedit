@@ -25,7 +25,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.3 2000-11-16 20:37:48 graeme Exp $
+# $Id: mpedit,v 1.4 2000-11-17 18:00:40 graeme Exp $
 
 
 # Program version.
@@ -178,15 +178,15 @@ fi
 
 if [ $version = 1 ]
 then
-    echo "$progname $VERSION" >&2
-    echo "Copyright (C) 1997-2000 Graeme S. Roy" >&2
-    echo >&2
-    echo "This is free software, and you are welcome to redistribute it under certain" >&2
-    echo "conditions; see the GNU Library General Public License for details." >&2
-    echo >&2
-    echo "For the latest mpatrol release and documentation," >&2
-    echo "visit http://www.cbmamiga.demon.co.uk/mpatrol." >&2
-    echo >&2
+    echo "$progname $VERSION"
+    echo "Copyright (C) 1997-2000 Graeme S. Roy"
+    echo
+    echo "This is free software, and you are welcome to redistribute it under certain"
+    echo "conditions; see the GNU Library General Public License for details."
+    echo
+    echo "For the latest mpatrol release and documentation,"
+    echo "visit http://www.cbmamiga.demon.co.uk/mpatrol."
+    echo
 fi
 
 
@@ -194,13 +194,13 @@ fi
 
 if [ $error = 1 -o $help = 1 ]
 then
-    echo "Usage: $progname [options] sourcefile [linenumber]" >&2
-    echo >&2
+    echo "Usage: $progname [options] sourcefile [linenumber]"
+    echo
     if [ $help = 0 ]
     then
-        echo "Type \`$progname --help' for a complete list of options." >&2
+        echo "Type \`$progname --help' for a complete list of options."
     else
-cat <<EOF >&2
+cat <<EOF
 Options:
   -e  --editor=<filename>
         Specifies the text editor to use.
