@@ -144,6 +144,8 @@ typedef enum __mp_alloctype
     MP_AT_MEMCPY,    /* memcpy() */
     MP_AT_MEMMOVE,   /* memmove() */
     MP_AT_BCOPY,     /* bcopy() */
+    MP_AT_MEMCMP,    /* memcmp() */
+    MP_AT_BCMP,      /* bcmp() */
     MP_AT_MAX
 }
 __mp_alloctype;
@@ -238,6 +240,12 @@ __mp_allocinfo;
 #ifdef bcopy
 #undef bcopy
 #endif /* bcopy */
+#ifdef memcmp
+#undef memcmp
+#endif /* memcmp */
+#ifdef bcmp
+#undef bcmp
+#endif /* bcmp */
 
 
 #ifdef __GNUC__
@@ -283,6 +291,12 @@ __mp_allocinfo;
 #define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, \
                                            __PRETTY_FUNCTION__, __FILE__, \
                                            __LINE__, 0)
+#define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, \
+                                        __PRETTY_FUNCTION__, __FILE__, \
+                                        __LINE__, 0)
+#define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, \
+                                      __PRETTY_FUNCTION__, __FILE__, __LINE__, \
+                                      0)
 
 #else /* __GNUC__ */
 
@@ -321,6 +335,10 @@ __mp_allocinfo;
                                       __FILE__, __LINE__, 0)
 #define bcopy(p, q, l) (void) __mp_copymem((p), (q), (l), MP_AT_BCOPY, NULL, \
                                            __FILE__, __LINE__, 0)
+#define memcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_MEMCMP, NULL, \
+                                        __FILE__, __LINE__, 0)
+#define bcmp(p, q, l) __mp_comparemem((p), (q), (l), MP_AT_BCMP, NULL, \
+                                      __FILE__, __LINE__, 0)
 
 #endif /* __GNUC__ */
 
@@ -359,6 +377,10 @@ __asm void *__mp_copymem(register __a0 void *, register __a1 void *,
                          register __d0 size_t, register __d1 __mp_alloctype,
                          register __a2 char *, register __a3 char *,
                          register __d2 unsigned long, register __d3 size_t);
+__asm int __mp_comparemem(register __a0 void *, register __a1 void *,
+                          register __d0 size_t, register __d1 alloctype,
+                          register __a2 char *, register __a3 char *,
+                          register __d2 unsigned long, register __d3 size_t);
 __asm int __mp_info(register __a0 void *, register __a1 __mp_allocinfo *);
 __asm void __mp_memorymap(register __d0 int);
 __asm void __mp_summary(void);
@@ -383,6 +405,8 @@ void *__mp_setmem(void *, size_t, unsigned char, __mp_alloctype, char *, char *,
                   unsigned long, size_t);
 void *__mp_copymem(void *, void *, size_t, __mp_alloctype, char *, char *,
                    unsigned long, size_t);
+int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
+                    unsigned long, size_t);
 int __mp_info(void *, __mp_allocinfo *);
 void __mp_memorymap(int);
 void __mp_summary(void);
