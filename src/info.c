@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.74 2001-03-04 13:27:00 graeme Exp $"
+#ident "$Id: info.c,v 1.75 2001-03-04 13:50:44 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.74 2001-03-04 13:27:00 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.75 2001-03-04 13:50:44 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -320,8 +320,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, v);
-                __mp_warn(ET_MAXALN, f, v->file, v->line, "alignment %lu is "
-                          "greater than the system page size", a);
+                __mp_warn(ET_MAXALN, f, v->file, v->line, NULL, a);
                 __mp_diag("\n");
             }
             a = h->alloc.heap.memory.page;
@@ -487,8 +486,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, v);
-        __mp_error(ET_NOTALL, f, v->file, v->line, MP_POINTER " has not been "
-                   "allocated", p);
+        __mp_error(ET_NOTALL, f, v->file, v->line, NULL, p);
         __mp_diag("\n");
         p = NULL;
     }
@@ -499,8 +497,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, v);
-        __mp_error(ET_MISMAT, f, v->file, v->line, MP_POINTER " does not match "
-                   "allocation of " MP_POINTER, p, n->block);
+        __mp_error(ET_MISMAT, f, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -514,8 +511,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, v);
-        __mp_error(ET_INCOMP, f, v->file, v->line, MP_POINTER " was allocated "
-                   "with %s", p, __mp_functionnames[m->data.type]);
+        __mp_error(ET_INCOMP, f, v->file, v->line, NULL, p,
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -726,8 +723,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
                 __mp_logfree(h, p, f, v);
                 o = 1;
             }
-            __mp_warn(ET_FRENUL, f, v->file, v->line, "attempt to free a NULL "
-                      "pointer");
+            __mp_warn(ET_FRENUL, f, v->file, v->line, NULL);
             __mp_diag("\n");
         }
         return;
@@ -752,8 +748,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, v);
-        __mp_error(ET_NOTALL, f, v->file, v->line, MP_POINTER " has not been "
-                   "allocated", p);
+        __mp_error(ET_NOTALL, f, v->file, v->line, NULL, p);
         __mp_diag("\n");
     }
     else if (p != n->block)
@@ -763,8 +758,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, v);
-        __mp_error(ET_MISMAT, f, v->file, v->line, MP_POINTER " does not match "
-                   "allocation of " MP_POINTER, p, n->block);
+        __mp_error(ET_MISMAT, f, v->file, v->line, NULL, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -784,8 +778,8 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, v);
-        __mp_error(ET_INCOMP, f, v->file, v->line, MP_POINTER " was allocated "
-                   "with %s", p, __mp_functionnames[m->data.type]);
+        __mp_error(ET_INCOMP, f, v->file, v->line, NULL, p,
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -795,8 +789,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, v);
-        __mp_error(ET_FREMRK, f, v->file, v->line, "attempt to free marked "
-                   "memory allocation " MP_POINTER, p);
+        __mp_error(ET_FREMRK, f, v->file, v->line, NULL, p);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -1194,8 +1187,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f, loginfo *v)
     if (p == NULL)
     {
         if ((s > 0) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(ET_NULOPN, f, v->file, v->line, "attempt to perform "
-                       "operation on a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, v->file, v->line, NULL);
         return 0;
     }
     e = 1;
@@ -1204,8 +1196,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, alloctype f, loginfo *v)
     if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
-            __mp_error(ET_FREOPN, f, v->file, v->line, "attempt to perform "
-                       "operation on free memory\n");
+            __mp_error(ET_FREOPN, f, v->file, v->line, NULL);
             e = 0;
         }
         else if (m->data.flags & FLG_FREED)
@@ -1275,8 +1266,7 @@ __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f, loginfo *v,
     if (p == NULL)
     {
         if ((g == 0) || (u > p) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(ET_NULOPN, f, v->file, v->line, "attempt to perform "
-                       "operation on a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, v->file, v->line, NULL);
         return 0;
     }
     e = 0;
