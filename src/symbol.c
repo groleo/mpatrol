@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.8 2000-02-10 21:27:50 graeme Exp $"
+#ident "$Id: symbol.c,v 1.9 2000-02-29 22:17:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -105,6 +105,22 @@ dynamiclink;
 #endif /* SYSTEM */
 
 
+#if FORMAT == FORMAT_BFD
+/* This structure is used to maintain a list of access library handles for
+ * the purposes of mapping return addresses to line numbers.
+ */
+
+typedef struct objectfile
+{
+    struct objectfile *next;  /* pointer to next object file */
+    bfd *file;                /* access library handle */
+    asymbol **symbols;        /* pointer to symbols */
+    size_t base;              /* virtual address of object file */
+}
+objectfile;
+#endif /* FORMAT */
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -146,7 +162,30 @@ MP_GLOBAL void __mp_newsymbols(symhead *y, heaphead *h)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
-    y->handle = NULL;
+    y->hhead = y->htail = NULL;
+    y->lineinfo = 0;
+}
+
+
+/* Close all access library handles.
+ */
+
+MP_GLOBAL void __mp_closesymbols(symhead *y)
+{
+#if FORMAT == FORMAT_BFD
+    objectfile *n, *p;
+#endif /* FORMAT */
+
+#if FORMAT == FORMAT_BFD
+    for (n = (objectfile *) y->hhead; n != NULL; n = p)
+    {
+        p = n->next;
+        bfd_close(n->file);
+        free(n->symbols);
+        free(n);
+    }
+#endif /* FORMAT */
+    y->hhead = y->htail = NULL;
 }
 
 
@@ -165,11 +204,6 @@ MP_GLOBAL void __mp_deletesymbols(symhead *y)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
-#if FORMAT == FORMAT_BFD
-    if (y->handle != NULL)
-        bfd_close(y->handle);
-#endif /* FORMAT */
-    y->handle = NULL;
 }
 
 
@@ -559,7 +593,14 @@ static int addsymbols(symhead *y, bfd *h, char *f, size_t b)
                     r = 0;
                     break;
                 }
-    free(p);
+    /* If we are making use of line number information in the object files then
+     * we store the symbol table along with the access library handle; otherwise
+     * we can free the symbol table now.
+     */
+    if (y->lineinfo && (r == 1))
+        ((objectfile *) y->htail)->symbols = p;
+    else
+        free(p);
     return r;
 }
 #endif /* FORMAT */
@@ -579,6 +620,7 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
     Elf *a, *e;
     Elf_Arhdr *h;
 #elif FORMAT == FORMAT_BFD
+    objectfile *p, *q;
     bfd *h;
 #endif /* FORMAT */
     char *t;
@@ -692,25 +734,59 @@ MP_GLOBAL int __mp_addsymbols(symhead *y, char *s, size_t b)
      * library is still worth using for ELF file formats, but the BFD library
      * comes with support for debugging information.  So take your pick!
      */
+    p = NULL;
     bfd_init();
     if ((h = bfd_openr(s, NULL)) == NULL)
     {
         __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
         r = 0;
     }
-    else if (!bfd_check_format(h, bfd_object))
+    else
     {
-        __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
-        r = 0;
+        if (!bfd_check_format(h, bfd_object))
+        {
+            __mp_error(AT_MAX, "%s: %s\n", s, bfd_errmsg(bfd_get_error()));
+            r = 0;
+        }
+        else if (y->lineinfo &&
+                 ((p = (objectfile *) malloc(sizeof(objectfile))) == NULL))
+            r = 0;
+        else if ((t = __mp_addstring(&y->strings, s)) == NULL)
+            r = 0;
+        else
+        {
+            if (y->lineinfo)
+            {
+                if (y->hhead == NULL)
+                    y->hhead = p;
+                else
+                {
+                    q = (objectfile *) y->htail;
+                    q->next = p;
+                }
+                y->htail = p;
+                p->next = NULL;
+                p->file = h;
+                p->symbols = NULL;
+                p->base = b;
+            }
+            r = addsymbols(y, h, t, b);
+            if (y->lineinfo && (r == 0))
+                if (y->hhead == p)
+                    y->hhead = y->htail = NULL;
+                else
+                {
+                    y->htail = q;
+                    q->next = NULL;
+                }
+        }
+        if (!y->lineinfo || (r == 0))
+        {
+            if (p != NULL)
+                free(p);
+            bfd_close(h);
+        }
     }
-    else if ((t = __mp_addstring(&y->strings, s)) == NULL)
-        r = 0;
-    else if (r = addsymbols(y, h, t, b))
-        /* After successfully reading the symbols we won't close the BFD
-         * handle since we will need it to read debugging information.
-         * We will close it when __mp_deletesymbols() is called.
-         */
-        y->handle = h;
 #endif /* FORMAT */
     return r;
 }
