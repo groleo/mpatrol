@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.84 2001-09-20 23:18:10 graeme Exp $
+ * $Id: config.h,v 1.85 2001-09-23 21:37:37 graeme Exp $
  */
 
 
@@ -277,6 +277,9 @@
  */
 
 #ifndef MP_MEMALIGN_SUPPORT
+#if defined(HAVE_CONFIG_H) && defined(HAVE_MEMALIGN)
+#define MP_MEMALIGN_SUPPORT 1
+#else /* HAVE_CONFIG_H && HAVE_MEMALIGN */
 #if SYSTEM == SYSTEM_CYGWIN || SYSTEM == SYSTEM_DGUX || \
     SYSTEM == SYSTEM_DRSNX || SYSTEM == SYSTEM_IRIX || \
     SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS || \
@@ -285,6 +288,7 @@
 #else /* SYSTEM */
 #define MP_MEMALIGN_SUPPORT 0
 #endif /* SYSTEM */
+#endif /* HAVE_CONFIG_H && HAVE_MEMALIGN */
 #endif /* MP_MEMALIGN_SUPPORT */
 
 
@@ -352,6 +356,9 @@
  */
 
 #ifndef MP_MINCORE_SUPPORT
+#if defined(HAVE_CONFIG_H) && defined(HAVE_MINCORE)
+#define MP_MINCORE_SUPPORT 1
+#else /* HAVE_CONFIG_H && HAVE_MINCORE */
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
     SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
     SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SOLARIS || \
@@ -360,6 +367,7 @@
 #else /* SYSTEM */
 #define MP_MINCORE_SUPPORT 0
 #endif /* SYSTEM */
+#endif /* HAVE_CONFIG_H && HAVE_MINCORE */
 #endif /* MP_MINCORE_SUPPORT */
 
 
