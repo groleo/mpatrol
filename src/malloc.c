@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.8 2000-03-07 00:58:53 graeme Exp $"
+#ident "$Id: malloc.c,v 1.9 2000-03-14 00:30:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -284,7 +284,11 @@ void (*set_new_handler__FPFv_v(void (*h)(void)))(void)
 #ifdef __cplusplus
 void *operator new(size_t l)
 #else /* __cplusplus */
+#ifdef __GNUC__
+void *__builtin_new(size_t l)
+#else /* __GNUC__ */
 void *__nw__FUi(size_t l)
+#endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
     return __mp_alloc(l, 0, AT_NEW, NULL, NULL, 0, 1);
@@ -297,7 +301,11 @@ void *__nw__FUi(size_t l)
 #ifdef __cplusplus
 void *operator new[](size_t l)
 #else /* __cplusplus */
+#ifdef __GNUC__
+void *__builtin_vec_new(size_t l)
+#else /* __GNUC__ */
 void *__arr_nw__FUi(size_t l)
+#endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
     return __mp_alloc(l, 0, AT_NEWVEC, NULL, NULL, 0, 1);
@@ -310,7 +318,11 @@ void *__arr_nw__FUi(size_t l)
 #ifdef __cplusplus
 void operator delete(void *p)
 #else /* __cplusplus */
+#ifdef __GNUC__
+void __builtin_delete(void *p)
+#else /* __GNUC__ */
 void __dl__FPv(void *p)
+#endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
     __mp_free(p, AT_DELETE, NULL, NULL, 0, 1);
@@ -323,7 +335,11 @@ void __dl__FPv(void *p)
 #ifdef __cplusplus
 void operator delete[](void *p)
 #else /* __cplusplus */
+#ifdef __GNUC__
+void __builtin_vec_delete(void *p)
+#else /* __GNUC__ */
 void __arr_dl__FPv(void *p)
+#endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
     __mp_free(p, AT_DELETEVEC, NULL, NULL, 0, 1);
