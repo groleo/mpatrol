@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.35 2001-02-13 22:12:05 graeme Exp $"
+#ident "$Id: option.c,v 1.36 2001-02-13 22:30:25 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.35 2001-02-13 22:12:05 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.36 2001-02-13 22:30:25 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -774,8 +774,10 @@ __mp_parseoptions(infohead *h)
                         i = OE_BADNUMBER;
                     else
                     {
-                        h->alloc.fmax = n;
-                        h->alloc.flags |= FLG_NOFREE;
+                        if (h->alloc.fmax = n)
+                            h->alloc.flags |= FLG_NOFREE;
+                        else
+                            h->alloc.flags &= ~FLG_NOFREE;
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "NOPROTECT"))
@@ -1316,11 +1318,12 @@ __mp_set(infohead *h, unsigned long o, unsigned long v)
         h->check = v;
         break;
       case OPT_NOFREE:
-        if (v != 0)
-            while (h->alloc.flist.size > v)
-                __mp_recyclefreed(&h->alloc);
-        h->alloc.fmax = v;
-        h->alloc.flags |= FLG_NOFREE;
+        while (h->alloc.flist.size > v)
+            __mp_recyclefreed(&h->alloc);
+        if (h->alloc.fmax = v)
+            h->alloc.flags |= FLG_NOFREE;
+        else
+            h->alloc.flags &= ~FLG_NOFREE;
         break;
       default:
         r = o;
