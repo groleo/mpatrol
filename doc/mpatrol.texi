@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.28 2000-01-27 01:51:02 graeme Exp $
+@c $Id: mpatrol.texi,v 1.29 2000-01-28 01:15:33 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.4
 @set VERSION 1.1.0
-@set UPDATED 27th January, 2000
+@set UPDATED 28th January, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -343,7 +343,7 @@ Contains 4 replacement C++ dynamic memory allocation functions:
 @end multitable
 
 @item
-Contains 5 replacement C memory operation functions:
+Contains 7 replacement C memory operation functions:
 
 @multitable @columnfractions .2 .1 .7
 @item @code{memset()}
@@ -361,6 +361,12 @@ Contains 5 replacement C memory operation functions:
 @item @code{bcopy()}
 @tab UNIX
 @tab Copies possibly-overlapping memory.
+@item @code{memcmp()}
+@tab ANSI
+@tab Compares two blocks of memory.
+@item @code{bcmp()}
+@tab old
+@tab Compares two blocks of memory.
 @end multitable
 
 @item
@@ -2455,10 +2461,11 @@ example have been numbered and their descriptions appear below.
 26  free blocks:       1 (8176 bytes)
 27  internal blocks:   25 (204800 bytes)
 28  total heap usage:  212992 bytes
-29  total copied:      0 bytes
-30  total set:         0 bytes
-31  total warnings:    0
-32  total errors:      1
+29  total compared:    0 bytes
+30  total copied:      0 bytes
+31  total set:         0 bytes
+32  total warnings:    0
+33  total errors:      1
 @end smallexample
 
 @enumerate 1
@@ -2620,16 +2627,20 @@ library's data structures.  This can be overridden at run-time using the
 Total heap usage.  This value contains the total amount of system heap memory
 that has been allocated by the mpatrol library.
 
-@cindex bytes copied
-@cindex bytes set
 @item
+@cindex bytes compared
+Total compared.
+@item
+@cindex bytes copied
 Total copied.
 @item
+@cindex bytes set
 Total set.  These values contain the total number of bytes that have been
-tracked by the mpatrol library in byte copy operations (such as
-@code{memcpy()}) and byte set operations (such as @code{memset()}) respectively.
-They do not take into account any other such operations that occur outwith these
-functions, such as loading and storing from machine instructions.
+tracked by the mpatrol library in byte comparison operations (such as
+@code{memcmp()}), byte copy operations (such as @code{memcpy()}) and byte set
+operations (such as @code{memset()}) respectively.  They do not take into
+account any other such operations that occur outwith these functions, such as
+loading and storing from machine instructions.
 
 @item
 Total warnings.
@@ -3954,6 +3965,27 @@ straddle that allocation's boundaries then an error message will be generated in
 the log file and no bytes will be copied.  This function is available for
 backwards compatibility with older C libraries and should not be used in new
 code.
+
+@findex memcmp
+@item @code{int memcmp(void *ptr1, void *ptr2, size_t size)}
+Compares @var{size} bytes from @var{ptr1} and @var{ptr2} and returns @samp{0} if
+all of the bytes are identical, or returns the byte difference of the first
+differing bytes.  If @var{size} is @samp{0} or @var{ptr1} is the same as
+@var{ptr2} then no bytes will be compared.  If the operation would read from an
+existing memory allocation in the heap but would straddle that allocation's
+boundaries then an error message will be generated in the log file and no bytes
+will be compared.
+
+@findex bcmp
+@item @code{int bcmp(void *ptr1, void *ptr2, size_t size)}
+Compares @var{size} bytes from @var{ptr1} and @var{ptr2} and returns @samp{0} if
+all of the bytes are identical, or returns the byte difference of the first
+differing bytes.  If @var{size} is @samp{0} or @var{ptr1} is the same as
+@var{ptr2} then no bytes will be compared.  If the operation would read from an
+existing memory allocation in the heap but would straddle that allocation's
+boundaries then an error message will be generated in the log file and no bytes
+will be compared.  This function is available for backwards compatibility with
+older C libraries and should not be used in new code.
 @end table
 
 The following 7 functions are available as support routines for additional
