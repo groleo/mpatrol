@@ -32,8 +32,13 @@
 
 
 /*
- * $Id: target.h,v 1.34 2001-09-19 21:08:59 graeme Exp $
+ * $Id: target.h,v 1.35 2001-09-19 23:51:17 graeme Exp $
  */
+
+
+#ifdef HAVE_CONFIG_H
+#include "configure.h"
+#endif /* HAVE_CONFIG_H */
 
 
 /* The target operating system.  This determines how the mpatrol library
