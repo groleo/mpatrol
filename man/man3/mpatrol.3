@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.24 2000-05-10 20:01:52 graeme Exp $
+.\" $Id: mpatrol.3,v 1.25 2000-05-10 21:00:39 graeme Exp $
 .\"
 .TH MPATROL 3 "10 May 2000" "Release 1.2" "mpatrol library"
 .SH NAME
@@ -831,7 +831,8 @@ are problems when using the mpatrol library in combination with another malloc
 library which uses \fBsbrk()\fP to allocate its memory.  It is ignored on
 systems that do not support the \fBmmap()\fP system call.
 .SH SEE ALSO
-\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBmalloc\fP(3),
+\fBmemory\fP(3), \fBstring\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and FAQ.
 .SH AUTHOR
