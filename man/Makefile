@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.5 2000-12-14 00:21:19 graeme Exp $
+# $Id: Makefile,v 1.6 2000-12-14 17:43:34 graeme Exp $
 
 
 # Definitions
@@ -108,7 +108,18 @@ ps/libmpatrol.ps: man3/libmpatrol.3
 
 all: $(PAGES) $(DVIPAGES) $(PSPAGES)
 
+mpatrol_man.tar.gz: $(DVIPAGES) $(PSPAGES) README
+	@ mkdir -p mpatrol/man/dvi
+	@ cp $(DVIPAGES) mpatrol/man/dvi
+	@ mkdir -p mpatrol/man/ps
+	@ cp $(PSPAGES) mpatrol/man/ps
+	@ cp README mpatrol/man
+	@ tar cf mpatrol_man.tar mpatrol
+	@ gzip mpatrol_man.tar
+	-@ rm -rf mpatrol >/dev/null 2>&1
+
 clean:
 	-@ rm -f $(PAGES) $(DVIPAGES) $(PSPAGES) >/dev/null 2>&1
+	-@ rm -f mpatrol_man.tar.gz >/dev/null 2>&1
 
 clobber: clean
