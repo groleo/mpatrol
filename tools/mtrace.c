@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mtrace.c,v 1.7 2001-07-26 16:11:07 graeme Exp $"
+#ident "$Id: mtrace.c,v 1.8 2001-08-01 22:36:22 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.7 2001-07-26 16:11:07 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mtrace_id = "$Id: mtrace.c,v 1.8 2001-08-01 22:36:22 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -125,11 +125,11 @@ location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
 
 static
 void
-prologue(MP_CONST void *p, size_t l, MP_CONST char *s, MP_CONST char *t,
-         unsigned long u, MP_CONST void *a)
+prologue(MP_CONST void *p, size_t l, size_t m, MP_CONST char *s,
+         MP_CONST char *t, unsigned long u, MP_CONST void *a)
 {
     if (old_prologue != NULL)
-        old_prologue(p, l, s, t, u, a);
+        old_prologue(p, l, m, s, t, u, a);
     alloc_pointer = (void *) p;
     alloc_size = l;
 }
