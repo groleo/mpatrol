@@ -107,7 +107,7 @@ MP_EXPORT void __mp_freealloc(allochead *, allocnode *, void *);
 MP_EXPORT int __mp_protectalloc(allochead *, memaccess);
 MP_EXPORT allocnode *__mp_findalloc(allochead *, void *);
 MP_EXPORT allocnode *__mp_findfreed(allochead *, void *);
-MP_EXPORT allocnode *__mp_findnode(allochead *, void *);
+MP_EXPORT allocnode *__mp_findnode(allochead *, void *, size_t);
 
 
 #ifdef __cplusplus

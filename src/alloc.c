@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.4 2000-01-09 20:35:11 graeme Exp $"
+#ident "$Id: alloc.c,v 1.5 2000-01-21 00:32:45 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -700,7 +700,7 @@ MP_GLOBAL allocnode *__mp_findfreed(allochead *h, void *p)
  * its allocation or as part of an overflow buffer.
  */
 
-MP_GLOBAL allocnode *__mp_findnode(allochead *h, void *p)
+MP_GLOBAL allocnode *__mp_findnode(allochead *h, void *p, size_t s)
 {
     allocnode *n;
     treenode *t;
@@ -737,7 +737,10 @@ MP_GLOBAL allocnode *__mp_findnode(allochead *h, void *p)
             l += h->oflow << 1;
         }
         if (p < b)
-            break;
+            if ((char *) p + s > (char *) b)
+                return n;
+            else
+                break;
         else if ((char *) b + l > (char *) p)
             return n;
         n = (allocnode *) n->lnode.next;
