@@ -7454,8 +7454,9 @@ work for unoptimised code.  A much better solution would be write the
 implementations at a lower level in assembly, but this is much less portable. 
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
-write one?  I can think of many applications that would benefit from such a
-library besides this one<a rel=footnote href="#fn-43"><sup>43</sup></a>.
+write one<a rel=footnote href="#fn-43"><sup>43</sup></a>?  I
+can think of many applications that would benefit from such a library besides
+this one<a rel=footnote href="#fn-44"><sup>44</sup></a>.
 
 <li>An alternative implementation for call stack traversal uses the functions
 <code>__builtin_frame_address()</code> and <code>__builtin_return_address()</code> that are
@@ -8593,7 +8594,7 @@ detects many common memory access errors in running applications, whilst on the
 Macintosh, QC by Onyx Technology provides roughly the same functionality.
 
 <p>A list of over seventy different items of software which help in debugging
-dynamic memory allocation problems is given below<a rel=footnote href="#fn-44"><sup>44</sup></a>.  They all provide some of the features that
+dynamic memory allocation problems is given below<a rel=footnote href="#fn-45"><sup>45</sup></a>.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
 you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
 Electric Fence and Mprof, so I can't vouch for any of the others, although if
@@ -9595,6 +9596,22 @@ overwrites, double-freeing, wild pointers, invalid parameters, etc.
 <dd><a href="http://www.onyx-tech.com/">http://www.onyx-tech.com/</a>
 <br><dt>Overview
 <dd>Performs memory protection on PowerPC executables and helps detect memory leaks. 
+</dl>
+
+<li>StackTrace
+<dl>
+<dt>Author
+<dd>Bjorn Reese (<a href="mailto:breese@mail1.stofanet.dk">breese@mail1.stofanet.dk</a>)
+<br><dt>License
+<dd>Free Software
+<br><dt>Platforms
+<dd>Various UNIX
+<br><dt>Location
+<dd><a href="http://home1.stofanet.dk/breese/debug/debug.tar.gz">http://home1.stofanet.dk/breese/debug/debug.tar.gz</a>
+<br><dt>Overview
+<dd>Provides code to generate a stack trace of the program at any point during
+execution using either a debugger or built-in methods found in the GNU C
+compiler or on some systems. 
 </dl>
 
 <li>TestCenter
@@ -10982,6 +10999,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>stack memory allocations: <a href="#Stack%20memory%20allocations">Stack memory allocations</a>
 <li>stack tracebacks: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
 <li>stack unwinding: <a href="#Call%20stacks%20and%20symbol%20tables">Call stacks and symbol tables</a>
+<li>StackTrace: <a href="#Related%20software">Related software</a>
 <li>static inline: <a href="#Building">Building</a>
 <li>static memory allocations: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>statistics: <a href="#Logging%20and%20tracing">Logging and tracing</a>
@@ -11254,12 +11272,16 @@ one.</p>
 an mpatrol profiling output file with the <code>file</code> command.</p>
 
 <li><a name="fn-43"></a>
-<p>Looking back at these statements about six
-months after they were written, it would appear that I have just written such a
-library judging by the number of architectures for which stack traversal is now
-supported.</p>
+<p>There is currently a library called StackTrace written by
+Bjorn Reese which invokes a debugger to generate a stack traceback on certain
+UNIX platforms.  This method would be too slow for mpatrol to use though.</p>
 
 <li><a name="fn-44"></a>
+<p>Looking back at these statements about six months after they
+were written, it would appear that I have just written such a library judging by
+the number of architectures for which stack traversal is now supported.</p>
+
+<li><a name="fn-45"></a>
 <p>This list can be
 considered to be a slightly more up to date version of <cite>Debugging Tools
 for Dynamic Storage Allocation and Memory Management</cite>

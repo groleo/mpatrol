@@ -7440,9 +7440,9 @@ H.1 Notes for all platforms
      would be write the implementations at a lower level in assembly,
      but this is much less portable.  Perhaps there is a library which
      can be used to perform this across many operating systems and
-     processor architectures, or maybe someone would like to write one?
-     I can think of many applications that would benefit from such a
-     library besides this one(1).
+     processor architectures, or maybe someone would like to write
+     one(1)?  I can think of many applications that would benefit from
+     such a library besides this one(2).
 
    * An alternative implementation for call stack traversal uses the
      functions `__builtin_frame_address()' and
@@ -7736,7 +7736,12 @@ H.1 Notes for all platforms
 
    ---------- Footnotes ----------
 
-   (1) Looking back at these statements about six months after they
+   (1) There is currently a library called StackTrace written by Bjorn
+Reese which invokes a debugger to generate a stack traceback on certain
+UNIX platforms.  This method would be too slow for mpatrol to use
+though.
+
+   (2) Looking back at these statements about six months after they
 were written, it would appear that I have just written such a library
 judging by the number of architectures for which stack traversal is now
 supported.
@@ -9795,6 +9800,24 @@ Netware platforms.
           Performs memory protection on PowerPC executables and helps
           detect memory leaks.
 
+   * StackTrace
+    Author
+          Bjorn Reese (<breese@mail1.stofanet.dk>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://home1.stofanet.dk/breese/debug/debug.tar.gz'
+
+    Overview
+          Provides code to generate a stack trace of the program at any
+          point during execution using either a debugger or built-in
+          methods found in the GNU C compiler or on some systems.
+
    * TestCenter
     Author
           CenterLine Development Systems (<info@centerline.com>)
@@ -11552,6 +11575,8 @@ stack:                                              See 5.2.
 stack memory allocations:                           See 5.2.
 stack tracebacks:                                   See 6.2.
 stack unwinding:                                    See 6.2.
+StackTrace:                                        
+          See ``Appendix J Related software''.
 static inline:                                     
           See ``I.2 Building''.
 static memory allocations:                          See 5.1.

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.138 2000-11-16 01:25:40 graeme Exp $
+@c $Id: mpatrol.texi,v 1.139 2000-11-16 18:37:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -8260,11 +8260,13 @@ work for unoptimised code.  A much better solution would be write the
 implementations at a lower level in assembly, but this is much less portable.
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
-write one?  I can think of many applications that would benefit from such a
-library besides this one@footnote{Looking back at these statements about six
-months after they were written, it would appear that I have just written such a
-library judging by the number of architectures for which stack traversal is now
-supported.}.
+write one@footnote{There is currently a library called StackTrace written by
+Bjorn Reese which invokes a debugger to generate a stack traceback on certain
+UNIX platforms.  This method would be too slow for mpatrol to use though.}?  I
+can think of many applications that would benefit from such a library besides
+this one@footnote{Looking back at these statements about six months after they
+were written, it would appear that I have just written such a library judging by
+the number of architectures for which stack traversal is now supported.}.
 
 @item
 An alternative implementation for call stack traversal uses the functions
@@ -10673,6 +10675,24 @@ MacOS
 @uref{http://www.onyx-tech.com/}
 @item Overview
 Performs memory protection on PowerPC executables and helps detect memory leaks.
+@end table
+
+@cindex StackTrace
+@item
+StackTrace
+@table @asis
+@item Author
+Bjorn Reese (@email{breese@@mail1.stofanet.dk})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://home1.stofanet.dk/breese/debug/debug.tar.gz}
+@item Overview
+Provides code to generate a stack trace of the program at any point during
+execution using either a debugger or built-in methods found in the GNU C
+compiler or on some systems.
 @end table
 
 @cindex TestCenter

@@ -7668,9 +7668,9 @@ Notes for all platforms
      would be write the implementations at a lower level in assembly,
      but this is much less portable.  Perhaps there is a library which
      can be used to perform this across many operating systems and
-     processor architectures, or maybe someone would like to write one?
-     I can think of many applications that would benefit from such a
-     library besides this one(1).
+     processor architectures, or maybe someone would like to write
+     one(1)?  I can think of many applications that would benefit from
+     such a library besides this one(2).
 
    * An alternative implementation for call stack traversal uses the
      functions `__builtin_frame_address()' and
@@ -7964,7 +7964,12 @@ Notes for all platforms
 
    ---------- Footnotes ----------
 
-   (1) Looking back at these statements about six months after they
+   (1) There is currently a library called StackTrace written by Bjorn
+Reese which invokes a debugger to generate a stack traceback on certain
+UNIX platforms.  This method would be too slow for mpatrol to use
+though.
+
+   (2) Looking back at these statements about six months after they
 were written, it would appear that I have just written such a library
 judging by the number of architectures for which stack traversal is now
 supported.
@@ -10064,6 +10069,24 @@ Netware platforms.
           Performs memory protection on PowerPC executables and helps
           detect memory leaks.
 
+   * StackTrace
+    Author
+          Bjorn Reese (<breese@mail1.stofanet.dk>)
+
+    License
+          Free Software
+
+    Platforms
+          Various UNIX
+
+    Location
+          `http://home1.stofanet.dk/breese/debug/debug.tar.gz'
+
+    Overview
+          Provides code to generate a stack trace of the program at any
+          point during execution using either a debugger or built-in
+          methods found in the GNU C compiler or on some systems.
+
    * TestCenter
     Author
           CenterLine Development Systems (<info@centerline.com>)
@@ -11467,6 +11490,7 @@ Index
 * stack memory allocations:              Stack memory allocations.
 * stack tracebacks:                      Call stacks and symbol tables.
 * stack unwinding:                       Call stacks and symbol tables.
+* StackTrace:                            Related software.
 * static inline:                         Building.
 * static memory allocations:             Static memory allocations.
 * statistics:                            Logging and tracing.
@@ -11643,22 +11667,23 @@ Node: New processor support340367
 Node: New file format support341050
 Node: Notes341440
 Node: Generic notes343051
-Ref: Generic notes-Footnote-1361403
-Node: UNIX notes361625
-Node: Amiga notes366378
-Node: Windows notes369993
-Node: Netware notes371364
-Node: Frequently asked questions373875
-Node: Documentation374498
-Node: Building378291
-Node: Linking384894
-Node: Running389166
-Node: Files402802
-Node: Related software405390
-Ref: Related software-Footnote-1439513
-Node: References439754
-Node: Copying442347
-Node: Function index470236
-Node: Index472494
+Ref: Generic notes-Footnote-1361407
+Ref: Generic notes-Footnote-2361625
+Node: UNIX notes361847
+Node: Amiga notes366600
+Node: Windows notes370215
+Node: Netware notes371586
+Node: Frequently asked questions374097
+Node: Documentation374720
+Node: Building378513
+Node: Linking385116
+Node: Running389388
+Node: Files403024
+Node: Related software405612
+Ref: Related software-Footnote-1440187
+Node: References440428
+Node: Copying443021
+Node: Function index470910
+Node: Index473168
 
 End Tag Table
