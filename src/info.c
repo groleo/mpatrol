@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.22 2000-05-08 20:45:01 graeme Exp $"
+#ident "$Id: info.c,v 1.23 2000-05-08 20:58:26 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -310,7 +310,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          */
         m = (infonode *) n->info;
         __mp_error(f, MP_POINTER " was freed with %s", p,
-                   __mp_alloctypenames[m->data.type]);
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -340,7 +340,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          * operator new or operator new[].
          */
         __mp_error(f, MP_POINTER " was allocated with %s", p,
-                   __mp_alloctypenames[m->data.type]);
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -494,7 +494,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          */
         m = (infonode *) n->info;
         __mp_error(f, MP_POINTER " was freed with %s", p,
-                   __mp_alloctypenames[m->data.type]);
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -522,7 +522,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          * the function used to free the block.
          */
         __mp_error(f, MP_POINTER " was allocated with %s", p,
-                   __mp_alloctypenames[m->data.type]);
+                   __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }

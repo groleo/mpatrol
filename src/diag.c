@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.21 2000-05-08 20:45:00 graeme Exp $"
+#ident "$Id: diag.c,v 1.22 2000-05-08 20:58:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -83,7 +83,7 @@ static unsigned long errors, warnings;
  * allocation function.
  */
 
-MP_GLOBAL char *__mp_alloctypenames[AT_MAX] =
+MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 {
     "malloc",
     "calloc",
@@ -257,7 +257,7 @@ MP_GLOBAL void __mp_warn(alloctype f, char *s, ...)
         __mp_openlogfile(NULL);
     __mp_diag("WARNING: ");
     if (f != AT_MAX)
-        __mp_diag("%s: ", __mp_alloctypenames[f]);
+        __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
     vfprintf(logfile, s, v);
     va_end(v);
@@ -277,7 +277,7 @@ MP_GLOBAL void __mp_error(alloctype f, char *s, ...)
         __mp_openlogfile(NULL);
     __mp_diag("ERROR: ");
     if (f != AT_MAX)
-        __mp_diag("%s: ", __mp_alloctypenames[f]);
+        __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
     vfprintf(logfile, s, v);
     va_end(v);
@@ -346,8 +346,8 @@ MP_GLOBAL void __mp_printsize(size_t l)
 
 MP_GLOBAL void __mp_printtype(infonode *n)
 {
-    __mp_diag("{%s:%lu:%lu}", __mp_alloctypenames[n->data.type],
-              n->data.alloc, n->data.realloc);
+    __mp_diag("{%s:%lu:%lu}", __mp_functionnames[n->data.type], n->data.alloc,
+              n->data.realloc);
 }
 
 
@@ -504,7 +504,7 @@ MP_GLOBAL void __mp_printalloc(symhead *y, allocnode *n)
 MP_GLOBAL void __mp_logalloc(infohead *h, size_t l, size_t a, alloctype f,
                              char *s, char *t, unsigned long u, stackinfo *v)
 {
-    __mp_diag("ALLOC: %s (%lu, ", __mp_alloctypenames[f], h->count);
+    __mp_diag("ALLOC: %s (%lu, ", __mp_functionnames[f], h->count);
     __mp_printsize(l);
     __mp_diag(", ");
     if (a == 0)
@@ -533,7 +533,7 @@ MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
                                alloctype f, char *s, char *t, unsigned long u,
                                stackinfo *v)
 {
-    __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+    __mp_diag("REALLOC: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", ");
     if (a == 0)
@@ -561,7 +561,7 @@ MP_GLOBAL void __mp_logrealloc(infohead *h, void *p, size_t l, size_t a,
 MP_GLOBAL void __mp_logfree(infohead *h, void *p, alloctype f, char *s, char *t,
                             unsigned long u, stackinfo *v)
 {
-    __mp_diag("FREE: %s (" MP_POINTER, __mp_alloctypenames[f], p);
+    __mp_diag("FREE: %s (" MP_POINTER, __mp_functionnames[f], p);
     __mp_diag(") [");
 #if MP_THREADS_SUPPORT
     __mp_diag("%lu|", __mp_threadid());
@@ -584,7 +584,7 @@ MP_GLOBAL void __mp_logmemset(infohead *h, void *p, size_t l, unsigned char c,
                               alloctype f, char *s, char *t, unsigned long u,
                               stackinfo *v)
 {
-    __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+    __mp_diag("MEMSET: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", 0x%02lX", c);
     __mp_diag(") [");
@@ -610,7 +610,7 @@ MP_GLOBAL void __mp_logmemcopy(infohead *h, void *p, void *q, size_t l,
                                stackinfo *v)
 {
     __mp_diag("MEMCOPY: %s (" MP_POINTER ", " MP_POINTER ", ",
-              __mp_alloctypenames[f], p, q);
+              __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(") [");
 #if MP_THREADS_SUPPORT
@@ -634,7 +634,7 @@ MP_GLOBAL void __mp_logmemlocate(infohead *h, void *p, size_t l, void *q,
                                  size_t m, alloctype f, char *s, char *t,
                                  unsigned long u, stackinfo *v)
 {
-    __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_alloctypenames[f], p);
+    __mp_diag("MEMFIND: %s (" MP_POINTER ", ", __mp_functionnames[f], p);
     __mp_printsize(l);
     __mp_diag(", " MP_POINTER ", ", q);
     __mp_printsize(m);
@@ -661,7 +661,7 @@ MP_GLOBAL void __mp_logmemcompare(infohead *h, void *p, void *q, size_t l,
                                   unsigned long u, stackinfo *v)
 {
     __mp_diag("MEMCMP: %s (" MP_POINTER ", " MP_POINTER ", ",
-              __mp_alloctypenames[f], p, q);
+              __mp_functionnames[f], p, q);
     __mp_printsize(l);
     __mp_diag(") [");
 #if MP_THREADS_SUPPORT

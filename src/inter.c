@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.28 2000-04-24 10:18:34 graeme Exp $"
+#ident "$Id: inter.c,v 1.29 2000-05-08 20:58:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -901,7 +901,7 @@ int __mp_printinfo(void *p)
         fputs("    freed by:           ", stderr);
     else
         fputs("    allocated by:       ", stderr);
-    fprintf(stderr, "%s\n", __mp_alloctypenames[m->data.type]);
+    fprintf(stderr, "%s\n", __mp_functionnames[m->data.type]);
     fprintf(stderr, "    allocation index:   %lu\n", m->data.alloc);
     fprintf(stderr, "    reallocation index: %lu\n", m->data.realloc);
 #if MP_THREADS_SUPPORT

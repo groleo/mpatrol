@@ -41,7 +41,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT char *__mp_alloctypenames[AT_MAX];
+MP_EXPORT char *__mp_functionnames[AT_MAX];
 
 
 MP_EXPORT char *__mp_logfile(char *);
