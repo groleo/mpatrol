@@ -33,7 +33,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.6 2000-04-05 19:44:24 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.7 2000-04-06 00:25:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -244,21 +244,9 @@ static void addoption(char *o, char *v, int s)
 
 static void setoptions(void)
 {
-    char *s;
-
     sprintf(options, "%s=", MP_OPTIONS);
     optlen = strlen(options);
-    /* The environment variable may already have been set, in which case
-     * we will append options to the end of it so that the command line
-     * options override the existing environment.
-     */
-    if ((s = getenv(MP_OPTIONS)) && (*s != '\0'))
-    {
-        addoption(s, NULL, 1);
-        addoption("LOGFILE", logfile, 0);
-    }
-    else
-        addoption("LOGFILE", logfile, 1);
+    addoption("LOGFILE", logfile, 1);
     if (allocbyte)
         addoption("ALLOCBYTE", allocbyte, 0);
     if (allocstop)
@@ -324,39 +312,15 @@ static void setoptions(void)
 }
 
 
-#if MP_PRELOAD_SUPPORT
-/* Build the environment variable containing details of libraries to preload.
- */
-
-static void setlibraries(void)
-{
-    static char s[256];
-
-    /* The dynamic linker on some UNIX systems supports requests for it to
-     * preload a specified list of shared libraries before running a process,
-     * via the LD_PRELOAD environment variable.  If any of the specified
-     * libraries only exist as archive libraries then the mpatrol library
-     * should be built to contain them since there is no way to preload an
-     * archive library.  However, this may have repercussions when building a
-     * shared library from position-dependent code.
-     */
-    sprintf(s, "%s=%s", MP_PRELOAD_NAME, MP_PRELOAD_LIBS);
-    if (putenv(s))
-    {
-        fprintf(stderr, "%s: Cannot set environment variable `%s'\n", progname,
-                MP_PRELOAD_NAME);
-        exit(EXIT_FAILURE);
-    }
-}
-#endif /* MP_PRELOAD_SUPPORT */
-
-
 /* Convert the command line options to mpatrol library options and run the
  * specified command and arguments.
  */
 
 int main(int argc, char **argv)
 {
+#if MP_PRELOAD_SUPPORT
+    static char p[256];
+#endif /* MP_PRELOAD_SUPPORT */
     char *s;
     size_t i, l;
     int c, d, e, r, v;
@@ -472,8 +436,24 @@ int main(int argc, char **argv)
     }
     setoptions();
 #if MP_PRELOAD_SUPPORT
+    /* The dynamic linker on some UNIX systems supports requests for it to
+     * preload a specified list of shared libraries before running a process,
+     * via the LD_PRELOAD environment variable.  If any of the specified
+     * libraries only exist as archive libraries then the mpatrol library
+     * should be built to contain them since there is no way to preload an
+     * archive library.  However, this may have repercussions when building a
+     * shared library from position-dependent code.
+     */
     if (d == 1)
-        setlibraries();
+    {
+        sprintf(p, "%s=%s", MP_PRELOAD_NAME, MP_PRELOAD_LIBS);
+        if (putenv(p))
+        {
+            fprintf(stderr, "%s: Cannot set environment variable `%s'\n",
+                    progname, MP_PRELOAD_NAME);
+            exit(EXIT_FAILURE);
+        }
+    }
 #endif /* MP_PRELOAD_SUPPORT */
     /* We now prepare to run the command that is to be tested.  Because we
      * are using system() to run the command, we need to ensure that all
@@ -486,11 +466,11 @@ int main(int argc, char **argv)
      */
     for (i = l = 0; i < argc; i++)
     {
-        l += strlen(argv[i]) + (i > 0);
+        l += strlen(argv[i]) + 1;
         if (strchr(argv[i], ' '))
             l += 2;
     }
-    if ((s = (char *) malloc(l + 1)) == NULL)
+    if ((s = (char *) malloc(l)) == NULL)
     {
         fprintf(stderr, "%s: Out of memory\n", progname);
         exit(EXIT_FAILURE);
