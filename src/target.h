@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.33 2001-09-06 21:35:07 graeme Exp $
+ * $Id: target.h,v 1.34 2001-09-19 21:08:59 graeme Exp $
  */
 
 
@@ -308,6 +308,9 @@
 
 
 #ifndef ENVIRON
+#if ARCH == ARCH_ALPHA || ARCH == ARCH_IA64
+#define ENVIRON ENVIRON_64
+#else /* ARCH */
 #if SYSTEM == SYSTEM_IRIX
 #if defined(ABI64) || defined(_ABI64)
 #define ENVIRON ENVIRON_64
@@ -329,12 +332,9 @@
 #define ENVIRON ENVIRON_32
 #endif /* arch64 */
 #else /* SYSTEM */
-#if ARCH == ARCH_ALPHA || ARCH == ARCH_IA64
-#define ENVIRON ENVIRON_64
-#else /* ARCH */
 #define ENVIRON ENVIRON_32
-#endif /* ARCH */
 #endif /* SYSTEM */
+#endif /* ARCH */
 #endif /* ENVIRON */
 
 
