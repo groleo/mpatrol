@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.135 2001-07-26 17:46:51 graeme Exp $"
+#ident "$Id: inter.c,v 1.136 2001-07-26 17:49:52 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.135 2001-07-26 17:46:51 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.136 2001-07-26 17:49:52 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1533,6 +1533,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 /* Return the full version number of the mpatrol library.
  */
 
+MP_API
 unsigned long
 __mp_libversion(void)
 {
@@ -1543,6 +1544,7 @@ __mp_libversion(void)
 /* Return an error message corresponding to a given error type.
  */
 
+MP_API
 char *
 __mp_strerror(errortype e)
 {
@@ -1555,6 +1557,7 @@ __mp_strerror(errortype e)
 /* Return the name of the function corresponding to a given allocation type.
  */
 
+MP_API
 char *
 __mp_function(alloctype f)
 {
@@ -1567,6 +1570,7 @@ __mp_function(alloctype f)
 /* Set the user data for a given memory allocation.
  */
 
+MP_API
 int
 __mp_setuser(void *p, void *d)
 {
@@ -1601,6 +1605,7 @@ __mp_setuser(void *p, void *d)
 /* Set the marked flag for a given memory allocation.
  */
 
+MP_API
 int
 __mp_setmark(void *p)
 {
@@ -1639,6 +1644,7 @@ __mp_setmark(void *p)
 /* Obtain any details about the memory block that contains a given address.
  */
 
+MP_API
 int
 __mp_info(void *p, allocinfo *d)
 {
@@ -1732,6 +1738,7 @@ __mp_info(void *p, allocinfo *d)
 /* Obtain any details about the function symbol that contains a given address.
  */
 
+MP_API
 int
 __mp_syminfo(void *p, symbolinfo *d)
 {
@@ -1788,6 +1795,7 @@ __mp_syminfo(void *p, symbolinfo *d)
  * the standard error file stream instead of the log file.
  */
 
+MP_API
 int
 __mp_printinfo(void *p)
 {

@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.50 2001-07-26 17:46:51 graeme Exp $
+ * $Id: inter.h,v 1.51 2001-07-26 17:49:52 graeme Exp $
  */
 
 
@@ -142,14 +142,14 @@ MP_API void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *,
                             char *, unsigned long, size_t);
 MP_API int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
                            unsigned long, size_t);
-unsigned long __mp_libversion(void);
-char *__mp_strerror(errortype);
-char *__mp_function(alloctype);
-int __mp_setuser(void *, void *);
-int __mp_setmark(void *);
-int __mp_info(void *, allocinfo *);
-int __mp_syminfo(void *, symbolinfo *);
-int __mp_printinfo(void *);
+MP_API unsigned long __mp_libversion(void);
+MP_API char *__mp_strerror(errortype);
+MP_API char *__mp_function(alloctype);
+MP_API int __mp_setuser(void *, void *);
+MP_API int __mp_setmark(void *);
+MP_API int __mp_info(void *, allocinfo *);
+MP_API int __mp_syminfo(void *, symbolinfo *);
+MP_API int __mp_printinfo(void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
 size_t __mp_iterateall(int (*)(void *, void *), void *);
