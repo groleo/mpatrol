@@ -45,6 +45,9 @@
 #else /* MP_LIBRARYSTACK_SUPPORT */
 #if TARGET == TARGET_UNIX
 #include <setjmp.h>
+#if MP_SIGINFO_SUPPORT
+#include <siginfo.h>
+#endif /* MP_SIGINFO_SUPPORT */
 #if ARCH == ARCH_SPARC
 #include <ucontext.h>
 #ifndef R_SP
@@ -57,7 +60,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.16 2000-06-26 22:57:52 graeme Exp $"
+#ident "$Id: stack.c,v 1.17 2000-06-29 12:52:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -139,8 +142,13 @@ static unsigned char recursive;
 #endif /* SYSTEM */
 #else /* MP_LIBRARYSTACK_SUPPORT */
 static jmp_buf environment;
+#if MP_SIGINFO_SUPPORT
+static struct sigaction bushandler;
+static struct sigaction segvhandler;
+#else /* MP_SIGINFO_SUPPORT */
 static void (*bushandler)(int);
 static void (*segvhandler)(int);
+#endif /* MP_SIGINFO_SUPPORT */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
 
@@ -347,6 +355,9 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
     jmp_buf j;
 #endif /* TARGET */
 #else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#if MP_SIGINFO_SUPPORT
+    struct sigaction i;
+#endif /* MP_SIGINFO_SUPPORT */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -499,8 +510,16 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
      * to cause major problems for stack traversal on some platforms.
      */
 #if TARGET == TARGET_UNIX
+#if MP_SIGINFO_SUPPORT
+    i.sa_flags = 0;
+    (void *) i.sa_handler = (void *) stackhandler;
+    sigfillset(&i.sa_mask);
+    sigaction(SIGBUS, &i, &bushandler);
+    sigaction(SIGSEGV, &i, &segvhandler);
+#else /* MP_SIGINFO_SUPPORT */
     bushandler = signal(SIGBUS, stackhandler);
     segvhandler = signal(SIGSEGV, stackhandler);
+#endif /* MP_SIGINFO_SUPPORT */
     if (setjmp(environment))
         __mp_newframe(p, p->first);
     else
@@ -545,15 +564,28 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
         }
     }
 #if TARGET == TARGET_UNIX
+#if MP_SIGINFO_SUPPORT
+    sigaction(SIGBUS, &bushandler, NULL);
+    sigaction(SIGSEGV, &segvhandler, NULL);
+#else /* MP_SIGINFO_SUPPORT */
     signal(SIGBUS, bushandler);
     signal(SIGSEGV, segvhandler);
+#endif /* MP_SIGINFO_SUPPORT */
 #endif /* TARGET */
 #elif TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
     /* For the MIPS architecture we perform code reading to determine the
      * frame pointers and the return addresses.
      */
+#if MP_SIGINFO_SUPPORT
+    i.sa_flags = 0;
+    (void *) i.sa_handler = (void *) stackhandler;
+    sigfillset(&i.sa_mask);
+    sigaction(SIGBUS, &i, &bushandler);
+    sigaction(SIGSEGV, &i, &segvhandler);
+#else /* MP_SIGINFO_SUPPORT */
     bushandler = signal(SIGBUS, stackhandler);
     segvhandler = signal(SIGSEGV, stackhandler);
+#endif /* MP_SIGINFO_SUPPORT */
     if (setjmp(environment))
         __mp_newframe(p, p->first);
     else
@@ -572,8 +604,13 @@ MP_GLOBAL int __mp_getframe(stackinfo *p)
             p->addr = NULL;
         }
     }
+#if MP_SIGINFO_SUPPORT
+    sigaction(SIGBUS, &bushandler, NULL);
+    sigaction(SIGSEGV, &segvhandler, NULL);
+#else /* MP_SIGINFO_SUPPORT */
     signal(SIGBUS, bushandler);
     signal(SIGSEGV, segvhandler);
+#endif /* MP_SIGINFO_SUPPORT */
 #endif /* TARGET && ARCH */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
     return r;
