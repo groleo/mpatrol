@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #if TARGET == TARGET_UNIX
 #include <unistd.h>
 #if SYSTEM == SYSTEM_LINUX
@@ -49,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.9 2001-02-06 21:58:42 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.10 2001-02-08 18:15:26 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.9 2001-02-06 21:58:42 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.10 2001-02-08 18:15:26 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -234,6 +235,16 @@ __mp_init(void)
 void
 __mp_fini(void)
 {
+}
+
+
+/* Set an mpatrol option after the library has been initialised.
+ */
+
+unsigned long
+__mp_setoption(long o, unsigned long v)
+{
+    return ~0L;
 }
 
 
@@ -519,11 +530,31 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 }
 
 
+/* Return the name of the function corresponding to a given allocation type.
+ */
+
+char *
+__mp_function(alloctype f)
+{
+    return NULL;
+}
+
+
 /* Obtain any details about the memory block that contains a given address.
  */
 
 int
 __mp_info(void *p, allocinfo *d)
+{
+    return 0;
+}
+
+
+/* Obtain any details about the function symbol that contains a given address.
+ */
+
+int
+__mp_syminfo(void *p, symbolinfo *d)
 {
     return 0;
 }
@@ -652,6 +683,16 @@ __mp_printf(char *s, ...)
 }
 
 
+/* Write user data to the mpatrol log file.
+ */
+
+int
+__mp_vprintf(char *s, va_list v)
+{
+    return 0;
+}
+
+
 /* Write a hex dump for a specified memory location to the mpatrol log file.
  */
 
@@ -666,6 +707,17 @@ __mp_logmemory(void *p, size_t l)
 
 int
 __mp_logstack(size_t k)
+{
+    return 0;
+}
+
+
+/* Write the details about the memory block that contains a given address to
+ * the mpatrol log file.
+ */
+
+int
+__mp_logaddr(void *p)
 {
     return 0;
 }
@@ -686,6 +738,17 @@ __mp_edit(char *f, unsigned long l)
 
 int
 __mp_list(char *f, unsigned long l)
+{
+    return 0;
+}
+
+
+/* Edit or list a given source file at a specific line, but only if the EDIT
+ * or LIST options are in effect.
+ */
+
+int
+__mp_view(char *f, unsigned long l)
 {
     return 0;
 }

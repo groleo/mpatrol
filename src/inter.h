@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include "info.h"
+#include <stdarg.h>
 
 
 /* An allocinfo structure provides information about a particular memory
@@ -59,6 +60,23 @@ typedef struct allocinfo
 allocinfo;
 
 
+/* A symbolinfo structure provides information about a particular symbol.
+ * This must be kept up to date with the definition of __mp_symbolinfo in
+ * mpatrol.h.
+ */
+
+typedef struct symbolinfo
+{
+    char *name;         /* symbol name */
+    char *object;       /* module symbol located in */
+    void *addr;         /* start address */
+    size_t size;        /* size of symbol */
+    char *file;         /* file name corresponding to address */
+    unsigned long line; /* line number corresponding to address */
+}
+symbolinfo;
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -67,6 +85,7 @@ extern "C"
 
 void __mp_init(void);
 void __mp_fini(void);
+unsigned long __mp_setoption(long, unsigned long);
 infohead *__mp_memhead(void);
 void *__mp_alloc(size_t, size_t, alloctype, char *, char *, unsigned long,
                  char *, size_t, size_t);
@@ -83,7 +102,9 @@ void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *, char *,
                      unsigned long, size_t);
 int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
                     unsigned long, size_t);
+char *__mp_function(alloctype);
 int __mp_info(void *, allocinfo *);
+int __mp_syminfo(void *, symbolinfo *);
 int __mp_printinfo(void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *), unsigned long);
@@ -96,10 +117,13 @@ void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(char *, ...);
+int __mp_vprintf(char *, va_list);
 void __mp_logmemory(void *, size_t);
 int __mp_logstack(size_t);
+int __mp_logaddr(void *);
 int __mp_edit(char *, unsigned long);
 int __mp_list(char *, unsigned long);
+int __mp_view(char *, unsigned long);
 void chkr_set_right(void *, size_t, unsigned char);
 void chkr_copy_bitmap(void *, void *, size_t);
 void chkr_check_addr(void *, size_t, unsigned char);

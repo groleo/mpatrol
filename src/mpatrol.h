@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
 #include <new>
@@ -294,6 +295,21 @@ typedef struct __mp_allocinfo
 __mp_allocinfo;
 
 
+/* The details of a particular function symbol.
+ */
+
+typedef struct __mp_symbolinfo
+{
+    char *name;         /* symbol name */
+    char *object;       /* module symbol located in */
+    void *addr;         /* start address */
+    size_t size;        /* size of symbol */
+    char *file;         /* file name corresponding to address */
+    unsigned long line; /* line number corresponding to address */
+}
+__mp_symbolinfo;
+
+
 /* The structure filled by mallinfo().
  */
 
@@ -552,6 +568,7 @@ extern "C"
 
 void __mp_init(void);
 void __mp_fini(void);
+unsigned long __mp_setoption(long, unsigned long);
 void *__mp_alloc(size_t, size_t, __mp_alloctype, MP_CONST char *,
                  MP_CONST char *, unsigned long, MP_CONST char *, size_t,
                  size_t);
@@ -572,7 +589,9 @@ void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
                      unsigned long, size_t);
 int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
+char *__mp_function(__mp_alloctype);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
+int __mp_syminfo(MP_CONST void *, __mp_symbolinfo *);
 int __mp_printinfo(MP_CONST void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *), unsigned long);
@@ -586,10 +605,13 @@ void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
 int __mp_printf(MP_CONST char *, ...);
+int __mp_vprintf(MP_CONST char *, va_list);
 void __mp_logmemory(MP_CONST void *, size_t);
 int __mp_logstack(size_t);
+int __mp_logaddr(MP_CONST void *);
 int __mp_edit(MP_CONST char *, unsigned long);
 int __mp_list(MP_CONST char *, unsigned long);
+int __mp_view(MP_CONST char *, unsigned long);
 
 
 #ifdef __cplusplus
@@ -606,6 +628,7 @@ int __mp_list(MP_CONST char *, unsigned long);
 
 #define __mp_init() ((void) 0)
 #define __mp_fini() ((void) 0)
+#define __mp_setoption(o, v) ((unsigned long) ~0L)
 #define __mp_alloc(l, a, f, s, t, u, g, h, k) ((void *) NULL)
 #define __mp_strdup(p, l, f, s, t, u, k) ((char *) NULL)
 #define __mp_realloc(p, l, a, f, s, t, u, g, h, k) ((void *) NULL)
@@ -614,7 +637,9 @@ int __mp_list(MP_CONST char *, unsigned long);
 #define __mp_copymem(p, q, l, c, f, s, t, u, k) ((void *) NULL)
 #define __mp_locatemem(p, l, q, m, f, s, t, u, k) ((void *) NULL)
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
+#define __mp_function(f) ((char *) NULL)
 #define __mp_info(p, d) ((int) 0)
+#define __mp_syminfo(p, d) ((int) 0)
 #define __mp_printinfo(p) ((int) 0)
 #define __mp_snapshot() ((unsigned long) 0)
 #define __mp_iterate(p, s) ((size_t) 0)
@@ -626,10 +651,13 @@ int __mp_list(MP_CONST char *, unsigned long);
 #define __mp_nomemory(h) ((void (*)(void)) NULL)
 #define __mp_pushdelstack(s, t, u) ((void) 0)
 #define __mp_popdelstack(s, t, u) ((void) 0)
+#define __mp_vprintf(s, v) ((int) 0)
 #define __mp_logmemory(p, l) ((void) 0)
 #define __mp_logstack(k) ((int) 0)
+#define __mp_logaddr(p) ((int) 0)
 #define __mp_edit(f, l) ((int) 0)
 #define __mp_list(f, l) ((int) 0)
+#define __mp_view(f, l) ((int) 0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ == 199901L)
 #define __mp_printf(s, ...) ((int) 0)

@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.77 2001-02-08 00:02:44 graeme Exp $"
+#ident "$Id: inter.c,v 1.78 2001-02-08 18:15:26 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.77 2001-02-08 00:02:44 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.78 2001-02-08 18:15:26 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -502,6 +502,31 @@ __mp_fini(void)
         memhead.init = 0;
     }
     restoresignals();
+}
+
+
+/* Set an mpatrol option after the library has been initialised.
+ */
+
+unsigned long
+__mp_setoption(long o, unsigned long v)
+{
+    unsigned long r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (o > 0)
+        r = 1;
+    else
+    {
+        o = -o;
+        if ((r = __mp_setopt(&memhead, (unsigned long) o, v)) &&
+            (o != OPT_SETFLAGS) && (o != OPT_UNSETFLAGS))
+            r = 1;
+    }
+    restoresignals();
+    return r;
 }
 
 
@@ -1196,6 +1221,18 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 }
 
 
+/* Return the name of the function corresponding to a given allocation type.
+ */
+
+char *
+__mp_function(alloctype f)
+{
+    if ((f >= (alloctype) 0) && (f < AT_MAX))
+        return __mp_functionnames[f];
+    return NULL;
+}
+
+
 /* Obtain any details about the memory block that contains a given address.
  */
 
@@ -1212,15 +1249,14 @@ __mp_info(void *p, allocinfo *d)
         __mp_init();
     /* Check that we know something about the address that was supplied.
      */
-    if (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) &&
-        ((n = __mp_findfreed(&memhead.alloc, p)) == NULL))
+    if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
     {
         restoresignals();
         return 0;
     }
     /* We now fill in the details for the supplied structure.
      */
-    m = (infonode *) n->info;
     d->block = n->block;
     d->size = n->size;
     d->type = m->data.type;
@@ -1256,6 +1292,58 @@ __mp_info(void *p, allocinfo *d)
 }
 
 
+/* Obtain any details about the function symbol that contains a given address.
+ */
+
+int
+__mp_syminfo(void *p, symbolinfo *d)
+{
+    symnode *n;
+    char *s, *t;
+    unsigned long u;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    n = __mp_findsymbol(&memhead.syms, p);
+    r = __mp_findsource(&memhead.syms, p, &s, &t, &u);
+    if (((n == NULL) && (s != NULL)) || (t != NULL))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        if ((n == NULL) && (s != NULL))
+            s = __mp_addstring(&memhead.syms.strings, s);
+        if (t != NULL)
+            t = __mp_addstring(&memhead.syms.strings, t);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    if ((n != NULL) || (r != 0))
+    {
+        if (n != NULL)
+        {
+            d->name = n->data.name;
+            d->object = n->data.file;
+            d->addr = n->data.addr;
+            d->size = n->data.size;
+        }
+        else
+        {
+            d->name = s;
+            d->object = NULL;
+            d->addr = NULL;
+            d->size = 0;
+        }
+        d->file = t;
+        d->line = u;
+        r = 1;
+    }
+    restoresignals();
+    return r;
+}
+
+
 /* Display any details about the memory block that contains a given address.
  * This is for calling within a symbolic debugger and will result in output to
  * the standard error file stream instead of the log file.
@@ -1272,17 +1360,21 @@ __mp_printinfo(void *p)
     savesignals();
     /* Check that we know something about the address that was supplied.
      */
+    n = NULL;
     if (!memhead.init || memhead.fini ||
-        (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) &&
-         ((n = __mp_findfreed(&memhead.alloc, p)) == NULL)))
+        ((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
+        ((m = (infonode *) n->info) == NULL))
     {
-        fprintf(stderr, "address " MP_POINTER " not in heap\n", p);
+        fprintf(stderr, "address " MP_POINTER, p);
+        if (n == NULL)
+            fputs(" not in heap\n", stderr);
+        else
+            fputs(" is in free memory\n", stderr);
         restoresignals();
         return 0;
     }
     /* We now display the details of the associated memory block.
      */
-    m = (infonode *) n->info;
     fprintf(stderr, "address " MP_POINTER " located in %s block:\n", p,
             (m->data.flags & FLG_FREED) ? "freed" : "allocated");
     fprintf(stderr, "    start of block:     " MP_POINTER "\n", n->block);
@@ -1594,6 +1686,45 @@ __mp_printf(char *s, ...)
 }
 
 
+/* Write user data to the mpatrol log file.
+ */
+
+int
+__mp_vprintf(char *s, va_list v)
+{
+    char b[1024];
+    char *p, *t;
+    size_t l;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    r = vsprintf(b, s, v);
+    if (r >= 0)
+    {
+        l = strlen(MP_PRINTPREFIX);
+        for (t = b; p = strchr(t, '\n'); t = p + 1)
+        {
+            *p = '\0';
+            if (*t != '\0')
+            {
+                __mp_diag("%s%s", MP_PRINTPREFIX, t);
+                r += l;
+            }
+            __mp_diag("\n");
+        }
+        if (*t != '\0')
+        {
+            __mp_diag("%s%s\n", MP_PRINTPREFIX, t);
+            r += l + 1;
+        }
+    }
+    restoresignals();
+    return r;
+}
+
+
 /* Write a hex dump for a specified memory location to the mpatrol log file.
  */
 
@@ -1641,6 +1772,33 @@ __mp_logstack(size_t k)
 }
 
 
+/* Write the details about the memory block that contains a given address to
+ * the mpatrol log file.
+ */
+
+int
+__mp_logaddr(void *p)
+{
+    allocnode *n;
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (((n = __mp_findnode(&memhead.alloc, p, 1)) == NULL) ||
+        (n->info == NULL))
+        r = 0;
+    else
+    {
+        __mp_printalloc(&memhead.syms, n);
+        __mp_diag("\n");
+        r = 1;
+    }
+    restoresignals();
+    return r;
+}
+
+
 /* Invoke a text editor on a given source file at a specific line.
  */
 
@@ -1670,6 +1828,29 @@ __mp_list(char *f, unsigned long l)
     if (!memhead.init)
         __mp_init();
     r = __mp_editfile(f, l, 1);
+    restoresignals();
+    return r;
+}
+
+
+/* Edit or list a given source file at a specific line, but only if the EDIT
+ * or LIST options are in effect.
+ */
+
+int
+__mp_view(char *f, unsigned long l)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (__mp_diagflags & FLG_EDIT)
+        r = __mp_editfile(f, l, 0);
+    else if (__mp_diagflags & FLG_LIST)
+        r = __mp_editfile(f, l, 1);
+    else
+        r = 0;
     restoresignals();
     return r;
 }
