@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 25th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
 October, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 25th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
 October, 2000.
 
 Foreword
@@ -2122,9 +2122,9 @@ to be able to see the caller and callee relationships for all functions
 that allocated memory, either directly or indirectly.  This graph is
 shown in a tabular form similar to that of `gprof', but it can also be
 written to a graph specification file for later processing by `dot'.
-The `dot' command is part of GraphViz, an excellent graph visualisation
-package that was developed at AT&T Bell Labs and is available for free
-download for UNIX and Windows platforms from
+The `dot' and `dotty' commands are part of GraphViz, an excellent graph
+visualisation package that was developed at AT&T Bell Labs and is
+available for free download for UNIX and Windows platforms from
 `http://www.research.att.com/sw/tools/graphviz/'.
 
    Only allocations and deallocations are recorded, with each
@@ -2462,6 +2462,84 @@ like:
 by freeing the string as well as the structure at line 77.  A version
 of the above program that does not contain the memory leak can be found
 in `tests/profile/test2.c'.
+
+   As a final demonstration of mpatrol's profiling features we will
+attempt to profile a real application in order to see where the memory
+allocations come from.  Since all of the following steps were performed
+on a Solaris machine, the `--dynamic' option of the `mpatrol' command
+was used to allow us to replace the system memory allocation routines
+with mpatrol's routines without requiring a relink.  It also means that
+we can profile all of the child processes that were created by the
+application as well.
+
+   The application that we are going to profile is the GNU C compiler,
+`gcc' (version 2.95.2), which is quite a complicated and large program.
+The actual `gcc' command is really the compiler driver which invokes the
+C preprocessor followed by the compiler, the assembler, the prelinker
+and finally the linker (well, it does in this example).  On Solaris, the
+`gcc' distribution uses the system assembler and linker which come with
+no symbol tables in their executable files so we will not be profiling
+them.
+
+   For the purpose of this demonstration we will only be looking at the
+graph files produced by the `--graph-file' option of the `mprof'
+command, but ordinarily you would want to look at the tables that
+`mprof' produces as well.  All of the command line examples use the
+`bash' shell but in most cases these will work in other shells with a
+minimal amount of changes.
+
+   We will use `tests/profile/test2.c' as the source file to compile
+with `gcc' and we'll turn on optimisation in order to cause `gcc' to
+allocate a bit more memory than it would normally.  When running it
+through the `mpatrol' command we also use `--check=0' so that we disable
+mpatrol's internal checks -- we don't need them if we are only
+profiling.  Note that use is also made of the format string feature of
+the `--log-file' and `--prof-file' options so that it is clear which
+mpatrol log and profiling output files belong to which processes.
+
+     bash$ mpatrol --dynamic --log-file=%p.log --prof-file=%p.out
+                   --prof --check=0 gcc -O -o test2 test2.c
+     bash$ ls *.log *.out
+     as.log         cc1.out        cpp.log        gcc.out
+     as.out         collect2.log   cpp.out        ld.log
+     cc1.log        collect2.out   gcc.log        ld.out
+
+   As mentioned above, we're not interested in the mpatrol log and
+profiling output files for `as' and `ld' so we'll delete them.  We can
+now use `mprof' to create graph specification files for each of the
+profiling output files produced.  You can find these graph
+specification files in the `extra' directory in the mpatrol
+distribution.
+
+     bash$ rm as.log as.out ld.log ld.out
+     bash$ ls *.out
+     cc1.out        collect2.out   cpp.out        gcc.out
+     bash$ for file in *.out
+     > do
+     >     mprof --graph-file=`basename $file .out`.dot $file
+     > done >/dev/null
+     bash$ ls *.dot
+     cc1.dot        collect2.dot   cpp.dot        gcc.dot
+
+   The graph specification files that have now been produced can be
+viewed and manipulated with the `dotty' command, or they can be
+converted to various image formats with the `dot' command.  However,
+this presumes that you already have the GraphViz graph visualisation
+package installed.  If you have then you can convert the graph
+specification files to GIF and postscript images using the following
+commands.  If not, you can still view the graphs produced in the HTML,
+DVI, postscript and PDF versions of this manual, or you can look at the
+relevant files in the `doc/images' directory in the mpatrol
+distribution.
+
+     bash$ dot -Tgif -Gsize="6,3" -Gratio=fill -o gcc.gif gcc.dot
+     bash$ dot -Tgif -Gsize="6,3" -Gratio=fill -o cpp.gif cpp.dot
+     bash$ dot -Tgif -Gsize="7,4" -Gratio=fill -o cc1.gif cc1.dot
+     bash$ dot -Tgif -Gsize="4,3" -Gratio=fill -o collect2.gif collect2.dot
+     bash$ dot -Tps -Gsize="6,3" -Gratio=fill -o gcc.ps gcc.dot
+     bash$ dot -Tps -Gsize="6,3" -Gratio=fill -o cpp.ps cpp.dot
+     bash$ dot -Tps -Gsize="9,6" -Gratio=fill -Grotate=90 -o cc1.ps cc1.dot
+     bash$ dot -Tps -Gsize="4,3" -Gratio=fill -o collect2.ps collect2.dot
 
    Much of the functionality of this implementation of memory
 allocation profiling is based upon `mprof' by Benjamin Zorn and Paul
@@ -9081,6 +9159,7 @@ archive library:                                    See 2.
 arenas:                                             See 9.
 articles:                                          
           See ``Appendix K References''.
+assembler:                                          See 8.
 ATOM:                                              
           See ``Appendix J Related software''.
 author, contacting:                                
@@ -9091,6 +9170,7 @@ AUTOSAVE:
           See ``Appendix B Environment''.
 backwards compatibility:                           
           See ``I.3 Linking''.
+bash:                                               See 8.
 BASIC:                                              See 5.
 batch testing:                                      See 7.6.
 best fit:                                           See 10.
@@ -9216,6 +9296,8 @@ documentation formats:
 documentation questions:                           
           See ``I.1 Documentation''.
 dot:                                                See 8.
+dotty:                                              See 8.
+driver:                                             See 8.
 DRS/NX, SPARC:                                     
           See ``Appendix G Supported systems''.
 dumping memory:                                     See 11.4.
@@ -9278,6 +9360,7 @@ foreword:
           See ``Foreword''.
 FORMAT:                                            
           See ``I.2 Building''.
+format string:                                      See 8.
 Fortify:                                           
           See ``Appendix J Related software''.
 FORTRAN:                                            See 5.
@@ -9319,6 +9402,9 @@ GlowCode:
           See ``Appendix J Related software''.
 GNU C library:                                     
           See ``Appendix J Related software''.
+gprof:                                              See 8.
+graph:                                              See 8.
+graph specification file:                           See 8.
 GraphViz:                                           See 8.
 Great Circle:                                      
           See ``Appendix J Related software''.
@@ -9671,6 +9757,8 @@ portability:                                        See 9.
 POSIX threads:                                      See 6.3.
 postscript:                                        
           See ``I.1 Documentation''.
+prelinker:                                          See 8.
+preprocessor:                                       See 8.
 PRESERVE:                                          
           See ``Appendix B Environment''.
 preserve freed contents:                            See 7.3.
