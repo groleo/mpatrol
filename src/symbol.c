@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.18 2000-04-24 10:12:59 graeme Exp $"
+#ident "$Id: symbol.c,v 1.19 2000-04-26 23:11:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -295,6 +295,7 @@ static int addsymbol(symhead *y, SYMENT *p, char *f, char *s)
         }
         else
             n->data.size = 0;
+        n->data.index = 0;
         n->data.offset = 0;
         /* The linkage information is required for when we look up a symbol.
          */
@@ -333,6 +334,7 @@ static int addsymbol(symhead *y, Elf32_Sym *p, char *f, char *s, size_t b)
         n->data.name = r;
         n->data.addr = (void *) a;
         n->data.size = p->st_size;
+        n->data.index = 0;
         n->data.offset = 0;
         /* The linkage information is required for when we look up a symbol.
          */
@@ -376,6 +378,7 @@ static int addsymbol(symhead *y, asymbol *p, char *f, char *s, size_t b)
          * be calculated in __mp_fixsymbols().
          */
         n->data.size = 0;
+        n->data.index = 0;
         n->data.offset = 0;
         /* The linkage information is required for when we look up a symbol.
          */

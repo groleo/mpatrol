@@ -58,6 +58,7 @@ typedef union symnode
         char *name;           /* symbol name */
         void *addr;           /* start address */
         size_t size;          /* size of symbol */
+        unsigned long index;  /* profiling table index */
         unsigned long offset; /* profiling table offset */
         unsigned long flags;  /* format-dependent flags */
     }
