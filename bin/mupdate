@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.4 1999-10-10 10:21:00 graeme Exp $
+# $Id: mupdate,v 1.5 1999-11-10 20:49:19 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -87,17 +87,31 @@ mv src/version.c.new src/version.c
 cvs commit -m "Updated to version $release" src/version.c >/dev/null 2>&1
 
 
-# Update the ChangeLog file with all the changes since the last release.
+# Update the ChangeLog and NEWS files with all the changes since the last
+# release.
 
 rcs2log -R -u 'graeme	Graeme Roy	graeme@epc.co.uk' >ChangeLog.new \
         2>/dev/null
+cp ChangeLog.new NEWS.new
 cat ChangeLog >>ChangeLog.new
+cat NEWS >>NEWS.new
 vi ChangeLog.new
 cmp ChangeLog ChangeLog.new >/dev/null 2>&1
 if [ $? != 0 ]
 then
     mv ChangeLog.new ChangeLog
     cvs commit -m "Updated to version $release" ChangeLog >/dev/null 2>&1
+else
+    rm -f ChangeLog.new
+fi
+vi NEWS.new
+cmp NEWS NEWS.new >/dev/null 2>&1
+if [ $? != 0 ]
+then
+    mv NEWS.new NEWS
+    cvs commit -m "Updated to version $release" NEWS >/dev/null 2>&1
+else
+    rm -f NEWS.new
 fi
 
 
