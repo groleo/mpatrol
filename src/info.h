@@ -38,24 +38,25 @@
 #include "signals.h"
 
 
-#define FLG_CHECKALLOCS   1    /* check all memory allocations */
-#define FLG_CHECKREALLOCS 2    /* check all memory reallocations */
-#define FLG_CHECKFREES    4    /* check all memory deallocations */
-#define FLG_LOGALLOCS     8    /* log all memory allocations */
-#define FLG_LOGREALLOCS   16   /* log all memory reallocations */
-#define FLG_LOGFREES      32   /* log all memory deallocations */
-#define FLG_LOGMEMORY     64   /* log all memory operations */
-#define FLG_SHOWFREED     128  /* show all freed allocations */
-#define FLG_SHOWUNFREED   256  /* show all unfreed allocations */
-#define FLG_SHOWMAP       512  /* show memory map of heap */
-#define FLG_SHOWSYMBOLS   1024 /* show all symbols read */
-#define FLG_SAFESIGNALS   2048 /* save and restore signal handlers */
-#define FLG_NOPROTECT     4096 /* do not protect internal structures */
-#define FLG_ALLOWOFLOW    8192 /* allow memory operations to overflow */
+#define FLG_CHECKALLOCS   1     /* check all memory allocations */
+#define FLG_CHECKREALLOCS 2     /* check all memory reallocations */
+#define FLG_CHECKFREES    4     /* check all memory deallocations */
+#define FLG_CHECKMEMORY   8     /* check all memory operations */
+#define FLG_LOGALLOCS     16    /* log all memory allocations */
+#define FLG_LOGREALLOCS   32    /* log all memory reallocations */
+#define FLG_LOGFREES      64    /* log all memory deallocations */
+#define FLG_LOGMEMORY     128   /* log all memory operations */
+#define FLG_SHOWFREED     256   /* show all freed allocations */
+#define FLG_SHOWUNFREED   512   /* show all unfreed allocations */
+#define FLG_SHOWMAP       1024  /* show memory map of heap */
+#define FLG_SHOWSYMBOLS   2048  /* show all symbols read */
+#define FLG_SAFESIGNALS   4096  /* save and restore signal handlers */
+#define FLG_NOPROTECT     8192  /* do not protect internal structures */
+#define FLG_ALLOWOFLOW    16384 /* allow memory operations to overflow */
 
-#define FLG_FREED         1    /* allocation has been freed */
-#define FLG_PROFILED      2    /* allocation has been profiled */
-#define FLG_INTERNAL      4    /* allocation was made from within the library */
+#define FLG_FREED         1     /* allocation has been freed */
+#define FLG_PROFILED      2     /* allocation has been profiled */
+#define FLG_INTERNAL      4     /* allocation was made from within the library */
 
 
 /* The different types of memory allocation and operation functions.
