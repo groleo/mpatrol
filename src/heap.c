@@ -32,13 +32,8 @@
 #include "utils.h"
 
 
-#if MP_INUSE_SUPPORT
-extern "C" void _Inuse_heapalloc(void *, unsigned long);
-#endif /* MP_INUSE_SUPPORT */
-
-
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.4 2000-04-02 15:30:40 graeme Exp $"
+#ident "$Id: heap.c,v 1.5 2000-04-02 15:38:57 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -46,6 +41,11 @@ extern "C" void _Inuse_heapalloc(void *, unsigned long);
 extern "C"
 {
 #endif /* __cplusplus */
+
+
+#if MP_INUSE_SUPPORT
+void _Inuse_heapalloc(void *, unsigned long);
+#endif /* MP_INUSE_SUPPORT */
 
 
 /* Initialise the fields of a heap head so that the heap becomes empty.
