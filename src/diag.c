@@ -39,7 +39,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.5 2000-01-09 20:35:12 graeme Exp $"
+#ident "$Id: diag.c,v 1.6 2000-01-21 00:36:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -97,7 +97,12 @@ MP_GLOBAL char *__mp_alloctypenames[AT_MAX] =
     "operator new",
     "operator new[]",
     "operator delete",
-    "operator delete[]"
+    "operator delete[]",
+    "memset",
+    "bzero",
+    "memcpy",
+    "memmove",
+    "bcopy"
 };
 
 
