@@ -21,13 +21,13 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.7 2000-04-27 18:33:43 graeme Exp $
+# $Id: prototype,v 1.8 2000-04-27 18:55:38 graeme Exp $
 
 
 d none bin 0775 bin bin
 f none bin/mpatrol 0775 bin bin
 f none bin/mprof 0775 bin bin
-f none bin/memleak 0775 bin bin
+f none bin/mleak 0775 bin bin
 d none doc 0775 bin bin
 d none doc/mpatrol 0775 bin bin
 f none doc/mpatrol/README 0664 bin bin
@@ -58,7 +58,7 @@ s none lib/libmpatrol.so=libmpatrol.so.1.2
 d none man 0775 bin bin
 d none man/man1 0775 bin bin
 f none man/man1/mpatrol.1 0664 bin bin
-f none man/man1/memleak.1 0664 bin bin
+f none man/man1/mleak.1 0664 bin bin
 d none man/man3 0775 bin bin
 f none man/man3/mpatrol.3 0664 bin bin
 i pkginfo

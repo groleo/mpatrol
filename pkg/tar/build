@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.10 2000-04-27 18:33:47 graeme Exp $
+# $Id: build,v 1.11 2000-04-27 18:55:42 graeme Exp $
 
 
 version=1.2.0
@@ -35,7 +35,7 @@ libversion=1.2
 
 cd ../../build/unix
 make clobber
-make libmpatrol.a libmpatrol.so.$libversion mpatrol mprof memleak
+make libmpatrol.a libmpatrol.so.$libversion mpatrol mprof mleak
 cd ../../pkg/tar
 
 
@@ -54,7 +54,7 @@ cp ../../ChangeLog mpatrol
 mkdir -p mpatrol/bin
 cp ../../build/unix/mpatrol mpatrol/bin
 cp ../../build/unix/mprof mpatrol/bin
-cp ../../build/unix/memleak mpatrol/bin
+cp ../../build/unix/mleak mpatrol/bin
 mkdir -p mpatrol/doc/images
 cp ../../doc/README mpatrol/doc
 cp ../../doc/mpatrol.txt mpatrol/doc
@@ -80,10 +80,10 @@ ln -s libmpatrol.so.$libversion libmpatrol.so
 cd ../..
 mkdir -p mpatrol/man/cat1
 cp ../../man/cat1/mpatrol.1 mpatrol/man/cat1
-cp ../../man/cat1/memleak.1 mpatrol/man/cat1
+cp ../../man/cat1/mleak.1 mpatrol/man/cat1
 mkdir -p mpatrol/man/man1
 cp ../../man/man1/mpatrol.1 mpatrol/man/man1
-cp ../../man/man1/memleak.1 mpatrol/man/man1
+cp ../../man/man1/mleak.1 mpatrol/man/man1
 mkdir -p mpatrol/man/cat3
 cp ../../man/cat3/mpatrol.3 mpatrol/man/cat3
 mkdir -p mpatrol/man/man3

@@ -111,9 +111,9 @@
 #endif /* MP_BREAK_SIZE */
 
 
-/* The size of the input line buffer in the memleak tool.  If any of the lines
+/* The size of the input line buffer in the mleak tool.  If any of the lines
  * in the log file are longer than this then an error message will be generated
- * and memleak will terminate.
+ * and mleak will terminate.
  */
 
 #ifndef MP_BUFFER_SIZE

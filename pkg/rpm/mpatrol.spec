@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.13 2000-04-27 18:33:45 graeme Exp $
+# $Id: mpatrol.spec,v 1.14 2000-04-27 18:55:40 graeme Exp $
 
 
 %define version 1.2.0
@@ -63,7 +63,7 @@ to recompile or relink in order to change the library's behaviour.
 
 %build
 cd build/unix
-make libmpatrol.a libmpatrol.so.%{libversion} mpatrol mprof memleak
+make libmpatrol.a libmpatrol.so.%{libversion} mpatrol mprof mleak
 
 
 %install
@@ -71,7 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 cp build/unix/mpatrol $RPM_BUILD_ROOT/usr/bin
 cp build/unix/mprof $RPM_BUILD_ROOT/usr/bin
-cp build/unix/memleak $RPM_BUILD_ROOT/usr/bin
+cp build/unix/mleak $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
 cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
 cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
@@ -98,7 +98,7 @@ cp build/unix/libmpatrol.a $RPM_BUILD_ROOT/usr/lib
 cp build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/usr/lib
 mkdir -p $RPM_BUILD_ROOT/usr/man/man1
 cp man/man1/mpatrol.1 $RPM_BUILD_ROOT/usr/man/man1
-cp man/man1/memleak.1 $RPM_BUILD_ROOT/usr/man/man1
+cp man/man1/mleak.1 $RPM_BUILD_ROOT/usr/man/man1
 mkdir -p $RPM_BUILD_ROOT/usr/man/man3
 cp man/man3/mpatrol.3 $RPM_BUILD_ROOT/usr/man/man3
 
