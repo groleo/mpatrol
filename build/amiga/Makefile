@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.8 2000-04-06 18:03:08 graeme Exp $
+# $Id: Makefile,v 1.9 2000-04-06 18:21:30 graeme Exp $
 
 
 # Definitions
@@ -83,13 +83,13 @@ memleak: memleak.o getopt.o tree.o version.o
 all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol memleak
 
 clean:
-	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
-	-@ Delete mpatrol.o memleak.o getopt.o FORCE >NIL:
+	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
+	-@ rm -f mpatrol.o memleak.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
-	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
-	-@ Delete $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) FORCE >NIL:
-	-@ Delete mpatrol memleak FORCE >NIL:
+	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f mpatrol memleak 2>&1 >/dev/null
 
 
 # Dependencies
