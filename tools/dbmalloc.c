@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.1 2001-02-26 23:40:22 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.2 2001-02-27 01:39:47 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.1 2001-02-26 23:40:22 graeme Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: dbmalloc.c,v 1.2 2001-02-27 01:39:47 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -244,16 +244,44 @@ callback(MP_CONST void *p, void *t)
 int
 __mpt_dbmallocoption(int c, union dbmalloptarg *v)
 {
+    unsigned long n;
     int r;
 
     r = 0;
     switch (c)
     {
+      case MALLOC_ERRFILE:
+        r = __mp_setoption(MP_OPT_LOGFILE, (unsigned long) v->str);
+        break;
+      case MALLOC_CKCHAIN:
+        if (v->i != 0)
+            n = (unsigned long) -1;
+        else
+            n = 0;
+        if (((r = __mp_setoption(MP_OPT_CHECKLOWER, n)) == 0) &&
+            ((r = __mp_setoption(MP_OPT_CHECKUPPER, n)) == 0))
+            r = __mp_setoption(MP_OPT_CHECKFREQ, 1);
+        break;
+      case MALLOC_FILLAREA:
+        if (v->i != 0)
+            n = sizeof(void *);
+        else
+            n = 0;
+        r = __mp_setoption(MP_OPT_OFLOWSIZE, n);
+        break;
       case MALLOC_REUSE:
         r = __mp_setoption(MP_OPT_NOFREE, v->i);
         break;
       case MALLOC_DETAIL:
         malloc_detail = v->i;
+        break;
+      case MALLOC_ZERO:
+        if (v->i != 0)
+            c = MP_OPT_SETFLAGS;
+        else
+            c = MP_OPT_UNSETFLAGS;
+        if (__mp_setoption(c, MP_FLG_CHECKALLOCS))
+            r = 1;
         break;
       default:
         r = 1;
