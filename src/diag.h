@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.31 2001-03-04 16:30:54 graeme Exp $
+ * $Id: diag.h,v 1.32 2001-03-05 18:58:29 graeme Exp $
  */
 
 
@@ -141,6 +141,7 @@ MP_EXPORT void __mp_logmemcompare(infohead *, void *, void *, size_t, alloctype,
 MP_EXPORT void __mp_printallocs(infohead *, int);
 MP_EXPORT void __mp_printfreed(infohead *);
 MP_EXPORT void __mp_printfree(infohead *);
+MP_EXPORT void __mp_printleaktab(infohead *, size_t, int, int, int);
 MP_EXPORT void __mp_printmap(infohead *);
 MP_EXPORT void __mp_printversion(void);
 MP_EXPORT void __mp_printsummary(infohead *);

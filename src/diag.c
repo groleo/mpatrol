@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.68 2001-03-04 16:30:54 graeme Exp $"
+#ident "$Id: diag.c,v 1.69 2001-03-05 18:58:29 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.68 2001-03-04 16:30:54 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.69 2001-03-05 18:58:29 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1221,6 +1221,101 @@ __mp_printfree(infohead *h)
 }
 
 
+/* Display the details of a leak table node.
+ */
+
+static
+void
+printleakinfo(tablenode *n, int o, int c)
+{
+    size_t i, j;
+
+    if (o == SOPT_ALLOCATED)
+    {
+        i = n->data.acount;
+        j = n->data.atotal;
+    }
+    else if (o == SOPT_FREED)
+    {
+        i = n->data.dcount;
+        j = n->data.dtotal;
+    }
+    else
+    {
+        i = n->data.acount - n->data.dcount;
+        j = n->data.atotal - n->data.dtotal;
+    }
+    if (c != 0)
+        __mp_diag("    %6lu  %8lu  ", i, j);
+    else
+        __mp_diag("    %8lu  %6lu  ", j, i);
+    if ((n->data.file != NULL) && (n->data.line != 0))
+        __mp_diag("%s line %lu\n", n->data.file, n->data.line);
+    else if (n->data.file != NULL)
+        __mp_diag("%s\n", n->data.file);
+    else if (n->data.line != 0)
+        __mp_diag(MP_POINTER "\n", n->data.line);
+    else
+        __mp_diag("unknown location\n");
+}
+
+
+/* Display the leak table.
+ */
+
+MP_GLOBAL
+void
+__mp_printleaktab(infohead *h, size_t l, int o, int c, int r)
+{
+    tablenode *n;
+    treenode *t;
+    char *s;
+
+    __mp_sortleaktab(&h->ltable, o, c);
+    if ((l == 0) || (l > h->ltable.tree.size))
+        l = h->ltable.tree.size;
+    if (o == SOPT_ALLOCATED)
+        s = "allocated";
+    else if (o == SOPT_FREED)
+        s = "freed";
+    else
+        s = "unfreed";
+    if (l == 0)
+    {
+        __mp_diag("no %s memory entries in leak table\n\n", s);
+        return;
+    }
+    __mp_diag("%s %lu %s memory %s in leak table:\n\n",
+              (r == 0) ? "bottom" : "top", l, s,
+              (l == 1) ? "entry" : "entries");
+    if (c != 0)
+    {
+        __mp_diag("     count     bytes  location\n");
+        __mp_diag("    ------  --------  --------\n");
+    }
+    else
+    {
+        __mp_diag("       bytes   count  location\n");
+        __mp_diag("    --------  ------  --------\n");
+    }
+    if (r == 0)
+        for (t = __mp_minimum(h->ltable.tree.root); (t != NULL) && (l != 0);
+             t = __mp_successor(t), l--)
+        {
+            n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
+            printleakinfo(n, o, c);
+        }
+    else
+        for (t = __mp_maximum(h->ltable.tree.root); (t != NULL) && (l != 0);
+             t = __mp_predecessor(t), l--)
+        {
+            n = (tablenode *) ((char *) t - offsetof(tablenode, data.tnode));
+            printleakinfo(n, o, c);
+        }
+    __mp_diag("\n");
+}
+
+
 /* Display a complete memory map of the heap.
  */
 
@@ -1440,10 +1535,12 @@ __mp_printsummary(infohead *h)
     __mp_printsize(h->alloc.fsize);
     n = h->alloc.heap.itree.size + h->alloc.itree.size + h->addr.list.size +
         h->syms.strings.list.size + h->syms.strings.tree.size +
-        h->syms.itree.size + h->prof.ilist.size + h->list.size + h->alist.size;
+        h->syms.itree.size + h->ltable.list.size + h->prof.ilist.size +
+        h->list.size + h->alist.size;
     __mp_diag(")\ninternal blocks:   %lu (", n);
     n = h->alloc.heap.isize + h->alloc.isize + h->addr.size +
-        h->syms.strings.size + h->syms.size + h->prof.size + h->size;
+        h->syms.strings.size + h->syms.size + h->ltable.isize + h->prof.size +
+        h->size;
     __mp_printsize(n);
     __mp_diag(")\ntotal heap usage:  ");
     n = h->alloc.heap.isize + h->alloc.heap.dsize;
