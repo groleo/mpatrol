@@ -327,6 +327,17 @@
 #endif /* MP_PRELOAD_SUPPORT */
 
 
+/* The name of the environment variable which is used to specify a list of
+ * shared libraries to preload.
+ */
+
+#if MP_PRELOAD_SUPPORT
+#ifndef MP_PRELOAD_NAME
+#define MP_PRELOAD_NAME "LD_PRELOAD"
+#endif /* MP_PRELOAD_NAME */
+#endif /* MP_PRELOAD_SUPPORT */
+
+
 /* Indicates if the compiler supports the __builtin_frame_address() and
  * __builtin_return_address() macros, and if they should be used instead of
  * traversing the call stack directly.  Note that this method only allows a
