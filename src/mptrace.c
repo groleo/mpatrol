@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.1 2000-12-03 22:09:15 graeme Exp $"
+#ident "$Id: mptrace.c,v 1.2 2000-12-04 00:05:44 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -299,7 +299,7 @@ static void readfile(void)
     allocation *f;
     void *a;
     size_t i, l;
-    unsigned long n, t;
+    unsigned long n;
     int b, e;
 
     /* When reading the tracing output file, we assume that if it begins and
@@ -343,20 +343,18 @@ static void readfile(void)
           case 'A':
             bufferpos++;
             bufferlen--;
-            t = getuleb128();
             n = getuleb128();
             a = (void *) getuleb128();
             l = getuleb128();
             newalloc(n, a, l);
-            fprintf(stdout, "A %lu %lu " MP_POINTER " %lu\n", t, n, a, l);
+            fprintf(stdout, "A %lu " MP_POINTER " %lu\n", n, a, l);
             break;
           case 'F':
             bufferpos++;
             bufferlen--;
-            t = getuleb128();
             n = getuleb128();
             if (f = (allocation *) __mp_search(alloctree.root, n))
-                fprintf(stdout, "F %lu %lu " MP_POINTER " %lu\n", t, n, f->addr,
+                fprintf(stdout, "F %lu " MP_POINTER " %lu\n", n, f->addr,
                         f->size);
             else
                 fprintf(stderr, "%s: Unknown allocation index `%lu'\n",
