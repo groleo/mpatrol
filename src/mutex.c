@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.5 2000-05-23 23:09:41 graeme Exp $"
+#ident "$Id: mutex.c,v 1.6 2000-05-24 00:42:07 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -225,18 +225,25 @@ MP_GLOBAL void __mp_lockmutex(mutextype m)
 
     l = &locks[m];
     i = __mp_threadid();
-    lockmutex(&l->guard);
-    if ((l->owner == i) && (l->count > 0))
-        l->count++;
-    else
+    while (1)
     {
-        unlockmutex(&l->guard);
-        lockmutex(&l->real);
         lockmutex(&l->guard);
-        l->owner = i;
-        l->count = 1;
+        if (l->count == 0)
+        {
+            l->owner = i;
+            l->count = 1;
+            unlockmutex(&l->guard);
+            lockmutex(&l->real);
+            break;
+        }
+        else if (l->owner == i)
+        {
+            l->count++;
+            unlockmutex(&l->guard);
+            break;
+        }
+        unlockmutex(&l->guard);
     }
-    unlockmutex(&l->guard);
 }
 
 
@@ -251,16 +258,10 @@ MP_GLOBAL void __mp_unlockmutex(mutextype m)
     l = &locks[m];
     i = __mp_threadid();
     lockmutex(&l->guard);
-    if ((l->owner == i) && (l->count > 0))
+    if (l->count > 0)
         l->count--;
-    else
-    {
-        unlockmutex(&l->guard);
+    if ((l->owner == i) && (l->count == 0))
         unlockmutex(&l->real);
-        lockmutex(&l->guard);
-        l->owner = i;
-        l->count = 1;
-    }
     unlockmutex(&l->guard);
 }
 
