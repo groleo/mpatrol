@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.241 2001-09-03 22:43:53 graeme Exp $
+@c $Id: mpatrol.texi,v 1.242 2001-09-03 23:38:07 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.12
 @set VERSION 1.4.7
-@set UPDATED 3rd September, 2001
+@set UPDATED 4th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -11407,9 +11407,6 @@ You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
-@item
-The @command{mpsym} command does not work if @command{perl} is not installed due
-to the lack of a @command{printf} command on the system.
 @end itemize
 
 @item
@@ -11427,9 +11424,6 @@ You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
-@item
-The @command{mpsym} command does not work if @command{perl} is not installed due
-to the lack of a @command{printf} command on the system.
 @end itemize
 
 @cindex LynxOS, PowerPC
@@ -11449,9 +11443,6 @@ The @code{__mp_init_} initialisation function feature does not work since
 function entry points need to be referenced through the TOC.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
-@item
-The @command{mpsym} command does not work if @command{perl} is not installed due
-to the lack of a @command{printf} command on the system.
 @end itemize
 
 @item
@@ -11472,9 +11463,6 @@ The @code{__mp_init_} initialisation function feature does not work since
 function entry points need to be referenced through the TOC.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
-@item
-The @command{mpsym} command does not work if @command{perl} is not installed due
-to the lack of a @command{printf} command on the system.
 @end itemize
 
 @cindex SINIX, MIPS
