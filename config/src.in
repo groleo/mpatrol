@@ -62,10 +62,12 @@ host_triplet = @host@
 AS = @AS@
 CC = @CC@
 DLLTOOL = @DLLTOOL@
+EXEEXT = @EXEEXT@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
@@ -116,21 +118,26 @@ malloc.lo cplus.lo machine.lo version.lo
 libmpalloc_la_LIBADD = 
 libmpalloc_la_OBJECTS =  mpalloc.lo mpfailure.lo mpsetfail.lo \
 mpmalloc.lo mpcalloc.lo mpstrdup.lo mprealloc.lo
+bin_PROGRAMS =  mpatrol$(EXEEXT) mprof$(EXEEXT) mptrace$(EXEEXT) \
+mleak$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
-mpatrol_OBJECTS =  mpatrol.o getopt.o version.o
+mpatrol_OBJECTS =  mpatrol.$(OBJEXT) getopt.$(OBJEXT) version.$(OBJEXT)
 mpatrol_LDADD = $(LDADD)
 mpatrol_DEPENDENCIES = 
 mpatrol_LDFLAGS = 
-mprof_OBJECTS =  mprof.o graph.o getopt.o list.o tree.o version.o
+mprof_OBJECTS =  mprof.$(OBJEXT) graph.$(OBJEXT) getopt.$(OBJEXT) \
+list.$(OBJEXT) tree.$(OBJEXT) version.$(OBJEXT)
 mprof_LDADD = $(LDADD)
 mprof_DEPENDENCIES = 
 mprof_LDFLAGS = 
-mptrace_OBJECTS =  mptrace.o getopt.o tree.o slots.o utils.o version.o
+mptrace_OBJECTS =  mptrace.$(OBJEXT) getopt.$(OBJEXT) tree.$(OBJEXT) \
+slots.$(OBJEXT) utils.$(OBJEXT) version.$(OBJEXT)
 mptrace_LDADD = $(LDADD)
 mptrace_DEPENDENCIES = 
 mptrace_LDFLAGS = 
-mleak_OBJECTS =  mleak.o getopt.o tree.o version.o
+mleak_OBJECTS =  mleak.$(OBJEXT) getopt.$(OBJEXT) tree.$(OBJEXT) \
+version.$(OBJEXT)
 mleak_LDADD = $(LDADD)
 mleak_DEPENDENCIES = 
 mleak_LDFLAGS = 
@@ -162,7 +169,7 @@ OBJECTS = $(libmpatrol_la_OBJECTS) $(libmpalloc_la_OBJECTS) $(mpatrol_OBJECTS) $
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .s
+.SUFFIXES: .S .c .lo .o .obj .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile
 
@@ -196,6 +203,11 @@ uninstall-libLTLIBRARIES:
 	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -204,6 +216,7 @@ uninstall-libLTLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
@@ -259,20 +272,20 @@ uninstall-binPROGRAMS:
 	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	done
 
-mpatrol: $(mpatrol_OBJECTS) $(mpatrol_DEPENDENCIES)
-	@rm -f mpatrol
+mpatrol$(EXEEXT): $(mpatrol_OBJECTS) $(mpatrol_DEPENDENCIES)
+	@rm -f mpatrol$(EXEEXT)
 	$(LINK) $(mpatrol_LDFLAGS) $(mpatrol_OBJECTS) $(mpatrol_LDADD) $(LIBS)
 
-mprof: $(mprof_OBJECTS) $(mprof_DEPENDENCIES)
-	@rm -f mprof
+mprof$(EXEEXT): $(mprof_OBJECTS) $(mprof_DEPENDENCIES)
+	@rm -f mprof$(EXEEXT)
 	$(LINK) $(mprof_LDFLAGS) $(mprof_OBJECTS) $(mprof_LDADD) $(LIBS)
 
-mptrace: $(mptrace_OBJECTS) $(mptrace_DEPENDENCIES)
-	@rm -f mptrace
+mptrace$(EXEEXT): $(mptrace_OBJECTS) $(mptrace_DEPENDENCIES)
+	@rm -f mptrace$(EXEEXT)
 	$(LINK) $(mptrace_LDFLAGS) $(mptrace_OBJECTS) $(mptrace_LDADD) $(LIBS)
 
-mleak: $(mleak_OBJECTS) $(mleak_DEPENDENCIES)
-	@rm -f mleak
+mleak$(EXEEXT): $(mleak_OBJECTS) $(mleak_DEPENDENCIES)
+	@rm -f mleak$(EXEEXT)
 	$(LINK) $(mleak_LDFLAGS) $(mleak_OBJECTS) $(mleak_LDADD) $(LIBS)
 
 install-includeHEADERS: $(include_HEADERS)
