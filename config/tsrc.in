@@ -72,6 +72,8 @@ VERSION = @VERSION@
 
 INCLUDES = -DMP_THREADS_SUPPORT
 
+libmpatrolmt_la_LDFLAGS = -release @VERSION@
+
 lib_LTLIBRARIES = libmpatrolmt.la
 
 noinst_HEADERS = config.h target.h list.h tree.h slots.h utils.h memory.h 		 heap.h alloc.h info.h stack.h addr.h strtab.h symbol.h 		 signals.h mutex.h diag.h option.h leaktab.h profile.h trace.h 		 inter.h machine.h version.h
@@ -88,7 +90,6 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libmpatrolmt_la_LDFLAGS = 
 libmpatrolmt_la_LIBADD = 
 libmpatrolmt_la_OBJECTS =  list.lo tree.lo slots.lo utils.lo memory.lo \
 heap.lo alloc.lo info.lo stack.lo addr.lo strtab.lo symbol.lo \

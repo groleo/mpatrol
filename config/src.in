@@ -70,6 +70,10 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
+libmpatrol_la_LDFLAGS = -release @VERSION@
+
+libmpalloc_la_LDFLAGS = -release @VERSION@
+
 bin_PROGRAMS = mpatrol mprof mptrace mleak
 
 lib_LTLIBRARIES = libmpatrol.la libmpalloc.la
@@ -103,13 +107,11 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libmpatrol_la_LDFLAGS = 
 libmpatrol_la_LIBADD = 
 libmpatrol_la_OBJECTS =  list.lo tree.lo slots.lo utils.lo memory.lo \
 heap.lo alloc.lo info.lo stack.lo addr.lo strtab.lo symbol.lo \
 signals.lo diag.lo option.lo leaktab.lo profile.lo trace.lo inter.lo \
 malloc.lo cplus.lo machine.lo version.lo
-libmpalloc_la_LDFLAGS = 
 libmpalloc_la_LIBADD = 
 libmpalloc_la_OBJECTS =  mpalloc.lo mpfailure.lo mpsetfail.lo \
 mpmalloc.lo mpcalloc.lo mpstrdup.lo mprealloc.lo

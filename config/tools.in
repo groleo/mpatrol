@@ -72,7 +72,7 @@ VERSION = @VERSION@
 
 INCLUDES = -I../src
 
-libmptools_la_LDFLAGS = -static
+libmptools_la_LDFLAGS = -static -release @VERSION@
 
 lib_LTLIBRARIES = libmptools.la
 
