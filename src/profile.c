@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.20 2000-04-24 10:36:48 graeme Exp $"
+#ident "$Id: profile.c,v 1.21 2000-04-24 10:46:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -422,16 +422,15 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
      */
     fwrite(&l, sizeof(size_t), 1, f);
     fputc('\0', f);
-    for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
-         n = (profnode *) __mp_successor(&n->data.node))
-    {
-        if (n->data.symbol->data.offset != 0)
-        {
-            fputs(n->data.symbol->data.name, f);
-            fputc('\0', f);
-        }
-        n->data.symbol->data.offset = 0;
-    }
+    if (l > 1)
+        for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
+             n = (profnode *) __mp_successor(&n->data.node))
+            if ((n->data.symbol != NULL) && (n->data.symbol->data.offset != 0))
+            {
+                n->data.symbol->data.offset = 0;
+                fputs(n->data.symbol->data.name, f);
+                fputc('\0', f);
+            }
     fwrite(s, sizeof(char), 4, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
