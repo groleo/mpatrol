@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.8 2000-04-26 23:05:49 graeme Exp $"
+#ident "$Id: mprof.c,v 1.9 2000-04-27 00:04:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -67,6 +67,7 @@ typedef struct profilenode
     unsigned long parent; /* parent node */
     void *addr;           /* return address */
     unsigned long symbol; /* associated symbol */
+    unsigned long name;   /* associated symbol name */
     unsigned long data;   /* profiling data */
     profiledata tdata;    /* temporary profiling data */
 }
@@ -125,6 +126,12 @@ static profilenode *nodes;
  */
 
 static size_t nodesize;
+
+
+/* The array containing the symbol addresses.
+ */
+
+static void **addrs;
 
 
 /* The string table containing the symbol names.
@@ -322,10 +329,23 @@ static void readfile(void)
             getentry(&p->parent, sizeof(unsigned long), 1);
             getentry(&p->addr, sizeof(void *), 1);
             getentry(&p->symbol, sizeof(unsigned long), 1);
+            getentry(&p->name, sizeof(unsigned long), 1);
             getentry(&p->data, sizeof(unsigned long), 1);
             __mp_treeinsert(&proftree, &p->node, (unsigned long) p->addr);
             cleardata(&p->tdata);
         }
+    }
+    /* Read the table containing the symbol addresses.
+     */
+    getentry(&i, sizeof(size_t), 1);
+    if (i > 0)
+    {
+        if ((addrs = (void **) malloc(i * sizeof(void *))) == NULL)
+        {
+            fprintf(stderr, "%s: Out of memory\n", progname);
+            exit(EXIT_FAILURE);
+        }
+        getentry(addrs, sizeof(void *), i);
     }
     /* Read the string table containing the symbol names.
      */
@@ -381,6 +401,25 @@ static void printdata(size_t *d, size_t t)
             else
                 fprintf(stdout, " %2.0f", n);
         }
+}
+
+
+/* Display the symbol associated with a particular call site.
+ */
+
+static void printsymbol(profilenode *n)
+{
+    ptrdiff_t o;
+
+    if (n->name == 0)
+        fprintf(stdout, MP_POINTER, n->addr);
+    else
+    {
+        fputs(symbols + n->name, stdout);
+        if (useaddresses && (n->symbol != 0) &&
+            ((o = (char *) n->addr - (char *) addrs[n->symbol - 1]) != 0))
+            fprintf(stdout, "%+ld", o);
+    }
 }
 
 
@@ -558,10 +597,8 @@ static void directtable(void)
             printdata(d->dtotal, atotal - dtotal);
             fprintf(stdout, "  %6lu  ", c);
         }
-        if (n->symbol != 0)
-            fprintf(stdout, "%s\n", symbols + n->symbol);
-        else
-            fprintf(stdout, MP_POINTER "\n", n->addr);
+        printsymbol(n);
+        fputc('\n', stdout);
         cleardata(d);
     }
     for (i = 0; i < 4; i++)
@@ -647,6 +684,7 @@ int main(int argc, char **argv)
     datasize = 0;
     nodes = NULL;
     nodesize = 0;
+    addrs = NULL;
     symbols = NULL;
     sbound = mbound = lbound = 0;
     __mp_newtree(&proftree);
@@ -671,6 +709,8 @@ int main(int argc, char **argv)
         free(data);
     if (nodes != NULL)
         free(nodes);
+    if (addrs != NULL)
+        free(addrs);
     if (symbols != NULL)
         free(symbols);
     return EXIT_SUCCESS;
