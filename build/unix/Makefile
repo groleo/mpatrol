@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.67 2001-03-05 19:12:46 graeme Exp $
+# $Id: Makefile,v 1.68 2001-03-06 20:13:25 graeme Exp $
 
 
 # Definitions
@@ -317,6 +317,10 @@ option.o option.s.o option.n.ln option.t.o option.s.t.o option.t.ln: \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/diag.h \
 	$(SOURCE)/utils.h $(SOURCE)/profile.h $(SOURCE)/trace.h
+leaktab.o leaktab.s.o leaktab.n.ln leaktab.t.o leaktab.s.t.o leaktab.t.ln: \
+	$(SOURCE)/leaktab.c $(SOURCE)/leaktab.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/list.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/utils.h
 profile.o profile.s.o profile.n.ln profile.t.o profile.s.t.o profile.t.ln: \
 	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
@@ -399,9 +403,9 @@ $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/malloc.c \
-	$(SOURCE)/cplus.c $(SOURCE)/profile.c $(SOURCE)/profile.h \
-	$(SOURCE)/trace.c $(SOURCE)/trace.h $(SOURCE)/machine.h \
-	$(SOURCE)/version.c
+	$(SOURCE)/cplus.c $(SOURCE)/leaktab.c $(SOURCE)/leaktab.h \
+	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/trace.c \
+	$(SOURCE)/trace.h $(SOURCE)/machine.h $(SOURCE)/version.c
 $(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
@@ -414,8 +418,9 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/malloc.c $(SOURCE)/cplus.c \
-	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/trace.c \
-	$(SOURCE)/trace.h $(SOURCE)/machine.h $(SOURCE)/version.c
+	$(SOURCE)/leaktab.c $(SOURCE)/leaktab.h $(SOURCE)/profile.c \
+	$(SOURCE)/profile.h $(SOURCE)/trace.c $(SOURCE)/trace.h \
+	$(SOURCE)/machine.h $(SOURCE)/version.c
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/mpalloc.c $(SOURCE)/inter.h $(SOURCE)/info.h \
 	$(SOURCE)/alloc.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
