@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.8 2000-11-07 19:03:53 graeme Exp $
+# $Id: mupdate,v 1.9 2000-11-08 00:29:04 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -120,9 +120,20 @@ echo "$release $newdate" >VERSION
 cvs commit -m "Updated to version $release" VERSION >/dev/null 2>&1
 
 
-# Tag the entire distribution and create a new release archive.
+# Tag the entire distribution.
 
 cvs tag REL_${newver}_${newrev}_${newcnt} >/dev/null 2>&1
+
+
+# Remove the CVS subdirectories.
+
+for dir in `find . -name CVS -print`
+do
+    rm -rf "$dir"
+done
+
+
+# Create a new release archive.
 
 archive="mpatrol_$release.tar"
 
