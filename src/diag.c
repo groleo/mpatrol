@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.31 2000-07-16 22:33:35 graeme Exp $"
+#ident "$Id: diag.c,v 1.32 2000-10-30 22:15:35 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -428,7 +428,7 @@ MP_GLOBAL void __mp_printsymbol(symhead *y, void *a, long m)
     else
         __mp_diag("???");
     if ((t != NULL) && (u != 0))
-        __mp_diag(" (%s:%lu)", t, u);
+        __mp_diag(" at %s:%lu", t, u);
 }
 
 

@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.122 2000-10-29 23:28:54 graeme Exp $
+@c $Id: mpatrol.texi,v 1.123 2000-10-30 22:13:54 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -4713,14 +4713,14 @@ last successful function call to the mpatrol library.
 
 @smallexample
 ALLOC: malloc (50, 8192 bytes, 2 bytes) [main|test1.c|54]
-        0x80000A30 main (/usr/users/homedir/graeme/test1.c:54)
+        0x80000A30 main at /usr/users/homedir/graeme/test1.c:54
         0x80000944 _start
 
 returns 0x80009000
 
 ALLOC: malloc (51, 4 bytes, 2 bytes) [strtoupper|test1.c|42]
-        0x800009AE strtoupper (/usr/users/homedir/graeme/test1.c:42)
-        0x80000A54 main (/usr/users/homedir/graeme/test1.c:57)
+        0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
+        0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
         0x80000944 _start
 
 returns 0x80007068
@@ -4738,8 +4738,8 @@ ERROR: allocation 0x80007080 has a corrupted overflow buffer at 0x80007084
         0x80007084  00AAAAAA AAAAAAAA                    ........
 
     0x80007080 (4 bytes) @{malloc:51:0@} [strtoupper|test1.c|42]
-        0x800009AE strtoupper (/usr/users/homedir/graeme/test1.c:42)
-        0x80000A54 main (/usr/users/homedir/graeme/test1.c:57)
+        0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
+        0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
         0x80000944 _start
 @end smallexample
 

@@ -4201,14 +4201,14 @@ variable allows us to see the last successful function call to the
 mpatrol library.
 
      ALLOC: malloc (50, 8192 bytes, 2 bytes) [main|test1.c|54]
-             0x80000A30 main (/usr/users/homedir/graeme/test1.c:54)
+             0x80000A30 main at /usr/users/homedir/graeme/test1.c:54
              0x80000944 _start
      
      returns 0x80009000
      
      ALLOC: malloc (51, 4 bytes, 2 bytes) [strtoupper|test1.c|42]
-             0x800009AE strtoupper (/usr/users/homedir/graeme/test1.c:42)
-             0x80000A54 main (/usr/users/homedir/graeme/test1.c:57)
+             0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
+             0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
              0x80000944 _start
      
      returns 0x80007068
@@ -4223,8 +4223,8 @@ allocation was affected(3).
              0x80007084  00AAAAAA AAAAAAAA                    ........
      
          0x80007080 (4 bytes) {malloc:51:0} [strtoupper|test1.c|42]
-             0x800009AE strtoupper (/usr/users/homedir/graeme/test1.c:42)
-             0x80000A54 main (/usr/users/homedir/graeme/test1.c:57)
+             0x800009AE strtoupper at /usr/users/homedir/graeme/test1.c:42
+             0x80000A54 main at /usr/users/homedir/graeme/test1.c:57
              0x80000944 _start
 
    Now we can make a better guess about what is happening.  Since the
