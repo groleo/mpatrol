@@ -30,7 +30,7 @@
 
 
 /*
- * $Id: version.h,v 1.19 2001-10-03 22:36:15 graeme Exp $
+ * $Id: version.h,v 1.20 2001-10-03 23:08:48 graeme Exp $
  */
 
 
@@ -59,6 +59,8 @@ extern "C"
 
 MP_EXPORT char *__mp_version;
 MP_EXPORT char *__mp_copyright;
+MP_EXPORT char *__mp_author;
+MP_EXPORT char *__mp_email;
 MP_EXPORT char *__mp_homepage;
 
 
