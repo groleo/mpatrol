@@ -60,6 +60,14 @@
 #endif /* MP_FUNCNAME */
 
 
+/* A macro for disabling the definition of replacement C++ operators.
+ */
+
+#ifndef MP_NOCPLUSPLUS
+#define MP_NOCPLUSPLUS 0
+#endif /* MP_NOCPLUSPLUS */
+
+
 /* Options for backwards compatibility with other versions of mallopt().  They
  * are all currently ignored as they have no meaning when used with mpatrol.
  */
@@ -280,6 +288,7 @@ __mp_allocinfo;
 #undef bcmp
 #endif /* bcmp */
 
+#if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
 #ifdef new
 #undef new
@@ -288,6 +297,7 @@ __mp_allocinfo;
 #undef delete
 #endif /* delete */
 #endif /* __cplusplus */
+#endif /* MP_NOCPLUSPLUS */
 
 
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
@@ -445,6 +455,7 @@ void __mp_popdelstack(char **, char **, unsigned long *);
 #endif /* __cplusplus */
 
 
+#if !MP_NOCPLUSPLUS
 #ifdef __cplusplus
 
 typedef void (*new_handler)(void);
@@ -509,6 +520,7 @@ static inline void operator delete[](void *p)
 #define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__), ::delete
 
 #endif /* __cplusplus */
+#endif /* MP_NOCPLUSPLUS */
 
 
 #endif /* MP_MPATROL_H */
