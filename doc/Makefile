@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.33 2001-07-12 22:38:55 graeme Exp $
+# $Id: Makefile,v 1.34 2001-08-22 22:26:46 graeme Exp $
 
 
 # Definitions
@@ -89,9 +89,9 @@ $(DOCUMENT).html: $(DOCUMENT).texi images/$(DOCUMENT).jpg images/test.jpg \
 	images/trace.jpg
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ texi2html -top_file $@ -split section -menu -number -verbose $<
+	@ texi2html -top_file $@ -expand none -split section -menu -number -verbose $<
 else
-	@ texi2html -top_file $@ -split section -menu -number $<
+	@ texi2html -top_file $@ -expand none -split section -menu -number $<
 endif
 else
 # Build the HTML file from the Texinfo file using makeinfo
