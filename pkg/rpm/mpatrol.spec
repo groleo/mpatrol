@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.38 2000-11-20 22:29:18 graeme Exp $
+# $Id: mpatrol.spec,v 1.39 2000-11-20 22:53:07 graeme Exp $
 
 
 %define libversion 1.3
@@ -69,55 +69,13 @@ make mpatrol mprof mleak
 
 %install
 rm -rf $RPM_BUILD_ROOT
+mv doc/README README.DOC
 mkdir -p $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mpatrol $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mprof $RPM_BUILD_ROOT/%{_bindir}
 install -m755 -s build/unix/mleak $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpsym $RPM_BUILD_ROOT/%{_bindir}
 install -m755 bin/mpedit $RPM_BUILD_ROOT/%{_bindir}
-mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/README $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/README.DOC
-cp COPYING $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp COPYING.LIB $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp NEWS $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp ChangeLog $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.txt $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.guide $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.html $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.dvi $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.ps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/refcard.dvi $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/refcard.ps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/refcard.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}
-cp doc/images/mpatrol.txt $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/mpatrol.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/mpatrol.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/mpatrol.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/test.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/test.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/test.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/gcc.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/gcc.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/gcc.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cpp.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cpp.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cpp.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cc1.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cc1.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/cc1.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/collect2.jpg $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/collect2.eps $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-cp doc/images/collect2.pdf $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/images
-mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
-cp tests/pass/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/pass
-mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/fail
-cp tests/fail/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/fail
-mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
-cp tests/profile/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/profile
-mkdir -p $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
-cp tests/tutorial/test*.c $RPM_BUILD_ROOT/usr/doc/mpatrol-%{version}/tests/tutorial
 mkdir -p $RPM_BUILD_ROOT/%{_includedir}
 install -m644 src/mpatrol.h $RPM_BUILD_ROOT/%{_includedir}
 mkdir -p $RPM_BUILD_ROOT/%{_infodir}
@@ -138,8 +96,14 @@ install -m644 man/man3/mpatrol.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 
 %files
+%defattr(-,root,root)
+%doc README README.DOC COPYING COPYING.LIB NEWS ChangeLog
+%doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
+%doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
+%doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf
+%doc doc/images
+%doc tests
 %{_bindir}
-/usr/doc
 %{_includedir}
 %{_infodir}
 %{_libdir}
