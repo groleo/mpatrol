@@ -23,7 +23,10 @@
 /*
  * String tables.  All memory allocations are performed by the heap
  * manager and all strnodes are stored at the beginning of their
- * respective blocks of memory.
+ * respective blocks of memory.  The hash function comes from P. J.
+ * Weinberger's C compiler and was published in Compilers: Principles,
+ * Techniques and Tools, First Edition by Aho, Sethi and Ullman
+ * (Addison-Wesley, 1986, ISBN 0-201-10194-7).
  */
 
 
@@ -33,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.3 2000-01-09 20:35:22 graeme Exp $"
+#ident "$Id: strtab.c,v 1.4 2000-03-13 21:09:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -73,6 +76,26 @@ MP_GLOBAL void __mp_deletestrtab(strtab *t)
     t->heap = NULL;
     __mp_newtree(&t->tree);
     t->size = 0;
+}
+
+
+/* Calculate the hash bucket a string should be placed in.
+ */
+
+static unsigned long hash(char *s)
+{
+    unsigned long g, h;
+
+    for (h = 0; *s != '\0'; s++)
+    {
+        h = (h << 4) + *s;
+        if (g = h & 0xF0000000)
+        {
+            h ^= g >> 24;
+            h ^= g;
+        }
+    }
+    return h % MP_HASHTABSIZE;
 }
 
 

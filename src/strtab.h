@@ -32,7 +32,26 @@
 
 
 #include "config.h"
+#include "list.h"
 #include "heap.h"
+
+
+/* A hash entry is used to maintain a hash table of strings so that
+ * only unique strings are ever stored in the string table.
+ */
+
+typedef struct hashentry
+{
+    listnode node;   /* list node */
+    union
+    {
+        void *block; /* pointer to internal block */
+        char *key;   /* pointer to string in table */
+    }
+    data;
+    size_t size;     /* size of internal block or string */
+}
+hashentry;
 
 
 /* A strnode belongs to a binary search tree of strnodes, ordered
