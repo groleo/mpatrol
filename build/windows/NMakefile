@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.9 2000-04-25 01:12:48 graeme Exp $
+# $Id: NMakefile,v 1.10 2000-04-27 18:40:11 graeme Exp $
 
 
 # Definitions
@@ -107,16 +107,16 @@ mpatrol.exe: mpatrol.obj getopt.obj version.obj
 mprof.exe: mprof.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj getopt.obj tree.obj version.obj
 
-memleak.exe: memleak.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj version.obj
+mleak.exe: mleak.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
-	mpatrol.exe mprof.exe memleak.exe
+	mpatrol.exe mprof.exe mleak.exe
 
 clean:
 	-@ del /f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) >nul 2>&1
 	-@ del /f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) >nul 2>&1
-	-@ del /f mpatrol.obj mprof.obj memleak.obj getopt.obj >nul 2>&1
+	-@ del /f mpatrol.obj mprof.obj mleak.obj getopt.obj >nul 2>&1
 
 clobber: clean
 	-@ del /f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) >nul 2>&1
@@ -124,7 +124,7 @@ clobber: clean
 	-@ del /f $(LIBRARY).lib $(LIBRARY).exp >nul 2>&1
 	-@ del /f $(LIBRARY)mt.lib $(LIBRARY)mt.exp >nul 2>&1
 	-@ del /f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) >nul 2>&1
-	-@ del /f mpatrol.exe mprof.exe memleak.exe >nul 2>&1
+	-@ del /f mpatrol.exe mprof.exe mleak.exe >nul 2>&1
 
 
 # Dependencies
@@ -261,7 +261,7 @@ mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
-memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

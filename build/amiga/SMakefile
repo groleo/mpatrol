@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.18 2000-04-27 18:27:35 graeme Exp $
+# $Id: SMakefile,v 1.19 2000-04-27 18:39:59 graeme Exp $
 
 
 # Definitions
@@ -79,19 +79,19 @@ mpatrol: mpatrol.o getopt.o version.o
 mprof: mprof.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mprof.o getopt.o tree.o version.o LIB LIB:scm.lib
 
-memleak: memleak.o getopt.o tree.o version.o
-	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ memleak.o getopt.o tree.o version.o
+mleak: mleak.o getopt.o tree.o version.o
+	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof memleak
+all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof mleak
 
 clean:
 	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
-	-@ Delete mpatrol.o mprof.o memleak.o getopt.o FORCE >NIL:
+	-@ Delete mpatrol.o mprof.o mleak.o getopt.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
 	-@ Delete $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) FORCE >NIL:
-	-@ Delete mpatrol mpatrol.lnk mprof mprof.lnk memleak memleak.lnk FORCE >NIL:
+	-@ Delete mpatrol mpatrol.lnk mprof mprof.lnk mleak mleak.lnk FORCE >NIL:
 
 
 # Dependencies
@@ -212,7 +212,7 @@ mpatrol.o: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.o: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
-memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+mleak.o: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

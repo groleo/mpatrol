@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.21 2000-04-25 01:12:47 graeme Exp $
+# $Id: Makefile,v 1.22 2000-04-27 18:40:10 graeme Exp $
 
 
 # Definitions
@@ -103,16 +103,16 @@ mpatrol.exe: mpatrol.obj getopt.obj version.obj
 mprof.exe: mprof.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mprof.obj getopt.obj tree.obj version.obj
 
-memleak.exe: memleak.obj getopt.obj tree.obj version.obj
-	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj version.obj
+mleak.exe: mleak.obj getopt.obj tree.obj version.obj
+	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
-	mpatrol.exe mprof.exe memleak.exe
+	mpatrol.exe mprof.exe mleak.exe
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f mpatrol.obj mprof.obj memleak.obj getopt.obj 2>&1 >/dev/null
+	-@ rm -f mpatrol.obj mprof.obj mleak.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -120,7 +120,7 @@ clobber: clean
 	-@ rm -f $(LIBRARY).lib $(LIBRARY).exp 2>&1 >/dev/null
 	-@ rm -f $(LIBRARY)mt.lib $(LIBRARY)mt.exp 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f mpatrol.exe mprof.exe memleak.exe 2>&1 >/dev/null
+	-@ rm -f mpatrol.exe mprof.exe mleak.exe 2>&1 >/dev/null
 
 
 # Dependencies
@@ -257,7 +257,7 @@ mpatrol.obj: $(SOURCE)/mpatrol.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/version.h
 mprof.obj: $(SOURCE)/mprof.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
-memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+mleak.obj: $(SOURCE)/mleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/version.h
 getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
