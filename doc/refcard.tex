@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.18 2001-02-12 19:12:21 graeme Exp $
+% $Id: refcard.tex,v 1.19 2001-02-20 20:10:18 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -360,6 +360,25 @@ have to be used instead.
 \end{description}
 
 \vskip 12pt
+\heading{C dynamic memory alternative functions}
+\vskip 6pt
+
+\begin{description}
+\item[\function{MP\_MALLOC}]
+\hfill Allocates memory without failure.
+\item[\function{MP\_CALLOC}]
+\hfill Allocates zero-filled memory without failure.
+\item[\function{MP\_STRDUP}]
+\hfill Duplicates a string without failure.
+\item[\function{MP\_REALLOC}]
+\hfill Resizes memory without failure.
+\item[\function{MP\_FREE}]
+\hfill Frees memory.
+\item[\function{MP\_FAILURE}]
+\hfill Sets the allocation failure handler.
+\end{description}
+
+\vskip 12pt
 \heading{C$++$ dynamic memory allocation functions}
 \vskip 6pt
 
@@ -430,6 +449,8 @@ have to be used instead.
 \hfill Displays a map of memory in the heap.
 \item[\function{\_\_mp\_summary}]
 \hfill Displays a summary of library statistics.
+\item[\function{\_\_mp\_stats}]
+\hfill Returns statistics about the heap.
 \item[\function{\_\_mp\_check}]
 \hfill Validates memory in the heap.
 \item[\function{\_\_mp\_prologue}]
