@@ -21,13 +21,13 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.36 2001-09-03 20:45:42 graeme Exp $
+# $Id: mpatrol.psf,v 1.37 2001-09-13 19:36:04 graeme Exp $
 
 
 product
     tag				mpatrol
     title			"mpatrol library"
-    revision			1.4.7
+    revision			1.4.8
     category			language
     category_title		"Languages"
     description			"The mpatrol library for controlling and tracing dynamic memory allocations."

@@ -24,10 +24,10 @@ rem MA 02111-1307, USA.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.47 2001-09-03 20:45:44 graeme Exp $
+rem $Id: build.bat,v 1.48 2001-09-13 19:34:59 graeme Exp $
 
 
-set version=1.4.7
+set version=1.4.8
 
 
 rem Build the mpatrol library.

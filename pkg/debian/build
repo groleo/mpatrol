@@ -24,11 +24,11 @@
 # UNIX shell script to build a Debian package file
 
 
-# $Id: build,v 1.1 2001-09-09 22:52:07 graeme Exp $
+# $Id: build,v 1.2 2001-09-13 19:41:37 graeme Exp $
 
 
 arch=i386
-version=1.4.7
+version=1.4.8
 revision=1
 
 
