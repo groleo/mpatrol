@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.40 2003-11-24 14:46:21 graeme Exp $
+# $Id: Makefile,v 1.41 2003-11-24 15:29:00 graeme Exp $
 
 
 # Definitions
@@ -147,12 +147,12 @@ ifeq ($(VERBOSE),true)
 	@ thumbpdf --verbose $@
 	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
-	-@ rm -f thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).tpt thumbdta.tex >/dev/null 2>&1
 else
 	@ thumbpdf --quiet $@
 	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
-	-@ rm -f thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).tpt thumbdta.tex >/dev/null 2>&1
 endif
 endif
 
@@ -231,12 +231,12 @@ ifeq ($(VERBOSE),true)
 	@ thumbpdf --verbose $@
 	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --verbose $<
-	-@ rm -f thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(SOURCE).tpt thumbdta.tex >/dev/null 2>&1
 else
 	@ thumbpdf --quiet $@
 	-@ rm -f $@ thumb*.png thumbpdf.pdf thumbpdf.log >/dev/null 2>&1
 	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --quiet $<
-	-@ rm -f thumbdta.tex >/dev/null 2>&1
+	-@ rm -f $(SOURCE).tpt thumbdta.tex >/dev/null 2>&1
 endif
 endif
 	-@ rm -rf bin src tools >/dev/null 2>&1
