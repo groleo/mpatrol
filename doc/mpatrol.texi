@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.195 2001-03-07 19:24:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.196 2001-03-08 23:00:11 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.7
 @set VERSION 1.4.2
-@set UPDATED 7th March, 2001
+@set UPDATED 8th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -231,13 +231,15 @@ it.
 @cindex contributors
 Finally, I'd like to thank Stephan Springl (@email{springl@@bfw-online.de}) for
 his help on reading debugging information from object files via the GNU BFD
-library, and Alexander Barton (@email{abarton@@innotrac.com}) and Dave Gibson
-(@email{david@@epc.co.uk}) for their help on writing thread-safe code.  Roger
-Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
-command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris
-Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
-initial testing for the FreeBSD port and Ivan Finch (@email{i.finch@@rl.ac.uk})
-did the same for the Tru64 port.
+library, and Adam Zell (@email{zell@@best.com}) for helping with patching the
+dynamic linker support functions for loading shared libraries.  Both Alexander
+Barton (@email{abarton@@innotrac.com}) and Dave Gibson
+(@email{david@@epc.co.uk}) helped to make mpatrol thread-safe.  Roger Keane
+(@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym} command
+and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris Makushkin
+(@email{oberon@@antibiotic.ru}) requested, helped with, and provided initial
+testing for the FreeBSD port and Ivan Finch (@email{i.finch@@rl.ac.uk}) did the
+same for the Tru64 port.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -598,7 +600,8 @@ be set.
 A tracing command is provided which reads a tracing output file produced by the
 mpatrol library and displays the memory allocation events in tabular or
 graphical form.  It also displays any relevant statistics that could be
-calculated.
+calculated, and has an option to write out a trace-driven memory allocation
+simulation program as C source code.
 
 @item
 On UNIX platforms, the @code{mmap()} function can optionally be used to allocate
@@ -785,6 +788,11 @@ An option exists to abort the program with a failure condition if there are more
 than a specified number of unfreed memory allocations at program termination.
 This could be useful for batch testing in order to check that all tests free up
 most of their allocated memory.
+
+@item
+Memory allocations can be @emph{marked} to indicate to the mpatrol library that
+they should remain allocated for the lifetime of the program and should not be
+freed or be listed as a memory leak.
 
 @item
 Functions always report if their arguments are illegal in order to pinpoint any
@@ -2717,6 +2725,13 @@ memory allocation with the @code{__mp_setuser()} function.  This can have any
 value and is not interpreted by the mpatrol library.  It was added for user code
 to associate its own data with memory allocations.
 
+The @code{marked} field that is also shown in the previous example indicates if
+a memory allocation has been @emph{marked} to indicate that it should never be
+freed.  This can only be performed from the source code by calling
+@code{__mp_setmark()} with the address of the memory allocation.  Such a memory
+allocation can be reallocated but never freed, and will not contribute to the
+list of memory leaks.
+
 You may also have noticed the use of @code{__mp_syminfo()} in the above example.
 This function is very similar to the @code{__mp_info()} function except that
 instead of looking for the details of a memory allocation at a specific address,
@@ -3085,11 +3100,9 @@ symbol names so that they can be processed properly by a C++ demangler if
 necessary.  Passing a file descriptor of @samp{0} to @code{malloc_dump()} or
 @code{malloc_list()} results in the output being sent to the mpatrol log file.
 
-The @code{malloc_inuse()} function does not deduct any memory used by marked
-allocations, contrary to the behaviour of the Dbmalloc library.  In addition,
-the @code{malloc_size()} and @code{malloc_mark()} functions do not give an error
+The @code{malloc_size()} and @code{malloc_mark()} functions do not give an error
 message if the pointer passed in does not correspond to a heap allocation.
-Neither of these three functions automatically perform an integrity check of the
+Neither of these functions automatically perform an integrity check of the
 heap.  Note that the @code{malloc_chain_check()} function will never return a
 non-zero value --- it always terminates with an error message in the mpatrol log
 file whenever it detects heap corruption.  As a result, the
@@ -4757,7 +4770,8 @@ arena.  An arena can have as many allocations added to it as required, but
 allocations cannot usually be freed until the whole arena is freed.  Note that
 there are not really any generic implementations of arenas that are available as
 everyone tends to write their own version when they require it, although SGI
-IRIX systems do come with an arena library called @emph{amalloc}.
+IRIX and Compaq Tru64 systems do come with an arena library called
+@emph{amalloc}.
 
 @cindex slot tables
 However, what if you don't plan to free all of the blocks at the same time?  A
@@ -5234,6 +5248,7 @@ allocation count:  52
 allocation peak:   20 (427512 bytes)
 allocation limit:  0 bytes
 allocated blocks:  7 (1528 bytes)
+marked blocks:     0 (0 bytes)
 freed blocks:      0 (0 bytes)
 free blocks:       4 (432648 bytes)
 internal blocks:   33 (540672 bytes)
@@ -5513,16 +5528,17 @@ example have been numbered and their descriptions appear below.
 30  allocation peak:   20 (427512 bytes)
 31  allocation limit:  0 bytes
 32  allocated blocks:  7 (1528 bytes)
-33  freed blocks:      0 (0 bytes)
-34  free blocks:       4 (432648 bytes)
-35  internal blocks:   33 (540672 bytes)
-36  total heap usage:  974848 bytes
-37  total compared:    0 bytes
-38  total located:     2 bytes
-39  total copied:      32176 bytes
-40  total set:         582856 bytes
-41  total warnings:    0
-42  total errors:      1
+33  marked blocks:     0 (0 bytes)
+34  freed blocks:      0 (0 bytes)
+35  free blocks:       4 (432648 bytes)
+36  internal blocks:   33 (540672 bytes)
+37  total heap usage:  974848 bytes
+38  total compared:    0 bytes
+39  total located:     2 bytes
+40  total copied:      32176 bytes
+41  total set:         582856 bytes
+42  total warnings:    0
+43  total errors:      1
 @end smallexample
 
 @enumerate 1
@@ -5705,18 +5721,25 @@ option.
 @cindex allocated blocks
 Allocated blocks.
 @item
+@cindex marked blocks
+Marked blocks.
+@item
 @cindex freed blocks
 Freed blocks.
 @item
 @cindex free blocks
-Free blocks.  These values contain the total number of allocated, freed and
-free blocks at the time the summary was produced.  A freed block is an allocated
-block that has been freed but has not been returned to the free memory list for
-later allocation.  These values may be different from those expected if the
-mpatrol library makes any memory allocations during initialisation.  In this
-example a large amount of memory is used by the system object file access
-library which is used for reading the symbols from the program's executable file
-and any shared libraries that it requires.
+Free blocks.  These values contain the total number of allocated, marked, freed
+and free blocks at the time the summary was produced.  A marked block is an
+allocated block that the user has instructed (via the @code{__mp_setmark()}
+function) the mpatrol library should remain allocated for the rest of the
+lifetime of the program and should never be freed or counted as a memory leak.
+A freed block is an allocated block that has been freed but has not been
+returned to the free memory list for later allocation.  These values may be
+different from those expected if the mpatrol library makes any memory
+allocations during initialisation.  In this example a large amount of memory is
+used by the system object file access library which is used for reading the
+symbols from the program's executable file and any shared libraries that it
+requires.
 
 @cindex internal blocks
 @item
@@ -10681,6 +10704,16 @@ Solaris 8, SPARC V9, ELF32/ELF64, @command{g++}
 @itemize @bullet
 @item
 The @option{USEDEBUG} option has no effect.
+@item
+The mpatrol library can be compiled and run in a 64-bit environment.
+@end itemize
+
+@cindex Tru64, Alpha
+@item
+Tru64 5.0, Alpha, BFD, @command{cxx}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
