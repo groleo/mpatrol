@@ -62,13 +62,11 @@ typedef struct stackinfo
     void *frames[MP_MAXSTACK]; /* array of frame pointers */
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
     size_t index;              /* current stack index */
-#else /* MP_BUILTINSTACK_SUPPORT */
-#if SYSTEM == SYSTEM_HPUX
+#elif SYSTEM == SYSTEM_HPUX
     struct frameinfo next;     /* next frame handle */
-#else /* SYSTEM */
+#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
     void *next;                /* next frame handle */
-#endif /* SYSTEM */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
 }
 stackinfo;
 
