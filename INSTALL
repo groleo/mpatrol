@@ -51,3 +51,10 @@ Building and installing
     so you may or may not also be able to copy the cat1 and cat3 subdirectories
     as well.  The man* subdirectories contain the unformatted manual pages while
     the cat* subdirectories contain the formatted manual pages.
+
+  * Go up one directory level into the doc directory and examine the files
+    located there.  The mpatrol.texi file contains the Texinfo source for the
+    manual and can be translated into a wide variety of documentation formats.
+    There may already be translated files in the doc directory, but if not you
+    will have to generate them yourself using an appropriate tool and then
+    install or print them.
