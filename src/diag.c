@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.74 2001-03-07 21:16:31 graeme Exp $"
+#ident "$Id: diag.c,v 1.75 2001-03-07 21:29:10 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.74 2001-03-07 21:16:31 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.75 2001-03-07 21:29:10 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1539,6 +1539,8 @@ __mp_printsummary(infohead *h)
     __mp_printsize(h->limit);
     __mp_diag("\nallocated blocks:  %lu (", h->alloc.atree.size);
     __mp_printsize(h->alloc.asize);
+    __mp_diag(")\nmarked blocks:     %lu (", h->mcount);
+    __mp_printsize(h->mtotal);
     __mp_diag(")\nfreed blocks:      %lu (", h->alloc.gtree.size);
     __mp_printsize(h->alloc.gsize);
     __mp_diag(")\nfree blocks:       %lu (", h->alloc.ftree.size);
