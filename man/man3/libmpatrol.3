@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.31 2001-07-26 16:31:08 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.32 2001-07-26 16:56:37 graeme Exp $
 .\"
 .TH LIBMPATROL 3 "26 July 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -1028,9 +1028,11 @@ c l.
 Installs a low-memory handler and returns a pointer to the previously installed
 handler, or the null pointer if no handler had been previously installed.  This
 will be called once by C memory allocation functions, and repeatedly by C++
-memory allocation functions, when they would normally return \fBNULL\fP.  Note
-that this function is equivalent to \fBset_new_handler\fP and will replace the
-handler installed by that function.
+memory allocation functions, when they would normally return \fBNULL\fP.  The
+four arguments contain the function name, file name, line number and the return
+address of the calling function, or null pointers and zero if they cannot be
+determined.  Note that this function is equivalent to \fBset_new_handler\fP and
+will replace the handler installed by that function.
 .TP
 \fB__mp_printf\fP
 Writes format string \fIfmt\fP with variable arguments to the log file, with

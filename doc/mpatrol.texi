@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.229 2001-07-26 16:31:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.230 2001-07-26 16:56:17 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2883,7 +2883,9 @@ install a low-memory handler with the @code{__mp_nomemory()} function, which
 will be called by the mpatrol library if it ever runs out of memory during the
 call to a memory allocation function.  This gives you the opportunity to use
 that handler to either free up any unneeded memory or simply to abort, thus
-removing the need to check for failed allocations.
+removing the need to check for failed allocations.  Note that the low-memory
+handler also accepts the same four common arguments that the prologue and
+epilogue handlers do.
 
 It is also possible to iterate over all of the allocated and freed memory
 allocations that are currently in the heap at any point in a program.  This is
@@ -9323,9 +9325,11 @@ pointers and zero if they cannot be determined):
 Installs a low-memory handler and returns a pointer to the previously installed
 handler, or the @samp{NULL} pointer if no handler had been previously installed.
 This will be called once by C memory allocation functions, and repeatedly by C++
-memory allocation functions, when they would normally return @samp{NULL}.  Note
-that this function is equivalent to @code{set_new_handler()} and will replace
-the handler installed by that function.
+memory allocation functions, when they would normally return @samp{NULL}.  The
+four arguments contain the function name, file name, line number and the return
+address of the calling function, or null pointers and zero if they cannot be
+determined.  Note that this function is equivalent to @code{set_new_handler()}
+and will replace the handler installed by that function.
 
 @findex __mp_printf
 @item @code{int __mp_printf(const char *fmt, ...)}
