@@ -267,6 +267,15 @@ __mp_allocinfo;
 #undef bcmp
 #endif /* bcmp */
 
+#ifdef __cplusplus
+#ifdef new
+#undef new
+#endif /* new */
+#ifdef delete
+#undef delete
+#endif /* delete */
+#endif /* __cplusplus */
+
 
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
                              __LINE__, 0)
@@ -365,6 +374,10 @@ __asm void (*__mp_prologue(register __a0 void (*)(void *, size_t)))
            (void *, size_t);
 __asm void (*__mp_epilogue(register __a0 void (*)(void *)))(void *);
 __asm void (*__mp_nomemory(register __a0 void (*)(void)))(void);
+__asm void __mp_pushdelstack(register __a0 char *, register __a1 char *,
+                             register __d0 unsigned long);
+__asm void __mp_popdelstack(register __a0 char **, register __a1 char **,
+                            register __a2 unsigned long *);
 
 #else /* AMIGA */
 
@@ -392,6 +405,8 @@ void __mp_check(void);
 void (*__mp_prologue(void (*)(void *, size_t)))(void *, size_t);
 void (*__mp_epilogue(void (*)(void *)))(void *);
 void (*__mp_nomemory(void (*)(void)))(void);
+void __mp_pushdelstack(char *, char *, unsigned long);
+void __mp_popdelstack(char **, char **, unsigned long *);
 
 #endif /* AMIGA */
 
@@ -438,7 +453,11 @@ static inline void *operator new[](size_t l, char *s, char *t, unsigned long u)
 
 static inline void operator delete(void *p)
 {
-    __mp_free(p, MP_AT_DELETE, NULL, NULL, 0, 0);
+    char *s, *t;
+    unsigned long u;
+
+    __mp_popdelstack(&s, &t, &u);
+    __mp_free(p, MP_AT_DELETE, s, t, u, 0);
 }
 
 
@@ -447,11 +466,16 @@ static inline void operator delete(void *p)
 
 static inline void operator delete[](void *p)
 {
-    __mp_free(p, MP_AT_DELETEVEC, NULL, NULL, 0, 0);
+    char *s, *t;
+    unsigned long u;
+
+    __mp_popdelstack(&s, &t, &u);
+    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 0);
 }
 
 
 #define new ::new(MP_FUNCNAME, __FILE__, __LINE__)
+#define delete __mp_pushdelstack(MP_FUNCNAME, __FILE__, __LINE__); ::delete
 
 #endif /* __cplusplus */
 
