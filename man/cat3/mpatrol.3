@@ -61,7 +61,7 @@ DDEESSCCRRIIPPTTIIOONN
 
 
 
-Release 1.0              15 October 1999                        1
+Release 1.0              21 October 1999                        1
 
 
 
@@ -127,7 +127,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        2
+Release 1.0              21 October 1999                        2
 
 
 
@@ -193,7 +193,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        3
+Release 1.0              21 October 1999                        3
 
 
 
@@ -259,7 +259,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        4
+Release 1.0              21 October 1999                        4
 
 
 
@@ -325,7 +325,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        5
+Release 1.0              21 October 1999                        5
 
 
 
@@ -391,7 +391,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        6
+Release 1.0              21 October 1999                        6
 
 
 
@@ -457,7 +457,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              15 October 1999                        7
+Release 1.0              21 October 1999                        7
 
 
 
@@ -523,7 +523,7 @@ LLIINNKKIINNGG
 
 
 
-Release 1.0              15 October 1999                        8
+Release 1.0              21 October 1999                        8
 
 
 
@@ -583,13 +583,13 @@ EENNVVIIRROONNMMEENNTT
               Note that this setting will be ignored if its value
               is zero.  Default value: AALLLLOOCCSSTTOOPP=_0.
 
-       CCHHEECCKKAALLLL
-              Equivalent to the  CCHHEECCKKAALLLLOOCCSS,  CCHHEECCKKRREEAALLLLOOCCSS  and
-              CCHHEECCKKFFRREEEESS options specified together.
+       CCHHEECCKK=_u_n_s_i_g_n_e_d _r_a_n_g_e
+              Specifies a range of allocation indices at which to
+              check  the  integrity  of  free memory and overflow
 
 
 
-Release 1.0              15 October 1999                        9
+Release 1.0              21 October 1999                        9
 
 
 
@@ -597,6 +597,20 @@ Release 1.0              15 October 1999                        9
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              buffers.  The range must be specified  as  no  more
+              than two unsigned integers separated by a dash.  If
+              numbers on either the left side or the  right  side
+              of  the  dash are omitted then they will be assumed
+              to be _0 and _i_n_f_i_n_i_t_y respectively.  A value of _0 on
+              its  own  indicates that no such checking will ever
+              be performed.  This option can be used to speed  up
+              the  execution  speed of the library at the expense
+              of checking.  Default value: CCHHEECCKK=_-.
+
+       CCHHEECCKKAALLLL
+              Equivalent to the  CCHHEECCKKAALLLLOOCCSS,  CCHHEECCKKRREEAALLLLOOCCSS  and
+              CCHHEECCKKFFRREEEESS options specified together.
 
        CCHHEECCKKAALLLLOOCCSS
               Checks  that no attempt is made to allocate a block
@@ -638,6 +652,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               program when it is being freed.   When  the  memory
               allocation  with  the specified allocation index is
               to be freed the program will  be  halted,  and  its
+
+
+
+Release 1.0              21 October 1999                       10
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               state  may  be examined at that point using a suit-
               able debugger.  Note  that  this  setting  will  be
               ignored  if  its  value  is  zero.   Default value:
@@ -652,18 +678,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               ory  should increase beyond this.  This can be used
               to stress-test software to see how  it  behaves  in
               low memory conditions.  The internal memory used by
-
-
-
-Release 1.0              15 October 1999                       10
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               the library itself will not be counted as  part  of
               the  total heap size, but on some systems there may
               be a small amount of memory required to  initialise
@@ -704,6 +718,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               memory reallocations made internally by the library
               will not be logged.
 
+
+
+
+Release 1.0              21 October 1999                       11
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
        NNOOFFRREEEE Specifies that the mpatrol library should keep  all
               reallocated  and  freed  memory  allocations.  Such
               freed memory allocations will then  be  flagged  as
@@ -718,18 +744,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        NNOOPPRROOTTEECCTT
               Specifies  that the mpatrol library's internal data
               structures should not be made read-only after every
-
-
-
-Release 1.0              15 October 1999                       11
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               memory  allocation  reallocation  or  deallocation.
               This may significantly speed up execution but  this
               will  be  at the expense of less safety if the pro-
@@ -770,6 +784,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        PPAAGGEEAALLLLOOCC=_L_O_W_E_R|_U_P_P_E_R
               Specifies that each  individual  memory  allocation
+
+
+
+Release 1.0              21 October 1999                       12
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               should  occupy  at least one page of virtual memory
               and should be placed at the lowest or highest point
               within  these  pages.   This  allows the library to
@@ -783,20 +809,8 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        PPRREESSEERRVVEE
               Specifies that  any  reallocated  or  freed  memory
-              allocations    should   preserve   their   original
-
-
-
-Release 1.0              15 October 1999                       12
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
-              contents.  This option must be used with the NNOOFFRREEEE
+              allocations  should  preserve  their  original con-
+              tents.  This option must be used  with  the  NNOOFFRREEEE
               option and has no effect otherwise.
 
        PPRROOGGFFIILLEE=_s_t_r_i_n_g
@@ -837,6 +851,17 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               tion.  This step will not be performed if an abnor-
               mal termination occurs or if the heap is empty.
 
+
+
+Release 1.0              21 October 1999                       13
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
        SSHHOOWWSSYYMMBBOOLLSS
               Specifies that a summary of  all  of  the  function
               symbols  read  from  the  program's executable file
@@ -850,18 +875,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               ory allocations should be displayed at the  end  of
               program execution.  This step will not be performed
               if an abnormal termination occurs or if  there  are
-
-
-
-Release 1.0              15 October 1999                       13
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               no unfreed allocations.
 
        UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
@@ -903,6 +916,18 @@ CCOOPPYYRRIIGGHHTT
        This library is distributed in the hope that  it  will  be
        useful, but WITHOUT ANY WARRANTY; without even the implied
        warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+
+
+
+Release 1.0              21 October 1999                       14
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
        PURPOSE.   See  the GNU Library General Public License for
        more details.
 
@@ -919,6 +944,47 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-Release 1.0              15 October 1999                       14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Release 1.0              21 October 1999                       15
 
 

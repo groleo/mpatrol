@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.3 1999-10-14 23:59:42 graeme Exp $
+.\" $Id: mpatrol.3,v 1.4 1999-10-21 21:35:07 graeme Exp $
 .\"
-.TH MPATROL 3 "15 October 1999" "Release 1.0" "mpatrol library"
+.TH MPATROL 3 "21 October 1999" "Release 1.0" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -418,6 +418,16 @@ allocated.  When the number of memory allocations reaches this number the
 program will be halted, and its state may be examined at that point by using
 a suitable debugger.  Note that this setting will be ignored if its value is
 zero.  Default value: \fBALLOCSTOP\fP=\fI0\fP.
+.TP
+\fBCHECK\fP=\fIunsigned range\fP
+Specifies a range of allocation indices at which to check the integrity of free
+memory and overflow buffers.  The range must be specified as no more than two
+unsigned integers separated by a dash.  If numbers on either the left side or
+the right side of the dash are omitted then they will be assumed to be \fI0\fP
+and \fIinfinity\fP respectively.  A value of \fI0\fP on its own indicates that
+no such checking will ever be performed.  This option can be used to speed up
+the execution speed of the library at the expense of checking.  Default value:
+\fBCHECK\fP=\fI-\fP.
 .TP
 \fBCHECKALL\fP
 Equivalent to the \fBCHECKALLOCS\fP, \fBCHECKREALLOCS\fP and \fBCHECKFREES\fP

@@ -37,6 +37,11 @@ OOPPTTIIOONNSS
               [AALLLLOOCCBBYYTTEE]   Specifies  an 8-bit byte pattern with
               which to prefill newly-allocated memory.
 
+       --CC <_u_n_s_i_g_n_e_d _r_a_n_g_e>
+              [CCHHEECCKK]  Specifies a range of allocation indices at
+              which  to  check  the  integrity of free memory and
+              overflow buffers.
+
        --cc     [CCHHEECCKKAALLLL]  Specifies that all arguments  to  func-
               tions  which  allocate,  reallocate  and deallocate
               memory have rigorous checks performed on them.
@@ -53,15 +58,10 @@ OOPPTTIIOONNSS
               option will only work if the dynamic linker  recog-
               nises the LLDD__PPRREELLOOAADD environment variable.
 
-       --ee <_s_t_r_i_n_g>
-              [PPRROOGGFFIILLEE]   Specifies an alternative filename with
-              which to locate the executable file containing  the
-              program's symbols.
 
 
 
-
-Release 1.0              15 October 1999                        1
+Release 1.0              21 October 1999                        1
 
 
 
@@ -69,6 +69,11 @@ Release 1.0              15 October 1999                        1
 
 MPATROL(1)               mpatrol library               MPATROL(1)
 
+
+       --ee <_s_t_r_i_n_g>
+              [PPRROOGGFFIILLEE]   Specifies an alternative filename with
+              which to locate the executable file containing  the
+              program's symbols.
 
        --FF <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [FFRREEEESSTTOOPP]   Specifies an allocation index at which
@@ -119,15 +124,10 @@ MPATROL(1)               mpatrol library               MPATROL(1)
 
        --RR <_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r>
               [RREEAALLLLOOCCSSTTOOPP]  Specifies  an  allocation  index  at
-              which  to stop the program when a memory allocation
-              is being reallocated.
-
-       --SS     [SSHHOOWWMMAAPP & SSHHOOWWSSYYMMBBOOLLSS]  Specifies  that  a  memory
-              map  of the entire heap and a summary of all of the
 
 
 
-Release 1.0              15 October 1999                        2
+Release 1.0              21 October 1999                        2
 
 
 
@@ -136,6 +136,11 @@ Release 1.0              15 October 1999                        2
 MPATROL(1)               mpatrol library               MPATROL(1)
 
 
+              which  to stop the program when a memory allocation
+              is being reallocated.
+
+       --SS     [SSHHOOWWMMAAPP & SSHHOOWWSSYYMMBBOOLLSS]  Specifies  that  a  memory
+              map  of the entire heap and a summary of all of the
               function symbols read from the program's executable
               file should be displayed at the end of program exe-
               cution.
@@ -188,11 +193,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-
-Release 1.0              15 October 1999                        3
+Release 1.0              21 October 1999                        3
 
 
