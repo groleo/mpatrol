@@ -18,16 +18,16 @@
 # MA 02111-1307, USA.
 
 
-# GNU Makefile to compile on UNIX with GCC
+# GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.52 2001-02-01 20:46:21 graeme Exp $
+# $Id: Makefile,v 1.53 2001-02-04 21:31:54 graeme Exp $
 
 
 # Definitions
 
 SHELL = /bin/sh
-CC    = gcc
+CC    = g++
 AR    = ar
 LD    = $(CC)
 LINT  = lint

@@ -18,15 +18,15 @@
 # MA 02111-1307, USA.
 
 
-# GNU Makefile to compile on AmigaOS with GCC
+# GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.43 2001-02-01 20:46:19 graeme Exp $
+# $Id: Makefile,v 1.44 2001-02-04 21:28:36 graeme Exp $
 
 
 # Definitions
 
-CC = gcc
+CC = g++
 AR = ar
 
 SOURCE = ../../src
