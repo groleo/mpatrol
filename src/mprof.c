@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.7 2000-04-26 00:12:28 graeme Exp $"
+#ident "$Id: mprof.c,v 1.8 2000-04-26 23:05:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -161,6 +161,20 @@ static FILE *proffile;
  */
 
 static char *progname;
+
+
+/* Indicates if different allocation points within single functions should
+ * be noted when displaying the profiling tables.
+ */
+
+static int useaddresses;
+
+
+/* Indicates if the emphasis will be on allocation counts rather than
+ * allocated bytes when displaying the profiling tables.
+ */
+
+static int showcounts;
 
 
 /* Clear the statistics for a set of profiling data.
@@ -437,59 +451,143 @@ static void bintable(void)
 
 static void directtable(void)
 {
+    profiledata *d;
     profilenode *n, *p;
-    profiledata d;
+    treenode *t;
+    profiledata m;
     size_t i;
     unsigned long a, b, c;
+    double e, f;
 
+    cleardata(&m);
     printchar(' ', 31);
     fputs("DIRECT ALLOCATIONS\n\n", stdout);
-    printchar(' ', 14);
-    fputs("allocated", stdout);
-    printchar(' ', 15);
-    fputs("unfreed\n", stdout);
-    printchar(' ', 8);
-    printchar('-', 21);
-    fputs("  ", stdout);
-    printchar('-', 21);
-    fputs("\n     %     bytes   s  m  l  x     "
-          "bytes   s  m  l  x   calls  function\n\n", stdout);
+    if (showcounts)
+    {
+        printchar(' ', 9);
+        fputs("allocated", stdout);
+        printchar(' ', 21);
+        fputs("unfreed\n", stdout);
+        printchar('-', 27);
+        fputs("  ", stdout);
+        printchar('-', 27);
+        fputs("\n count       %   s  m  l  x   "
+              "count       %   s  m  l  x     bytes  function\n\n", stdout);
+    }
+    else
+    {
+        printchar(' ', 10);
+        fputs("allocated", stdout);
+        printchar(' ', 23);
+        fputs("unfreed\n", stdout);
+        printchar('-', 29);
+        fputs("  ", stdout);
+        printchar('-', 29);
+        fputs("\n   bytes       %   s  m  l  x     "
+              "bytes       %   s  m  l  x   count  function\n\n", stdout);
+    }
     for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL; n = p)
     {
         p = (profilenode *) __mp_successor(&n->node);
         if (n->data != 0)
         {
-            d = data[n->data - 1];
-            while ((p != NULL) && ((p->addr == n->addr) ||
-                   ((p->symbol != 0) && (p->symbol == n->symbol))))
+            d = &n->tdata;
+            sumdata(d, &data[n->data - 1]);
+            while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
+                     (p->symbol != 0) && (p->symbol == n->symbol))))
             {
-                n = p;
-                p = (profilenode *) __mp_successor(&n->node);
-                if (n->data != 0)
-                    sumdata(&d, &data[n->data - 1]);
+                if (p->data != 0)
+                    sumdata(d, &data[p->data - 1]);
+                p = (profilenode *) __mp_successor(&p->node);
             }
-            a = b = c = 0;
+            a = 0;
             for (i = 0; i < 4; i++)
-            {
-                a += d.atotal[i];
-                b += d.dtotal[i];
-                c += d.acount[i];
-                d.dcount[i] = d.acount[i] - d.dcount[i];
-                d.dtotal[i] = d.atotal[i] - d.dtotal[i];
-            }
-            b = a - b;
-            fprintf(stdout, "%6.2f  %8lu ",
-                    ((double) a / (double) atotal) * 100.0, a);
-            printdata(d.atotal, atotal);
-            fprintf(stdout, "  %8lu ", b);
-            printdata(d.dtotal, dtotal);
-            fprintf(stdout, "  %6lu  ", c);
-            if (n->symbol != 0)
-                fprintf(stdout, "%s\n", symbols + n->symbol);
-            else
-                fprintf(stdout, MP_POINTER "\n", n->addr);
+                if (showcounts)
+                    a += d->acount[i];
+                else
+                    a += d->atotal[i];
+            __mp_treeinsert(&temptree, &n->tnode, a);
+            sumdata(&m, d);
         }
     }
+    for (t = __mp_maximum(temptree.root); t != NULL; t = __mp_predecessor(t))
+    {
+        n = (profilenode *) ((char *) t - offsetof(profilenode, tnode));
+        d = &n->tdata;
+        a = t->key;
+        b = c = 0;
+        for (i = 0; i < 4; i++)
+        {
+            if (showcounts)
+            {
+                b += d->dcount[i];
+                c += d->atotal[i];
+            }
+            else
+            {
+                b += d->dtotal[i];
+                c += d->acount[i];
+            }
+            d->dcount[i] = d->acount[i] - d->dcount[i];
+            d->dtotal[i] = d->atotal[i] - d->dtotal[i];
+        }
+        b = a - b;
+        if (showcounts)
+        {
+            e = ((double) a / (double) acount) * 100.0;
+            if (acount != dcount)
+                f = ((double) b / (double) (acount - dcount)) * 100.0;
+            else
+                f = 0.0;
+            fprintf(stdout, "%6lu  %6.2f ", a, e);
+            printdata(d->acount, acount);
+            fprintf(stdout, "  %6lu  %6.2f ", b, f);
+            printdata(d->dcount, acount - dcount);
+            fprintf(stdout, "  %8lu  ", c);
+        }
+        else
+        {
+            e = ((double) a / (double) atotal) * 100.0;
+            if (atotal != dtotal)
+                f = ((double) b / (double) (atotal - dtotal)) * 100.0;
+            else
+                f = 0.0;
+            fprintf(stdout, "%8lu  %6.2f ", a, e);
+            printdata(d->atotal, atotal);
+            fprintf(stdout, "  %8lu  %6.2f ", b, f);
+            printdata(d->dtotal, atotal - dtotal);
+            fprintf(stdout, "  %6lu  ", c);
+        }
+        if (n->symbol != 0)
+            fprintf(stdout, "%s\n", symbols + n->symbol);
+        else
+            fprintf(stdout, MP_POINTER "\n", n->addr);
+        cleardata(d);
+    }
+    for (i = 0; i < 4; i++)
+    {
+        m.dcount[i] = m.acount[i] - m.dcount[i];
+        m.dtotal[i] = m.atotal[i] - m.dtotal[i];
+    }
+    if (temptree.size != 0)
+        fputc('\n', stdout);
+    if (showcounts)
+    {
+        fprintf(stdout, "%6lu         ", acount);
+        printdata(m.acount, acount);
+        fprintf(stdout, "  %6lu         ", acount - dcount);
+        printdata(m.dcount, acount - dcount);
+        fprintf(stdout, "  %8lu  total\n", atotal);
+    }
+    else
+    {
+        fprintf(stdout, "%8lu         ", atotal);
+        printdata(m.atotal, atotal);
+        fprintf(stdout, "  %8lu         ", atotal - dtotal);
+        printdata(m.dtotal, atotal - dtotal);
+        fprintf(stdout, "  %6lu  total\n", acount);
+    }
+    __mp_newtree(&temptree);
 }
 
 
@@ -503,9 +601,15 @@ int main(int argc, char **argv)
 
     e = v = 0;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "V")) != EOF)
+    while ((c = __mp_getopt(argc, argv, "acV")) != EOF)
         switch (c)
         {
+          case 'a':
+            useaddresses = 1;
+            break;
+          case 'c':
+            showcounts = 1;
+            break;
           case 'V':
             v = 1;
             break;
@@ -527,7 +631,7 @@ int main(int argc, char **argv)
     }
     if ((argc > 1) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [-V] [file]\n", progname);
+        fprintf(stderr, "Usage: %s [-acV] [file]\n", progname);
         exit(EXIT_FAILURE);
     }
     if (argc == 1)
