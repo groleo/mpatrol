@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.37 2000-05-23 23:10:27 graeme Exp $"
+#ident "$Id: inter.c,v 1.38 2000-05-24 00:04:10 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -87,19 +87,18 @@ extern void **__piob;
 
 static void savesignals(void)
 {
+#if MP_THREADS_SUPPORT
+    __mp_lockmutex(MT_MAIN);
+#endif /* MP_THREADS_SUPPORT */
     /* Only perform this step if we are not doing a recursive call.
      */
-    if (!memhead.recur)
+    if (memhead.recur++ == 0)
     {
-#if MP_THREADS_SUPPORT
-        __mp_lockmutex(MT_MAIN);
-#endif /* MP_THREADS_SUPPORT */
         if (!memhead.init)
             __mp_initsignals(&memhead.signals);
         if (memhead.flags & FLG_SAFESIGNALS)
             __mp_savesignals(&memhead.signals);
     }
-    memhead.recur++;
 }
 
 
@@ -111,14 +110,11 @@ static void restoresignals(void)
 {
     /* Only perform this step if we are not doing a recursive call.
      */
-    memhead.recur--;
-    if (!memhead.recur)
-    {
+    if (--memhead.recur == 0)
         __mp_restoresignals(&memhead.signals);
 #if MP_THREADS_SUPPORT
-        __mp_unlockmutex(MT_MAIN);
+    __mp_unlockmutex(MT_MAIN);
 #endif /* MP_THREADS_SUPPORT */
-    }
 }
 
 
