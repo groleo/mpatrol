@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.8 2000-12-26 10:46:17 graeme Exp $"
+#ident "$Id: mleak.c,v 1.9 2001-01-18 20:31:55 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -172,7 +172,7 @@ freealloc(unsigned long i)
 
 static
 char *
-getline(void)
+getnextline(void)
 {
     static char s[MP_BUFFER_SIZE + 1];
     unsigned long i;
@@ -213,7 +213,7 @@ readfile(void)
     char *s, *t;
     unsigned long a, l, n, o;
 
-    while (s = getline())
+    while (s = getnextline())
         if (strncmp(s, "ALLOC: ", 7) == 0)
         {
             /* Parse relevant details from the memory allocation and
@@ -235,7 +235,8 @@ readfile(void)
                     /* Don't record the allocation if the pointer returned is
                      * NULL.
                      */
-                    while ((s = getline()) && (strncmp(s, "returns ", 8) != 0));
+                    while ((s = getnextline()) &&
+                           (strncmp(s, "returns ", 8) != 0));
                     if ((n != 0) && (s != NULL) &&
                         (a = strtoul(s + 8, NULL, 0)))
                         newalloc(n, a, l, o);
@@ -254,11 +255,11 @@ readfile(void)
                 *t = '\0';
                 if (a = strtoul(s + 1, NULL, 0))
                 {
-                    while ((s = getline()) && (*s != '\0'));
+                    while ((s = getnextline()) && (*s != '\0'));
                     /* Don't record the deallocation if a warning or error
                      * occurred.
                      */
-                    if ((s = getline()) && (strncmp(s, "    ", 4) == 0) &&
+                    if ((s = getnextline()) && (strncmp(s, "    ", 4) == 0) &&
                         (s = strchr(s + 4, ':')) && (t = strchr(s + 1, ':')))
                     {
                         /* Get the allocation index.
@@ -275,7 +276,7 @@ readfile(void)
              * allocations in the log file.  In this case we just parse them
              * anyway, adding any new entries to the allocation tree.
              */
-            while (s = getline())
+            while (s = getnextline())
             {
                 /* Parse relevant details from the unfreed allocation and
                  * add the allocation to the allocation tree.
@@ -305,7 +306,7 @@ readfile(void)
                         }
                     }
                 }
-                while ((s = getline()) && (*s != '\0'));
+                while ((s = getnextline()) && (*s != '\0'));
             }
 }
 
@@ -337,7 +338,7 @@ printallocs(void)
          * we can format it in the same way as that displayed for the
          * SHOWUNFREED option.
          */
-        if (s = getline())
+        if (s = getnextline())
             if ((strncmp(s, "ALLOC: ", 7) == 0) &&
                 (t = strchr(s + 7, '(')) && (t > s) && (*(t = t - 1) == ' '))
             {
@@ -348,7 +349,7 @@ printallocs(void)
                     printf("    " MP_POINTER " (%lu byte%s) {%s:%lu:0} %s\n",
                            n->addr, n->size, (n->size == 1) ? "" : "s", r,
                            n->node.key, s);
-                    while ((s = getline()) && (*s != '\0'))
+                    while ((s = getnextline()) && (*s != '\0'))
                         puts(s);
                     if (alloctree.size > 1)
                         putchar('\n');
@@ -357,7 +358,7 @@ printallocs(void)
             else
             {
                 puts(s);
-                while ((s = getline()) && (*s != '\0'))
+                while ((s = getnextline()) && (*s != '\0'))
                     puts(s);
                 if (alloctree.size > 1)
                     putchar('\n');
