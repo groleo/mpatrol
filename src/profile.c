@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.12 2000-04-20 18:14:13 graeme Exp $"
+#ident "$Id: profile.c,v 1.13 2000-04-20 18:37:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -263,6 +263,7 @@ MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 
 MP_GLOBAL int __mp_writeprofile(profhead *p)
 {
+    char s[4];
     profnode *n;
     FILE *f;
     size_t i;
@@ -290,6 +291,10 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
      * that if an error does occur then it will not be too drastic if we
      * continue writing the rest of the file.
      */
+    __mp_memcopy(s, MP_PROFMAGIC, 4);
+    fwrite(s, sizeof(char), 4, f);
+    /* Write out the allocation and deallocation bins.
+     */
     i = MP_BIN_SIZE;
     fwrite(&i, sizeof(size_t), 1, f);
     fwrite(p->acounts, sizeof(size_t), MP_BIN_SIZE, f);
@@ -298,6 +303,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
     fwrite(&p->dtotals, sizeof(size_t), 1, f);
     /* Write out the statistics from every call site.
      */
+    fwrite(&p->tree.size, sizeof(size_t), 1, f);
     for (n = (profnode *) __mp_minimum(p->tree.root); n != NULL;
          n = (profnode *) __mp_successor(&n->data.node))
     {
@@ -307,6 +313,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p)
         fwrite(n->data.data.dcount, sizeof(size_t), 4, f);
         fwrite(n->data.data.dtotal, sizeof(size_t), 4, f);
     }
+    fwrite(s, sizeof(char), 4, f);
     if ((f != stderr) && (f != stdout) && fclose(f))
         return 0;
     return 1;
