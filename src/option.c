@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.17 2000-06-29 18:03:23 graeme Exp $"
+#ident "$Id: option.c,v 1.18 2000-07-16 23:01:36 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -136,9 +136,9 @@ static char *options_help[] =
     "MEDIUMBOUND", "unsigned integer",
     "", "Specifies the limit in bytes up to which memory allocations should be",
     "", "classified as medium allocations for profiling purposes.",
-    "NOFREE", NULL,
-    "", "Specifies that the mpatrol library should keep all reallocated and",
-    "", "freed memory allocations.",
+    "NOFREE", "unsigned integer",
+    "", "Specifies that a number of recently-freed memory allocations should",
+    "", "be prevented from being returned to the free memory pool.",
     "NOPROTECT", NULL,
     "", "Specifies that the mpatrol library's internal data structures should",
     "", "not be made read-only after every memory allocation, reallocation or",
@@ -684,13 +684,16 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                 break;
               case 'N':
                 if (matchoption(o, "NOFREE"))
-                {
-                    if (*a != '\0')
-                        i = OE_IGNARGUMENT;
+                    if (*a == '\0')
+                        i = OE_NOARGUMENT;
+                    else if (a[readnumber(a, (long *) &n, 1)] != '\0')
+                        i = OE_BADNUMBER;
                     else
+                    {
+                        h->alloc.fmax = n;
+                        h->alloc.flags |= FLG_NOFREE;
                         i = OE_RECOGNISED;
-                    h->alloc.flags |= FLG_NOFREE;
-                }
+                    }
                 else if (matchoption(o, "NOPROTECT"))
                 {
                     if (*a != '\0')
