@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.192 2001-02-25 22:13:46 graeme Exp $
+@c $Id: mpatrol.texi,v 1.193 2001-03-04 20:43:08 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.6
-@set VERSION 1.4.1
-@set UPDATED 25th February, 2001
+@set EDITION 2.7
+@set VERSION 1.4.2
+@set UPDATED 4th March, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -236,7 +236,8 @@ library, and Alexander Barton (@email{abarton@@innotrac.com}) and Dave Gibson
 Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
 command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Boris
 Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and provided
-initial testing for the FreeBSD port.
+initial testing for the FreeBSD port and Ivan Finch (@email{i.finch@@rl.ac.uk})
+did the same for the Tru64 port.
 
 @cindex release builds
 Oh, and always remember to do final release builds without the mpatrol library
@@ -11891,11 +11892,11 @@ for Dynamic Storage Allocation and Memory Management}
 (@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
 (@email{zorn@@microsoft.com}).}.  They all provide some of the features that
 mpatrol contains and you may wish to use one of them to solve your problem if
-you have trouble using mpatrol.  I have only ever used Dbmalloc, Dmalloc,
-Electric Fence and Mprof, so I can't vouch for any of the others, although if
-you have any recommendations feel free to let me know so I can add them to this
-list.  In particular, there seems to be a shortage of such programs for Netware
-platforms.
+you have trouble using mpatrol.  I have only ever used CSRI malloc, Dbmalloc,
+Dmalloc, Electric Fence and Mprof, so I can't vouch for any of the others,
+although if you have any recommendations feel free to let me know so I can add
+them to this list.  In particular, there seems to be a shortage of such programs
+for Netware platforms.
 
 @cindex AProbe
 @cindex OC Systems
