@@ -36,9 +36,9 @@
 #include <winbase.h>
 #elif defined(_NETWARE)
 #include <nwthread.h>
-#else /* _WIN32 && _NETWARE */
+#else /* AMIGA && _WIN32 && _NETWARE */
 #include <pthread.h>
-#endif /* _WIN32 && _NETWARE */
+#endif /* AMIGA && _WIN32 && _NETWARE */
 
 
 #if defined(_WIN32)
