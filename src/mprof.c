@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.12 2000-04-30 16:29:53 graeme Exp $"
+#ident "$Id: mprof.c,v 1.13 2000-05-02 23:05:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -379,7 +379,7 @@ static void readfile(void)
     /* Read the string table containing the symbol names.
      */
     getentry(&i, sizeof(size_t), 1);
-    if (i > 1)
+    if (i > 0)
     {
         if ((symbols = (char *) malloc(i * sizeof(char))) == NULL)
         {
