@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.33 2000-11-21 21:47:08 graeme Exp $
+# $Id: Makefile,v 1.34 2000-11-22 22:07:26 graeme Exp $
 
 
 # Definitions
@@ -239,11 +239,7 @@ signals.t.o signals.s.t.o signals.t.ln: $(SOURCE)/signals.c \
 	$(SOURCE)/strtab.h $(SOURCE)/inter.h $(SOURCE)/profile.h \
 	$(SOURCE)/mutex.h
 mutex.t.o mutex.s.t.o mutex.t.ln: $(SOURCE)/mutex.c $(SOURCE)/mutex.h \
-	$(SOURCE)/inter.h $(SOURCE)/info.h $(SOURCE)/alloc.h $(SOURCE)/heap.h \
-	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
-	$(SOURCE)/addr.h $(SOURCE)/stack.h $(SOURCE)/profile.h \
-	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/signals.h \
-	$(SOURCE)/machine.h $(SOURCE)/config.h $(SOURCE)/target.h
+	$(SOURCE)/config.h $(SOURCE)/target.h
 diag.o diag.s.o diag.n.ln: $(SOURCE)/diag.c $(SOURCE)/diag.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
@@ -276,14 +272,15 @@ inter.o inter.s.o inter.n.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/diag.h $(SOURCE)/option.h $(SOURCE)/profile.h
+	$(SOURCE)/diag.h $(SOURCE)/option.h $(SOURCE)/profile.h \
+	$(SOURCE)/machine.h
 inter.t.o inter.s.t.o inter.t.ln: $(SOURCE)/inter.c $(SOURCE)/inter.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
 	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
 	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
 	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
 	$(SOURCE)/diag.h $(SOURCE)/mutex.h $(SOURCE)/option.h \
-	$(SOURCE)/profile.h
+	$(SOURCE)/profile.h $(SOURCE)/machine.h
 malloc.o malloc.s.o malloc.n.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
 	$(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
