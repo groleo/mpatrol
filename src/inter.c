@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.145 2001-09-04 21:41:27 graeme Exp $"
+#ident "$Id: inter.c,v 1.146 2001-09-04 22:42:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.145 2001-09-04 21:41:27 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.146 2001-09-04 22:42:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1793,6 +1793,39 @@ __mp_syminfo(void *p, symbolinfo *d)
     }
     restoresignals();
     return r;
+}
+
+
+/* Obtain the name of the function symbol that contains a given address.
+ */
+
+MP_API
+char *
+__mp_symbol(void *p)
+{
+    symnode *n;
+    char *s, *t;
+    unsigned long u;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (__mp_processid() != memhead.pid)
+        __mp_reinit();
+    if (n = __mp_findsymbol(&memhead.syms, p))
+        t = n->data.name;
+    else if (__mp_findsource(&memhead.syms, p, &s, &t, &u) && (s != NULL))
+    {
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        t = __mp_addstring(&memhead.syms.strings, s);
+        if (!(memhead.flags & FLG_NOPROTECT))
+            __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+    }
+    else
+        t = NULL;
+    restoresignals();
+    return t;
 }
 
 
