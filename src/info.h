@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.58 2001-07-26 15:08:57 graeme Exp $
+ * $Id: info.h,v 1.59 2001-07-26 16:40:59 graeme Exp $
  */
 
 
@@ -77,7 +77,7 @@
 typedef void (*prologuehandler)(void *, size_t, char *, char *, unsigned long,
                                 void *);
 typedef void (*epiloguehandler)(void *, char *, char *, unsigned long, void *);
-typedef void (*nomemoryhandler)(void);
+typedef void (*nomemoryhandler)(char *, char *, unsigned long, void *);
 
 
 /* The different types of memory allocation and operation functions.

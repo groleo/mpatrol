@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.131 2001-07-26 15:08:57 graeme Exp $
+ * $Id: mpatrol.h,v 1.132 2001-07-26 16:40:59 graeme Exp $
  */
 
 
@@ -285,7 +285,8 @@ typedef void (*__mp_prologuehandler)(MP_CONST void *, size_t, MP_CONST char *,
 typedef void (*__mp_epiloguehandler)(MP_CONST void *, MP_CONST char *,
                                      MP_CONST char *, unsigned long,
                                      MP_CONST void *);
-typedef void (*__mp_nomemoryhandler)(void);
+typedef void (*__mp_nomemoryhandler)(MP_CONST char *, MP_CONST char *,
+                                     unsigned long, MP_CONST void *);
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
