@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.39 2000-11-08 18:20:51 graeme Exp $"
+#ident "$Id: info.c,v 1.40 2000-11-09 18:53:49 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1112,23 +1112,29 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
  * then return the length of the string.
  */
 
-MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f)
+MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f,
+                               int g)
 {
     allocnode *n;
     infonode *m;
     treenode *t;
     void *b;
-    char *c;
+    char *c, *u;
     size_t l;
     int e;
 
+    if (g == 1)
+        u = p + *s;
+    else
+        u = NULL;
     *s = 0;
     if (p == NULL)
     {
-        __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+        if ((g == 0) || (u > p) || (h->flags & FLG_CHECKMEMORY))
+            __mp_error(f, "attempt to perform operation on a NULL pointer\n");
         return 0;
     }
-    e = 1;
+    e = 0;
     if ((n = __mp_findnode(&h->alloc, p, 1)) == NULL)
     {
         if ((t = __mp_searchhigher(h->alloc.atree.root, (unsigned long) p)) ||
@@ -1141,10 +1147,24 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f)
             else
                 b = n->block;
             b = (char *) b - h->alloc.oflow;
-            for (c = p; (c < (char *) b) && (*c != '\0'); c++);
-            if (c == b)
-                e = 0;
+            if (g == 1)
+            {
+                for (c = p; (c < u) && (c < (char *) b) && (*c != '\0'); c++);
+                if (u > (char *) b)
+                    if (c == b)
+                        e = 1;
+                    else if (!(h->flags & FLG_ALLOWOFLOW))
+                        e = 2;
+            }
+            else
+            {
+                for (c = p; (c < (char *) b) && (*c != '\0'); c++);
+                if (c == b)
+                    e = 1;
+            }
         }
+        else if (g == 1)
+            for (c = p; (c < u) && (*c != '\0'); c++);
         else
             for (c = p; *c != '\0'; c++);
         *s = (size_t) (c - p);
@@ -1164,14 +1184,26 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f)
     else if ((p >= (char *) n->block) && (p < (char *) n->block + n->size))
     {
         b = (char *) n->block + n->size;
-        for (c = p; (c < (char *) b) && (*c != '\0'); c++);
-        if (c == b)
-            e = 0;
+        if (g == 1)
+        {
+            for (c = p; (c < u) && (c < (char *) b) && (*c != '\0'); c++);
+            if (u > (char *) b)
+                if (c == b)
+                    e = 1;
+                else if (!(h->flags & FLG_ALLOWOFLOW))
+                    e = 2;
+        }
+        else
+        {
+            for (c = p; (c < (char *) b) && (*c != '\0'); c++);
+            if (c == b)
+                e = 1;
+        }
         *s = (size_t) (c - p);
     }
     else
-        e = 0;
-    if (e == 0)
+        e = 1;
+    if (e != 0)
     {
         if (h->alloc.flags & FLG_PAGEALLOC)
         {
@@ -1187,17 +1219,18 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f)
         }
         b = (char *) b - h->alloc.oflow;
         l += h->alloc.oflow << 1;
-        if (h->flags & FLG_ALLOWOFLOW)
-            __mp_warn(f, "string " MP_POINTER " overflows [" MP_POINTER ","
-                      MP_POINTER "]", p, b, (char *) b + l - 1);
-        else
+        if (e == 1)
             __mp_error(f, "string " MP_POINTER " overflows [" MP_POINTER ","
                        MP_POINTER "]", p, b, (char *) b + l - 1);
+        else
+            __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
+                      MP_POINTER "," MP_POINTER "]", p, u - 1, b,
+                      (char *) b + l - 1);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
-        e = ((h->flags & FLG_ALLOWOFLOW) != 0);
+        return (e == 2);
     }
-    return e;
+    return 1;
 }
 
 
