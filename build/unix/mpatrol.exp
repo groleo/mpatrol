@@ -24,6 +24,7 @@
 __mp_init
 __mp_fini
 __mp_setoption
+__mp_getoption
 __mp_alloc
 __mp_strdup
 __mp_realloc
@@ -33,6 +34,7 @@ __mp_copymem
 __mp_comparemem
 __mp_locatemem
 __mp_function
+__mp_setuser
 __mp_info
 __mp_syminfo
 __mp_printinfo
