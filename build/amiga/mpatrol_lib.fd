@@ -39,4 +39,6 @@ __mp_check()()
 __mp_prologue(a)(A0)
 __mp_epilogue(a)(A0)
 __mp_nomemory(a)(A0)
+__mp_pushdelstack(a,b,c)(A0,A1,D0)
+__mp_popdelstack(a,b,c)(A0,A1,A2)
 ##end
