@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.9 2000-12-18 22:14:38 graeme Exp $
+# $Id: mpatrol.psf,v 1.10 2000-12-24 23:51:17 graeme Exp $
 
 
 product
@@ -135,6 +135,8 @@ product
 	file			test14.c
 	file			test15.c
 	file			test16.c
+	file			test17.c
+	file			test18.c
 	directory		mpatrol/doc/mpatrol/tests/profile=/usr/local/doc/mpatrol/tests/profile
 	file			test1.c
 	file			test2.c
