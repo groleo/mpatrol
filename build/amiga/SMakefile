@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.41 2001-01-22 21:08:48 graeme Exp $
+# $Id: SMakefile,v 1.42 2001-01-22 21:29:39 graeme Exp $
 
 
 # Definitions
@@ -52,6 +52,9 @@ ARCHIVE_MPATROL	= $(MPATROL).lib
 OBJECT_MPATROL	= lib$(MPATROL).o
 ARCHTS_MPATROL	= $(MPATROL)mt.lib
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
+
+ARCHIVE_MPALLOC	= $(MPALLOC).lib
+OBJECT_MPALLOC	= lib$(MPALLOC).o
 
 
 # Rules

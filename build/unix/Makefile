@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.48 2001-01-22 21:08:50 graeme Exp $
+# $Id: Makefile,v 1.49 2001-01-22 21:29:41 graeme Exp $
 
 
 # Definitions
@@ -61,6 +61,10 @@ ARCHTS_MPTOBJS	= $(MPTTOBJS:.o=.t.o) machine.t.o
 SHARTS_MPTOBJS	= $(MPTTOBJS:.o=.s.t.o) machine.s.t.o
 LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 
+ARCHIVE_MPAOBJS	= $(MPAOBJS)
+SHARED_MPAOBJS	= $(MPAOBJS:.o=.s.o)
+LINT_MPAOBJS	= $(MPAOBJS:.o=.n.ln)
+
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= lib$(MPATROL).so
 OBJECT_MPATROL	= lib$(MPATROL).o
@@ -69,6 +73,11 @@ ARCHTS_MPATROL	= lib$(MPATROL)mt.a
 SHARTS_MPATROL	= lib$(MPATROL)mt.so
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
 LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
+
+ARCHIVE_MPALLOC	= lib$(MPALLOC).a
+SHARED_MPALLOC	= lib$(MPALLOC).so
+OBJECT_MPALLOC	= lib$(MPALLOC).o
+LINT_MALLOC	= llib-l$(MPALLOC).ln
 
 
 # Rules

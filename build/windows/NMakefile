@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: NMakefile,v 1.34 2001-01-22 21:08:54 graeme Exp $
+# $Id: NMakefile,v 1.35 2001-01-22 21:29:42 graeme Exp $
 
 
 # Definitions
@@ -68,6 +68,10 @@ OBJECT_MPATROL	= lib$(MPATROL).obj
 ARCHTS_MPATROL	= lib$(MPATROL)mt.lib
 SHARTS_MPATROL	= $(MPATROL)mt.dll
 OBJTS_MPATROL	= lib$(MPATROL)mt.obj
+
+ARCHIVE_MPALLOC	= lib$(MPALLOC).lib
+SHARED_MPALLOC	= $(MPALLOC).dll
+OBJECT_MPALLOC	= lib$(MPALLOC).obj
 
 
 # Rules

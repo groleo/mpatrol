@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.6 2001-01-22 21:08:50 graeme Exp $
+# $Id: Makefile.aix,v 1.7 2001-01-22 21:29:41 graeme Exp $
 
 
 # Definitions
@@ -55,6 +55,9 @@ LINT_MPTOBJS	= $(MPTOBJS:.o=.n.ln)
 ARCHTS_MPTOBJS	= $(MPTTOBJS:.o=.t.o) machine.t.o
 LINTTS_MPTOBJS	= $(MPTTOBJS:.o=.t.ln)
 
+ARCHIVE_MPAOBJS	= $(MPAOBJS)
+LINT_MPAOBJS	= $(MPAOBJS:.o=.n.ln)
+
 ARCHIVE_MPATROL	= lib$(MPATROL).a
 SHARED_MPATROL	= shr.o
 OBJECT_MPATROL	= lib$(MPATROL).o
@@ -63,6 +66,11 @@ ARCHTS_MPATROL	= lib$(MPATROL)mt.a
 SHARTS_MPATROL	= shrmt.so
 OBJTS_MPATROL	= lib$(MPATROL)mt.o
 LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
+
+ARCHIVE_MPALLOC	= lib$(MPALLOC).a
+SHARED_MPALLOC	= shra.o
+OBJECT_MPALLOC	= lib$(MPALLOC).o
+LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 
 # Rules
