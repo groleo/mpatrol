@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.32 2001-03-05 18:58:29 graeme Exp $
+ * $Id: diag.h,v 1.33 2001-03-05 20:13:44 graeme Exp $
  */
 
 
@@ -40,8 +40,11 @@
 #include "info.h"
 
 
-#define FLG_EDIT 1 /* edit any source files associated with diagnostics */
-#define FLG_LIST 2 /* list any source files associated with diagnostics */
+#define FLG_EDIT   1 /* edit any source files associated with diagnostics */
+#define FLG_LIST   2 /* list any source files associated with diagnostics */
+
+#define FLG_COUNTS 1 /* display counts in leak table */
+#define FLG_BOTTOM 2 /* display bottom entries in leak table */
 
 
 /* The different types of warnings and errors reported by the mpatrol library.
