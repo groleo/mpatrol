@@ -1,0 +1,30 @@
+Begin4
+Title:          mpatrol
+Version:        1.2.0
+Entered-date:   2000-05-22
+Description:    A link library that attempts to diagnose run-time errors that
+                are caused by the wrong use of dynamically allocated memory.
+                Along with providing a comprehensive and configurable log of
+                all dynamic memory operations that occurred during the
+                lifetime of a program, the mpatrol library performs extensive
+                checking to detect any misuse of dynamically allocated memory.
+                All of this functionality can be integrated into existing code
+                through the inclusion of a single header file at compile-time.
+                All logging and tracing output from the mpatrol library is
+                sent to a separate log file in order to keep its diagnostics
+                separate from any that the program being tested might
+                generate.  A wide variety of library settings can also be
+                changed at run-time via an environment variable, thus removing
+                the need to recompile or relink in order to change the
+                library's behaviour.
+Keywords:       mpatrol malloc realloc free new delete library allocate
+                allocation trace tracing debug debugging dynamic memory
+Author:         graeme@epc.co.uk (Graeme S. Roy)
+Maintained-by:  graeme@epc.co.uk (Graeme S. Roy)
+Primary-site:   www.cbmamiga.demon.co.uk mpatrol/files
+                296K mpatrol_1.2.0.tar.gz
+                1.7M mpatrol_doc.tar.gz
+Alternate-site: metalab.unc.edu pub/Linux/devel
+                296K mpatrol-1.2.0.tar.gz
+Copying-policy: GPL
+End
