@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.14 2001-05-22 22:43:22 graeme Exp $"
+#ident "$Id: trace.c,v 1.15 2001-06-07 17:58:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.14 2001-05-22 22:43:22 graeme Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.15 2001-06-07 17:58:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -266,7 +266,8 @@ __mp_traceheap(void *a, size_t l, int i)
 
 MP_GLOBAL
 void
-__mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
+__mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l,
+                unsigned long d, char *f, char *g, unsigned long u)
 {
     void *b;
     size_t s;
@@ -283,6 +284,16 @@ __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(l, &s);
     fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(d, &s);
+    fwrite(b, s, 1, tracefile);
+    if ((f != NULL) && (*f != '\0'))
+        fputs(f, tracefile);
+    fputc(0, tracefile);
+    if ((g != NULL) && (*g != '\0'))
+        fputs(g, tracefile);
+    fputc(0, tracefile);
+    b = __mp_encodeuleb128(u, &s);
+    fwrite(b, s, 1, tracefile);
 }
 
 
@@ -291,7 +302,8 @@ __mp_tracealloc(tracehead *t, unsigned long n, void *a, size_t l)
 
 MP_GLOBAL
 void
-__mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l)
+__mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l,
+                  unsigned long d, char *f, char *g, unsigned long u)
 {
     void *b;
     size_t s;
@@ -308,6 +320,16 @@ __mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l)
     fwrite(b, s, 1, tracefile);
     b = __mp_encodeuleb128(l, &s);
     fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(d, &s);
+    fwrite(b, s, 1, tracefile);
+    if ((f != NULL) && (*f != '\0'))
+        fputs(f, tracefile);
+    fputc(0, tracefile);
+    if ((g != NULL) && (*g != '\0'))
+        fputs(g, tracefile);
+    fputc(0, tracefile);
+    b = __mp_encodeuleb128(u, &s);
+    fwrite(b, s, 1, tracefile);
 }
 
 
@@ -316,7 +338,8 @@ __mp_tracerealloc(tracehead *t, unsigned long n, void *a, size_t l)
 
 MP_GLOBAL
 void
-__mp_tracefree(tracehead *t, unsigned long n)
+__mp_tracefree(tracehead *t, unsigned long n, unsigned long d, char *f, char *g,
+               unsigned long u)
 {
     void *b;
     size_t s;
@@ -328,6 +351,16 @@ __mp_tracefree(tracehead *t, unsigned long n)
      * that the size of the tracing output file can be kept to a minimum.
      */
     b = __mp_encodeuleb128(n, &s);
+    fwrite(b, s, 1, tracefile);
+    b = __mp_encodeuleb128(d, &s);
+    fwrite(b, s, 1, tracefile);
+    if ((f != NULL) && (*f != '\0'))
+        fputs(f, tracefile);
+    fputc(0, tracefile);
+    if ((g != NULL) && (*g != '\0'))
+        fputs(g, tracefile);
+    fputc(0, tracefile);
+    b = __mp_encodeuleb128(u, &s);
     fwrite(b, s, 1, tracefile);
 }
 

@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.126 2001-05-23 20:19:11 graeme Exp $"
+#ident "$Id: inter.c,v 1.127 2001-06-07 17:58:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.126 2001-05-23 20:19:11 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.127 2001-06-07 17:58:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -404,8 +404,14 @@ finishmarked(void)
     allocnode *n;
     infonode *m;
     treenode *t;
+    unsigned long d;
     int p;
 
+#if MP_THREADS_SUPPORT
+    d = __mp_threadid();
+#else /* MP_THREADS_SUPPORT */
+    d = 0;
+#endif /* MP_THREADS_SUPPORT */
     if (memhead.flags & FLG_NOPROTECT)
         p = -1;
     else
@@ -426,7 +432,7 @@ finishmarked(void)
                 __mp_profilefree(&memhead.prof, n->size, m,
                                  !(memhead.flags & FLG_NOPROTECT));
             if (m->data.flags & FLG_TRACED)
-                __mp_tracefree(&memhead.trace, m->data.alloc);
+                __mp_tracefree(&memhead.trace, m->data.alloc, d, NULL, NULL, 0);
         }
     }
     if (p == 1)

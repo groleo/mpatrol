@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.84 2001-05-22 19:41:01 graeme Exp $"
+#ident "$Id: info.c,v 1.85 2001-06-07 17:58:42 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.84 2001-05-22 19:41:01 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.85 2001-06-07 17:58:42 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -317,7 +317,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
     allocanode *g;
     infonode *m;
     void *p;
-    unsigned long c;
+    unsigned long c, t;
     int o;
 
     p = NULL;
@@ -414,13 +414,18 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
              (g = getallocanode(h))) && (m = getinfonode(h)))
             if (n = __mp_getalloc(&h->alloc, l, a, m))
             {
+#if MP_THREADS_SUPPORT
+                t = __mp_threadid();
+#else /* MP_THREADS_SUPPORT */
+                t = 0;
+#endif /* MP_THREADS_SUPPORT */
                 /* Fill in the details of the allocation information node.
                  */
                 m->data.type = f;
                 m->data.alloc = c;
                 m->data.realloc = 0;
 #if MP_THREADS_SUPPORT
-                m->data.thread = __mp_threadid();
+                m->data.thread = t;
 #endif /* MP_THREADS_SUPPORT */
                 m->data.event = h->event;
                 m->data.func = v->func;
@@ -449,7 +454,8 @@ __mp_getmemory(infohead *h, size_t l, size_t a, alloctype f, loginfo *v)
                         m->data.flags |= FLG_PROFILED;
                     if (h->trace.tracing)
                     {
-                        __mp_tracealloc(&h->trace, c, p, l);
+                        __mp_tracealloc(&h->trace, c, p, l, t, v->func, v->file,
+                                        v->line);
                         m->data.flags |= FLG_TRACED;
                     }
                 }
@@ -509,6 +515,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
     allocnode *n, *r;
     infonode *i, *m;
     size_t d;
+    unsigned long t;
     int o;
 
     if ((h->flags & FLG_LOGREALLOCS) && (h->recur == 1))
@@ -623,6 +630,11 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
         }
         else
         {
+#if MP_THREADS_SUPPORT
+            t = __mp_threadid();
+#else /* MP_THREADS_SUPPORT */
+            t = 0;
+#endif /* MP_THREADS_SUPPORT */
             d = n->size;
             if (!(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READWRITE);
@@ -641,7 +653,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     i->data.alloc = m->data.alloc;
                     i->data.realloc = m->data.realloc - 1;
 #if MP_THREADS_SUPPORT
-                    i->data.thread = __mp_threadid();
+                    i->data.thread = t;
 #endif /* MP_THREADS_SUPPORT */
                     i->data.event = h->event;
                     i->data.func = v->func;
@@ -655,7 +667,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
                         __mp_tracerealloc(&h->trace, m->data.alloc, r->block,
-                                          l);
+                                          l, t, v->func, v->file, v->line);
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -686,7 +698,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
                     if (m->data.flags & FLG_TRACED)
                         __mp_tracerealloc(&h->trace, m->data.alloc, r->block,
-                                          l);
+                                          l, t, v->func, v->file, v->line);
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -701,7 +713,8 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                  * block without having to relocate it.
                  */
                 if (m->data.flags & FLG_TRACED)
-                    __mp_tracerealloc(&h->trace, m->data.alloc, n->block, l);
+                    __mp_tracerealloc(&h->trace, m->data.alloc, n->block, l, t,
+                                      v->func, v->file, v->line);
 #if MP_INUSE_SUPPORT
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -717,7 +730,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
                                      !(h->flags & FLG_NOPROTECT));
                 m->data.type = f;
 #if MP_THREADS_SUPPORT
-                m->data.thread = __mp_threadid();
+                m->data.thread = t;
 #endif /* MP_THREADS_SUPPORT */
                 m->data.event = h->event;
                 m->data.func = v->func;
@@ -767,6 +780,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
     allocnode *n;
     allocanode *g;
     infonode *m;
+    unsigned long t;
     int o;
 
     if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
@@ -857,6 +871,11 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
     }
     else
     {
+#if MP_THREADS_SUPPORT
+        t = __mp_threadid();
+#else /* MP_THREADS_SUPPORT */
+        t = 0;
+#endif /* MP_THREADS_SUPPORT */
         if ((h->flags & FLG_LOGFREES) && (h->recur == 1))
         {
             __mp_printalloc(&h->syms, n);
@@ -878,7 +897,8 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
         if (m->data.flags & FLG_PROFILED)
             __mp_profilefree(&h->prof, n->size, m, !(h->flags & FLG_NOPROTECT));
         if (m->data.flags & FLG_TRACED)
-            __mp_tracefree(&h->trace, m->data.alloc);
+            __mp_tracefree(&h->trace, m->data.alloc, t, v->func, v->file,
+                           v->line);
         __mp_freeaddrs(&h->addr, m->data.stack);
         if (h->alloc.flags & FLG_NOFREE)
         {
@@ -887,7 +907,7 @@ __mp_freememory(infohead *h, void *p, alloctype f, loginfo *v)
              */
             m->data.type = f;
 #if MP_THREADS_SUPPORT
-            m->data.thread = __mp_threadid();
+            m->data.thread = t;
 #endif /* MP_THREADS_SUPPORT */
             m->data.event = h->event;
             m->data.func = v->func;

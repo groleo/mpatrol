@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: trace.h,v 1.10 2001-05-22 19:41:15 graeme Exp $
+ * $Id: trace.h,v 1.11 2001-06-07 17:58:42 graeme Exp $
  */
 
 
@@ -62,9 +62,12 @@ MP_EXPORT void __mp_newtrace(tracehead *, meminfo *);
 MP_EXPORT int __mp_changetrace(tracehead *, char *, int);
 MP_EXPORT int __mp_endtrace(tracehead *);
 MP_EXPORT void __mp_traceheap(void *, size_t, int);
-MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t);
-MP_EXPORT void __mp_tracerealloc(tracehead *, unsigned long, void *, size_t);
-MP_EXPORT void __mp_tracefree(tracehead *, unsigned long);
+MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t,
+                               unsigned long, char *, char *, unsigned long);
+MP_EXPORT void __mp_tracerealloc(tracehead *, unsigned long, void *, size_t,
+                                 unsigned long, char *, char *, unsigned long);
+MP_EXPORT void __mp_tracefree(tracehead *, unsigned long, unsigned long, char *,
+                              char *, unsigned long);
 
 
 #ifdef __cplusplus
