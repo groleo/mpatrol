@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.15 2000-05-14 22:17:03 graeme Exp $"
+#ident "$Id: option.c,v 1.16 2000-05-16 00:33:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -71,6 +71,10 @@ static char *options_help[] =
     "ALLOCSTOP", "unsigned integer",
     "", "Specifies an allocation index at which to stop the program when it is",
     "", "being allocated.",
+    "ALLOWOFLOW", NULL,
+    "", "Specifies that a warning rather than an error should be produced if",
+    "", "any memory operation function overflows the boundaries of a memory",
+    "", "allocation, and that the operation should still be performed.",
     "AUTOSAVE", "unsigned integer",
     "", "Specifies the frequency at which to periodically write the profiling",
     "", "data to the profiling output file.",
@@ -455,6 +459,14 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
                         h->astop = n;
                         i = OE_RECOGNISED;
                     }
+                else if (matchoption(o, "ALLOWOFLOW"))
+                {
+                    if (*a != '\0')
+                        i = OE_IGNARGUMENT;
+                    else
+                        i = OE_RECOGNISED;
+                    h->flags |= FLG_ALLOWOFLOW;
+                }
                 else if (matchoption(o, "AUTOSAVE"))
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
