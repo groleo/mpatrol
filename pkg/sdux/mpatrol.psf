@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.6 2000-12-14 18:22:48 graeme Exp $
+# $Id: mpatrol.psf,v 1.7 2000-12-18 20:11:42 graeme Exp $
 
 
 product
@@ -81,6 +81,9 @@ product
 	file			collect2.jpg
 	file			collect2.eps
 	file			collect2.pdf
+	file			trace.jpg
+	file			trace.eps
+	file			trace.pdf
 	directory		mpatrol/doc/mpatrol/dvi=/usr/local/doc/mpatrol/dvi
 	file			mpatrol.dvi
 	file			mprof.dvi
