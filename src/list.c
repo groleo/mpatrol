@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: list.c,v 1.7 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: list.c,v 1.8 2002-03-11 23:09:15 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *list_id = "$Id: list.c,v 1.7 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *list_id = "$Id: list.c,v 1.8 2002-03-11 23:09:15 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -182,6 +182,24 @@ __mp_remtail(listhead *l)
     l->tlpr->next = (listnode *) &l->tail;
     l->size--;
     return t;
+}
+
+
+/* Join a list onto the end of another list.
+ */
+
+MP_GLOBAL
+void
+__mp_joinlist(listhead *l, listhead *n)
+{
+    if (n->size == 0)
+        return;
+    l->tlpr->next = n->head;
+    n->head->prev = l->tlpr;
+    l->tlpr = n->tlpr;
+    n->tlpr->next = (listnode *) &l->tail;
+    l->size += n->size;
+    __mp_newlist(n);
 }
 
 

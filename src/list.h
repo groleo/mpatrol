@@ -33,7 +33,7 @@
 
 
 /*
- * $Id: list.h,v 1.6 2002-01-08 20:13:59 graeme Exp $
+ * $Id: list.h,v 1.7 2002-03-11 23:09:15 graeme Exp $
  */
 
 
@@ -81,6 +81,7 @@ MP_EXPORT void __mp_insert(listhead *, listnode *, listnode *);
 MP_EXPORT void __mp_remove(listhead *, listnode *);
 MP_EXPORT listnode *__mp_remhead(listhead *);
 MP_EXPORT listnode *__mp_remtail(listhead *);
+MP_EXPORT void __mp_joinlist(listhead *, listhead *);
 
 
 #ifdef __cplusplus
