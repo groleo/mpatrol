@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.18 2000-05-04 08:21:22 graeme Exp $
+# $Id: Makefile,v 1.19 2000-05-04 20:03:22 graeme Exp $
 
 
 # Definitions
@@ -88,7 +88,7 @@ LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
 	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) $(TFLAGS) -c -o $@ $<
 
 .c.t.ln:
-	$(LINT) $(CFLAGS) $(TFLAGS) -y -c -o $@ $<
+	$(LINT) $(CFLAGS) $(TFLAGS) -y -C `basename $@ .ln` $<
 
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
