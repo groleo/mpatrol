@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.22 2000-05-31 20:48:45 graeme Exp $
+# $Id: Makefile,v 1.23 2000-06-12 21:41:45 graeme Exp $
 
 
 # Definitions
@@ -51,11 +51,11 @@ TOBJECTS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
 	   profile.o inter.o malloc.o version.o
 
-ARCHIVE_OBJECTS	= $(OBJECTS)
-SHARED_OBJECTS	= $(OBJECTS:.o=.s.o)
+ARCHIVE_OBJECTS	= $(OBJECTS) machine.o
+SHARED_OBJECTS	= $(OBJECTS:.o=.s.o) machine.s.o
 LINT_OBJECTS	= $(OBJECTS:.o=.ln)
-ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o)
-SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o)
+ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
+SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o) machine.s.t.o
 LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
 
 ARCHIVE_LIBRARY	= lib$(LIBRARY).a
@@ -70,7 +70,7 @@ LINTTS_LIBRARY	= llib-l$(LIBRARY)mt.ln
 
 # Rules
 
-.SUFFIXES: .c .o .s.o .ln .t.o .s.t.o .t.ln
+.SUFFIXES: .c .s .o .s.o .ln .t.o .s.t.o .t.ln
 
 .c.o:
 	$(CC) $(CFLAGS) $(OFLAGS) -c $<
@@ -119,6 +119,26 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c
 
 $(LINTTS_LIBRARY): $(LINTTS_OBJECTS)
 	$(LINT) -o $(LIBRARY)mt $(LINTTS_OBJECTS)
+
+machine.o: $(SOURCE)/machine.c
+	$(CC) $(CFLAGS) -E -P $< >machine.s
+	$(CC) $(CFLAGS) $(OFLAGS) -c machine.s
+	-@ rm -f machine.s 2>&1 >/dev/null
+
+machine.s.o: $(SOURCE)/machine.c
+	$(CC) $(CFLAGS) $(SFLAGS) -E -P $< >machine.s
+	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) -c -o $@ machine.s
+	-@ rm -f machine.s 2>&1 >/dev/null
+
+machine.t.o: $(SOURCE)/machine.c
+	$(CC) $(CFLAGS) $(TFLAGS) -E -P $< >machine.s
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ machine.s
+	-@ rm -f machine.s 2>&1 >/dev/null
+
+machine.s.t.o: $(SOURCE)/machine.c
+	$(CC) $(CFLAGS) $(SFLAGS) $(TFLAGS) -E -P $< >machine.s
+	$(CC) $(CFLAGS) $(OFLAGS) $(SFLAGS) $(TFLAGS) -c -o $@ machine.s
+	-@ rm -f machine.s 2>&1 >/dev/null
 
 mpatrol: mpatrol.o getopt.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mpatrol.o getopt.o version.o
@@ -259,6 +279,8 @@ malloc.o malloc.s.o malloc.ln malloc.t.o malloc.s.t.o malloc.t.ln: \
 version.o version.s.o version.ln version.t.o version.s.t.o version.t.ln: \
 	$(SOURCE)/version.c $(SOURCE)/version.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
+machine.o machine.s.o machine.t.o machine.s.t.o: $(SOURCE)/machine.c \
+	$(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
