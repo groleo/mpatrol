@@ -82,6 +82,17 @@ their corresponding answers or solutions.
     preprocessor macro MP_NOCPLUSPLUS when compiling your source file, which
     will disable the overriding of any C++ operators in mpatrol.h.
 
+ Q. I still have the above problem, but I don't think it's due to placement
+    new since the compiler complains about operator new[], so could that be a
+    clue?
+
+ A. Yes.  The most likely reason is that the C++ compiler does not support
+    the array new and delete operators.  These were introduced some time
+    before the standardisation of the C++ language but some compilers may not
+    yet have support for them.  It may be that you have to use a special
+    compiler option to enable support for these operators, but if not you will
+    probably have to edit mpatrol.h to temporarily allow your files to compile.
+
 
  3. LINKING
 
@@ -123,6 +134,18 @@ their corresponding answers or solutions.
     1.0.8 should be compatible, but upgrading to version 1.1.0 may require a
     relink.
 
+ Q. I have linked my program with the DLL version of the mpatrol library on
+    Windows but it crashes when I run it.  I suspect that the crash is occurring
+    when the mpatrol library is being initialised, so what is going wrong?
+
+ A. There appears to be a problem when using the mpatrol DLL and the static
+    version of the Microsoft C run-time library, and also a problem when using
+    the static version of mpatrol and the Microsoft C run-time library DLL.
+    Luckily, if you ensure that you use either both static libraries or both
+    DLLs at the same time then the problem should go away.  There doesn't seem
+    to be an easier way around it at this time or, for that matter, an
+    explanation for why it happens
+
 
  4. RUNNING
 
@@ -140,6 +163,17 @@ their corresponding answers or solutions.
     the MPATROL_OPTIONS environment variable that will allow you to control what
     is logged and what is not.  Note that the mpatrol shell script will always
     log all calls to allocate, reallocate and free memory by default.
+
+ Q. Why does the USEDEBUG option not work for me?
+
+ A. Firstly, you have to ensure that you have built the mpatrol library with
+    support for the GNU BFD object file access library by compiling with the
+    FORMAT=FORMAT_BFD preprocessor macro definition.  Secondly, you have to
+    ensure that you have compiled all relevant object files with debugging
+    information enabled (usually by adding an option to the compiler command
+    line), although the mpatrol library does not need to be compiled this way.
+    The file and line number information will hopefully then appear in the
+    log file for all symbols that have associated debugging information.
 
  Q. I am trying to use the mpatrol shell script to debug an executable file that
     was not originally compiled with the mpatrol library.  However, even though
@@ -245,6 +279,17 @@ their corresponding answers or solutions.
     add memory protection to machines with built-in MMUs, which can then be
     used in conjunction with mpatrol.  I'm not sure about the availability of
     such software for Netware.
+
+ Q. I have built the mpatrol library with GCC on AmigaOS and have successfully
+    linked it to my program.  However, why are none of the options in the
+    MPATROL_OPTIONS environment variable recognised when I run it?
+
+ A. The getenv() function in the GNU C library is not compatible with the
+    AmigaDOS SetEnv and GetEnv commands since it does not treat environment
+    variables as files located in ENV: and is only compatible with software
+    that uses the ixemul library.  However, the env command that comes with
+    most GNU software distributions allows you to set an environment variable
+    that the GNU getenv() function can read when you are running in AmigaDOS.
 
 
  5. FILES
