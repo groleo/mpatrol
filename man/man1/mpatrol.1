@@ -1,6 +1,6 @@
 .\" mpatrol
 .\" A library for controlling and tracing dynamic memory allocations.
-.\" Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+.\" Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 .\"
 .\" This library is free software; you can redistribute it and/or
 .\" modify it under the terms of the GNU Library General Public
@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.1,v 1.4 1999-11-25 17:17:38 graeme Exp $
+.\" $Id: mpatrol.1,v 1.5 2000-01-09 20:56:39 graeme Exp $
 .\"
-.TH MPATROL 1 "25 November 1999" "Release 1.0" "mpatrol library"
+.TH MPATROL 1 "9 January 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- runs programs using the mpatrol library
 .SH SYNOPSIS
@@ -79,6 +79,10 @@ when it is being freed.
 \fB\-f\fP <\fIunsigned integer\fP>
 [\fBFREEBYTE\fP]  Specifies an 8-bit byte pattern with which to prefill
 newly-freed memory.
+.TP
+\fB\-g\fP
+[\fBSAFESIGNALS\fP]  Instructs the library to save and replace certain signal
+handlers during the execution of library code and to restore them afterwards.
 .TP
 \fB\-L\fP <\fIunsigned integer\fP>
 [\fBLIMIT\fP]  Specifies the limit in bytes at which all memory allocations
@@ -159,7 +163,7 @@ The mpatrol manual.
 .SH AUTHOR
 Graeme S. Roy <graeme@epc.co.uk>
 .SH COPYRIGHT
-Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 .PP
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free
