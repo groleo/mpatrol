@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.62 2001-08-23 22:46:42 graeme Exp $
+ * $Id: info.h,v 1.63 2001-12-05 23:03:01 graeme Exp $
  */
 
 
@@ -156,6 +156,7 @@ allocanode;
 
 typedef struct loginfo
 {
+    alloctype type;     /* type of memory allocation */
     char *func;         /* calling function name */
     char *file;         /* file name in which call took place */
     unsigned long line; /* line number at which call took place */
