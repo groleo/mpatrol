@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.20 2001-03-06 19:33:09 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.21 2001-03-09 00:17:23 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "6 March 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "9 March 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -943,6 +943,8 @@ l l.
 \fBgtotal\fP	Total size of freed blocks.
 \fBicount\fP	Total number of internal blocks.
 \fBitotal\fP	Total size of internal blocks.
+\fBmcount\fP	Total number of marked blocks.
+\fBmtotal\fP	Total size of marked blocks.
 .TE
 .TP
 \fB__mp_check\fP
@@ -1418,7 +1420,8 @@ be read from the executable file.
 \fBSHOWUNFREED\fP
 Specifies that a summary of all of the unfreed memory allocations should be
 displayed at the end of program execution.  This step will not be performed if
-an abnormal termination occurs or if there are no unfreed allocations.
+an abnormal termination occurs or if there are no unfreed allocations.  Note
+that any marked memory allocations will not be listed.
 .TP
 \fBSMALLBOUND\fP=\fIunsigned integer\fP
 Specifies the limit in bytes up to which memory allocations should be classified
@@ -1449,7 +1452,8 @@ Specifies the minimum number of unfreed allocations at which to abort the
 program just before program termination.  A summary of all the allocations will
 be displayed on the standard error file stream before aborting.  This option may
 be handy for use in batch tests as it can force tests to fail if they do not
-free up a minimum number of memory allocations.  Note that this setting will be
+free up a minimum number of memory allocations, although marked allocations will
+not be considered as unfreed allocations.  Note that this setting will be
 ignored if its value is zero.  Default value: \fBUNFREEDABORT\fP=\fI0\fP.
 .TP
 \fBUSEDEBUG\fP

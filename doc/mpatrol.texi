@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.197 2001-03-09 00:05:17 graeme Exp $
+@c $Id: mpatrol.texi,v 1.198 2001-03-09 00:17:22 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -596,6 +596,8 @@ encoded form so as to keep the size of the file down.  An environment variable
 specifying a default directory in which to place tracing output files can also
 be set.
 
+@cindex trace-driven simulation
+@cindex simulation, trace-driven
 @item
 A tracing command is provided which reads a tracing output file produced by the
 mpatrol library and displays the memory allocation events in tabular or
@@ -2730,7 +2732,8 @@ a memory allocation has been @emph{marked} to indicate that it should never be
 freed.  This can only be performed from the source code by calling
 @code{__mp_setmark()} with the address of the memory allocation.  Such a memory
 allocation can be reallocated but never freed, and will not contribute to the
-list of memory leaks.
+list of memory leaks.  It will also be profiled and traced as freed by the end
+of program execution if memory allocation profiling or tracing is enabled.
 
 You may also have noticed the use of @code{__mp_syminfo()} in the above example.
 This function is very similar to the @code{__mp_info()} function except that
@@ -8536,6 +8539,10 @@ following information:
 @tab Total number of internal blocks.
 @item @code{itotal}
 @tab Total size of internal blocks.
+@item @code{mcount}
+@tab Total number of marked blocks.
+@item @code{mtotal}
+@tab Total size of marked blocks.
 @end multitable
 
 @findex __mp_check
@@ -9062,7 +9069,8 @@ be read from the executable file.
 @item @option{SHOWUNFREED}
 Specifies that a summary of all of the unfreed memory allocations should be
 displayed at the end of program execution.  This step will not be performed if
-an abnormal termination occurs or if there are no unfreed allocations.
+an abnormal termination occurs or if there are no unfreed allocations.  Note
+that any marked memory allocations will not be listed.
 
 @cindex SMALLBOUND
 @item @option{SMALLBOUND}=<@var{unsigned-integer}>
@@ -9098,7 +9106,8 @@ Specifies the minimum number of unfreed allocations at which to abort the
 program just before program termination.  A summary of all the allocations will
 be displayed on the standard error file stream before aborting.  This option may
 be handy for use in batch tests as it can force tests to fail if they do not
-free up a minimum number of memory allocations.  Note that this setting will be
+free up a minimum number of memory allocations, although marked allocations will
+not be considered as unfreed allocations.  Note that this setting will be
 ignored if its value is zero.  Default value: @option{UNFREEDABORT=0}.
 
 @cindex USEDEBUG
