@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.50 2001-02-04 21:45:22 graeme Exp $
+# $Id: Makefile,v 1.51 2001-02-05 21:19:24 graeme Exp $
 
 
 # Definitions
@@ -63,6 +63,8 @@ SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  sbrk.ts.obj main.ts.obj version.ts.obj
 ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj
+SHARED_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
+		  mpcalloc.obj mpstrdup.obj mprealloc.obj main2.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll
@@ -72,6 +74,7 @@ SHARTS_MPATROL	= $(MPATROL)mt.dll
 OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).lib
+SHARED_MPALLOC	= $(MPALLOC).dll
 
 
 # Rules
@@ -105,6 +108,9 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c
 $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_MPAOBJS)
 
+$(SHARED_MPALLOC): $(SHARED_MPAOBJS) $(MPALLOC).def
+	$(LD) -dll -nologo -def:$(MPALLOC).def -out:$@ $(SHARED_MPAOBJS)
+
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mpatrol.obj getopt.obj version.obj
 
@@ -118,12 +124,12 @@ mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
 all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
-	$(ARCHIVE_MPALLOC) mpatrol.exe mprof.exe mptrace.exe mleak.exe
+	$(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) mpatrol.exe mprof.exe mptrace.exe mleak.exe
 
 clean:
 	-@ rm -f $(ARCHIVE_MPTOBJS) $(ARCHTS_MPTOBJS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPTOBJS) $(SHARTS_MPTOBJS) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPAOBJS) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPAOBJS) $(SHARED_MPAOBJS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
@@ -132,7 +138,8 @@ clobber: clean
 	-@ rm -f $(MPATROL).lib $(MPATROL).exp 2>&1 >/dev/null
 	-@ rm -f $(MPATROL)mt.lib $(MPATROL)mt.exp 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
-	-@ rm -f $(ARCHIVE_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(MPALLOC).lib $(MPALLOC).exp 2>&1 >/dev/null
 	-@ rm -f mpatrol.exe mprof.exe mptrace.exe mleak.exe 2>&1 >/dev/null
 
 
@@ -253,7 +260,7 @@ malloc.obj malloc.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h \
 	$(SOURCE)/profile.h $(SOURCE)/trace.h
 sbrk.obj sbrk.ts.obj: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
         $(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
-main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+main.obj main.ts.obj: main.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
 	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h \
 	$(SOURCE)/stack.h $(SOURCE)/alloc.h $(SOURCE)/signals.h \
@@ -279,6 +286,7 @@ mpstrdup.obj: $(SOURCE)/mpstrdup.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
 mprealloc.obj: $(SOURCE)/mprealloc.c $(SOURCE)/mpalloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
+main2.obj: main2.c $(SOURCE)/config.h $(SOURCE)/target.h
 $(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
