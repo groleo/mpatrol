@@ -90,6 +90,19 @@ typedef enum alloctype
 alloctype;
 
 
+/* The structure used to record source level information about recursive
+ * calls to C++ operator delete and operator delete[].
+ */
+
+typedef struct delstack
+{
+    char *func;         /* calling function name */
+    char *file;         /* file name in which call took place */
+    unsigned long line; /* line number at which call took place */
+}
+delstack;
+
+
 /* An allocation information node belongs to a table of nodes, although
  * details of internal memory allocations are also stored in allocation
  * information nodes as part of a list.
@@ -155,6 +168,8 @@ typedef struct infohead
     void (*epilogue)(void *);         /* epilogue function */
     void (*nomemory)(void);           /* low-memory handler function */
     char *log;                        /* log filename */
+    delstack dels[MP_MAXDELSTACK];    /* delete stack */
+    long delpos;                      /* delete stack pointer */
     unsigned long flags;              /* global flags */
     memaccess prot;                   /* protection status */
     size_t recur;                     /* recursion count */
