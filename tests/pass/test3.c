@@ -34,9 +34,15 @@ void *buffer = NULL;
 int freed = 0;
 
 
-void handler(void)
+void handler(MP_CONST char *s, MP_CONST char *t, unsigned long u,
+             MP_CONST void *a)
 {
-    fputs("low memory handler called\n", stderr);
+    fputs("low memory handler called", stderr);
+    if (s != NULL)
+        fprintf(stderr, " from %s", s);
+    if ((t != NULL) && (u != 0))
+        fprintf(stderr, " at %s line %lu", t, u);
+    fputc('\n', stderr);
     if (buffer == NULL)
     {
         fputs("no buffer to free\n", stderr);
@@ -64,7 +70,6 @@ int main(void)
     else
     {
         fputs("test failed\n", stderr);
-        fputs("set LIMIT=1572864\n", stderr);
         r = EXIT_FAILURE;
     }
     if (p != NULL)
