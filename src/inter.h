@@ -81,6 +81,7 @@ void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *, char *,
 int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
                     unsigned long, size_t);
 int __mp_info(void *, allocinfo *);
+int __mp_printinfo(void *);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);

@@ -35,13 +35,14 @@
 #include "sbrk.h"
 #endif /* TARGET */
 #include "option.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.22 2000-04-03 18:21:41 graeme Exp $"
+#ident "$Id: inter.c,v 1.23 2000-04-04 17:38:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -842,6 +843,81 @@ int __mp_info(void *p, allocinfo *d)
             a->data.name = s->data.name;
     if ((memhead.recur == 1) && !(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READONLY);
+    restoresignals();
+    return 1;
+}
+
+
+/* Display any details about the memory block that contains a given address.
+ * This is for calling within a symbolic debugger and will result in output to
+ * the standard error file stream instead of the log file.
+ */
+
+int __mp_printinfo(void *p)
+{
+    addrnode *a;
+    symnode *s;
+    allocnode *n;
+    infonode *m;
+
+    savesignals();
+    /* Check that we know something about the address that was supplied.
+     */
+    if (!memhead.init || memhead.fini ||
+        (((n = __mp_findalloc(&memhead.alloc, p)) == NULL) &&
+         ((n = __mp_findfreed(&memhead.alloc, p)) == NULL)))
+    {
+        fprintf(stderr, "address " MP_POINTER " not in heap\n", p);
+        restoresignals();
+        return 0;
+    }
+    /* We now display the details of the associated memory block.
+     */
+    m = (infonode *) n->info;
+    fprintf(stderr, "address " MP_POINTER " located in %s block:\n", p,
+            m->data.freed ? "freed" : "allocated");
+    fprintf(stderr, "    start of block:     " MP_POINTER "\n", n->block);
+    fprintf(stderr, "    size of block:      %lu byte%s\n", n->size,
+            (n->size == 1) ? "" : "s");
+    if (m->data.freed)
+        fputs("    freed by:           ", stderr);
+    else
+        fputs("    allocated by:       ", stderr);
+    fprintf(stderr, "%s\n", __mp_alloctypenames[m->data.type]);
+    fprintf(stderr, "    allocation index:   %lu\n", m->data.alloc);
+    fprintf(stderr, "    reallocation index: %lu\n", m->data.realloc);
+#if MP_THREADS_SUPPORT
+    fprintf(stderr, "    thread identifier:  %lu\n", m->data.thread);
+#endif /* MP_THREADS_SUPPORT */
+    fprintf(stderr, "    calling function:   %s\n",
+            m->data.func ? m->data.func : "<unknown>");
+    fprintf(stderr, "    called from file:   %s\n",
+            m->data.file ? m->data.file : "<unknown>");
+    fputs("    called at line:     ", stderr);
+    if (m->data.line)
+        fprintf(stderr, "%lu\n", m->data.line);
+    else
+        fputs("<unknown>\n", stderr);
+    /* Traverse the function call stack, displaying as much information as
+     * possible.
+     */
+    if (a = m->data.stack)
+    {
+        fputs("    function call stack:\n", stderr);
+        do
+        {
+            fprintf(stderr, "\t" MP_POINTER " ", a->data.addr);
+            if (a->data.name)
+                fputs(a->data.name, stderr);
+            else if (s = __mp_findsymbol(&memhead.syms, a->data.addr))
+                fputs(s->data.name, stderr);
+            else
+                fputs("???", stderr);
+            fputc('\n', stderr);
+            a = a->data.next;
+        }
+        while (a != NULL);
+    }
     restoresignals();
     return 1;
 }

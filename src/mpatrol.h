@@ -373,6 +373,7 @@ void *__mp_locatemem(MP_CONST void *, size_t, MP_CONST void *, size_t,
 int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
+int __mp_printinfo(MP_CONST void *);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
