@@ -1,6 +1,6 @@
 .\" mpatrol
 .\" A library for controlling and tracing dynamic memory allocations.
-.\" Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+.\" Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 .\"
 .\" This library is free software; you can redistribute it and/or
 .\" modify it under the terms of the GNU Library General Public
@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.6 1999-12-06 20:26:17 graeme Exp $
+.\" $Id: mpatrol.3,v 1.7 2000-01-09 21:02:30 graeme Exp $
 .\"
-.TH MPATROL 3 "6 December 1999" "Release 1.0" "mpatrol library"
+.TH MPATROL 3 "9 January 2000" "Release 1.1" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -595,6 +595,13 @@ be halted the first time any allocation is reallocated the specified number of
 times.  Note that this setting will be ignored if its value is zero.  Default
 value: \fBREALLOCSTOP\fP=\fI0\fP.
 .TP
+\fBSAFESIGNALS\fP
+Instructs the library to save and replace certain signal handlers during the
+execution of library code and to restore them afterwards.  This was the default
+behaviour in version 1.0 of the mpatrol library and was changed since some
+memory-intensive programs became very hard to interrupt using the keyboard,
+thus giving the impression that the program or system had hung.
+.TP
 \fBSHOWALL\fP
 Equivalent to the \fBSHOWFREED\fP, \fBSHOWUNFREED\fP, \fBSHOWMAP\fP and
 \fBSHOWSYMBOLS\fP options specified together.
@@ -642,7 +649,7 @@ The mpatrol manual.
 .SH AUTHOR
 Graeme S. Roy <graeme@epc.co.uk>
 .SH COPYRIGHT
-Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 .PP
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

@@ -61,7 +61,7 @@ DDEESSCCRRIIPPTTIIOONN
 
 
 
-Release 1.0              6 December 1999                        1
+Release 1.1               9 January 2000                        1
 
 
 
@@ -127,7 +127,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        2
+Release 1.1               9 January 2000                        2
 
 
 
@@ -193,7 +193,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        3
+Release 1.1               9 January 2000                        3
 
 
 
@@ -259,7 +259,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        4
+Release 1.1               9 January 2000                        4
 
 
 
@@ -325,7 +325,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        5
+Release 1.1               9 January 2000                        5
 
 
 
@@ -391,7 +391,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        6
+Release 1.1               9 January 2000                        6
 
 
 
@@ -457,7 +457,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                        7
+Release 1.1               9 January 2000                        7
 
 
 
@@ -523,7 +523,7 @@ LLIINNKKIINNGG
 
 
 
-Release 1.0              6 December 1999                        8
+Release 1.1               9 January 2000                        8
 
 
 
@@ -589,7 +589,7 @@ EENNVVIIRROONNMMEENNTT
 
 
 
-Release 1.0              6 December 1999                        9
+Release 1.1               9 January 2000                        9
 
 
 
@@ -655,7 +655,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                       10
+Release 1.1               9 January 2000                       10
 
 
 
@@ -721,7 +721,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                       11
+Release 1.1               9 January 2000                       11
 
 
 
@@ -787,7 +787,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                       12
+Release 1.1               9 January 2000                       12
 
 
 
@@ -853,7 +853,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
 
 
-Release 1.0              6 December 1999                       13
+Release 1.1               9 January 2000                       13
 
 
 
@@ -872,54 +872,54 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               that this setting will be ignored if its  value  is
               zero.  Default value: RREEAALLLLOOCCSSTTOOPP=_0.
 
+       SSAAFFEESSIIGGNNAALLSS
+              Instructs  the  library to save and replace certain
+              signal handlers during  the  execution  of  library
+              code  and to restore them afterwards.  This was the
+              default behaviour in version  1.0  of  the  mpatrol
+              library and was changed since some memory-intensive
+              programs became very hard to  interrupt  using  the
+              keyboard,  thus giving the impression that the pro-
+              gram or system had hung.
+
        SSHHOOWWAALLLL
-              Equivalent  to  the SSHHOOWWFFRREEEEDD, SSHHOOWWUUNNFFRREEEEDD, SSHHOOWWMMAAPP
+              Equivalent to the SSHHOOWWFFRREEEEDD,  SSHHOOWWUUNNFFRREEEEDD,  SSHHOOWWMMAAPP
               and SSHHOOWWSSYYMMBBOOLLSS options specified together.
 
        SSHHOOWWFFRREEEEDD
               Specifies that a summary of all of the freed memory
-              allocations  should be displayed at the end of pro-
-              gram execution.  This option must be used  in  con-
-              junction  with the NNOOFFRREEEE option and this step will
-              not be performed if an abnormal termination  occurs
+              allocations should be displayed at the end of  pro-
+              gram  execution.   This option must be used in con-
+              junction with the NNOOFFRREEEE option and this step  will
+              not  be performed if an abnormal termination occurs
               or if there were no freed allocations.
 
        SSHHOOWWMMAAPP
-              Specifies  that  a  memory  map  of the entire heap
-              should be displayed at the end  of  program  execu-
+              Specifies that a memory  map  of  the  entire  heap
+              should  be  displayed  at the end of program execu-
               tion.  This step will not be performed if an abnor-
               mal termination occurs or if the heap is empty.
 
        SSHHOOWWSSYYMMBBOOLLSS
-              Specifies that a summary of  all  of  the  function
-              symbols  read  from  the  program's executable file
-              should be displayed at the end  of  program  execu-
+              Specifies  that  a  summary  of all of the function
+              symbols read from  the  program's  executable  file
+              should  be  displayed  at the end of program execu-
               tion.  This step will not be performed if an abnor-
-              mal termination occurs or if no  symbols  could  be
+              mal  termination  occurs  or if no symbols could be
               read from the executable file.
 
        SSHHOOWWUUNNFFRREEEEDD
               Specifies that a summary of all of the unfreed mem-
-              ory allocations should be displayed at the  end  of
+              ory  allocations  should be displayed at the end of
               program execution.  This step will not be performed
-              if an abnormal termination occurs or if  there  are
+              if  an  abnormal termination occurs or if there are
               no unfreed allocations.
 
-       UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies the minimum number of unfreed allocations
-              at which to abort the program just  before  program
-              termination.  A summary of all the allocations will
-              be displayed on  the  standard  error  file  stream
-              before  aborting.  This option may be handy for use
-              in batch tests as it can force  tests  to  fail  if
-              they  do  not  free  up  a minimum number of memory
-              allocations.   Note  that  this  setting  will   be
-              ignored  if  its  value  is  zero.   Default value:
-              UUNNFFRREEEEDDAABBOORRTT=_0.
 
 
 
-Release 1.0              6 December 1999                       14
+
+Release 1.1               9 January 2000                       14
 
 
 
@@ -928,13 +928,25 @@ Release 1.0              6 December 1999                       14
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       UUNNFFRREEEEDDAABBOORRTT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies the minimum number of unfreed allocations
+              at  which  to abort the program just before program
+              termination.  A summary of all the allocations will
+              be  displayed  on  the  standard  error file stream
+              before aborting.  This option may be handy for  use
+              in  batch  tests  as  it can force tests to fail if
+              they do not free up  a  minimum  number  of  memory
+              allocations.    Note  that  this  setting  will  be
+              ignored if  its  value  is  zero.   Default  value:
+              UUNNFFRREEEEDDAABBOORRTT=_0.
+
        UUSSEEMMMMAAPP
-              Specifies  that  the  library  should  use   mmmmaapp(())
+              Specifies   that  the  library  should  use  mmmmaapp(())
               instead of ssbbrrkk(()) to allocate system memory on UNIX
               platforms.  This option should be used if there are
               problems when using the mpatrol library in combina-
-              tion with another malloc library which uses  ssbbrrkk(())
-              to  allocate  its memory.  It is ignored on systems
+              tion  with another malloc library which uses ssbbrrkk(())
+              to allocate its memory.  It is ignored  on  systems
               that do not support the mmmmaapp(()) system call.
 
 SSEEEE AALLSSOO
@@ -946,22 +958,22 @@ AAUUTTHHOORR
        Graeme S. Roy <graeme@epc.co.uk>
 
 CCOOPPYYRRIIGGHHTT
-       Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+       Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-       This library is free software;  you  can  redistribute  it
-       and/or  modify  it under the terms of the GNU Library Gen-
-       eral Public License as  published  by  the  Free  Software
-       Foundation;  either  version 2 of the License, or (at your
+       This  library  is  free  software; you can redistribute it
+       and/or modify it under the terms of the GNU  Library  Gen-
+       eral  Public  License  as  published  by the Free Software
+       Foundation; either version 2 of the License, or  (at  your
        option) any later version.
 
-       This library is distributed in the hope that  it  will  be
+       This  library  is  distributed in the hope that it will be
        useful, but WITHOUT ANY WARRANTY; without even the implied
-       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
-       PURPOSE.   See  the GNU Library General Public License for
+       warranty  of  MERCHANTABILITY  or FITNESS FOR A PARTICULAR
+       PURPOSE.  See the GNU Library General Public  License  for
        more details.
 
        You should have received a copy of the GNU Library General
-       Public  License  along with this library; if not, write to
+       Public License along with this library; if not,  write  to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
        330, Boston, MA 02111-1307, USA.
 
@@ -973,18 +985,6 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-Release 1.0              6 December 1999                       15
+Release 1.1               9 January 2000                       15
 
 
