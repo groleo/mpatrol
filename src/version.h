@@ -37,7 +37,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MP_VERNUM 10304
+#define MP_VERNUM 10400
 
 
 #ifdef __cplusplus

@@ -42,7 +42,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MPATROL_VERSION 10304
+#define MPATROL_VERSION 10400
 
 
 /* A macro for representing constant function parameters.
