@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.41 2000-12-06 22:48:29 graeme Exp $
+# $Id: Makefile,v 1.42 2000-12-07 01:25:23 graeme Exp $
 
 
 # Definitions
@@ -193,7 +193,8 @@ memory.o memory.s.o memory.n.ln memory.t.o memory.s.t.o memory.t.ln: \
 	$(SOURCE)/target.h $(SOURCE)/stack.h $(SOURCE)/utils.h
 heap.o heap.s.o heap.n.ln heap.t.o heap.s.t.o heap.t.ln: $(SOURCE)/heap.c \
 	$(SOURCE)/heap.h $(SOURCE)/config.h $(SOURCE)/target.h \
-	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/utils.h
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/tree.h \
+	$(SOURCE)/trace.h $(SOURCE)/utils.h
 alloc.o alloc.s.o alloc.n.ln alloc.t.o alloc.s.t.o alloc.t.ln: \
 	$(SOURCE)/alloc.c $(SOURCE)/alloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \

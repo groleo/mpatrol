@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.32 2000-12-03 23:08:46 graeme Exp $
+# $Id: Makefile,v 1.33 2000-12-07 01:25:22 graeme Exp $
 
 
 # Definitions
@@ -114,7 +114,7 @@ memory.obj memory.ts.obj: $(SOURCE)/memory.c $(SOURCE)/memory.h \
 	$(SOURCE)/utils.h
 heap.obj heap.ts.obj: $(SOURCE)/heap.c $(SOURCE)/heap.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
-	$(SOURCE)/tree.h $(SOURCE)/utils.h
+	$(SOURCE)/tree.h $(SOURCE)/trace.h $(SOURCE)/utils.h
 alloc.obj alloc.ts.obj: $(SOURCE)/alloc.c $(SOURCE)/alloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/utils.h

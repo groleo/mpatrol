@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.33 2000-12-03 23:08:45 graeme Exp $
+# $Id: Makefile,v 1.34 2000-12-07 01:25:20 graeme Exp $
 
 
 # Definitions
@@ -112,7 +112,7 @@ memory.o memory.t.o: $(SOURCE)/memory.c $(SOURCE)/memory.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/stack.h $(SOURCE)/utils.h
 heap.o heap.t.o: $(SOURCE)/heap.c $(SOURCE)/heap.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
-	$(SOURCE)/tree.h $(SOURCE)/utils.h
+	$(SOURCE)/tree.h $(SOURCE)/trace.h $(SOURCE)/utils.h
 alloc.o alloc.t.o: $(SOURCE)/alloc.c $(SOURCE)/alloc.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/heap.h $(SOURCE)/memory.h \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/utils.h
