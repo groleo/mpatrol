@@ -40,7 +40,8 @@ typedef struct option
 {
     char *name; /* option name */
     int value;  /* option value */
-    char arg;   /* option has an argument */
+    char *arg;  /* option argument */
+    char *desc; /* option description */
 }
 option;
 
