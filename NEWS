@@ -13,10 +13,10 @@ Changes for 1.4.2
   * Added the __mp_errno global variable and a function to obtain the error
     message string corresponding to an error code.
 
-  * Added __mp_init_* initialisation function support.
+  * Added __mp_init_* and __mp_fini_* initialisation and finalisation function
+    support.
 
-  * Allocations made by the alloca() family of functions are no longer allowed
-    to be marked.
+  * Finished the support for marked allocations.
 
   * Tru64 is now supported.
 
@@ -27,14 +27,20 @@ Changes for 1.4.2
     calling memset(), etc. thus defeating the whole purpose of the original
     change!
 
+  * Fixed a problem building the shared version of the mpatrol library with some
+    versions of GNU C++.
+
   * Fixed the mpsym command which had problems when GDB displayed lines that
     were too long.
 
   * Added Dmalloc-compatible function implementations as an external package.
 
-  * Forgot to build the dbmalloc module and install its header file in the
+  * Forgot to build the Dbmalloc module and install its header file in the
     previous release.  Also now read all relevant Dbmalloc environment variables
     on initialisation and mapped all Dbmalloc error codes onto mpatrol errors.
+    Fixed the malloc_inuse() function for marked allocations.
+
+  * Added a chapter to the mpatrol manual describing the tools supplied.
 
   * Added the AUTHORS, CHECKSUMS and THANKS files.
 

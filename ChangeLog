@@ -1,3 +1,52 @@
+2001-03-07  Graeme Roy  <graeme@epc.co.uk>
+
+	* THANKS:
+	Added CheeChun Kok for his help on delaying the initialisation of the
+	mpatrol library until the environment is set up.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/unix/Makefile.aix, build/netware/Makefile, build/amiga/Makefile,
+	  build/amiga/SMakefile:
+	Added more leaktab dependencies.  Added diag.h dependencies to all files
+	that include inter.h.
+
+	* doc/mpatrol.texi:
+	Brought documentation up to date.  Added more information about the leak
+	table.
+
+	* doc/refcard.tex: Brought reference card up to date.
+
+	* src/config.h: Define MP_USE_ATEXIT to 0 by default on Tru64.
+
+	* src/target.h: Added DYNLINK_OSF.
+
+	* src/symbol.c: Added support for the OSF dynamic linker.
+
+	* src/info.c, src/info.h:
+	Added the mtotal field.  Updated the marked total for reallocations.
+	Also added marked allocation count.
+
+	* src/diag.c:
+	Don't show marked allocations with SHOWUNFREED or UNFREEDABORT.  Added
+	marked blocks to summary.
+
+	* src/inter.c:
+	Don't allow marked allocations to be remarked and update the marked
+	total.  Added the marked allocation count.  Don't show marked
+	allocations with SHOWUNFREED or UNFREEDABORT.  Added finishmarked() to
+	profile and trace the automatic freeing of marked allocations.
+
+	* src/inter.h, src/mpatrol.h: Added marked block statistics.
+
+	* src/cplus.c: Added #pragma implementation new for g++.
+
+	* src/machine.c: Added __mp_stackpointer() for Linux SPARC.
+
+	* tools/dbmalloc.c, tools/dbmalloc.h:
+	Fixed the malloc_inuse() function for marked allocations.
+
+	* tools/mgauge.c: Now consider marked allocations.
+
 2001-03-06  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mpsym: Added set width 0.
@@ -16,13 +65,21 @@
 
 	* man/man3/libmpatrol.3: Added more functions.
 
-	* src/config.h: Reduced the size of the leak table from 97 to 47 slots.
+	* src/config.h:
+	Reduced the size of the leak table from 97 to 47 slots.  Also added
+	support for functions whose names begin with __mp_fini_*.
+
+	* src/info.c, src/info.h: Added __mp_atfini().
+
+	* src/symbol.c: Added __mp_fini_* function support.
 
 	* src/diag.c: Added totals to __mp_printleaktab().
 
 	* src/inter.c, src/inter.h, src/mpalloc.c, src/mpatrol.h:
 	Added __mp_addallocentry() and __mp_addfreeentry().  Added a return
 	value to __mp_startleaktable() and __mp_stopleaktable().
+
+	* src/mpatrol.h: Added a definition for __mp_errno when NDEBUG is used.
 
 	* tests/pass/test4.c, tests/pass/test10.c:
 	Made use of the allocated flag.
