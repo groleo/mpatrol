@@ -59,9 +59,9 @@ the information necessary to generate each of the preformatted files.
                    of the mpatrol manual.
 
 
-The following files are all formatted for on-line documentation.  They generally
-contain little or no formatting codes, leaving the final formatting up to the
-viewer program.
+The following files are also provided with the main distribution and are all
+formatted for on-line documentation.  They generally contain little or no
+formatting codes, leaving the final formatting up to the viewer program.
 
   * mpatrol.txt
         Format:    ASCII text
@@ -97,8 +97,9 @@ viewer program.
                    links to JPEG images rather than embedding them.
 
 
-The following files are all formatted for printed manuals.  All can be viewed
-with a variety of programs, not just the ones listed here.
+The following files are provided with the documentation distribution and are all
+formatted for printed manuals.  All can be viewed with a variety of programs,
+not just the ones listed here.
 
   * mpatrol.dvi & refcard.dvi
         Format:    Device Independent format (DVI)
