@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.7 2000-03-31 08:36:39 graeme Exp $
+# $Id: Makefile,v 1.8 2000-04-03 18:11:44 graeme Exp $
 
 
 # Definitions
@@ -84,7 +84,7 @@ $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 $(SHARED_LIBRARY): $(SHARED_OBJECTS) $(LIBRARY).def
 	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARED_OBJECTS)
 
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
 
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
@@ -93,7 +93,7 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
 	$(LD) -dll -nologo -def:$(LIBRARY).def -out:$@ $(SHARTS_OBJECTS)
 
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
 memleak.exe: memleak.obj tree.obj
@@ -211,7 +211,7 @@ main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/symbol.h $(SOURCE)/strtab.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -222,7 +222,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \

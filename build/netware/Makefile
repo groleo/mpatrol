@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C/C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.4 2000-03-31 08:40:59 graeme Exp $
+# $Id: Makefile,v 1.5 2000-04-03 18:12:23 graeme Exp $
 
 
 # Definitions
@@ -66,13 +66,13 @@ OBJTS_LIBRARY	= $(LIBRARY)mt.obj
 $(ARCHIVE_LIBRARY): $(OBJECTS)
 	$(AR) -xar -o $@ $(OBJECTS)
 
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
 $(ARCHTS_LIBRARY): $(TOBJECTS)
 	$(AR) -xar -o $@ $(TOBJECTS)
 
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 memleak.nlm: memleak.obj tree.obj
@@ -173,7 +173,7 @@ inter.ts.obj: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -184,7 +184,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \

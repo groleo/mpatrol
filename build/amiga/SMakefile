@@ -21,7 +21,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.6 2000-03-31 08:50:20 graeme Exp $
+# $Id: SMakefile,v 1.7 2000-04-03 18:13:26 graeme Exp $
 
 
 # Definitions
@@ -64,14 +64,14 @@ OBJTS_LIBRARY	= $(LIBRARY)mt.o
 $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) -n $@ REPLACE $(ARCHIVE_OBJECTS)
 
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
-	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+$(OBJECT_LIBRARY): $(SOURCE)/library.c
+	$(CC) $(CFLAGS) $(OFLAGS) OBJNAME $@ $(SOURCE)/library.c
 
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) -n $@ REPLACE $(ARCHTS_OBJECTS)
 
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
-	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/mpatrol.c
+$(OBJTS_LIBRARY): $(SOURCE)/library.c
+	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) OBJNAME $@ $(SOURCE)/library.c
 
 memleak: memleak.o tree.o
 	$(CC) $(CFLAGS) $(OFLAGS) LINK PNAME $@ memleak.o tree.o
@@ -167,7 +167,7 @@ inter.t.o: $(SOURCE)/inter.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/mutex.h $(SOURCE)/option.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -178,7 +178,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/symbol.c $(SOURCE)/signals.c $(SOURCE)/inter.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \

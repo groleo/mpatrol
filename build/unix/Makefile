@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.5 2000-04-03 18:04:00 graeme Exp $
+# $Id: Makefile,v 1.6 2000-04-03 18:10:54 graeme Exp $
 
 
 # Definitions
@@ -88,7 +88,7 @@ $(SHARED_LIBRARY).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
 $(SHARED_LIBRARY): $(SHARED_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
 
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJECT_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
 $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
@@ -100,7 +100,7 @@ $(SHARTS_LIBRARY).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
 $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
 
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c
+$(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 memleak: memleak.o tree.o
@@ -213,7 +213,7 @@ malloc.o malloc.s.o malloc.t.o malloc.s.t.o: $(SOURCE)/malloc.c \
 	$(SOURCE)/strtab.h
 version.o version.s.o version.t.o version.s.t.o: $(SOURCE)/version.c \
 	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -225,7 +225,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/diag.c $(SOURCE)/version.h $(SOURCE)/option.c \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/malloc.c \
 	$(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/mpatrol.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
