@@ -21,7 +21,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.8 2000-12-26 10:51:59 graeme Exp $
+# $Id: Makefile,v 1.9 2001-01-04 21:01:35 graeme Exp $
 
 
 # Definitions
@@ -31,13 +31,13 @@ ROFF   = groff
 PSTILL = pstill
 
 PAGES	 = cat1/mpatrol.1 cat1/mprof.1 cat1/mptrace.1 cat1/mleak.1 \
-	   cat1/mpsym.1 cat1/mpedit.1 cat3/libmpatrol.3
+	   cat1/mpsym.1 cat1/mpedit.1 cat1/hexwords.1 cat3/libmpatrol.3
 DVIPAGES = dvi/mpatrol.dvi dvi/mprof.dvi dvi/mptrace.dvi dvi/mleak.dvi \
-	   dvi/mpsym.dvi dvi/mpedit.dvi dvi/libmpatrol.dvi
+	   dvi/mpsym.dvi dvi/mpedit.dvi dvi/hexwords.dvi dvi/libmpatrol.dvi
 PSPAGES	 = ps/mpatrol.ps ps/mprof.ps ps/mptrace.ps ps/mleak.ps \
-	   ps/mpsym.ps ps/mpedit.ps ps/libmpatrol.ps
+	   ps/mpsym.ps ps/mpedit.ps ps/hexwords.ps ps/libmpatrol.ps
 PDFPAGES = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
-	   pdf/mpsym.pdf pdf/mpedit.pdf pdf/libmpatrol.pdf
+	   pdf/mpsym.pdf pdf/mpedit.pdf pdf/hexwords.pdf pdf/libmpatrol.pdf
 
 
 # Rules
@@ -64,6 +64,9 @@ cat1/mpsym.1: man1/mpsym.1
 cat1/mpedit.1: man1/mpedit.1
 	$(ROFF) -Tascii -man $< >$@
 
+cat1/hexwords.1: man1/hexwords.1
+	$(ROFF) -Tascii -man -t $< >$@
+
 cat3/libmpatrol.3: man3/libmpatrol.3
 	$(ROFF) -Tascii -man -t $< >$@
 
@@ -84,6 +87,9 @@ dvi/mpsym.dvi: man1/mpsym.1
 
 dvi/mpedit.dvi: man1/mpedit.1
 	$(ROFF) -Tdvi -man $< >$@
+
+dvi/hexwords.dvi: man1/hexwords.1
+	$(ROFF) -Tdvi -man -t $< >$@
 
 dvi/libmpatrol.dvi: man3/libmpatrol.3
 	$(ROFF) -Tdvi -man -t $< >$@
@@ -106,6 +112,9 @@ ps/mpsym.ps: man1/mpsym.1
 ps/mpedit.ps: man1/mpedit.1
 	$(ROFF) -Tps -man $< >$@
 
+ps/hexwords.ps: man1/hexwords.1
+	$(ROFF) -Tps -man -t $< >$@
+
 ps/libmpatrol.ps: man3/libmpatrol.3
 	$(ROFF) -Tps -man -t $< >$@
 
@@ -125,6 +134,9 @@ pdf/mpsym.pdf: ps/mpsym.ps
 	$(PSTILL) -c -o $@ $<
 
 pdf/mpedit.pdf: ps/mpedit.ps
+	$(PSTILL) -c -o $@ $<
+
+pdf/hexwords.pdf: ps/hexwords.ps
 	$(PSTILL) -c -o $@ $<
 
 pdf/libmpatrol.pdf: ps/libmpatrol.ps
