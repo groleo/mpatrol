@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.20 2000-11-03 18:27:33 graeme Exp $"
+#ident "$Id: malloc.c,v 1.21 2000-12-20 23:02:14 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -44,14 +44,16 @@ extern "C"
 /* Allocate an uninitialised memory block of a given size.
  */
 
-void *malloc(size_t l)
+void *
+malloc(size_t l)
 {
     return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(malloc)(size_t l)
+void *
+MP_ALTFUNCNAME(malloc)(size_t l)
 {
     return __mp_alloc(l, 0, AT_MALLOC, NULL, NULL, 0, 1);
 }
@@ -62,14 +64,16 @@ void *MP_ALTFUNCNAME(malloc)(size_t l)
  * array of elements of a given size.
  */
 
-void *calloc(size_t l, size_t n)
+void *
+calloc(size_t l, size_t n)
 {
     return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
+void *
+MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 {
     return __mp_alloc(l * n, 0, AT_CALLOC, NULL, NULL, 0, 1);
 }
@@ -79,14 +83,16 @@ void *MP_ALTFUNCNAME(calloc)(size_t l, size_t n)
 /* Allocate an uninitialised memory block of a given size and alignment.
  */
 
-void *memalign(size_t a, size_t l)
+void *
+memalign(size_t a, size_t l)
 {
     return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
+void *
+MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
 {
     return __mp_alloc(l, a, AT_MEMALIGN, NULL, NULL, 0, 1);
 }
@@ -97,14 +103,16 @@ void *MP_ALTFUNCNAME(memalign)(size_t a, size_t l)
  * the system page size.
  */
 
-void *valloc(size_t l)
+void *
+valloc(size_t l)
 {
     return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(valloc)(size_t l)
+void *
+MP_ALTFUNCNAME(valloc)(size_t l)
 {
     return __mp_alloc(l, 0, AT_VALLOC, NULL, NULL, 0, 1);
 }
@@ -114,14 +122,16 @@ void *MP_ALTFUNCNAME(valloc)(size_t l)
 /* Allocate an uninitialised number of pages from the system.
  */
 
-void *pvalloc(size_t l)
+void *
+pvalloc(size_t l)
 {
     return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(pvalloc)(size_t l)
+void *
+MP_ALTFUNCNAME(pvalloc)(size_t l)
 {
     return __mp_alloc(l, 0, AT_PVALLOC, NULL, NULL, 0, 1);
 }
@@ -131,14 +141,16 @@ void *MP_ALTFUNCNAME(pvalloc)(size_t l)
 /* Allocate a temporary uninitialised memory block of a given size.
  */
 
-void *alloca(size_t l)
+void *
+alloca(size_t l)
 {
     return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(alloca)(size_t l)
+void *
+MP_ALTFUNCNAME(alloca)(size_t l)
 {
     return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
 }
@@ -148,14 +160,16 @@ void *MP_ALTFUNCNAME(alloca)(size_t l)
 /* Duplicate an existing string using memory from the heap.
  */
 
-char *strdup(MP_CONST char *p)
+char *
+strdup(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRDUP, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-char *MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
+char *
+MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRDUP, NULL, NULL, 0, 1);
 }
@@ -166,14 +180,16 @@ char *MP_ALTFUNCNAME(strdup)(MP_CONST char *p)
  * on the size of the memory allocated for the new string.
  */
 
-char *strndup(MP_CONST char *p, size_t l)
+char *
+strndup(MP_CONST char *p, size_t l)
 {
     return __mp_strdup((char *) p, l, AT_STRNDUP, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-char *MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
+char *
+MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
 {
     return __mp_strdup((char *) p, l, AT_STRNDUP, NULL, NULL, 0, 1);
 }
@@ -183,14 +199,16 @@ char *MP_ALTFUNCNAME(strndup)(MP_CONST char *p, size_t l)
 /* Duplicate an existing string using memory from the heap.
  */
 
-char *strsave(MP_CONST char *p)
+char *
+strsave(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRSAVE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-char *MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
+char *
+MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRSAVE, NULL, NULL, 0, 1);
 }
@@ -202,9 +220,11 @@ char *MP_ALTFUNCNAME(strsave)(MP_CONST char *p)
  */
 
 #if SYSTEM == SYSTEM_DGUX
-char *strnsave(MP_CONST char *p, int l)
+char *
+strnsave(MP_CONST char *p, int l)
 #else /* SYSTEM */
-char *strnsave(MP_CONST char *p, size_t l)
+char *
+strnsave(MP_CONST char *p, size_t l)
 #endif /* SYSTEM */
 {
     return __mp_strdup((char *) p, l, AT_STRNSAVE, NULL, NULL, 0, 1);
@@ -213,9 +233,11 @@ char *strnsave(MP_CONST char *p, size_t l)
 
 #if MP_ALTFUNCNAMES
 #if SYSTEM == SYSTEM_DGUX
-char *MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, int l)
+char *
+MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, int l)
 #else /* SYSTEM */
-char *MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
+char *
+MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
 #endif /* SYSTEM */
 {
     return __mp_strdup((char *) p, l, AT_STRNSAVE, NULL, NULL, 0, 1);
@@ -226,14 +248,16 @@ char *MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
 /* Duplicate an existing string using temporary memory from the heap.
  */
 
-char *strdupa(MP_CONST char *p)
+char *
+strdupa(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRDUPA, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-char *MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
+char *
+MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
 {
     return __mp_strdup((char *) p, 0, AT_STRDUPA, NULL, NULL, 0, 1);
 }
@@ -244,14 +268,16 @@ char *MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
  * limit on the size of the memory allocated for the new string.
  */
 
-char *strndupa(MP_CONST char *p, size_t l)
+char *
+strndupa(MP_CONST char *p, size_t l)
 {
     return __mp_strdup((char *) p, l, AT_STRNDUPA, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-char *MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
+char *
+MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 {
     return __mp_strdup((char *) p, l, AT_STRNDUPA, NULL, NULL, 0, 1);
 }
@@ -261,14 +287,16 @@ char *MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
 /* Resize an existing block of memory.
  */
 
-void *realloc(void *p, size_t l)
+void *
+realloc(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(realloc)(void *p, size_t l)
+void *
+MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_REALLOC, NULL, NULL, 0, 1);
 }
@@ -278,14 +306,16 @@ void *MP_ALTFUNCNAME(realloc)(void *p, size_t l)
 /* Resize an existing block of memory, usually a block allocated by calloc().
  */
 
-void *recalloc(void *p, size_t l, size_t n)
+void *
+recalloc(void *p, size_t l, size_t n)
 {
     return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
+void *
+MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 {
     return __mp_realloc(p, l * n, 0, AT_RECALLOC, NULL, NULL, 0, 1);
 }
@@ -295,14 +325,16 @@ void *MP_ALTFUNCNAME(recalloc)(void *p, size_t l, size_t n)
 /* Resize an existing block of memory, but never relocate it.
  */
 
-void *expand(void *p, size_t l)
+void *
+expand(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(expand)(void *p, size_t l)
+void *
+MP_ALTFUNCNAME(expand)(void *p, size_t l)
 {
     return __mp_realloc(p, l, 0, AT_EXPAND, NULL, NULL, 0, 1);
 }
@@ -312,14 +344,16 @@ void *MP_ALTFUNCNAME(expand)(void *p, size_t l)
 /* Free an existing block of memory.
  */
 
-void free(void *p)
+void
+free(void *p)
 {
     __mp_free(p, AT_FREE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(free)(void *p)
+void
+MP_ALTFUNCNAME(free)(void *p)
 {
     __mp_free(p, AT_FREE, NULL, NULL, 0, 1);
 }
@@ -329,14 +363,16 @@ void MP_ALTFUNCNAME(free)(void *p)
 /* Free an existing block of memory, usually a block allocated by calloc().
  */
 
-void cfree(void *p, size_t l, size_t n)
+void
+cfree(void *p, size_t l, size_t n)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
+void
+MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
 }
@@ -346,14 +382,16 @@ void MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 /* Explicitly free an existing block of temporary memory.
  */
 
-void dealloca(void *p)
+void
+dealloca(void *p)
 {
     __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(dealloca)(void *p)
+void
+MP_ALTFUNCNAME(dealloca)(void *p)
 {
     __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
 }
@@ -363,14 +401,16 @@ void MP_ALTFUNCNAME(dealloca)(void *p)
 /* Set a block of memory to a specific byte.
  */
 
-void *memset(void *p, int c, size_t l)
+void *
+memset(void *p, int c, size_t l)
 {
     return __mp_setmem(p, l, (unsigned char) c, AT_MEMSET, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
+void *
+MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
 {
     return __mp_setmem(p, l, (unsigned char) c, AT_MEMSET, NULL, NULL, 0, 1);
 }
@@ -380,14 +420,16 @@ void *MP_ALTFUNCNAME(memset)(void *p, int c, size_t l)
 /* Set a block of memory to the zero byte.
  */
 
-void bzero(void *p, size_t l)
+void
+bzero(void *p, size_t l)
 {
     __mp_setmem(p, l, 0, AT_BZERO, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(bzero)(void *p, size_t l)
+void
+MP_ALTFUNCNAME(bzero)(void *p, size_t l)
 {
     __mp_setmem(p, l, 0, AT_BZERO, NULL, NULL, 0, 1);
 }
@@ -398,7 +440,8 @@ void MP_ALTFUNCNAME(bzero)(void *p, size_t l)
  * stopping when a specific character is found.
  */
 
-void *memccpy(void *q, MP_CONST void *p, int c, size_t l)
+void *
+memccpy(void *q, MP_CONST void *p, int c, size_t l)
 {
     return __mp_copymem((void *) p, q, l, (unsigned char) c, AT_MEMCCPY, NULL,
                         NULL, 0, 1);
@@ -410,7 +453,8 @@ void *memccpy(void *q, MP_CONST void *p, int c, size_t l)
  * stopping when a specific character is found.
  */
 
-void *MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
+void *
+MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 {
     return __mp_copymem((void *) p, q, l, (unsigned char) c, AT_MEMCCPY, NULL,
                         NULL, 0, 1);
@@ -421,14 +465,16 @@ void *MP_ALTFUNCNAME(memccpy)(void *q, MP_CONST void *p, int c, size_t l)
 /* Copy a non-overlapping block of memory from one address to another.
  */
 
-void *memcpy(void *q, MP_CONST void *p, size_t l)
+void *
+memcpy(void *q, MP_CONST void *p, size_t l)
 {
     return __mp_copymem((void *) p, q, l, 0, AT_MEMCPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
+void *
+MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 {
     return __mp_copymem((void *) p, q, l, 0, AT_MEMCPY, NULL, NULL, 0, 1);
 }
@@ -438,14 +484,16 @@ void *MP_ALTFUNCNAME(memcpy)(void *q, MP_CONST void *p, size_t l)
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
-void *memmove(void *q, MP_CONST void *p, size_t l)
+void *
+memmove(void *q, MP_CONST void *p, size_t l)
 {
     return __mp_copymem((void *) p, q, l, 0, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
+void *
+MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 {
     return __mp_copymem((void *) p, q, l, 0, AT_MEMMOVE, NULL, NULL, 0, 1);
 }
@@ -455,14 +503,16 @@ void *MP_ALTFUNCNAME(memmove)(void *q, MP_CONST void *p, size_t l)
 /* Copy a possibly-overlapping block of memory from one address to another.
  */
 
-void bcopy(MP_CONST void *p, void *q, size_t l)
+void
+bcopy(MP_CONST void *p, void *q, size_t l)
 {
     __mp_copymem((void *) p, q, l, 0, AT_BCOPY, NULL, NULL, 0, 1);
 }
 
 
 #if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
+void
+MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 {
     __mp_copymem((void *) p, q, l, 0, AT_BCOPY, NULL, NULL, 0, 1);
 }
@@ -472,7 +522,8 @@ void MP_ALTFUNCNAME(bcopy)(MP_CONST void *p, void *q, size_t l)
 /* Look for the first occurrence of a character in a block of memory.
  */
 
-void *memchr(MP_CONST void *p, int c, size_t l)
+void *
+memchr(MP_CONST void *p, int c, size_t l)
 {
     return __mp_locatemem((void *) p, l, NULL, (size_t) c, AT_MEMCHR, NULL,
                           NULL, 0, 1);
@@ -480,7 +531,8 @@ void *memchr(MP_CONST void *p, int c, size_t l)
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
+void *
+MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
 {
     return __mp_locatemem((void *) p, l, NULL, (size_t) c, AT_MEMCHR, NULL,
                           NULL, 0, 1);
@@ -491,7 +543,8 @@ void *MP_ALTFUNCNAME(memchr)(MP_CONST void *p, int c, size_t l)
 /* Attempt to locate the position of one block of memory in another block.
  */
 
-void *memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
+void *
+memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
     return __mp_locatemem((void *) p, l, (void *) q, m, AT_MEMMEM, NULL, NULL,
                           0, 1);
@@ -499,8 +552,8 @@ void *memmem(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 
 
 #if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q,
-                             size_t m)
+void *
+MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q, size_t m)
 {
     return __mp_locatemem((void *) p, l, (void *) q, m, AT_MEMMEM, NULL, NULL,
                           0, 1);
@@ -511,7 +564,8 @@ void *MP_ALTFUNCNAME(memmem)(MP_CONST void *p, size_t l, MP_CONST void *q,
 /* Compare two blocks of memory.
  */
 
-int memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
+int
+memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
     return __mp_comparemem((void *) p, (void *) q, l, AT_MEMCMP, NULL, NULL, 0,
                            1);
@@ -519,7 +573,8 @@ int memcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 
 #if MP_ALTFUNCNAMES
-int MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
+int
+MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
     return __mp_comparemem((void *) p, (void *) q, l, AT_MEMCMP, NULL, NULL, 0,
                            1);
@@ -530,7 +585,8 @@ int MP_ALTFUNCNAME(memcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 /* Compare two blocks of memory.
  */
 
-int bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
+int
+bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
     return __mp_comparemem((void *) p, (void *) q, l, AT_BCMP, NULL, NULL, 0,
                            1);
@@ -538,7 +594,8 @@ int bcmp(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 
 #if MP_ALTFUNCNAMES
-int MP_ALTFUNCNAME(bcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
+int
+MP_ALTFUNCNAME(bcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 {
     return __mp_comparemem((void *) p, (void *) q, l, AT_BCMP, NULL, NULL, 0,
                            1);
@@ -556,15 +613,20 @@ int MP_ALTFUNCNAME(bcmp)(MP_CONST void *p, MP_CONST void *q, size_t l)
 
 #ifdef __cplusplus
 #ifdef __GNUC__
-extern "C" void (*set_new_handler(void (*h)(void)))(void)
+extern "C"
+void
+(*set_new_handler(void (*h)(void)))(void)
 #else /* __GNUC__ */
-void (*set_new_handler(void (*h)(void)))(void)
+void
+(*set_new_handler(void (*h)(void)))(void)
 #endif /* __GNUC__ */
 #else /* __cplusplus */
 #ifdef __GNUC__
-void (*set_new_handler(void (*h)(void)))(void)
+void
+(*set_new_handler(void (*h)(void)))(void)
 #else /* __GNUC__ */
-void (*set_new_handler__FPFv_v(void (*h)(void)))(void)
+void
+(*set_new_handler__FPFv_v(void (*h)(void)))(void)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
@@ -576,12 +638,15 @@ void (*set_new_handler__FPFv_v(void (*h)(void)))(void)
  */
 
 #ifdef __cplusplus
-void *operator new(size_t l)
+void *
+operator new(size_t l)
 #else /* __cplusplus */
 #ifdef __GNUC__
-void *__builtin_new(size_t l)
+void *
+__builtin_new(size_t l)
 #else /* __GNUC__ */
-void *__nw__FUi(size_t l)
+void *
+__nw__FUi(size_t l)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
@@ -593,12 +658,15 @@ void *__nw__FUi(size_t l)
  */
 
 #ifdef __cplusplus
-void *operator new[](size_t l)
+void *
+operator new[](size_t l)
 #else /* __cplusplus */
 #ifdef __GNUC__
-void *__builtin_vec_new(size_t l)
+void *
+__builtin_vec_new(size_t l)
 #else /* __GNUC__ */
-void *__arr_nw__FUi(size_t l)
+void *
+__arr_nw__FUi(size_t l)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
@@ -610,12 +678,15 @@ void *__arr_nw__FUi(size_t l)
  */
 
 #ifdef __cplusplus
-void operator delete(void *p)
+void
+operator delete(void *p)
 #else /* __cplusplus */
 #ifdef __GNUC__
-void __builtin_delete(void *p)
+void
+__builtin_delete(void *p)
 #else /* __GNUC__ */
-void __dl__FPv(void *p)
+void
+__dl__FPv(void *p)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
@@ -627,12 +698,15 @@ void __dl__FPv(void *p)
  */
 
 #ifdef __cplusplus
-void operator delete[](void *p)
+void
+operator delete[](void *p)
 #else /* __cplusplus */
 #ifdef __GNUC__
-void __builtin_vec_delete(void *p)
+void
+__builtin_vec_delete(void *p)
 #else /* __GNUC__ */
-void __arr_dl__FPv(void *p)
+void
+__arr_dl__FPv(void *p)
 #endif /* __GNUC__ */
 #endif /* __cplusplus */
 {
