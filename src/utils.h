@@ -32,6 +32,18 @@
 #include "config.h"
 
 
+#if MP_MACROROUTINES
+#define __mp_ispoweroftwo(n) \
+    (((unsigned long) (n) > 0) && (((unsigned long) (n) & \
+       ((unsigned long) (n) - 1)) == 0))
+#define __mp_rounddown(n, a) \
+    ((unsigned long) (n) & ~((unsigned long) (a) - 1))
+#define __mp_roundup(n, a) \
+    ((((unsigned long) (n) - 1) & ~((unsigned long) (a) - 1)) + \
+     (unsigned long) (a))
+#endif /* MP_MACROROUTINES */
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,10 +51,14 @@ extern "C"
 
 
 MP_EXPORT unsigned char __mp_logtwo(unsigned long);
+#if !MP_MACROROUTINES
 MP_EXPORT int __mp_ispoweroftwo(unsigned long);
+#endif /* MP_MACROROUTINES */
 MP_EXPORT unsigned long __mp_poweroftwo(unsigned long);
+#if !MP_MACROROUTINES
 MP_EXPORT unsigned long __mp_rounddown(unsigned long, unsigned long);
 MP_EXPORT unsigned long __mp_roundup(unsigned long, unsigned long);
+#endif /* MP_MACROROUTINES */
 
 
 #ifdef __cplusplus
