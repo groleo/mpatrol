@@ -1,3 +1,10 @@
+2001-03-12  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi:
+	Added more things to do and revised the timing results.
+
+	* src/target.h: Default to GNU BFD for Tru64.
+
 2001-03-11  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi, doc/refcard.tex, man/man3/libmpatrol.3:

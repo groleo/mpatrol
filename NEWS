@@ -1,4 +1,4 @@
-Changes for 1.4.2
+Changes for 1.4.2 (12th March, 2001)
 
   * Added the LEAKTABLE option which displays a leak table at the end of program
     execution.  Also added functions for users to manipulate the leak table.
