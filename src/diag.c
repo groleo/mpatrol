@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.40 2000-11-13 20:47:58 graeme Exp $"
+#ident "$Id: diag.c,v 1.41 2000-11-13 21:57:12 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -249,7 +249,7 @@ MP_GLOBAL int __mp_openlogfile(char *s)
         /* Because logfile is NULL, the __mp_error() function will open the log
          * file as stderr, which should always work.
          */
-        __mp_error(ET_MAX, AT_MAX, "%s: cannot open file\n", s);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: cannot open file\n", s);
         return 0;
     }
     /* Attempt to set the stream buffer for the log file.  This is done here so
@@ -290,65 +290,6 @@ MP_GLOBAL int __mp_closelogfile(void)
 }
 
 
-/* Sends a diagnostic message to the log file.
- */
-
-MP_GLOBAL void __mp_diag(char *s, ...)
-{
-    va_list v;
-
-    if (logfile == NULL)
-        __mp_openlogfile(NULL);
-    va_start(v, s);
-    vfprintf(logfile, s, v);
-    va_end(v);
-}
-
-
-/* Sends a warning message to the log file.
- */
-
-MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *s, ...)
-{
-    va_list v;
-
-    if (logfile == NULL)
-        __mp_openlogfile(NULL);
-    __mp_diag("WARNING: ");
-    if (e != ET_MAX)
-        __mp_diag("[%s]: ", errornames[e]);
-    if (f != AT_MAX)
-        __mp_diag("%s: ", __mp_functionnames[f]);
-    va_start(v, s);
-    vfprintf(logfile, s, v);
-    va_end(v);
-    __mp_diag("\n");
-    warnings++;
-}
-
-
-/* Sends an error message to the log file.
- */
-
-MP_GLOBAL void __mp_error(errortype e, alloctype f, char *s, ...)
-{
-    va_list v;
-
-    if (logfile == NULL)
-        __mp_openlogfile(NULL);
-    __mp_diag("ERROR: ");
-    if (e != ET_MAX)
-        __mp_diag("[%s]: ", errornames[e]);
-    if (f != AT_MAX)
-        __mp_diag("%s: ", __mp_functionnames[f]);
-    va_start(v, s);
-    vfprintf(logfile, s, v);
-    va_end(v);
-    __mp_diag("\n");
-    errors++;
-}
-
-
 /* Invokes a text editor on a given source file at a specific line.
  */
 
@@ -381,6 +322,67 @@ static int editfile(char *f, unsigned long l)
         return 0;
 #endif /* TARGET */
     return 1;
+}
+
+
+/* Sends a diagnostic message to the log file.
+ */
+
+MP_GLOBAL void __mp_diag(char *s, ...)
+{
+    va_list v;
+
+    if (logfile == NULL)
+        __mp_openlogfile(NULL);
+    va_start(v, s);
+    vfprintf(logfile, s, v);
+    va_end(v);
+}
+
+
+/* Sends a warning message to the log file.
+ */
+
+MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *n, unsigned long l,
+                         char *s, ...)
+{
+    va_list v;
+
+    if (logfile == NULL)
+        __mp_openlogfile(NULL);
+    __mp_diag("WARNING: ");
+    if (e != ET_MAX)
+        __mp_diag("[%s]: ", errornames[e]);
+    if (f != AT_MAX)
+        __mp_diag("%s: ", __mp_functionnames[f]);
+    va_start(v, s);
+    vfprintf(logfile, s, v);
+    va_end(v);
+    __mp_diag("\n");
+    warnings++;
+}
+
+
+/* Sends an error message to the log file.
+ */
+
+MP_GLOBAL void __mp_error(errortype e, alloctype f, char *n, unsigned long l,
+                          char *s, ...)
+{
+    va_list v;
+
+    if (logfile == NULL)
+        __mp_openlogfile(NULL);
+    __mp_diag("ERROR: ");
+    if (e != ET_MAX)
+        __mp_diag("[%s]: ", errornames[e]);
+    if (f != AT_MAX)
+        __mp_diag("%s: ", __mp_functionnames[f]);
+    va_start(v, s);
+    vfprintf(logfile, s, v);
+    va_end(v);
+    __mp_diag("\n");
+    errors++;
 }
 
 

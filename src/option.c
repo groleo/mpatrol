@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.20 2000-11-11 15:51:05 graeme Exp $"
+#ident "$Id: option.c,v 1.21 2000-11-13 21:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -247,7 +247,8 @@ static size_t readnumber(char *s, long *n, int u)
         s++;
     if ((u == 1) && (*s == '-'))
     {
-        __mp_error(ET_MAX, AT_MAX, "ignoring negative number `%s'\n", s);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "ignoring negative number `%s'\n",
+                   s);
         t = s;
     }
     else if ((u == 0) && (*s == '-') && (s[1] == '0') && ((s[2] == 'b') ||
@@ -272,8 +273,8 @@ static size_t readnumber(char *s, long *n, int u)
     else
         *n = strtoul(s, &t, 0);
     if (errno == ERANGE)
-        __mp_warn(ET_MAX, AT_MAX, "%s number overflow in `%s'\n", ((u == 0) &&
-                   (*n == LONG_MIN)) ? "negative" : "positive", s);
+        __mp_warn(ET_MAX, AT_MAX, NULL, 0, "%s number overflow in `%s'\n",
+                  ((u == 0) && (*n == LONG_MIN)) ? "negative" : "positive", s);
     errno = e;
     return (size_t) (t - s);
 }
@@ -374,8 +375,8 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
         return;
     if (strlen(s) + 1 > sizeof(options))
     {
-        __mp_error(ET_MAX, AT_MAX, "%s: environment variable too long\n",
-                   MP_OPTIONS);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "%s: environment variable too "
+                   "long\n", MP_OPTIONS);
         return;
     }
     /* We shouldn't modify the original string returned by getenv() since
@@ -936,41 +937,43 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
             {
               case OE_UNRECOGNISED:
                 if (*a == '\0')
-                    __mp_error(ET_MAX, AT_MAX, "unrecognised option `%s'\n", o);
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "unrecognised option "
+                               "`%s'\n", o);
                 else
-                    __mp_error(ET_MAX, AT_MAX, "unrecognised option `%s=%s'\n",
-                               o, a);
+                    __mp_error(ET_MAX, AT_MAX, NULL, 0, "unrecognised option "
+                               "`%s=%s'\n", o, a);
                 break;
               case OE_NOARGUMENT:
-                __mp_error(ET_MAX, AT_MAX, "missing argument for option `%s'\n",
-                           o);
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "missing argument for "
+                           "option `%s'\n", o);
                 break;
               case OE_BADNUMBER:
-                __mp_error(ET_MAX, AT_MAX, "bad numeric argument `%s' for "
-                           "option `%s'\n", a, o);
-                break;
-              case OE_BADRANGE:
-                __mp_error(ET_MAX, AT_MAX, "bad numeric range `%s' for option "
-                           "`%s'\n", a, o);
-                break;
-              case OE_BIGNUMBER:
-                __mp_error(ET_MAX, AT_MAX, "numeric argument `%s' is too large "
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "bad numeric argument `%s' "
                            "for option `%s'\n", a, o);
                 break;
+              case OE_BADRANGE:
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "bad numeric range `%s' "
+                           "for option `%s'\n", a, o);
+                break;
+              case OE_BIGNUMBER:
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "numeric argument `%s' is "
+                           "too large for option `%s'\n", a, o);
+                break;
               case OE_LOWERORUPPER:
-                __mp_error(ET_MAX, AT_MAX, "must specify `LOWER' or `UPPER' "
-                           "for option `%s'\n", o);
+                __mp_error(ET_MAX, AT_MAX, NULL, 0, "must specify `LOWER' or "
+                           "`UPPER' for option `%s'\n", o);
                 break;
               case OE_IGNARGUMENT:
-                __mp_warn(ET_MAX, AT_MAX, "ignoring argument `%s' for option "
-                          "`%s'\n", a, o);
+                __mp_warn(ET_MAX, AT_MAX, NULL, 0, "ignoring argument `%s' for "
+                          "option `%s'\n", a, o);
                 break;
               default:
                 break;
             }
         }
         else if (*a != '\0')
-            __mp_warn(ET_MAX, AT_MAX, "missing option for argument `%s'\n", a);
+            __mp_warn(ET_MAX, AT_MAX, NULL, 0, "missing option for argument "
+                      "`%s'\n", a);
     }
     /* Check the validity of the profiling allocation boundaries.  There is
      * potential for error if either of the small or large bounds overlap the
@@ -979,16 +982,16 @@ MP_GLOBAL void __mp_parseoptions(infohead *h)
      */
     if (h->prof.sbound >= h->prof.mbound)
     {
-        __mp_error(ET_MAX, AT_MAX, "small allocation boundary `%lu' overlaps "
-                   "medium allocation boundary `%lu'\n", h->prof.sbound,
-                   h->prof.mbound);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "small allocation boundary `%lu' "
+                   "overlaps medium allocation boundary `%lu'\n",
+                   h->prof.sbound, h->prof.mbound);
         h->prof.sbound = h->prof.mbound - 1;
     }
     if (h->prof.lbound <= h->prof.mbound)
     {
-        __mp_error(ET_MAX, AT_MAX, "large allocation boundary `%lu' overlaps "
-                   "medium allocation boundary `%lu'\n", h->prof.lbound,
-                   h->prof.mbound);
+        __mp_error(ET_MAX, AT_MAX, NULL, 0, "large allocation boundary `%lu' "
+                   "overlaps medium allocation boundary `%lu'\n",
+                   h->prof.lbound, h->prof.mbound);
         h->prof.lbound = h->prof.mbound + 1;
     }
     if (l != 0)
