@@ -1,11 +1,88 @@
-Thu May  4 08:25:29 2000  Graeme Roy  <graeme@epc.co.uk>
+Thu May 11 00:37:58 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ:
+	Mentioned -fno-inline-functions and how to suppress diagnostic messages.
+
+	* doc/README, doc/Makefile: Added the ASCII art image file.
+
+	* pkg/tar/build, pkg/rpm/mpatrol.spec, pkg/pkg/build, pkg/pkg/prototype,
+	  pkg/lha/build:
+	Added doc/images/mpatrol.txt to the distribution.
+
+Wed May 10 23:59:26 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi, man/man3/mpatrol.3, man/cat3/mpatrol.3,
+	  src/mpatrol.h, src/malloc.c:
+	Added an extra argument to recalloc().
+
+	* doc/mpatrol.texi:
+	Mentioned that mpatrol can now be used with the IRIX _RLD_LIST
+	environment variable.  Added ASCII logo for info files.
+
+	* doc/images/mpatrol.txt:
+	New image file containing the word mpatrol in ASCII art.
+
+	* FAQ, man/man1/mpatrol.1, man/cat1/mpatrol.1, src/mpatrol.c:
+	Removed references to LD_PRELOAD.
+
+	* man/man1/mprof.1, man/cat1/mprof.1, man/man3/mpatrol.3,
+	  man/cat3/mpatrol.3:
+	Added extra references.
+
+	* src/config.h:
+	IRIX systems have support for preloading shared libraries, but the name
+	of the environment variable is _RLD_LIST and not LD_PRELOAD.
+
+	* src/diag.c: Added explicit return type to logcall().
+
+	* src/info.c:
+	The comparison in memcmp() should be between unsigned chars and not
+	plain chars.
+
+	* src/mpatrol.h: Disable all mpatrol features if NDEBUG is defined.
+
+	* tests/fail/test11.c, tests/fail/test12.c:
+	The option is PAGEALLOC and not PAGESIZE.
+
+Mon May  8 21:53:30 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/amiga/Makefile, build/amiga/Makefile, build/netware/Makefile,
+	  build/unix/Makefile, build/windows/Makefile, build/windows/NMakefile:
+	Added mutex.h to threadsafe diagnostics module.
+
+	* src/diag.c, src/diag.h:
+	Added the __mp_logalloc(), __mp_logrealloc() and __mp_logfree()
+	functions.  Added the logcall() function.  Added __mp_logmemset(),
+	__mp_logmemcopy(), __mp_logmemlocate() and __mp_logmemcompare().
+
+	* src/info.c:
+	Added calls to __mp_logalloc(), __mp_logrealloc() and __mp_logfree().
+	Display the call details when CHECK* options are used, even if the LOG*
+	options are not used.  Added more display of call details when errors
+	occur and fixed a bug when profiling memory allocations of size 0.
+
+	* src/diag.c, src/diag.h, src/info.c, src/inter.c:
+	Changed __mp_alloctypenames[] to __mp_functionnames[].
+
+Thu May  4 20:21:49 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* build/unix/Makefile: Added lint support.
+
+	* doc/mpatrol.texi:
+	Changed the arguments to cfree() and documented the lint make target.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Added new parameters to cfree().
+
+	* pkg/pkg/prototype, pkg/pkg/build: Added the lint library.
 
 	* src/diag.c: Made the error and warning counts static.
 
 	* src/malloc.c, src/config.h:
 	Added MP_ALTFUNCNAMES and MP_ALTFUNCNAME().
+
+	* src/malloc.c, src/mpatrol.h:
+	cfree() takes two additional arguments, similar to calloc().
 
 Wed May  3 00:20:14 2000  Graeme Roy  <graeme@epc.co.uk>
 
