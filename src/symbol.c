@@ -105,7 +105,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.32 2000-07-30 23:45:52 graeme Exp $"
+#ident "$Id: symbol.c,v 1.33 2000-11-05 22:55:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -311,6 +311,8 @@ MP_GLOBAL void __mp_newsymbols(symhead *y, heaphead *h)
     __mp_newtree(&y->dtree);
     y->size = 0;
     y->hhead = y->htail = NULL;
+    y->prot = MA_NOACCESS;
+    y->protrecur = 0;
     y->lineinfo = 0;
 }
 
@@ -352,6 +354,8 @@ MP_GLOBAL void __mp_deletesymbols(symhead *y)
     __mp_newtree(&y->itree);
     __mp_newtree(&y->dtree);
     y->size = 0;
+    y->prot = MA_NOACCESS;
+    y->protrecur = 0;
 }
 
 
@@ -1430,12 +1434,28 @@ MP_GLOBAL int __mp_protectsymbols(symhead *y, memaccess a)
 {
     symnode *n;
 
+    if (!__mp_protectstrtab(&y->strings, a))
+        return 0;
+    /* The library already knows what its protection status is so we don't
+     * need to do anything if the request has already been done.
+     */
+    if (y->prot == a)
+    {
+        y->protrecur++;
+        return 1;
+    }
+    else if (y->protrecur > 0)
+    {
+        y->protrecur--;
+        return 1;
+    }
+    y->prot = a;
     for (n = (symnode *) __mp_minimum(y->itree.root); n != NULL;
          n = (symnode *) __mp_successor(&n->index.node))
         if (!__mp_memprotect(&y->heap->memory, n->index.block, n->index.size,
              a))
             return 0;
-    return __mp_protectstrtab(&y->strings, a);
+    return 1;
 }
 
 

@@ -74,15 +74,17 @@ symnode;
 
 typedef struct symhead
 {
-    heaphead *heap;  /* pointer to heap */
-    strtab strings;  /* string table */
-    slottable table; /* table of symbol nodes */
-    treeroot itree;  /* internal allocation tree */
-    treeroot dtree;  /* symbol node allocation tree */
-    size_t size;     /* number of symbol nodes in table */
-    void *hhead;     /* access library handle list head */
-    void *htail;     /* access library handle list tail */
-    char lineinfo;   /* line number information flag */
+    heaphead *heap;   /* pointer to heap */
+    strtab strings;   /* string table */
+    slottable table;  /* table of symbol nodes */
+    treeroot itree;   /* internal allocation tree */
+    treeroot dtree;   /* symbol node allocation tree */
+    size_t size;      /* number of symbol nodes in table */
+    void *hhead;      /* access library handle list head */
+    void *htail;      /* access library handle list tail */
+    memaccess prot;   /* protection status */
+    size_t protrecur; /* protection recursion count */
+    char lineinfo;    /* line number information flag */
 }
 symhead;
 
