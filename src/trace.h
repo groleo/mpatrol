@@ -32,7 +32,7 @@
 
 
 #include "config.h"
-#include <stddef.h>
+#include "memory.h"
 
 
 /* A tracehead contains all the tracing information including the
@@ -53,8 +53,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newtrace(tracehead *, char *);
-MP_EXPORT void __mp_endtrace(tracehead *);
+MP_EXPORT int __mp_newtrace(tracehead *, meminfo *);
+MP_EXPORT int __mp_endtrace(tracehead *);
 MP_EXPORT void __mp_tracealloc(tracehead *, unsigned long, void *, size_t);
 MP_EXPORT void __mp_tracefree(tracehead *, unsigned long);
 
