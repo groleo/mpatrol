@@ -81,7 +81,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.49 2001-01-25 21:39:09 graeme Exp $"
+#ident "$Id: memory.c,v 1.50 2001-02-05 22:24:16 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -123,13 +123,13 @@ static size_t memorysize;
 
 
 #if TARGET == TARGET_UNIX
-static jmp_buf environment;
+static jmp_buf memorystate;
 #if MP_SIGINFO_SUPPORT
-static struct sigaction bushandler;
-static struct sigaction segvhandler;
+static struct sigaction membushandler;
+static struct sigaction memsegvhandler;
 #else /* MP_SIGINFO_SUPPORT */
-static void (*bushandler)(int);
-static void (*segvhandler)(int);
+static void (*membushandler)(int);
+static void (*memsegvhandler)(int);
 #endif /* MP_SIGINFO_SUPPORT */
 #endif /* TARGET */
 
@@ -704,7 +704,7 @@ static
 void
 memoryhandler(int s)
 {
-    longjmp(environment, 1);
+    longjmp(memorystate, 1);
 }
 #endif /* TARGET */
 
@@ -745,28 +745,28 @@ __mp_memquery(meminfo *i, void *p)
     s.sa_flags = 0;
     (void *) s.sa_handler = (void *) memoryhandler;
     sigfillset(&s.sa_mask);
-    sigaction(SIGBUS, &s, &bushandler);
-    sigaction(SIGSEGV, &s, &segvhandler);
+    sigaction(SIGBUS, &s, &membushandler);
+    sigaction(SIGSEGV, &s, &memsegvhandler);
 #else /* MP_SIGINFO_SUPPORT */
-    bushandler = signal(SIGBUS, memoryhandler);
-    segvhandler = signal(SIGSEGV, memoryhandler);
+    membushandler = signal(SIGBUS, memoryhandler);
+    memsegvhandler = signal(SIGSEGV, memoryhandler);
 #endif /* MP_SIGINFO_SUPPORT */
-    if (setjmp(environment))
+    if (setjmp(memorystate))
         r = MA_NOACCESS;
     else
     {
         c = *((char *) p);
-        if (setjmp(environment))
+        if (setjmp(memorystate))
             r = MA_READONLY;
         else
             *((char *) p) = c;
     }
 #if MP_SIGINFO_SUPPORT
-    sigaction(SIGBUS, &bushandler, NULL);
-    sigaction(SIGSEGV, &segvhandler, NULL);
+    sigaction(SIGBUS, &membushandler, NULL);
+    sigaction(SIGSEGV, &memsegvhandler, NULL);
 #else /* MP_SIGINFO_SUPPORT */
-    signal(SIGBUS, bushandler);
-    signal(SIGSEGV, segvhandler);
+    signal(SIGBUS, membushandler);
+    signal(SIGSEGV, memsegvhandler);
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
     /* On Windows, the VirtualQuery() function allows us to determine the
