@@ -57,17 +57,17 @@
 #endif /* TARGET */
 
 
-#define SYSTEM_ANY      1  /* no specific system */
-#define SYSTEM_AIX      2  /* AIX */
-#define SYSTEM_DGUX     3  /* DG/UX */
-#define SYSTEM_DYNIX    4  /* DYNIX/ptx */
-#define SYSTEM_HPUX     5  /* HP/UX */
-#define SYSTEM_IRIX     6  /* IRIX */
-#define SYSTEM_LINUX    7  /* Linux */
-#define SYSTEM_LYNXOS   8  /* LynxOS */
-#define SYSTEM_SINIX    9  /* SINIX */
-#define SYSTEM_SOLARIS  10 /* Solaris */
-#define SYSTEM_UNIXWARE 11 /* UnixWare */
+#define SYSTEM_ANY      0  /* no specific system */
+#define SYSTEM_AIX      1  /* AIX */
+#define SYSTEM_DGUX     2  /* DG/UX */
+#define SYSTEM_DYNIX    3  /* DYNIX/ptx */
+#define SYSTEM_HPUX     4  /* HP/UX */
+#define SYSTEM_IRIX     5  /* IRIX */
+#define SYSTEM_LINUX    6  /* Linux */
+#define SYSTEM_LYNXOS   7  /* LynxOS */
+#define SYSTEM_SINIX    8  /* SINIX */
+#define SYSTEM_SOLARIS  9  /* Solaris */
+#define SYSTEM_UNIXWARE 10 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -156,12 +156,13 @@
 #endif /* ARCH */
 
 
-#define FORMAT_NONE  1 /* no symbol support */
-#define FORMAT_COFF  2 /* COFF */
-#define FORMAT_XCOFF 3 /* XCOFF */
-#define FORMAT_ELF32 4 /* ELF32 */
-#define FORMAT_ELF64 5 /* ELF64 */
-#define FORMAT_BFD   6 /* GNU BFD */
+#define FORMAT_NONE  0 /* no symbol support */
+#define FORMAT_COFF  1 /* COFF */
+#define FORMAT_XCOFF 2 /* XCOFF */
+#define FORMAT_ELF32 3 /* ELF32 */
+#define FORMAT_ELF64 4 /* ELF64 */
+#define FORMAT_BFD   5 /* GNU BFD */
+#define FORMAT_PE    6 /* Portable Executable */
 
 
 #ifndef FORMAT
@@ -172,6 +173,8 @@
 #else /* SYSTEM */
 #define FORMAT FORMAT_ELF32
 #endif /* SYSTEM */
+#elif TARGET == TARGET_WINDOWS
+#define FORMAT FORMAT_PE
 #else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define FORMAT FORMAT_BFD
