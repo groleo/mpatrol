@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.53 2001-01-15 21:58:32 graeme Exp $"
+#ident "$Id: info.c,v 1.54 2001-01-15 23:03:30 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -624,6 +624,15 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, alloctype f,
             }
             if (p != NULL)
             {
+                m->data.type = f;
+#if MP_THREADS_SUPPORT
+                m->data.thread = __mp_threadid();
+#endif /* MP_THREADS_SUPPORT */
+                m->data.func = v->func;
+                m->data.file = v->file;
+                m->data.line = v->line;
+                __mp_freeaddrs(&h->addr, m->data.stack);
+                m->data.stack = __mp_getaddrs(&h->addr, v->stack);
                 m->data.typestr = v->typestr;
                 m->data.typesize = v->typesize;
                 if (m->data.flags & FLG_PROFILED)
