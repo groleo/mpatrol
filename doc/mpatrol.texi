@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.208 2001-03-19 19:09:54 graeme Exp $
+@c $Id: mpatrol.texi,v 1.209 2001-03-19 19:29:55 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -13478,6 +13478,22 @@ Provides a profiler, call coverage tool and resource browser which can detail
 memory leaks.
 @end table
 
+@cindex GMemLogger
+@item
+GMemLogger
+@table @asis
+@item Author
+Yves Mettier (@email{ymettier@@libertysurf.fr})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://sourceforge.net/projects/gmemlogger/}
+@item Overview
+Logs allocated memory for the purpose of detecting memory leaks.
+@end table
+
 @cindex Great Circle
 @cindex Geodesic Systems
 @item
@@ -14645,6 +14661,30 @@ Aaron Dailey (@email{adailey@@chaparraltec.com})
 @item Overview
 Documents techniques for better use of the C++ dynamic memory allocation
 operators.
+@end table
+
+@cindex Mozilla
+@item
+How To Debug Memory Leaks
+@table @asis
+@item Author
+The Mozilla Organization (@email{webmaster@@mozilla.org})
+@item Location
+@uref{http://www.lxr.mozilla.org/mozilla/source/xpcom/doc/MemoryTools.html}
+@item Overview
+A list of memory analysis tools that the Mozilla team have developed in order to
+quickly spot and fix memory leaks.
+@end table
+
+@item
+Just Say No To Memory Leaks
+@table @asis
+@item Author
+Steve Litt (@email{slitt@@troubleshooters.com})
+@item Location
+@uref{http://www.troubleshooters.com/codecorn/memleak.htm}
+@item Overview
+An article discussing memory leaks and how to avoid them.
 @end table
 
 @item
