@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.62 2001-03-04 12:59:52 graeme Exp $"
+#ident "$Id: diag.c,v 1.63 2001-03-04 13:14:51 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.62 2001-03-04 12:59:52 graeme Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.63 2001-03-04 13:14:51 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -61,7 +61,8 @@ static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.62 2001-03-04 12:59
 
 typedef struct errorinfo
 {
-    char *code; /* error abbreviation code */
+    char *code;   /* error abbreviation code */
+    char *format; /* error format */
 }
 errorinfo;
 
@@ -110,12 +111,16 @@ static unsigned long errors, warnings;
 static errorinfo errordetails[ET_MAX] =
 {
     {"NOERR"},
-    {"ALLOVF"},
+    {"ALLOVF",
+     "allocation " MP_POINTER " has a corrupted overflow buffer at "
+         MP_POINTER},
     {"ALLZER"},
     {"BADALN"},
     {"FRDCOR"},
     {"FRDOPN"},
-    {"FRDOVF"},
+    {"FRDOVF",
+     "freed allocation " MP_POINTER " has a corrupted overflow buffer at "
+         MP_POINTER},
     {"FRECOR"},
     {"FREMRK"},
     {"FRENUL"},
