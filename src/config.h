@@ -290,6 +290,18 @@
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
+/* The maximum number of recursive calls to C++ operator delete and operator
+ * delete[] that will have source level information associated with them.
+ * This acts as a workaround for the fact that placement delete will only be
+ * called during an exception and not if explicitly invoked.  However, the
+ * current implementation is not thread-safe.
+ */
+
+#ifndef MP_MAXDELSTACK
+#define MP_MAXDELSTACK 32
+#endif /* MP_MAXDELSTACK */
+
+
 /* Indicates if the compiler supports the long long type.  This is only used
  * to determine the minimum alignment required for a generic memory allocation.
  */
