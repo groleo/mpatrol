@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpcalloc.c,v 1.2 2001-02-05 22:58:33 graeme Exp $"
+#ident "$Id: mpcalloc.c,v 1.3 2001-02-08 21:16:38 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpcalloc_id = "$Id: mpcalloc.c,v 1.2 2001-02-05 22:58:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpcalloc_id = "$Id: mpcalloc.c,v 1.3 2001-02-08 21:16:38 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -59,7 +59,10 @@ __mp_xcalloc(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u,
     void *p;
 
     if (l == 0)
-        l = 1;
+        if (h != 0)
+            l = h;
+        else
+            l = 1;
     if ((p = malloc(l)) == NULL)
     {
         if (__mp_failure != NULL)
