@@ -34,10 +34,12 @@ EXPORTS
 	__mp_strdup	@4
 	__mp_realloc	@5
 	__mp_free	@6
-	__mp_info	@7
-	__mp_memorymap	@8
-	__mp_summary	@9
-	__mp_check	@10
-	__mp_prologue	@11
-	__mp_epilogue	@12
-	__mp_nomemory	@13
+	__mp_setmem	@7
+	__mp_copymem	@8
+	__mp_info	@9
+	__mp_memorymap	@10
+	__mp_summary	@11
+	__mp_check	@12
+	__mp_prologue	@13
+	__mp_epilogue	@14
+	__mp_nomemory	@15
