@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.221 2001-06-13 21:41:44 graeme Exp $
+@c $Id: mpatrol.texi,v 1.222 2001-06-13 22:57:13 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -249,7 +249,8 @@ testing for the FreeBSD port, and Ivan Finch (@email{i.finch@@rl.ac.uk}) and
 Andreas Schallenberg (@email{andreas.schallenberg@@informatik.uni-oldenburg.de})
 did the same for the Tru64 and SuSE ports.  Both Aleksandar Donev
 (@email{donev@@pa.msu.edu}) and Van Snyder (@email{vsnyder@@math.jpl.nasa.gov})
-provided suggestions and code for using mpatrol with FORTRAN.
+provided suggestions and code for using mpatrol with FORTRAN.  Michael Anthony
+(@email{m@@xyzfind.com}) wrote the profdiff tool.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today
@@ -4614,11 +4615,14 @@ If the filename argument is given as @samp{-} then the standard input file
 stream will be used as the tracing output file.
 
 @cindex --verbose
+@cindex --source
 Normally, the @command{mptrace} command will simply read in the tracing output
 file and display any statistics it has gathered.  However, it can also be
 instructed to display a tracing table which displays useful details for every
 event in the tracing output file.  The tracing table can be displayed with the
-@option{--verbose} option.
+@option{--verbose} option.  If the mpatrol library was able to obtain
+source-level information for one or more memory events then this can be
+displayed in the tracing table by adding the @option{--source} option.
 
 @cindex --sim-file
 A C source file containing a trace-driven memory allocation simulation program
@@ -4772,6 +4776,10 @@ Note that both the tracing files mentioned above and the examples below treat
 reallocations as a deallocation followed by an allocation.  This was the
 behaviour in older versions of the mpatrol library and I haven't bothered to
 update the files.  However, it shouldn't affect the final outcome in any way.
+In addition, as the @file{mpatrol.h} header file was not included by any of the
+source files that comprise the compiler and its toolset, there was no
+source-level information for memory events.  If there was, the @option{--source}
+option could have been used to display it.
 
 @smallexample
 bash$ rm as.log as.trace ld.log ld.trace
