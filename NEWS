@@ -1,10 +1,10 @@
-Changes for 1.1.0
+Changes for 1.1.0 (30th January, 2000)
 
   * Added a new file containing answers to frequently asked questions.
 
   * Added references to the memory management reference, FreshMeat and eGroups
     in the mpatrol manual.  Also added more related software and removed the
-    authors from the concept index.
+    authors from the concept index and added a complete tutorial.
 
   * Changed the suffix of the ASCII documentation from .doc to .txt since it
     was being wrongly assumed to be a Microsoft Word document.
@@ -12,8 +12,9 @@ Changes for 1.1.0
   * Object libraries are now no longer built when the all Makefile target is
     used.
 
-  * The library now replaces the memset(), bzero(), memcpy(), memmove() and
-    bcopy() functions for tracing and debugging purposes.
+  * The library now replaces the memset(), bzero(), memcpy(), memmove(),
+    bcopy(), memcmp(), bcmp(), memchr() and memmem() functions for tracing and
+    debugging purposes.
 
   * Added the expand() function for backwards compatibility with other C
     libraries.
@@ -22,14 +23,15 @@ Changes for 1.1.0
 
   * Added the SAFESIGNALS option which is now no longer enabled by default.
 
-  * Added a summary of bytes copied and set when __mp_summary() is called.
+  * Added a summary of bytes compared, located, copied and set when
+    __mp_summary() is called.
 
   * Dynamic symbols are now used on GNU BFD as well as ELF when the object file
     has been stripped of its symbol table.
 
-  * Relevant options and flags have been added for mallopt() support.
+  * Relevant options and flags have been added for future mallopt() support.
 
-  * Added new tests for the memory operation functions.
+  * Added new tests for the tutorial and memory operation functions.
 
 
 Changes for 1.0.8 (20th December, 1999)
