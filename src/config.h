@@ -131,6 +131,15 @@
 #endif /* MP_BIN_SIZE */
 
 
+/* The number of buckets in the hash table used to implement the string table.
+ * This must be a prime number.
+ */
+
+#ifndef MP_HASHTAB_SIZE
+#define MP_HASHTAB_SIZE 211
+#endif /* MP_HASHTAB_SIZE */
+
+
 /* The multiple of pages to allocate from the heap every time a new block of
  * internal memory is required.  The higher the value, the less distinct
  * internal blocks to keep track of, but the potential for more memory wastage
@@ -140,6 +149,18 @@
 #ifndef MP_ALLOCFACTOR
 #define MP_ALLOCFACTOR 2
 #endif /* MP_ALLOCFACTOR */
+
+
+/* The maximum number of recursive calls to C++ operator delete and operator
+ * delete[] that will have source level information associated with them.
+ * This acts as a workaround for the fact that placement delete will only be
+ * called during an exception and not if explicitly invoked.  However, the
+ * current implementation is not thread-safe.
+ */
+
+#ifndef MP_MAXDELSTACK
+#define MP_MAXDELSTACK 32
+#endif /* MP_MAXDELSTACK */
 
 
 /* Indicates if all of the heap memory used by the library should be
@@ -346,6 +367,53 @@
 #endif /* MP_PROCFS_SUPPORT && MP_WATCH_SUPPORT */
 
 
+/* Indicates if the compiler supports the __builtin_frame_address() and
+ * __builtin_return_address() macros, and if they should be used instead of
+ * traversing the call stack directly.  Note that this method only allows a
+ * finite number of call stack traversals per function.
+ */
+
+#ifndef MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_AMIGA && defined(__GNUC__)
+#define MP_BUILTINSTACK_SUPPORT 1
+#else /* TARGET && __GNUC__ */
+#define MP_BUILTINSTACK_SUPPORT 0
+#endif /* TARGET && __GNUC__ */
+#endif /* MP_BUILTINSTACK_SUPPORT */
+
+
+/* The maximum number of call stack traversals per function if builtin
+ * frame address and return address support is being used.  This number must
+ * be supported by the required number of macro functions in stack.c.
+ */
+
+#if MP_BUILTINSTACK_SUPPORT
+#ifndef MP_MAXSTACK
+#if TARGET == TARGET_AMIGA && defined(__GNUC__)
+#define MP_MAXSTACK 3
+#else /* TARGET && __GNUC__ */
+#define MP_MAXSTACK 8
+#endif /* TARGET && __GNUC__ */
+#endif /* MP_MAXSTACK */
+#endif /* MP_BUILTINSTACK_SUPPORT */
+
+
+/* Indicates if the operating system provides support routines for traversing
+ * call stacks in an external library.  This is currently only available for
+ * HP/UX and IRIX, but the IRIX unwind() library routine calls malloc() and
+ * free() so the non-library method of call stack traversal is used instead as
+ * it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
+ */
+
+#ifndef MP_LIBRARYSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && SYSTEM == SYSTEM_HPUX
+#define MP_LIBRARYSTACK_SUPPORT 1
+#else /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#define MP_LIBRARYSTACK_SUPPORT 0
+#endif /* MP_BUILTINSTACK_SUPPORT && SYSTEM */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
+
+
 /* Indicates if the system dynamic linker supports preloading a set of shared
  * libraries specified in an environment variable.
  */
@@ -384,25 +452,47 @@
 #ifndef MP_PRELOAD_LIBS
 #if FORMAT == FORMAT_NONE || FORMAT == FORMAT_COFF
 #if SYSTEM == SYSTEM_IRIX
+#if MP_LIBRARYSTACK_SUPPORT
+#define MP_PRELOAD_LIBS "libmpatrol.so:libexc.so:DEFAULT"
+#else /* MP_LIBRARYSTACK_SUPPORT */
 #define MP_PRELOAD_LIBS "libmpatrol.so:DEFAULT"
+#endif /* MP_LIBRARYSTACK_SUPPORT */
 #else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so"
 #endif /* SYSTEM */
 #elif FORMAT == FORMAT_ELF32
 #if SYSTEM == SYSTEM_IRIX
+#if MP_LIBRARYSTACK_SUPPORT
+#define MP_PRELOAD_LIBS "libmpatrol.so:libelf.so:libexc.so:DEFAULT"
+#else /* MP_LIBRARYSTACK_SUPPORT */
 #define MP_PRELOAD_LIBS "libmpatrol.so:libelf.so:DEFAULT"
+#endif /* MP_LIBRARYSTACK_SUPPORT */
 #else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so libelf.so"
 #endif /* SYSTEM */
 #elif FORMAT == FORMAT_BFD
 #if SYSTEM == SYSTEM_IRIX
+#if MP_LIBRARYSTACK_SUPPORT
+#define MP_PRELOAD_LIBS "libmpatrol.so:libbfd.so:libiberty.so:libexc.so:DEFAULT"
+#else /* MP_LIBRARYSTACK_SUPPORT */
 #define MP_PRELOAD_LIBS "libmpatrol.so:libbfd.so:libiberty.so:DEFAULT"
+#endif /* MP_LIBRARYSTACK_SUPPORT */
 #else /* SYSTEM */
 #define MP_PRELOAD_LIBS "libmpatrol.so libbfd.so libiberty.so"
 #endif /* SYSTEM */
 #endif /* FORMAT */
 #endif /* MP_PRELOAD_LIBS */
 #endif /* MP_PRELOAD_SUPPORT */
+
+
+/* Indicates if support for Parasoft Inuse is enabled.  This is a commercial
+ * product which graphically displays process memory usage and is provided as
+ * an add-on for Parasoft Insure++.
+ */
+
+#ifndef MP_INUSE_SUPPORT
+#define MP_INUSE_SUPPORT 0
+#endif /* MP_INUSE_SUPPORT */
 
 
 /* Indicates if the C functions defined in malloc.c are to have duplicate
@@ -429,66 +519,18 @@
 #endif /* MP_ALTFUNCNAMES */
 
 
-/* Indicates if the compiler supports the __builtin_frame_address() and
- * __builtin_return_address() macros, and if they should be used instead of
- * traversing the call stack directly.  Note that this method only allows a
- * finite number of call stack traversals per function.
+/* Indicates if the compiler supports the ident preprocessor directive for
+ * placing a version string in the comment section of an object file.
  */
 
-#ifndef MP_BUILTINSTACK_SUPPORT
-#if TARGET == TARGET_AMIGA && defined(__GNUC__)
-#define MP_BUILTINSTACK_SUPPORT 1
-#else /* TARGET && __GNUC__ */
-#define MP_BUILTINSTACK_SUPPORT 0
-#endif /* TARGET && __GNUC__ */
-#endif /* MP_BUILTINSTACK_SUPPORT */
-
-
-/* The maximum number of call stack traversals per function if builtin
- * frame address and return address support is being used.  This number must
- * be supported by the required number of macro functions in stack.c.
- */
-
-#if MP_BUILTINSTACK_SUPPORT
-#ifndef MP_MAXSTACK
-#if TARGET == TARGET_AMIGA && defined(__GNUC__)
-#define MP_MAXSTACK 3
-#else /* TARGET && __GNUC__ */
-#define MP_MAXSTACK 8
-#endif /* TARGET && __GNUC__ */
-#endif /* MP_MAXSTACK */
-#endif /* MP_BUILTINSTACK_SUPPORT */
-
-
-/* The maximum number of recursive calls to C++ operator delete and operator
- * delete[] that will have source level information associated with them.
- * This acts as a workaround for the fact that placement delete will only be
- * called during an exception and not if explicitly invoked.  However, the
- * current implementation is not thread-safe.
- */
-
-#ifndef MP_MAXDELSTACK
-#define MP_MAXDELSTACK 32
-#endif /* MP_MAXDELSTACK */
-
-
-/* The number of buckets in the hash table used to implement the string table.
- * This must be a prime number.
- */
-
-#ifndef MP_HASHTABSIZE
-#define MP_HASHTABSIZE 211
-#endif /* MP_HASHTABSIZE */
-
-
-/* Indicates if support for Parasoft Inuse is enabled.  This is a commercial
- * product which graphically displays process memory usage and is provided as
- * an add-on for Parasoft Insure++.
- */
-
-#ifndef MP_INUSE_SUPPORT
-#define MP_INUSE_SUPPORT 0
-#endif /* MP_INUSE_SUPPORT */
+#ifndef MP_IDENT_SUPPORT
+#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
+    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
+#define MP_IDENT_SUPPORT 1
+#else /* SYSTEM */
+#define MP_IDENT_SUPPORT 0
+#endif /* SYSTEM */
+#endif /* MP_IDENT_SUPPORT */
 
 
 /* Indicates if the compiler supports the long long type.  This is only used
@@ -502,20 +544,6 @@
 #define MP_LONGLONG_SUPPORT 0
 #endif /* __GNUC__ */
 #endif /* MP_LONGLONG_SUPPORT */
-
-
-/* Indicates if the compiler supports the ident preprocessor directive for
- * placing a version string in the comment section of an object file.
- */
-
-#ifndef MP_IDENT_SUPPORT
-#if SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DYNIX || \
-    SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SOLARIS
-#define MP_IDENT_SUPPORT 1
-#else /* SYSTEM */
-#define MP_IDENT_SUPPORT 0
-#endif /* SYSTEM */
-#endif /* MP_IDENT_SUPPORT */
 
 
 /* The format string passed to fprintf() which is used to display addresses.
