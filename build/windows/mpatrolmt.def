@@ -122,12 +122,12 @@ EXPORTS
 	memmem
 	memcmp
 	bcmp
+	?set_new_handler@@YAP6AXXZP6AXXZ@Z
 	??2@YAPAXI@Z
 	??2@YAPAXIABUnothrow_t@std@@@Z
-	??3@YAXPAX@Z
-	??3@YAXPAXABUnothrow_t@std@@@Z
 	??_U@YAPAXI@Z
 	??_U@YAPAXIABUnothrow_t@std@@@Z
+	??3@YAXPAX@Z
+	??3@YAXPAXABUnothrow_t@std@@@Z
 	??_V@YAXPAX@Z
 	??_V@YAXPAXABUnothrow_t@std@@@Z
-	?set_new_handler@@YAP6AXXZP6AXXZ@Z
