@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.11 2000-12-06 22:53:38 graeme Exp $"
+#ident "$Id: strtab.c,v 1.12 2000-12-08 00:15:06 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -171,12 +171,13 @@ MP_GLOBAL char *__mp_addstring(strtab *t, char *s)
     /* If we have no suitable space left then we must allocate some more
      * memory for the string table in order for it to be able to hold the
      * new string.  The size of the new string is rounded up to a multiple
-     * of the system page size.
+     * of the system page size and is then multiplied by MP_ALLOCFACTOR.
      */
     if ((n = (strnode *) __mp_searchhigher(t->tree.root, l)) == NULL)
     {
         m = __mp_roundup(sizeof(strnode) + l, t->heap->memory.page);
-        if ((p = __mp_heapalloc(t->heap, m, t->align, 1)) == NULL)
+        if ((p = __mp_heapalloc(t->heap, m * MP_ALLOCFACTOR, t->align, 1)) ==
+            NULL)
         {
             __mp_freeslot(&t->table, e);
             return NULL;
