@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.86 2001-02-22 18:38:37 graeme Exp $"
+#ident "$Id: inter.c,v 1.87 2001-02-22 20:26:06 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.86 2001-02-22 18:38:37 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.87 2001-02-22 20:26:06 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -429,6 +429,14 @@ __mp_fini(void)
             /* Firstly, check the integrity of the memory blocks.
              */
             __mp_checkinfo(&memhead);
+            /* Then call any finalisation functions in the reverse order in
+             * which they were registered.
+             */
+            while (memhead.finicount > 0)
+            {
+                memhead.finis[--memhead.finicount]();
+                memhead.finis[memhead.finicount] = NULL;
+            }
             /* Next, determine the call stack details in case we need to
              * free any remaining allocations that were made by alloca().
              */
@@ -502,6 +510,29 @@ __mp_fini(void)
         memhead.init = 0;
     }
     restoresignals();
+}
+
+
+/* Register a finalisation function to be called when __mp_fini() is called.
+ */
+
+int
+__mp_atexit(void (*f)(void))
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (memhead.finicount == MP_MAXFINIS)
+        r = 0;
+    else
+    {
+        memhead.finis[memhead.finicount++] = f;
+        r = 1;
+    }
+    restoresignals();
+    return r;
 }
 
 
