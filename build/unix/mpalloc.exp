@@ -46,6 +46,9 @@ __mp_printinfo
 __mp_snapshot
 __mp_iterate
 __mp_iterateall
+__mp_clearleaktable
+__mp_startleaktable
+__mp_stopleaktable
 __mp_memorymap
 __mp_summary
 __mp_stats
