@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.44 2000-11-16 20:35:14 graeme Exp $"
+#ident "$Id: diag.c,v 1.45 2000-11-30 20:49:13 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -304,6 +304,57 @@ MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
     {
         if (s == NULL)
             s = MP_PROFFILE;
+        processfile(m, s, b, sizeof(b));
+    }
+    return b;
+}
+
+
+/* Process the tracing output file name, expanding any special characters.
+ * Note that this function is not currently re-entrant.
+ */
+
+MP_GLOBAL char *__mp_tracefile(meminfo *m, char *s)
+{
+    static char b[256];
+    char p[256];
+    char *d;
+
+    if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
+         (strcmp(s, "stdout") == 0)))
+        return s;
+    if ((d = getenv(MP_TRACEDIR)) && (*d != '\0') && ((s == NULL) ||
+#if TARGET == TARGET_UNIX
+         !strchr(s, '/')))
+#elif TARGET == TARGET_AMIGA
+         !strpbrk(s, ":/")))
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+         !strpbrk(s, ":/\\")))
+#endif /* TARGET */
+    {
+        /* If the environment variable specified with MP_TRACEDIR is set and no
+         * tracing output file name has already been given then we use a
+         * special format for the name of the output file so that all such
+         * files will be written to that directory, which must exist.
+         */
+        if (s == NULL)
+            s = "%n.%p.trace";
+#if TARGET == TARGET_UNIX
+        sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_AMIGA
+        if ((d[strlen(d) - 1] == ':') || (d[strlen(d) - 1] == '/'))
+            sprintf(p, "%s%s", d, s);
+        else
+            sprintf(p, "%s/%s", d, s);
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+        sprintf(p, "%s\\%s", d, s);
+#endif /* TARGET */
+        processfile(m, p, b, sizeof(b));
+    }
+    else
+    {
+        if (s == NULL)
+            s = MP_TRACEFILE;
         processfile(m, s, b, sizeof(b));
     }
     return b;
