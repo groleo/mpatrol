@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.32 2000-05-14 11:37:25 graeme Exp $"
+#ident "$Id: inter.c,v 1.33 2000-05-14 11:56:50 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -652,8 +652,8 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
 /* Copy a block of memory from one address to another.
  */
 
-void *__mp_copymem(void *p, void *q, size_t l, int c, alloctype f, char *s,
-                   char *t, unsigned long u, size_t k)
+void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
+                   char *s, char *t, unsigned long u, size_t k)
 {
     stackinfo i;
     int j;
