@@ -1,3 +1,69 @@
+Mon Jun 12 21:54:19 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Removed references to problems on HP/UX as they are now fixed.
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Added rules for the machine.c assembler module.  Added machine.h as a
+	dependency for the stack module.
+
+	* doc/mpatrol.texi:
+	Mentioned that problems on HP/UX are now fixed, as are some problems on
+	MIPS.
+
+	* man/man3/mpatrol.3, man/cat3/mpatrol.3:
+	Mentioned the libexc library on IRIX.
+
+	* src/config.h:
+	Removed siginfo support for IRIX as it doesn't appear to work as
+	advertised.
+
+	* src/stack.c:
+	Fixed problem with HP/UX and libcl.sl, and also removed need to call
+	getcontext on generic MIPS platforms.
+
+	* src/symbol.c:
+	Fixed problem with symbols read from HP/UX shared libraries.
+
+	* src/machine.c, src/machine.h:
+	New files containing processor-dependent assembler routines.
+
+Thu Jun  8 18:37:12 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented SINIX and UnixWare support.
+
+	* src/config.h: Added support for SINIX and UnixWare.
+
+	* src/target.h: Added SINIX and UnixWare.
+
+	* src/memory.c: Added program filenames for SINIX and UnixWare.
+
+	* src/stack.c: Some fixes for MIPS stack traversal.
+
+	* src/symbol.c: Added shared library support for SINIX and UnixWare.
+
+Wed Jun  7 21:55:29 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* FAQ: Documented libexc.so on IRIX.
+
+	* doc/mpatrol.texi:
+	Documented a bit about the different types of call stack traversal.
+
+	* src/config.h: Added MP_LIBRARYSTACK_SUPPORT.
+
+	* src/memory.c: Modified for MP_LIBRARYSTACK_SUPPORT.
+
+	* src/stack.c, src/stack.h:
+	Added support for generic MIPS stack traversal.
+
+	* src/strtab.c, src/strtab.h: Changed MP_HASHTABSIZE to MP_HASHTAB_SIZE.
+
+Mon Jun  5 20:28:57 2000  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.texi: Documented IRIX MIPS stack traversal.
+
+	* src/stack.c, src/stack.h: Added MIPS stack traversal.
+
 Thu Jun  1 21:29:46 2000  Graeme Roy  <graeme@epc.co.uk>
 
 	* FAQ: Documented potential problems on HP/UX.
