@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.147 2001-09-26 23:00:52 graeme Exp $"
+#ident "$Id: inter.c,v 1.148 2001-10-04 00:19:39 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.147 2001-09-26 23:00:52 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.148 2001-10-04 00:19:39 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -515,7 +515,10 @@ __mp_init(void)
             __mp_addsymbols(&memhead.syms, memhead.alloc.heap.memory.prog, NULL,
                             0);
         __mp_fixsymbols(&memhead.syms);
-        __mp_diag("\n");
+        if (__mp_diagflags & FLG_HTML)
+            __mp_diagtag("  <HR>\n");
+        else
+            __mp_diag("\n");
         if (!(memhead.flags & FLG_NOPROTECT))
         {
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
