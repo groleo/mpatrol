@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.27 2000-05-14 22:09:01 graeme Exp $"
+#ident "$Id: diag.c,v 1.28 2000-05-14 23:10:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -121,6 +121,7 @@ MP_GLOBAL char *__mp_functionnames[AT_MAX] =
 
 static void processfile(meminfo *m, char *s, char *b, size_t l)
 {
+    char *p, *t;
     size_t i;
 
     for (i = 0; (i < l - 1) && (*s != '\0'); i++, s++)
@@ -130,6 +131,22 @@ static void processfile(meminfo *m, char *s, char *b, size_t l)
               case 'n':
                 sprintf(b + i, "%lu", __mp_processid());
                 i += strlen(b + i) - 1;
+                s++;
+                break;
+              case 'p':
+                if (p = m->prog)
+#if TARGET == TARGET_UNIX
+                    while (t = strchr(p, '/'))
+#elif TARGET == TARGET_AMIGA
+                    while (t = strpbrk(p, ":/"))
+#elif TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE
+                    while (t = strpbrk(p, ":/\\"))
+#endif /* TARGET */
+                        p = t + 1;
+                if ((p == NULL) || (*p == '\0'))
+                    p = "mpatrol";
+                strcpy(b + i, p);
+                i += strlen(p) - 1;
                 s++;
                 break;
               default:
