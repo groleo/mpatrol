@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 29th
 October, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 26th
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 29th
 October, 2000.
 
 Foreword
@@ -5305,10 +5305,25 @@ the command line in a similar way to the UNIX function `getopt()'.
      check the integrity of free memory and overflow buffers.
 
 `--check-all'
-     [`CHECKALL']  Specifies that all arguments to functions which
-     allocate, reallocate and deallocate memory have rigorous checks
-     performed on them.  In addition, functions which perform memory
-     operations will be checked for zero-length `NULL' pointers.
+     [`CHECKALL']  Equivalent to the `--check-allocs',
+     `--check-reallocs', `--check-frees' and `--check-memory' options
+     specified together.
+
+`--check-allocs'
+     [`CHECKALLOCS']  Checks that no attempt is made to allocate a
+     block of memory of size zero.
+
+`--check-frees'
+     [`CHECKFREES']  Checks that no attempt is made to deallocate a
+     `NULL' pointer.
+
+`--check-memory'
+     [`CHECKMEMORY']  Checks that no attempt is made to perform a
+     zero-length memory operation on a `NULL' pointer.
+
+`--check-reallocs'
+     [`CHECKREALLOCS']  Checks that no attempt is made to reallocate a
+     `NULL' pointer or resize an existing block of memory to size zero.
 
 `--def-align' <UNSIGNED-INTEGER>
      [`DEFALIGN']  Specifies the default alignment for general-purpose
@@ -9015,6 +9030,14 @@ Index
 -check:                                            
           See ``Appendix C Options''.
 -check-all:                                        
+          See ``Appendix C Options''.
+-check-allocs:                                     
+          See ``Appendix C Options''.
+-check-frees:                                      
+          See ``Appendix C Options''.
+-check-memory:                                     
+          See ``Appendix C Options''.
+-check-reallocs:                                   
           See ``Appendix C Options''.
 -counts:                                            See 8.
 -def-align:                                        
