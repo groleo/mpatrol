@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.98 2001-02-26 00:01:58 graeme Exp $
+ * $Id: mpatrol.h,v 1.99 2001-02-27 01:55:59 graeme Exp $
  */
 
 
@@ -779,15 +779,26 @@ __mp_printf(MP_CONST char *s, ...)
 #ifndef NDEBUG
 
 
+#if !defined(_WIN32) || defined(__GNUC__)
+namespace std
+{
+#endif /* _WIN32 && __GNUC__ */
+
+
 /* Set the low-memory handler.
  */
 
 MP_INLINE
-std::new_handler
-std::set_new_handler(std::new_handler h) throw()
+new_handler
+set_new_handler(new_handler h) throw()
 {
-    return (std::new_handler) __mp_nomemory(h);
+    return (new_handler) __mp_nomemory(h);
 }
+
+
+#if !defined(_WIN32) || defined(__GNUC__)
+}
+#endif /* _WIN32 && __GNUC__ */
 
 
 /* Override operator new.

@@ -40,18 +40,24 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.3 2001-02-05 23:22:08 graeme Exp $"
+#ident "$Id: cplus.c,v 1.4 2001-02-27 01:55:59 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.3 2001-02-05 23:22:08 graeme Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.4 2001-02-27 01:55:59 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
+
+
+#if TARGET != TARGET_WINDOWS || defined(__GNUC__)
+namespace std
+{
+#endif /* TARGET && __GNUC__ */
 
 
 /* Set the low-memory handler and return the previous setting.
  */
 
 #ifdef __cplusplus
-std::new_handler
-std::set_new_handler(std::new_handler h) throw()
+new_handler
+set_new_handler(new_handler h) throw()
 #elif defined(__GNUC__)
 void
 (*set_new_handler__FPFv_v(void (*h)(void)))(void)
@@ -61,11 +67,16 @@ void
 #endif /* __cplusplus && __GNUC__ */
 {
 #ifdef __cplusplus
-    return (std::new_handler) __mp_nomemory(h);
+    return (new_handler) __mp_nomemory(h);
 #else /* __cplusplus */
     return __mp_nomemory(h);
 #endif /* __cplusplus */
 }
+
+
+#if TARGET != TARGET_WINDOWS || defined(__GNUC__)
+}
+#endif /* TARGET && __GNUC__ */
 
 
 /* Allocate an uninitialised memory block of a given size, throwing an
