@@ -28,7 +28,7 @@
 
 
 /*
- * $Id: mgauge.c,v 1.1 2001-02-16 23:02:13 graeme Exp $
+ * $Id: mgauge.c,v 1.2 2001-02-18 18:50:44 graeme Exp $
  */
 
 
@@ -44,7 +44,6 @@
 #define OVERFLOW_CHAR '+' /* the character to use when an overflow occurs */
 
 
-typedef void (*prologue_handler)(MP_CONST void *, size_t, MP_CONST void *);
 typedef void (*epilogue_handler)(MP_CONST void *, MP_CONST void *);
 
 
@@ -54,10 +53,9 @@ extern "C"
 #endif /* __cplusplus */
 
 
-/* The previous mpatrol prologue and epilogue handlers.
+/* The previous mpatrol epilogue handler.
  */
 
-static prologue_handler old_prologue;
 static epilogue_handler old_epilogue;
 
 
@@ -119,18 +117,6 @@ updategauge(void)
 }
 
 
-/* Possibly call the old prologue function if one was installed.
- */
-
-static
-void
-prologue(MP_CONST void *p, size_t l, MP_CONST void *a)
-{
-    if (old_prologue != NULL)
-        old_prologue(p, l, a);
-}
-
-
 /* Update the memory allocation gauge and possibly also call the old epilogue
  * function if one was installed.
  */
@@ -177,7 +163,6 @@ mgaugestart(MP_CONST char *f, unsigned char c, unsigned long s, unsigned long u)
             update_frequency = u;
         fprintf(gauge_file, "0 %*lu\n", COLUMN_WIDTH - 2, gauge_size);
         updategauge();
-        old_prologue = __mp_prologue(prologue);
         old_epilogue = __mp_epilogue(epilogue);
         return 1;
     }
@@ -193,7 +178,6 @@ mgaugeend(void)
 {
     if (gauge_file == NULL)
         return;
-    __mp_prologue(old_prologue);
     __mp_epilogue(old_epilogue);
     updategauge();
     fputc('\n', gauge_file);
