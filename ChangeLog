@@ -1,3 +1,53 @@
+2000-11-22  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/windows/Makefile, build/windows/NMakefile, build/unix/Makefile,
+	  build/netware/Makefile, build/amiga/Makefile, build/amiga/SMakefile:
+	Changed the dependencies following the movement of library
+	initialisation to inter.c.
+
+	* doc/mpatrol.texi:
+	Documented the SD/UX package and how to create shared libraries from
+	archive libraries.
+
+	* pkg/lha/build, pkg/tar/build: Added more files to the extra directory.
+
+	* pkg/sdux/build, pkg/sdux/mpatrol.psf:
+	New files to build an SD/UX package.
+
+2000-11-21  Graeme Roy  <graeme@epc.co.uk>
+
+	* build/unix/Makefile:
+	Figured out why the .init and .fini sections never worked with the GNU
+	linker.  It's because you've got to call the compiler driver to process
+	them via collect2.  Why?  The ELF linkers on other systems don't need
+	this so why should Linux and other GCC-based systems?
+
+	* src/config.h: Changed the documentation for the MP_INIT_SUPPORT macro.
+
+	* src/machine.c:
+	Added support for placing calls in the .fini section to terminate the
+	mpatrol library.
+
+	* src/machine.h:
+	The __mp_initsection variable should now be visible even when not
+	building a threadsafe library.
+
+	* src/mutex.c: Moved library initialisation code to inter.c.
+
+	* src/inter.c:
+	Now always initialise the library before main() and terminate it after
+	exit() if possible, even if we are not creating a threadsafe library.
+
+2000-11-20  Graeme Roy  <graeme@epc.co.uk>
+
+	* doc/mpatrol.guide, doc/mpatrol.html, doc/mpatrol.info,
+	  doc/mpatrol.texi, doc/mpatrol.txt:
+	Added more related software.
+
+	* pkg/rpm/mpatrol.spec:
+	Updated to PowerTools spec.  Use the install command and also use the
+	built-in default directories.  Now mark documentation as such.
+
 2000-11-19  Graeme Roy  <graeme@epc.co.uk>
 
 	* bin/mupdate: Also update the MP_VERNUM preprocessor macro.
