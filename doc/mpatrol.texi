@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.95 2000-06-22 23:25:09 graeme Exp $
+@c $Id: mpatrol.texi,v 1.96 2000-06-22 23:56:54 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2973,6 +2973,28 @@ file format access library:
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
    -liberty -lcl
+@end smallexample
+@end itemize
+
+On Windows platforms, with mpatrol installed in @file{/mpatrol}, the mpatrol
+library can usually be incorporated into a program using the following commands:
+
+@itemize @bullet
+@cindex PE
+@item
+If the program is to contain no debugging information:
+
+@smallexample
+cl -I/mpatrol/include <file> -link -libpath:/mpatrol/lib
+   -defaultlib:mpatrol -defaultlib:imagehlp
+@end smallexample
+
+@item
+If the program is to contain debugging information:
+
+@smallexample
+cl -I/mpatrol/include -Zi <file> -link -libpath:/mpatrol/lib
+   -defaultlib:mpatrol -defaultlib:imagehlp -pdb:none
 @end smallexample
 @end itemize
 
@@ -6328,16 +6350,12 @@ The @option{-d} option to the @command{mpatrol} command has no effect.
 @cindex Microsoft
 @cindex Windows, Intel 80x86
 @item
-Microsoft Windows NT 4.0, Intel Pentium III, n/a, Microsoft Visual C/C++
+Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C/C++
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
-The @option{USEDEBUG} option has no effect.
-@item
 The @option{USEMMAP} option has no effect.
-@item
-No support for reading symbols.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6807,12 +6825,6 @@ in the mpatrol library.  This restriction does not exist when using
 @item
 Need to add watch point area support, possibly by using guard pages as a basis
 for an implementation.
-
-@item
-Need to add support for reading symbols from Windows executable files.  Also
-need to add support for reading symbols from any DLLs that are required by the
-program.  This may be possible in a limited fashion by using the GNU BFD
-library, but may only work with code compiled with @command{gcc}.
 
 @item
 There seems to be a problem when mixing the archive version of the mpatrol
