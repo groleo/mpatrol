@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.44 2000-11-06 19:40:49 graeme Exp $"
+#ident "$Id: inter.c,v 1.45 2000-11-08 00:21:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -560,7 +560,10 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
             (n > l))
             n = l;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
-            __mp_memcopy(p, o, n + 1);
+        {
+            __mp_memcopy(p, o, n);
+            p[n] = '\0';
+        }
     }
     if (memhead.epilogue && (memhead.recur == 1))
         memhead.epilogue(p);
