@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.9 2000-04-27 00:04:12 graeme Exp $"
+#ident "$Id: mprof.c,v 1.10 2000-04-30 15:06:25 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -70,6 +70,7 @@ typedef struct profilenode
     unsigned long name;   /* associated symbol name */
     unsigned long data;   /* profiling data */
     profiledata tdata;    /* temporary profiling data */
+    unsigned char flags;  /* temporary flags */
 }
 profilenode;
 
@@ -184,6 +185,13 @@ static int useaddresses;
 static int showcounts;
 
 
+/* Indicates the maximum stack depth to use when comparing function call
+ * stacks for the memory leak table.
+ */
+
+static unsigned long maxstack;
+
+
 /* Clear the statistics for a set of profiling data.
  */
 
@@ -215,6 +223,26 @@ static void sumdata(profiledata *a, profiledata *b)
         a->atotal[i] += b->atotal[i];
         a->dtotal[i] += b->dtotal[i];
     }
+}
+
+
+/* Compare two function call stacks.
+ */
+
+static int comparestack(profilenode *n, profilenode *p)
+{
+    size_t i;
+
+    for (i = 1; (maxstack == 0) || (i < maxstack); i++)
+    {
+        if ((n->parent == 0) || (p->parent == 0))
+            return ((n->parent == 0) && (p->parent == 0));
+        n = &nodes[n->parent - 1];
+        p = &nodes[p->parent - 1];
+        if ((n->addr != p->addr) && (useaddresses || (n->symbol != p->symbol)))
+            return 0;
+    }
+    return 1;
 }
 
 
@@ -333,6 +361,7 @@ static void readfile(void)
             getentry(&p->data, sizeof(unsigned long), 1);
             __mp_treeinsert(&proftree, &p->node, (unsigned long) p->addr);
             cleardata(&p->tdata);
+            p->flags = 0;
         }
     }
     /* Read the table containing the symbol addresses.
@@ -628,6 +657,100 @@ static void directtable(void)
 }
 
 
+/* Display the memory leak table.
+ */
+
+static void leaktable(void)
+{
+    profiledata *d;
+    profilenode *n, *p;
+    treenode *t;
+    size_t i;
+    unsigned long a, b, j, k;
+    double e, f, g;
+
+    printchar(' ', 34);
+    fputs("MEMORY LEAKS\n\n", stdout);
+    printchar(' ', 16);
+    fputs("unfreed", stdout);
+    printchar(' ', 22);
+    fputs("allocated\n", stdout);
+    printchar('-', 40);
+    fputs("  ", stdout);
+    printchar('-', 16);
+    if (showcounts)
+        fputs("\n     %   count       %     bytes       %   "
+              "count     bytes  function\n\n", stdout);
+    else
+        fputs("\n     %     bytes       %   count       %     "
+              "bytes   count  function\n\n", stdout);
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL; n = p)
+    {
+        p = (profilenode *) __mp_successor(&n->node);
+        if ((n->data != 0) && !n->flags)
+        {
+            d = &n->tdata;
+            sumdata(d, &data[n->data - 1]);
+            while ((p != NULL) && ((p->addr == n->addr) || (!useaddresses &&
+                     (p->symbol != 0) && (p->symbol == n->symbol))))
+            {
+                if ((p->data != 0) && !p->flags && comparestack(n, p))
+                {
+                    sumdata(d, &data[p->data - 1]);
+                    p->flags = 1;
+                }
+                p = (profilenode *) __mp_successor(&p->node);
+            }
+            p = (profilenode *) __mp_successor(&n->node);
+            a = 0;
+            for (i = 0; i < 4; i++)
+                if (showcounts)
+                    a += d->acount[i] - d->dcount[i];
+                else
+                    a += d->atotal[i] - d->dtotal[i];
+            if (a > 0)
+                __mp_treeinsert(&temptree, &n->tnode, a);
+        }
+    }
+    for (t = __mp_maximum(temptree.root); t != NULL; t = __mp_predecessor(t))
+    {
+        n = (profilenode *) ((char *) t - offsetof(profilenode, tnode));
+        d = &n->tdata;
+        a = t->key;
+        b = j = k = 0;
+        for (i = 0; i < 4; i++)
+            if (showcounts)
+            {
+                b += d->dtotal[i];
+                j += d->acount[i];
+                k += d->atotal[i];
+            }
+            else
+            {
+                b += d->dcount[i];
+                j += d->atotal[i];
+                k += d->acount[i];
+            }
+        b = k - b;
+        e = ((double) a / (double) j) * 100.0;
+        f = ((double) b / (double) k) * 100.0;
+        if (showcounts)
+        {
+            g = ((double) a / (double) (acount - dcount)) * 100.0;
+            fprintf(stdout, "%6.2f  %6lu  %6.2f  %8lu  %6.2f  %6lu  %8lu  ",
+                    g, a, e, b, f, j, k);
+        }
+        else
+        {
+            g = ((double) a / (double) (atotal - dtotal)) * 100.0;
+            fprintf(stdout, "%6.2f  %8lu  %6.2f  %6lu  %6.2f  %8lu  %6lu  ",
+                    g, a, e, b, f, j, k);
+        }
+        cleardata(d);
+    }
+}
+
+
 /* Read the profiling output file and display all specified information.
  */
 
@@ -637,8 +760,9 @@ int main(int argc, char **argv)
     int c, e, v;
 
     e = v = 0;
+    maxstack = 1;
     progname = argv[0];
-    while ((c = __mp_getopt(argc, argv, "acV")) != EOF)
+    while ((c = __mp_getopt(argc, argv, "acn:V")) != EOF)
         switch (c)
         {
           case 'a':
@@ -646,6 +770,10 @@ int main(int argc, char **argv)
             break;
           case 'c':
             showcounts = 1;
+            break;
+          case 'n':
+            if (!__mp_getnum(progname, __mp_optarg, (long *) &maxstack, 1))
+                e = 1;
             break;
           case 'V':
             v = 1;
@@ -668,7 +796,7 @@ int main(int argc, char **argv)
     }
     if ((argc > 1) || (e == 1))
     {
-        fprintf(stderr, "Usage: %s [-acV] [file]\n", progname);
+        fprintf(stderr, "Usage: %s [-acV] [-n depth] [file]\n", progname);
         exit(EXIT_FAILURE);
     }
     if (argc == 1)
@@ -701,6 +829,8 @@ int main(int argc, char **argv)
     bintable();
     fputs("\n\n", stdout);
     directtable();
+    fputs("\n\n", stdout);
+    leaktable();
     if (acounts != NULL)
         free(acounts);
     if (dcounts != NULL)
