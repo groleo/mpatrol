@@ -21,7 +21,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: NMakefile,v 1.50 2001-03-01 01:00:36 graeme Exp $
+# $Id: NMakefile,v 1.51 2001-03-05 19:12:49 graeme Exp $
 
 
 # Definitions
@@ -43,29 +43,31 @@ MPTOOLS	= mptools
 
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj cplus.obj sbrk.obj version.obj
+		  signals.obj diag.obj option.obj leaktab.obj profile.obj \
+		  trace.obj inter.obj malloc.obj cplus.obj sbrk.obj version.obj
 SHARED_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj cplus.obj sbrk.obj main.obj version.obj
+		  signals.obj diag.obj option.obj leaktab.obj profile.obj \
+		  trace.obj inter.obj malloc.obj cplus.obj sbrk.obj main.obj \
+		  version.obj
 ARCHTS_MPTOBJS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
-		  cplus.ts_obj sbrk.ts_obj version.ts_obj
+		  leaktab.ts_obj profile.ts_obj trace.ts_obj inter.ts_obj \
+		  malloc.ts_obj cplus.ts_obj sbrk.ts_obj version.ts_obj
 SHARTS_MPTOBJS	= list.ts_obj tree.ts_obj slots.ts_obj utils.ts_obj \
 		  memory.ts_obj heap.ts_obj alloc.ts_obj info.ts_obj \
 		  stack.ts_obj addr.ts_obj strtab.ts_obj symbol.ts_obj \
 		  signals.ts_obj mutex.ts_obj diag.ts_obj option.ts_obj \
-		  profile.ts_obj trace.ts_obj inter.ts_obj malloc.ts_obj \
-		  cplus.ts_obj sbrk.ts_obj main.ts_obj version.ts_obj
+		  leaktab.ts_obj profile.ts_obj trace.ts_obj inter.ts_obj \
+		  malloc.ts_obj cplus.ts_obj sbrk.ts_obj main.ts_obj \
+		  version.ts_obj
 ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj
 SHARED_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj main2.obj
-ARCHIVE_MPLOBJS	= dbmalloc.obj dmalloc.obj mgauge.obj mtrace.obj
+ARCHIVE_MPLOBJS	= dbmalloc.obj dmalloc.obj heapdiff.obj mgauge.obj mtrace.obj
 
 ARCHIVE_MPATROL	= lib$(MPATROL).lib
 SHARED_MPATROL	= $(MPATROL).dll

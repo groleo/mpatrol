@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.66 2001-03-01 01:00:34 graeme Exp $
+# $Id: Makefile,v 1.67 2001-03-05 19:12:46 graeme Exp $
 
 
 # Definitions
@@ -50,10 +50,10 @@ REVISION = 4
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o cplus.o version.o
+	   leaktab.o profile.o trace.o inter.o malloc.o cplus.o version.o
 MPTTOBJS = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o mutex.o diag.o option.o \
-	   profile.o trace.o inter.o malloc.o cplus.o version.o
+	   leaktab.o profile.o trace.o inter.o malloc.o cplus.o version.o
 MPAOBJS	 = mpalloc.o mpfailure.o mpsetfail.o mpmalloc.o mpcalloc.o mpstrdup.o \
 	   mprealloc.o
 MPLOBJS	 = dbmalloc.o dmalloc.o heapdiff.o mgauge.o mtrace.o

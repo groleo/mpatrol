@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.52 2001-03-01 01:00:33 graeme Exp $
+# $Id: Makefile,v 1.53 2001-03-05 19:12:44 graeme Exp $
 
 
 # Definitions
@@ -44,11 +44,13 @@ MPTOOLS	= mptools
 
 MPTOBJS	 = list.obj tree.obj slots.obj utils.obj memory.obj heap.obj alloc.obj \
 	   info.obj stack.obj addr.obj strtab.obj symbol.obj signals.obj \
-	   diag.obj option.obj profile.obj trace.obj inter.obj version.obj
+	   diag.obj option.obj leaktab.obj profile.obj trace.obj inter.obj \
+	   version.obj
 MPTTOBJS = list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj memory.ts.obj \
 	   heap.ts.obj alloc.ts.obj info.ts.obj stack.ts.obj addr.ts.obj \
 	   strtab.ts.obj symbol.ts.obj signals.ts.obj mutex.ts.obj diag.ts.obj \
-	   option.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj version.ts.obj
+	   option.ts.obj leaktab.ts.obj profile.ts.obj trace.ts.obj \
+	   inter.ts.obj version.ts.obj
 MPAOBJS	 = mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj mpcalloc.obj \
 	   mpstrdup.obj mprealloc.obj
 MPLOBJS	 = dbmalloc.obj dmalloc.obj heapdiff.obj mgauge.obj mtrace.obj

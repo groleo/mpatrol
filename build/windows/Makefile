@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.62 2001-03-01 01:00:35 graeme Exp $
+# $Id: Makefile,v 1.63 2001-03-05 19:12:49 graeme Exp $
 
 
 # Definitions
@@ -45,24 +45,26 @@ MPTOOLS	= mptools
 
 ARCHIVE_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj cplus.obj sbrk.obj version.obj
+		  signals.obj diag.obj option.obj leaktab.obj profile.obj \
+		  trace.obj inter.obj malloc.obj cplus.obj sbrk.obj version.obj
 SHARED_MPTOBJS	= list.obj tree.obj slots.obj utils.obj memory.obj heap.obj \
 		  alloc.obj info.obj stack.obj addr.obj strtab.obj symbol.obj \
-		  signals.obj diag.obj option.obj profile.obj trace.obj \
-		  inter.obj malloc.obj cplus.obj sbrk.obj main.obj version.obj
+		  signals.obj diag.obj option.obj leaktab.obj profile.obj \
+		  trace.obj inter.obj malloc.obj cplus.obj sbrk.obj main.obj \
+		  version.obj
 ARCHTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
-		  cplus.ts.obj sbrk.ts.obj version.ts.obj
+		  leaktab.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj \
+		  malloc.ts.obj cplus.ts.obj sbrk.ts.obj version.ts.obj
 SHARTS_MPTOBJS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  memory.ts.obj heap.ts.obj alloc.ts.obj info.ts.obj \
 		  stack.ts.obj addr.ts.obj strtab.ts.obj symbol.ts.obj \
 		  signals.ts.obj mutex.ts.obj diag.ts.obj option.ts.obj \
-		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
-		  cplus.ts.obj sbrk.ts.obj main.ts.obj version.ts.obj
+		  leaktab.ts.obj profile.ts.obj trace.ts.obj inter.ts.obj \
+		  malloc.ts.obj cplus.ts.obj sbrk.ts.obj main.ts.obj \
+		  version.ts.obj
 ARCHIVE_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
 		  mpcalloc.obj mpstrdup.obj mprealloc.obj
 SHARED_MPAOBJS	= mpalloc.obj mpfailure.obj mpsetfail.obj mpmalloc.obj \
