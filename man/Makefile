@@ -21,13 +21,13 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.18 2003-11-26 00:58:50 graeme Exp $
+# $Id: Makefile,v 1.19 2003-11-26 01:02:13 graeme Exp $
 
 
 # Definitions
 
 SHELL  = /bin/sh
-ROFF   = groff
+ROFF   = groff -man
 HTML   = man2html -r
 PSTILL = pstill -c -c -p
 
@@ -55,31 +55,31 @@ PDFPAGES  = pdf/mpatrol.pdf pdf/mprof.pdf pdf/mptrace.pdf pdf/mleak.pdf \
 default: $(CATPAGES)
 
 cat1/mpatrol.1: man1/mpatrol.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/mprof.1: man1/mprof.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/mptrace.1: man1/mptrace.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/mleak.1: man1/mleak.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/mpsym.1: man1/mpsym.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/mpedit.1: man1/mpedit.1
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 cat1/hexwords.1: man1/hexwords.1
-	$(ROFF) -Tascii -man -t $< >$@
+	$(ROFF) -Tascii -t $< >$@
 
 cat3/libmpatrol.3: man3/libmpatrol.3
-	$(ROFF) -Tascii -man -t $< >$@
+	$(ROFF) -Tascii -t $< >$@
 
 cat3/libmpalloc.3: man3/libmpalloc.3
-	$(ROFF) -Tascii -man $< >$@
+	$(ROFF) -Tascii $< >$@
 
 html/mpatrol.html: man1/mpatrol.1
 	$(HTML) $< >$@
@@ -109,58 +109,58 @@ html/libmpalloc.html: man3/libmpalloc.3
 	$(HTML) $< >$@
 
 dvi/mpatrol.dvi: man1/mpatrol.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/mprof.dvi: man1/mprof.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/mptrace.dvi: man1/mptrace.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/mleak.dvi: man1/mleak.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/mpsym.dvi: man1/mpsym.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/mpedit.dvi: man1/mpedit.1
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 dvi/hexwords.dvi: man1/hexwords.1
-	$(ROFF) -Tdvi -man -t $< >$@
+	$(ROFF) -Tdvi -t $< >$@
 
 dvi/libmpatrol.dvi: man3/libmpatrol.3
-	$(ROFF) -Tdvi -man -t $< >$@
+	$(ROFF) -Tdvi -t $< >$@
 
 dvi/libmpalloc.dvi: man3/libmpalloc.3
-	$(ROFF) -Tdvi -man $< >$@
+	$(ROFF) -Tdvi $< >$@
 
 ps/mpatrol.ps: man1/mpatrol.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/mprof.ps: man1/mprof.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/mptrace.ps: man1/mptrace.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/mleak.ps: man1/mleak.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/mpsym.ps: man1/mpsym.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/mpedit.ps: man1/mpedit.1
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 ps/hexwords.ps: man1/hexwords.1
-	$(ROFF) -Tps -man -t $< >$@
+	$(ROFF) -Tps -t $< >$@
 
 ps/libmpatrol.ps: man3/libmpatrol.3
-	$(ROFF) -Tps -man -t $< >$@
+	$(ROFF) -Tps -t $< >$@
 
 ps/libmpalloc.ps: man3/libmpalloc.3
-	$(ROFF) -Tps -man $< >$@
+	$(ROFF) -Tps $< >$@
 
 pdf/mpatrol.pdf: ps/mpatrol.ps
 	$(PSTILL) -o $@ $<
