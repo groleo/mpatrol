@@ -306,7 +306,7 @@ Further information
     library will run quite happily at a sane speed.
 
     The mpatrol library is by no means the only library of its kind.  Solaris
-    2.7 has no less that 4 different malloc libraries, and there are plenty
+    2.7 has no less that 6 different malloc libraries, and there are plenty
     available as freeware or as commercial products.  Try to keep in mind that
     mpatrol comes with absolutely no warranty and so if it doesn't work for you
     and you need a fast solution, try some of the other libraries or products
