@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.142 2000-11-16 20:40:31 graeme Exp $
+@c $Id: mpatrol.texi,v 1.143 2000-11-16 20:50:56 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3611,7 +3611,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.3.0 (00/07/17)
+@@(#) mpatrol 1.3.0 (00/11/16)
 Copyright (C) 1997-2000 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under

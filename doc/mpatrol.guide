@@ -3452,7 +3452,7 @@ library, the @{b}MPATROL_OPTIONS@{ub} environment variable should be set to be
 @{b}LOGALL@{ub} and the program should be executed, generating the following
 output in @{b}mpatrol.log@{ub}.
 
-     @(#) mpatrol 1.3.0 (00/07/17)
+     @(#) mpatrol 1.3.0 (00/11/16)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
