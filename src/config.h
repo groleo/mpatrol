@@ -705,7 +705,8 @@
 
 /* The name of the log file used to send library diagnostics to.  This may
  * be overridden at run-time using the LOGFILE option and may contain
- * special formatting characters.
+ * special formatting characters.  It may also be affected by the environment
+ * variable specified in MP_LOGDIR.
  */
 
 #ifndef MP_LOGFILE
@@ -713,14 +714,35 @@
 #endif /* MP_LOGFILE */
 
 
+/* The name of the environment variable used to specify a directory into which
+ * all mpatrol log files should be written.  The directory specified must
+ * actually exist.
+ */
+
+#ifndef MP_LOGDIR
+#define MP_LOGDIR "LOGDIR"
+#endif /* MP_LOGDIR */
+
+
 /* The name of the file used to send memory allocation profiling information
  * to.  This may be overridden at run-time using the PROFFILE option and may
- * contain special formatting characters.
+ * contain special formatting characters.  It may also be affected by the
+ * environment variable specified in MP_PROFDIR.
  */
 
 #ifndef MP_PROFFILE
 #define MP_PROFFILE "mpatrol.out"
 #endif /* MP_PROFFILE */
+
+
+/* The name of the environment variable used to specify a directory into which
+ * all mpatrol profiling output files should be written.  The directory
+ * specified must actually exist.
+ */
+
+#ifndef MP_PROFDIR
+#define MP_PROFDIR "PROFDIR"
+#endif /* MP_PROFDIR */
 
 
 /* The magic sequence of bytes to use at the beginning and end of every
