@@ -30,7 +30,7 @@
 
 
 /*
- * $Id: version.h,v 1.16 2001-08-23 22:46:42 graeme Exp $
+ * $Id: version.h,v 1.17 2001-08-28 00:09:30 graeme Exp $
  */
 
 
@@ -42,7 +42,7 @@
  * and ff represents the bug fix count.
  */
 
-#define MP_VERNUM 10405
+#define MP_VERNUM 10406
 
 
 #ifdef __cplusplus
