@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.218 2001-05-30 22:29:28 graeme Exp $
+@c $Id: mpatrol.texi,v 1.219 2001-05-30 22:55:45 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -8922,7 +8922,7 @@ and no bytes will be searched.
 @node Functions 6, , Functions 5, Functions
 @section mpatrol library functions
 
-The following 37 functions are available as support routines for additional
+The following 41 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
@@ -9358,6 +9358,43 @@ the @command{mpedit} command and will have no effect if the @option{EDIT} and
 system.  Returns @samp{1} if the edit or listing was successfully performed,
 @samp{-1} if there was an error, or @samp{0} if neither of the options were set
 or if there is no support for this feature.
+
+@findex __mp_readcontents
+@item @code{int __mp_readcontents(const char *file, void *ptr)}
+Reads the contents of a memory allocation contents file into the memory
+allocation containing @var{ptr}.  The name of the file is composed of the
+@var{file} string followed by the allocation index of the memory allocation
+separated by a dot.  If @var{file} is @samp{NULL} then it is assumed to be
+@file{.mpatrol}.  Returns @samp{1} if the contents were read successfully and
+@samp{0} otherwise.
+
+@findex __mp_writecontents
+@item @code{int __mp_writecontents(const char *file, const void *ptr)}
+Writes the contents of the memory allocation containing @var{ptr} to an
+allocation contents file.  The name of the file is composed of the @var{file}
+string followed by the allocation index of the memory allocation separated by
+a dot.  If @var{file} is @samp{NULL} then it is assumed to be @file{.mpatrol}.
+Returns @samp{1} if the contents were written successfully and @samp{0}
+otherwise.
+
+@findex __mp_cmpcontents
+@item @code{long __mp_cmpcontents(const char *file, const void *ptr)}
+Compares the contents of the memory allocation containing @var{ptr} with the
+contents of a previously written allocation contents file.  The name of the file
+is composed of the @var{file} string followed by the allocation index of the
+memory allocation separated by a dot.  If @var{file} is @samp{NULL} then it is
+assumed to be @file{.mpatrol}.  Any differences are written to the mpatrol log
+file.  Returns the number of differences found, or @samp{-1} if there was an
+error.
+
+@findex __mp_remcontents
+@item @code{int __mp_remcontents(const char *file, const void *ptr)}
+Removes the memory allocation contents file that corresponds to the memory
+allocation containing @var{ptr}.  The name of the file is composed of the
+@var{file} string followed by the allocation index of the memory allocation
+separated by a dot.  If @var{file} is @samp{NULL} then it is assumed to be
+@file{.mpatrol}.  Returns @samp{1} if the file was removed successfully and
+@samp{0} otherwise.
 @end table
 
 @node Environment, Options, Functions, Top
