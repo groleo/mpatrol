@@ -39,11 +39,17 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #include <time.h>
+#if TARGET == TARGET_UNIX
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#endif /* TARGET */
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.39 2000-11-12 12:18:02 graeme Exp $"
+#ident "$Id: diag.c,v 1.40 2000-11-13 20:47:58 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -340,6 +346,41 @@ MP_GLOBAL void __mp_error(errortype e, alloctype f, char *s, ...)
     va_end(v);
     __mp_diag("\n");
     errors++;
+}
+
+
+/* Invokes a text editor on a given source file at a specific line.
+ */
+
+static int editfile(char *f, unsigned long l)
+{
+#if TARGET == TARGET_UNIX
+    char t[32];
+    char *v[4];
+    pid_t p;
+    int r;
+#endif /* TARGET */
+
+#if TARGET == TARGET_UNIX
+    sprintf(t, "%lu", l);
+    if ((p = fork()) < 0)
+        return 0;
+    if (p == 0)
+    {
+        v[0] = MP_EDITOR;
+        v[1] = f;
+        v[2] = t;
+        v[3] = NULL;
+        execvp(v[0], v);
+        _exit(EXIT_FAILURE);
+    }
+    while (waitpid(p, &r, 0) < 0)
+        if (errno != EINTR)
+            return 0;
+    if (!WIFEXITED(r) || (WEXITSTATUS(r) != 0))
+        return 0;
+#endif /* TARGET */
+    return 1;
 }
 
 
