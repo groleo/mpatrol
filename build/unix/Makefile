@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.77 2001-08-24 10:55:16 graeme Exp $
+# $Id: Makefile,v 1.78 2001-09-03 20:33:07 graeme Exp $
 
 
 # Definitions
@@ -127,7 +127,7 @@ $(SHARED_MPATROL).$(VERSION).$(REVISION): $(SHARED_MPTOBJS)
 	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPTOBJS)
 
 $(SHARED_MPATROL): $(SHARED_MPATROL).$(VERSION).$(REVISION)
-	@ ln -fs $< $@
+	@ ln -f -s $< $@
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
@@ -142,7 +142,7 @@ $(SHARTS_MPATROL).$(VERSION).$(REVISION): $(SHARTS_MPTOBJS)
 	$(LD) $(LDFLAGS) -o $@ $(SHARTS_MPTOBJS)
 
 $(SHARTS_MPATROL): $(SHARTS_MPATROL).$(VERSION).$(REVISION)
-	@ ln -fs $< $@
+	@ ln -f -s $< $@
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
@@ -157,7 +157,7 @@ $(SHARED_MPALLOC).$(VERSION).$(REVISION): $(SHARED_MPAOBJS)
 	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPAOBJS)
 
 $(SHARED_MPALLOC): $(SHARED_MPALLOC).$(VERSION).$(REVISION)
-	@ ln -fs $< $@
+	@ ln -f -s $< $@
 
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
