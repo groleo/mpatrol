@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.16 2000-04-19 00:03:13 graeme Exp $"
+#ident "$Id: info.c,v 1.17 2000-04-19 17:51:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -277,12 +277,18 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                 m->data.file = t;
                 m->data.line = u;
                 m->data.stack = __mp_getaddrs(&h->addr, v);
-                m->data.freed = 0;
+                if (h->recur > 1)
+                    m->data.flags = FLG_INTERNAL;
+                else
+                    m->data.flags = 0;
                 p = n->block;
                 if ((f == AT_CALLOC) || (f == AT_RECALLOC))
                     __mp_memset(p, 0, l);
                 else
                     __mp_memset(p, h->alloc.abyte, l);
+                if (h->prof.profiling && (h->recur == 1) &&
+                    __mp_profilealloc(&h->prof, l, m))
+                    m->data.flags |= FLG_PROFILED;
 #if MP_INUSE_SUPPORT
                 _Inuse_malloc(p, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -444,8 +450,13 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     i->data.file = t;
                     i->data.line = u;
                     i->data.stack = __mp_getaddrs(&h->addr, v);
-                    i->data.freed = 1;
+                    i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+                    if (m->data.flags & FLG_PROFILED)
+                    {
+                        __mp_profilefree(&h->prof, d, m);
+                        __mp_profilealloc(&h->prof, l, m);
+                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -474,6 +485,11 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+                    if (m->data.flags & FLG_PROFILED)
+                    {
+                        __mp_profilefree(&h->prof, d, m);
+                        __mp_profilealloc(&h->prof, l, m);
+                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -482,10 +498,17 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                 }
                 else
                     p = NULL;
-#if MP_INUSE_SUPPORT
             else
+            {
+                if (m->data.flags & FLG_PROFILED)
+                {
+                    __mp_profilefree(&h->prof, d, m);
+                    __mp_profilealloc(&h->prof, l, m);
+                }
+#if MP_INUSE_SUPPORT
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
+            }
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
             if ((p != NULL) && (l > d))
@@ -593,6 +616,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         }
         if (!(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READWRITE);
+        if (m->data.flags & FLG_PROFILED)
+            __mp_profilefree(&h->prof, n->size, m);
         __mp_freeaddrs(&h->addr, m->data.stack);
         if (h->alloc.flags & FLG_NOFREE)
         {
@@ -607,7 +632,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
             m->data.file = t;
             m->data.line = u;
             m->data.stack = __mp_getaddrs(&h->addr, v);
-            m->data.freed = 1;
+            m->data.flags |= FLG_FREED;
         }
         else
         {
@@ -864,7 +889,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
             }
             else
                 continue;
-        if (m->data.freed && !(h->alloc.flags & FLG_PAGEALLOC) &&
+        if ((m->data.flags & FLG_FREED) && !(h->alloc.flags & FLG_PAGEALLOC) &&
             !(h->alloc.flags & FLG_PRESERVE))
             /* Check that all freed blocks are filled with the free byte, but
              * only if all allocations are not pages and the original contents
@@ -890,7 +915,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
              * need to perform the following checks.
              */
             continue;
-        if ((h->alloc.flags & FLG_PAGEALLOC) && !m->data.freed)
+        if ((h->alloc.flags & FLG_PAGEALLOC) && !(m->data.flags & FLG_FREED))
         {
             /* Check that all allocated blocks have overflow buffers filled with
              * the overflow byte, but only if all allocations are pages as this
@@ -908,7 +933,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                if (m->data.freed)
+                if (m->data.flags & FLG_FREED)
                     __mp_error(AT_MAX, "freed allocation " MP_POINTER " has a "
                                "corrupted overflow buffer at " MP_POINTER,
                                n->block, p);
@@ -938,7 +963,7 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                if (m->data.freed)
+                if (m->data.flags & FLG_FREED)
                     __mp_error(AT_MAX, "freed allocation " MP_POINTER " has a "
                                "corrupted overflow buffer at " MP_POINTER,
                                n->block, p);
@@ -983,7 +1008,7 @@ int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
             __mp_error(f, "attempt to perform operation on free memory\n");
             e = 0;
         }
-        else if (m->data.freed)
+        else if (m->data.flags & FLG_FREED)
         {
             __mp_error(f, "attempt to perform operation on freed memory");
             __mp_printalloc(&h->syms, n);

@@ -32,6 +32,7 @@
 
 
 #include "config.h"
+#include "alloc.h"
 #include "addr.h"
 #include "profile.h"
 #include "signals.h"
@@ -51,6 +52,10 @@
 #define FLG_SHOWSYMBOLS   1024 /* show all symbols read */
 #define FLG_SAFESIGNALS   2048 /* save and restore signal handlers */
 #define FLG_NOPROTECT     4096 /* do not protect internal structures */
+
+#define FLG_FREED         1    /* allocation has been freed */
+#define FLG_PROFILED      2    /* allocation has been profiled */
+#define FLG_INTERNAL      4    /* allocation was made from within the library */
 
 
 /* The different types of memory allocation and operation functions.
@@ -129,7 +134,7 @@ typedef union infonode
         char *file;            /* file name in which call took place */
         unsigned long line;    /* line number at which call took place */
         addrnode *stack;       /* call stack details */
-        char freed;            /* allocation has been freed */
+        unsigned long flags;   /* allocation flags */
     }
     data;
 }

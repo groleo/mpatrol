@@ -32,7 +32,7 @@
 
 
 #include "config.h"
-#include "alloc.h"
+#include <stddef.h>
 
 
 /* A profhead contains all the profiling information including the
@@ -55,8 +55,8 @@ extern "C"
 
 MP_EXPORT void __mp_newprofile(profhead *);
 MP_EXPORT void __mp_deleteprofile(profhead *);
-MP_EXPORT int __mp_profilealloc(profhead *, allocnode *);
-MP_EXPORT int __mp_profilefree(profhead *, allocnode *);
+MP_EXPORT int __mp_profilealloc(profhead *, size_t, void *);
+MP_EXPORT int __mp_profilefree(profhead *, size_t, void *);
 
 
 #ifdef __cplusplus

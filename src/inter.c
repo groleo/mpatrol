@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.24 2000-04-06 19:21:29 graeme Exp $"
+#ident "$Id: inter.c,v 1.25 2000-04-19 17:51:04 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -837,7 +837,7 @@ int __mp_info(void *p, allocinfo *d)
     d->file = m->data.file;
     d->line = m->data.line;
     d->stack = m->data.stack;
-    d->freed = m->data.freed;
+    d->freed = ((m->data.flags & FLG_FREED) != 0);
     if (!(memhead.flags & FLG_NOPROTECT))
         __mp_protectinfo(&memhead, MA_READWRITE);
     /* The names of the symbols in the call stack may not have been determined
@@ -882,11 +882,11 @@ int __mp_printinfo(void *p)
      */
     m = (infonode *) n->info;
     fprintf(stderr, "address " MP_POINTER " located in %s block:\n", p,
-            m->data.freed ? "freed" : "allocated");
+            (m->data.flags & FLG_FREED) ? "freed" : "allocated");
     fprintf(stderr, "    start of block:     " MP_POINTER "\n", n->block);
     fprintf(stderr, "    size of block:      %lu byte%s\n", n->size,
             (n->size == 1) ? "" : "s");
-    if (m->data.freed)
+    if (m->data.flags & FLG_FREED)
         fputs("    freed by:           ", stderr);
     else
         fputs("    allocated by:       ", stderr);

@@ -40,7 +40,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.14 2000-04-03 18:49:23 graeme Exp $"
+#ident "$Id: diag.c,v 1.15 2000-04-19 17:51:02 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -601,7 +601,7 @@ MP_GLOBAL void __mp_printmap(infohead *h)
                   (char *) n->block + n->size - 1);
         if (m == NULL)
             __mp_diag(" free (");
-        else if (m->data.freed == 1)
+        else if (m->data.flags & FLG_FREED)
             __mp_diag(" freed (");
         else
             __mp_diag(" allocated (");
@@ -711,6 +711,11 @@ MP_GLOBAL void __mp_printsummary(infohead *h)
         __mp_diag("<unset>");
     else
         __mp_diag("%s", h->log);
+    __mp_diag("\nprofiling file:    ");
+    if (h->prof.file == NULL)
+        __mp_diag("<unset>");
+    else
+        __mp_diag("%s", h->prof.file);
     __mp_diag("\nprogram filename:  ");
     if (h->alloc.heap.memory.prog == NULL)
         __mp_diag("<not found>");

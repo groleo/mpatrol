@@ -28,10 +28,11 @@
 
 
 #include "profile.h"
+#include "info.h"
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.2 2000-04-18 23:55:26 graeme Exp $"
+#ident "$Id: profile.c,v 1.3 2000-04-19 17:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -65,7 +66,7 @@ MP_GLOBAL void __mp_deleteprofile(profhead *p)
 /* Record a memory allocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilealloc(profhead *p, allocnode *n)
+MP_GLOBAL int __mp_profilealloc(profhead *p, size_t l, void *d)
 {
     return 1;
 }
@@ -74,7 +75,7 @@ MP_GLOBAL int __mp_profilealloc(profhead *p, allocnode *n)
 /* Record a memory deallocation for profiling.
  */
 
-MP_GLOBAL int __mp_profilefree(profhead *p, allocnode *n)
+MP_GLOBAL int __mp_profilefree(profhead *p, size_t l, void *d)
 {
     return 1;
 }
