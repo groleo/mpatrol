@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.12 2000-02-22 20:50:07 graeme Exp $"
+#ident "$Id: inter.c,v 1.13 2000-02-29 23:08:31 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -180,6 +180,9 @@ void __mp_fini(void)
             /* Firstly, check the integrity of the memory blocks.
              */
             __mp_checkinfo(&memhead);
+            /* Then close any access library handles that might still be open.
+             */
+            __mp_closesymbols(&memhead.syms);
             /* Then print a summary of library statistics and settings.
              */
             __mp_printsummary(&memhead);
