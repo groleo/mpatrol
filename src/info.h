@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.40 2001-02-12 19:27:58 graeme Exp $
+ * $Id: info.h,v 1.41 2001-02-15 21:02:36 graeme Exp $
  */
 
 
@@ -237,8 +237,9 @@ typedef struct infohead
     size_t stotal;                    /* total bytes set */
     unsigned long ffreq;              /* failure frequency */
     unsigned long fseed;              /* failure seed */
-    void (*prologue)(void *, size_t); /* prologue function */
-    void (*epilogue)(void *);         /* epilogue function */
+    void (*prologue)(void *, size_t,
+                     void *);         /* prologue function */
+    void (*epilogue)(void *, void *); /* epilogue function */
     void (*nomemory)(void);           /* low-memory handler function */
     char *log;                        /* log filename */
     delstack dels[MP_MAXDELSTACK];    /* delete stack */

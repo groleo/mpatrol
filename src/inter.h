@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.21 2001-02-13 23:57:56 graeme Exp $
+ * $Id: inter.h,v 1.22 2001-02-15 21:00:48 graeme Exp $
  */
 
 
@@ -119,8 +119,8 @@ size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*)(void *, size_t)))(void *, size_t);
-void (*__mp_epilogue(void (*)(void *)))(void *);
+void (*__mp_prologue(void (*)(void *, size_t, void *)))(void *, size_t, void *);
+void (*__mp_epilogue(void (*)(void *, void *)))(void *, void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(char *, char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);

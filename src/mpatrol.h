@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.87 2001-02-14 22:54:29 graeme Exp $
+ * $Id: mpatrol.h,v 1.88 2001-02-15 21:00:48 graeme Exp $
  */
 
 
@@ -664,9 +664,10 @@ size_t __mp_iterate(int (*)(MP_CONST void *, void *), void *, unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
-void (*__mp_prologue(void (*)(MP_CONST void *, size_t)))
-     (MP_CONST void *, size_t);
-void (*__mp_epilogue(void (*)(MP_CONST void *)))(MP_CONST void *);
+void (*__mp_prologue(void (*)(MP_CONST void *, size_t, MP_CONST void *)))
+     (MP_CONST void *, size_t, MP_CONST void *);
+void (*__mp_epilogue(void (*)(MP_CONST void *, MP_CONST void *)))
+     (MP_CONST void *, MP_CONST void *);
 void (*__mp_nomemory(void (*)(void)))(void);
 void __mp_pushdelstack(MP_CONST char *, MP_CONST char *, unsigned long);
 void __mp_popdelstack(char **, char **, unsigned long *);
@@ -714,8 +715,8 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)
 #define __mp_check() ((void) 0)
-#define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t)) NULL)
-#define __mp_epilogue(h) ((void (*)(MP_CONST void *)) NULL)
+#define __mp_prologue(h) ((void (*)(MP_CONST void *, size_t, MP_CONST void *)) NULL)
+#define __mp_epilogue(h) ((void (*)(MP_CONST void *, MP_CONST void *)) NULL)
 #define __mp_nomemory(h) ((void (*)(void)) NULL)
 #define __mp_pushdelstack(s, t, u) ((void) 0)
 #define __mp_popdelstack(s, t, u) ((void) 0)

@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.12 2001-02-14 00:02:54 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.13 2001-02-15 21:03:43 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.12 2001-02-14 00:02:54 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.13 2001-02-15 21:03:43 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -647,7 +647,7 @@ __mp_check(void)
  */
 
 void
-(*__mp_prologue(void (*h)(void *, size_t)))(void *, size_t)
+(*__mp_prologue(void (*h)(void *, size_t, void *)))(void *, size_t, void *)
 {
     return NULL;
 }
@@ -657,7 +657,7 @@ void
  */
 
 void
-(*__mp_epilogue(void (*h)(void *)))(void *)
+(*__mp_epilogue(void (*h)(void *, void *)))(void *, void *)
 {
     return NULL;
 }
