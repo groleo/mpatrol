@@ -19,9 +19,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.42 2000-11-14 20:51:26 graeme Exp $
+.\" $Id: mpatrol.3,v 1.43 2000-12-12 19:52:25 graeme Exp $
 .\"
-.TH MPATROL 3 "14 November 2000" "Release 1.3" "mpatrol library"
+.TH MPATROL 3 "12 December 2000" "Release 1.3" "mpatrol library"
 .SH NAME
 mpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -98,10 +98,10 @@ library functions will evaluate to empty statements.  It is intended that the
 All diagnostics are sent to the file \fImpatrol.log\fP in the current directory
 by default but this can be changed at run-time.  Additional configuration
 options can also be changed at run-time by setting and altering the
-\fBMPATROL_OPTIONS\fP environment variable.  In addition, both the \fBLOGFILE\fP
-and \fBPROFFILE\fP options are affected by the \fBLOGDIR\fP and \fBPROFDIR\fP
-environment variables respectively.  See \fBENVIRONMENT\fP below for more
-details.
+\fBMPATROL_OPTIONS\fP environment variable.  In addition, the \fBLOGFILE\fP,
+\fBPROFFILE\fP and \fBTRACEFILE\fP options are affected by the \fBLOGDIR\fP,
+\fBPROFDIR\fP and \fBTRACEDIR\fP environment variables respectively.  See
+\fBENVIRONMENT\fP below for more details.
 .PP
 Details of memory allocations and free memory are stored internally as a tree
 structure for speed and also to allow the best fit allocation algorithm to be
@@ -126,7 +126,10 @@ allocation and deallocation that was made during the execution of a program
 being written to a file at program termination if the \fBPROF\fP option is
 used.  The information stored in this file can then be used by the \fBmprof\fP
 command to display various tables summarising the memory allocation behaviour
-of the program that produced it.
+of the program that produced it.  Memory allocation tracing is also supported,
+where a trace of all memory allocations and deallocations can be written to a
+tracing output file in a concise encoded format for later processing by the
+\fBmptrace\fP command.  This is controlled with the \fBTRACE\fP option.
 .SH FUNCTIONS
 The following 18 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
@@ -919,8 +922,13 @@ memory-intensive programs became very hard to interrupt using the keyboard,
 thus giving the impression that the program or system had hung.
 .TP
 \fBSHOWALL\fP
-Equivalent to the \fBSHOWFREED\fP, \fBSHOWUNFREED\fP, \fBSHOWMAP\fP and
-\fBSHOWSYMBOLS\fP options specified together.
+Equivalent to the \fBSHOWFREE\fP, \fBSHOWFREED\fP, \fBSHOWUNFREED\fP,
+\fBSHOWMAP\fP and \fBSHOWSYMBOLS\fP options specified together.
+.TP
+\fBSHOWFREE\fP
+Specifies that a summary of all of the free memory blocks should be displayed at
+the end of program execution.  This step will not be performed if an abnormal
+termination occurs or if there were no free memory blocks.
 .TP
 \fBSHOWFREED\fP
 Specifies that a summary of all of the freed memory allocations should be
@@ -950,6 +958,24 @@ as small allocations for profiling purposes.  This limit must be greater than
 zero but less than the medium and large bounds.  Default value:
 \fBSMALLBOUND\fP=\fI32\fP.
 .TP
+\fBTRACE\fP
+Specifies that all memory allocations and deallocations are to be traced and
+sent to the tracing output file.  Memory reallocations are treated as a memory
+deallocation immediately followed by a memory allocation.
+.TP
+\fBTRACEFILE\fP=\fIstring\fP
+Specifies an alternative file in which to place all memory allocation tracing
+information from the mpatrol library.  If the \fBTRACEDIR\fP environment
+variable is set and the specified file does not contain a path component in its
+filename then the tracing output file will be located in the directory specified
+in \fBTRACEDIR\fP.  A filename of \fIstderr\fP will send this information to the
+\fBstderr\fP file stream and a filename of \fIstdout\fP will do the equivalent
+with the \fBstdout\fP file stream.  Note that if a problem occurs while opening
+the tracing output file then the tracing information will not be output.
+Default value: \fBTRACEFILE\fP=\fImpatrol.trace\fP or
+\fBTRACEFILE\fP=\fI%n.%p.trace\fP if the \fBTRACEDIR\fP environment variable is
+set.
+.TP
 \fBUNFREEDABORT\fP=\fIunsigned integer\fP
 Specifies the minimum number of unfreed allocations at which to abort the
 program just before program termination.  A summary of all the allocations will
@@ -972,9 +998,10 @@ are problems when using the mpatrol library in combination with another malloc
 library which uses \fBsbrk\fP to allocate its memory.  It is ignored on
 systems that do not support the \fBmmap\fP system call.
 .SH SEE ALSO
-\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmleak\fP(1), \fBmpsym\fP(1),
-\fBmpedit\fP(1), \fBmmap\fP(2), \fBsbrk\fP(2), \fBmalloc\fP(3), \fBalloca\fP(3),
-\fBmemory\fP(3), \fBstring\fP(3), \fBassert\fP(3), \fBelf\fP(3e), \fBbfd\fP(3).
+\fBmpatrol\fP(1), \fBmprof\fP(1), \fBmptrace\fP(1), \fBmleak\fP(1),
+\fBmpsym\fP(1), \fBmpedit\fP(1), \fBmmap\fP(2), \fBsbrk\fP(2), \fBmalloc\fP(3),
+\fBalloca\fP(3), \fBmemory\fP(3), \fBstring\fP(3), \fBassert\fP(3),
+\fBelf\fP(3e), \fBbfd\fP(3).
 .PP
 The mpatrol manual and reference card.
 .PP
