@@ -49,6 +49,22 @@
 #endif /* MP_GLOBAL */
 
 
+/* The keyword used to specify a constant variable or parameter.  This may
+ * only be supported by ANSI C or C++ compilers so it is defined under a
+ * macro just in case.  Note that constness is really only used for the
+ * highest-level functions in the library to prevent clashes with any
+ * functions that are being overridden.
+ */
+
+#ifndef MP_CONST
+#ifdef __STDC__
+#define MP_CONST const
+#else /* __STDC__ */
+#define MP_CONST
+#endif /* __STDC__ */
+#endif /* MP_CONST */
+
+
 /* Indicates if preprocessor macro versions of some internal library routines
  * should be used instead of their function equivalents in order to increase
  * run-time efficiency.  This might not be desirable if the library needs to be
