@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.261 2003-11-25 17:27:37 graeme Exp $
+@c $Id: mpatrol.texi,v 1.262 2003-11-25 21:32:29 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -12861,9 +12861,7 @@ contained in the files in the @file{pkg} directory.
 
 @item
 The postscript version of the quick reference card seems to print at an unusual
-offset on some printers.  In addition, the mpatrol manual should also be
-formatted in DocBook format once a suitable @TeX{}info to DocBook translator is
-available.
+offset on some printers.
 
 @item
 Perhaps add benchmark tests for dynamic memory allocation functions and memory
@@ -13200,7 +13198,6 @@ can be used to view or print these files.  Alternatively, you can browse the
 latest mpatrol manual on-line at
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/}.
 
-@cindex DocBook
 @item
 I'd like to convert the mpatrol manual to a different documentation format but
 there is no support for that format in the @file{Makefile}.  How would I go
@@ -13208,10 +13205,9 @@ about doing this?
 
 Since @TeX{}info is intended to be converted to other documentation formats it
 should be fairly easy for you to find a tool which will convert it into your
-desired format.  I plan to also provide the mpatrol manual in DocBook format if
-and when a suitable @TeX{}info to DocBook converter becomes available, but I
-won't provide preformatted versions of the mpatrol manual in any other format
-which isn't already supported.
+desired format.  Please note that I probably won't provide preformatted
+versions of the mpatrol manual in any other format which isn't already
+supported.
 
 @cindex DVI
 @cindex postscript
