@@ -21,7 +21,7 @@
 # GDB command file for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.3 2001-02-14 00:54:26 graeme Exp $
+# $Id: .gdbinit,v 1.4 2001-02-14 00:58:28 graeme Exp $
 
 
 # Set mpatrol library options in the current process environment.
@@ -52,6 +52,16 @@ Displays information about an address in the heap.
 end
 
 
+# Break at a specific allocation index.
+
+define allocstop
+call __mp_setoption(-3, $arg0)
+end
+document allocstop
+Breaks at a specific allocation index.
+end
+
+
 # Start the process by running until it reaches _start() since we cannot
 # set a breakpoint at __mp_trap() if it exists in a shared library until
 # the process has been started.  The _start() function exists on most
@@ -60,5 +70,4 @@ end
 
 break _start
 run
-clear _start
 break __mp_trap
