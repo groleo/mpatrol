@@ -33,6 +33,7 @@ __mp_comparemem
 __mp_locatemem
 __mp_info
 __mp_printinfo
+__mp_snapshot
 __mp_iterate
 __mp_memorymap
 __mp_summary

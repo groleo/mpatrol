@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.7 2001-02-06 19:53:17 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.8 2001-02-06 20:25:50 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.7 2001-02-06 19:53:17 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.8 2001-02-06 20:25:50 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -532,12 +532,23 @@ __mp_printinfo(void *p)
 }
 
 
+/* Return the current allocation event count for later use when examining
+ * the difference in the list of allocations between now and a future point.
+ */
+
+unsigned long
+__mp_snapshot(void)
+{
+    return 0;
+}
+
+
 /* Iterate over all of the allocated and freed memory blocks, calling a
  * user-supplied function for each one encountered.
  */
 
 size_t
-__mp_iterate(int (*f)(void *))
+__mp_iterate(int (*f)(void *), unsigned long s)
 {
     return 0;
 }

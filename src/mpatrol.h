@@ -568,7 +568,8 @@ int __mp_comparemem(MP_CONST void *, MP_CONST void *, size_t, __mp_alloctype,
                     MP_CONST char *, MP_CONST char *, unsigned long, size_t);
 int __mp_info(MP_CONST void *, __mp_allocinfo *);
 int __mp_printinfo(MP_CONST void *);
-size_t __mp_iterate(int (*)(void *));
+unsigned long __mp_snapshot(void);
+size_t __mp_iterate(int (*)(void *), unsigned long);
 void __mp_memorymap(int);
 void __mp_summary(void);
 void __mp_check(void);
@@ -609,7 +610,8 @@ int __mp_list(MP_CONST char *, unsigned long);
 #define __mp_comparemem(p, q, l, f, s, t, u, k) ((int) 0)
 #define __mp_info(p, d) ((int) 0)
 #define __mp_printinfo(p) ((int) 0)
-#define __mp_iterate(p) ((size_t) 0)
+#define __mp_snapshot() ((unsigned long) 0)
+#define __mp_iterate(p, s) ((size_t) 0)
 #define __mp_memorymap(s) ((void) 0)
 #define __mp_summary() ((void) 0)
 #define __mp_check() ((void) 0)

@@ -48,9 +48,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.74 2001-02-06 19:53:17 graeme Exp $"
+#ident "$Id: inter.c,v 1.75 2001-02-06 20:25:50 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.74 2001-02-06 19:53:17 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.75 2001-02-06 20:25:50 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1338,12 +1338,31 @@ __mp_printinfo(void *p)
 }
 
 
+/* Return the current allocation event count for later use when examining
+ * the difference in the list of allocations between now and a future point.
+ */
+
+unsigned long
+__mp_snapshot(void)
+{
+    unsigned long i;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    i = memhead.event;
+    restoresignals();
+    return i;
+}
+
+
 /* Iterate over all of the allocated and freed memory blocks, calling a
- * user-supplied function for each one encountered.
+ * user-supplied function for each one encountered, selecting only those
+ * memory blocks that have been modified since a given allocation event.
  */
 
 size_t
-__mp_iterate(int (*f)(void *))
+__mp_iterate(int (*f)(void *), unsigned long s)
 {
     allocnode *n, *p;
     infonode *m;
@@ -1356,7 +1375,8 @@ __mp_iterate(int (*f)(void *))
     i = 0;
     for (n = (allocnode *) memhead.alloc.list.head;
          p = (allocnode *) n->lnode.next; n = p)
-        if ((m = (infonode *) n->info) && !(m->data.flags & FLG_INTERNAL))
+        if ((m = (infonode *) n->info) && !(m->data.flags & FLG_INTERNAL) &&
+            (m->data.event > s))
         {
             i++;
             if (f == NULL)
