@@ -366,6 +366,16 @@
 #endif /* MP_HASHTABSIZE */
 
 
+/* Indicates if support for Parasoft Inuse is enabled.  This is a commercial
+ * product which graphically displays process memory usage and is provided as
+ * an add-on for Parasoft Insure++.
+ */
+
+#ifndef MP_INUSE_SUPPORT
+#define MP_INUSE_SUPPORT 0
+#endif /* MP_INUSE_SUPPORT */
+
+
 /* Indicates if the compiler supports the long long type.  This is only used
  * to determine the minimum alignment required for a generic memory allocation.
  */
