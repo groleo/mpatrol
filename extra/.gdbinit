@@ -21,7 +21,7 @@
 # GDB command file for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.2 2000-10-30 20:13:40 graeme Exp $
+# $Id: .gdbinit,v 1.3 2001-02-14 00:54:26 graeme Exp $
 
 
 # Set mpatrol library options in the current process environment.
@@ -50,3 +50,15 @@ end
 document printalloc
 Displays information about an address in the heap.
 end
+
+
+# Start the process by running until it reaches _start() since we cannot
+# set a breakpoint at __mp_trap() if it exists in a shared library until
+# the process has been started.  The _start() function exists on most
+# UNIX systems and it normally calls _init(), main() and then _fini().
+# If your system does not have _start() then change it to main() instead.
+
+break _start
+run
+clear _start
+break __mp_trap
