@@ -25,7 +25,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.1 1999-10-10 01:11:57 graeme Exp $
+# $Id: mupdate,v 1.2 1999-10-10 01:45:07 graeme Exp $
 
 
 # Read the old release version and release date from the VERSION file.
@@ -60,7 +60,7 @@ newversion=`printf %d%02d%02d $newver $newrev $newcnt`
 sed "s/MPATROL_VERSION $oldversion/MPATROL_VERSION $newversion/" src/mpatrol.h \
     >src/mpatrol.h.new
 mv src/mpatrol.h.new src/mpatrol.h
-cvs commit -m "Updated to version $release" src/mpatrol.h 2>&1 >/dev/null
+cvs commit -m "Updated to version $release" src/mpatrol.h >/dev/null 2>&1
 
 
 # Change the version.c source file in order to update the MP_VERSION
@@ -84,27 +84,28 @@ sed -e "s/MP_VERSION \"mpatrol $oldversion\"/MP_VERSION \"mpatrol $newversion\"/
     -e "s/MP_VERSION \" $olddate3\"/MP_VERSION \" $newdate3\"/" src/version.c \
     >src/version.c.new
 mv src/version.c.new src/version.c
-cvs commit -m "Updated to version $release" src/version.c 2>&1 >/dev/null
+cvs commit -m "Updated to version $release" src/version.c >/dev/null 2>&1
 
 
 # Update the ChangeLog file with all the changes since the last release.
 
-rcs2log -R -u 'graeme	Graeme Roy	graeme@epc.co.uk' >ChangeLog.new
+rcs2log -R -u 'graeme	Graeme Roy	graeme@epc.co.uk' >ChangeLog.new \
+        >/dev/null 2>&1
 cat ChangeLog >>ChangeLog.new
 mv ChangeLog.new ChangeLog
 vi ChangeLog
-cvs commit -m "Updated to version $release" ChangeLog 2>&1 >/dev/null
+cvs commit -m "Updated to version $release" ChangeLog >/dev/null 2>&1
 
 
 # Write the new release version and release date to the VERSION file.
 
 echo "$release $newdate" >VERSION
-cvs commit -m "Updated to version $release" VERSION 2>&1 >/dev/null
+cvs commit -m "Updated to version $release" VERSION >/dev/null 2>&1
 
 
 # Tag the entire distribution and create a new release archive.
 
-cvs tag REL_${newver}_${newrev}_${newcnt} 2>&1 >/dev/null
+cvs tag REL_${newver}_${newrev}_${newcnt} >/dev/null 2>&1
 
 archive="mpatrol_$release.tar"
 
