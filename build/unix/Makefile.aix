@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.7 2001-01-22 21:29:41 graeme Exp $
+# $Id: Makefile.aix,v 1.8 2001-01-22 21:42:47 graeme Exp $
 
 
 # Definitions
@@ -69,7 +69,6 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= shra.o
-OBJECT_MPALLOC	= lib$(MPALLOC).o
 LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 
@@ -116,6 +115,16 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c
 
 $(LINTTS_MPATROL): $(LINTTS_MPTOBJS)
 	$(LINT) -o $(MPATROL)mt $(LINTTS_MPTOBJS)
+
+$(ARCHIVE_MPALLOC): $(SHARED_MPALLOC) $(ARCHIVE_MPAOBJS)
+	-@ rm -f $@ 2>&1 >/dev/null
+	$(AR) cr $@ $(SHARED_MPALLOC) $(ARCHIVE_MPAOBJS)
+
+$(SHARED_MPALLOC): $(ARCHIVE_MPAOBJS) $(MPALLOC).exp
+	$(LD) -bmodtype:SRE -bexport:$(MPALLOC).exp -bnoentry -o $@ $(ARCHIVE_MPAOBJS)
+
+$(LINT_MPALLOC): $(LINT_MPAOBJS)
+	$(LINT) -o $(MPALLOC) $(LINT_MPAOBJS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s

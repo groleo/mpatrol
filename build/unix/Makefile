@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.49 2001-01-22 21:29:41 graeme Exp $
+# $Id: Makefile,v 1.50 2001-01-22 21:42:47 graeme Exp $
 
 
 # Definitions
@@ -76,8 +76,7 @@ LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 
 ARCHIVE_MPALLOC	= lib$(MPALLOC).a
 SHARED_MPALLOC	= lib$(MPALLOC).so
-OBJECT_MPALLOC	= lib$(MPALLOC).o
-LINT_MALLOC	= llib-l$(MPALLOC).ln
+LINT_MPALLOC	= llib-l$(MPALLOC).ln
 
 
 # Rules
@@ -133,6 +132,18 @@ $(OBJTS_MPATROL): $(SOURCE)/library.c
 
 $(LINTTS_MPATROL): $(LINTTS_MPTOBJS)
 	$(LINT) -o $(MPATROL)mt $(LINTTS_MPTOBJS)
+
+$(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
+	$(AR) cr $@ $(ARCHIVE_MPAOBJS)
+
+$(SHARED_MPALLOC).$(VERSION).$(REVISION): $(SHARED_MPAOBJS)
+	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPAOBJS)
+
+$(SHARED_MPALLOC): $(SHARED_MPALLOC).$(VERSION).$(REVISION)
+	@ ln -fs $< $@
+
+$(LINT_MPALLOC): $(LINT_MPAOBJS)
+	$(LINT) -o $(MPALLOC) $(LINT_MPAOBJS)
 
 machine.o: $(SOURCE)/machine.c
 	$(CC) $(CFLAGS) -E -P $< >machine.s
