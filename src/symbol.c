@@ -120,7 +120,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.47 2001-01-31 22:49:44 graeme Exp $"
+#ident "$Id: symbol.c,v 1.48 2001-01-31 23:00:29 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1579,7 +1579,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 
 MP_GLOBAL
 int
-__mp_addextsymbols(symhead *y)
+__mp_addextsymbols(symhead *y, meminfo *e)
 {
 #if DYNLINK == DYNLINK_AIX
     static char b[4096];
