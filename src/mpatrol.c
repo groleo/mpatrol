@@ -34,7 +34,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.2 2000-01-09 20:35:17 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.3 2000-03-20 23:16:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -57,7 +57,7 @@
 #include "diag.c"
 #include "option.c"
 #include "inter.c"
-#if TARGET == TARGET_UNIX
+#if TARGET == TARGET_UNIX || (TARGET == TARGET_AMIGA && defined(__GNUC__))
 #include "malloc.c"
-#endif /* TARGET */
+#endif /* TARGET && __GNUC__ */
 #include "version.c"
