@@ -19,7 +19,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: mpatrol.3,v 1.8 2000-01-24 00:46:36 graeme Exp $
+.\" $Id: mpatrol.3,v 1.9 2000-01-24 21:10:53 graeme Exp $
 .\"
 .TH MPATROL 3 "24 January 2000" "Release 1.1" "mpatrol library"
 .SH NAME
@@ -39,6 +39,7 @@ char *strsave(char *str);
 char *strnsave(char *str, size_t size);
 void *realloc(void *ptr, size_t size);
 void *recalloc(void *ptr, size_t size);
+void *expand(void *ptr, size_t size);
 void free(void *ptr);
 void cfree(void *ptr);
 
@@ -95,7 +96,7 @@ allocation was performed or for adding meaning to tracing.  Symbol names are
 read from the executable file and also possibly from any required shared
 libraries.
 .PP
-The following 13 functions are available as replacements for existing C library
+The following 14 functions are available as replacements for existing C library
 functions.  To use these you must include \fImpatrol.h\fP before all other
 header files, although on UNIX platforms they will be used anyway, albeit with
 slightly less tracing information:
@@ -239,6 +240,21 @@ allocated memory must be deallocated with \fBfree\fP and can be reallocated
 again with \fBrealloc\fP.  This function is available for backwards
 compatibility with older C libraries and \fBcalloc\fP and should not be used in
 new code.
+.TP
+\fBexpand\fP
+Attempts to resize the memory allocation beginning at \fIptr\fP to \fIsize\fP
+bytes and either returns \fIptr\fP if there was enough space to resize it, or
+\fBNULL\fP if the block could not be resized for a particular reason.  If
+\fIptr\fP is \fBNULL\fP then the call will be equivalent to \fBmalloc\fP.  If
+\fIsize\fP is \fB0\fP then the existing memory allocation will be freed and the
+\fBNULL\fP pointer will be returned.  If \fIsize\fP is greater than the original
+allocation then the extra space will be filled with uninitialized bytes and if
+\fIsize\fP is less than the original allocation then the memory block will be
+truncated.  If there is not enough space in the heap then the \fBNULL\fP pointer
+will be returned and \fBerrno\fP will be set to \fBENOMEM\fP.  The allocated
+memory must be deallocated with \fBfree\fP and can be reallocated again with
+\fBrealloc\fP.  This function is available for backwards compatibility with
+older C libraries and should not be used in new code.
 .TP
 \fBfree\fP
 Frees the memory allocation beginning at \fIptr\fP so the memory can be reused
@@ -590,7 +606,7 @@ can be used by the library to provide better diagnostics.  However, as no system
 memory will ever be reused by the mpatrol library, this option can quickly lead
 to a shortage of available system memory for a process.  Note that this option
 will always force a memory reallocation to return a pointer to newly-allocated
-memory.
+memory, but the \fBexpand()\fP function will never be affected by this option.
 .TP
 \fBNOPROTECT\fP
 Specifies that the mpatrol library's internal data structures should not be made
