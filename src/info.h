@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: info.h,v 1.53 2001-03-07 20:15:43 graeme Exp $
+ * $Id: info.h,v 1.54 2001-03-07 20:37:05 graeme Exp $
  */
 
 
@@ -237,6 +237,7 @@ typedef struct infohead
     size_t lrange;                    /* lower check range */
     size_t urange;                    /* upper check range */
     size_t check;                     /* check frequency */
+    size_t mcount;                    /* marked allocation count */
     size_t mtotal;                    /* total bytes marked */
     size_t dtotal;                    /* total bytes compared */
     size_t ltotal;                    /* total bytes located */
