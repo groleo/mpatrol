@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.152 2000-12-12 22:18:57 graeme Exp $
+@c $Id: mpatrol.texi,v 1.153 2000-12-12 22:54:57 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -126,7 +126,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Options::                     Command line options.
 * Diagnostic messages::         Warnings and errors.
 * Library performance::         Comparitive timings.
-* Profiling file format::       Profiling output file layout.
+* File formats::                Output file layouts.
 * Supported systems::           Known platforms that mpatrol runs on.
 * Notes::                       Known bugs and future enhancements.
 * Frequently asked questions::  For answering specific problems.
@@ -7805,7 +7805,7 @@ The alignment is set to the system page size and execution continues.
 @end table
 @end itemize
 
-@node Library performance, Profiling file format, Diagnostic messages, Top
+@node Library performance, File formats, Diagnostic messages, Top
 @appendix Library performance
 @cindex performance times
 @cindex times
@@ -7904,16 +7904,27 @@ Running using the Solaris malloc libraries:
 @tab 40.845
 @end multitable
 
-@node Profiling file format, Supported systems, Library performance, Top
-@appendix Profiling file format
-@cindex profiling file format
+@node File formats, Supported systems, Library performance, Top
+@appendix File formats
+@cindex file formats
 
 @cindex magic
-The format of the profiling output files that are produced by the mpatrol
-library is described here@footnote{The file @file{extra/magic} contains a UNIX
-@emph{magic} file excerpt for automatically identifying an mpatrol log file and
-an mpatrol profiling output file with the @command{file} command.}.  Every
-profiling output file contains the following components.
+The formats of the profiling and tracing output files that are produced by the
+mpatrol library are described here@footnote{The file @file{extra/magic} contains
+a UNIX @emph{magic} file excerpt for automatically identifying an mpatrol log
+file, an mpatrol profiling output file and an mpatrol tracing output file with
+the @command{file} command.}.
+
+@menu
+* Profiling file format::       Profiling output file layout.
+* Tracing file format::         Tracing output file layout.
+@end menu
+
+@node Profiling file format, Tracing file format, , File formats
+@appendixsec Profiling file format
+@cindex profiling file format
+
+Every mpatrol profiling output file contains the following components.
 
 @itemize @bullet
 @item
@@ -8004,7 +8015,58 @@ containing the nul-terminated symbol names.
 4 bytes containing the characters @samp{M}, @samp{P}, @samp{T} and @samp{L}.
 @end itemize
 
-@node Supported systems, Notes, Profiling file format, Top
+@node Tracing file format, , Profiling file format, File formats
+@appendixsec Tracing file format
+@cindex tracing file format
+
+Every mpatrol tracing output file contains the following components.
+
+@itemize @bullet
+@item
+4 bytes containing the characters @samp{M}, @samp{T}, @samp{R} and @samp{C}.
+
+@item
+1 unsigned integer representing the value @samp{1}.  This is used by
+@command{mptrace} to determine the endianness of the processor that produced the
+tracing output file so that it can decide whether to perform byte-swapping on
+the input data.
+
+@item
+1 unsigned integer containing the version number of the mpatrol library which
+produced the tracing output file.
+
+@item
+One or more of the following event records.
+
+@itemize @bullet
+@item
+If the event is a system heap allocation for use by the mpatrol library's
+internal data structures then the event record will begin with the character
+@samp{I} followed by the start address and size in bytes of the heap allocation
+encoded as unsigned LEB128 numbers.
+
+@item
+If the event is a system heap allocation for use by the program's memory
+allocations then the event record will begin with the character @samp{H}
+followed by the start address and size in bytes of the heap allocation encoded
+as unsigned LEB128 numbers.
+
+@item
+If the event is a memory allocation then the event record will begin with the
+character @samp{A} followed by the allocation index, start address and size in
+bytes of the memory allocation encoded as unsigned LEB128 numbers.
+
+@item
+If the event is a memory deallocation then the event record will begin with the
+character @samp{F} followed by the allocation index of the memory allocation
+encoded as an unsigned LEB128 number.
+@end itemize
+
+@item
+4 bytes containing the characters @samp{M}, @samp{T}, @samp{R} and @samp{C}.
+@end itemize
+
+@node Supported systems, Notes, File formats, Top
 @appendix Supported systems
 @cindex supported systems
 @cindex systems

@@ -74,7 +74,7 @@ December, 2000.
  @{" Options                    " link "Options"}  Command line options.
  @{" Diagnostic messages        " link "Diagnostic messages"}  Warnings and errors.
  @{" Library performance        " link "Library performance"}  Comparitive timings.
- @{" Profiling file format      " link "Profiling file format"}  Profiling output file layout.
+ @{" File formats               " link "File formats"}  Output file layouts.
  @{" Supported systems          " link "Supported systems"}  Known platforms that mpatrol runs on.
  @{" Notes                      " link "Notes"}  Known bugs and future enhancements.
  @{" Frequently asked questions " link "Frequently asked questions"}  For answering specific problems.
@@ -7561,7 +7561,7 @@ occurred.
 @endnode
 
 @node "Library performance" "mpatrol.guide/Library performance"
-@next "Profiling file format"
+@next "File formats"
 @prev "Diagnostic messages"
 @toc "Main"
 
@@ -7621,17 +7621,39 @@ Solaris watchmalloc(3x) library             40.845
 
 @endnode
 
-@node "Profiling file format" "mpatrol.guide/Profiling file format"
+@node "File formats" "mpatrol.guide/File formats"
 @next "Supported systems"
 @prev "Library performance"
 @toc "Main"
 
-Profiling file format
-*********************
+File formats
+************
 
-   The format of the profiling output files that are produced by the
-mpatrol library is described here(1).  Every profiling output file
-contains the following components.
+   The formats of the profiling and tracing output files that are
+produced by the mpatrol library are described here(1).
+
+
+ @{" Profiling file format      " link "Profiling file format"}  Profiling output file layout.
+ @{" Tracing file format        " link "Tracing file format"}  Tracing output file layout.
+
+   ---------- Footnotes ----------
+
+   (1) The file @{b}extra/magic@{ub} contains a UNIX @{i}magic@{ui} file excerpt for
+automatically identifying an mpatrol log file, an mpatrol profiling
+output file and an mpatrol tracing output file with the @{b}file@{ub} command.
+
+
+@endnode
+
+@node "Profiling file format" "mpatrol.guide/Profiling file format"
+@next "Tracing file format"
+@toc "File formats"
+
+Profiling file format
+=====================
+
+   Every mpatrol profiling output file contains the following
+components.
 
    * 4 bytes containing the characters @{b}M@{ub}, @{b}P@{ub}, @{b}T@{ub} and @{b}L@{ub}.
 
@@ -7704,18 +7726,60 @@ contains the following components.
 
    * 4 bytes containing the characters @{b}M@{ub}, @{b}P@{ub}, @{b}T@{ub} and @{b}L@{ub}.
 
-   ---------- Footnotes ----------
 
-   (1) The file @{b}extra/magic@{ub} contains a UNIX @{i}magic@{ui} file excerpt for
-automatically identifying an mpatrol log file and an mpatrol profiling
-output file with the @{b}file@{ub} command.
+@endnode
+
+@node "Tracing file format" "mpatrol.guide/Tracing file format"
+@prev "Profiling file format"
+@toc "File formats"
+
+Tracing file format
+===================
+
+   Every mpatrol tracing output file contains the following components.
+
+   * 4 bytes containing the characters @{b}M@{ub}, @{b}T@{ub}, @{b}R@{ub} and @{b}C@{ub}.
+
+   * 1 unsigned integer representing the value @{b}1@{ub}.  This is used by
+     @{b}mptrace@{ub} to determine the endianness of the processor that produced
+     the tracing output file so that it can decide whether to perform
+     byte-swapping on the input data.
+
+   * 1 unsigned integer containing the version number of the mpatrol
+     library which produced the tracing output file.
+
+   * One or more of the following event records.
+
+        * If the event is a system heap allocation for use by the
+          mpatrol library's internal data structures then the event
+          record will begin with the character @{b}I@{ub} followed by the start
+          address and size in bytes of the heap allocation encoded as
+          unsigned LEB128 numbers.
+
+        * If the event is a system heap allocation for use by the
+          program's memory allocations then the event record will begin
+          with the character @{b}H@{ub} followed by the start address and size
+          in bytes of the heap allocation encoded as unsigned LEB128
+          numbers.
+
+        * If the event is a memory allocation then the event record
+          will begin with the character @{b}A@{ub} followed by the allocation
+          index, start address and size in bytes of the memory
+          allocation encoded as unsigned LEB128 numbers.
+
+        * If the event is a memory deallocation then the event record
+          will begin with the character @{b}F@{ub} followed by the allocation
+          index of the memory allocation encoded as an unsigned LEB128
+          number.
+
+   * 4 bytes containing the characters @{b}M@{ub}, @{b}T@{ub}, @{b}R@{ub} and @{b}C@{ub}.
 
 
 @endnode
 
 @node "Supported systems" "mpatrol.guide/Supported systems"
 @next "Notes"
-@prev "Profiling file format"
+@prev "File formats"
 @toc "Main"
 
 Supported systems
@@ -11879,6 +11943,7 @@ Index
  @{" FDA (Free Debug Allocator)               " link "Related software"}   Related software
  @{" features                                 " link "Features"}   Features
  @{" fence posts                              " link "Overwrites and underwrites"}   Overwrites and underwrites
+ @{" file formats                             " link "File formats"}   File formats
  @{" file scope variables                     " link "Static memory allocations"}   Static memory allocations
  @{" files questions                          " link "Files"}   Files
  @{" files, mapping                           " link "Virtual memory"}   Virtual memory
@@ -12015,7 +12080,7 @@ Index
  @{" LSM                                      " link "Installation"}   Installation
  @{" LynxOS, Intel 80x86                      " link "Supported systems"}   Supported systems
  @{" LynxOS, PowerPC                          " link "Supported systems"}   Supported systems
- @{" magic                                    " link "Profiling file format"}   Profiling file format
+ @{" magic                                    " link "File formats"}   File formats
  @{" make                                     " link "Installation"}   Installation
  @{" Makefile                                 " link "Installation"}   Installation
  @{" Malloc Debug                             " link "Related software"}   Related software
@@ -12308,6 +12373,7 @@ Index
  @{" TRACEDIR                                 " link "Environment"}   Environment
  @{" TRACEFILE                                " link "Environment"}   Environment
  @{" tracing                                  " link "Logging and tracing"}   Logging and tracing
+ @{" tracing file format                      " link "Tracing file format"}   Tracing file format
  @{" tree structure                           " link "Example 2"}   Example 2
  @{" TurboPower                               " link "Related software"}   Related software
  @{" tutorial                                 " link "Tutorial"}   Tutorial

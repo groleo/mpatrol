@@ -64,7 +64,11 @@
 <li><a href="#Options">Appendix C Options</a>
 <li><a href="#Diagnostic%20messages">Appendix D Diagnostic messages</a>
 <li><a href="#Library%20performance">Appendix E Library performance</a>
-<li><a href="#Profiling%20file%20format">Appendix F Profiling file format</a>
+<li><a href="#File%20formats">Appendix F File formats</a>
+<ul>
+<li><a href="#Profiling%20file%20format">F.1 Profiling file format</a>
+<li><a href="#Tracing%20file%20format">F.2 Tracing file format</a>
+</ul>
 <li><a href="#Supported%20systems">Appendix G Supported systems</a>
 <ul>
 <li><a href="#New%20system%20support">G.1 Adding a new operating system</a>
@@ -129,7 +133,7 @@ memory allocations.
 <li><a href="#Options">Options</a>:                      Command line options. 
 <li><a href="#Diagnostic%20messages">Diagnostic messages</a>:          Warnings and errors. 
 <li><a href="#Library%20performance">Library performance</a>:          Comparitive timings. 
-<li><a href="#Profiling%20file%20format">Profiling file format</a>:        Profiling output file layout. 
+<li><a href="#File%20formats">File formats</a>:                 Output file layouts. 
 <li><a href="#Supported%20systems">Supported systems</a>:            Known platforms that mpatrol runs on. 
 <li><a href="#Notes">Notes</a>:                        Known bugs and future enhancements. 
 <li><a href="#Frequently%20asked%20questions">Frequently asked questions</a>:   For answering specific problems. 
@@ -7181,7 +7185,7 @@ were used.
 
 <p><hr>
 Node:<a name="Library%20performance">Library performance</a>,
-Next:<a rel=next href="#Profiling%20file%20format">Profiling file format</a>,
+Next:<a rel=next href="#File%20formats">File formats</a>,
 Previous:<a rel=previous href="#Diagnostic%20messages">Diagnostic messages</a>,
 Up:<a rel=up href="#Top">Top</a>
 <br>
@@ -7278,17 +7282,31 @@ preserved:
 <br></tr></table>
 
 <p><hr>
-Node:<a name="Profiling%20file%20format">Profiling file format</a>,
+Node:<a name="File%20formats">File formats</a>,
 Next:<a rel=next href="#Supported%20systems">Supported systems</a>,
 Previous:<a rel=previous href="#Library%20performance">Library performance</a>,
 Up:<a rel=up href="#Top">Top</a>
 <br>
 
-<h1>Appendix F Profiling file format</h1>
+<h1>Appendix F File formats</h1>
 
-<p>The format of the profiling output files that are produced by the mpatrol
-library is described here<a rel=footnote href="#fn-43"><sup>43</sup></a>.  Every
-profiling output file contains the following components.
+<p>The formats of the profiling and tracing output files that are produced by the
+mpatrol library are described here<a rel=footnote href="#fn-43"><sup>43</sup></a>.
+
+<ul>
+<li><a href="#Profiling%20file%20format">Profiling file format</a>:        Profiling output file layout. 
+<li><a href="#Tracing%20file%20format">Tracing file format</a>:          Tracing output file layout. 
+</ul>
+
+<p><hr>
+Node:<a name="Profiling%20file%20format">Profiling file format</a>,
+Next:<a rel=next href="#Tracing%20file%20format">Tracing file format</a>,
+Up:<a rel=up href="#File%20formats">File formats</a>
+<br>
+
+<h2>F.1 Profiling file format</h2>
+
+<p>Every mpatrol profiling output file contains the following components.
 
 <ul>
 <li>4 bytes containing the characters <code>M</code>, <code>P</code>, <code>T</code> and <code>L</code>.
@@ -7359,9 +7377,55 @@ containing the nul-terminated symbol names.
 </ul>
 
 <p><hr>
+Node:<a name="Tracing%20file%20format">Tracing file format</a>,
+Previous:<a rel=previous href="#Profiling%20file%20format">Profiling file format</a>,
+Up:<a rel=up href="#File%20formats">File formats</a>
+<br>
+
+<h2>F.2 Tracing file format</h2>
+
+<p>Every mpatrol tracing output file contains the following components.
+
+<ul>
+<li>4 bytes containing the characters <code>M</code>, <code>T</code>, <code>R</code> and <code>C</code>.
+
+<li>1 unsigned integer representing the value <code>1</code>.  This is used by
+<code>mptrace</code> to determine the endianness of the processor that produced the
+tracing output file so that it can decide whether to perform byte-swapping on
+the input data.
+
+<li>1 unsigned integer containing the version number of the mpatrol library which
+produced the tracing output file.
+
+<li>One or more of the following event records.
+
+<ul>
+<li>If the event is a system heap allocation for use by the mpatrol library's
+internal data structures then the event record will begin with the character
+<code>I</code> followed by the start address and size in bytes of the heap allocation
+encoded as unsigned LEB128 numbers.
+
+<li>If the event is a system heap allocation for use by the program's memory
+allocations then the event record will begin with the character <code>H</code>
+followed by the start address and size in bytes of the heap allocation encoded
+as unsigned LEB128 numbers.
+
+<li>If the event is a memory allocation then the event record will begin with the
+character <code>A</code> followed by the allocation index, start address and size in
+bytes of the memory allocation encoded as unsigned LEB128 numbers.
+
+<li>If the event is a memory deallocation then the event record will begin with the
+character <code>F</code> followed by the allocation index of the memory allocation
+encoded as an unsigned LEB128 number. 
+</ul>
+
+<li>4 bytes containing the characters <code>M</code>, <code>T</code>, <code>R</code> and <code>C</code>. 
+</ul>
+
+<p><hr>
 Node:<a name="Supported%20systems">Supported systems</a>,
 Next:<a rel=next href="#Notes">Notes</a>,
-Previous:<a rel=previous href="#Profiling%20file%20format">Profiling file format</a>,
+Previous:<a rel=previous href="#File%20formats">File formats</a>,
 Up:<a rel=up href="#Top">Top</a>
 <br>
 
@@ -11097,6 +11161,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>FDA (Free Debug Allocator): <a href="#Related%20software">Related software</a>
 <li>features: <a href="#Features">Features</a>
 <li>fence posts: <a href="#Overwrites%20and%20underwrites">Overwrites and underwrites</a>
+<li>file formats: <a href="#File%20formats">File formats</a>
 <li>file scope variables: <a href="#Static%20memory%20allocations">Static memory allocations</a>
 <li>files questions: <a href="#Files">Files</a>
 <li>files, mapping: <a href="#Virtual%20memory">Virtual memory</a>
@@ -11233,7 +11298,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>LSM: <a href="#Installation">Installation</a>
 <li>LynxOS, Intel 80x86: <a href="#Supported%20systems">Supported systems</a>
 <li>LynxOS, PowerPC: <a href="#Supported%20systems">Supported systems</a>
-<li>magic: <a href="#Profiling%20file%20format">Profiling file format</a>
+<li>magic: <a href="#File%20formats">File formats</a>
 <li>make: <a href="#Installation">Installation</a>
 <li>Makefile: <a href="#Installation">Installation</a>
 <li>Malloc Debug: <a href="#Related%20software">Related software</a>
@@ -11526,6 +11591,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>TRACEDIR: <a href="#Environment">Environment</a>
 <li>TRACEFILE: <a href="#Environment">Environment</a>
 <li>tracing: <a href="#Logging%20and%20tracing">Logging and tracing</a>
+<li>tracing file format: <a href="#Tracing%20file%20format">Tracing file format</a>
 <li>tree structure: <a href="#Example%202">Example 2</a>
 <li>TurboPower: <a href="#Related%20software">Related software</a>
 <li>tutorial: <a href="#Tutorial">Tutorial</a>
@@ -11760,9 +11826,10 @@ most debuggers show the next statement to be executed rather than the current
 one.</p>
 
 <li><a name="fn-43"></a>
-<p>The file <code>extra/magic</code> contains a UNIX
-<em>magic</em> file excerpt for automatically identifying an mpatrol log file and
-an mpatrol profiling output file with the <code>file</code> command.</p>
+<p>The file <code>extra/magic</code> contains
+a UNIX <em>magic</em> file excerpt for automatically identifying an mpatrol log
+file, an mpatrol profiling output file and an mpatrol tracing output file with
+the <code>file</code> command.</p>
 
 <li><a name="fn-44"></a>
 <p>There is currently a library called StackTrace written by

@@ -73,7 +73,7 @@ December, 2000.
 * Options::                     Command line options.
 * Diagnostic messages::         Warnings and errors.
 * Library performance::         Comparitive timings.
-* Profiling file format::       Profiling output file layout.
+* File formats::                Output file layouts.
 * Supported systems::           Known platforms that mpatrol runs on.
 * Notes::                       Known bugs and future enhancements.
 * Frequently asked questions::  For answering specific problems.
@@ -7401,7 +7401,7 @@ error occurred.
           continues.
 
 
-File: mpatrol.info,  Node: Library performance,  Next: Profiling file format,  Prev: Diagnostic messages,  Up: Top
+File: mpatrol.info,  Node: Library performance,  Next: File formats,  Prev: Diagnostic messages,  Up: Top
 
 Library performance
 *******************
@@ -7457,14 +7457,33 @@ Solaris mapmalloc(3x) library               0.033
 Solaris watchmalloc(3x) library             40.845
 
 
-File: mpatrol.info,  Node: Profiling file format,  Next: Supported systems,  Prev: Library performance,  Up: Top
+File: mpatrol.info,  Node: File formats,  Next: Supported systems,  Prev: Library performance,  Up: Top
+
+File formats
+************
+
+   The formats of the profiling and tracing output files that are
+produced by the mpatrol library are described here(1).
+
+* Menu:
+
+* Profiling file format::       Profiling output file layout.
+* Tracing file format::         Tracing output file layout.
+
+   ---------- Footnotes ----------
+
+   (1) The file `extra/magic' contains a UNIX _magic_ file excerpt for
+automatically identifying an mpatrol log file, an mpatrol profiling
+output file and an mpatrol tracing output file with the `file' command.
+
+
+File: mpatrol.info,  Node: Profiling file format,  Next: Tracing file format,  Up: File formats
 
 Profiling file format
-*********************
+=====================
 
-   The format of the profiling output files that are produced by the
-mpatrol library is described here(1).  Every profiling output file
-contains the following components.
+   Every mpatrol profiling output file contains the following
+components.
 
    * 4 bytes containing the characters `M', `P', `T' and `L'.
 
@@ -7537,14 +7556,52 @@ contains the following components.
 
    * 4 bytes containing the characters `M', `P', `T' and `L'.
 
-   ---------- Footnotes ----------
+
+File: mpatrol.info,  Node: Tracing file format,  Prev: Profiling file format,  Up: File formats
 
-   (1) The file `extra/magic' contains a UNIX _magic_ file excerpt for
-automatically identifying an mpatrol log file and an mpatrol profiling
-output file with the `file' command.
+Tracing file format
+===================
+
+   Every mpatrol tracing output file contains the following components.
+
+   * 4 bytes containing the characters `M', `T', `R' and `C'.
+
+   * 1 unsigned integer representing the value `1'.  This is used by
+     `mptrace' to determine the endianness of the processor that
+     produced the tracing output file so that it can decide whether to
+     perform byte-swapping on the input data.
+
+   * 1 unsigned integer containing the version number of the mpatrol
+     library which produced the tracing output file.
+
+   * One or more of the following event records.
+
+        * If the event is a system heap allocation for use by the
+          mpatrol library's internal data structures then the event
+          record will begin with the character `I' followed by the
+          start address and size in bytes of the heap allocation
+          encoded as unsigned LEB128 numbers.
+
+        * If the event is a system heap allocation for use by the
+          program's memory allocations then the event record will begin
+          with the character `H' followed by the start address and size
+          in bytes of the heap allocation encoded as unsigned LEB128
+          numbers.
+
+        * If the event is a memory allocation then the event record
+          will begin with the character `A' followed by the allocation
+          index, start address and size in bytes of the memory
+          allocation encoded as unsigned LEB128 numbers.
+
+        * If the event is a memory deallocation then the event record
+          will begin with the character `F' followed by the allocation
+          index of the memory allocation encoded as an unsigned LEB128
+          number.
+
+   * 4 bytes containing the characters `M', `T', `R' and `C'.
 
 
-File: mpatrol.info,  Node: Supported systems,  Next: Notes,  Prev: Profiling file format,  Up: Top
+File: mpatrol.info,  Node: Supported systems,  Next: Notes,  Prev: File formats,  Up: Top
 
 Supported systems
 *****************
@@ -11609,6 +11666,7 @@ Index
 * FDA (Free Debug Allocator):            Related software.
 * features:                              Features.
 * fence posts:                           Overwrites and underwrites.
+* file formats:                          File formats.
 * file scope variables:                  Static memory allocations.
 * files questions:                       Files.
 * files, mapping:                        Virtual memory.
@@ -11745,7 +11803,7 @@ Index
 * LSM:                                   Installation.
 * LynxOS, Intel 80x86:                   Supported systems.
 * LynxOS, PowerPC:                       Supported systems.
-* magic:                                 Profiling file format.
+* magic:                                 File formats.
 * make:                                  Installation.
 * Makefile:                              Installation.
 * Malloc Debug:                          Related software.
@@ -12038,6 +12096,7 @@ Index
 * TRACEDIR:                              Environment.
 * TRACEFILE:                             Environment.
 * tracing:                               Logging and tracing.
+* tracing file format:                   Tracing file format.
 * tree structure:                        Example 2.
 * TurboPower:                            Related software.
 * tutorial:                              Tutorial.
@@ -12089,116 +12148,118 @@ Index
 
 Tag Table:
 Node: Top1257
-Node: Foreword3479
-Node: Overview7963
-Node: Features10940
-Node: Installation27940
-Node: Integration33629
-Ref: Integration-Footnote-138792
-Node: Memory allocations38913
-Node: Static memory allocations39590
-Ref: Static memory allocations-Footnote-142051
-Node: Stack memory allocations42093
-Ref: Stack memory allocations-Footnote-143957
-Node: Dynamic memory allocations43996
-Ref: Dynamic memory allocations-Footnote-147418
-Ref: Dynamic memory allocations-Footnote-247537
-Node: Operating system support47641
-Node: Virtual memory49601
-Ref: Virtual memory-Footnote-155629
-Ref: Virtual memory-Footnote-255885
-Ref: Virtual memory-Footnote-356061
-Ref: Virtual memory-Footnote-456096
-Ref: Virtual memory-Footnote-556155
-Node: Call stacks and symbol tables56379
-Ref: Call stacks and symbol tables-Footnote-162057
-Ref: Call stacks and symbol tables-Footnote-262125
-Ref: Call stacks and symbol tables-Footnote-362176
-Ref: Call stacks and symbol tables-Footnote-462220
-Ref: Call stacks and symbol tables-Footnote-562262
-Ref: Call stacks and symbol tables-Footnote-662304
-Ref: Call stacks and symbol tables-Footnote-762352
-Node: Threads62458
-Ref: Threads-Footnote-168464
-Node: Using mpatrol68559
-Node: Library behaviour69425
-Ref: Library behaviour-Footnote-174821
-Node: Logging and tracing74879
-Node: General errors79745
-Ref: General errors-Footnote-183883
-Ref: General errors-Footnote-284039
-Node: Overwrites and underwrites84207
-Ref: Overwrites and underwrites-Footnote-191726
-Ref: Overwrites and underwrites-Footnote-291789
-Node: Using with a debugger91913
-Ref: Using with a debugger-Footnote-1100967
-Ref: Using with a debugger-Footnote-2101035
-Ref: Using with a debugger-Footnote-3101291
-Node: Testing101380
-Ref: Testing-Footnote-1104117
-Ref: Testing-Footnote-2104298
-Node: Library functions104357
-Node: Utilities111238
-Node: The mpatrol command112071
-Node: The mleak command118569
-Node: The mpsym command120533
-Node: The mpedit command123011
-Node: Profiling126376
-Ref: Profiling-Footnote-1154282
-Ref: Profiling-Footnote-2154506
-Node: Improving performance154610
-Ref: Improving performance-Footnote-1163512
-Ref: Improving performance-Footnote-2163554
-Ref: Improving performance-Footnote-3163631
-Ref: Improving performance-Footnote-4163703
-Node: How it works163747
-Node: Examples170940
-Node: Example 1174600
-Ref: Example 1-Footnote-1198716
-Node: Example 2198906
-Node: Example 3204306
-Node: Example 4211163
-Node: Example 5214668
-Ref: Example 5-Footnote-1218468
-Node: Example 6218597
-Node: Example 7220455
-Node: Example 8230691
-Node: Tutorial246562
-Ref: Tutorial-Footnote-1261093
-Ref: Tutorial-Footnote-2261384
-Ref: Tutorial-Footnote-3261533
-Ref: Tutorial-Footnote-4261670
-Ref: Tutorial-Footnote-5261769
-Node: Functions262050
-Node: Environment292486
-Node: Options313040
-Node: Diagnostic messages324429
-Node: Library performance340371
-Node: Profiling file format342873
-Ref: Profiling file format-Footnote-1346285
-Node: Supported systems346465
-Node: New system support360733
-Node: New processor support361929
-Node: New file format support362612
-Node: Notes363002
-Node: Generic notes364613
-Ref: Generic notes-Footnote-1382102
-Ref: Generic notes-Footnote-2382320
-Node: UNIX notes382542
-Node: Amiga notes387054
-Node: Windows notes390718
-Node: Netware notes392138
-Node: Frequently asked questions394698
-Node: Documentation395321
-Node: Building399114
-Node: Linking406139
-Node: Running410411
-Node: Files424561
-Node: Related software427557
-Ref: Related software-Footnote-1462880
-Node: References463121
-Node: Copying465714
-Node: Function index493603
-Node: Index495861
+Node: Foreword3470
+Node: Overview7954
+Node: Features10931
+Node: Installation27931
+Node: Integration33620
+Ref: Integration-Footnote-138783
+Node: Memory allocations38904
+Node: Static memory allocations39581
+Ref: Static memory allocations-Footnote-142042
+Node: Stack memory allocations42084
+Ref: Stack memory allocations-Footnote-143948
+Node: Dynamic memory allocations43987
+Ref: Dynamic memory allocations-Footnote-147409
+Ref: Dynamic memory allocations-Footnote-247528
+Node: Operating system support47632
+Node: Virtual memory49592
+Ref: Virtual memory-Footnote-155620
+Ref: Virtual memory-Footnote-255876
+Ref: Virtual memory-Footnote-356052
+Ref: Virtual memory-Footnote-456087
+Ref: Virtual memory-Footnote-556146
+Node: Call stacks and symbol tables56370
+Ref: Call stacks and symbol tables-Footnote-162048
+Ref: Call stacks and symbol tables-Footnote-262116
+Ref: Call stacks and symbol tables-Footnote-362167
+Ref: Call stacks and symbol tables-Footnote-462211
+Ref: Call stacks and symbol tables-Footnote-562253
+Ref: Call stacks and symbol tables-Footnote-662295
+Ref: Call stacks and symbol tables-Footnote-762343
+Node: Threads62449
+Ref: Threads-Footnote-168455
+Node: Using mpatrol68550
+Node: Library behaviour69416
+Ref: Library behaviour-Footnote-174812
+Node: Logging and tracing74870
+Node: General errors79736
+Ref: General errors-Footnote-183874
+Ref: General errors-Footnote-284030
+Node: Overwrites and underwrites84198
+Ref: Overwrites and underwrites-Footnote-191717
+Ref: Overwrites and underwrites-Footnote-291780
+Node: Using with a debugger91904
+Ref: Using with a debugger-Footnote-1100958
+Ref: Using with a debugger-Footnote-2101026
+Ref: Using with a debugger-Footnote-3101282
+Node: Testing101371
+Ref: Testing-Footnote-1104108
+Ref: Testing-Footnote-2104289
+Node: Library functions104348
+Node: Utilities111229
+Node: The mpatrol command112062
+Node: The mleak command118560
+Node: The mpsym command120524
+Node: The mpedit command123002
+Node: Profiling126367
+Ref: Profiling-Footnote-1154273
+Ref: Profiling-Footnote-2154497
+Node: Improving performance154601
+Ref: Improving performance-Footnote-1163503
+Ref: Improving performance-Footnote-2163545
+Ref: Improving performance-Footnote-3163622
+Ref: Improving performance-Footnote-4163694
+Node: How it works163738
+Node: Examples170931
+Node: Example 1174591
+Ref: Example 1-Footnote-1198707
+Node: Example 2198897
+Node: Example 3204297
+Node: Example 4211154
+Node: Example 5214659
+Ref: Example 5-Footnote-1218459
+Node: Example 6218588
+Node: Example 7220446
+Node: Example 8230682
+Node: Tutorial246553
+Ref: Tutorial-Footnote-1261084
+Ref: Tutorial-Footnote-2261375
+Ref: Tutorial-Footnote-3261524
+Ref: Tutorial-Footnote-4261661
+Ref: Tutorial-Footnote-5261760
+Node: Functions262041
+Node: Environment292477
+Node: Options313031
+Node: Diagnostic messages324420
+Node: Library performance340362
+Node: File formats342855
+Ref: File formats-Footnote-1343279
+Node: Profiling file format343491
+Node: Tracing file format346753
+Node: Supported systems348620
+Node: New system support362879
+Node: New processor support364075
+Node: New file format support364758
+Node: Notes365148
+Node: Generic notes366759
+Ref: Generic notes-Footnote-1384248
+Ref: Generic notes-Footnote-2384466
+Node: UNIX notes384688
+Node: Amiga notes389200
+Node: Windows notes392864
+Node: Netware notes394284
+Node: Frequently asked questions396844
+Node: Documentation397467
+Node: Building401260
+Node: Linking408285
+Node: Running412557
+Node: Files426707
+Node: Related software429703
+Ref: Related software-Footnote-1465026
+Node: References465267
+Node: Copying467860
+Node: Function index495749
+Node: Index498007
 
 End Tag Table
