@@ -232,6 +232,9 @@ __mp_allocinfo;
 
 #ifndef NDEBUG
 
+#ifdef alloca
+#undef alloca
+#endif /* alloca */
 #ifdef malloc
 #undef malloc
 #endif /* malloc */
@@ -317,6 +320,8 @@ __mp_allocinfo;
 #endif /* MP_NOCPLUSPLUS */
 
 
+#define alloca(l) __mp_alloc((l), 0, MP_AT_ALLOCA, MP_FUNCNAME, __FILE__, \
+                             __LINE__, 0)
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
                              __LINE__, 0)
 #define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, MP_FUNCNAME, \
