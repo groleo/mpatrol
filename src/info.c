@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.40 2000-11-09 18:53:49 graeme Exp $"
+#ident "$Id: info.c,v 1.41 2000-11-11 15:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -243,7 +243,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             __mp_logalloc(h, l, a, f, s, t, u, v);
             o = 1;
         }
-        __mp_warn(f, "attempt to create an allocation of size 0\n");
+        __mp_warn(ET_ALLZER, f, "attempt to create an allocation of size 0\n");
     }
     if (f == AT_MEMALIGN)
     {
@@ -257,7 +257,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(f, "alignment 0 is invalid\n");
+                __mp_warn(ET_ZERALN, f, "alignment 0 is invalid\n");
             }
             a = h->alloc.heap.memory.page;
         }
@@ -267,7 +267,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(f, "alignment %lu is not a power of two\n", a);
+                __mp_warn(ET_BADALN, f, "alignment %lu is not a power of two\n",
+                          a);
             }
             a = __mp_poweroftwo(a);
         }
@@ -277,8 +278,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             {
                 if ((o == 0) && (h->recur == 1))
                     __mp_logalloc(h, l, a, f, s, t, u, v);
-                __mp_warn(f, "alignment %lu is greater than the system page "
-                          "size\n", a);
+                __mp_warn(ET_MAXALN, f, "alignment %lu is greater than the "
+                          "system page size\n", a);
             }
             a = h->alloc.heap.memory.page;
         }
@@ -401,7 +402,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         {
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-            __mp_warn(f, "attempt to resize a NULL pointer\n");
+            __mp_warn(ET_RSZNUL, f, "attempt to resize a NULL pointer\n");
         }
         p = __mp_getmemory(h, l, a, f, s, t, u, v);
     }
@@ -413,7 +414,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " was freed with %s", p,
+        __mp_error(ET_PRVFRD, f, MP_POINTER " was freed with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -426,7 +427,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " has not been allocated\n", p);
+        __mp_error(ET_NOTALL, f, MP_POINTER " has not been allocated\n", p);
         p = NULL;
     }
     else if (p != n->block)
@@ -436,8 +437,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " does not match allocation of " MP_POINTER, p,
-                   n->block);
+        __mp_error(ET_MISMAT, f, MP_POINTER " does not match allocation of "
+                   MP_POINTER, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         p = NULL;
@@ -451,7 +452,7 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " was allocated with %s", p,
+        __mp_error(ET_INCOMP, f, MP_POINTER " was allocated with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -463,7 +464,8 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         {
             if ((o == 0) && (h->recur == 1))
                 __mp_logrealloc(h, p, l, a, f, s, t, u, v);
-            __mp_warn(f, "attempt to resize an allocation to size 0\n");
+            __mp_warn(ET_RSZZER, f, "attempt to resize an allocation to "
+                      "size 0\n");
         }
         __mp_freememory(h, p, f, s, t, u, v);
         p = NULL;
@@ -613,7 +615,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
                 __mp_logfree(h, p, f, s, t, u, v);
                 o = 1;
             }
-            __mp_warn(f, "attempt to free a NULL pointer\n");
+            __mp_warn(ET_FRENUL, f, "attempt to free a NULL pointer\n");
         }
         return;
     }
@@ -625,7 +627,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         m = (infonode *) n->info;
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " was freed with %s", p,
+        __mp_error(ET_PRVFRD, f, MP_POINTER " was freed with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -637,7 +639,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " has not been allocated\n", p);
+        __mp_error(ET_NOTALL, f, MP_POINTER " has not been allocated\n", p);
     }
     else if (p != n->block)
     {
@@ -646,8 +648,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " does not match allocation of " MP_POINTER, p,
-                   n->block);
+        __mp_error(ET_MISMAT, f, MP_POINTER " does not match allocation of "
+                   MP_POINTER, p, n->block);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
@@ -667,7 +669,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logfree(h, p, f, s, t, u, v);
-        __mp_error(f, MP_POINTER " was allocated with %s", p,
+        __mp_error(ET_INCOMP, f, MP_POINTER " was allocated with %s", p,
                    __mp_functionnames[m->data.type]);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
@@ -796,9 +798,9 @@ MP_GLOBAL void *__mp_copymemory(infohead *h, void *p, void *q, size_t l,
             __mp_logmemcopy(h, p, q, l, c, f, s, t, u, v);
             o = 1;
         }
-        __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overlaps ["
-                  MP_POINTER "," MP_POINTER "]\n", p, (char *) p + l - 1, q,
-                  (char *) q + l - 1);
+        __mp_warn(ET_RNGOVL, f, "range [" MP_POINTER "," MP_POINTER "] "
+                  "overlaps [" MP_POINTER "," MP_POINTER "]\n", p,
+                  (char *) p + l - 1, q, (char *) q + l - 1);
     }
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to copy the memory.
@@ -936,7 +938,8 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(AT_MAX, "free memory corruption at " MP_POINTER, p);
+                __mp_error(ET_FRECOR, AT_MAX, "free memory corruption at "
+                           MP_POINTER, p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -956,8 +959,9 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
             {
                 __mp_printsummary(h);
                 __mp_diag("\n");
-                __mp_error(AT_MAX, "freed allocation " MP_POINTER " has memory "
-                           "corruption at " MP_POINTER, n->block, p);
+                __mp_error(ET_FRDCOR, AT_MAX, "freed allocation " MP_POINTER
+                           " has memory corruption at " MP_POINTER,
+                           n->block, p);
                 if ((l = (char *) n->block + n->size - (char *) p) > 256)
                     __mp_printmemory(p, 256);
                 else
@@ -991,13 +995,13 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
-                    __mp_error(AT_MAX, "freed allocation " MP_POINTER " has a "
-                               "corrupted overflow buffer at " MP_POINTER,
-                               n->block, p);
+                    __mp_error(ET_FRDOVF, AT_MAX, "freed allocation "
+                               MP_POINTER " has a corrupted overflow buffer at "
+                               MP_POINTER, n->block, p);
                 else
-                    __mp_error(AT_MAX, "allocation " MP_POINTER " has a "
-                               "corrupted overflow buffer at " MP_POINTER,
-                               n->block, p);
+                    __mp_error(ET_ALLOVF, AT_MAX, "allocation " MP_POINTER
+                               " has a corrupted overflow buffer at "
+                               MP_POINTER, n->block, p);
                 if (p < n->block)
                     __mp_printmemory(b, s);
                 else
@@ -1021,13 +1025,13 @@ MP_GLOBAL void __mp_checkinfo(infohead *h)
                 __mp_printsummary(h);
                 __mp_diag("\n");
                 if (m->data.flags & FLG_FREED)
-                    __mp_error(AT_MAX, "freed allocation " MP_POINTER " has a "
-                               "corrupted overflow buffer at " MP_POINTER,
-                               n->block, p);
+                    __mp_error(ET_FRDOVF, AT_MAX, "freed allocation "
+                               MP_POINTER " has a corrupted overflow buffer at "
+                               MP_POINTER, n->block, p);
                 else
-                    __mp_error(AT_MAX, "allocation " MP_POINTER " has a "
-                               "corrupted overflow buffer at " MP_POINTER,
-                               n->block, p);
+                    __mp_error(ET_ALLOVF, AT_MAX, "allocation " MP_POINTER
+                               " has a corrupted overflow buffer at "
+                               MP_POINTER, n->block, p);
                 if (p < n->block)
                     __mp_printmemory((char *) n->block - l, l);
                 else
@@ -1056,7 +1060,8 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
     if (p == NULL)
     {
         if ((s > 0) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, "attempt to perform operation on a NULL "
+                       "pointer\n");
         return 0;
     }
     e = 1;
@@ -1065,12 +1070,14 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
     if (n = __mp_findnode(&h->alloc, p, s))
         if ((m = (infonode *) n->info) == NULL)
         {
-            __mp_error(f, "attempt to perform operation on free memory\n");
+            __mp_error(ET_FREOPN, f, "attempt to perform operation on free "
+                       "memory\n");
             e = 0;
         }
         else if (m->data.flags & FLG_FREED)
         {
-            __mp_error(f, "attempt to perform operation on freed memory");
+            __mp_error(ET_FRDOPN, f, "attempt to perform operation on freed "
+                       "memory");
             __mp_printalloc(&h->syms, n);
             __mp_diag("\n");
             e = 0;
@@ -1093,11 +1100,11 @@ MP_GLOBAL int __mp_checkrange(infohead *h, void *p, size_t s, alloctype f)
             b = (char *) b - h->alloc.oflow;
             l += h->alloc.oflow << 1;
             if (h->flags & FLG_ALLOWOFLOW)
-                __mp_warn(f, "range [" MP_POINTER "," MP_POINTER
+                __mp_warn(ET_RNGOVF, f, "range [" MP_POINTER "," MP_POINTER
                           "] overflows [" MP_POINTER "," MP_POINTER "]", p,
                           (char *) p + s - 1, b, (char *) b + l - 1);
             else
-                __mp_error(f, "range [" MP_POINTER "," MP_POINTER
+                __mp_error(ET_RNGOVF, f, "range [" MP_POINTER "," MP_POINTER
                            "] overflows [" MP_POINTER "," MP_POINTER "]", p,
                            (char *) p + s - 1, b, (char *) b + l - 1);
             __mp_printalloc(&h->syms, n);
@@ -1131,7 +1138,8 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f,
     if (p == NULL)
     {
         if ((g == 0) || (u > p) || (h->flags & FLG_CHECKMEMORY))
-            __mp_error(f, "attempt to perform operation on a NULL pointer\n");
+            __mp_error(ET_NULOPN, f, "attempt to perform operation on a NULL "
+                       "pointer\n");
         return 0;
     }
     e = 0;
@@ -1171,12 +1179,14 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f,
     }
     else if ((m = (infonode *) n->info) == NULL)
     {
-        __mp_error(f, "attempt to perform operation on free memory\n");
+        __mp_error(ET_FREOPN, f, "attempt to perform operation on free "
+                   "memory\n");
         return 0;
     }
     else if (m->data.flags & FLG_FREED)
     {
-        __mp_error(f, "attempt to perform operation on freed memory");
+        __mp_error(ET_FRDOPN, f, "attempt to perform operation on freed "
+                   "memory");
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
         return 0;
@@ -1220,11 +1230,11 @@ MP_GLOBAL int __mp_checkstring(infohead *h, char *p, size_t *s, alloctype f,
         b = (char *) b - h->alloc.oflow;
         l += h->alloc.oflow << 1;
         if (e == 1)
-            __mp_error(f, "string " MP_POINTER " overflows [" MP_POINTER ","
-                       MP_POINTER "]", p, b, (char *) b + l - 1);
+            __mp_error(ET_STROVF, f, "string " MP_POINTER " overflows ["
+                       MP_POINTER "," MP_POINTER "]", p, b, (char *) b + l - 1);
         else
-            __mp_warn(f, "range [" MP_POINTER "," MP_POINTER "] overflows ["
-                      MP_POINTER "," MP_POINTER "]", p, u - 1, b,
+            __mp_warn(ET_RNGOVF, f, "range [" MP_POINTER "," MP_POINTER "] "
+                      "overflows [" MP_POINTER "," MP_POINTER "]", p, u - 1, b,
                       (char *) b + l - 1);
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");

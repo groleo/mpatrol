@@ -36,7 +36,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: profile.c,v 1.27 2000-11-05 23:10:58 graeme Exp $"
+#ident "$Id: profile.c,v 1.28 2000-11-11 15:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -356,7 +356,7 @@ MP_GLOBAL int __mp_writeprofile(profhead *p, int w)
         f = stdout;
     else if ((f = fopen(p->file, "wb")) == NULL)
     {
-        __mp_error(AT_MAX, "%s: cannot open file\n", p->file);
+        __mp_error(ET_MAX, AT_MAX, "%s: cannot open file\n", p->file);
         p->file = NULL;
         return 0;
     }

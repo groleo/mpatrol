@@ -43,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.37 2000-11-03 18:27:33 graeme Exp $"
+#ident "$Id: diag.c,v 1.38 2000-11-11 15:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -75,6 +75,37 @@ static char buffer[256];
  */
 
 static unsigned long errors, warnings;
+
+
+/* This array should always be kept in step with the errortype enumeration.
+ */
+
+static char *errornames[ET_MAX] =
+{
+    "ALLOVF",
+    "ALLZER",
+    "BADALN",
+    "FRDCOR",
+    "FRDOPN",
+    "FRDOVF",
+    "FRECOR",
+    "FRENUL",
+    "FREOPN",
+    "ILLMEM",
+    "INCOMP",
+    "MAXALN",
+    "MISMAT",
+    "NOTALL",
+    "NULOPN",
+    "OUTMEM",
+    "PRVFRD",
+    "RNGOVF",
+    "RNGOVL",
+    "RSZNUL",
+    "RSZZER",
+    "STROVF",
+    "ZERALN"
+};
 
 
 /* This array should always be kept in step with the alloctype enumeration.
@@ -212,7 +243,7 @@ MP_GLOBAL int __mp_openlogfile(char *s)
         /* Because logfile is NULL, the __mp_error() function will open the log
          * file as stderr, which should always work.
          */
-        __mp_error(AT_MAX, "%s: cannot open file\n", s);
+        __mp_error(ET_MAX, AT_MAX, "%s: cannot open file\n", s);
         return 0;
     }
     /* Attempt to set the stream buffer for the log file.  This is done here so
@@ -271,13 +302,15 @@ MP_GLOBAL void __mp_diag(char *s, ...)
 /* Sends a warning message to the log file.
  */
 
-MP_GLOBAL void __mp_warn(alloctype f, char *s, ...)
+MP_GLOBAL void __mp_warn(errortype e, alloctype f, char *s, ...)
 {
     va_list v;
 
     if (logfile == NULL)
         __mp_openlogfile(NULL);
     __mp_diag("WARNING: ");
+    if (e != ET_MAX)
+        __mp_diag("[%s]: ", errornames[e]);
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);
@@ -291,13 +324,15 @@ MP_GLOBAL void __mp_warn(alloctype f, char *s, ...)
 /* Sends an error message to the log file.
  */
 
-MP_GLOBAL void __mp_error(alloctype f, char *s, ...)
+MP_GLOBAL void __mp_error(errortype e, alloctype f, char *s, ...)
 {
     va_list v;
 
     if (logfile == NULL)
         __mp_openlogfile(NULL);
     __mp_diag("ERROR: ");
+    if (e != ET_MAX)
+        __mp_diag("[%s]: ", errornames[e]);
     if (f != AT_MAX)
         __mp_diag("%s: ", __mp_functionnames[f]);
     va_start(v, s);

@@ -45,7 +45,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: signals.c,v 1.15 2000-10-30 23:19:54 graeme Exp $"
+#ident "$Id: signals.c,v 1.16 2000-11-11 15:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -189,7 +189,8 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
 #endif /* ARCH */
 #endif /* SYSTEM */
 #endif /* MP_SIGINFO_SUPPORT */
-        __mp_error(AT_MAX, "illegal memory access at address " MP_POINTER, a);
+        __mp_error(ET_ILLMEM, AT_MAX, "illegal memory access at address "
+                   MP_POINTER, a);
         if (t = __mp_findnode(&h->alloc, a, 1))
             if (t->info != NULL)
                 __mp_printalloc(&h->syms, t);
@@ -204,7 +205,7 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
     }
     else
 #endif /* MP_SIGINFO_SUPPORT && SYSTEM */
-        __mp_error(AT_MAX, "illegal memory access");
+        __mp_error(ET_ILLMEM, AT_MAX, "illegal memory access");
     /* Obtain the call stack so that we can tell where the illegal memory
      * access came from.  This relies on the assumption that the stack area
      * for the signal handler is the same as the stack area for the main
@@ -223,9 +224,11 @@ static long __stdcall signalhandler(EXCEPTION_POINTERS *e)
      */
     a = (void *) r->ExceptionInformation[1];
     if (r->ExceptionInformation[0])
-        __mp_error(AT_MAX, "illegal memory write at address " MP_POINTER, a);
+        __mp_error(ET_ILLMEM, AT_MAX, "illegal memory write at address "
+                   MP_POINTER, a);
     else
-        __mp_error(AT_MAX, "illegal memory read at address " MP_POINTER, a);
+        __mp_error(ET_ILLMEM, AT_MAX, "illegal memory read at address "
+                   MP_POINTER, a);
     if (t = __mp_findnode(&h->alloc, a, 1))
         if (t->info != NULL)
             __mp_printalloc(&h->syms, t);

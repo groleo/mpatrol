@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.46 2000-11-09 18:54:11 graeme Exp $"
+#ident "$Id: inter.c,v 1.47 2000-11-11 15:51:05 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -464,7 +464,7 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
              */
             __mp_printsummary(&memhead);
             __mp_diag("\n");
-            __mp_error(f, "out of memory");
+            __mp_error(ET_OUTMEM, f, "out of memory");
             memhead.fini = 1;
             __mp_abort();
         }
