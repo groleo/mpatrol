@@ -1,58 +1,6 @@
 NOTES FOR THE MPATROL LIBRARY
 
 
-This document contains guidelines on how to add support for new operating
-systems, processor architectures and object file formats to the library source
-code, as well as containing a list of performance figures.
-
-
-Adding support for a new operating system
-
-  * Add a new TARGET and/or SYSTEM definition in target.h.  The TARGET macro is
-    for fundamentally different operating systems, whereas the SYSTEM macro is
-    for differentiating variations of a particular operating system.
-
-  * Make any necessary modifications to config.h.
-
-  * Add any support for memory allocation in memory.c.
-
-  * Add any support for stack traversal in stack.c.
-
-  * Add any support for signals in signals.c.
-
-  * Add any support for threads in mutex.c.
-
-  * Add a new version and date format (or use an existing one) in version.c.
-
-  * Decide if the malloc() replacements should be used from mpatrol.c.
-
-  * Add a new subdirectory in the build directory that contains a Makefile
-    and any other files that are required to build the library on the new
-    operating system.
-
-
-Adding support for a new processor architecture
-
-  * Add a new ARCH definition in target.h.
-
-  * Make any necessary modifications to config.h.
-
-  * Add any support for memory allocation in memory.c.
-
-  * Add any support for stack traversal in stack.c.
-
-
-Adding support for a new object file format
-
-  * Add a new FORMAT definition in target.h.
-
-  * Make any necessary modifications to config.h.
-
-  * Add any support for stack traversal in stack.c.
-
-  * Add any support for symbol reading in symbol.c.
-
-
 Library performance
 
     The following times were obtained on a Sun Ultra 5 with an UltraSPARC IIi
