@@ -24,7 +24,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.16 2000-04-30 17:59:00 graeme Exp $
+# $Id: build,v 1.17 2000-05-04 20:17:59 graeme Exp $
 
 
 version=1.2.0
@@ -35,7 +35,7 @@ libversion=1.2
 
 cd ../../build/unix
 make clobber
-make libmpatrol.a libmpatrol.so.$libversion mpatrol mprof mleak
+make libmpatrol.a libmpatrol.so.$libversion llib-lmpatrol.ln mpatrol mprof mleak
 cd ../../pkg/pkg
 
 
@@ -72,6 +72,7 @@ cp ../../doc/mpatrol.info info
 mkdir -p lib
 cp ../../build/unix/libmpatrol.a lib
 cp ../../build/unix/libmpatrol.so.$libversion lib
+cp ../../build/unix/llib-lmpatrol.ln lib
 mkdir -p man/man1
 cp ../../man/man1/mpatrol.1 man/man1
 cp ../../man/man1/mprof.1 man/man1

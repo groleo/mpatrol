@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.9 2000-04-30 17:59:00 graeme Exp $
+# $Id: prototype,v 1.10 2000-05-04 20:18:00 graeme Exp $
 
 
 d none bin 0775 bin bin
@@ -55,6 +55,7 @@ d none lib 0775 bin bin
 f none lib/libmpatrol.a 0664 bin bin
 f none lib/libmpatrol.so.1.2 0664 bin bin
 s none lib/libmpatrol.so=libmpatrol.so.1.2
+f none lib/llib-lmpatrol.ln 0664 bin bin
 d none man 0775 bin bin
 d none man/man1 0775 bin bin
 f none man/man1/mpatrol.1 0664 bin bin
