@@ -1,6 +1,6 @@
 ; mpatrol
 ; A library for controlling and tracing dynamic memory allocations.
-; Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
+; Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 ;
 ; This library is free software; you can redistribute it and/or
 ; modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
 LIBRARY MPATROL
 
-VERSION 1.0
+VERSION 1.1
 
 DESCRIPTION "controls and traces dynamic memory allocations"
 
