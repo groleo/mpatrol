@@ -66,9 +66,10 @@ given in the following table.
 
 The <I>dictfile</I> argument must be a valid dictionary filename but if
 <I>dictfile</I> is omitted then <B>hexwords</B> will use <I>/usr/dict/words</I> as
-the name of the dictionary file to use.  The dictionary file must be a plain
-text file that contains one word per line, otherwise few to no words will be
-matched.
+the name of the dictionary file to use.  If that cannot be found then
+<B>hexwords will try </B><I>/usr/lib/dict/words</I> and
+<I>/usr/share/dict/words</I>.  The dictionary file must be a plain text file
+that contains one word per line, otherwise few to no words will be matched.
 <P>
 
 The <B>hexwords</B> command currently makes use of several UNIX text processing
@@ -150,6 +151,6 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 This document was created by
 <A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 22:08:09 GMT, February 08, 2001
+Time: 23:58:12 GMT, February 08, 2001
 </BODY>
 </HTML>

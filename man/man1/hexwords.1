@@ -21,7 +21,7 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: hexwords.1,v 1.2 2001-02-08 20:51:25 graeme Exp $
+.\" $Id: hexwords.1,v 1.3 2001-02-08 23:58:47 graeme Exp $
 .\"
 .TH HEXWORDS 1 "8 February 2001" "Release 1.4" "mpatrol library"
 .SH NAME
@@ -76,9 +76,10 @@ a-f	a-f
 .PP
 The \fIdictfile\fP argument must be a valid dictionary filename but if
 \fIdictfile\fP is omitted then \fBhexwords\fP will use \fI/usr/dict/words\fP as
-the name of the dictionary file to use.  The dictionary file must be a plain
-text file that contains one word per line, otherwise few to no words will be
-matched.
+the name of the dictionary file to use.  If that cannot be found then
+\fBhexwords\fB will try \fI/usr/lib/dict/words\fP and
+\fI/usr/share/dict/words\fP.  The dictionary file must be a plain text file
+that contains one word per line, otherwise few to no words will be matched.
 .PP
 The \fBhexwords\fP command currently makes use of several UNIX text processing
 commands in order to extract the words and their hexadecimal equivalents.  As a
