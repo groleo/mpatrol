@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.6 2000-04-03 18:10:54 graeme Exp $
+# $Id: Makefile,v 1.7 2000-04-05 18:01:10 graeme Exp $
 
 
 # Definitions
@@ -103,8 +103,8 @@ $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-memleak: memleak.o tree.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o tree.o
+memleak: memleak.o getopt.o tree.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 	memleak
@@ -112,7 +112,7 @@ all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f memleak.o 2>&1 >/dev/null
+	-@ rm -f memleak.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -237,5 +237,7 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/malloc.c $(SOURCE)/version.c
-memleak.o: $(SOURCE)/memleak.c $(SOURCE)/tree.h $(SOURCE)/config.h \
+memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

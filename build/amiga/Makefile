@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.5 2000-04-03 18:13:25 graeme Exp $
+# $Id: Makefile,v 1.6 2000-04-05 18:01:06 graeme Exp $
 
 
 # Definitions
@@ -74,14 +74,14 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-memleak: memleak.o tree.o
-	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o tree.o
+memleak: memleak.o getopt.o tree.o
+	$(CC) $(CFLAGS) $(OFLAGS) -o $@ memleak.o getopt.o tree.o
 
 all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) memleak
 
 clean:
 	-@ Delete $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) FORCE >NIL:
-	-@ Delete memleak.o FORCE >NIL:
+	-@ Delete memleak.o getopt.o FORCE >NIL:
 
 clobber: clean
 	-@ Delete $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) FORCE >NIL:
@@ -198,5 +198,7 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
-memleak.o: $(SOURCE)/memleak.c $(SOURCE)/tree.h $(SOURCE)/config.h \
+memleak.o: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+getopt.o: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.8 2000-04-03 18:11:44 graeme Exp $
+# $Id: Makefile,v 1.9 2000-04-05 18:01:11 graeme Exp $
 
 
 # Definitions
@@ -96,8 +96,8 @@ $(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(LIBRARY).def
 $(OBJTS_LIBRARY): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
-memleak.exe: memleak.obj tree.obj
-	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj tree.obj
+memleak.exe: memleak.obj getopt.obj tree.obj
+	$(CC) $(CFLAGS) $(OFLAGS) memleak.obj getopt.obj tree.obj
 
 all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 	memleak.exe
@@ -105,7 +105,7 @@ all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_OBJECTS) $(SHARTS_OBJECTS) 2>&1 >/dev/null
-	-@ rm -f memleak.obj 2>&1 >/dev/null
+	-@ rm -f memleak.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
 	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
@@ -234,5 +234,7 @@ $(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/inter.h $(SOURCE)/mutex.c $(SOURCE)/diag.c \
 	$(SOURCE)/version.h $(SOURCE)/option.c $(SOURCE)/option.h \
 	$(SOURCE)/inter.c $(SOURCE)/version.c
-memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/tree.h $(SOURCE)/config.h \
+memleak.obj: $(SOURCE)/memleak.c $(SOURCE)/getopt.h $(SOURCE)/tree.h \
+	$(SOURCE)/config.h $(SOURCE)/target.h
+getopt.obj: $(SOURCE)/getopt.c $(SOURCE)/getopt.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h
