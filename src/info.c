@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.96 2001-12-06 00:48:56 graeme Exp $"
+#ident "$Id: info.c,v 1.97 2001-12-06 01:16:50 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.96 2001-12-06 00:48:56 graeme Exp $";
+static MP_CONST MP_VOLATILE char *info_id = "$Id: info.c,v 1.97 2001-12-06 01:16:50 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -946,8 +946,12 @@ MP_GLOBAL
 void
 __mp_setmemory(infohead *h, void *p, size_t l, unsigned char c, loginfo *v)
 {
+    v->ltype = LT_SET;
+    v->variant.logmemset.block = p;
+    v->variant.logmemset.size = l;
+    v->variant.logmemset.byte = c;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemset(h, p, l, c, v);
+        __mp_logmemset(h, v);
     /* If the pointer is not NULL and does not overflow any memory blocks then
      * proceed to set the memory.
      */
@@ -969,8 +973,13 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
 {
     void *r;
 
+    v->ltype = LT_COPY;
+    v->variant.logmemcopy.srcblock = p;
+    v->variant.logmemcopy.dstblock = q;
+    v->variant.logmemcopy.size = l;
+    v->variant.logmemcopy.byte = c;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcopy(h, p, q, l, c, v);
+        __mp_logmemcopy(h, v);
     /* We must ensure that the memory to be copied does not overlap when
      * memcpy() or memccpy() are called.  This does not matter when calling
      * __mp_memcopy() but it will matter when calling the normal system
@@ -981,7 +990,7 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
          ((q < p) && ((char *) q + l > (char *) p))))
     {
         if (h->recur == 1)
-            __mp_logmemcopy(h, p, q, l, c, v);
+            __mp_logmemcopy(h, v);
         __mp_warn(ET_RNGOVL, v->type, v->file, v->line, NULL, p,
                   (char *) p + l - 1, q, (char *) q + l - 1);
         __mp_diag("\n");
@@ -1021,8 +1030,13 @@ __mp_locatememory(infohead *h, void *p, size_t l, void *q, size_t m, loginfo *v)
     void *r;
 
     r = NULL;
+    v->ltype = LT_LOCATE;
+    v->variant.logmemlocate.block = p;
+    v->variant.logmemlocate.size = l;
+    v->variant.logmemlocate.patblock = q;
+    v->variant.logmemlocate.patsize = m;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemlocate(h, p, l, q, m, v);
+        __mp_logmemlocate(h, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to start the search.
      */
@@ -1048,8 +1062,12 @@ __mp_comparememory(infohead *h, void *p, void *q, size_t l, loginfo *v)
     int c;
 
     c = 0;
+    v->ltype = LT_COMPARE;
+    v->variant.logmemcompare.block1 = p;
+    v->variant.logmemcompare.block2 = q;
+    v->variant.logmemcompare.size = l;
     if ((h->flags & FLG_LOGMEMORY) && (h->recur == 1))
-        __mp_logmemcompare(h, p, q, l, v);
+        __mp_logmemcompare(h, v);
     /* If the pointers are not NULL and do not overflow any memory blocks then
      * proceed to compare the memory.
      */
