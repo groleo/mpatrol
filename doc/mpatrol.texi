@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.49 2000-04-03 23:48:56 graeme Exp $
+@c $Id: mpatrol.texi,v 1.50 2000-04-04 17:40:39 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -403,7 +403,8 @@ deallocation.
 
 @item
 A function is provided to return as much information as possible about a given
-memory allocation, and can be called at any time during program execution.
+memory allocation, and can be called at any time during program execution.  A
+similar function is also provided for calling from within a debugger.
 
 @item
 A function is provided to display library settings and heap usage statistics,
@@ -1795,6 +1796,46 @@ functions, the source line becomes line 16 because that was the location of the
 1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
 destination.
 
+Sometimes it is useful to be able to see information about a memory allocation
+whilst running a program from within a debugger.  The @code{__mp_printinfo()}
+function is provided for that purpose and takes a heap address as its only
+argument.  Using the above example, it would have been possible to print out
+information about the pointer @samp{p} at line 17 from within @command{gdb}:
+
+@smallexample
+(gdb) call __mp_printinfo(p)
+address 0x80033000 located in allocated block:
+    start of block:     0x80033000
+    size of block:      2 bytes
+    allocated by:       malloc
+    allocation index:   1000
+    reallocation index: 0
+    calling function:   main
+    called from file:   test.c
+    called at line:     16
+    function call stack:
+        0x80000D8E main
+        0x80000D24 _start
+@end smallexample
+
+Some debuggers, such as @command{gdb}, also allow you to define your own
+commands for use in a debugging session.  The following example defines a
+new @command{gdb} command called @samp{printalloc} which calls
+@code{__mp_printinfo()}:
+
+@smallexample
+(gdb) define printalloc
+Type commands for definition of "printalloc".
+End with a line saying just "end".
+>call __mp_printinfo($arg0)
+>end
+(gdb) document printalloc
+Type documentation for "printalloc".
+End with a line saying just "end".
+>Displays information about an address in the heap.
+>end
+@end smallexample
+
 @node Testing, Library functions, Using with a debugger, Using mpatrol
 @section Testing
 @cindex testing
@@ -1952,7 +1993,10 @@ nothing known about address 0x8000A068
 As you can see, anything that the mpatrol library knows about any memory
 allocation can be obtained for use in your own code, which can be very useful
 if you need to write handlers to keep track of memory allocations, etc. for
-debugging purposes.
+debugging purposes.  It can also be useful to have this information when running
+your program within a debugger, so you can use the @code{__mp_printinfo()}
+function to display information about a heap address if your debugger supports
+calling functions from the command prompt.
 
 It is also possible for you to be able to intercept calls to allocate,
 reallocate and deallocate memory for your own purposes.  You can install
@@ -3987,7 +4031,7 @@ information.
 @table @asis
 @findex malloc
 @item @code{void *malloc(size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to @var{size} bytes
 in length.  If @var{size} is @samp{0} then the memory allocated will be
@@ -3998,7 +4042,7 @@ or reallocated with @code{realloc()}.
 
 @findex calloc
 @item @code{void *calloc(size_t nelem, size_t size)}
-Allocates @var{nelem} elements of @var{size} zero-initialized bytes from the
+Allocates @var{nelem} elements of @var{size} zero-initialised bytes from the
 heap and returns a pointer to the first byte of the allocation.  The pointer
 returned will be suitably aligned for casting to any type and can be used to
 store data of up to @code{nelem * size} bytes in length.  If @code{nelem * size}
@@ -4010,7 +4054,7 @@ allocated memory must be deallocated with @code{free()} or reallocated with
 
 @findex memalign
 @item @code{void *memalign(size_t align, size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to
 @var{align} bytes and can be used to store data of up to @var{size} bytes in
 length.  If @var{align} is zero then the default system alignment will be used.
@@ -4025,7 +4069,7 @@ guarantee the preservation of alignment.
 
 @findex valloc
 @item @code{void *valloc(size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to the
 system page size and can be used to store data of up to @var{size} bytes in
 length.  If @var{size} is @samp{0} then the memory allocated will be implicitly
@@ -4037,7 +4081,7 @@ preservation of alignment.
 
 @findex pvalloc
 @item @code{void *pvalloc(size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be aligned to the
 system page size and can be used to store data of up to @var{size} bytes in
 length.  If @var{size} is @samp{0} then the memory allocated will be implicitly
@@ -4116,7 +4160,7 @@ aligned for casting to any type and can be used to store data of up to
 equivalent to @code{malloc()}.  If @var{size} is @samp{0} then the existing
 memory allocation will be freed and the @samp{NULL} pointer will be returned.
 If @var{size} is greater than the original allocation then the extra space will
-be filled with uninitialized bytes.  If there is not enough space in the heap
+be filled with uninitialised bytes.  If there is not enough space in the heap
 then the @samp{NULL} pointer will be returned and @code{errno} will be set to
 @code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} and
 can be reallocated again with @code{realloc()}.
@@ -4132,7 +4176,7 @@ aligned for casting to any type and can be used to store data of up to
 equivalent to @code{calloc()}.  If @var{size} is @samp{0} then the existing
 memory allocation will be freed and the @samp{NULL} pointer will be returned.
 If @var{size} is greater than the original allocation then the extra space will
-be filled with zero-initialized bytes.  If there is not enough space in the heap
+be filled with zero-initialised bytes.  If there is not enough space in the heap
 then the @samp{NULL} pointer will be returned and @code{errno} will be set to
 @code{ENOMEM}.  The allocated memory must be deallocated with @code{free()} and
 can be reallocated again with @code{realloc()}.  This function is available for
@@ -4147,7 +4191,7 @@ bytes and either returns @var{ptr} if there was enough space to resize it, or
 @var{ptr} is @samp{NULL} then the call will be equivalent to @code{malloc()}.
 If @var{size} is @samp{0} then the existing memory allocation will be freed and
 the @samp{NULL} pointer will be returned.  If @var{size} is greater than the
-original allocation then the extra space will be filled with uninitialized bytes
+original allocation then the extra space will be filled with uninitialised bytes
 and if @var{size} is less than the original allocation then the memory block
 will be truncated.  If there is not enough space in the heap then the
 @samp{NULL} pointer will be returned and @code{errno} will be set to
@@ -4182,7 +4226,7 @@ anyway, albeit with slightly less tracing information.
 @table @asis
 @findex operator new
 @item @code{void *operator new(size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to @var{size} bytes
 in length.  If @var{size} is @samp{0} then the memory allocated will be
@@ -4193,7 +4237,7 @@ deallocated with @code{operator delete}.
 
 @findex operator new[]
 @item @code{void *operator new[](size_t size)}
-Allocates @var{size} uninitialized bytes from the heap and returns a pointer to
+Allocates @var{size} uninitialised bytes from the heap and returns a pointer to
 the first byte of the allocation.  The pointer returned will be suitably aligned
 for casting to any type and can be used to store data of up to @var{size} bytes
 in length.  If @var{size} is @samp{0} then the memory allocated will be
@@ -4322,7 +4366,7 @@ allocation's boundaries then an error message will be generated in the log file
 and no bytes will be searched.
 @end table
 
-The following 7 functions are available as support routines for additional
+The following 8 functions are available as support routines for additional
 control and tracing in the mpatrol library.  To use these you should include the
 @file{mpatrol.h} header file.
 
@@ -4362,6 +4406,14 @@ will be returned and @var{info} will contain the following information:
 @item @code{freed}
 @tab Indicates if allocation has been freed.
 @end multitable
+
+@findex __mp_printinfo
+@item @code{int __mp_printinfo(const void *ptr)}
+Displays information about a specific memory allocation containing @var{ptr} to
+the standard error file stream.  If @var{ptr} does not belong to a previously
+allocated memory allocation then @samp{0} will be returned, otherwise @samp{1}
+will be returned.  This function is intended to be called from within a
+debugger.
 
 @findex __mp_memorymap
 @item @code{void __mp_memorymap(int stats)}
@@ -5454,7 +5506,7 @@ only traverse a number of stack frames at compile-time, not run-time so there is
 a maximum number of stack frames that can be traversed at any one time.  The
 implementation depends on both of these builtin functions returning @samp{NULL}
 when the top of stack is reached.  If this is not the case then this method
-cannot be used.
+cannot be used or should only be used with a small number of fixed stack frames.
 
 @item
 An option should be added to suppress stack traversal, and therefore symbol
@@ -5474,18 +5526,6 @@ assume that the current symbol terminates at the beginning of the next symbol in
 the virtual address space.
 
 @item
-Perhaps debugging information could be better utilised when the library is
-reading the symbol table from an executable file.  This could be used to add
-line number information to calls that were not made via @file{mpatrol.h}, but
-this would require cacheing any filenames since they may disappear due to the
-object file access library freeing them after use.
-
-@item
-Possibly add ability to interface with various debuggers, including
-@command{gdb}, which could be used to provide reliable stack traces and symbolic
-information as well as complete debugging information if available.
-
-@item
 Perhaps add a memory allocation profiling feature (something similar to mprof),
 which could be used to determine where most of the memory allocations occur, or
 if bottlenecks could be removed from the code.  This could take the form of the
@@ -5494,10 +5534,27 @@ program, and could take advantage of the stack tracebacks and symbol tables in
 the mpatrol library.
 
 @item
+Perhaps add a memory usage profiling feature which would dump out memory usage
+statistics to a file at set intervals during run-time so that a table of memory
+usage could be built up.  This could also be extended to having a graphical
+tool which could display this information.
+
+@item
+Add a CRC checksum to memory blocks and use it to check that freed memory
+allocations have not been corrupted when the @option{NOFREE} and
+@option{PRESERVE} options are in use on platforms which have no memory
+protection.  This could also be extended to marking allocated memory blocks
+and then displaying what blocks have changed after a certain period from within
+a debugger.
+
+@item
 Improve use of watch points by allowing an option which will only install write
 watch points instead of both read and write watch points.  Not only will this
 speed up the use of watch points, but will also cause less problems with reading
 from misaligned memory allocations.
+
+@item
+Perhaps add memory protection to the simulated @code{sbrk} heap.
 
 @item
 Add a @option{SHOWFREE} option to display a list of all free memory blocks at
@@ -5510,7 +5567,7 @@ that option is added then perhaps @option{SHOWALL} should only be equivalent to
 Add an option, similar to @option{NOFREE}, that would prevent a freed memory
 allocation from being used until a certain number of memory allocations later.
 This would be far less of a resource-hogger than the @option{NOFREE} option and
-might catch just as many errors.
+might catch just as many errors but might be extremely hard to implement.
 
 @item
 Add versions of @code{mallopt()}, @code{mallinfo()}, @code{memorymap()},
@@ -5524,7 +5581,15 @@ Perhaps add debugging/tracing versions of the string manipulation functions,
 such as @code{strlen()} and @code{strcmp()} in much the same way as was done for
 the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
-with.  Also need to add replacement version of @code{memccpy()}.
+with.  Also need to add replacement version of @code{memccpy()} and have better
+detection of internal and free blocks when displaying memory range errors.
+
+@item
+Perhaps add definitions of @code{xmalloc()}, @code{xrealloc()}, etc. which never
+return @samp{NULL} on failure, and perhaps also add definitions of
+@code{XtMalloc()}, @code{XtRealloc()}, etc. for X-Window programming.  Some
+other malloc libraries provide versions of these but perhaps they are not needed
+if they are implemented using @code{malloc()}, @code{realloc()}, etc.
 
 @item
 Add another library which can be linked in instead of mpatrol and replaces
@@ -5533,6 +5598,12 @@ all calls to @code{__mp_alloc()}, etc., with the original calls to
 removing all mpatrol functionality for perhaps even a release build, and might
 be useful for implementing functions such as @code{memalign()} which don't
 exist on many systems.
+
+@item
+Add an option to the @command{mpatrol} shell script to automatically invoke a
+C++ name demangler on the generated mpatrol log file.  The location and filename
+of the demangler tool could be determined from an environment variable so as to
+cater for a wide variety of C++ compilers.
 
 @item
 Script files similar to the @command{mpatrol} shell script provided for UNIX
@@ -5577,7 +5648,8 @@ additional signals being caught so this may need to be improved.
 @item
 Need to add a portable way of initialising the thread-safe version of the
 library when it is compiled by a C compiler.  There is already a solution to
-this problem when it is compiled by a C++ compiler.
+this problem when it is compiled by a C++ compiler, but it may only work if the
+final program is linked with that specific compiler.
 
 @item
 Need to add support for call stack traversal for at least the Alpha, MIPS,
@@ -5811,6 +5883,24 @@ to freed memory or outside memory blocks.  Also contains a garbage collector for
 detecting memory leaks.
 @end table
 
+@cindex CSRI malloc
+@item
+CSRI malloc
+@table @asis
+@item Author
+Mark Moraes (@email{moraes@@deshaw.com})
+@item License
+Free Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{ftp://ftp.cs.toronto.edu/pub/moraes/malloc.tar.gz}
+@item Overview
+A library of dynamic memory allocation functions with limited debugging and
+profiling support and detection of memory leaks.  Also comes with a graphical
+tool to display a dynamic picture of the heap.
+@end table
+
 @cindex Dbmalloc
 @item
 Dbmalloc
@@ -6022,6 +6112,23 @@ Detects memory leaks in C++ programs by overriding @code{operator new} and
 @code{operator delete}.
 @end table
 
+@cindex Leaky
+@item
+Leaky
+@table @asis
+@item Author
+Kipp Hickman (@email{kipp@@netscape.com})
+@item License
+Netscape Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://www.mozilla.org/unix/leaky.html}
+@item Overview
+A program which helps find memory leaks and helps debug reference count problems
+with xpcom objects.
+@end table
+
 @cindex Malloc Debug Library
 @item
 Malloc Debug Library
@@ -6091,6 +6198,7 @@ usage profiling and error simulation.
 @end table
 
 @cindex Memory Advisor
+@cindex Sentinel
 @cindex PLATINUM Technology
 @item
 Memory Advisor
@@ -6106,7 +6214,8 @@ Various UNIX
 @item Overview
 Disassembles an object module into system-independent assembler code, inserts
 error checking instructions, then re-assembles the code.  Can also replace
-existing malloc libraries in order to provide greater error checking.
+existing malloc libraries in order to provide greater error checking.  Formerly
+known as Sentinel.
 @end table
 
 @cindex Memprof
@@ -6346,6 +6455,61 @@ MacOS
 @item Overview
 Runs in the background as a control panel and detects various memory errors
 which can then be caught and run under a debugger.
+@end table
+
+@cindex TestCenter
+@cindex CenterLine Development Systems
+@item
+TestCenter
+@table @asis
+@item Author
+CenterLine Development Systems (@email{info@@centerline.com})
+@item License
+Commercial Software
+@item Platforms
+Various UNIX
+@item Location
+@uref{http://www.centerline.com/}
+@item Overview
+Detects memory leaks, duplicate frees and illegal access errors including loads
+from uninitialised objects.
+@end table
+
+@cindex Third Degree
+@cindex Digital Equipment Corporation
+@item
+Third Degree
+@table @asis
+@item Author
+Digital Equipment Corporation (@email{info@@digital.com})
+@item License
+Commercial Software
+@item Platforms
+Digital UNIX
+@item Location
+@uref{http://www.digital.com/}
+@item Overview
+A tool that performs memory access checks and memory leak detection of C, C++
+and Fortran programs at run-time.  Applications are modified using ATOM to
+determine if any memory locations are accessed when not properly allocated or
+initialised.
+@end table
+
+@cindex Vmalloc
+@item
+Vmalloc
+@table @asis
+@item Author
+Kiem-Phong Vo (@email{kpv@@research.att.com})
+@item License
+AT&T Source Code License
+@item Platforms
+Various UNIX, Windows
+@item Location
+@uref{http://akpublic.research.att.com/sw/tools/vmalloc/}
+@item Overview
+A discipline and method library for dynamic memory allocation, with support for
+regions, debugging and profiling.
 @end table
 
 @cindex Wipeout
