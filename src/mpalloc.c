@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.41 2001-08-23 22:42:33 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.42 2001-08-24 11:43:18 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.41 2001-08-23 22:42:33 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.42 2001-08-24 11:43:18 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -147,9 +147,11 @@ pagesize(void)
     {
 #if TARGET == TARGET_UNIX
         /* This call could also be getpagesize() but it is more POSIX-conforming
-         * to call sysconf().  Unfortunately, SunOS only has getpagesize().
+         * to call sysconf().  Unfortunately, SunOS and the BSD systems only
+         * have getpagesize().
          */
-#if SYSTEM == SYSTEM_SUNOS
+#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
         s = getpagesize();
 #else /* SYSTEM */
         s = sysconf(_SC_PAGESIZE);
