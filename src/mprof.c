@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.5 2000-04-25 19:24:30 graeme Exp $"
+#ident "$Id: mprof.c,v 1.6 2000-04-25 23:40:11 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -137,10 +137,10 @@ static char *symbols;
 static size_t sbound, mbound, lbound;
 
 
-/* The tree containing information about each call site.
+/* The tree containing profiling details for all call sites.
  */
 
-static treeroot sitetree;
+static treeroot proftree;
 
 
 /* The profiling output file produced by mpatrol.
@@ -153,57 +153,6 @@ static FILE *proffile;
  */
 
 static char *progname;
-
-
-/* Sum the statistics from two sets of profiling data.
- */
-
-static void sumdata(profiledata *a, profiledata *b)
-{
-    size_t i;
-
-    for (i = 0; i < 4; i++)
-    {
-        a->acount[i] += b->acount[i];
-        a->dcount[i] += b->dcount[i];
-        a->atotal[i] += b->atotal[i];
-        a->dtotal[i] += b->dtotal[i];
-    }
-}
-
-
-/* Display a set of profiling data.
- */
-
-static void printdata(size_t *d, size_t t)
-{
-    size_t i;
-    double n;
-
-    for (i = 0; i < 4; i++)
-        if ((t == 0) || (d[i] == 0))
-            fputs("   ", stdout);
-        else
-        {
-            n = ((double) d[i] / (double) t) * 100.0;
-            if (n >= 99.5)
-                fputs(" %%", stdout);
-            else
-                fprintf(stdout, " %2.0f", n);
-        }
-}
-
-
-/* Display a character a specified number of times.
- */
-
-static void printchar(char c, size_t n)
-{
-    size_t i;
-
-    for (i = 0; i < n; i++)
-        fputc(c, stdout);
-}
 
 
 /* Read an entry from the profiling output file.
@@ -318,7 +267,7 @@ static void readfile(void)
             getentry(&p->addr, sizeof(void *), 1);
             getentry(&p->symbol, sizeof(unsigned long), 1);
             getentry(&p->data, sizeof(unsigned long), 1);
-            __mp_treeinsert(&sitetree, &p->node, (unsigned long) p->addr);
+            __mp_treeinsert(&proftree, &p->node, (unsigned long) p->addr);
         }
     }
     /* Read the string table containing the symbol names.
@@ -338,6 +287,57 @@ static void readfile(void)
     {
         fprintf(stderr, "%s: Invalid file format\n", progname);
         exit(EXIT_FAILURE);
+    }
+}
+
+
+/* Display a character a specified number of times.
+ */
+
+static void printchar(char c, size_t n)
+{
+    size_t i;
+
+    for (i = 0; i < n; i++)
+        fputc(c, stdout);
+}
+
+
+/* Display a set of profiling data.
+ */
+
+static void printdata(size_t *d, size_t t)
+{
+    size_t i;
+    double n;
+
+    for (i = 0; i < 4; i++)
+        if ((d[i] == 0) || (t == 0))
+            fputs("   ", stdout);
+        else
+        {
+            n = ((double) d[i] / (double) t) * 100.0;
+            if (n >= 99.5)
+                fputs(" %%", stdout);
+            else
+                fprintf(stdout, " %2.0f", n);
+        }
+}
+
+
+/* Sum the statistics from two sets of profiling data.
+ */
+
+static void sumdata(profiledata *a, profiledata *b)
+{
+    size_t i;
+
+    for (i = 0; i < 4; i++)
+    {
+        a->acount[i] += b->acount[i];
+        a->dcount[i] += b->dcount[i];
+        a->atotal[i] += b->atotal[i];
+        a->dtotal[i] += b->dtotal[i];
     }
 }
 
@@ -426,7 +426,7 @@ static void directtable(void)
     printchar('-', 21);
     fputs("\n     %     bytes   s  m  l  x     "
           "bytes   s  m  l  x   calls  function\n\n", stdout);
-    for (n = (profilenode *) __mp_minimum(sitetree.root); n != NULL; n = p)
+    for (n = (profilenode *) __mp_minimum(proftree.root); n != NULL; n = p)
     {
         p = (profilenode *) __mp_successor(&n->node);
         if (n->data != 0)
@@ -514,7 +514,7 @@ int main(int argc, char **argv)
     nodesize = 0;
     symbols = NULL;
     sbound = mbound = lbound = 0;
-    __mp_newtree(&sitetree);
+    __mp_newtree(&proftree);
     if (strcmp(f, "-") == 0)
         proffile = stdin;
     else if ((proffile = fopen(f, "rb")) == NULL)
