@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.4 2000-03-31 08:30:56 graeme Exp $
+# $Id: Makefile,v 1.5 2000-04-03 18:04:00 graeme Exp $
 
 
 # Definitions
@@ -83,7 +83,7 @@ $(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
 
 $(SHARED_LIBRARY).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
-	$(LD) -G -h $(SHARED_LIBRARY).$(VERSION) -o $@ $(SHARED_OBJECTS)
+	$(LD) -G -h $@ -o $@ $(SHARED_OBJECTS)
 
 $(SHARED_LIBRARY): $(SHARED_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
@@ -95,7 +95,7 @@ $(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
 	$(AR) cr $@ $(ARCHTS_OBJECTS)
 
 $(SHARTS_LIBRARY).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
-	$(LD) -G -h $(SHARTS_LIBRARY).$(VERSION) -o $@ $(SHARTS_OBJECTS)
+	$(LD) -G -h $@ -o $@ $(SHARTS_OBJECTS)
 
 $(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
