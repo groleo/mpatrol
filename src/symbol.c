@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.13 2000-03-15 00:43:04 graeme Exp $"
+#ident "$Id: symbol.c,v 1.14 2000-03-20 23:45:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -860,7 +860,13 @@ MP_GLOBAL void __mp_fixsymbols(symhead *y)
 {
     symnode *n, *p;
     void *l, *m;
+#if TARGET == TARGET_AMIGA
+    unsigned long o;
+#endif /* TARGET */
 
+#if TARGET == TARGET_AMIGA
+    o = 0;
+#endif /* TARGET */
     l = NULL;
     for (n = (symnode *) __mp_minimum(y->dtree.root); n != NULL; n = p)
     {
@@ -877,7 +883,27 @@ MP_GLOBAL void __mp_fixsymbols(symhead *y)
                 n->data.size = (char *) p->data.addr - (char *) n->data.addr;
         if ((m = (char *) n->data.addr + n->data.size) > l)
             l = m;
+#if TARGET == TARGET_AMIGA
+        /* On AmigaOS, sections are scatter-loaded into memory and will occupy
+         * different addresses each time a program is loaded.  One easy way to
+         * determine the run-time address of each function is to find the
+         * offset for one function and add it to all functions, but this means
+         * that this function must be compiled with symbolic information and
+         * assumes that all text symbols are in the one hunk.
+         */
+        if ((o == 0) && (strcmp(n->data.name, "___mp_fixsymbols") == 0))
+            o = (char *) __mp_fixsymbols - (char *) n->data.addr;
+#endif /* TARGET */
     }
+#if TARGET == TARGET_AMIGA
+    if (o != 0)
+        for (n = (symnode *) __mp_minimum(y->itree.root); n != NULL;
+             n = (symnode *) __mp_successor(&n->index.node))
+        {
+            n->data.node.key += o;
+            n->data.addr = (char *) n->data.addr + o;
+        }
+#endif /* TARGET */
 }
 
 
