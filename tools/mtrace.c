@@ -28,7 +28,7 @@
 
 
 /*
- * $Id: mtrace.c,v 1.1 2001-02-15 22:20:53 graeme Exp $
+ * $Id: mtrace.c,v 1.2 2001-02-22 20:28:47 graeme Exp $
  */
 
 
@@ -57,6 +57,12 @@ static epilogue_handler old_epilogue;
  */
 
 static FILE *trace_file;
+
+
+/* Indicates whether the call to muntrace() has been planted with __mp_atexit().
+ */
+
+static int trace_atexit;
 
 
 /* The pointer and size obtained each time our prologue function is called.
@@ -175,6 +181,11 @@ mtrace(void)
     if ((f = getenv("MALLOC_TRACE")) && (*f != '\0') &&
         (trace_file = fopen(f, "w")))
     {
+        if (!trace_atexit)
+        {
+            __mp_atexit(muntrace);
+            trace_atexit = 1;
+        }
         fputs("= Start\n", trace_file);
         old_prologue = __mp_prologue(prologue);
         old_epilogue = __mp_epilogue(epilogue);
