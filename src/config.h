@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.73 2001-03-06 00:20:26 graeme Exp $
+ * $Id: config.h,v 1.74 2001-03-06 22:10:36 graeme Exp $
  */
 
 
@@ -783,10 +783,12 @@
 
 /* Indicates if the mpatrol library can assume that any functions whose names
  * begin with __mp_init_* when the symbols are being read should be called
- * when __mp_init() is called.  This should not be enabled on systems where
- * the address of the symbol in the object file does not represent the entry
- * point for the resulting function and will obviously not work if the symbol
- * has been stripped from the executable or shared library at any point.
+ * when __mp_init() is called.  This also applies to functions whose names
+ * begin with __mp_fini_*, in which case they will be called when __mp_fini()
+ * is called.  This should not be enabled on systems where the address of the
+ * symbol in the object file does not represent the entry point for the
+ * resulting function and will obviously not work if the symbol has been
+ * stripped from the executable or shared library at any point.
  */
 
 #ifndef MP_INITFUNC_SUPPORT
