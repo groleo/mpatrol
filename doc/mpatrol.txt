@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
+   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
+   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
 November, 2000.
 
 Foreword
@@ -574,17 +574,18 @@ if you perform the following steps.
 
    Alternatively, the `pkg' directory contains files that can be used to
 automatically generate a _package_ in a specific format suitable for
-installation on a system.  Two package formats (PKG and RPM) and three
-archive formats are currently supported (generic tape archive, LhA and
-ZIP).  The first package format is generally used on UNIX SVR4 systems,
-while the second was introduced by Red Hat for use in their Linux
-distributions.  The generic tape archive can be used as a distribution
-for UNIX systems where no package format is supported, but it does not
-contain information on how to install the files on the system once they
-have been extracted from the distribution.  The LhA and ZIP formats are
-also roughly the same, but the LhA format is intended for Amiga systems
-and is used for Aminet distributions, while the ZIP format is intended
-for Windows systems and is used for WinSite distributions.  You should
+installation on a system.  Three package formats (PKG, SD/UX and RPM)
+and three archive formats are currently supported (generic tape
+archive, LhA and ZIP).  The first package format is generally used on
+UNIX SVR4 systems, while the second is used on HP/UX systems and the
+third was introduced by Red Hat for use in their Linux distributions.
+The generic tape archive can be used as a distribution for UNIX systems
+where no package format is supported, but it does not contain
+information on how to install the files on the system once they have
+been extracted from the distribution.  The LhA and ZIP formats are also
+roughly the same, but the LhA format is intended for Amiga systems and
+is used for Aminet distributions, while the ZIP format is intended for
+Windows systems and is used for WinSite distributions.  You should
 really know what you are doing before you attempt to build a package,
 and you should also be aware that some of the package files may need to
 be modified before you begin.
@@ -2130,6 +2131,15 @@ be problems if the resulting shared library contains position-dependent
 code from the archive libraries you incorporated.  The only way to find
 out is for you to try it and see.
 
+   If you have access to the GNU linker on your system then there may
+be a way to convert archive libraries into shared libraries if
+position-independent code is not necessarily required for building
+shared libraries on your system.  If you use the `--whole-archive' and
+`--shared' linker options then the GNU linker will read the entire
+contents of one or more archive libraries before writing out a shared
+library.  All going well, you should be able to use the new shared
+library in conjunction with the `--dynamic' `mpatrol' option.
+
    In order to build a shared version of the mpatrol library with
 embedded object file format access libraries, you must first modify the
 `Makefile' you would normally use to build the mpatrol library.  At the
@@ -3265,7 +3275,7 @@ library, the `MPATROL_OPTIONS' environment variable should be set to be
 `LOGALL' and the program should be executed, generating the following
 output in `mpatrol.log'.
 
-     @(#) mpatrol 1.3.0 (00/11/19)
+     @(#) mpatrol 1.3.1 (00/11/22)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
@@ -3275,7 +3285,7 @@ output in `mpatrol.log'.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Tue Oct 31 00:18:17 2000
+     Log file generated on Wed Nov 22 22:26:31 2000
      
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
              0x0804942F main+31
@@ -8086,10 +8096,6 @@ H.2 Notes for UNIX platforms
      (specifically FreeBSD, NetBSD, OpenBSD and SunOS) and other
      non-System V UNIX operating systems.
 
-   * There is a problem on later Linux releases where the `_DYNAMIC'
-     symbol is defined in `elf.h', thus resulting in a conflicting
-     definition when compiling `symbol.c'.
-
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
      `_RLD_LIST' environment variables.  This is because the object
@@ -8097,8 +8103,7 @@ H.2 Notes for UNIX platforms
      systems.
 
    * Perhaps add files to build the mpatrol library and tools as a
-     Debian package and possibly also a package in the HP/UX package
-     format.
+     Debian package.
 
 H.3 Notes for Amiga platforms
 =============================
@@ -8549,12 +8554,14 @@ I.4 Running
      memory operations, such as `memcpy()' and `memcmp()', but I get
      nothing in the log file.  Why is this?
 
-     The memory operation functions do not automatically initialise the
-     mpatrol library since on many systems the startup routines call
-     them very early on.  If your program does not call any memory
-     allocation functions to initialise the mpatrol library then you
-     must explicitly call the `__mp_init()' function.  All memory
-     operation functions following that call with then be traced.
+     On systems that do not support `.init' and `.fini' sections or are
+     not `gcc' or C++ based then the memory operation functions will not
+     automatically initialise the mpatrol library since on many systems
+     the startup routines call them very early on.  On such systems, if
+     your program does not call any memory allocation functions to
+     initialise the mpatrol library then you must explicitly call the
+     `__mp_init()' function.  All memory operation functions following
+     that call with then be traced.
 
   3. Why does the `USEDEBUG' option not work for me?
 
@@ -11863,6 +11870,7 @@ running questions:
 SAFESIGNALS:                                       
           See ``Appendix B Environment''.
 sbrk:                                               See 7.1.
+SD/UX package:                                      See 3.
 sections:                                           See 5.1.
 semaphores:                                         See 6.3.
 Sentinel:                                          

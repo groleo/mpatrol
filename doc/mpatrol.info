@@ -11,7 +11,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
+   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -50,7 +50,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 20th
+   This is edition 2.1 of the mpatrol manual for version 1.3.1, 22nd
 November, 2000.
 
 * Menu:
@@ -625,17 +625,18 @@ if you perform the following steps.
 
    Alternatively, the `pkg' directory contains files that can be used to
 automatically generate a _package_ in a specific format suitable for
-installation on a system.  Two package formats (PKG and RPM) and three
-archive formats are currently supported (generic tape archive, LhA and
-ZIP).  The first package format is generally used on UNIX SVR4 systems,
-while the second was introduced by Red Hat for use in their Linux
-distributions.  The generic tape archive can be used as a distribution
-for UNIX systems where no package format is supported, but it does not
-contain information on how to install the files on the system once they
-have been extracted from the distribution.  The LhA and ZIP formats are
-also roughly the same, but the LhA format is intended for Amiga systems
-and is used for Aminet distributions, while the ZIP format is intended
-for Windows systems and is used for WinSite distributions.  You should
+installation on a system.  Three package formats (PKG, SD/UX and RPM)
+and three archive formats are currently supported (generic tape
+archive, LhA and ZIP).  The first package format is generally used on
+UNIX SVR4 systems, while the second is used on HP/UX systems and the
+third was introduced by Red Hat for use in their Linux distributions.
+The generic tape archive can be used as a distribution for UNIX systems
+where no package format is supported, but it does not contain
+information on how to install the files on the system once they have
+been extracted from the distribution.  The LhA and ZIP formats are also
+roughly the same, but the LhA format is intended for Amiga systems and
+is used for Aminet distributions, while the ZIP format is intended for
+Windows systems and is used for WinSite distributions.  You should
 really know what you are doing before you attempt to build a package,
 and you should also be aware that some of the package files may need to
 be modified before you begin.
@@ -2268,6 +2269,15 @@ be problems if the resulting shared library contains position-dependent
 code from the archive libraries you incorporated.  The only way to find
 out is for you to try it and see.
 
+   If you have access to the GNU linker on your system then there may
+be a way to convert archive libraries into shared libraries if
+position-independent code is not necessarily required for building
+shared libraries on your system.  If you use the `--whole-archive' and
+`--shared' linker options then the GNU linker will read the entire
+contents of one or more archive libraries before writing out a shared
+library.  All going well, you should be able to use the new shared
+library in conjunction with the `--dynamic' `mpatrol' option.
+
    In order to build a shared version of the mpatrol library with
 embedded object file format access libraries, you must first modify the
 `Makefile' you would normally use to build the mpatrol library.  At the
@@ -3438,7 +3448,7 @@ library, the `MPATROL_OPTIONS' environment variable should be set to be
 `LOGALL' and the program should be executed, generating the following
 output in `mpatrol.log'.
 
-     @(#) mpatrol 1.3.0 (00/11/19)
+     @(#) mpatrol 1.3.1 (00/11/22)
      Copyright (C) 1997-2000 Graeme S. Roy
      
      This is free software, and you are welcome to redistribute it under
@@ -3448,7 +3458,7 @@ output in `mpatrol.log'.
      For the latest mpatrol release and documentation,
      visit http://www.cbmamiga.demon.co.uk/mpatrol.
      
-     Log file generated on Tue Oct 31 00:18:17 2000
+     Log file generated on Wed Nov 22 22:26:31 2000
      
      ALLOC: malloc (52, 16 bytes, 4 bytes) [main|test1.c|36]
              0x0804942F main+31
@@ -8336,10 +8346,6 @@ Notes for UNIX platforms
      (specifically FreeBSD, NetBSD, OpenBSD and SunOS) and other
      non-System V UNIX operating systems.
 
-   * There is a problem on later Linux releases where the `_DYNAMIC'
-     symbol is defined in `elf.h', thus resulting in a conflicting
-     definition when compiling `symbol.c'.
-
    * The `--dynamic' option to the `mpatrol' command does not always
      work on systems whose dynamic linkers support the `LD_PRELOAD' or
      `_RLD_LIST' environment variables.  This is because the object
@@ -8347,8 +8353,7 @@ Notes for UNIX platforms
      systems.
 
    * Perhaps add files to build the mpatrol library and tools as a
-     Debian package and possibly also a package in the HP/UX package
-     format.
+     Debian package.
 
 
 File: mpatrol.info,  Node: Amiga notes,  Next: Windows notes,  Prev: UNIX notes,  Up: Notes
@@ -8831,12 +8836,14 @@ Running
      memory operations, such as `memcpy()' and `memcmp()', but I get
      nothing in the log file.  Why is this?
 
-     The memory operation functions do not automatically initialise the
-     mpatrol library since on many systems the startup routines call
-     them very early on.  If your program does not call any memory
-     allocation functions to initialise the mpatrol library then you
-     must explicitly call the `__mp_init()' function.  All memory
-     operation functions following that call with then be traced.
+     On systems that do not support `.init' and `.fini' sections or are
+     not `gcc' or C++ based then the memory operation functions will not
+     automatically initialise the mpatrol library since on many systems
+     the startup routines call them very early on.  On such systems, if
+     your program does not call any memory allocation functions to
+     initialise the mpatrol library then you must explicitly call the
+     `__mp_init()' function.  All memory operation functions following
+     that call with then be traced.
 
   3. Why does the `USEDEBUG' option not work for me?
 
@@ -11806,6 +11813,7 @@ Index
 * running questions:                     Running.
 * SAFESIGNALS:                           Environment.
 * sbrk:                                  Library behaviour.
+* SD/UX package:                         Installation.
 * sections:                              Static memory allocations.
 * semaphores:                            Threads.
 * Sentinel:                              Related software.
@@ -11935,112 +11943,112 @@ Node: Foreword3479
 Node: Overview7963
 Node: Features10593
 Node: Installation26875
-Node: Integration32488
-Ref: Integration-Footnote-137523
-Node: Memory allocations37644
-Node: Static memory allocations38321
-Ref: Static memory allocations-Footnote-140782
-Node: Stack memory allocations40824
-Ref: Stack memory allocations-Footnote-142688
-Node: Dynamic memory allocations42727
-Ref: Dynamic memory allocations-Footnote-146149
-Ref: Dynamic memory allocations-Footnote-246268
-Node: Operating system support46372
-Node: Virtual memory48332
-Ref: Virtual memory-Footnote-154360
-Ref: Virtual memory-Footnote-254616
-Ref: Virtual memory-Footnote-354792
-Ref: Virtual memory-Footnote-454827
-Ref: Virtual memory-Footnote-554886
-Node: Call stacks and symbol tables55110
-Ref: Call stacks and symbol tables-Footnote-160788
-Ref: Call stacks and symbol tables-Footnote-260856
-Ref: Call stacks and symbol tables-Footnote-360907
-Ref: Call stacks and symbol tables-Footnote-460951
-Ref: Call stacks and symbol tables-Footnote-560993
-Ref: Call stacks and symbol tables-Footnote-661035
-Ref: Call stacks and symbol tables-Footnote-761083
-Node: Threads61189
-Ref: Threads-Footnote-167195
-Node: Using mpatrol67290
-Node: Library behaviour68156
-Ref: Library behaviour-Footnote-173552
-Node: Logging and tracing73610
-Node: General errors77592
-Ref: General errors-Footnote-181730
-Ref: General errors-Footnote-281886
-Node: Overwrites and underwrites82054
-Ref: Overwrites and underwrites-Footnote-189573
-Ref: Overwrites and underwrites-Footnote-289636
-Node: Using with a debugger89760
-Ref: Using with a debugger-Footnote-198814
-Ref: Using with a debugger-Footnote-298882
-Ref: Using with a debugger-Footnote-399138
-Node: Testing99227
-Ref: Testing-Footnote-1101964
-Ref: Testing-Footnote-2102145
-Node: Library functions102204
-Node: Utilities109085
-Node: The mpatrol command109918
-Node: The mleak command115878
-Node: The mpsym command117842
-Node: The mpedit command120320
-Node: Profiling123685
-Ref: Profiling-Footnote-1151591
-Ref: Profiling-Footnote-2151815
-Node: Improving performance151919
-Ref: Improving performance-Footnote-1160613
-Ref: Improving performance-Footnote-2160655
-Ref: Improving performance-Footnote-3160732
-Ref: Improving performance-Footnote-4160804
-Node: How it works160848
-Node: Examples167493
-Node: Example 1171153
-Ref: Example 1-Footnote-1194749
-Node: Example 2194939
-Node: Example 3200339
-Node: Example 4207196
-Node: Example 5210701
-Ref: Example 5-Footnote-1214501
-Node: Example 6214630
-Node: Example 7216488
-Node: Example 8226724
-Node: Tutorial241880
-Ref: Tutorial-Footnote-1256411
-Ref: Tutorial-Footnote-2256702
-Ref: Tutorial-Footnote-3256851
-Ref: Tutorial-Footnote-4256988
-Ref: Tutorial-Footnote-5257087
-Node: Functions257368
-Node: Environment287804
-Node: Options307054
-Node: Diagnostic messages317347
-Node: Library performance333289
-Node: Profiling file format335791
-Ref: Profiling file format-Footnote-1339203
-Node: Supported systems339383
-Node: New system support353516
-Node: New processor support354712
-Node: New file format support355395
-Node: Notes355785
-Node: Generic notes357396
-Ref: Generic notes-Footnote-1375752
-Ref: Generic notes-Footnote-2375970
-Node: UNIX notes376192
-Node: Amiga notes380945
-Node: Windows notes384560
-Node: Netware notes385931
-Node: Frequently asked questions388442
-Node: Documentation389065
-Node: Building392858
-Node: Linking399461
-Node: Running403733
-Node: Files417369
-Node: Related software420365
-Ref: Related software-Footnote-1455688
-Node: References455929
-Node: Copying458522
-Node: Function index486411
-Node: Index488669
+Node: Integration32535
+Ref: Integration-Footnote-137570
+Node: Memory allocations37691
+Node: Static memory allocations38368
+Ref: Static memory allocations-Footnote-140829
+Node: Stack memory allocations40871
+Ref: Stack memory allocations-Footnote-142735
+Node: Dynamic memory allocations42774
+Ref: Dynamic memory allocations-Footnote-146196
+Ref: Dynamic memory allocations-Footnote-246315
+Node: Operating system support46419
+Node: Virtual memory48379
+Ref: Virtual memory-Footnote-154407
+Ref: Virtual memory-Footnote-254663
+Ref: Virtual memory-Footnote-354839
+Ref: Virtual memory-Footnote-454874
+Ref: Virtual memory-Footnote-554933
+Node: Call stacks and symbol tables55157
+Ref: Call stacks and symbol tables-Footnote-160835
+Ref: Call stacks and symbol tables-Footnote-260903
+Ref: Call stacks and symbol tables-Footnote-360954
+Ref: Call stacks and symbol tables-Footnote-460998
+Ref: Call stacks and symbol tables-Footnote-561040
+Ref: Call stacks and symbol tables-Footnote-661082
+Ref: Call stacks and symbol tables-Footnote-761130
+Node: Threads61236
+Ref: Threads-Footnote-167242
+Node: Using mpatrol67337
+Node: Library behaviour68203
+Ref: Library behaviour-Footnote-173599
+Node: Logging and tracing73657
+Node: General errors77639
+Ref: General errors-Footnote-181777
+Ref: General errors-Footnote-281933
+Node: Overwrites and underwrites82101
+Ref: Overwrites and underwrites-Footnote-189620
+Ref: Overwrites and underwrites-Footnote-289683
+Node: Using with a debugger89807
+Ref: Using with a debugger-Footnote-198861
+Ref: Using with a debugger-Footnote-298929
+Ref: Using with a debugger-Footnote-399185
+Node: Testing99274
+Ref: Testing-Footnote-1102011
+Ref: Testing-Footnote-2102192
+Node: Library functions102251
+Node: Utilities109132
+Node: The mpatrol command109965
+Node: The mleak command116463
+Node: The mpsym command118427
+Node: The mpedit command120905
+Node: Profiling124270
+Ref: Profiling-Footnote-1152176
+Ref: Profiling-Footnote-2152400
+Node: Improving performance152504
+Ref: Improving performance-Footnote-1161198
+Ref: Improving performance-Footnote-2161240
+Ref: Improving performance-Footnote-3161317
+Ref: Improving performance-Footnote-4161389
+Node: How it works161433
+Node: Examples168078
+Node: Example 1171738
+Ref: Example 1-Footnote-1195334
+Node: Example 2195524
+Node: Example 3200924
+Node: Example 4207781
+Node: Example 5211286
+Ref: Example 5-Footnote-1215086
+Node: Example 6215215
+Node: Example 7217073
+Node: Example 8227309
+Node: Tutorial242465
+Ref: Tutorial-Footnote-1256996
+Ref: Tutorial-Footnote-2257287
+Ref: Tutorial-Footnote-3257436
+Ref: Tutorial-Footnote-4257573
+Ref: Tutorial-Footnote-5257672
+Node: Functions257953
+Node: Environment288389
+Node: Options307639
+Node: Diagnostic messages317932
+Node: Library performance333874
+Node: Profiling file format336376
+Ref: Profiling file format-Footnote-1339788
+Node: Supported systems339968
+Node: New system support354101
+Node: New processor support355297
+Node: New file format support355980
+Node: Notes356370
+Node: Generic notes357981
+Ref: Generic notes-Footnote-1376337
+Ref: Generic notes-Footnote-2376555
+Node: UNIX notes376777
+Node: Amiga notes381289
+Node: Windows notes384904
+Node: Netware notes386275
+Node: Frequently asked questions388786
+Node: Documentation389409
+Node: Building393202
+Node: Linking399805
+Node: Running404077
+Node: Files417837
+Node: Related software420833
+Ref: Related software-Footnote-1456156
+Node: References456397
+Node: Copying458990
+Node: Function index486879
+Node: Index489137
 
 End Tag Table

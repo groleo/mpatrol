@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.150 2000-11-22 22:59:33 graeme Exp $
+@c $Id: mpatrol.texi,v 1.151 2000-11-22 23:00:29 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -2441,7 +2441,7 @@ not necessarily required for building shared libraries on your system.  If you
 use the @option{--whole-archive} and @option{--shared} linker options then the
 GNU linker will read the entire contents of one or more archive libraries before
 writing out a shared library.  All going well, you should be able to use the new
-shared library in conjunction with the @option{--dynamic} @coommand{mpatrol}
+shared library in conjunction with the @option{--dynamic} @command{mpatrol}
 option.
 
 @cindex embedded libraries
