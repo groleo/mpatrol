@@ -46,7 +46,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.2 2001-02-01 20:58:35 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.3 2001-02-04 21:24:51 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -268,25 +268,30 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
       case AT_VALLOC:
       case AT_PVALLOC:
         /* We cannot rely on any system having implementations of memalign(),
-         * valloc() or pvalloc() and so we must implement them with malloc().
-         * This is done by allocating extra space and then rounding up the
-         * start address of the new allocation to the specified alignment.
-         * This means that there is likely to be some space wasted for each
-         * allocation and the memory allocated by such functions cannot be
-         * freed with free().  The latter point is actually true for most
-         * implementations.
+         * valloc() or pvalloc() and so we must either implement them with
+         * malloc() or with memalign() if it exists.  For the former
+         * implementation, this is done by allocating extra space and then
+         * rounding up the start address of the new allocation to the specified
+         * alignment.  This means that there is likely to be some space wasted
+         * for each allocation and the memory allocated by such functions
+         * cannot be freed with free().  The latter point is also likely to be
+         * true even if we allocated the memory with memalign().
          */
         n = pagesize();
         if (f == AT_PVALLOC)
             l = ((l - 1) & ~(n - 1)) + n;
         if ((f == AT_VALLOC) || (f == AT_PVALLOC) || (a > n))
             a = n;
-        else if (a == 0)
-            a = 1;
+        else if (a < sizeof(long))
+            a = sizeof(long);
         else
             a = poweroftwo(a);
+#if MP_MEMALIGN_SUPPORT
+        p = memalign(a, l);
+#else /* MP_MEMALIGN_SUPPORT */
         if (p = malloc(l + a - 1))
-            p = (void *) (((unsigned long) p - 1) & ~(a - 1)) + a;
+            p = (void *) ((((unsigned long) p - 1) & ~(a - 1)) + a);
+#endif /* MP_MEMALIGN_SUPPORT */
         break;
       case AT_ALLOCA:
         p = __mp_xmalloc(l + sizeof(allocaheader), s, t, u, g, h);
