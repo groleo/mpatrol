@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.247 2001-09-05 22:15:24 graeme Exp $
+@c $Id: mpatrol.texi,v 1.248 2001-09-06 23:03:00 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -35,9 +35,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.12
-@set VERSION 1.4.7
-@set UPDATED 5th September, 2001
+@set EDITION 2.13
+@set VERSION 1.4.8
+@set UPDATED 6th September, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -3679,6 +3679,13 @@ as the log file.  Note also that the @command{mleak} command supports the
 @option{--help} and @option{--version} options in common with the other mpatrol
 command line tools.
 
+@cindex condenseleaklog
+Note that mpatrol patch 5 (which can be downloaded from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch5.tar.gz})
+contains the source code to a FORTRAN 90 program called
+@command{condenseleaklog} which offers similar facilities to the @command{mleak}
+command, as well as the ability to trim and filter stack traces.
+
 @node The mpsym command, The mpedit command, The mleak command, Utilities
 @section The @command{mpsym} command
 @cindex mpsym command
@@ -4569,6 +4576,7 @@ unfreed memory can be produced to detect where memory leaks come from (via the
 @option{--leaks} option).
 @end ifnotinfo
 
+@cindex profdiff
 Although @command{mprof} does not currently offer this facility, a small tool
 called @command{profdiff} which reports differences between two mpatrol
 profiling output files can be downloaded from
