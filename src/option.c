@@ -39,9 +39,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.44 2002-02-05 00:49:03 graeme Exp $"
+#ident "$Id: option.c,v 1.45 2005-03-10 00:10:07 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.44 2002-02-05 00:49:03 graeme Exp $";
+static MP_CONST MP_VOLATILE char *option_id = "$Id: option.c,v 1.45 2005-03-10 00:10:07 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -94,7 +94,7 @@ static char *options_help[] =
     "", "Checks that no attempt is made to deallocate a NULL pointer.",
     "CHECKMEMORY", NULL,
     "", "Checks that no attempt is made to perform a zero-length memory",
-    "", "operation on a NULL pointer.",
+    "", "operation or a memory operation on a NULL pointer.",
     "CHECKREALLOCS", NULL,
     "", "Checks that no attempt is made to reallocate a NULL pointer or resize",
     "", "an existing block of memory to size zero.",
