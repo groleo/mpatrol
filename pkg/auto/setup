@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.6 2001-08-02 23:09:35 graeme Exp $
+# $Id: setup,v 1.7 2001-08-19 20:53:13 graeme Exp $
 
 
 uselinks=0
@@ -70,6 +70,7 @@ for file in $files
 do
     copyfile "$file" `basename "$file"`
 done
+copyfile ../../config/configure.in configure.in
 copyfile ../../config/top.am Makefile.am
 if [ $generate = 0 ]
 then
@@ -99,6 +100,46 @@ copyfile ../../../config/bin.am Makefile.am
 if [ $generate = 0 ]
 then
     copyfile ../../../config/bin.in Makefile.in
+fi
+cd ..
+
+
+# Create the doc directory for holding the mpatrol texinfo manual.
+
+echo "Creating doc directory" >&2
+makedir doc
+cd doc
+copyfile ../../../doc/mpatrol.texi mpatrol.texi
+copyfile ../../../doc/texinfo.tex texinfo.tex
+copyfile ../../../config/doc.am Makefile.am
+makedir images
+cd images
+for file in ../../../../doc/images/*.eps
+do
+    copyfile "$file" `basename "$file"`
+done
+copyfile ../../../../doc/images/mpatrol.txt mpatrol.txt
+cd ..
+if [ $generate = 0 ]
+then
+    copyfile ../../../config/doc.in Makefile.in
+fi
+cd ..
+
+
+# Create the man directory for holding the mpatrol manual pages.
+
+echo "Creating man directory" >&2
+makedir man
+cd man
+for file in ../../../man/man1/*.1 ../../../man/man3/*.3
+do
+    copyfile "$file" `basename "$file"`
+done
+copyfile ../../../config/man.am Makefile.am
+if [ $generate = 0 ]
+then
+    copyfile ../../../config/man.in Makefile.in
 fi
 cd ..
 
