@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: dbmalloc.h,v 1.8 2001-02-28 23:14:20 graeme Exp $
+ * $Id: dbmalloc.h,v 1.9 2001-03-04 16:46:07 graeme Exp $
  */
 
 
@@ -158,6 +158,7 @@ union dbmalloptarg
 
 #define dbmallinit() __mp_init_dbmalloc()
 #define dbmallopt(c, v) __mpt_dbmallocoption((c), (v))
+#define malloc_perror(s) __mpt_dbmallocperror(s)
 #define malloc_chain_check(f) __mpt_dbmallocchaincheck((f), MP_FUNCNAME, \
                                                        __FILE__, __LINE__)
 #define malloc_dump(f) __mpt_dbmallocdump(f)
@@ -176,6 +177,7 @@ extern "C"
 
 
 int __mpt_dbmallocoption(int, union dbmalloptarg *);
+void __mpt_dbmallocperror(MP_CONST char *);
 int __mpt_dbmallocchaincheck(int, MP_CONST char *, MP_CONST char *,
                              unsigned long);
 void __mpt_dbmallocdump(int);
@@ -196,6 +198,7 @@ static MP_VOLATILE void *__mpt_init_dbmalloc = (void *) __mp_init_dbmalloc;
 
 #define dbmallinit() ((void) 0)
 #define dbmallopt(c, v) ((int) 1)
+#define malloc_perror(s) ((void) 0)
 #define malloc_chain_check(f) ((int) 0)
 #define malloc_dump(f) ((void) 0)
 #define malloc_list(f, l, u) ((void) 0)

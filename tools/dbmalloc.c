@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dbmalloc.c,v 1.9 2001-02-28 23:14:20 graeme Exp $"
+#ident "$Id: dbmalloc.c,v 1.10 2001-03-04 16:46:07 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dbmalloc_id = "$Id: dbmalloc.c,v 1.9 2001-02-28 23:14:20 graeme Exp $";
+static MP_CONST MP_VOLATILE char *dbmalloc_id = "$Id: dbmalloc.c,v 1.10 2001-03-04 16:46:07 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -312,6 +312,20 @@ __mpt_dbmallocoption(int c, union dbmalloptarg *v)
         break;
     }
     return r;
+}
+
+
+/* Display a malloc library error message.
+ */
+
+void
+__mpt_dbmallocperror(MP_CONST char *s)
+{
+    if ((s != NULL) && (*s != '\0'))
+        fprintf(stderr, "%s: ", s);
+    if ((s = __mp_strerror(__mp_errno)) == NULL)
+        s = "unknown error";
+    fprintf(stderr, "%s\n", s);
 }
 
 
