@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.14 2000-05-10 20:35:30 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.15 2000-05-16 00:49:09 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -92,6 +92,7 @@ static int safesignals, noprotect;
 static int nofree, preserve;
 static int oflowwatch;
 static int usemmap, usedebug;
+static int allowoflow;
 
 
 /* The table describing a summary of all recognised options.
@@ -148,6 +149,10 @@ static char *options_help[] =
     "l", "string",
     "", "Specifies an alternative file in which to place all diagnostics from",
     "", "the mpatrol library.",
+    "M", NULL,
+    "", "Specifies that a warning rather than an error should be produced if",
+    "", "any memory operation function overflows the boundaries of a memory",
+    "", "allocation, and that the operation should still be performed.",
     "m", NULL,
     "", "Specifies that the library should use mmap() instead of sbrk() to",
     "", "allocate system memory.",
@@ -279,6 +284,8 @@ static void setoptions(void)
         addoption("ALLOCBYTE", allocbyte, 0);
     if (allocstop)
         addoption("ALLOCSTOP", allocstop, 0);
+    if (allowoflow)
+        addoption("ALLOWOFLOW", NULL, 0);
     if (autosave)
         addoption("AUTOSAVE", autosave, 0);
     if (check)
@@ -378,7 +385,8 @@ int main(int argc, char **argv)
     logfile = "mpatrol.%n.log";
     proffile = "mpatrol.%n.out";
     while ((c = __mp_getopt(argc, argv,
-             "1:2:3:A:a:C:cD:de:F:f:GgL:l:mNnO:o:P:pQ:R:SsU:VvwXxZ:z:")) != EOF)
+             "1:2:3:A:a:C:cD:de:F:f:GgL:l:MmNnO:o:P:pQ:R:SsU:VvwXxZ:z:")) !=
+           EOF)
         switch (c)
         {
           case '1':
@@ -428,6 +436,9 @@ int main(int argc, char **argv)
             break;
           case 'l':
             logfile = __mp_optarg;
+            break;
+          case 'M':
+            allowoflow = 1;
             break;
           case 'm':
             usemmap = 1;
