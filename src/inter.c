@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.110 2001-03-05 23:51:39 graeme Exp $"
+#ident "$Id: inter.c,v 1.111 2001-03-06 01:07:17 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.110 2001-03-05 23:51:39 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.111 2001-03-06 01:07:17 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1804,6 +1804,48 @@ __mp_iterateall(int (*f)(void *, void *), void *d)
 }
 
 
+/* Add a memory allocation to the leak table.
+ */
+
+int
+__mp_addallocentry(char *f, unsigned long l, size_t c)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectinfo(&memhead, MA_READWRITE);
+    r = __mp_allocentry(&memhead.ltable, f, l, c);
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectinfo(&memhead, MA_READONLY);
+    restoresignals();
+    return r;
+}
+
+
+/* Remove a memory allocation from the leak table.
+ */
+
+int
+__mp_addfreeentry(char *f, unsigned long l, size_t c)
+{
+    int r;
+
+    savesignals();
+    if (!memhead.init)
+        __mp_init();
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
+    r = __mp_freeentry(&memhead.ltable, f, l, c);
+    if (!(memhead.flags & FLG_NOPROTECT))
+        __mp_protectleaktab(&memhead.ltable, MA_READONLY);
+    restoresignals();
+    return r;
+}
+
+
 /* Clear the leak table.
  */
 
@@ -1814,10 +1856,10 @@ __mp_clearleaktable(void)
     if (!memhead.init)
         __mp_init();
     if (!(memhead.flags & FLG_NOPROTECT))
-        __mp_protectstrtab(&memhead.syms.strings, MA_READWRITE);
+        __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
     __mp_clearleaktab(&memhead.ltable);
     if (!(memhead.flags & FLG_NOPROTECT))
-        __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
+        __mp_protectleaktab(&memhead.ltable, MA_READONLY);
     restoresignals();
 }
 
@@ -1860,10 +1902,10 @@ __mp_leaktable(size_t l, int o, unsigned char f)
     if (!memhead.init)
         __mp_init();
     if (!(memhead.flags & FLG_NOPROTECT))
-        __mp_protectinfo(&memhead, MA_READWRITE);
+        __mp_protectleaktab(&memhead.ltable, MA_READWRITE);
     __mp_printleaktab(&memhead, l, o, f);
     if (!(memhead.flags & FLG_NOPROTECT))
-        __mp_protectinfo(&memhead, MA_READONLY);
+        __mp_protectleaktab(&memhead.ltable, MA_READONLY);
     restoresignals();
 }
 

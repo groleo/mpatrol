@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.39 2001-03-05 20:36:35 graeme Exp $
+ * $Id: inter.h,v 1.40 2001-03-06 01:07:17 graeme Exp $
  */
 
 
@@ -149,6 +149,8 @@ int __mp_printinfo(void *);
 unsigned long __mp_snapshot(void);
 size_t __mp_iterate(int (*)(void *, void *), void *, unsigned long);
 size_t __mp_iterateall(int (*)(void *, void *), void *);
+int __mp_addallocentry(char *, unsigned long, size_t);
+int __mp_addfreeentry(char *, unsigned long, size_t);
 void __mp_clearleaktable(void);
 void __mp_startleaktable(void);
 void __mp_stopleaktable(void);

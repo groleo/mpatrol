@@ -46,6 +46,8 @@ __mp_printinfo
 __mp_snapshot
 __mp_iterate
 __mp_iterateall
+__mp_addallocentry
+__mp_addfreeentry
 __mp_clearleaktable
 __mp_startleaktable
 __mp_stopleaktable
