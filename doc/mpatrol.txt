@@ -3,7 +3,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 3rd
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 6th
 November, 2000.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -41,7 +41,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.0 of the mpatrol manual for version 1.3.0, 3rd
+   This is edition 2.0 of the mpatrol manual for version 1.3.0, 6th
 November, 2000.
 
 Foreword
@@ -201,22 +201,26 @@ out.
      can be used to quickly determine if an address has been allocated
      on the heap.
 
-   * Contains 14 replacement C dynamic memory allocation functions:
+   * Contains 18 replacement C dynamic memory allocation functions:
 
      `malloc()'    ANSI    Allocates memory.
      `calloc()'    ANSI    Allocates zero-filled memory.
      `memalign()'  UNIX    Allocates memory with a specified alignment.
      `valloc()'    UNIX    Allocates page-aligned memory.
      `pvalloc()'   UNIX    Allocates a number of pages.
+     `alloca()'    old     Allocates temporary memory.
      `strdup()'    UNIX    Duplicates a string.
      `strndup()'   old     Duplicates a string with a maximum length.
      `strsave()'   old     Duplicates a string.
      `strnsave()'  old     Duplicates a string with a maximum length.
+     `strdupa()'   old     Duplicates a string.
+     `strndupa()'  old     Duplicates a string with a maximum length.
      `realloc()'   ANSI    Resizes memory.
      `recalloc()'  old     Resizes memory allocated by `calloc()'.
      `expand()'    old     Resizes memory but does not relocate it.
      `free()'      ANSI    Frees memory.
      `cfree()'     old     Frees memory allocated by `calloc()'.
+     `dealloca()'  old     Explicitly frees temporary memory.
 
    * Contains 4 replacement C++ dynamic memory allocation functions:
 
@@ -352,6 +356,13 @@ out.
      allocations can be prevented from being returned to the free
      memory pool.  Any older freed memory allocations will then
      eventually be reused.
+
+   * The `alloca()', `strdupa()' and `strndupa()' functions are
+     implemented so that the temporary stack-based allocations that
+     they would normally make are now temporary heap-based allocations
+     that can be traced by mpatrol.  Such allocations will be
+     implicitly freed when the function that allocated them returns,
+     but a function also exists to explicitly free them as well.
 
    * Calls to memory operation functions (such as `memset()' or
      `memcpy()') have their arguments checked to ensure that they do
@@ -799,9 +810,10 @@ diagnose errors if any occur.
 memory from the stack rather than the heap, and so the memory is
 automatically freed when the function that called it returns.  This is
 a non-standard feature that is not guaranteed to be present in a
-compiler, and indeed may not be possible to implement on some systems.
-However, some compilers now support variable length arrays which
-provide roughly the same functionality.
+compiler, and indeed may not be possible to implement on some
+systems(2).  However, the mpatrol library provides a debugging version
+of this function (and a few other related functions) on all systems, so
+that they make use of the heap instead of the stack.
 
    As can be seen from the above paragraphs, dynamic memory allocations
 are the types of memory allocations that can cause the most problems in
@@ -816,6 +828,9 @@ into!
 
    (1) There is currently at least one garbage collection package
 available for C and C++ (*note Related software::).
+
+   (2) Some compilers now support variable length arrays which provide
+roughly the same functionality.
 
 6 Operating system support
 **************************
@@ -1308,6 +1323,16 @@ through the line number tables will have to be made every time a call
 stack is displayed.  Alternatively, the `mpsym' command may be used to
 process an mpatrol log file with a debugger in order to obtain symbol
 names and source level information for any call stacks.
+
+   Because the `alloca()', `strdupa()' and `strndupa()' functions
+automatically free their allocations when the calling function returns,
+the log entries for these types of memory allocation are slightly
+different.  The actual memory allocation will have an entry similar to
+`malloc()', etc., but the memory deallocation will be marked as being
+done by `alloca()' and will occur at the next call to an mpatrol
+library function after the calling function has returned.  However, any
+such allocations that are explicitly deallocated with the `dealloca()'
+function will be marked as being done by `dealloca()'.
 
    The mpatrol library will always try to display as much useful
 information as possible in this log file, and will always display a
@@ -2006,10 +2031,12 @@ failed allocations.
    Finally, there are three functions which affect the mpatrol library
 globally.  The first, `__mp_check()', allows you to force an internal
 check of the mpatrol library's data structures at any point during
-program execution.  The other two functions, `__mp_memorymap()' and
-`__mp_summary()' allow you to force the generation of a memory map or
-library statistics at any point in your program, in much the same way
-as they would normally be displayed at the end of program execution.
+program execution and also to free up any out of scope memory
+allocations made by the `alloca()' family of functions.  The other two
+functions, `__mp_memorymap()' and `__mp_summary()' allow you to force
+the generation of a memory map or library statistics at any point in
+your program, in much the same way as they would normally be displayed
+at the end of program execution.
 
 7.8 Utilities
 =============
@@ -2881,6 +2908,24 @@ has already been read and processed by the mpatrol library.  It also has
 the added bonus of allowing the user to save profiling output files for
 later use even when the executable files which produced them have
 changed or no longer exist.
+
+   Support for the `alloca()' family of functions was added for mpatrol
+release 1.3.0 and uses the heap instead of the stack in order to trace
+and debug these functions.  If full call stack tracebacks are supported
+on a particular system then mpatrol will compare the current call stack
+with the call stack of the function that called `alloca()' in order to
+determine if a memory allocation made by `alloca()' is out of scope.
+This is generally a safe way to determine when such allocations should
+be freed, but if full call stack tracebacks are not supported then
+mpatrol will compare the addresses of specific local variables in the
+call stack in order to determine if the allocation should be freed.
+This is an inferior method since it depends on the same function call
+sequence being used each time an mpatrol function is called.
+Therefore, a safety boundary was added that will prevent mpatrol from
+freeing such allocations unless they are a really clear-cut case (i.e.
+the stack frames differ by a minimum number of bytes).  As a result,
+this second method will not usually free such allocations until a much
+later point.
 
    The library is written in a modular fashion so as to make it easy to
 add new functionality.  New modules have already been added, such as
@@ -4010,7 +4055,334 @@ matched by calls to `operator delete[]' and not `operator delete'.
 Hence, the library reports this as an error and does not free the memory
 allocation.
 
-11.7 Additional useful information
+11.7 The `alloca()' functions
+=============================
+
+   There are two examples of using `alloca()' and its related functions
+in `tests/pass/test8.c' and `tests/fail/test16.c'.  Both rely on mpatrol
+having full call stack traceback support, although they will work
+(albeit with slightly different results) on systems that do not.
+
+   The first test simply illustrates the use of `alloca()' and how its
+memory allocations are freed when they are no longer in use.
+
+       23  /*
+       24   * Tests alloca() and related functions via nested function calls.
+       25   * The final output should be a horizontal pyramid of plus signs
+       26   * followed by a horizontal pyramid of minus signs.
+       27   */
+     
+     
+       30  #include "mpatrol.h"
+       31  #include <stdio.h>
+     
+     
+       34  char *f1(char *s)
+       35  {
+       36      char *t;
+       37      size_t l;
+     
+       39      l = strlen(s) + 1;
+       40      if ((t = (char *) alloca(l + 1)) == NULL)
+       41          return NULL;
+       42      memcpy(t, s, l);
+       43      t[l - 1] = t[l - 2];
+       44      t[l] = '\0';
+       45      return strdup(t);
+       46  }
+     
+     
+       49  char *f2(char *s)
+       50  {
+       51      char *t;
+       52      size_t l;
+     
+       54      l = strlen(s) - 1;
+       55      if ((t = (char *) alloca(l + 1)) == NULL)
+       56          return NULL;
+       57      memcpy(t, s, l + 1);
+       58      t[l] = '\0';
+       59      return strdup(t);
+       60  }
+     
+     
+       63  int f(char *s, size_t l)
+       64  {
+       65      char *t;
+       66      size_t i;
+     
+       68      puts(s);
+       69      for (i = 0; i < l; i++)
+       70      {
+       71          if (((t = f1(s)) == NULL) ||
+       72              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
+       73              return 0;
+       74          strcpy(s, t);
+       75          free(t);
+       76          puts(s);
+       77      }
+       78      for (i = 0; i < l; i++)
+       79      {
+       80          if (((t = f2(s)) == NULL) ||
+       81              ((s = (char *) alloca(strlen(t) + 1)) == NULL))
+       82              return 0;
+       83          strcpy(s, t);
+       84          free(t);
+       85          puts(s);
+       86      }
+       87      return 1;
+       88  }
+     
+     
+       91  int main(void)
+       92  {
+       93      char *s;
+     
+       95      s = strdupa("+");
+       96      if (!f(s, 4))
+       97          exit(EXIT_FAILURE);
+       98      dealloca(s);
+       99      s = strdupa("-");
+      100      if (!f(s, 4))
+      101          exit(EXIT_FAILURE);
+      102      dealloca(s);
+      103      return EXIT_SUCCESS;
+      104  }
+
+   When compiled and run, you should get the following output.
+
+     +
+     ++
+     +++
+     ++++
+     +++++
+     ++++
+     +++
+     ++
+     +
+     -
+     --
+     ---
+     ----
+     -----
+     ----
+     ---
+     --
+     -
+
+   If you run it again, this time with the `MPATROL_OPTIONS' environment
+variable set to `LOGALLOCS' and `LOGFREES', you should see the
+following in the newly-generated `mpatrol.log' file.  Note that the
+`...' marks text that has been removed.
+
+     ALLOC: strdupa (1, 2 bytes, 1 byte) [main|test8.c|95]
+             0x000138F0 main+52
+             0x00013350 _start+100
+     
+     returns 0x0008C000
+     
+     ALLOC: alloca (2, 3 bytes, 8 bytes) [f1|test8.c|40]
+             0x000134CC f1+76
+             0x000136D8 f+68
+             0x00013904 main+72
+             0x00013350 _start+100
+     
+     returns 0x0008C008
+     
+     ALLOC: strdup (3, 3 bytes, 1 byte) [f1|test8.c|45]
+             0x00013584 f1+260
+             0x000136D8 f+68
+             0x00013904 main+72
+             0x00013350 _start+100
+     
+     returns 0x0008C002
+     
+     FREE: alloca (0x0008C008) [f|test8.c|72]
+             0x00013728 f+148
+             0x00013904 main+72
+             0x00013350 _start+100
+     
+         0x0008C008 (3 bytes) {alloca:2:0} [f1|test8.c|40]
+             0x000134CC f1+76
+             0x000136D8 f+68
+             0x00013904 main+72
+             0x00013350 _start+100
+     
+     ALLOC: alloca (4, 3 bytes, 8 bytes) [f|test8.c|72]
+             0x00013728 f+148
+             0x00013904 main+72
+             0x00013350 _start+100
+     
+     returns 0x0008C008
+     
+     ...
+     
+     FREE: alloca (0x0008C040) [main|test8.c|102]
+             0x000139C8 main+268
+             0x00013350 _start+100
+     
+         0x0008C040 (2 bytes) {alloca:50:0} [f|test8.c|81]
+             0x00013828 f+404
+             0x00013988 main+204
+             0x00013350 _start+100
+     
+     FREE: alloca (0x0008C038) [main|test8.c|102]
+             0x000139C8 main+268
+             0x00013350 _start+100
+     
+         0x0008C038 (3 bytes) {alloca:47:0} [f|test8.c|81]
+             0x00013828 f+404
+             0x00013988 main+204
+             0x00013350 _start+100
+     
+     ...
+     
+     FREE: alloca (0x0008C010) [main|test8.c|102]
+             0x000139C8 main+268
+             0x00013350 _start+100
+     
+         0x0008C010 (4 bytes) {alloca:32:0} [f|test8.c|72]
+             0x00013728 f+148
+             0x00013988 main+204
+             0x00013350 _start+100
+     
+     FREE: alloca (0x0008C008) [main|test8.c|102]
+             0x000139C8 main+268
+             0x00013350 _start+100
+     
+         0x0008C008 (3 bytes) {alloca:29:0} [f|test8.c|72]
+             0x00013728 f+148
+             0x00013988 main+204
+             0x00013350 _start+100
+     
+     FREE: dealloca (0x0008C000) [main|test8.c|102]
+             0x000139C8 main+268
+             0x00013350 _start+100
+     
+         0x0008C000 (2 bytes) {strdupa:26:0} [main|test8.c|99]
+             0x00013974 main+184
+             0x00013350 _start+100
+
+   After the first call to `strdupa()', there is a call to `alloca()'
+followed by a call to `strdup()'.  Because the memory allocation made by
+`strdupa()' is at the top level of the program it cannot automatically
+be freed until `main()' returns.  However, at the next call to
+`alloca()' in `f()', the mpatrol library notices that the memory
+allocation that was made by `alloca()' in `f1()' can be freed since
+`f1()' has returned.  The relevant allocation is then freed before
+making the next memory allocation.  You can see how it makes its
+decision by examining the call stack at the point of deallocation.
+
+   However, all of the memory allocations made by `alloca()' in `f()'
+cannot be freed until `f()' returns.  This can be seen in the two sets
+of eight consecutive deallocations in the log file, each set followed
+by a call to `dealloca()'.  The `dealloca()' function explicitly frees
+a memory allocation that was made by the `alloca()' family of
+functions, but these calls are not really necessary as all of these
+memory allocations would be freed anyway when `main()' returns.  The
+call to `dealloca()' is really only necessary to force a deallocation
+for a specific purpose at a certain point in the program.  Note that
+implicit deallocations are marked as being done by `alloca()' while
+explicit deallocations are marked as being done by `dealloca()'.
+
+   The second test illustrates how the mpatrol library can help debug
+`alloca()'-related problems by treating such memory allocations as
+normal heap allocations.
+
+     23  /*
+     24   * Duplicates a string using alloca() and then returns the address
+     25   * of the allocation.  This is illegal since the memory allocated
+     26   * by alloca() will be freed when the function returns.  The call
+     27   * to memcpy() will then corrupt free memory and the call to free()
+     28   * will attempt to free an invalid pointer.
+     29   */
+     
+     
+     32  #include "mpatrol.h"
+     33  #include <stdio.h>
+     
+     
+     36  char *f(size_t l)
+     37  {
+     38      return (char *) alloca(l);
+     39  }
+     
+     
+     42  char *g(char *s)
+     43  {
+     44      char *t;
+     45      size_t l;
+     
+     47      l = strlen(s) + 1;
+     48      if (t = f(l))
+     49          memcpy(t, s, l);
+     50      return t;
+     51  }
+     
+     
+     54  int main(void)
+     55  {
+     56      char *s;
+     
+     58      s = g("test");
+     59      free(s);
+     60      return EXIT_SUCCESS;
+     61  }
+
+   If you compile and run this example with the `MPATROL_OPTIONS'
+environment variable containing the options `LOGALL' and `NOFREE=0' you
+should see the following in `mpatrol.log'.
+
+     ALLOC: alloca (1, 5 bytes, 8 bytes) [f|test16.c|38]
+             0x0001346C f+52
+             0x000134A8 g+40
+             0x00013524 main+20
+             0x00013308 _start+100
+     
+     returns 0x0008C000
+     
+     FREE: alloca (0x0008C000) [g|test16.c|49]
+             0x000134F8 g+120
+             0x00013524 main+20
+             0x00013308 _start+100
+     
+         0x0008C000 (5 bytes) {alloca:1:0} [f|test16.c|38]
+             0x0001346C f+52
+             0x000134A8 g+40
+             0x00013524 main+20
+             0x00013308 _start+100
+     
+     MEMCOPY: memcpy (0x0001F760, 0x0008C000, 5 bytes, 0x00) [g|test16.c|49]
+             0x000134F8 g+120
+             0x00013524 main+20
+             0x00013308 _start+100
+     
+     ERROR: memcpy: attempt to perform operation on freed memory
+         0x0008C000 (5 bytes) {alloca:1:0} [g|test16.c|49]
+             0x000134F8 g+120
+             0x00013524 main+20
+             0x00013308 _start+100
+     
+     returns 0x0008C000
+     
+     FREE: free (0x0008C000) [main|test16.c|59]
+             0x00013550 main+64
+             0x00013308 _start+100
+     
+     ERROR: free: 0x0008C000 was freed with alloca
+         0x0008C000 (5 bytes) {alloca:1:0} [g|test16.c|49]
+             0x000134F8 g+120
+             0x00013524 main+20
+             0x00013308 _start+100
+
+   As you can see, memory allocations made by `alloca()' are treated in
+almost exactly the same way as normal memory allocations, with the
+result that errors similar to those above can be detected by the
+mpatrol library.  The only real difference between the two types of
+memory allocations is that allocations made by the `alloca()' family of
+functions will never show up in the list of unfreed memory allocations.
+
+11.8 Additional useful information
 ==================================
 
    This last example illustrates the various `SHOW' options that are
@@ -4719,11 +5091,14 @@ special mpatrol library functions will evaluate to empty statements.
 It is intended that the `NDEBUG' preprocessor macro be defined in
 release builds.
 
-   The following 14 functions are available as replacements for
+   The following 18 functions are available as replacements for
 existing C library functions.  To use these you must include
 `mpatrol.h' before all other header files, although on UNIX and Windows
 platforms (and AmigaOS when using `gcc') they will be used anyway,
-albeit with slightly less tracing information.
+albeit with slightly less tracing information.  If `alloca()' is being
+used and `alloca.h' is included then `mpatrol.h' must appear before
+`alloca.h' otherwise the debugging version of `alloca()' will not be
+used.
 
 `void *malloc(size_t size)'
      Allocates SIZE uninitialised bytes from the heap and returns a
@@ -4788,6 +5163,25 @@ albeit with slightly less tracing information.
      or reallocated with `realloc()', although the latter will not
      guarantee the preservation of alignment.
 
+`void *alloca(size_t size)'
+     Allocates SIZE temporary uninitialised bytes from the heap and
+     returns a pointer to the first byte of the allocation.  The
+     pointer returned will be suitably aligned for casting to any type
+     and can be used to store data of up to SIZE bytes in length.  If
+     SIZE is `0' then the memory allocated will be implicitly rounded
+     up to `1' byte.  If there is not enough space in the heap then the
+     `NULL' pointer will be returned and `errno' will be set to
+     `ENOMEM'.  The `alloca()' function normally allocates its memory
+     from the stack, with the result that all such allocations will be
+     freed when the function returns.  This version of `alloca()'
+     allocates its memory from the heap in order to provide better
+     debugging, but the allocations may not necessarily be freed
+     immediately when the function returns.  The allocated memory can
+     be deallocated explicitly with `dealloca()', but may not be
+     reallocated or deallocated in any other way.  This function is
+     available for backwards compatibility with older C source code and
+     should not be used in new code.
+
 `char *strdup(const char *str)'
      Allocates exactly enough memory from the heap to duplicate STR
      (including the terminating nul character) and returns a pointer to
@@ -4845,6 +5239,48 @@ albeit with slightly less tracing information.
      deallocated with `free()' or reallocated with `realloc()'.  This
      function is available for backwards compatibility with older C
      libraries and should not be used in new code.
+
+`char *strdupa(const char *str)'
+     Allocates exactly enough temporary memory from the heap to
+     duplicate STR (including the terminating nul character) and
+     returns a pointer to the first byte of the allocation after
+     copying STR to the newly-allocated memory.  The pointer returned
+     will have no alignment constraints and can be used to store
+     character data up to the length of STR.  If STR is `NULL' then the
+     `NULL' pointer will be returned.  If there is not enough space in
+     the heap then the `NULL' pointer will be returned and `errno' will
+     be set to `ENOMEM'.  The `strdupa()' function normally allocates
+     its memory from the stack, with the result that all such
+     allocations will be freed when the function returns.  This version
+     of `strdupa()' allocates its memory from the heap in order to
+     provide better debugging, but the allocations may not necessarily
+     be freed immediately when the function returns.  The allocated
+     memory can be deallocated explicitly with `dealloca()', but may
+     not be reallocated or deallocated in any other way.  This function
+     is available for backwards compatibility with older C source code
+     and should not be used in new code.
+
+`char *strndupa(const char *str, size_t size)'
+     Allocates exactly enough temporary memory from the heap to
+     duplicate STR (including the terminating nul character) and
+     returns a pointer to the first byte of the allocation after
+     copying STR to the newly-allocated memory.  The pointer returned
+     will have no alignment constraints and can be used to store
+     character data up to the length of STR.  If STR is `NULL' then the
+     `NULL' pointer will be returned.  If the length of STR is greater
+     than SIZE then only SIZE characters will be allocated and copied,
+     with one additional byte for the nul character.  If there is not
+     enough space in the heap then the `NULL' pointer will be returned
+     and `errno' will be set to `ENOMEM'.  The `strndupa()' function
+     normally allocates its memory from the stack, with the result that
+     all such allocations will be freed when the function returns.
+     This version of `strndupa()' allocates its memory from the heap in
+     order to provide better debugging, but the allocations may not
+     necessarily be freed immediately when the function returns.  The
+     allocated memory can be deallocated explicitly with `dealloca()',
+     but may not be reallocated or deallocated in any other way.  This
+     function is available for backwards compatibility with older C
+     source code and should not be used in new code.
 
 `void *realloc(void *ptr, size_t size)'
      Resizes the memory allocation beginning at PTR to SIZE bytes and
@@ -4912,6 +5348,18 @@ albeit with slightly less tracing information.
      implementation.  This function is available for backwards
      compatibility with older C libraries and `calloc()' and should not
      be used in new code.
+
+`void dealloca(void *ptr)'
+     Explicitly frees the temporary memory allocation beginning at PTR
+     so the memory can be reused by another call to allocate memory.
+     If PTR is `NULL' then no memory will be freed.  All of the
+     previous contents will be destroyed.  This function can only be
+     used to free memory that was allocated with the `alloca()',
+     `strdupa()' and `strndupa()' functions, but is only really
+     required if the mpatrol library does not automatically free such
+     memory allocations when the allocating function returns.  This
+     function is mpatrol-specific and should not be used in release
+     code.
 
    The following 5 functions are available as replacements for existing
 C++ library functions, but the replacements in `mpatrol.h' will only be
@@ -6865,6 +7313,15 @@ H.1 Notes for all platforms
      this is not the case then this method cannot be used or should
      only be used with a small number of fixed stack frames.
 
+   * Need to change `__mp_compareaddrs()' so that it will improve the
+     detection of when to free memory allocations made by `alloca()'
+     and its related functions.  This will involve checking the common
+     return addresses in the call stacks instead of just checking them
+     if the stack depth is the same.  Also, on systems that don't have
+     full call stack traversal, the minimum number of bytes that stack
+     frames should differ by should be platform-dependent since the
+     current value is way too high.
+
    * Add a function to display a stack trace of the current call stack
      to a file stream and another function to walk all current memory
      allocations invoking a call-back function for each one
@@ -7399,7 +7856,24 @@ I.2 Building
      support for these operators, but if not you will probably have to
      edit `mpatrol.h' to temporarily allow your files to compile.
 
-  5. Why do some of the `Makefile's contain the `-fno-inline-functions'
+  5. Why am I unable to call the mpatrol version of `alloca()'?  I only
+     ever seem to call the default version.
+
+     Most implementations of the `alloca()' function are compiler
+     builtins which will be converted to inline assembler or object
+     code in order for them to be able to dynamically modify the
+     calling function's stack frame at run-time.  As a result, the call
+     to `alloca()' is recognised as an intrinsic keyword and is dealt
+     with specially by the compiler.  However, if this can be
+     intercepted by the preprocessor before the compiler parses the
+     source code then the call can be redirected to another function.
+     This is one of the functions of the `mpatrol.h' header file, which
+     means that it must be included before the first call the
+     `alloca()'.  If `alloca.h' is also being included then `mpatrol.h'
+     must be included after it, otherwise it may redefine `alloca()'
+     back to the default version.
+
+  6. Why do some of the `Makefile's contain the `-fno-inline-functions'
      option as part of `OFLAGS'?
 
      The `-fno-inline-functions' option is a `gcc'-specific option
@@ -9259,6 +9733,8 @@ __mp_prologue:
           See ``Appendix A Functions''.
 __mp_summary:                                      
           See ``Appendix A Functions''.
+alloca:                                            
+          See ``Appendix A Functions''.
 bcmp:                                              
           See ``Appendix A Functions''.
 bcopy:                                             
@@ -9268,6 +9744,8 @@ bzero:
 calloc:                                            
           See ``Appendix A Functions''.
 cfree:                                             
+          See ``Appendix A Functions''.
+dealloca:                                          
           See ``Appendix A Functions''.
 expand:                                            
           See ``Appendix A Functions''.
@@ -9309,7 +9787,11 @@ set_new_handler:
           See ``Appendix A Functions''.
 strdup:                                            
           See ``Appendix A Functions''.
+strdupa:                                           
+          See ``Appendix A Functions''.
 strndup:                                           
+          See ``Appendix A Functions''.
+strndupa:                                          
           See ``Appendix A Functions''.
 strnsave:                                          
           See ``Appendix A Functions''.
@@ -9913,7 +10395,7 @@ memory debugger:
           See ``Appendix J Related software''.
 memory dump:                                        See 11.4.
 memory leak table:                                  See 8.
-memory leaks:                                       See 11.7.
+memory leaks:                                       See 11.8.
 memory management interface:                        See 6.
 Memory Management Reference:                       
           See ``Appendix K References''.
