@@ -26,34 +26,3 @@ LIBRARY MPATROLMT
 VERSION 1.4
 
 DESCRIPTION "controls and traces dynamic memory allocations"
-
-EXPORTS
-	malloc
-	calloc
-	memalign
-	valloc
-	pvalloc
-	alloca
-	strdup
-	strndup
-	strsave
-	strnsave
-	strdupa
-	strndupa
-	realloc
-	reallocf
-	recalloc
-	expand
-	free
-	cfree
-	dealloca
-	memset
-	bzero
-	memccpy
-	memcpy
-	memmove
-	bcopy
-	memchr
-	memmem
-	memcmp
-	bcmp

@@ -26,10 +26,3 @@ LIBRARY MPALLOC
 VERSION 1.4
 
 DESCRIPTION "dynamic memory allocation replacement library"
-
-EXPORTS
-	__mp_setfailhandler
-	__mp_xmalloc
-	__mp_xcalloc
-	__mp_xstrdup
-	__mp_xrealloc
