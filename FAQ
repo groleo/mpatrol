@@ -1,0 +1,124 @@
+FAQ FOR THE MPATROL LIBRARY
+
+
+This file contains frequently asked questions about the mpatrol library and
+their corresponding answers or solutions.
+
+
+ 1. DOCUMENTATION
+
+ Q. I can't seem to format the TeXinfo manual for mpatrol into anything that I
+    can view or print.
+
+ A. You'll need to have the appropriate document formatting programs installed
+    on your system before you can do this, and even then you'll also need to
+    have suitable software for viewing or printing the formatted documents.  You
+    can download an archive containing the latest mpatrol manual in a variety of
+    formats from http://www.cbmamiga.demon.co.uk/mpatrol/ and this will also
+    contain a file telling you where to get programs that can be used to view or
+    print these files.  Alternatively, you can browse the latest mpatrol manual
+    on-line at the same site.
+
+ Q. I'd like to convert the mpatrol manual to a different documentation format
+    but there is no support for that format in the Makefile.
+
+ A. Since TeXinfo is intended to be converted to other documentation formats it
+    should be fairly easy for you to find a tool which will convert it into your
+    desired format.  I plan to also provide the mpatrol manual in DocBook format
+    if and when a suitable TeXinfo to DocBook converter becomes available, but I
+    won't provide preformatted versions of the mpatrol manual in any other
+    format which isn't already supported.
+
+ Q. How do I install the mpatrol manual as a GNU info file?
+
+ A. Assuming you have the GNU info file built and copied to your system's info
+    file directory, you should use the install-info command to place an entry
+    for mpatrol in your system's GNU info directory file, otherwise the GNU info
+    reader may not be able to locate the mpatrol entry.  You may also need to
+    modify your INFOPATH environment variable if you installed the GNU info file
+    in a non-standard place.
+
+ Q. How do I install the mpatrol manual pages?
+
+ A. This is very system-dependent, but need only be done on UNIX systems since
+    they cannot be used on other platforms.  The unformatted manual pages exist
+    in man/man1 and man/man3 and should be copied to your system's manual page
+    directory.  If you don't have the nroff command installed on your system
+    then you may also need to copy the formatted manual pages, located in
+    man/cat1 and man/cat3.  You may also need to modify your MANPATH environment
+    variable if you installed the manual pages in a non-standard place, and some
+    systems require you to update the whatis database after installing new
+    manual pages, by running makewhatis, catman or equivalent.  Note that there
+    are two manual pages for mpatrol with the same name and you are likely to
+    see the section 1 manual page by default.  You must explicitly specify the
+    section number when using the man command in order to view the other manual
+    page.
+
+
+ 2. LINKING
+
+ Q. I get undefined symbols when linking with the mpatrol library.
+
+ A. This is most likely caused by the mpatrol library requiring additional
+    symbols defined in an object file access library.  If mpatrol was built with
+    FORMAT=FORMAT_ELF32 then you'll need to add -lelf (or equivalent) to the
+    compiler command line straight after -lmpatrol.  If mpatrol was built with
+    FORMAT=FORMAT_BFD then you'll need to add -lbfd -liberty (or equivalent)
+    instead.  If you are using the thread-safe version of mpatrol then you may
+    also need to link with the system threads library.
+
+ Q. I get duplicate definitions of symbols when linking with the mpatrol
+    library.
+
+ A. This is most likely caused by your code, or a library, providing definitions
+    of malloc() and free() which conflict with those defined in the mpatrol
+    library.  You'll need to disable these in order to perform a successful link
+    and use the replacements in mpatrol instead.
+
+ Q. I linked my program to a shared library version of mpatrol.  Now, when I try
+    to run my program, the system complains that it cannot find the mpatrol
+    library.
+
+ A. You need to tell the system where to find the shared library version of the
+    mpatrol library, either by setting your LD_LIBRARY_PATH environment variable
+    (or just PATH on Windows platforms), or by embedding the full path to the
+    library into the executable when you link your program by setting the
+    LD_RUN_PATH environment variable.
+
+ Q. I linked my program to a shared library version of mpatrol.  Will future
+    releases of mpatrol remain compatible with this version or will I have to
+    relink my program?
+
+ A. Backwards compatibility is not generally guaranteed, but should be preserved
+    if only the bug fix part of the mpatrol version number has changed, with the
+    major and minor versions staying the same.  For example, versions 1.0.3 and
+    1.0.8 should be compatible, but upgrading to version 1.1.0 may require a
+    relink.
+
+
+ 3. RUNNING
+
+ Q. I am trying to use the mpatrol shell script to debug an executable file that
+    was not originally compiled with the mpatrol library.  However, even though
+    it runs successfully, no mpatrol log file is produced.
+
+ A. First, check that you are passing the -d option to the mpatrol shell script.
+    If that doesn't work then check that the executable file has been
+    dynamically linked; statically linked executables cannot be forced to use
+    the mpatrol library.  If it still doesn't work then it may be that the
+    dynamic linker on your system doesn't recognise the LD_PRELOAD environment
+    variable, in which case you can't use this feature.
+
+ Q. I know that there's a definite heap corruption problem in my program as it
+    keeps crashing in unrelated code due to pointer corruption, and when I link
+    with the mpatrol library it stops crashing.  What can I do?
+
+ A. Try as many of the relevant mpatrol run-time options as possible and make
+    sure that you closely examine the mpatrol log file for warnings and errors -
+    your problem may have been noticed by the mpatrol library but it may not
+    have considered it a fatal error and continued execution.  If this still
+    doesn't show up anything then you can probably rest assured that you have a
+    memory corruption problem but you may need to use a commercial product such
+    as Purify to isolate it.  If that fails then you'll just have to employ the
+    traditional debugging method of single-stepping through your program in a
+    debugger until something unusual or unexpected happens.
