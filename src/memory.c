@@ -53,7 +53,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.13 2000-04-04 17:39:01 graeme Exp $"
+#ident "$Id: memory.c,v 1.14 2000-04-23 15:40:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -125,7 +125,7 @@ static size_t minalign(void)
         struct { char x; long double y; } z;
         n = (char *) &z.y - &z.x;
     }
-    if (a < n)
+    if (a < (unsigned long) n)
         a = n;
     {
         /* A generic pointer type.  The assumption in this case is that
@@ -135,7 +135,7 @@ static size_t minalign(void)
         struct { char x; void *y; } z;
         n = (char *) &z.y - &z.x;
     }
-    if (a < n)
+    if (a < (unsigned long) n)
         a = n;
     return __mp_poweroftwo(a);
 }

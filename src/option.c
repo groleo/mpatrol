@@ -41,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: option.c,v 1.12 2000-04-20 22:06:55 graeme Exp $"
+#ident "$Id: option.c,v 1.13 2000-04-23 15:40:52 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -291,7 +291,7 @@ static int readrange(char *s, unsigned long *l, unsigned long *u)
     *t = '\0';
     /* If there was a number before the minus sign then read it.
      */
-    if ((*s != '\0') && (s[readnumber(s, l, 1)] != '\0'))
+    if ((*s != '\0') && (s[readnumber(s, (long *) l, 1)] != '\0'))
     {
         *l = (unsigned long) -1;
         w = 1;
@@ -303,7 +303,7 @@ static int readrange(char *s, unsigned long *l, unsigned long *u)
         s = t + 1;
         /* If there was a number after the minus sign then read it too.
          */
-        if ((*s != '\0') && (s[readnumber(s, u, 1)] != '\0'))
+        if ((*s != '\0') && (s[readnumber(s, (long *) u, 1)] != '\0'))
         {
             *u = (unsigned long) -1;
             w = 1;

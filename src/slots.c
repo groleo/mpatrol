@@ -35,7 +35,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: slots.c,v 1.2 2000-01-09 20:35:21 graeme Exp $"
+#ident "$Id: slots.c,v 1.3 2000-04-23 15:40:53 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -60,7 +60,7 @@ MP_GLOBAL void __mp_newslots(slottable *t, size_t s, size_t a)
      * minimum.  In any case, force the alignment to be a power of two.
      */
     n = (char *) &z.y - &z.x;
-    if (a < n)
+    if (a < (unsigned long) n)
         a = n;
     t->entalign = __mp_poweroftwo(a);
     /* If the supplied size is less than the size of a slot entry then
