@@ -34,6 +34,7 @@ void display(void *p)
 {
     __mp_allocstack *s;
     __mp_allocinfo d;
+    __mp_symbolinfo i;
 
     if (!__mp_info(p, &d))
     {
@@ -48,22 +49,36 @@ void display(void *p)
     else
         fprintf(stderr, "block:    0x%08lX\n", d.block);
     fprintf(stderr, "size:     %lu\n", d.size);
-    fprintf(stderr, "type:     %lu\n", d.type);
+    fprintf(stderr, "type:     %s\n", __mp_function(d.type));
     fprintf(stderr, "alloc:    %lu\n", d.alloc);
     fprintf(stderr, "realloc:  %lu\n", d.realloc);
+    fprintf(stderr, "thread:   %lu\n", d.thread);
     fprintf(stderr, "event:    %lu\n", d.event);
-    fprintf(stderr, "func:     %s\n", d.func ? d.func : "NULL");
-    fprintf(stderr, "file:     %s\n", d.file ? d.file : "NULL");
+    fprintf(stderr, "func:     %s\n", d.func ? d.func : "<unknown>");
+    fprintf(stderr, "file:     %s\n", d.file ? d.file : "<unknown>");
     fprintf(stderr, "line:     %lu\n", d.line);
     for (s = d.stack; s != NULL; s = s->next)
     {
         if (sizeof(void *) == 8)
-            fprintf(stderr, "\t0x%016lX: ", s->addr);
+            fprintf(stderr, "\t0x%016lX", s->addr);
         else
-            fprintf(stderr, "\t0x%08lX: ", s->addr);
-        fprintf(stderr, "%s\n", s->name ? s->name : "NULL");
+            fprintf(stderr, "\t0x%08lX", s->addr);
+        if (__mp_syminfo(s->addr, &i))
+        {
+            if (i.name != NULL)
+                fprintf(stderr, " %s", i.name);
+            if ((i.addr != NULL) && (i.addr != s->addr))
+                fprintf(stderr, "%+ld",
+                        (char *) s->addr - (char *) i.addr);
+            if (i.object != NULL)
+                fprintf(stderr, " [%s]", i.object);
+        }
+        else if (s->name != NULL)
+            fprintf(stderr, " %s", s->name);
+        fputc('\n', stderr);
     }
-    fprintf(stderr, "typename: %s\n", d.typestr ? d.typestr : "NULL");
+    fprintf(stderr, "typestr:  %s\n",
+            d.typestr ? d.typestr : "<unknown>");
     fprintf(stderr, "typesize: %lu\n", d.typesize);
     fprintf(stderr, "freed:    %d\n", d.freed);
 }
