@@ -38,7 +38,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.5 1999-11-25 16:47:03 graeme Exp $"
+#ident "$Id: inter.c,v 1.6 1999-12-21 20:21:37 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -340,7 +340,7 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         if (((f == AT_STRNDUP) || (f == AT_STRNSAVE)) && (n > l))
             n = l;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
-            memcpy(p, o, n + 1);
+            __mp_memcopy(p, o, n + 1);
     }
     if (memhead.epilogue)
         memhead.epilogue(p);
