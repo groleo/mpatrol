@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.15 2001-02-05 22:19:38 graeme Exp $
+# $Id: Makefile.aix,v 1.16 2001-02-05 23:34:06 graeme Exp $
 
 
 # Definitions
@@ -296,12 +296,16 @@ malloc.o malloc.n.ln malloc.t.o malloc.t.ln: $(SOURCE)/malloc.c \
 	$(SOURCE)/slots.h $(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h \
 	$(SOURCE)/alloc.h $(SOURCE)/signals.h $(SOURCE)/symbol.h \
 	$(SOURCE)/strtab.h $(SOURCE)/profile.h $(SOURCE)/trace.h
-cplus.o cplus.n.ln cplus.t.o cplus.t.ln: $(SOURCE)/cplus.c $(SOURCE)/inter.h \
-	$(SOURCE)/config.h $(SOURCE)/target.h $(SOURCE)/info.h \
-	$(SOURCE)/addr.h $(SOURCE)/heap.h $(SOURCE)/memory.h $(SOURCE)/slots.h \
-	$(SOURCE)/tree.h $(SOURCE)/list.h $(SOURCE)/stack.h $(SOURCE)/alloc.h \
-	$(SOURCE)/signals.h $(SOURCE)/symbol.h $(SOURCE)/strtab.h \
-	$(SOURCE)/profile.h $(SOURCE)/trace.h
+cplus.o cplus.n.ln: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
+	$(SOURCE)/trace.h $(SOURCE)/diag.h
+cplus.t.o cplus.t.ln: $(SOURCE)/cplus.c $(SOURCE)/inter.h $(SOURCE)/config.h \
+	$(SOURCE)/target.h $(SOURCE)/info.h $(SOURCE)/addr.h $(SOURCE)/heap.h \
+	$(SOURCE)/memory.h $(SOURCE)/slots.h $(SOURCE)/signals.h \
+	$(SOURCE)/symbol.h $(SOURCE)/strtab.h $(SOURCE)/profile.h \
+	$(SOURCE)/trace.h $(SOURCE)/diag.h $(SOURCE)/mutex.h
 version.o version.n.ln version.t.o version.t.ln: $(SOURCE)/version.c \
 	$(SOURCE)/version.h $(SOURCE)/config.h $(SOURCE)/target.h
 machine.o machine.t.o: $(SOURCE)/machine.c $(SOURCE)/config.h $(SOURCE)/target.h
