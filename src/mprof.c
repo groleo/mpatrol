@@ -35,11 +35,25 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.19 2000-10-03 16:17:00 graeme Exp $"
+#ident "$Id: mprof.c,v 1.20 2000-10-09 19:29:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 #define VERSION "1.1" /* the current version of this program */
+
+
+/* The flags used to parse the command line options.
+ */
+
+typedef enum options_flags
+{
+    OF_ADDRESSES  = 'a',
+    OF_COUNTS     = 'c',
+    OF_HELP       = 'h',
+    OF_STACKDEPTH = 'n',
+    OF_VERSION    = 'V'
+}
+options_flags;
 
 
 /* Structure containing statistics about the counts and totals of all of the
@@ -197,19 +211,21 @@ static unsigned long maxstack;
 
 static option options_table[] =
 {
-    {"addresses", 'a', NULL,
+    {"addresses", OF_ADDRESSES, NULL,
      "\tSpecifies that different call sites from within the same function\n"
      "\tare to be differentiated and that the names of all functions should\n"
      "\tbe displayed with their call site offset in bytes.\n"},
-    {"counts", 'c', NULL,
+    {"counts", OF_COUNTS, NULL,
      "\tSpecifies that certain tables should be sorted by the number of\n"
      "\tallocations or deallocations rather than the total number of bytes\n"
      "\tallocated or deallocated.\n"},
-    {"stack-depth", 'n', "depth",
+    {"help", OF_HELP, NULL,
+     "\tDisplays this quick-reference option summary.\n"},
+    {"stack-depth", OF_STACKDEPTH, "depth",
      "\tSpecifies the maximum stack depth to display and also use when\n"
      "\tcalculating if one call site has the same call stack as another call\n"
      "\tsite.\n"},
-    {"version", 'V', NULL,
+    {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
 };
@@ -858,26 +874,29 @@ int main(int argc, char **argv)
 {
     char b[256];
     char *f;
-    int c, e, v;
+    int c, e, h, v;
 
-    e = v = 0;
+    e = h = v = 0;
     maxstack = 1;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)
         {
-          case 'a':
+          case OF_ADDRESSES:
             useaddresses = 1;
             break;
-          case 'c':
+          case OF_COUNTS:
             showcounts = 1;
             break;
-          case 'n':
+          case OF_HELP:
+            h = 1;
+            break;
+          case OF_STACKDEPTH:
             if (!__mp_getnum(progname, __mp_optarg, (long *) &maxstack, 1))
                 e = 1;
             break;
-          case 'V':
+          case OF_VERSION:
             v = 1;
             break;
           default:
@@ -896,11 +915,19 @@ int main(int argc, char **argv)
         fputs("For the latest mpatrol release and documentation,\n", stderr);
         fprintf(stderr, "visit %s.\n\n", __mp_homepage);
     }
-    if ((argc > 1) || (e == 1))
+    if (argc > 1)
+        e = 1;
+    if ((e == 1) || (h == 1))
     {
         fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
-        __mp_showopts(options_table);
-        exit(EXIT_FAILURE);
+        if (h == 0)
+            fprintf(stderr, "Type `%s --help' for a complete list of "
+                    "options.\n", progname);
+        else
+            __mp_showopts(options_table);
+        if (e == 1)
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
     if (argc == 1)
         f = argv[0];

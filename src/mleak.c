@@ -41,11 +41,23 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mleak.c,v 1.4 2000-10-03 16:17:49 graeme Exp $"
+#ident "$Id: mleak.c,v 1.5 2000-10-09 19:29:19 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
 #define VERSION "1.2" /* the current version of this program */
+
+
+/* The flags used to parse the command line options.
+ */
+
+typedef enum options_flags
+{
+    OF_HELP    = 'h',
+    OF_IGNORE  = 'i',
+    OF_VERSION = 'V'
+}
+options_flags;
 
 
 /* Structure containing the allocation details and log file offset for a
@@ -104,10 +116,12 @@ static int ignorelist;
 
 static option options_table[] =
 {
-    {"ignore", 'i', NULL,
+    {"help", OF_HELP, NULL,
+     "\tDisplays this quick-reference option summary.\n"},
+    {"ignore", OF_IGNORE, NULL,
      "\tSpecifies that the list of unfreed allocations in the log file\n"
      "\tshould be ignored.\n"},
-    {"version", 'V', NULL,
+    {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
     NULL
 };
@@ -352,18 +366,21 @@ int main(int argc, char **argv)
 {
     char b[256];
     char *f;
-    int c, e, v;
+    int c, e, h, v;
 
-    e = v = 0;
+    e = h = v = 0;
     progname = argv[0];
     while ((c = __mp_getopt(argc, argv, __mp_shortopts(b, options_table),
              options_table)) != EOF)
         switch (c)
         {
-          case 'i':
+          case OF_HELP:
+            h = 1;
+            break;
+          case OF_IGNORE:
             ignorelist = 1;
             break;
-          case 'V':
+          case OF_VERSION:
             v = 1;
             break;
           default:
@@ -382,11 +399,19 @@ int main(int argc, char **argv)
         fputs("For the latest mpatrol release and documentation,\n", stderr);
         fprintf(stderr, "visit %s.\n\n", __mp_homepage);
     }
-    if ((argc > 1) || (e == 1))
+    if (argc > 1)
+        e = 1;
+    if ((e == 1) || (h == 1))
     {
         fprintf(stderr, "Usage: %s [options] [file]\n\n", progname);
-        __mp_showopts(options_table);
-        exit(EXIT_FAILURE);
+        if (h == 0)
+            fprintf(stderr, "Type `%s --help' for a complete list of "
+                    "options.\n", progname);
+        else
+            __mp_showopts(options_table);
+        if (e == 1)
+            exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
     if (argc == 1)
         f = argv[0];
