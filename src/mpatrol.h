@@ -25,7 +25,7 @@
 
 
 /*
- * $Id: mpatrol.h,v 1.102 2001-03-02 01:31:23 graeme Exp $
+ * $Id: mpatrol.h,v 1.103 2001-03-02 01:53:55 graeme Exp $
  */
 
 
@@ -657,7 +657,11 @@ struct mallinfo
          p = NULL; } while (0)
 #define MP_FAILURE(f) ((__mp_failhandler) NULL)
 
-#define __mp_check() __mp_checkheap(MP_FUNCNAME, __FILE__, __LINE__)
+#define __mp_check() \
+    __mp_checkheap(MP_FUNCNAME, __FILE__, __LINE__)
+
+#define __mp_vlocprintf(m, v) \
+    __mp_vprintfwithloc(MP_FUNCNAME, __FILE__, __LINE__, (m), (v))
 
 
 #ifdef __cplusplus
@@ -769,6 +773,7 @@ int __mp_view(MP_CONST char *, unsigned long);
 #define __mp_popdelstack(s, t, u) ((void) 0)
 #define __mp_vprintf(s, v) ((int) 0)
 #define __mp_vprintfwithloc(s, t, u, m, v) ((void) 0)
+#define __mp_vlocprintf(m, v) ((void) 0)
 #define __mp_logmemory(p, l) ((void) 0)
 #define __mp_logstack(k) ((int) 0)
 #define __mp_logaddr(p) ((int) 0)
