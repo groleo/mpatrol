@@ -37,6 +37,19 @@
 #include "stack.h"
 
 
+/* The different types of call stack comparison results.
+ */
+
+typedef enum stackcompare
+{
+    SC_SAME,      /* same depth, same addresses */
+    SC_DIFFERENT, /* same depth, different addresses */
+    SC_SHALLOWER, /* shallower call stack */
+    SC_DEEPER     /* deeper call stack */
+}
+stackcompare;
+
+
 /* An address node belongs to a stack of address nodes and contains
  * details of a single function in the call stack.  An internal address
  * node stores details of a single memory block allocated for address
@@ -88,6 +101,7 @@ MP_EXPORT void __mp_deleteaddrs(addrhead *);
 MP_EXPORT addrnode *__mp_getaddrs(addrhead *, stackinfo *);
 MP_EXPORT void __mp_freeaddrs(addrhead *, addrnode *);
 MP_EXPORT int __mp_protectaddrs(addrhead *, memaccess);
+MP_EXPORT stackcompare __mp_compareaddrs(addrnode *, addrnode *);
 
 
 #ifdef __cplusplus
