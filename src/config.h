@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.66 2001-02-27 19:55:50 graeme Exp $
+ * $Id: config.h,v 1.67 2001-02-27 20:42:29 graeme Exp $
  */
 
 
@@ -766,6 +766,18 @@
 #define MP_INIT_SUPPORT 0
 #endif /* SYSTEM */
 #endif /* MP_INIT_SUPPORT */
+
+
+/* Indicates if the mpatrol library can assume that any functions whose names
+ * begin with __mp_init_* when the symbols are being read should be called
+ * when __mp_init() is called.  This should not be enabled on systems where
+ * the address of the symbol in the object file does not represent the entry
+ * point for the resulting function.
+ */
+
+#ifndef MP_INITFUNC_SUPPORT
+#define MP_INITFUNC_SUPPORT 1
+#endif /* MP_INITFUNC_SUPPORT */
 
 
 /* Indicates if the __mp_fini() function should be registered with atexit() in
