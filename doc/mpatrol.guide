@@ -13,7 +13,7 @@ dynamic memory allocations.
 
    Copyright (C) 1997-2001 Graeme S. Roy <graeme@epc.co.uk>
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
 February, 2001.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -52,7 +52,7 @@ mpatrol
    This document describes mpatrol, a library for controlling and
 tracing dynamic memory allocations.
 
-   This is edition 2.5 of the mpatrol manual for version 1.4.0, 12th
+   This is edition 2.5 of the mpatrol manual for version 1.4.0, 14th
 February, 2001.
 
 
@@ -9554,9 +9554,13 @@ Notes for all platforms
      @{b}mallocblksize()@{ub} and @{b}msize()@{ub} which are provided in many other
      malloc libraries.  These won't necessarily behave in exactly the
      same way as existing implementations, but at least there won't be
-     link errors when compiling source code which uses them.  Global
-     variables could also be added for reading and writing library
-     settings in a debugger.
+     link errors when compiling source code which uses them.  Also, add
+     support for setting as many remaining options in @{b}__mp_setoption()@{ub}
+     as possible and perhaps even some options before the mpatrol
+     library has been initialised.
+
+   * Add similar functions to the GNU @{b}mcheck()@{ub} and @{b}mprobe()@{ub} functions,
+     as well as @{b}mtrace()@{ub} and @{b}muntrace()@{ub}.
 
    * Perhaps add debugging/tracing versions of the string manipulation
      functions, such as @{b}strlen()@{ub} and @{b}strcmp()@{ub} in much the same way as
@@ -9565,6 +9569,10 @@ Notes for all platforms
      just to assume the C locale to begin with.  Also need to have
      better detection of internal and free blocks when displaying
      memory range errors.
+
+   * Add wide-character equivalents of @{b}memset()@{ub}, etc.  These are
+     defined as @{b}wmemset()@{ub}, etc. and are now part of ANSI C.  Also add
+     @{b}memdup()@{ub} and @{b}xmemdup()@{ub}.
 
    * Perhaps reimplement the standard I/O library for internal use by
      mpatrol, thus preventing recursive calls to @{b}malloc()@{ub} each time a
@@ -9603,18 +9611,21 @@ Notes for all platforms
 
    * Extend the Checker-support functions to store and check
      information about access permissions within heap memory and
-     perhaps also in the stack as well.  Currently, the Checker-support
-     functions only ensure that no memory accesses cross allocation
-     boundaries or access free memory.  Could also make use of the
-     @{b}etext@{ub}, @{b}edata@{ub} and @{b}end@{ub} pointers that are set at run-time on most
-     UNIX systems.
+     perhaps also in the stack as well, and also improve the
+     diagnostics from the checker functions if they fail.  Currently,
+     the Checker-support functions only ensure that no memory accesses
+     cross allocation boundaries or access free memory.  Could also
+     make use of the @{b}etext@{ub}, @{b}edata@{ub} and @{b}end@{ub} pointers that are set at
+     run-time on most UNIX systems.  Need to properly implement
+     @{b}chkr_check_exec()@{ub}.
 
    * Details of the segments which make up the executable file and any
      shared libraries could be made use of in order to detect
      operations which cross such segments.  For example, a memory
      operation may erroneously cross the data and BSS segments.  The
      symbol table for data symbols could also be used to provide much
-     finer-grained error-checking.
+     finer-grained error-checking.  Need to make use of the
+     @{b}__mp_memquery()@{ub} function.
 
    * Add an option to specify that all failed memory allocations should
      abort (or at least give a warning) instead of returning a @{b}NULL@{ub}
@@ -9640,6 +9651,17 @@ Notes for all platforms
      is a further illegal memory access when it is displaying the
      summary.  This should be prevented by disabling the signal handler
      at its first entry.
+
+   * Need to make the mpalloc library threadsafe.  This is only likely
+     to be an issue when calling @{b}MP_FAILURE()@{ub}.  Should also add
+     something similar to @{b}xmalloc_set_program_name()@{ub} in order to show
+     the program name when a memory allocation fails.  If the C++
+     operators fail to allocate memory in libmpalloc then there should
+     probably also be an exception thrown to mimic the behaviour of
+     libmpatrol, although this isn't a big issue since the program
+     should be completely recompiled to remove mpatrol debugging before
+     a release.  In the same vein, perhaps there should be some sort of
+     support for @{b}set_new_handler()@{ub} in libmpalloc.
 
    * Add an option to write the mpatrol log file in HTML format, or
      even better XML format.  Could also write the tracing output file

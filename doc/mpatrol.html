@@ -122,7 +122,7 @@ Up:<a rel=up href="#(dir)">(dir)</a>
 memory allocations.
 
 <p>This is edition 2.5 of the mpatrol manual for version
-1.4.0, 12th February, 2001.
+1.4.0, 14th February, 2001.
 
 <ul>
 <li><a href="#Foreword">Foreword</a>:                     Motivation and feedback. 
@@ -9133,8 +9133,12 @@ summary as well.
 <code>mallocctl()</code>, <code>mallocblksize()</code> and <code>msize()</code> which are provided
 in many other malloc libraries.  These won't necessarily behave in exactly the
 same way as existing implementations, but at least there won't be link errors
-when compiling source code which uses them.  Global variables could also be
-added for reading and writing library settings in a debugger.
+when compiling source code which uses them.  Also, add support for setting as
+many remaining options in <code>__mp_setoption()</code> as possible and perhaps even
+some options before the mpatrol library has been initialised.
+
+<li>Add similar functions to the GNU <code>mcheck()</code> and <code>mprobe()</code> functions,
+as well as <code>mtrace()</code> and <code>muntrace()</code>.
 
 <li>Perhaps add debugging/tracing versions of the string manipulation functions,
 such as <code>strlen()</code> and <code>strcmp()</code> in much the same way as was done for
@@ -9142,6 +9146,10 @@ the memory operation functions.  The only problem with this would be locale
 support, but perhaps it might be easier just to assume the C locale to begin
 with.  Also need to have better detection of internal and free blocks when
 displaying memory range errors.
+
+<li>Add wide-character equivalents of <code>memset()</code>, etc.  These are defined as
+<code>wmemset()</code>, etc. and are now part of ANSI C.  Also add <code>memdup()</code> and
+<code>xmemdup()</code>.
 
 <li>Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to <code>malloc()</code> each time a write to the log file
@@ -9175,17 +9183,19 @@ This would allow mpatrol to keep track of the entry to and exit from every
 function, but would only work for code compiled with this option.
 
 <li>Extend the Checker-support functions to store and check information about
-access permissions within heap memory and perhaps also in the stack as well. 
+access permissions within heap memory and perhaps also in the stack as well,
+and also improve the diagnostics from the checker functions if they fail. 
 Currently, the Checker-support functions only ensure that no memory accesses
 cross allocation boundaries or access free memory.  Could also make use of the
 <code>etext</code>, <code>edata</code> and <code>end</code> pointers that are set at run-time on
-most UNIX systems.
+most UNIX systems.  Need to properly implement <code>chkr_check_exec()</code>.
 
 <li>Details of the segments which make up the executable file and any shared
 libraries could be made use of in order to detect operations which cross such
 segments.  For example, a memory operation may erroneously cross the data
 and BSS segments.  The symbol table for data symbols could also be used to
-provide much finer-grained error-checking.
+provide much finer-grained error-checking.  Need to make use of the
+<code>__mp_memquery()</code> function.
 
 <li>Add an option to specify that all failed memory allocations should abort (or at
 least give a warning) instead of returning a <code>NULL</code> pointer.  Also, perhaps
@@ -9208,6 +9218,16 @@ library is attempting to initialise itself.
 memory access on UNIX and Windows platforms, and there is a further illegal
 memory access when it is displaying the summary.  This should be prevented by
 disabling the signal handler at its first entry.
+
+<li>Need to make the mpalloc library threadsafe.  This is only likely to be an
+issue when calling <code>MP_FAILURE()</code>.  Should also add something similar to
+<code>xmalloc_set_program_name()</code> in order to show the program name when a
+memory allocation fails.  If the C++ operators fail to allocate memory in
+libmpalloc then there should probably also be an exception thrown to mimic the
+behaviour of libmpatrol, although this isn't a big issue since the program
+should be completely recompiled to remove mpatrol debugging before a release. 
+In the same vein, perhaps there should be some sort of support for
+<code>set_new_handler()</code> in libmpalloc.
 
 <li>Add an option to write the mpatrol log file in HTML format, or even better XML
 format.  Could also write the tracing output file in HATF format (Heap
