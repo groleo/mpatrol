@@ -56,7 +56,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.15 2000-03-21 00:12:15 graeme Exp $"
+#ident "$Id: symbol.c,v 1.16 2000-03-21 01:45:28 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -897,12 +897,18 @@ MP_GLOBAL void __mp_fixsymbols(symhead *y)
     }
 #if TARGET == TARGET_AMIGA
     if (o != 0)
+    {
+#if FORMAT == FORMAT_BFD
+        if (y->hhead != NULL)
+            ((objectfile *) y->hhead)->base = o;
+#endif /* FORMAT */
         for (n = (symnode *) __mp_minimum(y->dtree.root); n != NULL;
              n = (symnode *) __mp_successor(&n->index.node))
         {
             n->data.node.key += o;
             n->data.addr = (char *) n->data.addr + o;
         }
+    }
 #endif /* TARGET */
 }
 
