@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.32 2001-07-26 16:56:37 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.33 2001-08-01 22:46:58 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "26 July 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "1 August 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -998,13 +998,13 @@ name, file name, line number and the return address of the calling function, or
 null pointers and zero if they cannot be determined):
 
 .TS
-c c l.
-\fBArgument 1\fP	\fBArgument 2\fP	\fBCalled by\fP
+c c c l.
+\fBArgument 1\fP	\fBArgument 2\fP	\fBArgument 3\fP	\fBCalled by\fP
 
-\fI-1\fP	\fIsize\fP	\fBmalloc\fP, etc.
-\fIptr\fP	\fIsize\fP	\fBrealloc\fP, etc.
-\fIptr\fP	\fI-1\fP	\fBfree\fP, etc.
-\fIptr\fP	\fI-2\fP	\fBstrdup\fP, etc.
+\fI-1\fP	\fIsize\fP	\fIalign\fP	\fBmalloc\fP, etc.
+\fIptr\fP	\fIsize\fP	\fIalign\fP	\fBrealloc\fP, etc.
+\fIptr\fP	\fI-1\fP	\fI0\fP	\fBfree\fP, etc.
+\fIptr\fP	\fI-2\fP	\fI1\fP	\fBstrdup\fP, etc.
 .TE
 .TP
 \fB__mp_epilogue\fP

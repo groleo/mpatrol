@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.230 2001-07-26 16:56:17 graeme Exp $
+@c $Id: mpatrol.texi,v 1.231 2001-08-01 22:44:31 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 26th July, 2001
+@set UPDATED 1st August, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -2809,11 +2809,11 @@ code is an example of this and can be found in @file{tests/pass/test2.c}.
 34  __mp_epiloguehandler old_epilogue;
 
 
-37  void prologue(MP_CONST void *p, size_t l, MP_CONST char *s,
+37  void prologue(MP_CONST void *p, size_t l, size_t m, MP_CONST char *s,
 38                MP_CONST char *t, unsigned long u, MP_CONST void *a)
 39  @{
 40      if (old_prologue != NULL)
-41          old_prologue(p, l, s, t, u, a);
+41          old_prologue(p, l, m, s, t, u, a);
 42      if (p == (void *) -1)
 43          fprintf(stderr, "allocating %lu bytes\n", l);
 44      else if (l == (size_t) -1)
@@ -9283,21 +9283,26 @@ call the prologue function (the last four arguments contain the function name,
 file name, line number and the return address of the calling function, or null
 pointers and zero if they cannot be determined):
 
-@multitable @columnfractions .2 .2 .6
+@multitable @columnfractions .2 .2 .2 .4
 @item @emph{Argument 1}
 @tab @emph{Argument 2}
+@tab @emph{Argument 3}
 @tab @emph{Called by}
 @item @code{-1}
 @tab @var{size}
+@tab @var{align}
 @tab @code{malloc()}, etc.
 @item @var{ptr}
 @tab @var{size}
+@tab @var{align}
 @tab @code{realloc()}, etc.
 @item @var{ptr}
 @tab @code{-1}
+@tab @code{0}
 @tab @code{free()}, etc.
 @item @var{ptr}
 @tab @code{-2}
+@tab @code{1}
 @tab @code{strdup()}, etc.
 @end multitable
 
