@@ -136,3 +136,35 @@ their corresponding answers or solutions.
     malloc() and related functions would have the capability to cause lots of
     undesirable side effects.  However, this does not normally happen, which is
     why the behaviour was moved to an option for those that needed it.
+
+
+ 4. FILES
+
+ Q. Why is there a libmpatrol.o target in the UNIX Makefile?
+
+ A. This is simply used to build the mpatrol library as one large object file
+    for full incorporation into other libraries and was used during the
+    development of mpatrol.  On UNIX platforms some linkers support the -r
+    option for combining many object files into one large object file, but this
+    is not universally supported, hence the reason for using the compiler
+    instead.  Because all of the source files are compiled at once, there may be
+    conflicts with system header files when malloc() and its related functions
+    are being compiled, which is why such an object file is not built by
+    default.  Note that the Amiga Makefile uses mpatrol.o and the Windows and
+    Netware Makefiles use mpatrol.obj.
+
+ Q. What are the CVS subdirectories that come with the mpatrol distribution?
+
+ A. CVS stands for Concurrent Versions System and is a project version control
+    system.  All of the source files that comprise an mpatrol release are stored
+    in a central CVS repository so that previous releases can be easily
+    retrieved, but the CVS system needs to have a way of determining the
+    versions of currently checked-out files, hence the CVS subdirectories.  You
+    shouldn't need to worry about them, so just ignore them.
+
+ Q. What does the mupdate shell script do?
+
+ A. This is for my use in order to automate every new release of mpatrol.  You
+    should never need to run this script and it should not be installed
+    anywhere on your system.  This script also uses and modifies the VERSION
+    file and updates the NEWS and ChangeLog files.
