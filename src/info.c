@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.33 2000-11-02 18:49:43 graeme Exp $"
+#ident "$Id: info.c,v 1.34 2000-11-02 21:17:24 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -84,6 +84,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     __mp_newslots(&h->atable, sizeof(allocanode), __mp_poweroftwo(n));
     __mp_newlist(&h->list);
     __mp_newlist(&h->alist);
+    __mp_newlist(&h->astack);
     /* Initialise the settings to their default values.
      */
     h->size = h->count = h->peak = h->limit = 0;
@@ -139,6 +140,7 @@ MP_GLOBAL void __mp_deleteinfo(infohead *h)
     h->atable.size = 0;
     __mp_newlist(&h->list);
     __mp_newlist(&h->alist);
+    __mp_newlist(&h->astack);
     h->size = h->count = h->peak = 0;
     h->dtotal = h->ltotal = h->ctotal = h->stotal = 0;
     h->delpos = 0;
@@ -209,6 +211,7 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                                char *s, char *t, unsigned long u, stackinfo *v)
 {
     allocnode *n;
+    allocanode *g;
     infonode *m;
     void *p;
     unsigned long c;
@@ -301,7 +304,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
     {
         if (!(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READWRITE);
-        if (m = getinfonode(h))
+        if (((f != AT_ALLOCA) || (g = getallocanode(h))) &&
+            (m = getinfonode(h)))
             if (n = __mp_getalloc(&h->alloc, l, a, m))
             {
                 /* Fill in the details of the allocation information node.
@@ -335,6 +339,15 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             }
             else
                 __mp_freeslot(&h->table, m);
+        if ((f == AT_ALLOCA) && (g != NULL))
+            if (p != NULL)
+            {
+                __mp_addhead(&h->astack, &g->node);
+                g->block = p;
+                g->data.frame = NULL;
+            }
+            else
+                __mp_freeslot(&h->atable, g);
         if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READONLY);
         if (h->peak < h->alloc.asize)
@@ -412,10 +425,11 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         __mp_diag("\n");
         p = NULL;
     }
-    else if ((m->data.type == AT_NEW) || (m->data.type == AT_NEWVEC))
+    else if ((m->data.type == AT_ALLOCA) || (m->data.type == AT_NEW) ||
+             (m->data.type == AT_NEWVEC))
     {
         /* The function used to allocate the block is incompatible with
-         * operator new or operator new[].
+         * alloca(), operator new or operator new[].
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
@@ -561,6 +575,7 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
                                char *t, unsigned long u, stackinfo *v)
 {
     allocnode *n;
+    allocanode *g;
     infonode *m;
     int o;
 
@@ -618,7 +633,11 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
-    else if (((m->data.type == AT_NEW) && (f != AT_DELETE)) ||
+    else if (((m->data.type == AT_ALLOCA) && (f != AT_ALLOCA) &&
+              (f != AT_DEALLOCA)) ||
+             ((m->data.type != AT_ALLOCA) && ((f == AT_ALLOCA) ||
+               (f == AT_DEALLOCA))) ||
+             ((m->data.type == AT_NEW) && (f != AT_DELETE)) ||
              ((m->data.type != AT_NEW) && (f == AT_DELETE)) ||
              ((m->data.type == AT_NEWVEC) && (f != AT_DELETEVEC)) ||
              ((m->data.type != AT_NEWVEC) && (f == AT_DELETEVEC)))
@@ -673,6 +692,28 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         {
             __mp_freeslot(&h->table, m);
             m = NULL;
+        }
+        if ((f == AT_ALLOCA) || (f == AT_DEALLOCA))
+        {
+            /* Search the alloca allocation stack for the allocanode to free.
+             * We need to do this instead of just blindly removing the top of
+             * the stack since it is possible for the user to manually free an
+             * allocation created by alloca() through the use of the dealloca()
+             * function.
+             */
+            o = 0;
+            for (g = (allocanode *) h->astack.head; g->node.next != NULL;
+                 g = (allocanode *) g->node.next)
+                if (g->block == p)
+                {
+                    o = 1;
+                    break;
+                }
+            if (o == 1)
+            {
+                __mp_remove(&h->astack, &g->node);
+                __mp_freeslot(&h->atable, g);
+            }
         }
 #if MP_INUSE_SUPPORT
         _Inuse_free(p);
