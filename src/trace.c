@@ -30,12 +30,13 @@
 #include "trace.h"
 #include "diag.h"
 #include "utils.h"
+#include "version.h"
 #include <stdio.h>
 #include <string.h>
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.3 2000-11-30 21:03:15 graeme Exp $"
+#ident "$Id: trace.c,v 1.4 2000-11-30 23:09:27 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -69,9 +70,12 @@ MP_GLOBAL void __mp_newtrace(tracehead *t, meminfo *m)
 
 MP_GLOBAL int __mp_endtrace(tracehead *t)
 {
+    char s[4];
     int r;
 
     r = 1;
+    __mp_memcopy(s, (char *) MP_TRACEMAGIC, 4);
+    fwrite(s, sizeof(char), 4, tracefile);
     if ((tracefile == NULL) || (tracefile == stderr) || (tracefile == stdout))
     {
         /* We don't want to close the stderr or stdout file streams so
@@ -95,6 +99,10 @@ MP_GLOBAL int __mp_endtrace(tracehead *t)
 
 static int opentracefile(tracehead *t)
 {
+    char s[4];
+    size_t i;
+    unsigned long v;
+
     /* The tracing file name can also be named as stderr and stdout which
      * will go to the standard error and standard output streams respectively.
      */
@@ -110,6 +118,12 @@ static int opentracefile(tracehead *t)
         t->file = NULL;
         return 0;
     }
+    i = 1;
+    v = MP_VERNUM;
+    __mp_memcopy(s, (char *) MP_TRACEMAGIC, 4);
+    fwrite(s, sizeof(char), 4, tracefile);
+    fwrite(&i, sizeof(size_t), 1, tracefile);
+    fwrite(&v, sizeof(unsigned long), 1, tracefile);
     return 1;
 }
 
