@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.27 2000-11-15 22:58:33 graeme Exp $
+# $Id: Makefile,v 1.28 2000-11-15 23:19:16 graeme Exp $
 
 
 # Definitions
@@ -197,6 +197,7 @@ $(DOCUMENT)_doc.tar.gz: $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf \
 
 clean:
 	-@ rm -f $(DOCUMENT).txt $(DOCUMENT).info >/dev/null 2>&1
+	-@ rm -f $(DOCUMENT).info-* >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).guide $(DOCUMENT).html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT)_*.html >/dev/null 2>&1
 	-@ rm -f $(DOCUMENT).dvi $(DOCUMENT).ps $(DOCUMENT).pdf >/dev/null 2>&1
