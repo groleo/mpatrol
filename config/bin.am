@@ -21,7 +21,9 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: bin.am,v 1.1 2001-08-27 21:33:35 graeme Exp $
+## $Id: bin.am,v 1.2 2001-08-27 23:57:14 graeme Exp $
 
 
 bin_SCRIPTS = mpsym mpedit hexwords
+
+EXTRA_DIST = $(bin_SCRIPTS)

@@ -72,6 +72,8 @@ RANLIB = @RANLIB@
 VERSION = @VERSION@
 
 bin_SCRIPTS = mpsym mpedit hexwords
+
+EXTRA_DIST = $(bin_SCRIPTS)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 SCRIPTS =  $(bin_SCRIPTS)
