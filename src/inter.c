@@ -31,6 +31,9 @@
 #if MP_THREADS_SUPPORT
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
+#if TARGET == TARGET_WINDOWS
+#include "sbrk.h"
+#endif /* TARGET */
 #include "option.h"
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +41,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.19 2000-03-21 21:14:18 graeme Exp $"
+#ident "$Id: inter.c,v 1.20 2000-03-23 21:30:15 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -53,6 +56,22 @@ extern "C"
  */
 
 static infohead memhead;
+
+
+#if TARGET == TARGET_WINDOWS
+/* These are global variables used by the Microsoft C run-time library to
+ * indicate initialisation of the environment variables, the exit function
+ * table and the streams buffers respectively.  The run-time library calls
+ * malloc() and related functions to set these up so we cannot initialise
+ * the mpatrol library until all of these have been set up.  Instead, we
+ * will call sbrk() to allocate enough memory for these as they appear, but
+ * we cannot record anything about these allocations.
+ */
+
+extern int __env_initialized;
+extern void *__onexitbegin;
+extern void **__piob;
+#endif /* TARGET */
 
 
 /* Save the current signal handlers and set them to ignore.  Also lock the
@@ -238,6 +257,23 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
     stackinfo i;
     int j;
 
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we must
+     * allocate new memory with sbrk().  We don't even attempt to do anything
+     * with calls to memalign(), valloc() and pvalloc() but these shouldn't
+     * be coming through anyway.
+     */
+    if (!__env_initialized || !__onexitbegin || !__piob)
+    {
+        if (l == 0)
+            l = 1;
+        if ((p = sbrk(l)) == (void *) -1)
+            p = NULL;
+        else if (f == AT_CALLOC)
+            __mp_memset(p, 0, l);
+        return p;
+    }
+#endif /* TARGET */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -319,6 +355,28 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
     size_t n;
     int j;
 
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we must
+     * allocate new memory with sbrk() and copy the string to the new
+     * allocation.
+     */
+    if (!__piob || !__onexitbegin || !__env_initialized)
+    {
+        if (p == NULL)
+            o = NULL;
+        else
+        {
+            n = strlen(p);
+            if (((f == AT_STRNDUP) || (f == AT_STRNSAVE)) && (n > l))
+                n = l;
+            if ((o = (char *) sbrk(n + 1)) == (void *) -1)
+                o = NULL;
+            else
+                __mp_memcopy(o, p, n + 1);
+        }
+        return o;
+    }
+#endif /* TARGET */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -382,9 +440,36 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
 void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
                    unsigned long u, size_t k)
 {
+#if TARGET == TARGET_WINDOWS
+    void *q;
+#endif /* TARGET */
     stackinfo i;
     int j;
 
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then we must
+     * allocate new memory with sbrk() and copy the old contents to the new
+     * allocation.  We can't free the old allocation as we know nothing
+     * about it.
+     */
+    if (!__env_initialized || !__onexitbegin || !__piob)
+    {
+        if (p == NULL)
+        {
+            if (l == 0)
+                l = 1;
+            if ((q = sbrk(l)) == (void *) -1)
+                q = NULL;
+            else if (f == AT_CREALLOC)
+                __mp_memset(q, 0, l);
+        }
+        else if ((l == 0) || (f == AT_EXPAND) || ((q = sbrk(l)) == (void *) -1))
+            q = NULL;
+        else
+            __mp_memcopy(q, p, l);
+        return q;
+    }
+#endif /* TARGET */
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -440,7 +525,14 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
     stackinfo i;
     int j;
 
+#if TARGET == TARGET_WINDOWS
+    /* If the C run-time library has not finished initialising then just
+     * return since we know nothing about any of the prior allocations anyway.
+     */
+    if (!__env_initialized || !__onexitbegin || !__piob || memhead.fini)
+#else /* TARGET */
     if (memhead.fini)
+#endif /* TARGET */
         return;
     savesignals();
     if (!memhead.init)
