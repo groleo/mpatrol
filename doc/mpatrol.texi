@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.214 2001-05-07 16:05:59 graeme Exp $
+@c $Id: mpatrol.texi,v 1.215 2001-05-07 16:11:34 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.9
 @set VERSION 1.4.4
-@set UPDATED 7th April, 2001
+@set UPDATED 7th May, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
