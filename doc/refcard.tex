@@ -19,7 +19,7 @@
 
 % LaTeX reference card for mpatrol
 
-% $Id: refcard.tex,v 1.14 2000-12-12 22:26:46 graeme Exp $
+% $Id: refcard.tex,v 1.15 2000-12-18 20:56:03 graeme Exp $
 
 \documentclass[a4paper,landscape,final]{article}
 
@@ -616,6 +616,50 @@ the same call stack as another call site.  This also specifies the maximum
 number of functions to display in a call stack.
 \item[\flag{version}]
 Displays the version number of the \command{mprof} command.
+\end{description}
+
+\vskip 12pt
+\heading{mptrace command options}
+\vskip 6pt
+
+The \command{mptrace} command can be built with GUI support on certain
+platforms.  Any of the following options that are marked as being specific to
+the GUI version of \command{mptrace} will be read by the X command line parser
+rather than directly by \command{mptrace}.  As a result they are parsed
+according to X toolkit rules and do not appear in the quick-reference option
+summary produced by the \flag{--help} option.  The application class for setting
+\command{mptrace} X resources is called \texttt{MPTrace}.
+
+\begin{description}
+\item[\flagpar{alloc}{colour}]
+Specifies the colour to use for displaying allocated memory (GUI only).
+\item[\flagpar{base}{address}]
+Specifies the base address of the visible address space displayed in the memory
+map (GUI only).
+\item[\flagpar{delay}{length}]
+Specifies that a small delay of a certain length should be added after drawing
+each memory allocation event (GUI only).
+\item[\flagpar{free}{colour}]
+Specifies the colour to use for displaying free memory (GUI only).
+\item[\flagpar{height}{size}]
+Specifies the height (in pixels) of the drawing area (GUI only).
+\item[\flag{help}]
+Displays a quick-reference option summary.
+\item[\flagpar{internal}{colour}]
+Specifies the colour to use for displaying internal heap memory (GUI only).
+\item[\flagpar{space}{size}]
+Specifies the size (in megabytes) of the visible address space displayed in the
+memory map (GUI only).
+\item[\flagpar{unalloc}{colour}]
+Specifies the colour to use for displaying unallocated heap memory (GUI only).
+\item[\flagpar{view-height}{size}]
+Specifies the height (in pixels) of the window (GUI only).
+\item[\flagpar{view-width}{size}]
+Specifies the width (in pixels) of the window (GUI only).
+\item[\flagpar{width}{size}]
+Specifies the width (in pixels) of the drawing area (GUI only).
+\item[\flag{version}]
+Displays the version number of the \command{mptrace} command.
 \end{description}
 
 \vskip 12pt
