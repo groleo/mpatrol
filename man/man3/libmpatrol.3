@@ -21,9 +21,9 @@
 .\"
 .\" UNIX Manual Page
 .\"
-.\" $Id: libmpatrol.3,v 1.30 2001-07-25 22:34:49 graeme Exp $
+.\" $Id: libmpatrol.3,v 1.31 2001-07-26 16:31:08 graeme Exp $
 .\"
-.TH LIBMPATROL 3 "25 July 2001" "Release 1.4" "mpatrol library"
+.TH LIBMPATROL 3 "26 July 2001" "Release 1.4" "mpatrol library"
 .SH NAME
 libmpatrol \- dynamic memory allocation and tracing library
 .SH SYNOPSIS
@@ -993,9 +993,9 @@ Installs a prologue function to be called before any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed prologue function, or the null pointer if no prologue
 function had been previously installed.  The following arguments will be used
-to call the prologue function (including a third argument containing the return
-address of the calling function, or the null pointer if it cannot be
-determined):
+to call the prologue function (the last four arguments contain the function
+name, file name, line number and the return address of the calling function, or
+null pointers and zero if they cannot be determined):
 
 .TS
 c c l.
@@ -1012,9 +1012,9 @@ Installs an epilogue function to be called after any memory allocation,
 reallocation or deallocation function.  This function will return a pointer to
 the previously installed epilogue function, or the null pointer if no epilogue
 function had been previously installed.  The following arguments will be used
-to call the epilogue function (including a second argument containing the return
-address of the calling function, or the null pointer if it cannot be
-determined):
+to call the epilogue function (the last four arguments contain the function
+name, file name, line number and the return address of the calling function, or
+null pointers and zero if they cannot be determined):
 
 .TS
 c l.
