@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.43 2000-11-14 18:16:41 graeme Exp $"
+#ident "$Id: info.c,v 1.44 2000-11-30 21:32:00 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -73,6 +73,7 @@ MP_GLOBAL void __mp_newinfo(infohead *h)
     __mp_newaddrs(&h->addr, &h->alloc.heap);
     __mp_newsymbols(&h->syms, &h->alloc.heap);
     __mp_newprofile(&h->prof, &h->alloc.heap, &h->syms);
+    __mp_newtrace(&h->trace, &h->alloc.heap.memory);
     /* Determine the minimum alignment for an allocation information node
      * on this system and force the alignment to be a power of two.  This
      * information is used when initialising the slot table.  Likewise for
@@ -335,10 +336,18 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
                     __mp_memset(p, 0, l);
                 else
                     __mp_memset(p, h->alloc.abyte, l);
-                if (h->prof.profiling && (h->recur == 1) &&
-                    __mp_profilealloc(&h->prof, n->size, m,
-                                      !(h->flags & FLG_NOPROTECT)))
-                    m->data.flags |= FLG_PROFILED;
+                if (h->recur == 1)
+                {
+                    if (h->prof.profiling &&
+                        __mp_profilealloc(&h->prof, n->size, m,
+                                          !(h->flags & FLG_NOPROTECT)))
+                        m->data.flags |= FLG_PROFILED;
+                    if (h->trace.tracing)
+                    {
+                        __mp_tracealloc(&h->trace, c, p, l);
+                        m->data.flags |= FLG_TRACED;
+                    }
+                }
 #if MP_INUSE_SUPPORT
                 _Inuse_malloc(p, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -534,6 +543,11 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     i->data.stack = __mp_getaddrs(&h->addr, v);
                     i->data.flags = m->data.flags | FLG_FREED;
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+                    if (m->data.flags & FLG_TRACED)
+                    {
+                        __mp_tracefree(&h->trace, m->data.alloc);
+                        __mp_tracealloc(&h->trace, m->data.alloc, r->block, l);
+                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -562,6 +576,11 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                     (r = __mp_getalloc(&h->alloc, l, a, m)))
                 {
                     __mp_memcopy(r->block, n->block, (l > d) ? d : l);
+                    if (m->data.flags & FLG_TRACED)
+                    {
+                        __mp_tracefree(&h->trace, m->data.alloc);
+                        __mp_tracealloc(&h->trace, m->data.alloc, r->block, l);
+                    }
 #if MP_INUSE_SUPPORT
                     _Inuse_realloc(n->block, r->block, l);
 #endif /* MP_INUSE_SUPPORT */
@@ -570,10 +589,20 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
                 }
                 else
                     p = NULL;
-#if MP_INUSE_SUPPORT
             else
+            {
+                /* We have been able to increase or decrease the size of the
+                 * block without having to relocate it.
+                 */
+                if (m->data.flags & FLG_TRACED)
+                {
+                    __mp_tracefree(&h->trace, m->data.alloc);
+                    __mp_tracealloc(&h->trace, m->data.alloc, n->block, l);
+                }
+#if MP_INUSE_SUPPORT
                 _Inuse_realloc(n->block, n->block, l);
 #endif /* MP_INUSE_SUPPORT */
+            }
             if ((p != NULL) && (m->data.flags & FLG_PROFILED))
             {
                 __mp_profilefree(&h->prof, d, m, !(h->flags & FLG_NOPROTECT));
@@ -704,6 +733,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
             __mp_protectinfo(h, MA_READWRITE);
         if (m->data.flags & FLG_PROFILED)
             __mp_profilefree(&h->prof, n->size, m, !(h->flags & FLG_NOPROTECT));
+        if (m->data.flags & FLG_TRACED)
+            __mp_tracefree(&h->trace, m->data.alloc);
         __mp_freeaddrs(&h->addr, m->data.stack);
         if (h->alloc.flags & FLG_NOFREE)
         {
