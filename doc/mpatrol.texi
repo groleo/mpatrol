@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.81 2000-05-29 16:58:01 graeme Exp $
+@c $Id: mpatrol.texi,v 1.82 2000-05-30 18:27:20 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.10
 @set VERSION 1.2.1
-@set UPDATED 29th May, 2000
+@set UPDATED 30th May, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -5818,16 +5818,25 @@ The thread-safe version of the library does not work.
 @item
 The @option{OFLOWWATCH} option has no effect.
 @item
-Cannot automatically determine the program filename.
-@item
-No support for call stack traversal.
-@item
 The address of an illegal memory access cannot be determined.
 @item
 The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex DG/UX, Intel 80x86
+@item
+DG/UX 4.11, Intel Pentium Pro, ELF32, @command{gcc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
 @item
 DG/UX 4.20MU07, Intel Pentium Pro, ELF32, @command{gcc}
 @itemize @bullet
@@ -5840,19 +5849,6 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{-d} option to the @command{mpatrol} command does not work unless
 @file{libelf.so} is available.
-@end itemize
-
-@item
-DG/UX 4.11, Intel Pentium Pro, ELF32, @command{gcc}
-@itemize @bullet
-@item
-The thread-safe version of the library does not work.
-@item
-The @option{OFLOWWATCH} option has no effect.
-@item
-The @option{USEDEBUG} option has no effect.
-@item
-The @option{-d} option to the @command{mpatrol} command has no effect.
 @end itemize
 
 @cindex DG/UX, Motorola 88xx0
@@ -6011,10 +6007,6 @@ The thread-safe version of the library does not work.
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
-@item
-Cannot automatically determine the program filename.
-@item
-No support for call stack traversal.
 @item
 The address of an illegal memory access cannot be determined.
 @item
@@ -6504,19 +6496,18 @@ this problem when it is compiled by a C++ compiler, but it may only work if the
 final program is linked with that specific compiler.
 
 @item
-Need to add support for call stack traversal for at least the Alpha, MIPS,
-PA/RISC, PowerPC and RS/6000 processor architectures.  The current
-implementation of call stack traversal for the Motorola 88xx0 family is also a
-bit flaky and so should only be used when the library and program are built
-unoptimised.
+Need to add support for call stack traversal for at least the Alpha, MIPS and
+PA/RISC processor architectures.  The current implementation of call stack
+traversal for the Motorola 88xx0 family is also a bit flaky and so should only
+be used when the library and program are built unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for at least
-the Alpha, Motorola 88xx0, non-IRIX MIPS, PA/RISC, PowerPC and RS/6000 processor
-architectures.  Also need to add support for reading the program symbols from
-a suitable file in @file{/proc} for other operating systems that support it.
-If there is no support for either of these methods then the @option{PROGFILE}
-option can currently be used to specify the program name at run-time.
+the Alpha, Motorola 88xx0, non-IRIX MIPS and PA/RISC processor architectures.
+Also need to add support for reading the program symbols from a suitable file
+in @file{/proc} for other operating systems that support it.  If there is no
+support for either of these methods then the @option{PROGFILE} option can
+currently be used to specify the program name at run-time.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
