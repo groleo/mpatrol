@@ -40,10 +40,10 @@ extern "C"
 
 
 MP_EXPORT unsigned long __mp_threadid(void);
-MP_EXPORT void __mp_newmutex(void);
-MP_EXPORT void __mp_deletemutex(void);
-MP_EXPORT void __mp_lockmutex(void);
-MP_EXPORT void __mp_unlockmutex(void);
+MP_EXPORT void __mp_newrecmutex(void);
+MP_EXPORT void __mp_deleterecmutex(void);
+MP_EXPORT void __mp_lockrecmutex(void);
+MP_EXPORT void __mp_unlockrecmutex(void);
 
 
 #ifdef __cplusplus
