@@ -130,6 +130,12 @@ their corresponding answers or solutions.
     instead.  If you are using the thread-safe version of mpatrol then you may
     also need to link with the system threads library.
 
+ Q. Why do I still get undefined symbols on HP/UX platforms, despite following
+    the above instructions?
+
+ A. If the symbols are called U_get_current_frame and U_get_previous_frame then
+    you still need to link with the system stack traceback library, libcl.a.
+
  Q. Why do I get duplicate definitions of symbols when linking with the mpatrol
     library?
 
@@ -312,6 +318,14 @@ their corresponding answers or solutions.
     that you should always check the number of warnings and errors given in
     the summary at the end of program execution, and then search backwards in
     the log file for WARNING or ERROR.
+
+ Q. Why do I get a SIGABORT or SIGIOT raised every time I run a program linked
+    with mpatrol on HP/UX?
+
+ A. This is likely to be that you have linked with the shared version of the
+    system stack traceback library instead of the archive version, libcl.a.
+    There is currently a problem using libcl.sl that will hopefully be
+    resolved in the near future.
 
  Q. I have linked my program with the mpatrol library on an Amiga or Netware
     machine, but when it runs it still crashes the entire system.  Why is
