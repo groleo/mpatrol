@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.140 2000-11-16 20:09:55 graeme Exp $
+@c $Id: mpatrol.texi,v 1.141 2000-11-16 20:34:36 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1615,6 +1615,8 @@ types of functions to be traced using the @option{LOGALLOCS},
 feel that the log file is too large when @option{LOGALL} is used.  By default
 all diagnostics from the mpatrol library get sent to @file{mpatrol.log} in the
 current directory, but this can be changed using the @option{LOGFILE} option.
+In fact, you can also specify a directory where all log files from the mpatrol
+library will get placed by setting the @env{LOGDIR} environment variable.
 
 On systems that support it, every log entry also contains a call stack
 traceback that may also include the names of the symbols that appear on the
@@ -2633,7 +2635,7 @@ this then a new terminal window must be opened for it to use.
 
 @cindex list
 @cindex context listing
-If the @option{--list} option is given on the command line then the
+If the @option{--listing} option is given on the command line then the
 @command{mpedit} command will display a context listing of the source file at
 the specified line number to the standard error output stream instead of
 invoking the text editor.  The listing will be annotated with line numbers and
@@ -2690,12 +2692,14 @@ Memory allocation profiling is disabled by default, but can be enabled using
 the @option{PROF} option.  This writes all of the profiling data to a file
 called @file{mpatrol.out} in the current directory at the end of program
 execution, but the name of this file can be changed using the @option{PROFFILE}
-option.  Sometimes it can also be desirable for the mpatrol library to write out
-the accumulated profiling information in the middle of program execution rather
-than just at the end, even if it is only partially complete, and this behaviour
-can be controlled with the @option{AUTOSAVE} option.  This can be particularly
-useful when running the program from within a debugger, when it is necessary to
-analyse the profiling information at a certain point during program execution.
+option and the default directory in which to place these files can be changed
+by setting the @env{PROFDIR} environment variable.  Sometimes it can also be
+desirable for the mpatrol library to write out the accumulated profiling
+information in the middle of program execution rather than just at the end, even
+if it is only partially complete, and this behaviour can be controlled with the
+@option{AUTOSAVE} option.  This can be particularly useful when running the
+program from within a debugger, when it is necessary to analyse the profiling
+information at a certain point during program execution.
 
 Normally, the mpatrol library will perform profiling with all of its other
 features and checks enabled, but you might want to disable these if you only
@@ -6496,14 +6500,19 @@ Note that any memory allocations made internally by the library will not be
 logged.
 
 @cindex LOGFILE
+@cindex LOGDIR
 @item @option{LOGFILE}=<@var{string}>
 Specifies an alternative file in which to place all diagnostics from the mpatrol
-library.  A filename of @samp{stderr} will send all diagnostics to the
-@code{stderr} file stream and a filename of @samp{stdout} will do the equivalent
-with the @code{stdout} file stream.  Note that if a problem occurs while opening
-the log file or if any diagnostics require to be displayed before the log file
-has had a chance to be opened then they will be sent to the @code{stderr} file
-stream.  Default value: @option{LOGFILE=mpatrol.log}.
+library.  If the @env{LOGDIR} environment variable is set and the specified file
+does not contain a path component in its filename then the log file will be
+located in the directory specified in @env{LOGDIR}.  A filename of @samp{stderr}
+will send all diagnostics to the @code{stderr} file stream and a filename of
+@samp{stdout} will do the equivalent with the @code{stdout} file stream.  Note
+that if a problem occurs while opening the log file or if any diagnostics
+require to be displayed before the log file has had a chance to be opened then
+they will be sent to the @code{stderr} file stream.  Default value:
+@option{LOGFILE=mpatrol.log} or @option{LOGFILE=%n.%p.log} if the @env{LOGDIR}
+environment variable is set.
 
 @cindex LOGFREES
 @item @option{LOGFREES}
@@ -6601,14 +6610,18 @@ sent to the profiling output file.  Memory reallocations are treated as a
 memory deallocation immediately followed by a memory allocation.
 
 @cindex PROFFILE
+@cindex PROFDIR
 @item @option{PROFFILE}=<@var{string}>
 Specifies an alternative file in which to place all memory allocation profiling
-information from the mpatrol library.  A filename of @samp{stderr} will send
-this information to the @code{stderr} file stream and a filename of
-@samp{stdout} will do the equivalent with the @code{stdout} file stream.  Note
-that if a problem occurs while opening the profiling output file then the
-profiling information will be sent to the @code{stderr} file stream.  Default
-value: @option{PROFFILE=mpatrol.out}.
+information from the mpatrol library.  If the @env{PROFDIR} environment variable
+is set and the specified file does not contain a path component in its filename
+then the profiling output file will be located in the directory specified in
+@env{PROFDIR}.  A filename of @samp{stderr} will send this information to the
+@code{stderr} file stream and a filename of @samp{stdout} will do the equivalent
+with the @code{stdout} file stream.  Note that if a problem occurs while opening
+the profiling output file then the profiling information will not be output.
+Default value: @option{PROFFILE=mpatrol.out} or @option{PROFFILE=%n.%p.out} if
+the @env{PROFDIR} environment variable is set.
 
 @cindex PROGFILE
 @item @option{PROGFILE}=<@var{string}>
@@ -7959,6 +7972,9 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{LIST} option does not work since the @option{--listing} option does
+not work in the @command{mpedit} command.
+@item
 There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -7968,8 +7984,8 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 The @command{mpsym} command does not work due to the lack of a @command{printf}
 command on the system.
 @item
-The @command{mpedit} command does not work due to the lack of a @command{nl}
-command on the system.
+The @command{mpedit} command does not support the @option{--listing} option due
+to the lack of an @command{nl} command on the system.
 @end itemize
 
 @item
@@ -7982,6 +7998,9 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{LIST} option does not work since the @option{--listing} option does
+not work in the @command{mpedit} command.
+@item
 There is currently no support for reading symbols from COFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -7991,8 +8010,8 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 The @command{mpsym} command does not work due to the lack of a @command{printf}
 command on the system.
 @item
-The @command{mpedit} command does not work due to the lack of a @command{nl}
-command on the system.
+The @command{mpedit} command does not support the @option{--listing} option due
+to the lack of an @command{nl} command on the system.
 @end itemize
 
 @cindex LynxOS, PowerPC
@@ -8004,6 +8023,9 @@ The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{LIST} option does not work since the @option{--listing} option does
+not work in the @command{mpedit} command.
+@item
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -8013,8 +8035,8 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 The @command{mpsym} command does not work due to the lack of a @command{printf}
 command on the system.
 @item
-The @command{mpedit} command does not work due to the lack of a @command{nl}
-command on the system.
+The @command{mpedit} command does not support the @option{--listing} option due
+to the lack of an @command{nl} command on the system.
 @end itemize
 
 @item
@@ -8027,6 +8049,9 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{LIST} option does not work since the @option{--listing} option does
+not work in the @command{mpedit} command.
+@item
 There is currently no support for reading symbols from XCOFF shared libraries.
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway.
@@ -8036,8 +8061,8 @@ The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 The @command{mpsym} command does not work due to the lack of a @command{printf}
 command on the system.
 @item
-The @command{mpedit} command does not work due to the lack of a @command{nl}
-command on the system.
+The @command{mpedit} command does not support the @option{--listing} option due
+to the lack of an @command{nl} command on the system.
 @end itemize
 
 @cindex SINIX, MIPS
@@ -8162,6 +8187,8 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{EDIT} and @option{LIST} options have no effect.
+@item
 Limited support for call stack traversal.
 @item
 Limited support for reading symbols.
@@ -8191,6 +8218,8 @@ The @option{USEDEBUG} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
 @item
+The @option{EDIT} and @option{LIST} options have no effect.
+@item
 No support for call stack traversal.
 @item
 No support for reading symbols.
@@ -8213,6 +8242,8 @@ Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C/C++
 The @option{OFLOWWATCH} option has no effect.
 @item
 The @option{USEMMAP} option has no effect.
+@item
+The @option{EDIT} and @option{LIST} options have no effect.
 @item
 There is currently a problem when mixing the archive library version of
 mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa.

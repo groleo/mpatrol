@@ -1497,7 +1497,9 @@ select one or more types of functions to be traced using the @{b}LOGALLOCS@{ub},
 @{b}LOGREALLOCS@{ub}, @{b}LOGFREES@{ub} and @{b}LOGMEMORY@{ub} options if you feel that the log
 file is too large when @{b}LOGALL@{ub} is used.  By default all diagnostics from
 the mpatrol library get sent to @{b}mpatrol.log@{ub} in the current directory,
-but this can be changed using the @{b}LOGFILE@{ub} option.
+but this can be changed using the @{b}LOGFILE@{ub} option.  In fact, you can
+also specify a directory where all log files from the mpatrol library
+will get placed by setting the @{b}LOGDIR@{ub} environment variable.
 
    On systems that support it, every log entry also contains a call
 stack traceback that may also include the names of the symbols that
@@ -2559,7 +2561,7 @@ text editor must also open a new window to edit the source file so that
 it does not obscure any mpatrol diagnostic messages, and if it does not
 support this then a new terminal window must be opened for it to use.
 
-   If the @{b}--list@{ub} option is given on the command line then the @{b}mpedit@{ub}
+   If the @{b}--listing@{ub} option is given on the command line then the @{b}mpedit@{ub}
 command will display a context listing of the source file at the
 specified line number to the standard error output stream instead of
 invoking the text editor.  The listing will be annotated with line
@@ -2619,13 +2621,15 @@ displayed tables may contain less meaningful information.
 enabled using the @{b}PROF@{ub} option.  This writes all of the profiling data
 to a file called @{b}mpatrol.out@{ub} in the current directory at the end of
 program execution, but the name of this file can be changed using the
-@{b}PROFFILE@{ub} option.  Sometimes it can also be desirable for the mpatrol
-library to write out the accumulated profiling information in the
-middle of program execution rather than just at the end, even if it is
-only partially complete, and this behaviour can be controlled with the
-@{b}AUTOSAVE@{ub} option.  This can be particularly useful when running the
-program from within a debugger, when it is necessary to analyse the
-profiling information at a certain point during program execution.
+@{b}PROFFILE@{ub} option and the default directory in which to place these files
+can be changed by setting the @{b}PROFDIR@{ub} environment variable.  Sometimes
+it can also be desirable for the mpatrol library to write out the
+accumulated profiling information in the middle of program execution
+rather than just at the end, even if it is only partially complete, and
+this behaviour can be controlled with the @{b}AUTOSAVE@{ub} option.  This can be
+particularly useful when running the program from within a debugger,
+when it is necessary to analyse the profiling information at a certain
+point during program execution.
 
    Normally, the mpatrol library will perform profiling with all of its
 other features and checks enabled, but you might want to disable these
@@ -6249,13 +6253,17 @@ a mixture of both.
 
 @{b}LOGFILE@{ub}=<STRING>
      Specifies an alternative file in which to place all diagnostics
-     from the mpatrol library.  A filename of @{b}stderr@{ub} will send all
+     from the mpatrol library.  If the @{b}LOGDIR@{ub} environment variable is
+     set and the specified file does not contain a path component in
+     its filename then the log file will be located in the directory
+     specified in @{b}LOGDIR@{ub}.  A filename of @{b}stderr@{ub} will send all
      diagnostics to the @{b}stderr@{ub} file stream and a filename of @{b}stdout@{ub}
      will do the equivalent with the @{b}stdout@{ub} file stream.  Note that if
      a problem occurs while opening the log file or if any diagnostics
      require to be displayed before the log file has had a chance to be
      opened then they will be sent to the @{b}stderr@{ub} file stream.  Default
-     value: @{b}LOGFILE=mpatrol.log@{ub}.
+     value: @{b}LOGFILE=mpatrol.log@{ub} or @{b}LOGFILE=%n.%p.log@{ub} if the @{b}LOGDIR@{ub}
+     environment variable is set.
 
 @{b}LOGFREES@{ub}
      Specifies that all memory deallocations are to be logged and sent
@@ -6350,13 +6358,16 @@ a mixture of both.
 
 @{b}PROFFILE@{ub}=<STRING>
      Specifies an alternative file in which to place all memory
-     allocation profiling information from the mpatrol library.  A
-     filename of @{b}stderr@{ub} will send this information to the @{b}stderr@{ub} file
-     stream and a filename of @{b}stdout@{ub} will do the equivalent with the
-     @{b}stdout@{ub} file stream.  Note that if a problem occurs while opening
-     the profiling output file then the profiling information will be
-     sent to the @{b}stderr@{ub} file stream.  Default value:
-     @{b}PROFFILE=mpatrol.out@{ub}.
+     allocation profiling information from the mpatrol library.  If the
+     @{b}PROFDIR@{ub} environment variable is set and the specified file does
+     not contain a path component in its filename then the profiling
+     output file will be located in the directory specified in @{b}PROFDIR@{ub}.
+     A filename of @{b}stderr@{ub} will send this information to the @{b}stderr@{ub}
+     file stream and a filename of @{b}stdout@{ub} will do the equivalent with
+     the @{b}stdout@{ub} file stream.  Note that if a problem occurs while
+     opening the profiling output file then the profiling information
+     will not be output.  Default value: @{b}PROFFILE=mpatrol.out@{ub} or
+     @{b}PROFFILE=%n.%p.out@{ub} if the @{b}PROFDIR@{ub} environment variable is set.
 
 @{b}PROGFILE@{ub}=<STRING>
      Specifies an alternative filename with which to locate the
@@ -7627,6 +7638,9 @@ supported on that system.
 
         * The @{b}USEMMAP@{ub} option has no effect.
 
+        * The @{b}LIST@{ub} option does not work since the @{b}--listing@{ub} option does
+          not work in the @{b}mpedit@{ub} command.
+
         * There is currently no support for reading symbols from COFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7637,8 +7651,8 @@ supported on that system.
         * The @{b}mpsym@{ub} command does not work due to the lack of a @{b}printf@{ub}
           command on the system.
 
-        * The @{b}mpedit@{ub} command does not work due to the lack of a @{b}nl@{ub}
-          command on the system.
+        * The @{b}mpedit@{ub} command does not support the @{b}--listing@{ub} option due
+          to the lack of an @{b}nl@{ub} command on the system.
 
    * LynxOS 3.0.0, Intel Pentium Pro, COFF, @{b}gcc@{ub}
         * The @{b}OFLOWWATCH@{ub} option has no effect.
@@ -7647,6 +7661,9 @@ supported on that system.
 
         * The @{b}USEMMAP@{ub} option has no effect.
 
+        * The @{b}LIST@{ub} option does not work since the @{b}--listing@{ub} option does
+          not work in the @{b}mpedit@{ub} command.
+
         * There is currently no support for reading symbols from COFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7657,13 +7674,16 @@ supported on that system.
         * The @{b}mpsym@{ub} command does not work due to the lack of a @{b}printf@{ub}
           command on the system.
 
-        * The @{b}mpedit@{ub} command does not work due to the lack of a @{b}nl@{ub}
-          command on the system.
+        * The @{b}mpedit@{ub} command does not support the @{b}--listing@{ub} option due
+          to the lack of an @{b}nl@{ub} command on the system.
 
    * LynxOS 3.0.0, PowerPC, BFD, @{b}gcc@{ub}
         * The @{b}OFLOWWATCH@{ub} option has no effect.
 
         * The @{b}USEMMAP@{ub} option has no effect.
+
+        * The @{b}LIST@{ub} option does not work since the @{b}--listing@{ub} option does
+          not work in the @{b}mpedit@{ub} command.
 
         * There is currently no support for reading symbols from XCOFF
           shared libraries.  You should currently always perform a
@@ -7675,8 +7695,8 @@ supported on that system.
         * The @{b}mpsym@{ub} command does not work due to the lack of a @{b}printf@{ub}
           command on the system.
 
-        * The @{b}mpedit@{ub} command does not work due to the lack of a @{b}nl@{ub}
-          command on the system.
+        * The @{b}mpedit@{ub} command does not support the @{b}--listing@{ub} option due
+          to the lack of an @{b}nl@{ub} command on the system.
 
    * LynxOS 3.0.0, PowerPC, XCOFF, @{b}gcc@{ub}
         * The @{b}OFLOWWATCH@{ub} option has no effect.
@@ -7685,6 +7705,9 @@ supported on that system.
 
         * The @{b}USEMMAP@{ub} option has no effect.
 
+        * The @{b}LIST@{ub} option does not work since the @{b}--listing@{ub} option does
+          not work in the @{b}mpedit@{ub} command.
+
         * There is currently no support for reading symbols from XCOFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7695,8 +7718,8 @@ supported on that system.
         * The @{b}mpsym@{ub} command does not work due to the lack of a @{b}printf@{ub}
           command on the system.
 
-        * The @{b}mpedit@{ub} command does not work due to the lack of a @{b}nl@{ub}
-          command on the system.
+        * The @{b}mpedit@{ub} command does not support the @{b}--listing@{ub} option due
+          to the lack of an @{b}nl@{ub} command on the system.
 
    * SINIX 5.43, MIPS R4000, ELF32, @{b}cc@{ub}
         * The thread-safe version of the library does not work.  This
@@ -7776,6 +7799,8 @@ supported on that system.
 
         * The @{b}USEMMAP@{ub} option has no effect.
 
+        * The @{b}EDIT@{ub} and @{b}LIST@{ub} options have no effect.
+
         * Limited support for call stack traversal.
 
         * Limited support for reading symbols.
@@ -7801,6 +7826,8 @@ supported on that system.
 
         * The @{b}USEMMAP@{ub} option has no effect.
 
+        * The @{b}EDIT@{ub} and @{b}LIST@{ub} options have no effect.
+
         * No support for call stack traversal.
 
         * No support for reading symbols.
@@ -7818,6 +7845,8 @@ supported on that system.
         * The @{b}OFLOWWATCH@{ub} option has no effect.
 
         * The @{b}USEMMAP@{ub} option has no effect.
+
+        * The @{b}EDIT@{ub} and @{b}LIST@{ub} options have no effect.
 
         * There is currently a problem when mixing the archive library
           version of mpatrol with the DLL version of the Microsoft
@@ -11682,6 +11711,7 @@ Index
  @{" log file                                 " link "Example 1"}   Example 1
  @{" LOGALL                                   " link "Environment"}   Environment
  @{" LOGALLOCS                                " link "Environment"}   Environment
+ @{" LOGDIR                                   " link "Environment"}   Environment
  @{" LOGFILE                                  " link "Environment"}   Environment
  @{" LOGFREES                                 " link "Environment"}   Environment
  @{" logging                                  " link "Logging and tracing"}   Logging and tracing
@@ -11864,6 +11894,7 @@ Index
  @{" process id                               " link "Options"}   Options
  @{" processor architectures, adding support  " link "New processor support"}   New processor support
  @{" PROF                                     " link "Environment"}   Environment
+ @{" PROFDIR                                  " link "Environment"}   Environment
  @{" PROFFILE                                 " link "Environment"}   Environment
  @{" profiling                                " link "Profiling"}   Profiling
  @{" profiling file format                    " link "Profiling file format"}   Profiling file format

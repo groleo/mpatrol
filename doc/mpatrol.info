@@ -1433,7 +1433,9 @@ you may select one or more types of functions to be traced using the
 feel that the log file is too large when `LOGALL' is used.  By default
 all diagnostics from the mpatrol library get sent to `mpatrol.log' in
 the current directory, but this can be changed using the `LOGFILE'
-option.
+option.  In fact, you can also specify a directory where all log files
+from the mpatrol library will get placed by setting the `LOGDIR'
+environment variable.
 
    On systems that support it, every log entry also contains a call
 stack traceback that may also include the names of the symbols that
@@ -2454,7 +2456,7 @@ source file so that it does not obscure any mpatrol diagnostic
 messages, and if it does not support this then a new terminal window
 must be opened for it to use.
 
-   If the `--list' option is given on the command line then the
+   If the `--listing' option is given on the command line then the
 `mpedit' command will display a context listing of the source file at
 the specified line number to the standard error output stream instead of
 invoking the text editor.  The listing will be annotated with line
@@ -2509,13 +2511,15 @@ displayed tables may contain less meaningful information.
 enabled using the `PROF' option.  This writes all of the profiling data
 to a file called `mpatrol.out' in the current directory at the end of
 program execution, but the name of this file can be changed using the
-`PROFFILE' option.  Sometimes it can also be desirable for the mpatrol
-library to write out the accumulated profiling information in the
-middle of program execution rather than just at the end, even if it is
-only partially complete, and this behaviour can be controlled with the
-`AUTOSAVE' option.  This can be particularly useful when running the
-program from within a debugger, when it is necessary to analyse the
-profiling information at a certain point during program execution.
+`PROFFILE' option and the default directory in which to place these
+files can be changed by setting the `PROFDIR' environment variable.
+Sometimes it can also be desirable for the mpatrol library to write out
+the accumulated profiling information in the middle of program
+execution rather than just at the end, even if it is only partially
+complete, and this behaviour can be controlled with the `AUTOSAVE'
+option.  This can be particularly useful when running the program from
+within a debugger, when it is necessary to analyse the profiling
+information at a certain point during program execution.
 
    Normally, the mpatrol library will perform profiling with all of its
 other features and checks enabled, but you might want to disable these
@@ -6093,13 +6097,17 @@ as well as uppercase, or a mixture of both.
 
 `LOGFILE'=<STRING>
      Specifies an alternative file in which to place all diagnostics
-     from the mpatrol library.  A filename of `stderr' will send all
+     from the mpatrol library.  If the `LOGDIR' environment variable is
+     set and the specified file does not contain a path component in
+     its filename then the log file will be located in the directory
+     specified in `LOGDIR'.  A filename of `stderr' will send all
      diagnostics to the `stderr' file stream and a filename of `stdout'
      will do the equivalent with the `stdout' file stream.  Note that
      if a problem occurs while opening the log file or if any
      diagnostics require to be displayed before the log file has had a
      chance to be opened then they will be sent to the `stderr' file
-     stream.  Default value: `LOGFILE=mpatrol.log'.
+     stream.  Default value: `LOGFILE=mpatrol.log' or
+     `LOGFILE=%n.%p.log' if the `LOGDIR' environment variable is set.
 
 `LOGFREES'
      Specifies that all memory deallocations are to be logged and sent
@@ -6194,13 +6202,17 @@ as well as uppercase, or a mixture of both.
 
 `PROFFILE'=<STRING>
      Specifies an alternative file in which to place all memory
-     allocation profiling information from the mpatrol library.  A
-     filename of `stderr' will send this information to the `stderr'
-     file stream and a filename of `stdout' will do the equivalent with
-     the `stdout' file stream.  Note that if a problem occurs while
-     opening the profiling output file then the profiling information
-     will be sent to the `stderr' file stream.  Default value:
-     `PROFFILE=mpatrol.out'.
+     allocation profiling information from the mpatrol library.  If the
+     `PROFDIR' environment variable is set and the specified file does
+     not contain a path component in its filename then the profiling
+     output file will be located in the directory specified in
+     `PROFDIR'.  A filename of `stderr' will send this information to
+     the `stderr' file stream and a filename of `stdout' will do the
+     equivalent with the `stdout' file stream.  Note that if a problem
+     occurs while opening the profiling output file then the profiling
+     information will not be output.  Default value:
+     `PROFFILE=mpatrol.out' or `PROFFILE=%n.%p.out' if the `PROFDIR'
+     environment variable is set.
 
 `PROGFILE'=<STRING>
      Specifies an alternative filename with which to locate the
@@ -7452,6 +7464,9 @@ supported on that system.
 
         * The `USEMMAP' option has no effect.
 
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
+
         * There is currently no support for reading symbols from COFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7462,8 +7477,8 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
-        * The `mpedit' command does not work due to the lack of a `nl'
-          command on the system.
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
 
    * LynxOS 3.0.0, Intel Pentium Pro, COFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -7472,6 +7487,9 @@ supported on that system.
 
         * The `USEMMAP' option has no effect.
 
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
+
         * There is currently no support for reading symbols from COFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7482,13 +7500,16 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
-        * The `mpedit' command does not work due to the lack of a `nl'
-          command on the system.
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
 
    * LynxOS 3.0.0, PowerPC, BFD, `gcc'
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEMMAP' option has no effect.
+
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
 
         * There is currently no support for reading symbols from XCOFF
           shared libraries.  You should currently always perform a
@@ -7500,8 +7521,8 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
-        * The `mpedit' command does not work due to the lack of a `nl'
-          command on the system.
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
 
    * LynxOS 3.0.0, PowerPC, XCOFF, `gcc'
         * The `OFLOWWATCH' option has no effect.
@@ -7510,6 +7531,9 @@ supported on that system.
 
         * The `USEMMAP' option has no effect.
 
+        * The `LIST' option does not work since the `--listing' option
+          does not work in the `mpedit' command.
+
         * There is currently no support for reading symbols from XCOFF
           shared libraries.  You should currently always perform a
           static link instead of a dynamic link when linking your
@@ -7520,8 +7544,8 @@ supported on that system.
         * The `mpsym' command does not work due to the lack of a
           `printf' command on the system.
 
-        * The `mpedit' command does not work due to the lack of a `nl'
-          command on the system.
+        * The `mpedit' command does not support the `--listing' option
+          due to the lack of an `nl' command on the system.
 
    * SINIX 5.43, MIPS R4000, ELF32, `cc'
         * The thread-safe version of the library does not work.  This
@@ -7602,6 +7626,8 @@ supported on that system.
 
         * The `USEMMAP' option has no effect.
 
+        * The `EDIT' and `LIST' options have no effect.
+
         * Limited support for call stack traversal.
 
         * Limited support for reading symbols.
@@ -7627,6 +7653,8 @@ supported on that system.
 
         * The `USEMMAP' option has no effect.
 
+        * The `EDIT' and `LIST' options have no effect.
+
         * No support for call stack traversal.
 
         * No support for reading symbols.
@@ -7644,6 +7672,8 @@ supported on that system.
         * The `OFLOWWATCH' option has no effect.
 
         * The `USEMMAP' option has no effect.
+
+        * The `EDIT' and `LIST' options have no effect.
 
         * There is currently a problem when mixing the archive library
           version of mpatrol with the DLL version of the Microsoft
@@ -11407,6 +11437,7 @@ Index
 * log file:                              Example 1.
 * LOGALL:                                Environment.
 * LOGALLOCS:                             Environment.
+* LOGDIR:                                Environment.
 * LOGFILE:                               Environment.
 * LOGFREES:                              Environment.
 * logging:                               Logging and tracing.
@@ -11589,6 +11620,7 @@ Index
 * process id:                            Options.
 * processor architectures, adding support: New processor support.
 * PROF:                                  Environment.
+* PROFDIR:                               Environment.
 * PROFFILE:                              Environment.
 * profiling:                             Profiling.
 * profiling file format:                 Profiling file format.
@@ -11787,80 +11819,80 @@ Node: Using mpatrol66804
 Node: Library behaviour67670
 Ref: Library behaviour-Footnote-173066
 Node: Logging and tracing73124
-Node: General errors76956
-Ref: General errors-Footnote-181094
-Ref: General errors-Footnote-281250
-Node: Overwrites and underwrites81418
-Ref: Overwrites and underwrites-Footnote-188937
-Ref: Overwrites and underwrites-Footnote-289000
-Node: Using with a debugger89124
-Ref: Using with a debugger-Footnote-198178
-Ref: Using with a debugger-Footnote-298246
-Ref: Using with a debugger-Footnote-398502
-Node: Testing98591
-Ref: Testing-Footnote-1101328
-Ref: Testing-Footnote-2101509
-Node: Library functions101568
-Node: Utilities108449
-Node: The mpatrol command109282
-Node: The mleak command115242
-Node: The mpsym command117206
-Node: The mpedit command119684
-Node: Profiling123046
-Ref: Profiling-Footnote-1145501
-Node: Improving performance145725
-Ref: Improving performance-Footnote-1154419
-Ref: Improving performance-Footnote-2154461
-Ref: Improving performance-Footnote-3154538
-Ref: Improving performance-Footnote-4154610
-Node: How it works154654
-Node: Examples161299
-Node: Example 1164959
-Ref: Example 1-Footnote-1188555
-Node: Example 2188745
-Node: Example 3194145
-Node: Example 4201002
-Node: Example 5204507
-Ref: Example 5-Footnote-1208307
-Node: Example 6208436
-Node: Example 7210294
-Node: Example 8220530
-Node: Tutorial235686
-Ref: Tutorial-Footnote-1250217
-Ref: Tutorial-Footnote-2250508
-Ref: Tutorial-Footnote-3250657
-Ref: Tutorial-Footnote-4250794
-Ref: Tutorial-Footnote-5250893
-Node: Functions251174
-Node: Environment281610
-Node: Options300307
-Node: Diagnostic messages310600
-Node: Library performance326542
-Node: Profiling file format329044
-Ref: Profiling file format-Footnote-1332456
-Node: Supported systems332636
-Node: New system support346006
-Node: New processor support347202
-Node: New file format support347885
-Node: Notes348275
-Node: Generic notes349886
-Ref: Generic notes-Footnote-1368242
-Ref: Generic notes-Footnote-2368460
-Node: UNIX notes368682
-Node: Amiga notes373435
-Node: Windows notes377050
-Node: Netware notes378421
-Node: Frequently asked questions380932
-Node: Documentation381555
-Node: Building385348
-Node: Linking391951
-Node: Running396223
-Node: Files409859
-Node: Related software412855
-Ref: Related software-Footnote-1447430
-Node: References447671
-Node: Copying450264
-Node: Function index478153
-Node: Index480411
+Node: General errors77106
+Ref: General errors-Footnote-181244
+Ref: General errors-Footnote-281400
+Node: Overwrites and underwrites81568
+Ref: Overwrites and underwrites-Footnote-189087
+Ref: Overwrites and underwrites-Footnote-289150
+Node: Using with a debugger89274
+Ref: Using with a debugger-Footnote-198328
+Ref: Using with a debugger-Footnote-298396
+Ref: Using with a debugger-Footnote-398652
+Node: Testing98741
+Ref: Testing-Footnote-1101478
+Ref: Testing-Footnote-2101659
+Node: Library functions101718
+Node: Utilities108599
+Node: The mpatrol command109432
+Node: The mleak command115392
+Node: The mpsym command117356
+Node: The mpedit command119834
+Node: Profiling123199
+Ref: Profiling-Footnote-1145770
+Node: Improving performance145994
+Ref: Improving performance-Footnote-1154688
+Ref: Improving performance-Footnote-2154730
+Ref: Improving performance-Footnote-3154807
+Ref: Improving performance-Footnote-4154879
+Node: How it works154923
+Node: Examples161568
+Node: Example 1165228
+Ref: Example 1-Footnote-1188824
+Node: Example 2189014
+Node: Example 3194414
+Node: Example 4201271
+Node: Example 5204776
+Ref: Example 5-Footnote-1208576
+Node: Example 6208705
+Node: Example 7210563
+Node: Example 8220799
+Node: Tutorial235955
+Ref: Tutorial-Footnote-1250486
+Ref: Tutorial-Footnote-2250777
+Ref: Tutorial-Footnote-3250926
+Ref: Tutorial-Footnote-4251063
+Ref: Tutorial-Footnote-5251162
+Node: Functions251443
+Node: Environment281879
+Node: Options301129
+Node: Diagnostic messages311422
+Node: Library performance327364
+Node: Profiling file format329866
+Ref: Profiling file format-Footnote-1333278
+Node: Supported systems333458
+Node: New system support347591
+Node: New processor support348787
+Node: New file format support349470
+Node: Notes349860
+Node: Generic notes351471
+Ref: Generic notes-Footnote-1369827
+Ref: Generic notes-Footnote-2370045
+Node: UNIX notes370267
+Node: Amiga notes375020
+Node: Windows notes378635
+Node: Netware notes380006
+Node: Frequently asked questions382517
+Node: Documentation383140
+Node: Building386933
+Node: Linking393536
+Node: Running397808
+Node: Files411444
+Node: Related software414440
+Ref: Related software-Footnote-1449015
+Node: References449256
+Node: Copying451849
+Node: Function index479738
+Node: Index481996
 
 End Tag Table

@@ -1437,7 +1437,9 @@ types of functions to be traced using the <code>LOGALLOCS</code>,
 <code>LOGREALLOCS</code>, <code>LOGFREES</code> and <code>LOGMEMORY</code> options if you
 feel that the log file is too large when <code>LOGALL</code> is used.  By default
 all diagnostics from the mpatrol library get sent to <code>mpatrol.log</code> in the
-current directory, but this can be changed using the <code>LOGFILE</code> option.
+current directory, but this can be changed using the <code>LOGFILE</code> option. 
+In fact, you can also specify a directory where all log files from the mpatrol
+library will get placed by setting the <code>LOGDIR</code> environment variable.
 
 <p>On systems that support it, every log entry also contains a call stack
 traceback that may also include the names of the symbols that appear on the
@@ -2415,7 +2417,7 @@ that the text editor must also open a new window to edit the source file so that
 it does not obscure any mpatrol diagnostic messages, and if it does not support
 this then a new terminal window must be opened for it to use.
 
-<p>If the <code>--list</code> option is given on the command line then the
+<p>If the <code>--listing</code> option is given on the command line then the
 <code>mpedit</code> command will display a context listing of the source file at
 the specified line number to the standard error output stream instead of
 invoking the text editor.  The listing will be annotated with line numbers and
@@ -2470,12 +2472,14 @@ displayed tables may contain less meaningful information.
 the <code>PROF</code> option.  This writes all of the profiling data to a file
 called <code>mpatrol.out</code> in the current directory at the end of program
 execution, but the name of this file can be changed using the <code>PROFFILE</code>
-option.  Sometimes it can also be desirable for the mpatrol library to write out
-the accumulated profiling information in the middle of program execution rather
-than just at the end, even if it is only partially complete, and this behaviour
-can be controlled with the <code>AUTOSAVE</code> option.  This can be particularly
-useful when running the program from within a debugger, when it is necessary to
-analyse the profiling information at a certain point during program execution.
+option and the default directory in which to place these files can be changed
+by setting the <code>PROFDIR</code> environment variable.  Sometimes it can also be
+desirable for the mpatrol library to write out the accumulated profiling
+information in the middle of program execution rather than just at the end, even
+if it is only partially complete, and this behaviour can be controlled with the
+<code>AUTOSAVE</code> option.  This can be particularly useful when running the
+program from within a debugger, when it is necessary to analyse the profiling
+information at a certain point during program execution.
 
 <p>Normally, the mpatrol library will perform profiling with all of its other
 features and checks enabled, but you might want to disable these if you only
@@ -6020,12 +6024,16 @@ logged.
 
 <br><dt><code>LOGFILE</code>=&lt;<var>string</var>&gt;
 <dd>Specifies an alternative file in which to place all diagnostics from the mpatrol
-library.  A filename of <code>stderr</code> will send all diagnostics to the
-<code>stderr</code> file stream and a filename of <code>stdout</code> will do the equivalent
-with the <code>stdout</code> file stream.  Note that if a problem occurs while opening
-the log file or if any diagnostics require to be displayed before the log file
-has had a chance to be opened then they will be sent to the <code>stderr</code> file
-stream.  Default value: <code>LOGFILE=mpatrol.log</code>.
+library.  If the <code>LOGDIR</code> environment variable is set and the specified file
+does not contain a path component in its filename then the log file will be
+located in the directory specified in <code>LOGDIR</code>.  A filename of <code>stderr</code>
+will send all diagnostics to the <code>stderr</code> file stream and a filename of
+<code>stdout</code> will do the equivalent with the <code>stdout</code> file stream.  Note
+that if a problem occurs while opening the log file or if any diagnostics
+require to be displayed before the log file has had a chance to be opened then
+they will be sent to the <code>stderr</code> file stream.  Default value:
+<code>LOGFILE=mpatrol.log</code> or <code>LOGFILE=%n.%p.log</code> if the <code>LOGDIR</code>
+environment variable is set.
 
 <br><dt><code>LOGFREES</code>
 <dd>Specifies that all memory deallocations are to be logged and sent to the log
@@ -6112,12 +6120,15 @@ memory deallocation immediately followed by a memory allocation.
 
 <br><dt><code>PROFFILE</code>=&lt;<var>string</var>&gt;
 <dd>Specifies an alternative file in which to place all memory allocation profiling
-information from the mpatrol library.  A filename of <code>stderr</code> will send
-this information to the <code>stderr</code> file stream and a filename of
-<code>stdout</code> will do the equivalent with the <code>stdout</code> file stream.  Note
-that if a problem occurs while opening the profiling output file then the
-profiling information will be sent to the <code>stderr</code> file stream.  Default
-value: <code>PROFFILE=mpatrol.out</code>.
+information from the mpatrol library.  If the <code>PROFDIR</code> environment variable
+is set and the specified file does not contain a path component in its filename
+then the profiling output file will be located in the directory specified in
+<code>PROFDIR</code>.  A filename of <code>stderr</code> will send this information to the
+<code>stderr</code> file stream and a filename of <code>stdout</code> will do the equivalent
+with the <code>stdout</code> file stream.  Note that if a problem occurs while opening
+the profiling output file then the profiling information will not be output. 
+Default value: <code>PROFFILE=mpatrol.out</code> or <code>PROFFILE=%n.%p.out</code> if
+the <code>PROFDIR</code> environment variable is set.
 
 <br><dt><code>PROGFILE</code>=&lt;<var>string</var>&gt;
 <dd>Specifies an alternative filename with which to locate the executable file
@@ -7267,14 +7278,16 @@ unless <code>libelf.so</code> is available.
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>LIST</code> option does not work since the <code>--listing</code> option does
+not work in the <code>mpedit</code> command. 
 <li>There is currently no support for reading symbols from COFF shared libraries. 
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work due to the lack of a <code>printf</code>
 command on the system. 
-<li>The <code>mpedit</code> command does not work due to the lack of a <code>nl</code>
-command on the system. 
+<li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
+to the lack of an <code>nl</code> command on the system. 
 </ul>
 
 <li>LynxOS 3.0.0, Intel Pentium Pro, COFF, <code>gcc</code>
@@ -7282,28 +7295,32 @@ command on the system.
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>LIST</code> option does not work since the <code>--listing</code> option does
+not work in the <code>mpedit</code> command. 
 <li>There is currently no support for reading symbols from COFF shared libraries. 
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work due to the lack of a <code>printf</code>
 command on the system. 
-<li>The <code>mpedit</code> command does not work due to the lack of a <code>nl</code>
-command on the system. 
+<li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
+to the lack of an <code>nl</code> command on the system. 
 </ul>
 
 <li>LynxOS 3.0.0, PowerPC, BFD, <code>gcc</code>
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>LIST</code> option does not work since the <code>--listing</code> option does
+not work in the <code>mpedit</code> command. 
 <li>There is currently no support for reading symbols from XCOFF shared libraries. 
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work due to the lack of a <code>printf</code>
 command on the system. 
-<li>The <code>mpedit</code> command does not work due to the lack of a <code>nl</code>
-command on the system. 
+<li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
+to the lack of an <code>nl</code> command on the system. 
 </ul>
 
 <li>LynxOS 3.0.0, PowerPC, XCOFF, <code>gcc</code>
@@ -7311,14 +7328,16 @@ command on the system.
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>LIST</code> option does not work since the <code>--listing</code> option does
+not work in the <code>mpedit</code> command. 
 <li>There is currently no support for reading symbols from XCOFF shared libraries. 
 You should currently always perform a static link instead of a dynamic link
 when linking your program, but that is the default on LynxOS anyway. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
 <li>The <code>mpsym</code> command does not work due to the lack of a <code>printf</code>
 command on the system. 
-<li>The <code>mpedit</code> command does not work due to the lack of a <code>nl</code>
-command on the system. 
+<li>The <code>mpedit</code> command does not support the <code>--listing</code> option due
+to the lack of an <code>nl</code> command on the system. 
 </ul>
 
 <li>SINIX 5.43, MIPS R4000, ELF32, <code>cc</code>
@@ -7399,6 +7418,7 @@ section in the <code>Makefile</code> before building the library.
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>EDIT</code> and <code>LIST</code> options have no effect. 
 <li>Limited support for call stack traversal. 
 <li>Limited support for reading symbols. 
 <li>No detection of illegal memory accesses. 
@@ -7416,6 +7436,7 @@ processing tools are installed.
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEDEBUG</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>EDIT</code> and <code>LIST</code> options have no effect. 
 <li>No support for call stack traversal. 
 <li>No support for reading symbols. 
 <li>No detection of illegal memory accesses. 
@@ -7428,6 +7449,7 @@ processing tools are installed.
 <ul>
 <li>The <code>OFLOWWATCH</code> option has no effect. 
 <li>The <code>USEMMAP</code> option has no effect. 
+<li>The <code>EDIT</code> and <code>LIST</code> options have no effect. 
 <li>There is currently a problem when mixing the archive library version of
 mpatrol with the DLL version of the Microsoft Runtime Library, and vice versa. 
 <li>The <code>--dynamic</code> option to the <code>mpatrol</code> command has no effect. 
@@ -10921,6 +10943,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>log file: <a href="#Example%201">Example 1</a>
 <li>LOGALL: <a href="#Environment">Environment</a>
 <li>LOGALLOCS: <a href="#Environment">Environment</a>
+<li>LOGDIR: <a href="#Environment">Environment</a>
 <li>LOGFILE: <a href="#Environment">Environment</a>
 <li>LOGFREES: <a href="#Environment">Environment</a>
 <li>logging: <a href="#Logging%20and%20tracing">Logging and tracing</a>
@@ -11103,6 +11126,7 @@ Up:<a rel=up href="#Top">Top</a>
 <li>process id: <a href="#Options">Options</a>
 <li>processor architectures, adding support: <a href="#New%20processor%20support">New processor support</a>
 <li>PROF: <a href="#Environment">Environment</a>
+<li>PROFDIR: <a href="#Environment">Environment</a>
 <li>PROFFILE: <a href="#Environment">Environment</a>
 <li>profiling: <a href="#Profiling">Profiling</a>
 <li>profiling file format: <a href="#Profiling%20file%20format">Profiling file format</a>
