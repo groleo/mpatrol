@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GCC
 
 
-# $Id: Makefile,v 1.45 2001-01-22 20:25:51 graeme Exp $
+# $Id: Makefile,v 1.46 2001-01-22 20:40:14 graeme Exp $
 
 
 # Definitions
@@ -59,14 +59,14 @@ ARCHTS_OBJECTS	= $(TOBJECTS:.o=.t.o) machine.t.o
 SHARTS_OBJECTS	= $(TOBJECTS:.o=.s.t.o) machine.s.t.o
 LINTTS_OBJECTS	= $(TOBJECTS:.o=.t.ln)
 
-ARCHIVE_LIBRARY	= lib$(MPATROL).a
-SHARED_LIBRARY	= lib$(MPATROL).so
-OBJECT_LIBRARY	= lib$(MPATROL).o
-LINT_LIBRARY	= llib-l$(MPATROL).ln
-ARCHTS_LIBRARY	= lib$(MPATROL)mt.a
-SHARTS_LIBRARY	= lib$(MPATROL)mt.so
-OBJTS_LIBRARY	= lib$(MPATROL)mt.o
-LINTTS_LIBRARY	= llib-l$(MPATROL)mt.ln
+ARCHIVE_MPATROL	= lib$(MPATROL).a
+SHARED_MPATROL	= lib$(MPATROL).so
+OBJECT_MPATROL	= lib$(MPATROL).o
+LINT_MPATROL	= llib-l$(MPATROL).ln
+ARCHTS_MPATROL	= lib$(MPATROL)mt.a
+SHARTS_MPATROL	= lib$(MPATROL)mt.so
+OBJTS_MPATROL	= lib$(MPATROL)mt.o
+LINTTS_MPATROL	= llib-l$(MPATROL)mt.ln
 
 
 # Rules
@@ -93,34 +93,34 @@ LINTTS_LIBRARY	= llib-l$(MPATROL)mt.ln
 	$(LINT) $(CFLAGS) $(TFLAGS) -y -c $<
 	-@ mv -f `basename $@ .t.ln`.ln $@
 
-$(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
 
-$(SHARED_LIBRARY).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
+$(SHARED_MPATROL).$(VERSION).$(REVISION): $(SHARED_OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(SHARED_OBJECTS)
 
-$(SHARED_LIBRARY): $(SHARED_LIBRARY).$(VERSION).$(REVISION)
+$(SHARED_MPATROL): $(SHARED_MPATROL).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
 
-$(OBJECT_LIBRARY): $(SOURCE)/library.c
+$(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(LINT_LIBRARY): $(LINT_OBJECTS)
+$(LINT_MPATROL): $(LINT_OBJECTS)
 	$(LINT) -o $(MPATROL) $(LINT_OBJECTS)
 
-$(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
 	$(AR) cr $@ $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
+$(SHARTS_MPATROL).$(VERSION).$(REVISION): $(SHARTS_OBJECTS)
 	$(LD) $(LDFLAGS) -o $@ $(SHARTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(SHARTS_LIBRARY).$(VERSION).$(REVISION)
+$(SHARTS_MPATROL): $(SHARTS_MPATROL).$(VERSION).$(REVISION)
 	@ ln -fs $< $@
 
-$(OBJTS_LIBRARY): $(SOURCE)/library.c
+$(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(LINTTS_LIBRARY): $(LINTTS_OBJECTS)
+$(LINTTS_MPATROL): $(LINTTS_OBJECTS)
 	$(LINT) -o $(MPATROL)mt $(LINTTS_OBJECTS)
 
 machine.o: $(SOURCE)/machine.c
@@ -155,10 +155,10 @@ mptrace: mptrace.o getopt.o tree.o utils.o version.o
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
+all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 	mpatrol mprof mptrace mleak
 
-lint: $(LINT_LIBRARY) $(LINTTS_LIBRARY)
+lint: $(LINT_MPATROL) $(LINTTS_MPATROL)
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
@@ -167,12 +167,12 @@ clean:
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
-	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_LIBRARY).$(VERSION).$(REVISION) 2>&1 >/dev/null
-	-@ rm -f $(SHARTS_LIBRARY).$(VERSION).$(REVISION) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_LIBRARY) $(SHARTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f $(LINT_LIBRARY) $(LINTTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPATROL).$(VERSION).$(REVISION) 2>&1 >/dev/null
+	-@ rm -f $(SHARTS_MPATROL).$(VERSION).$(REVISION) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPATROL) $(SHARTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(LINT_MPATROL) $(LINTTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
@@ -306,7 +306,7 @@ version.o version.s.o version.n.ln version.t.o version.s.t.o version.t.ln: \
 	$(SOURCE)/target.h
 machine.o machine.s.o machine.t.o machine.s.t.o: $(SOURCE)/machine.c \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -319,7 +319,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/malloc.c \
 	$(SOURCE)/profile.c $(SOURCE)/profile.h $(SOURCE)/trace.c \
 	$(SOURCE)/trace.h $(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \

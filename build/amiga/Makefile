@@ -21,7 +21,7 @@
 # GNU Makefile to compile on AmigaOS with GCC
 
 
-# $Id: Makefile,v 1.36 2001-01-22 20:25:49 graeme Exp $
+# $Id: Makefile,v 1.37 2001-01-22 20:40:11 graeme Exp $
 
 
 # Definitions
@@ -46,10 +46,10 @@ ARCHTS_OBJECTS	= list.t.o tree.t.o slots.t.o utils.t.o memory.t.o heap.t.o \
 		  signals.t.o mutex.t.o diag.t.o option.t.o profile.t.o \
 		  trace.t.o inter.t.o malloc.t.o sbrk.t.o version.t.o
 
-ARCHIVE_LIBRARY	= lib$(MPATROL).a
-OBJECT_LIBRARY	= lib$(MPATROL).o
-ARCHTS_LIBRARY	= lib$(MPATROL)mt.a
-OBJTS_LIBRARY	= lib$(MPATROL)mt.o
+ARCHIVE_MPATROL	= lib$(MPATROL).a
+OBJECT_MPATROL	= lib$(MPATROL).o
+ARCHTS_MPATROL	= lib$(MPATROL)mt.a
+OBJTS_MPATROL	= lib$(MPATROL)mt.o
 
 
 # Rules
@@ -62,16 +62,16 @@ OBJTS_LIBRARY	= lib$(MPATROL)mt.o
 .c.t.o:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
-$(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
 	$(AR) cr $@ $(ARCHIVE_OBJECTS)
 
-$(OBJECT_LIBRARY): $(SOURCE)/library.c
+$(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
 
-$(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
 	$(AR) cr $@ $(ARCHTS_OBJECTS)
 
-$(OBJTS_LIBRARY): $(SOURCE)/library.c
+$(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
 
 mpatrol: mpatrol.o getopt.o version.o
@@ -86,15 +86,15 @@ mptrace: mptrace.o getopt.o tree.o utils.o version.o
 mleak: mleak.o getopt.o tree.o version.o
 	$(CC) $(CFLAGS) $(OFLAGS) -o $@ mleak.o getopt.o tree.o version.o
 
-all: $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) mpatrol mprof mptrace mleak
+all: $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) mpatrol mprof mptrace mleak
 
 clean:
 	-@ rm -f $(ARCHIVE_OBJECTS) $(ARCHTS_OBJECTS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.o mprof.o mptrace.o mleak.o graph.o getopt.o 2>&1 >/dev/null
 
 clobber: clean
-	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f mpatrol mprof mptrace mleak 2>&1 >/dev/null
 
 
@@ -213,7 +213,7 @@ sbrk.o sbrk.t.o: $(SOURCE)/sbrk.c $(SOURCE)/sbrk.h $(SOURCE)/config.h \
 	$(SOURCE)/target.h $(SOURCE)/memory.h $(SOURCE)/utils.h
 version.o version.t.o: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -226,7 +226,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/profile.c \
 	$(SOURCE)/profile.h $(SOURCE)/trace.c $(SOURCE)/trace.h \
 	$(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \

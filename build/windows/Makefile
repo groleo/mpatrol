@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C/C++
 
 
-# $Id: Makefile,v 1.43 2001-01-22 20:25:52 graeme Exp $
+# $Id: Makefile,v 1.44 2001-01-22 20:40:15 graeme Exp $
 
 
 # Definitions
@@ -61,12 +61,12 @@ SHARTS_OBJECTS	= list.ts.obj tree.ts.obj slots.ts.obj utils.ts.obj \
 		  profile.ts.obj trace.ts.obj inter.ts.obj malloc.ts.obj \
 		  sbrk.ts.obj main.ts.obj version.ts.obj
 
-ARCHIVE_LIBRARY	= lib$(MPATROL).lib
-SHARED_LIBRARY	= $(MPATROL).dll
-OBJECT_LIBRARY	= lib$(MPATROL).obj
-ARCHTS_LIBRARY	= lib$(MPATROL)mt.lib
-SHARTS_LIBRARY	= $(MPATROL)mt.dll
-OBJTS_LIBRARY	= lib$(MPATROL)mt.obj
+ARCHIVE_MPATROL	= lib$(MPATROL).lib
+SHARED_MPATROL	= $(MPATROL).dll
+OBJECT_MPATROL	= lib$(MPATROL).obj
+ARCHTS_MPATROL	= lib$(MPATROL)mt.lib
+SHARTS_MPATROL	= $(MPATROL)mt.dll
+OBJTS_MPATROL	= lib$(MPATROL)mt.obj
 
 
 # Rules
@@ -79,22 +79,22 @@ OBJTS_LIBRARY	= lib$(MPATROL)mt.obj
 .c.ts.obj:
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
-$(ARCHIVE_LIBRARY): $(ARCHIVE_OBJECTS)
+$(ARCHIVE_MPATROL): $(ARCHIVE_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHIVE_OBJECTS)
 
-$(SHARED_LIBRARY): $(SHARED_OBJECTS) $(MPATROL).def
+$(SHARED_MPATROL): $(SHARED_OBJECTS) $(MPATROL).def
 	$(LD) -dll -nologo -def:$(MPATROL).def -out:$@ $(SHARED_OBJECTS) -defaultlib:imagehlp
 
-$(OBJECT_LIBRARY): $(SOURCE)/library.c
+$(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -Fo$@ $<
 
-$(ARCHTS_LIBRARY): $(ARCHTS_OBJECTS)
+$(ARCHTS_MPATROL): $(ARCHTS_OBJECTS)
 	$(AR) -nologo -out:$@ $(ARCHTS_OBJECTS)
 
-$(SHARTS_LIBRARY): $(SHARTS_OBJECTS) $(MPATROL)mt.def
+$(SHARTS_MPATROL): $(SHARTS_OBJECTS) $(MPATROL)mt.def
 	$(LD) -dll -nologo -def:$(MPATROL)mt.def -out:$@ $(SHARTS_OBJECTS) -defaultlib:imagehlp
 
-$(OBJTS_LIBRARY): $(SOURCE)/library.c
+$(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -Fo$@ $<
 
 mpatrol.exe: mpatrol.obj getopt.obj version.obj
@@ -109,7 +109,7 @@ mptrace.exe: mptrace.obj getopt.obj tree.obj utils.obj version.obj
 mleak.exe: mleak.obj getopt.obj tree.obj version.obj
 	$(CC) $(CFLAGS) $(OFLAGS) mleak.obj getopt.obj tree.obj version.obj
 
-all: $(ARCHIVE_LIBRARY) $(SHARED_LIBRARY) $(ARCHTS_LIBRARY) $(SHARTS_LIBRARY) \
+all: $(ARCHIVE_MPATROL) $(SHARED_MPATROL) $(ARCHTS_MPATROL) $(SHARTS_MPATROL) \
 	mpatrol.exe mprof.exe mptrace.exe mleak.exe
 
 clean:
@@ -118,11 +118,11 @@ clean:
 	-@ rm -f mpatrol.obj mprof.obj mptrace.obj mleak.obj graph.obj getopt.obj 2>&1 >/dev/null
 
 clobber: clean
-	-@ rm -f $(ARCHIVE_LIBRARY) $(ARCHTS_LIBRARY) 2>&1 >/dev/null
-	-@ rm -f $(SHARED_LIBRARY) $(SHARTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(SHARED_MPATROL) $(SHARTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(MPATROL).lib $(MPATROL).exp 2>&1 >/dev/null
 	-@ rm -f $(MPATROL)mt.lib $(MPATROL)mt.exp 2>&1 >/dev/null
-	-@ rm -f $(OBJECT_LIBRARY) $(OBJTS_LIBRARY) 2>&1 >/dev/null
+	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f mpatrol.exe mprof.exe mptrace.exe mleak.exe 2>&1 >/dev/null
 
 
@@ -251,7 +251,7 @@ main.obj main.ts.obj: $(SOURCE)/malloc.c $(SOURCE)/inter.h $(SOURCE)/config.h \
 	$(SOURCE)/trace.h
 version.obj version.ts.obj: $(SOURCE)/version.c $(SOURCE)/version.h \
 	$(SOURCE)/config.h $(SOURCE)/target.h
-$(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJECT_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
@@ -264,7 +264,7 @@ $(OBJECT_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/option.h $(SOURCE)/inter.c $(SOURCE)/profile.c \
 	$(SOURCE)/profile.h $(SOURCE)/trace.c $(SOURCE)/trace.h \
 	$(SOURCE)/version.c
-$(OBJTS_LIBRARY): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
+$(OBJTS_MPATROL): $(SOURCE)/library.c $(SOURCE)/config.h $(SOURCE)/target.h \
 	$(SOURCE)/list.c $(SOURCE)/list.h $(SOURCE)/tree.c $(SOURCE)/tree.h \
 	$(SOURCE)/slots.c $(SOURCE)/slots.h $(SOURCE)/utils.h \
 	$(SOURCE)/utils.c $(SOURCE)/memory.c $(SOURCE)/memory.h \
