@@ -49,7 +49,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.42 2000-11-14 18:29:34 graeme Exp $"
+#ident "$Id: diag.c,v 1.43 2000-11-14 20:30:43 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -218,6 +218,9 @@ MP_GLOBAL char *__mp_logfile(meminfo *m, char *s)
     char p[256];
     char *d;
 
+    if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
+         (strcmp(s, "stdout") == 0)))
+        return s;
     if ((d = getenv(MP_LOGDIR)) && (*d != '\0') && ((s == NULL) ||
 #if TARGET == TARGET_UNIX
          !strchr(s, '/')))
@@ -266,6 +269,9 @@ MP_GLOBAL char *__mp_proffile(meminfo *m, char *s)
     char p[256];
     char *d;
 
+    if ((s != NULL) && ((strcmp(s, "stderr") == 0) ||
+         (strcmp(s, "stdout") == 0)))
+        return s;
     if ((d = getenv(MP_PROFDIR)) && (*d != '\0') && ((s == NULL) ||
 #if TARGET == TARGET_UNIX
          !strchr(s, '/')))
