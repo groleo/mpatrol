@@ -97,8 +97,10 @@ DDEESSCCRRIIPPTTIIOONN
        current directory by default but this can  be  changed  at
        run-time.   Additional  configuration  options can also be
        changed at run-time  by  setting  and  altering  the  MMPPAA--
-       TTRROOLL__OOPPTTIIOONNSS  environment variable.  See EENNVVIIRROONNMMEENNTT below
-       for more details.
+       TTRROOLL__OOPPTTIIOONNSS  environment variable.  In addition, both the
+       LLOOGGFFIILLEE and PPRROOFFFFIILLEE options are affected  by  the  LLOOGGDDIIRR
+       and PPRROOFFDDIIRR environment variables respectively.  See EENNVVII--
+       RROONNMMEENNTT below for more details.
 
        Details of memory allocations and free memory  are  stored
        internally as a tree structure for speed and also to allow
@@ -122,8 +124,6 @@ DDEESSCCRRIIPPTTIIOONN
        executable  file  will  be  read  to  determine additional
        source-level information.
 
-       Memory allocation profiling is supported, with  statistics
-       about  every  memory  allocation and deallocation that was
 
 
 
@@ -136,6 +136,8 @@ Release 1.3              14 November 2000                       2
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       Memory allocation profiling is supported, with  statistics
+       about  every  memory  allocation and deallocation that was
        made during the execution of a program being written to  a
        file  at  program  termination if the PPRROOFF option is used.
        The information stored in this file can then  be  used  by
@@ -188,8 +190,6 @@ FFUUNNCCTTIIOONNSS
               not  a  power  of two then it will be rounded up to
               the nearest power of two.  If _a_l_i_g_n is greater than
               the  system  page size then it will be truncated to
-              that value.  If _s_i_z_e is _0 then the memory allocated
-              will  be implicitly rounded up to _1 byte.  If there
 
 
 
@@ -202,6 +202,8 @@ Release 1.3              14 November 2000                       3
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              that value.  If _s_i_z_e is _0 then the memory allocated
+              will  be implicitly rounded up to _1 byte.  If there
               is not enough space  in  the  heap  then  the  null
               pointer  will  be returned and eerrrrnnoo will be set to
               EENNOOMMEEMM.  The allocated memory must  be  deallocated
@@ -254,8 +256,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               the heap in order to provide better debugging,  but
               the  allocations may not necessarily be freed imme-
               diately when the function returns.   The  allocated
-              memory can be deallocated explicitly with ddeeaallllooccaa,
-              but may not be reallocated or  deallocated  in  any
 
 
 
@@ -268,6 +268,8 @@ Release 1.3              14 November 2000                       4
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              memory can be deallocated explicitly with ddeeaallllooccaa,
+              but may not be reallocated or  deallocated  in  any
               other  way.   This  function is available for back-
               wards compatibility with older C  source  code  and
               should not be used in new code.
@@ -320,8 +322,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               space in the heap then the  null  pointer  will  be
               returned  and  eerrrrnnoo  will  be  set to EENNOOMMEEMM.  The
               allocated memory must be deallocated with  ffrreeee  or
-              reallocated  with rreeaalllloocc.  This function is avail-
-              able  for  backwards  compatibility  with  older  C
 
 
 
@@ -334,6 +334,8 @@ Release 1.3              14 November 2000                       5
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              reallocated  with rreeaalllloocc.  This function is avail-
+              able  for  backwards  compatibility  with  older  C
               libraries and should not be used in new code.
 
        ssttrrnnssaavvee
@@ -386,8 +388,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               Allocates  exactly enough temporary memory from the
               heap to duplicate _s_t_r  (including  the  terminating
               nul  character)  and returns a pointer to the first
-              byte of the allocation after  copying  _s_t_r  to  the
-              newly-allocated  memory.  The pointer returned will
 
 
 
@@ -400,6 +400,8 @@ Release 1.3              14 November 2000                       6
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              byte of the allocation after  copying  _s_t_r  to  the
+              newly-allocated  memory.  The pointer returned will
               have no alignment constraints and can  be  used  to
               store  character  data up to the length of _s_t_r.  If
               _s_t_r is NNUULLLL and _s_i_z_e is non-zero then an error will
@@ -452,8 +454,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               original allocation.  The pointer returned will  be
               suitably aligned for casting to any type and can be
               used to store data of up to _n_e_l_e_m * _s_i_z_e  bytes  in
-              length.   If  _p_t_r  is  NNUULLLL  then  the call will be
-              equivalent to ccaalllloocc.  If _n_e_l_e_m * _s_i_z_e  is  _0  then
 
 
 
@@ -466,6 +466,8 @@ Release 1.3              14 November 2000                       7
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              length.   If  _p_t_r  is  NNUULLLL  then  the call will be
+              equivalent to ccaalllloocc.  If _n_e_l_e_m * _s_i_z_e  is  _0  then
               the  existing  memory  allocation will be freed and
               the null pointer will be returned.  If _n_e_l_e_m * _s_i_z_e
               is  greater  than  the original allocation then the
@@ -518,8 +520,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               beginning  at  _p_t_r  so  the memory can be reused by
               another call to allocate memory.  If  _p_t_r  is  NNUULLLL
               then  no  memory  will be explicitly freed.  All of
-              the previous  contents  will  be  destroyed.   This
-              function  can  only be used to free memory that was
 
 
 
@@ -532,6 +532,8 @@ Release 1.3              14 November 2000                       8
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              the previous  contents  will  be  destroyed.   This
+              function  can  only be used to free memory that was
               allocated with the  aallllooccaa,  ssttrrdduuppaa  and  ssttrrnndduuppaa
               functions,  but is only really required if the mpa-
               trol library does not automatically free such  mem-
@@ -584,8 +586,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               memory can be reused by another  call  to  allocate
               memory.   If  _p_t_r  is  NNUULLLL  then no memory will be
               freed.   All  of  the  previous  contents  will  be
-              destroyed.   This  function  must only be used with
-              memory allocated by ooppeerraattoorr nneeww.
 
 
 
@@ -597,6 +597,9 @@ Release 1.3              14 November 2000                       9
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              destroyed.   This  function  must only be used with
+              memory allocated by ooppeerraattoorr nneeww.
 
        ooppeerraattoorr ddeelleettee[[]]
               Frees the memory allocation beginning at _p_t_r so the
@@ -649,9 +652,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        mmeemmccccppyy
               Copies _s_i_z_e bytes from  _s_r_c  to  _d_e_s_t  and  returns
               NNUULLLL,  or  copies  the  number  of  bytes up to and
-              including the first  occurrence  of  _b_y_t_e  if  _b_y_t_e
-              exists  within  the  specified  range and returns a
-              pointer to the first byte after _b_y_t_e.  If _s_i_z_e is 00
 
 
 
@@ -664,6 +664,9 @@ Release 1.3              14 November 2000                      10
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              including the first  occurrence  of  _b_y_t_e  if  _b_y_t_e
+              exists  within  the  specified  range and returns a
+              pointer to the first byte after _b_y_t_e.  If _s_i_z_e is 00
               or  _s_r_c  is  the same as _d_e_s_t then no bytes will be
               copied.  The source and destination  ranges  should
               not overlap, otherwise a warning will be written to
@@ -715,9 +718,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
        bbccmmpp   Compares _s_i_z_e bytes from _p_t_r_1 and _p_t_r_2 and  returns
               00 if all of the bytes are identical, or returns the
               byte difference of the first differing  bytes.   If
-              _s_i_z_e is 00 or _p_t_r_1 is the same as _p_t_r_2 then no bytes
-              will be compared.  If the operation would read from
-              an existing memory allocation in the heap but would
 
 
 
@@ -730,6 +730,9 @@ Release 1.3              14 November 2000                      11
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              _s_i_z_e is 00 or _p_t_r_1 is the same as _p_t_r_2 then no bytes
+              will be compared.  If the operation would read from
+              an existing memory allocation in the heap but would
               straddle that allocation's boundaries then an error
               message  will  be  generated in the log file and no
               bytes will be compared.  This function is available
@@ -782,9 +785,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               ssttaacckk   Pointer to function call stack.
               ffrreeeedd   Indicates if alloc has been freed.
 
-       ____mmpp__pprriinnttiinnffoo
-              Displays   information   about  a  specific  memory
-
 
 
 Release 1.3              14 November 2000                      12
@@ -796,9 +796,11 @@ Release 1.3              14 November 2000                      12
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              allocation containing _p_t_r  to  the  standard  error
-              file  stream.   If  _p_t_r does not belong to a previ-
-              ously allocated memory allocation then  _0  will  be
+       ____mmpp__pprriinnttiinnffoo
+              Displays  information about a specific memory allo-
+              cation containing _p_t_r to the  standard  error  file
+              stream.   If  _p_t_r  does  not belong to a previously
+              allocated  memory  allocation  then   _0   will   be
               returned, otherwise _1 will be returned.  This func-
               tion is intended to be called from within a  debug-
               ger.
@@ -848,8 +850,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               viously installed.  The following arguments will be
               used to call the epilogue function:
 
-              AArrgguummeenntt CCaalllleedd bbyy
-
 
 
 
@@ -861,6 +861,8 @@ Release 1.3              14 November 2000                      13
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+              AArrgguummeenntt CCaalllleedd bbyy
 
               _p_t_r      mmaalllloocc, rreeaalllloocc, ssttrrdduupp, etc.
               _-_1       ffrreeee, etc.
@@ -915,8 +917,6 @@ EENNVVIIRROONNMMEENNTT
        in length.  If MMPPAATTRROOLL__OOPPTTIIOONNSS is unset or empty then  the
        default settings will be used.
 
-       The    syntax    for    options   specified   within   the
-
 
 
 Release 1.3              14 November 2000                      14
@@ -928,7 +928,8 @@ Release 1.3              14 November 2000                      14
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-       MMPPAATTRROOLL__OOPPTTIIOONNSS  environment   variable   is   OOPPTTIIOONN   or
+       The   syntax   for   options  specified  within  the  MMPPAA--
+       TTRROOLL__OOPPTTIIOONNSS   environment   variable   is    OOPPTTIIOONN    or
        OOPPTTIIOONN=_V_A_L_U_E,  where  OOPPTTIIOONN  is  a  keyword from the list
        below and _V_A_L_U_E is the setting for that option.  If  _V_A_L_U_E
        is  numeric  then it may be specified using binary, octal,
@@ -981,7 +982,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               fatal error occurs in a program, for example.  Note
               that  this  setting will be ignored if its value is
               zero.  Default value: AAUUTTOOSSAAVVEE=_0.
-
 
 
 
@@ -1039,15 +1039,15 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               if it is not).  The default alignment for a partic-
               ular system is calculated at run-time.
 
-       FFAAIILLFFRREEQQ=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies the frequency at which all memory alloca-
-              tions  will randomly fail.  For example, a value of
-              _1_0 will mean that roughly 1 in  10  memory  alloca-
-              tions  will fail, but a value of _0 will disable all
-              random failures.  This option  can  be  useful  for
-              stress-testing   an  application.   Default  value:
-              FFAAIILLFFRREEQQ=_0.
-
+       EEDDIITT   Specifies that a text editor should be  invoked  to
+              edit  any relevant source files that are associated
+              with any warnings or errors when they occur.   Only
+              diagnostics which occur at source lines in the pro-
+              gram will be affected and only then if they contain
+              source-level information.  This option is currently
+              only available on UNIX platforms as it makes use of
+              the   mmppeeddiitt   command.    It  also  overrides  the
+              behaviour of the LLIISSTT option.
 
 
 
@@ -1059,6 +1059,15 @@ Release 1.3              14 November 2000                      16
 
 MPATROL(3)               mpatrol library               MPATROL(3)
 
+
+       FFAAIILLFFRREEQQ=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies the frequency at which all memory alloca-
+              tions  will randomly fail.  For example, a value of
+              _1_0 will mean that roughly 1 in  10  memory  alloca-
+              tions  will fail, but a value of _0 will disable all
+              random failures.  This option  can  be  useful  for
+              stress-testing   an  application.   Default  value:
+              FFAAIILLFFRREEQQ=_0.
 
        FFAAIILLSSEEEEDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies the random number seed which will be used
@@ -1104,16 +1113,7 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        LLIIMMIITT=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
               Specifies the limit in bytes at  which  all  memory
-              allocations should fail if the total allocated mem-
-              ory should increase beyond this.  This can be  used
-              to  stress-test  software  to see how it behaves in
-              low memory conditions.  The internal memory used by
-              the  library  itself will not be counted as part of
-              the total heap size, but on some systems there  may
-              be  a small amount of memory required to initialise
-              the library itself.  Note that this setting will be
-              ignored  if  its  value  is  zero.   Default value:
-              LLIIMMIITT=_0.
+              allocations  should  fail  if  the  total allocated
 
 
 
@@ -1126,6 +1126,26 @@ Release 1.3              14 November 2000                      17
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+              memory should increase beyond this.   This  can  be
+              used  to stress-test software to see how it behaves
+              in low memory conditions.  The internal memory used
+              by  the  library itself will not be counted as part
+              of the total heap size, but on some  systems  there
+              may  be  a  small amount of memory required to ini-
+              tialise the library itself.  Note that this setting
+              will  be  ignored  if  its  value is zero.  Default
+              value: LLIIMMIITT=_0.
+
+       LLIISSTT   Specifies that a context listing  should  be  shown
+              for  any  relevant source files that are associated
+              with any warnings or errors when they occur.   Only
+              diagnostics which occur at source lines in the pro-
+              gram will be affected and only then if they contain
+              source-level information.  This option is currently
+              only available on UNIX platforms as it makes use of
+              the   mmppeeddiitt   command.    It  also  overrides  the
+              behaviour of the EEDDIITT option.
+
        LLOOGGAALLLL Equivalent to the LLOOGGAALLLLOOCCSS, LLOOGGRREEAALLLLOOCCSS,  LLOOGGFFRREEEESS
               and LLOOGGMMEEMMOORRYY options specified together.
 
@@ -1137,49 +1157,29 @@ MPATROL(3)               mpatrol library               MPATROL(3)
 
        LLOOGGFFIILLEE=_s_t_r_i_n_g
               Specifies an alternative file in which to place all
-              diagnostics  from  the mpatrol library.  A filename
-              of _s_t_d_e_r_r will send all diagnostics to  the  ssttddeerrrr
-              file  stream  and  a filename of _s_t_d_o_u_t will do the
-              equivalent with the ssttddoouutt file stream.  Note  that
-              if  a  problem occurs while opening the log file or
-              if any diagnostics require to be  displayed  before
-              the  log  file  has  had a chance to be opened then
-              they will  be  sent  to  the  ssttddeerrrr  file  stream.
-              Default value: LLOOGGFFIILLEE=_m_p_a_t_r_o_l_._l_o_g
+              diagnostics  from  the  mpatrol  library.   If  the
+              LLOOGGDDIIRR environment variable is set and  the  speci-
+              fied  file does not contain a path component in its
+              filename then the log file will be located  in  the
+              directory  specified  in  LLOOGGDDIIRR.   A  filename  of
+              _s_t_d_e_r_r will send all diagnostics to the ssttddeerrrr file
+              stream and a filename of _s_t_d_o_u_t will do the equiva-
+              lent with the ssttddoouutt file stream.  Note that  if  a
+              problem occurs while opening the log file or if any
+              diagnostics require to be displayed before the  log
+              file  has  had a chance to be opened then they will
+              be sent to the ssttddeerrrr file stream.  Default  value:
+              LLOOGGFFIILLEE=_m_p_a_t_r_o_l_._l_o_g  or  LLOOGGFFIILLEE=_%_n_._%_p_._l_o_g  if  the
+              LLOOGGDDIIRR environment variable is set.
 
        LLOOGGFFRREEEESS
-              Specifies  that  all memory deallocations are to be
-              logged and sent to the log  file.   Note  that  any
+              Specifies that all memory deallocations are  to  be
+              logged  and  sent  to  the log file.  Note that any
               memory deallocations made internally by the library
               will not be logged.
 
        LLOOGGMMEEMMOORRYY
-              Specifies that all  memory  operations  are  to  be
-              logged  and sent to the log file.  These operations
-              will be made by calls to functions such  as  mmeemmsseett
-              and  mmeemmccppyy.   Note that any memory operations made
-              internally by the library will not be logged.
-
-       LLOOGGRREEAALLLLOOCCSS
-              Specifies that all memory reallocations are  to  be
-              logged  and  sent  to  the log file.  Note that any
-              memory reallocations made internally by the library
-              will not be logged.
-
-       MMEEDDIIUUMMBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  the  limit  in  bytes up to which memory
-              allocations should be classified as medium  alloca-
-              tions  for  profiling purposes.  This limit must be
-              greater than the small  bound  but  less  than  the
-              large bound.  Default value: MMEEDDIIUUMMBBOOUUNNDD=_2_5_6.
-
-       NNOOFFRREEEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  that  a  number of recently-freed memory
-              allocations should be prevented from being returned
-              to the free memory pool.  Such freed memory alloca-
-              tions will then be flagged as freed and can be used
-              by the library to provide better diagnostics.  How-
-              ever, if the size of the freed queue  is  specified
+              Specifies  that  all  memory  operations  are to be
 
 
 
@@ -1192,60 +1192,60 @@ Release 1.3              14 November 2000                      18
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              as  zero  then no system memory will ever be reused
+              logged and sent to the log file.  These  operations
+              will  be  made by calls to functions such as mmeemmsseett
+              and mmeemmccppyy.  Note that any memory  operations  made
+              internally by the library will not be logged.
+
+       LLOOGGRREEAALLLLOOCCSS
+              Specifies  that  all memory reallocations are to be
+              logged and sent to the log  file.   Note  that  any
+              memory reallocations made internally by the library
+              will not be logged.
+
+       MMEEDDIIUUMMBBOOUUNNDD=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies the limit in bytes  up  to  which  memory
+              allocations  should be classified as medium alloca-
+              tions for profiling purposes.  This limit  must  be
+              greater  than  the  small  bound  but less than the
+              large bound.  Default value: MMEEDDIIUUMMBBOOUUNNDD=_2_5_6.
+
+       NNOOFFRREEEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies that a number  of  recently-freed  memory
+              allocations should be prevented from being returned
+              to the free memory pool.  Such freed memory alloca-
+              tions will then be flagged as freed and can be used
+              by the library to provide better diagnostics.  How-
+              ever,  if  the size of the freed queue is specified
+              as zero then no system memory will ever  be  reused
               by the mpatrol library, which can quickly lead to a
-              shortage  of available system memory for a process.
-              Note that this option will always  force  a  memory
+              shortage of available system memory for a  process.
+              Note  that  this  option will always force a memory
               reallocation to return a pointer to newly-allocated
-              memory, but  the  eexxppaanndd  function  will  never  be
+              memory,  but  the  eexxppaanndd  function  will  never be
               affected by this option.
 
        NNOOPPRROOTTEECCTT
-              Specifies  that the mpatrol library's internal data
+              Specifies that the mpatrol library's internal  data
               structures should not be made read-only after every
               memory  allocation  reallocation  or  deallocation.
-              This may significantly speed up execution but  this
-              will  be  at the expense of less safety if the pro-
-              gram accidentally overwrites some of the  library's
-              internal  data  structures.   Note that this option
+              This  may significantly speed up execution but this
+              will be at the expense of less safety if  the  pro-
+              gram  accidentally overwrites some of the library's
+              internal data structures.  Note  that  this  option
               has no effect on systems that do not support memory
               protection.
 
        OOFFLLOOWWBBYYTTEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies  an 8-bit byte pattern with which to fill
-              the overflow buffers  of  all  memory  allocations.
-              This  is used internally to ensure that nothing has
-              been written beyond the beginning or the end  of  a
-              block  of allocated memory.  Note that this setting
+              Specifies an 8-bit byte pattern with which to  fill
+              the  overflow  buffers  of  all memory allocations.
+              This is used internally to ensure that nothing  has
+              been  written  beyond the beginning or the end of a
+              block of allocated memory.  Note that this  setting
               will only have an effect if the OOFFLLOOWWSSIIZZEE option is
               in use.  Default value: OOFFLLOOWWBBYYTTEE=_0_x_A_A.
 
-       OOFFLLOOWWSSIIZZEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies the size in bytes to use for all overflow
-              buffers, which must be a power of two (and will  be
-              rounded  up  to  the  nearest power of two if it is
-              not).  This is used internally to ensure that noth-
-              ing  has  been  written beyond the beginning or the
-              end of a block of allocated memory.  Note that this
-              setting  specifies  the  size  for  only one of the
-              overflow buffers given to each  memory  allocation;
-              the  other  overflow  buffer will have an identical
-              size.  No overflow buffers will  be  used  if  this
-              setting is zero.  Default value: OOFFLLOOWWSSIIZZEE=_0.
 
-       OOFFLLOOWWWWAATTCCHH
-              Specifies that watch point areas should be used for
-              overflow buffers rather than filling with the over-
-              flow byte.  This can significantly reduce the speed
-              of program execution.  Note that this option has no
-              effect  on  systems that do not support watch point
-              areas.
-
-       PPAAGGEEAALLLLOOCC=_L_O_W_E_R|_U_P_P_E_R
-              Specifies that each  individual  memory  allocation
-              should  occupy  at least one page of virtual memory
-              and should be placed at the lowest or highest point
-              within  these  pages.   This  allows the library to
 
 
 
@@ -1258,60 +1258,60 @@ Release 1.3              14 November 2000                      19
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
+       OOFFLLOOWWSSIIZZEE=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies the size in bytes to use for all overflow
+              buffers,  which must be a power of two (and will be
+              rounded up to the nearest power of  two  if  it  is
+              not).  This is used internally to ensure that noth-
+              ing has been written beyond the  beginning  or  the
+              end of a block of allocated memory.  Note that this
+              setting specifies the size  for  only  one  of  the
+              overflow  buffers  given to each memory allocation;
+              the other overflow buffer will  have  an  identical
+              size.   No  overflow  buffers  will be used if this
+              setting is zero.  Default value: OOFFLLOOWWSSIIZZEE=_0.
+
+       OOFFLLOOWWWWAATTCCHH
+              Specifies that watch point areas should be used for
+              overflow buffers rather than filling with the over-
+              flow byte.  This can significantly reduce the speed
+              of program execution.  Note that this option has no
+              effect on systems that do not support  watch  point
+              areas.
+
+       PPAAGGEEAALLLLOOCC=_L_O_W_E_R|_U_P_P_E_R
+              Specifies  that  each  individual memory allocation
+              should occupy at least one page of  virtual  memory
+              and should be placed at the lowest or highest point
+              within these pages.  This  allows  the  library  to
               place an overflow buffer of one page on either side
-              of  every memory allocation and write-protect these
-              pages as well as all free and freed  memory.   Note
-              that  this  option has no effect on systems that do
-              not support memory protection, and is  disabled  by
-              default  on  other  systems as it can slow down the
+              of every memory allocation and write-protect  these
+              pages  as  well as all free and freed memory.  Note
+              that this option has no effect on systems  that  do
+              not  support  memory protection, and is disabled by
+              default on other systems as it can  slow  down  the
               speed of program execution.
 
        PPRREESSEERRVVEE
-              Specifies that  any  reallocated  or  freed  memory
-              allocations  should  preserve  their  original con-
-              tents.  This option must be used  with  the  NNOOFFRREEEE
+              Specifies  that  any  reallocated  or  freed memory
+              allocations should  preserve  their  original  con-
+              tents.   This  option  must be used with the NNOOFFRREEEE
               option and has no effect otherwise.
 
        PPRROOFF   Specifies that all memory allocations and dealloca-
-              tions are to be profiled and sent to the  profiling
+              tions  are to be profiled and sent to the profiling
               output file.  Memory reallocations are treated as a
-              memory deallocation immediately followed by a  mem-
+              memory  deallocation immediately followed by a mem-
               ory allocation.
 
        PPRROOFFFFIILLEE=_s_t_r_i_n_g
               Specifies an alternative file in which to place all
-              memory allocation profiling  information  from  the
-              mpatrol  library.   A  filename of _s_t_d_e_r_r will send
-              this information to the ssttddeerrrr file  stream  and  a
-              filename  of _s_t_d_o_u_t will do the equivalent with the
-              ssttddoouutt file stream.  Note that if a problem  occurs
-              while  opening  the  profiling output file then the
-              profiling information will be sent  to  the  ssttddeerrrr
-              file  stream.  Default value: PPRROOFFFFIILLEE=_m_p_a_t_r_o_l_._o_u_t.
-
-       PPRROOGGFFIILLEE=_s_t_r_i_n_g
-              Specifies an alternative  filename  with  which  to
-              locate the executable file containing the program's
-              symbols.  On most systems, the library  will  auto-
-              matically  be  able to determine this filename, but
-              on a few systems this option may have  to  be  used
-              before any or all symbols can be read.
-
-       RREEAALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
-              Specifies a reallocation index at which to stop the
-              program when a memory allocation is  being  reallo-
-              cated.   If  the  AALLLLOOCCSSTTOOPP option is non-zero then
-              the program will  be  halted  when  the  allocation
-              matching  that  allocation index is reallocated the
-              specified number of times.  Otherwise  the  program
-              will  be  halted  the  first time any allocation is
-              reallocated the specified number  of  times.   Note
-              that  this  setting will be ignored if its value is
-              zero.  Default value: RREEAALLLLOOCCSSTTOOPP=_0.
-
-       SSAAFFEESSIIGGNNAALLSS
-              Instructs the library to save and  replace  certain
-              signal  handlers  during  the  execution of library
+              memory  allocation  profiling  information from the
+              mpatrol library.  If the PPRROOFFDDIIRR environment  vari-
+              able is set and the specified file does not contain
+              a path component in its filename then the profiling
+              output file will be located in the directory speci-
+              fied in PPRROOFFDDIIRR.  A filename of  _s_t_d_e_r_r  will  send
 
 
 
@@ -1324,30 +1324,74 @@ Release 1.3              14 November 2000                      20
 MPATROL(3)               mpatrol library               MPATROL(3)
 
 
-              code and to restore them afterwards.  This was  the
-              default  behaviour  in  version  1.0 of the mpatrol
+              this  information  to  the ssttddeerrrr file stream and a
+              filename of _s_t_d_o_u_t will do the equivalent with  the
+              ssttddoouutt  file stream.  Note that if a problem occurs
+              while opening the profiling output  file  then  the
+              profiling  information will not be output.  Default
+              value: PPRROOFFFFIILLEE=_m_p_a_t_r_o_l_._o_u_t  or  PPRROOFFFFIILLEE=_%_n_._%_p_._o_u_t
+              if the PPRROOFFDDIIRR environment variable is set.
+
+       PPRROOGGFFIILLEE=_s_t_r_i_n_g
+              Specifies  an  alternative  filename  with which to
+              locate the executable file containing the program's
+              symbols.   On  most systems, the library will auto-
+              matically be able to determine this  filename,  but
+              on  a  few  systems this option may have to be used
+              before any or all symbols can be read.
+
+       RREEAALLLLOOCCSSTTOOPP=_u_n_s_i_g_n_e_d _i_n_t_e_g_e_r
+              Specifies a reallocation index at which to stop the
+              program  when  a memory allocation is being reallo-
+              cated.  If the AALLLLOOCCSSTTOOPP option  is  non-zero  then
+              the  program  will  be  halted  when the allocation
+              matching that allocation index is  reallocated  the
+              specified  number  of times.  Otherwise the program
+              will be halted the first  time  any  allocation  is
+              reallocated  the  specified  number of times.  Note
+              that this setting will be ignored if its  value  is
+              zero.  Default value: RREEAALLLLOOCCSSTTOOPP=_0.
+
+       SSAAFFEESSIIGGNNAALLSS
+              Instructs  the  library to save and replace certain
+              signal handlers during  the  execution  of  library
+              code  and to restore them afterwards.  This was the
+              default behaviour in version  1.0  of  the  mpatrol
               library and was changed since some memory-intensive
-              programs  became  very  hard to interrupt using the
-              keyboard, thus giving the impression that the  pro-
+              programs became very hard to  interrupt  using  the
+              keyboard,  thus giving the impression that the pro-
               gram or system had hung.
 
        SSHHOOWWAALLLL
-              Equivalent  to  the SSHHOOWWFFRREEEEDD, SSHHOOWWUUNNFFRREEEEDD, SSHHOOWWMMAAPP
+              Equivalent to the SSHHOOWWFFRREEEEDD,  SSHHOOWWUUNNFFRREEEEDD,  SSHHOOWWMMAAPP
               and SSHHOOWWSSYYMMBBOOLLSS options specified together.
 
        SSHHOOWWFFRREEEEDD
               Specifies that a summary of all of the freed memory
-              allocations  should be displayed at the end of pro-
-              gram execution.  This option must be used  in  con-
-              junction  with the NNOOFFRREEEE option and this step will
-              not be performed if an abnormal termination  occurs
+              allocations should be displayed at the end of  pro-
+              gram  execution.   This option must be used in con-
+              junction with the NNOOFFRREEEE option and this step  will
+              not  be performed if an abnormal termination occurs
               or if there were no freed allocations.
 
        SSHHOOWWMMAAPP
-              Specifies  that  a  memory  map  of the entire heap
-              should be displayed at the end  of  program  execu-
-              tion.  This step will not be performed if an abnor-
-              mal termination occurs or if the heap is empty.
+              Specifies that a memory  map  of  the  entire  heap
+              should  be  displayed  at the end of program execu-
+              tion.  This  step  will  not  be  performed  if  an
+
+
+
+Release 1.3              14 November 2000                      21
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
+              abnormal  termination  occurs  or  if  the  heap is
+              empty.
 
        SSHHOOWWSSYYMMBBOOLLSS
               Specifies that a summary of  all  of  the  function
@@ -1378,18 +1422,6 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               be displayed on  the  standard  error  file  stream
               before  aborting.  This option may be handy for use
               in batch tests as it can force  tests  to  fail  if
-
-
-
-Release 1.3              14 November 2000                      21
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
               they  do  not  free  up  a minimum number of memory
               allocations.   Note  that  this  setting  will   be
               ignored  if  its  value  is  zero.   Default value:
@@ -1412,6 +1444,18 @@ MPATROL(3)               mpatrol library               MPATROL(3)
               problems when using the mpatrol library in combina-
               tion with another malloc library which uses ssbbrrkk to
               allocate its memory.  It is ignored on systems that
+
+
+
+Release 1.3              14 November 2000                      22
+
+
+
+
+
+MPATROL(3)               mpatrol library               MPATROL(3)
+
+
               do not support the mmmmaapp system call.
 
 SSEEEE AALLSSOO
@@ -1444,51 +1488,7 @@ CCOOPPYYRRIIGGHHTT
        You should have received a copy of the GNU Library General
        Public License along with this library; if not,  write  to
        the Free Software Foundation, Inc., 59 Temple Place, Suite
-
-
-
-Release 1.3              14 November 2000                      22
-
-
-
-
-
-MPATROL(3)               mpatrol library               MPATROL(3)
-
-
        330, Boston, MA 02111-1307, USA.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
