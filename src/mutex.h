@@ -33,17 +33,28 @@
 #include "config.h"
 
 
+/* The different types of mutex that can be locked.
+ */
+
+typedef enum mutextype
+{
+    MT_MAIN, /* main mpatrol library mutex */
+    MT_MAX   /* total number of mutex types */
+}
+mutextype;
+
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
 
+MP_EXPORT void __mp_initmutexes(void);
+MP_EXPORT void __mp_finimutexes(void);
+MP_EXPORT void __mp_lockmutex(mutextype);
+MP_EXPORT void __mp_unlockmutex(mutextype);
 MP_EXPORT unsigned long __mp_threadid(void);
-MP_EXPORT void __mp_newrecmutex(void);
-MP_EXPORT void __mp_deleterecmutex(void);
-MP_EXPORT void __mp_lockrecmutex(void);
-MP_EXPORT void __mp_unlockrecmutex(void);
 
 
 #ifdef __cplusplus
