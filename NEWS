@@ -1,3 +1,14 @@
+Changes for 1.4.5 (14th June, 2001)
+
+  * Added the CHECKFORK option in order to fix the fork() problem on UNIX
+    platforms explicitly.  This had to be added because the fix in the previous
+    release did not work for multithreaded programs on Linux.
+
+  * Added the HD_CONTENTS flag to the heapdiff tool.
+
+  * Added the --source option to the mptrace command.
+
+
 Changes for 1.4.4 (31st May, 2001)
 
   * Added ability to read, write, compare and remove allocation contents files.

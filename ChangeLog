@@ -1,3 +1,51 @@
+2001-06-13  Graeme Roy  <graeme@epc.co.uk>
+
+	* THANKS: Credited Michael Anthony.
+
+	* doc/mpatrol.texi: Brought documentation slightly more up to date.
+
+	* doc/refcard.tex:
+	Added the --source, --check-fork and CHECKFORK options.
+
+	* man/man1/mptrace.1: Documented the --source option.
+
+	* man/man1/mpatrol.1: Added the --check-fork option.
+
+	* man/man3/libmpatrol.3:
+	Added the CHECKFORK option.  Documented the mpatrol_* versions of
+	functions.
+
+2001-06-12  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/info.h, src/inter.c, src/mpatrol.c, src/mpatrol.h, src/option.c,
+	  src/option.h:
+	Added the CHECKFORK option.
+
+	* src/inter.c:
+	Allow removal of allocation contents files for freed allocations.
+
+	* tools/heapdiff.c, tools/heapdiff.h: Added the HD_CONTENTS flag.
+
+2001-06-07  Graeme Roy  <graeme@epc.co.uk>
+
+	* src/config.h: Added MP_NAMECACHE_SIZE.
+
+	* src/info.c, src/inter.c, src/trace.c, src/trace.h:
+	Now pass thread id, source function name, file name and line number for
+	placing in tracing output file.  Added name caches for tracing function
+	names and file names.
+
+	* src/mprof.c: Don't close the graph file if it is stdout or stderr.
+
+	* src/mptrace.c:
+	Don't close the simulation file or the HATF file if they are stdout or
+	stderr and also always read the whole of a reallocation record, even if
+	the allocation index does not exist.  Added support for reading the
+	thread id, source function name, file name and line number from the
+	tracing output file.  Added ability to reach cached tracing files.
+	Added the --source option and changed the short option for --sim-file to
+	be -S.
+
 2001-05-30  Graeme Roy  <graeme@epc.co.uk>
 
 	* doc/mpatrol.texi, doc/refcard.tex, man/man3/libmpatrol.3:
