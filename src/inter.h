@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: inter.h,v 1.45 2001-05-22 19:41:15 graeme Exp $
+ * $Id: inter.h,v 1.46 2001-05-23 20:04:08 graeme Exp $
  */
 
 
@@ -142,6 +142,7 @@ void *__mp_locatemem(void *, size_t, void *, size_t, alloctype, char *, char *,
                      unsigned long, size_t);
 int __mp_comparemem(void *, void *, size_t, alloctype, char *, char *,
                     unsigned long, size_t);
+unsigned long __mp_libversion(void);
 char *__mp_strerror(errortype);
 char *__mp_function(alloctype);
 int __mp_setuser(void *, void *);

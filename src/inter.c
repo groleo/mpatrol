@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.124 2001-05-22 22:51:00 graeme Exp $"
+#ident "$Id: inter.c,v 1.125 2001-05-23 20:04:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.124 2001-05-22 22:51:00 graeme Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.125 2001-05-23 20:04:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1501,6 +1501,16 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     r = __mp_comparememory(&memhead, p, q, l, f, &v);
     restoresignals();
     return r;
+}
+
+
+/* Return the full version number of the mpatrol library.
+ */
+
+unsigned long
+__mp_libversion(void)
+{
+    return MP_VERNUM;
 }
 
 

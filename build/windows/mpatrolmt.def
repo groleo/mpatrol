@@ -44,6 +44,7 @@ EXPORTS
 	__mp_copymem
 	__mp_comparemem
 	__mp_locatemem
+	__mp_libversion
 	__mp_strerror
 	__mp_function
 	__mp_setuser

@@ -50,9 +50,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpalloc.c,v 1.31 2001-05-22 19:41:15 graeme Exp $"
+#ident "$Id: mpalloc.c,v 1.32 2001-05-23 20:04:08 graeme Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.31 2001-05-22 19:41:15 graeme Exp $";
+static MP_CONST MP_VOLATILE char *mpalloc_id = "$Id: mpalloc.c,v 1.32 2001-05-23 20:04:08 graeme Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -578,6 +578,16 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     if ((f != AT_MEMCMP) && (f != AT_BCMP))
         illegalfunction("__mp_comparemem", s, t, u);
     return memcmp(p, q, l);
+}
+
+
+/* Return the full version number of the mpatrol library.
+ */
+
+unsigned long
+__mp_libversion(void)
+{
+    return MP_VERNUM;
 }
 
 
