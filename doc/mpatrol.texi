@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-1999 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.13 1999-11-25 18:06:36 graeme Exp $
+@c $Id: mpatrol.texi,v 1.14 1999-11-26 13:15:18 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1014,10 +1014,12 @@ mpatrol in the appendices, but you may wish to try out the examples
 
 @menu
 * Logging and tracing::         General information.
+* Overwrites and underwrites::  Overflow buffers.
 * Using with a debugger::       Setting breakpoints.
+* Testing::                     Additional checks.
 @end menu
 
-@node Logging and tracing, Using with a debugger, , Using mpatrol
+@node Logging and tracing, Overwrites and underwrites, , Using mpatrol
 @section Logging and tracing
 @cindex logging
 @cindex tracing
@@ -1060,7 +1062,124 @@ will display any symbolic information that the mpatrol library managed to obtain
 from any executable files and libraries that were relevant to the program being
 tested.  All of these options can be selected with the @option{SHOWALL} option.
 
-@node Using with a debugger, , Logging and tracing, Using mpatrol
+@node Overwrites and underwrites, Using with a debugger, Logging and tracing, Using mpatrol
+@section Overwrites and underwrites
+@cindex overwrites
+@cindex underwrites
+
+Once a block of memory has been allocated, it is imperative that the program
+does not attempt to write any data past the end of the block or write any data
+just before the beginning of the block.  Even writing a single byte just beyond
+the end of an allocation or just before the beginning of an allocation can cause
+havoc.  This is because most malloc libraries store the details of the allocated
+block in the first few words before the beginning of the block, such as its size
+and a pointer to the next block.  The mpatrol library does not do this, so a
+program which failed using the normal malloc library and worked when the mpatrol
+library was linked in is a possible candidate for turning on overflow buffers.
+
+Such memory corruption can be extremely difficult to pinpoint as it is unlikely
+to show itself until the next call is made to the malloc library, or if the
+internal malloc library blocks were not overwritten, the next time the data is
+read from the block that was overwritten.  If the former is the case then the
+next library call will cause an internal error or a crash, but only when the
+memory block that was affected is referenced.  This is likely to disappear when
+using the mpatrol library since it keeps its internal structures separate, and
+write-protects them on systems that support memory protection.
+
+@cindex overflow buffers
+@cindex buffers, overflow
+@cindex fence posts
+@cindex overflow size
+@cindex overflow byte
+In order to identify such errors, it is possible to place special
+buffers@footnote{Commonly known as @emph{overflow buffers} or @emph{fence
+posts}.} on either side of every memory allocation, and these will be pre-filled
+with a specified byte.  Before every mpatrol library call, the library will
+check the integrity of every such overflow buffer in order to check for a memory
+underwrite or overwrite.  Depending on the number of allocations and size of
+these buffers, this can take a noticable amount of time (which is why overflow
+buffers are disabled by default), but can mean that these errors get noticed
+sooner.  The option which governs this is @option{OFLOWSIZE}.  The byte with
+which they get pre-filled can be changed with @option{OFLOWBYTE}.  Depending on
+what gets written, it might only be possible to see such errors when a different
+size of buffer or a different pre-fill byte is used.
+
+A worse situation can occur when it is only reads from memory that overflow or
+underflow; i.e. with the faulty code reading just before or just past a memory
+allocation.  These cannot be detected by overflow buffers as it is not possible
+using conventional means to interrupt every single read from memory.  However,
+on systems with virtual memory, it is possible to use the memory protection
+feature to provide an alternative to overflow buffers, although at the added
+expense of increased memory usage.
+
+The @option{PAGEALLOC} option turns on this feature and automatically rounds
+up the size of every memory allocation to a multiple of the system page size.
+It also rounds up the size of every overflow buffer to a multiple of the system
+page size so that every memory allocation occupies its own set of pages of
+virtual memory and no two memory allocations occupy the same page of virtual
+memory.  The overflow buffers are then read and write protected so that any
+memory accesses to them will generate an error@footnote{This is a feature that
+was first used by Electric Fence (@pxref{Related software}) to track down memory
+corruption.}.  Following on from the previous section, the @option{PAGEALLOC}
+option also causes free memory to be read and write protected as well since that
+will also occupy non-overlapping virtual memory pages.
+
+The remaining memory that is left over within an allocation's pages is
+effectively turned into traditional overflow buffers, being pre-filled with the
+overflow byte and checked periodically by the mpatrol library to ensure that
+nothing has written into them.  However, because of this remaining memory, the
+library has a choice of where to place the memory allocation within its pages.
+If it places the allocation at the very beginning then it will catch memory
+underwrites, but if it places the allocation at the very end then it will catch
+memory overwrites.  Such a choice can be controlled at run-time by supplying an
+argument to the @option{PAGEALLOC} option.  If @option{PAGEALLOC=LOWER} is used
+then every allocation will be placed at the very beginning of its pages and if
+@option{PAGEALLOC=UPPER} is used then the placement will be at the very end of
+its pages.  This is probably better explained in Example 3 (@pxref{Example 3})
+where the problems with @option{PAGEALLOC=UPPER} and alignment are also
+discussed.
+
+Obviously, there are still some deficiencies when using @option{PAGEALLOC} since
+it can use up a huge amount of memory (especially with @option{NOFREE}) and the
+overflow buffers within an allocation's pages can still be read without causing
+an immediate error.  Both of these deficiencies can be overcome by using the
+@option{OFLOWWATCH} option to install @emph{software watch points} instead of
+overflow buffers, but there are still very few systems that support software
+watch points at the moment, and it can slow a program's execution speed down by
+a factor of around 10,000.  The reason for this is that software watch points
+instruct the operating system to check every read from and write to memory,
+which means that it has to single-step through a process checking every
+instruction before it is executed.  However, this is a very thorough way of
+checking for overflows and is unlikely to miss anything, although there may be
+problems with misaligned memory accesses when using watch points
+(@pxref{Virtual memory}).
+
+To conclude, if you suspect your program has a piece of code which is performing
+illegal memory underwrites or overwrites to a memory allocation you should use
+each of the following options in sequence, but only if your system supports
+them.
+
+@enumerate 1
+@item
+@option{OFLOWSIZE=8}
+
+@item
+@option{OFLOWSIZE=32}
+
+@item
+@option{OFLOWSIZE=1} @option{PAGEALLOC=LOWER}
+
+@item
+@option{OFLOWSIZE=1} @option{PAGEALLOC=UPPER}
+
+@item
+@option{OFLOWSIZE=8} @option{OFLOWWATCH}
+
+@item
+@option{OFLOWSIZE=32} @option{OFLOWWATCH}
+@end enumerate
+
+@node Using with a debugger, Testing, Overwrites and underwrites, Using mpatrol
 @section Using with a debugger
 @cindex using with a debugger
 @cindex debugger
@@ -1238,6 +1357,58 @@ debugging information enabled.  So, after returning from all of the library
 functions, the source line becomes line 16 because that was the location of the
 1000th memory allocation.  Single-stepping twice gets us to line 18 which is our
 destination.
+
+@node Testing, , Using with a debugger, Using mpatrol
+@section Testing
+@cindex testing
+
+The mpatrol library has several features that make it useful when testing a
+program's dynamic memory allocations.  These are features that do not help in
+fixing an existing bug, but rather help to identify additional bugs that may be
+lurking in your code.
+
+@cindex limiting available memory
+It is possible to set a simulated upper limit on the amount of heap memory
+available to a process with the @option{LIMIT} option, which accepts a size in
+bytes, but will be disabled when it is zero.  This can be extremely useful for
+testing a program under simulated low memory conditions to see how it handles
+such errors.  Of course, you should set the heap limit to a value less than the
+amount of actual available memory otherwise this option will have no effect.
+Note that the mpatrol library may use up a small amount of heap memory when it
+initialises itself@footnote{Actually, it's not really the mpatrol library that
+uses the memory but the object file access libraries since they call
+@code{malloc()} to allocate any memory that they require.} so the value passed
+to the @option{LIMIT} option may need to be set slightly higher than you would
+normally expect.
+
+@cindex random failures
+@cindex failure frequency
+@cindex failure seed
+It is also possible to instruct the mpatrol library to randomly fail a certain
+number of memory allocations so that you can further test error handling code in
+a program.  The frequency at which failures occur can be controlled with the
+@option{FAILFREQ} option, where a value of zero means that no failures will
+occur, but any other value will randomly cause failures.  For example, a value
+of @samp{10} will cause roughly one in ten failures and a value of @samp{1} will
+cause every memory allocation to fail.  The random sequence can be made
+predictable by using the @option{FAILSEED} option.  If this is non-zero then the
+same program run with the same failure frequency and same failure seed will fail
+on exactly the same memory allocations.  If this is zero then the failure seed
+will itself be set randomly, but you can see its value when the summary is
+displayed at program termination.
+
+@cindex batch testing
+When running @emph{batch tests}@footnote{A set of tests that run without user
+intervention.} it is sometimes useful to be able to detect if there have been
+any memory leaks.  Such leaks should normally be distinguished from code which
+has purposely not freed the memory that it allocated, so there may be a certain
+expected number of unfreed allocations at program termination.  It may be that
+you would like to highlight any additional unfreed allocations since they may be
+due to real memory leaks, so the @option{UNFREEDABORT} option can be set to a
+threshold number of expected unfreed allocations.  If the library detects a
+number of unfreed allocations higher than this then it will abort the program at
+termination so that it fails.  All tests that fail in this way can then be
+examined after the test suite finishes.
 
 @node Improving performance, Examples, Using mpatrol, Top
 @chapter Improving performance
@@ -1805,9 +1976,6 @@ has no specified alignment.  It can be changed at run-time using the
 to crash due to bus errors which are caused by reading from or writing to
 misaligned data.
 
-@cindex overflow buffers
-@cindex buffers, overflow
-@cindex overflow size
 @item
 Overflow size.  This value is the size used by one overflow buffer.  If this is
 non-zero then every memory allocation will have two overflow buffers; one on
@@ -1816,7 +1984,6 @@ has written too many bytes to a memory allocation, thus overflowing into one of
 the buffers, but these extra checks can slow down execution speed.  It can be
 changed at run-time using the @option{OFLOWSIZE} option.
 
-@cindex overflow byte
 @item
 Overflow byte.
 @cindex allocation byte
@@ -1860,9 +2027,6 @@ performed, thus speeding up execution speed dramatically.  The library defaults
 to performing checks for every allocation index.  These can be changed at
 run-time using the @option{CHECK} option.
 
-@cindex random failures
-@cindex failure frequency
-@cindex failure seed
 @item
 Failure frequency.
 @item
@@ -1923,7 +2087,6 @@ Allocation peak.  This value contains the peak memory usage set by the program
 when running.  This value may be more than expected if the mpatrol library makes
 any memory allocations during initialisation.
 
-@cindex limiting available memory
 @item
 Allocation limit.  This value is used to limit the amount of memory that can be
 allocated by a program, which can be useful for stress-testing in simulated low
@@ -3206,8 +3369,6 @@ displayed at the end of program execution.  This step will not be performed if
 an abnormal termination occurs or if there are no unfreed allocations.
 
 @cindex UNFREEDABORT
-@cindex batch testing
-@cindex testing, batch
 @item @option{UNFREEDABORT}=<@var{unsigned-integer}>
 Specifies the minimum number of unfreed allocations at which to abort the
 program just before program termination.  A summary of all the allocations will
