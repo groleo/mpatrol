@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.246 2001-09-05 20:24:31 graeme Exp $
+@c $Id: mpatrol.texi,v 1.247 2001-09-05 22:15:24 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -15417,6 +15417,15 @@ that a program makes when running.  This can sometimes be invaluable in
 pinpointing the exact point at which a program fails, but as it only operates
 at the system call level, no information about individual memory allocations is
 available.
+
+@cindex pageheap
+On Windows 2000 (and probably later releases of the operating system as well)
+there is a utility called @command{pageheap} which acts in a similar way to the
+@command{mpatrol} command in that it overrides the definitions of
+@code{malloc()} and related functions for any programs that it runs.  It has
+a similar behaviour to the @option{--page-alloc-upper} option but has far less
+features.  However, it could be very useful if you can't get mpatrol to work
+for you.
 
 @node References, About the author, Related software, Top
 @appendix References
