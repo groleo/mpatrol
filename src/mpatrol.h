@@ -164,22 +164,24 @@
 
 typedef enum __mp_alloctype
 {
-    MP_AT_ALLOCA,    /* alloca() */
-    MP_AT_DEALLOCA,  /* dealloca() */
     MP_AT_MALLOC,    /* malloc() */
     MP_AT_CALLOC,    /* calloc() */
     MP_AT_MEMALIGN,  /* memalign() */
     MP_AT_VALLOC,    /* valloc() */
     MP_AT_PVALLOC,   /* pvalloc() */
+    MP_AT_ALLOCA,    /* alloca() */
     MP_AT_STRDUP,    /* strdup() */
     MP_AT_STRNDUP,   /* strndup() */
     MP_AT_STRSAVE,   /* strsave() */
     MP_AT_STRNSAVE,  /* strnsave() */
+    MP_AT_STRDUPA,   /* strdupa() */
+    MP_AT_STRNDUPA,  /* strndupa() */
     MP_AT_REALLOC,   /* realloc() */
     MP_AT_RECALLOC,  /* recalloc() */
     MP_AT_EXPAND,    /* expand() */
     MP_AT_FREE,      /* free() */
     MP_AT_CFREE,     /* cfree() */
+    MP_AT_DEALLOCA,  /* dealloca() */
     MP_AT_NEW,       /* operator new */
     MP_AT_NEWVEC,    /* operator new[] */
     MP_AT_DELETE,    /* operator delete */
@@ -233,12 +235,6 @@ __mp_allocinfo;
 
 #ifndef NDEBUG
 
-#ifdef alloca
-#undef alloca
-#endif /* alloca */
-#ifdef dealloca
-#undef dealloca
-#endif /* dealloca */
 #ifdef malloc
 #undef malloc
 #endif /* malloc */
@@ -254,6 +250,9 @@ __mp_allocinfo;
 #ifdef pvalloc
 #undef pvalloc
 #endif /* pvalloc */
+#ifdef alloca
+#undef alloca
+#endif /* alloca */
 #ifdef strdup
 #undef strdup
 #endif /* strdup */
@@ -266,6 +265,12 @@ __mp_allocinfo;
 #ifdef strnsave
 #undef strnsave
 #endif /* strnsave */
+#ifdef strdupa
+#undef strdupa
+#endif /* strdupa */
+#ifdef strndupa
+#undef strndupa
+#endif /* strndupa */
 #ifdef realloc
 #undef realloc
 #endif /* realloc */
@@ -281,6 +286,9 @@ __mp_allocinfo;
 #ifdef cfree
 #undef cfree
 #endif /* cfree */
+#ifdef dealloca
+#undef dealloca
+#endif /* dealloca */
 #ifdef memset
 #undef memset
 #endif /* memset */
@@ -324,10 +332,6 @@ __mp_allocinfo;
 #endif /* MP_NOCPLUSPLUS */
 
 
-#define alloca(l) __mp_alloc((l), 0, MP_AT_ALLOCA, MP_FUNCNAME, __FILE__, \
-                             __LINE__, 0)
-#define dealloca(p) __mp_free((p), MP_AT_DEALLOCA, MP_FUNCNAME, __FILE__, \
-                              __LINE__, 0)
 #define malloc(l) __mp_alloc((l), 0, MP_AT_MALLOC, MP_FUNCNAME, __FILE__, \
                              __LINE__, 0)
 #define calloc(l, n) __mp_alloc((l) * (n), 0, MP_AT_CALLOC, MP_FUNCNAME, \
@@ -338,6 +342,8 @@ __mp_allocinfo;
                              __LINE__, 0)
 #define pvalloc(l) __mp_alloc((l), 0, MP_AT_PVALLOC, MP_FUNCNAME, __FILE__, \
                               __LINE__, 0)
+#define alloca(l) __mp_alloc((l), 0, MP_AT_ALLOCA, MP_FUNCNAME, __FILE__, \
+                             __LINE__, 0)
 #define strdup(p) __mp_strdup((p), 0, MP_AT_STRDUP, MP_FUNCNAME, __FILE__, \
                               __LINE__, 0)
 #define strndup(p, l) __mp_strdup((p), (l), MP_AT_STRNDUP, MP_FUNCNAME, \
@@ -345,6 +351,10 @@ __mp_allocinfo;
 #define strsave(p) __mp_strdup((p), 0, MP_AT_STRSAVE, MP_FUNCNAME, __FILE__, \
                                __LINE__, 0)
 #define strnsave(p, l) __mp_strdup((p), (l), MP_AT_STRNSAVE, MP_FUNCNAME, \
+                                   __FILE__, __LINE__, 0)
+#define strdupa(p) __mp_strdup((p), 0, MP_AT_STRDUPA, MP_FUNCNAME, __FILE__, \
+                               __LINE__, 0)
+#define strndupa(p, l) __mp_strdup((p), (l), MP_AT_STRNDUPA, MP_FUNCNAME, \
                                    __FILE__, __LINE__, 0)
 #define realloc(p, l) __mp_realloc((p), (l), 0, MP_AT_REALLOC, MP_FUNCNAME, \
                                    __FILE__, __LINE__, 0)
@@ -355,6 +365,8 @@ __mp_allocinfo;
 #define free(p) __mp_free((p), MP_AT_FREE, MP_FUNCNAME, __FILE__, __LINE__, 0)
 #define cfree(p, l, n) __mp_free((p), MP_AT_CFREE, MP_FUNCNAME, __FILE__, \
                                  __LINE__, 0)
+#define dealloca(p) __mp_free((p), MP_AT_DEALLOCA, MP_FUNCNAME, __FILE__, \
+                              __LINE__, 0)
 #define memset(p, c, l) __mp_setmem((p), (l), (unsigned char) (c), \
                                     MP_AT_MEMSET, MP_FUNCNAME, __FILE__, \
                                     __LINE__, 0)
@@ -484,7 +496,7 @@ static inline new_handler set_new_handler(new_handler h)
 static inline void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
                                  unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 0);
+    return __mp_alloc(l, 0, MP_AT_NEW, s, t, u, 1);
 }
 
 
@@ -494,7 +506,7 @@ static inline void *operator new(size_t l, MP_CONST char *s, MP_CONST char *t,
 static inline void *operator new[](size_t l, MP_CONST char *s, MP_CONST char *t,
                                    unsigned long u)
 {
-    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 0);
+    return __mp_alloc(l, 0, MP_AT_NEWVEC, s, t, u, 1);
 }
 
 
@@ -507,7 +519,7 @@ static inline void operator delete(void *p)
     unsigned long u;
 
     __mp_popdelstack(&s, &t, &u);
-    __mp_free(p, MP_AT_DELETE, s, t, u, 0);
+    __mp_free(p, MP_AT_DELETE, s, t, u, 1);
 }
 
 
@@ -520,7 +532,7 @@ static inline void operator delete[](void *p)
     unsigned long u;
 
     __mp_popdelstack(&s, &t, &u);
-    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 0);
+    __mp_free(p, MP_AT_DELETEVEC, s, t, u, 1);
 }
 
 

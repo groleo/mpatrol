@@ -64,22 +64,24 @@
 
 typedef enum alloctype
 {
-    AT_ALLOCA,    /* alloca() */
-    AT_DEALLOCA,  /* dealloca() */
     AT_MALLOC,    /* malloc() */
     AT_CALLOC,    /* calloc() */
     AT_MEMALIGN,  /* memalign() */
     AT_VALLOC,    /* valloc() */
     AT_PVALLOC,   /* pvalloc() */
+    AT_ALLOCA,    /* alloca() */
     AT_STRDUP,    /* strdup() */
     AT_STRNDUP,   /* strndup() */
     AT_STRSAVE,   /* strsave() */
     AT_STRNSAVE,  /* strnsave() */
+    AT_STRDUPA,   /* strdupa() */
+    AT_STRNDUPA,  /* strndupa() */
     AT_REALLOC,   /* realloc() */
     AT_RECALLOC,  /* recalloc() */
     AT_EXPAND,    /* expand() */
     AT_FREE,      /* free() */
     AT_CFREE,     /* cfree() */
+    AT_DEALLOCA,  /* dealloca() */
     AT_NEW,       /* operator new */
     AT_NEWVEC,    /* operator new[] */
     AT_DELETE,    /* operator delete */

@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: info.c,v 1.35 2000-11-02 22:04:45 graeme Exp $"
+#ident "$Id: info.c,v 1.36 2000-11-03 18:27:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -304,8 +304,8 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
     {
         if (!(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READWRITE);
-        if (((f != AT_ALLOCA) || (g = getallocanode(h))) &&
-            (m = getinfonode(h)))
+        if ((((f != AT_ALLOCA) && (f != AT_STRDUPA) && (f != AT_STRNDUPA)) ||
+             (g = getallocanode(h))) && (m = getinfonode(h)))
             if (n = __mp_getalloc(&h->alloc, l, a, m))
             {
                 /* Fill in the details of the allocation information node.
@@ -339,14 +339,16 @@ MP_GLOBAL void *__mp_getmemory(infohead *h, size_t l, size_t a, alloctype f,
             }
             else
                 __mp_freeslot(&h->table, m);
-        if ((f == AT_ALLOCA) && (g != NULL))
+        if (((f == AT_ALLOCA) || (f == AT_STRDUPA) || (f == AT_STRNDUPA)) &&
+            (g != NULL))
             if (p != NULL)
             {
                 /* We take the address of a local variable in the calling
                  * function in order to determine if subsequent calls are
                  * closer to or further away from the program's entry point.
                  * This information can later be used to free up any
-                 * allocations made by alloca() that are now out of scope.
+                 * allocations made by alloca(), strdupa() or strndupa() that
+                 * are now out of scope.
                  */
                 __mp_addhead(&h->astack, &g->node);
                 g->block = p;
@@ -431,11 +433,12 @@ MP_GLOBAL void *__mp_resizememory(infohead *h, void *p, size_t l, size_t a,
         __mp_diag("\n");
         p = NULL;
     }
-    else if ((m->data.type == AT_ALLOCA) || (m->data.type == AT_NEW) ||
+    else if ((m->data.type == AT_ALLOCA) || (m->data.type == AT_STRDUPA) ||
+             (m->data.type == AT_STRNDUPA) || (m->data.type == AT_NEW) ||
              (m->data.type == AT_NEWVEC))
     {
         /* The function used to allocate the block is incompatible with
-         * alloca(), operator new or operator new[].
+         * alloca(), strdupa(), strndupa(), operator new or operator new[].
          */
         if ((o == 0) && (h->recur == 1))
             __mp_logrealloc(h, p, l, a, f, s, t, u, v);
@@ -639,9 +642,11 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
         __mp_printalloc(&h->syms, n);
         __mp_diag("\n");
     }
-    else if (((m->data.type == AT_ALLOCA) && (f != AT_ALLOCA) &&
+    else if ((((m->data.type == AT_ALLOCA) || (m->data.type == AT_STRDUPA) ||
+               (m->data.type == AT_STRNDUPA)) && (f != AT_ALLOCA) &&
               (f != AT_DEALLOCA)) ||
-             ((m->data.type != AT_ALLOCA) && ((f == AT_ALLOCA) ||
+             ((m->data.type != AT_ALLOCA) && (m->data.type != AT_STRDUPA) &&
+              (m->data.type != AT_STRNDUPA) && ((f == AT_ALLOCA) ||
                (f == AT_DEALLOCA))) ||
              ((m->data.type == AT_NEW) && (f != AT_DELETE)) ||
              ((m->data.type != AT_NEW) && (f == AT_DELETE)) ||
@@ -704,8 +709,8 @@ MP_GLOBAL void __mp_freememory(infohead *h, void *p, alloctype f, char *s,
             /* Search the alloca allocation stack for the allocanode to free.
              * We need to do this instead of just blindly removing the top of
              * the stack since it is possible for the user to manually free an
-             * allocation created by alloca() through the use of the dealloca()
-             * function.
+             * allocation that was created by one of the alloca() family of
+             * functions through the use of the dealloca() function.
              */
             o = 0;
             for (g = (allocanode *) h->astack.head; g->node.next != NULL;

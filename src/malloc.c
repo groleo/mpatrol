@@ -31,7 +31,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.19 2000-11-02 20:14:14 graeme Exp $"
+#ident "$Id: malloc.c,v 1.20 2000-11-03 18:27:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -39,40 +39,6 @@
 extern "C"
 {
 #endif /* __cplusplus */
-
-
-/* Allocate a temporary uninitialised memory block of a given size.
- */
-
-void *alloca(size_t l)
-{
-    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
-}
-
-
-#if MP_ALTFUNCNAMES
-void *MP_ALTFUNCNAME(alloca)(size_t l)
-{
-    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
-}
-#endif /* MP_ALTFUNCNAMES */
-
-
-/* Explicitly free an existing block of temporary memory.
- */
-
-void dealloca(void *p)
-{
-    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
-}
-
-
-#if MP_ALTFUNCNAMES
-void MP_ALTFUNCNAME(dealloca)(void *p)
-{
-    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
-}
-#endif /* MP_ALTFUNCNAMES */
 
 
 /* Allocate an uninitialised memory block of a given size.
@@ -162,6 +128,23 @@ void *MP_ALTFUNCNAME(pvalloc)(size_t l)
 #endif /* MP_ALTFUNCNAMES */
 
 
+/* Allocate a temporary uninitialised memory block of a given size.
+ */
+
+void *alloca(size_t l)
+{
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void *MP_ALTFUNCNAME(alloca)(size_t l)
+{
+    return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
 /* Duplicate an existing string using memory from the heap.
  */
 
@@ -236,6 +219,41 @@ char *MP_ALTFUNCNAME(strnsave)(MP_CONST char *p, size_t l)
 #endif /* SYSTEM */
 {
     return __mp_strdup((char *) p, l, AT_STRNSAVE, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Duplicate an existing string using temporary memory from the heap.
+ */
+
+char *strdupa(MP_CONST char *p)
+{
+    return __mp_strdup((char *) p, 0, AT_STRDUPA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+char *MP_ALTFUNCNAME(strdupa)(MP_CONST char *p)
+{
+    return __mp_strdup((char *) p, 0, AT_STRDUPA, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Duplicate an existing string using temporary memory from the heap, but set a
+ * limit on the size of the memory allocated for the new string.
+ */
+
+char *strndupa(MP_CONST char *p, size_t l)
+{
+    return __mp_strdup((char *) p, l, AT_STRNDUPA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+char *MP_ALTFUNCNAME(strndupa)(MP_CONST char *p, size_t l)
+{
+    return __mp_strdup((char *) p, l, AT_STRNDUPA, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 
@@ -321,6 +339,23 @@ void cfree(void *p, size_t l, size_t n)
 void MP_ALTFUNCNAME(cfree)(void *p, size_t l, size_t n)
 {
     __mp_free(p, AT_CFREE, NULL, NULL, 0, 1);
+}
+#endif /* MP_ALTFUNCNAMES */
+
+
+/* Explicitly free an existing block of temporary memory.
+ */
+
+void dealloca(void *p)
+{
+    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
+}
+
+
+#if MP_ALTFUNCNAMES
+void MP_ALTFUNCNAME(dealloca)(void *p)
+{
+    __mp_free(p, AT_DEALLOCA, NULL, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */
 

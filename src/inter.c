@@ -42,7 +42,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.41 2000-11-02 23:42:06 graeme Exp $"
+#ident "$Id: inter.c,v 1.42 2000-11-03 18:27:33 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -443,7 +443,8 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
         else
         {
             n = strlen(p);
-            if (((f == AT_STRNDUP) || (f == AT_STRNSAVE)) && (n > l))
+            if (((f == AT_STRNDUP) || (f == AT_STRNSAVE) ||
+                 (f == AT_STRNDUPA)) && (n > l))
                 n = l;
             if ((o = (char *) sbrk(n + 1)) == (void *) -1)
                 o = NULL;
@@ -495,7 +496,8 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
          */
         o = p;
         n = strlen(p);
-        if (((f == AT_STRNDUP) || (f == AT_STRNSAVE)) && (n > l))
+        if (((f == AT_STRNDUP) || (f == AT_STRNSAVE) || (f == AT_STRNDUPA)) &&
+            (n > l))
             n = l;
         if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, f, s, t, u, &i))
             __mp_memcopy(p, o, n + 1);
@@ -696,6 +698,7 @@ void *__mp_setmem(void *p, size_t l, unsigned char c, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     __mp_setmemory(&memhead, p, l, c, f, s, t, u, &i);
     restoresignals();
     return p;
@@ -756,6 +759,7 @@ void *__mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     q = __mp_copymemory(&memhead, p, q, l, c, f, s, t, u, &i);
     restoresignals();
     return q;
@@ -812,6 +816,7 @@ void *__mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     r = __mp_locatememory(&memhead, p, l, q, m, f, s, t, u, &i);
     restoresignals();
     return r;
@@ -865,6 +870,7 @@ int __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         if (!(memhead.flags & FLG_NOPROTECT))
             __mp_protectstrtab(&memhead.syms.strings, MA_READONLY);
     }
+    checkalloca(s, t, u, &i, 0);
     r = __mp_comparememory(&memhead, p, q, l, f, s, t, u, &i);
     restoresignals();
     return r;
@@ -1038,10 +1044,19 @@ void __mp_summary(void)
 
 void __mp_check(void)
 {
+    stackinfo i;
+
     savesignals();
     if (!memhead.init)
         __mp_init();
     __mp_checkinfo(&memhead);
+    /* Determine the call stack details in case we need to free any
+     * allocations that were made by alloca().
+     */
+    __mp_newframe(&i, NULL);
+    if (__mp_getframe(&i))
+        __mp_getframe(&i);
+    checkalloca(NULL, NULL, 0, &i, 0);
     restoresignals();
 }
 
