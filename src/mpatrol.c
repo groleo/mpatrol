@@ -33,6 +33,7 @@
 #include <string.h>
 #include <errno.h>
 #if TARGET == TARGET_UNIX
+#include <sys/param.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -42,7 +43,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.26 2000-10-29 22:51:32 graeme Exp $"
+#ident "$Id: mpatrol.c,v 1.27 2000-11-02 17:51:38 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -470,6 +471,43 @@ static void setoptions(int s)
 }
 
 
+#if TARGET == TARGET_UNIX
+/* Search for an executable file in the current search path.
+ */
+
+static char *execpath(char *s)
+{
+    static char t[MAXPATHLEN];
+    char *p, *x, *y;
+
+    if (strchr(s, '/'))
+        return s;
+    if ((p = getenv("PATH")) == NULL)
+        p = "";
+    if ((p = strdup(p)) == NULL)
+    {
+        fprintf(stderr, "%s: Out of memory\n", progname);
+        exit(EXIT_FAILURE);
+    }
+    for (x = y = p; y != NULL; x = y + 1)
+    {
+        if (y = strchr(x, ':'))
+            *y = '\0';
+        if (*x == '\0')
+            x = ".";
+        sprintf(t, "%s/%s", x, s);
+        if (access(t, X_OK) == 0)
+        {
+            s = t;
+            break;
+        }
+    }
+    free(p);
+    return s;
+}
+#endif /* TARGET */
+
+
 /* Convert the command line options to mpatrol library options and run the
  * specified command and arguments.
  */
@@ -734,6 +772,14 @@ int main(int argc, char **argv)
     }
     if (f == 0)
     {
+        /* Programs invoked with the execvp() function will not contain the
+         * full path that they were run with in argv[0].  We need to patch
+         * this here since otherwise the mpatrol library is unlikely to find
+         * the executable file to read symbols from.  Hopefully argv is located
+         * on the stack, otherwise it may be read-only and cause the following
+         * assignment to crash.
+         */
+        argv[0] = execpath(argv[0]);
         execvp(argv[0], argv);
         fprintf(stderr, "%s: Cannot execute command `%s'\n", progname, argv[0]);
         exit(EXIT_FAILURE);
