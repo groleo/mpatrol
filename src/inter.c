@@ -37,7 +37,7 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.2 1999-10-03 22:50:22 graeme Exp $"
+#ident "$Id: inter.c,v 1.3 1999-10-21 21:21:22 graeme Exp $"
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -91,6 +91,25 @@ static void restoresignals(void)
         __mp_unlockmutex();
 #endif /* MP_THREADS_SUPPORT */
     }
+}
+
+
+/* Check that a specified integer lies in a given range.
+ */
+
+static int checkrange(unsigned long l, unsigned long n, unsigned long u)
+{
+    /* If the lower and upper bounds are zero then the integer never lies in
+     * the given range.
+     */
+    if ((l != 0) || (u != 0))
+    {
+        if (l == (unsigned long) -1)
+            l = 0;
+        if ((l <= n) && (n <= u))
+            return 1;
+    }
+    return 0;
 }
 
 
@@ -231,7 +250,8 @@ void *__mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    __mp_checkinfo(&memhead);
+    if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
+        __mp_checkinfo(&memhead);
     if (memhead.prologue)
         memhead.prologue((void *) -1, l);
     /* Determine the call stack details.
@@ -288,7 +308,8 @@ char *__mp_strdup(char *p, size_t l, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    __mp_checkinfo(&memhead);
+    if (checkrange(memhead.lrange, memhead.count + 1, memhead.urange))
+        __mp_checkinfo(&memhead);
     if (memhead.prologue)
         memhead.prologue(p, (size_t) -2);
     /* Determine the call stack details.
@@ -345,7 +366,8 @@ void *__mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    __mp_checkinfo(&memhead);
+    if (checkrange(memhead.lrange, memhead.count, memhead.urange))
+        __mp_checkinfo(&memhead);
     if (memhead.prologue)
         memhead.prologue(p, l);
     /* Determine the call stack details.
@@ -392,7 +414,8 @@ void __mp_free(void *p, alloctype f, char *s, char *t, unsigned long u,
     savesignals();
     if (!memhead.init)
         __mp_init();
-    __mp_checkinfo(&memhead);
+    if (checkrange(memhead.lrange, memhead.count, memhead.urange))
+        __mp_checkinfo(&memhead);
     if (memhead.prologue)
         memhead.prologue(p, (size_t) -1);
     /* Determine the call stack details.
