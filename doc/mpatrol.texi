@@ -4,7 +4,7 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2000 Graeme S. Roy <graeme@epc.co.uk>
 
-@c $Id: mpatrol.texi,v 1.60 2000-04-19 17:50:06 graeme Exp $
+@c $Id: mpatrol.texi,v 1.61 2000-04-25 19:01:27 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -21,7 +21,7 @@
 @c Remember to change these after each revision!
 @set EDITION 1.9
 @set VERSION 1.1.5
-@set UPDATED 19th April, 2000
+@set UPDATED 25th April, 2000
 
 @ifhtml
 @image{images/mpatrol}
@@ -2354,12 +2354,35 @@ requirements.  The second reason was that the library's internal structures
 could be write-protected on systems with virtual memory, to prevent user code
 interfering with the operation of the library.
 
+Because the library attempts to record as much information as possible about
+every memory allocation there will inevitably be a much larger memory
+requirement when running a program linked with the library.  This will typically
+be two or three times larger in magnitude, but will be affected by the number
+of memory allocations made and also the number of symbols read.  The latter
+will also affect how quickly the program starts since the first call to allocate
+memory will result in the initialisation of the library and the loading of
+symbols from the executable file and any shared libraries.
+
+@cindex hidden memory
+Due to its design, it is also possible to allocate memory from the heap using
+the mpatrol library functions whilst already within an mpatrol library function.
+This does not normally occur, but on some platforms calling @code{printf()}
+from within the library may result in @code{printf()} calling @code{malloc()} to
+allocate itself a buffer, which ends up as a recursive call.  Luckily, this is
+dealt with by simply not displaying the allocation in the log file, but all
+other details of the allocation are still recorded.  This can sometimes result
+in @emph{hidden} memory usage which occurs behind the scenes and alters the peak
+memory usage in the summary.  This is particularly evident when the library uses
+an object file access library to read program symbols at the time of library
+initialisation.
+
 @cindex modules
 The library is written in a modular fashion so as to make it easy to add new
-functionality.  New modules have already been added, such as the @emph{stack}
-and @emph{symbol} modules.  Extra information about each memory allocation can
-be added to the @emph{allocation information} module in @file{src/info.h} and
-@file{src/info.c} without having to change much code in any other files.
+functionality.  New modules have already been added, such as the @emph{stack},
+@emph{symbol} and @emph{profile} modules.  Extra information about each memory
+allocation can be added to the @emph{allocation information} module in
+@file{src/info.h} and @file{src/info.c} without having to change much code in
+any other files.
 
 @node Examples, Tutorial, How it works, Top
 @chapter Examples
@@ -5106,8 +5129,26 @@ processor type, the object file format and the C compiler used to compile the
 library and tests.  The details following each system list any features of the
 library that are not (or cannot be) supported on that system.
 
-@cindex DG/UX, Intel 80x86
+@cindex AIX, IBM RS/6000
 @itemize @bullet
+@item
+AIX 4.1, IBM RS/6000, BFD, @command{cc}
+@itemize @bullet
+@item
+The thread-safe version of the library does not work.
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+Cannot automatically determine the program filename.
+@item
+No support for call stack traversal.
+@item
+The address of an illegal memory access cannot be determined.
+@item
+The @option{-d} option to the @command{mpatrol} command has no effect.
+@end itemize
+
+@cindex DG/UX, Intel 80x86
 @item
 DG/UX 4.20MU07, Intel Pentium Pro, ELF32, @command{gcc}
 @itemize @bullet
@@ -5706,17 +5747,18 @@ final program is linked with that specific compiler.
 
 @item
 Need to add support for call stack traversal for at least the Alpha, MIPS,
-PA/RISC and PowerPC processor architectures.  The current implementation of call
-stack traversal for the Motorola 88xx0 family is also a bit flaky and so should
-only be used when the library and program are built unoptimised.
+PA/RISC, PowerPC and RS/6000 processor architectures.  The current
+implementation of call stack traversal for the Motorola 88xx0 family is also a
+bit flaky and so should only be used when the library and program are built
+unoptimised.
 
 @item
 Need to add support for obtaining the program name from the stack for at least
-the Alpha, Motorola 88xx0, MIPS, PA/RISC and PowerPC processor architectures.
-Also need to add support for reading the program symbols from a suitable file
-in @file{/proc} for other operating systems that support it.  If there is no
-support for either of these methods then the @option{PROGFILE} option can
-currently be used to specify the program name at run-time.
+the Alpha, Motorola 88xx0, MIPS, PA/RISC, PowerPC and RS/6000 processor
+architectures.  Also need to add support for reading the program symbols from
+a suitable file in @file{/proc} for other operating systems that support it.
+If there is no support for either of these methods then the @option{PROGFILE}
+option can currently be used to specify the program name at run-time.
 
 @item
 The library cannot currently read any symbols from shared objects that have been
