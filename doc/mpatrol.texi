@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.224 2001-07-19 22:16:26 graeme Exp $
+@c $Id: mpatrol.texi,v 1.225 2001-07-25 21:31:53 graeme Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -37,7 +37,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.11
 @set VERSION 1.4.6
-@set UPDATED 19th July, 2001
+@set UPDATED 25th July, 2001
 
 @ifinfo
 This file documents mpatrol, a library for controlling and tracing dynamic
@@ -910,6 +910,7 @@ for your system.
 @cindex OFLAGS
 @cindex SFLAGS
 @cindex TFLAGS
+@cindex GUISUP
 @cindex compiling
 @cindex compiler
 @cindex linking
@@ -928,6 +929,12 @@ specifies options to be passed to the compiler when building a shared library
 and the @code{TFLAGS} macro specifies options to be passed to the compiler when
 building a thread-safe library.  You may also need to change the library names
 and library build commands on different systems.
+
+Note that the generic UNIX @file{Makefile} contains a macro called @code{GUISUP}
+which is set to @code{false} by default.  If it is set to @code{true} then the
+@command{mptrace} command will be built with GUI support enabled.  However,
+your system must contain the correct header files and libraries in order to
+support this.
 
 @cindex make
 @cindex all (make target)
@@ -11721,8 +11728,8 @@ systems whereas the @code{SYSTEM} macro is used to identify the operating system
 variant if @code{TARGET=TARGET_UNIX}.  You should try to identify the predefined
 preprocessor macros that the system C compiler defines for the operating system
 type and the operating system variant, otherwise you will have to specify the
-@code{TARGET} and @code{SYSTEM} macros explicitly in the Makefile when building
-the mpatrol library.  Note that for non-UNIX operating systems,
+@code{TARGET} and @code{SYSTEM} macros explicitly in the @file{Makefile} when
+building the mpatrol library.  Note that for non-UNIX operating systems,
 @code{SYSTEM=SYSTEM_ANY} is implied.
 
 The @code{ARCH} macro is used to identify the processor architecture and the
@@ -11730,7 +11737,7 @@ The @code{ARCH} macro is used to identify the processor architecture and the
 should try to identify the predefined preprocessor macros that the system C
 compiler defines for the processor architecture and processor word size,
 otherwise you may also have to specify the @code{ARCH} and @code{ENVIRON}
-macros explicitly in the Makefile when building the mpatrol library.  The
+macros explicitly in the @file{Makefile} when building the mpatrol library.  The
 default setting for the processor word size is @code{ENVIRON=ENVIRON_32}.
 
 You can normally figure out the preprocessor macros that are predefined by the
@@ -12142,7 +12149,7 @@ is being supported.
 A new @file{Makefile} should be added in the new subdirectory along with any
 extra system-specific files that might be needed to build the mpatrol library
 on the new system.  The new @file{Makefile} should be based upon one of the
-existing @file{Makefiles} in the other subdirectories but should obviously
+existing @file{Makefile}s in the other subdirectories but should obviously
 differ in the platform-dependent areas.  You may wish to add more than one
 @file{Makefile} to support different types of compilers on the new operating
 system.
@@ -12577,7 +12584,10 @@ to it.
 Perhaps incorporate a C++ encoded name demangler into the mpatrol library.  The
 most likely candidate is the GNU demangler that comes with the libiberty
 library, but that currently allocates temporary space on the heap using
-@code{xmalloc()} which means that it will run unbearably slowly under mpatrol.
+@code{xmalloc()} which means that it will run unbearably slowly under
+mpatrol@footnote{If you really really want this functionality then code to do
+this is available as an mpatrol library patch which can be downloaded from
+@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch4.tar.gz}.}.
 
 @item
 Add a script to wrap around various popular C and C++ compiler drivers so that
@@ -13184,16 +13194,19 @@ The GUI support for the @command{mptrace} command is currently written to use
 Motif and X Windows and so can only be built on systems with these libraries
 and run on systems with an X server.  This will most likely be possible only on
 UNIX platforms.  LessTif can be used instead of Motif if that is all that is
-available on your system.
+available on your system.  The UNIX @file{Makefile} has a macro called
+@code{GUISUP} which can be set to @code{true} or @code{false} depending on
+whether you wish to have GUI support or not.  The default is @code{false}.
 
 @cindex MP_GUI_SUPPORT
 @item
 How do I build the @command{mptrace} command without GUI support?
 
-This is done by default on non-UNIX platforms, but on UNIX platforms you will
-have to define the @code{MP_GUI_SUPPORT=0} preprocessor macro when compiling
-@command{mptrace}.  You might need to do this if your UNIX system does not have
-the correct header files and libraries installed needed for GUI support.
+This is done by default on all platforms.  However, if for some reason that is
+not the case then on UNIX platforms you will have to set the @code{GUISUP}
+@file{Makefile} macro to @code{false} when compiling @command{mptrace}.  You
+might need to do this if your UNIX system does not have the correct header files
+and libraries installed needed for GUI support.
 @end enumerate
 
 @node Linking, Running, Building, Frequently asked questions
@@ -13751,7 +13764,9 @@ you have trouble using mpatrol.  I have only ever used CSRI malloc, Dbmalloc,
 Dmalloc, Electric Fence and Mprof, so I can't vouch for any of the others,
 although if you have any recommendations feel free to let me know so I can add
 them to this list.  In particular, there seems to be a shortage of such programs
-for Netware platforms.
+for Netware platforms.  Note that there is a comparison of a few of the
+following programs at @uref{http://www.consistent.org/terran/memorycheck.shtml}
+which might help illustrate the differences between the various tools.
 
 @cindex AProbe
 @cindex OC Systems
