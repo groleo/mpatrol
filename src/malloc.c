@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+ * Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.32 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: malloc.c,v 1.33 2007-04-26 11:27:53 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.32 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.33 2007-04-26 11:27:53 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -181,6 +181,12 @@ MP_API
 void *
 alloca(size_t l)
 {
+#if SYSTEM == SYSTEM_INTERIX
+    /* alloca() has a non-standard calling convention on Interix.
+     */
+    register int eax asm("%eax");
+    l = eax;
+#endif /* SYSTEM */
     return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, NULL, 0, 1);
 }
 
@@ -190,6 +196,12 @@ MP_API
 void *
 MP_ALTFUNCNAME(alloca)(size_t l)
 {
+#if SYSTEM == SYSTEM_INTERIX
+    /* _alloca() has a non-standard calling convention on Interix.
+     */
+    register int eax asm("%eax");
+    l = eax;
+#endif /* SYSTEM */
     return __mp_alloc(l, 0, AT_ALLOCA, NULL, NULL, 0, NULL, 0, 1);
 }
 #endif /* MP_ALTFUNCNAMES */

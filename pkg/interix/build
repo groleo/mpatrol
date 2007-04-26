@@ -21,10 +21,10 @@
 # MA 02111-1307, USA.
 
 
-# UNIX shell script to build a PKG package file
+# UNIX shell script to build an Interix package file
 
 
-# $Id: build,v 1.76 2007-04-26 11:27:40 groy Exp $
+# $Id: build,v 1.1 2007-04-26 11:27:34 groy Exp $
 
 
 version=1.4.8
@@ -34,18 +34,17 @@ libversion=1.4
 # Build the mpatrol library.
 
 cd ../../build/unix
-make clobber
-make libmpatrol.a libmpatrol.so.$libversion
-make libmpatrolmt.a libmpatrolmt.so.$libversion
-make libmpalloc.a libmpalloc.so.$libversion
-make libmptools.a
-make lint
-make mpatrol mprof mptrace mleak GUISUP=true
+gmake clobber
+gmake libmpatrol.a libmpatrol.so.$libversion
+gmake libmpatrolmt.a libmpatrolmt.so.$libversion
+gmake libmpalloc.a libmpalloc.so.$libversion
+gmake libmptools.a
+gmake mpatrol mprof mptrace mleak GUISUP=false
 strip mpatrol
 strip mprof
 strip mptrace
 strip mleak
-cd ../../pkg/pkg
+cd ../../pkg/interix
 
 
 # Create the installation directory structure and copy the necessary
@@ -112,15 +111,14 @@ cp ../../doc/mpatrol.info info
 mkdir -p lib
 cp ../../build/unix/libmpatrol.a lib
 cp ../../build/unix/libmpatrol.so.$libversion lib
+ln -s libmpatrol.so.$libversion lib/libmpatrol.so
 cp ../../build/unix/libmpatrolmt.a lib
 cp ../../build/unix/libmpatrolmt.so.$libversion lib
-cp ../../build/unix/llib-lmpatrol.ln lib
-cp ../../build/unix/llib-lmpatrolmt.ln lib
+ln -s libmpatrolmt.so.$libversion lib/libmpatrolmt.so
 cp ../../build/unix/libmpalloc.a lib
 cp ../../build/unix/libmpalloc.so.$libversion lib
-cp ../../build/unix/llib-lmpalloc.ln lib
+ln -s libmpalloc.so.$libversion lib/libmpalloc.so
 cp ../../build/unix/libmptools.a lib
-cp ../../build/unix/llib-lmptools.ln lib
 mkdir -p man/man1
 cp ../../man/man1/*.1 man/man1
 mkdir -p man/man3
@@ -129,22 +127,14 @@ mkdir -p share/aclocal
 cp ../../extra/mpatrol.m4 share/aclocal
 
 
-# Create the package within a package directory structure.
-
-rm -rf GSRmptrl
-pkgmk -d`pwd` -r`pwd` GSRmptrl
-rm -rf bin doc include info lib man share
-
-
 # Convert the package directory structure to a package file.
 
-rm -f mpatrol-$version.pkg
-pkgtrans -s `pwd` mpatrol-$version.pkg GSRmptrl
-rm -rf GSRmptrl
+pkg_create -c comment -d desc -f pkglist mpatrol-$version-bin.tgz
+rm -rf bin doc include info lib man share
 
 
 # Clean up the build directory.
 
 cd ../../build/unix
-make clobber
-cd ../../pkg/pkg
+gmake clobber
+cd ../../pkg/interix

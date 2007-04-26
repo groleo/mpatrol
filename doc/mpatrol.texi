@@ -2,7 +2,7 @@
 
 @c mpatrol
 @c A library for controlling and tracing dynamic memory allocations.
-@c Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+@c Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
 @c
 @c This library is free software; you can redistribute it and/or
 @c modify it under the terms of the GNU Library General Public
@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.266 2005-03-10 00:16:28 graeme Exp $
+@c $Id: mpatrol.texi,v 1.267 2007-04-26 11:27:19 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -53,7 +53,7 @@
 This file documents mpatrol, a library for controlling and tracing dynamic
 memory allocations.
 
-Copyright @copyright{} 1997-2002 Graeme S. Roy @email{graeme.roy@@analog.com}
+Copyright @copyright{} 1997-2007 Graeme S. Roy @email{mpatrol@@cbmamiga.demon.co.uk}
 
 This is edition @value{EDITION} of the mpatrol manual for version
 @value{VERSION}, @value{UPDATED}.
@@ -93,7 +93,7 @@ library are the trademarks of their respective owners.
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1997-2002 Graeme S. Roy <@email{graeme.roy@@analog.com}>
+Copyright @copyright{} 1997-2007 Graeme S. Roy <@email{mpatrol@@cbmamiga.demon.co.uk}>
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -233,8 +233,7 @@ is also registered at FreshMeat (@uref{http://freshmeat.net/projects/mpatrol/})
 and SourceForge (@uref{http://sourceforge.net/projects/mpatrol/}) and several
 other software sites so you can receive notification of updates there as well.
 I normally only check my e-mail about once or twice a week, so don't expect an
-immediate response.  I can also be reached at @email{graeme.roy@@analog.com} but
-that is my work e-mail address.  There is also a discussion group at
+immediate response.  There is also a discussion group at
 @uref{http://groups.yahoo.com/group/mpatrol/} where you can post mpatrol-related
 questions but you must first subscribe to the group before you can send mail to
 it.
@@ -358,8 +357,8 @@ does is to read the documentation and try it out.
 @item
 Written for 32-bit and 64-bit UNIX, AmigaOS, Windows and Netware platforms.
 Contains direct support for (and takes advantage of most of the features of)
-AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD, HP/UX, IRIX, Linux, LynxOS, NetBSD,
-OpenBSD, SINIX, Solaris, SunOS, Tru64 and UnixWare.  Also contains
+AIX, DG/UX, DRS/NX, DYNIX/ptx, FreeBSD, HP/UX, Interix, IRIX, Linux, LynxOS,
+NetBSD, OpenBSD, SINIX, Solaris, SunOS, Tru64 and UnixWare.  Also contains
 target-specific code to take advantage of Alpha, Intel 80x86, Motorola 680x0
 and 88xx0, MIPS, HP PA/RISC, IBM RS/6000, PowerPC and SPARC processors.
 
@@ -368,8 +367,8 @@ Has the ability to read symbols from executable files and shared libraries in
 the @file{a.out}, COFF, XCOFF, ELF32, ELF64 and Windows Portable Executable file
 formats, and if the GNU BFD library is available then the mpatrol library can
 read symbols from all of the file formats that it has support for as well.  Can
-also liase with AIX, BSD-based, HP/UX, IRIX, OSF, SVR4-based and Windows dynamic
-linkers in order to find out information about shared libraries.
+also liase with AIX, BSD-based, HP/UX, Interix, IRIX, OSF, SVR4-based and
+Windows dynamic linkers in order to find out information about shared libraries.
 
 @item
 Can be built to allocate memory from a fixed-sized static array rather than
@@ -1147,11 +1146,11 @@ of all your code.
 
 @enumerate 1
 @item
-This step is currently only available on DYNIX/ptx, FreeBSD, IRIX, Linux,
-NetBSD, OpenBSD, Solaris and Tru64 platforms and on DG/UX 4.20MU07@footnote{Also
-available on DG/UX 4.20MU05 with patch dgux_R4.20MU05.p59 and DG/UX 4.20MU06
-with patch dgux_R4.20MU06.p08.} or later platforms with the @env{LD_PRELOAD}
-feature.
+This step is currently only available on DYNIX/ptx, FreeBSD, Interix, IRIX,
+Linux, NetBSD, OpenBSD, Solaris and Tru64 platforms and on
+DG/UX 4.20MU07@footnote{Also available on DG/UX 4.20MU05 with patch
+dgux_R4.20MU05.p59 and DG/UX 4.20MU06 with patch dgux_R4.20MU06.p08.} or later
+platforms with the @env{LD_PRELOAD} feature.
 
 If your program or application has been dynamically linked with the system C
 library (@file{libc.so}) or an alternative malloc shared library then you can
@@ -6135,7 +6134,7 @@ and the program should be executed, generating the following output in
 
 @smallexample
 @@(#) mpatrol 1.4.8 (02/01/08)
-Copyright (C) 1997-2002 Graeme S. Roy
+Copyright (C) 1997-2007 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
 certain conditions; see the GNU Library General Public License for
@@ -11533,6 +11532,29 @@ The @option{OFLOWWATCH} option has no effect.
 The @option{--dynamic} option to the @command{mpatrol} command has no effect.
 @end itemize
 
+@cindex Interix, Intel 80x86
+@cindex Windows Services for UNIX
+@cindex OpenNT
+@item
+Interix 3.5, Intel Pentium 4, PE-COFF, @command{gcc}
+@itemize @bullet
+@item
+The @option{OFLOWWATCH} option has no effect.
+@item
+The @option{USEMMAP} option must be used in order for the @option{PAGEALLOC}
+option to detect illegal memory accesses.
+@item
+The @option{USEDEBUG} option has no effect.
+@item
+The @option{-fPIC} option for @command{gcc} should not be used when building
+the mpatrol shared libraries as it currently doesn't generate correct code.
+@item
+The shared libraries @file{libmpatrol.so} and @file{libmpatrolmt.so} must be
+linked with the dynamic linker @file{/lib/ld.so} at build time in order for the
+@option{--dynamic} option to the @command{mpatrol} command to be able to find
+the symbols for any dependent shared libraries.
+@end itemize
+
 @cindex IRIX, MIPS
 @item
 IRIX 5.3, MIPS R4000, ELF32, @command{cc}
@@ -11931,7 +11953,7 @@ work.
 @cindex Microsoft
 @cindex Windows, Intel 80x86
 @item
-Microsoft Windows NT 4.0, Intel Pentium III, PE, Microsoft Visual C++
+Microsoft Windows NT 4.0, Intel Pentium III, IMAGEHLP, Microsoft Visual C++
 @itemize @bullet
 @item
 The @option{OFLOWWATCH} option has no effect.
@@ -13706,7 +13728,7 @@ corresponding shared library version.
 Why does the mpatrol library not read the symbols in my executable file on
 Windows platforms?
 
-If the mpatrol library was compiled with the @code{FORMAT=FORMAT_PE}
+If the mpatrol library was compiled with the @code{FORMAT=FORMAT_IMGHLP}
 preprocessor macro defined then you must ensure that you compile your files with
 debugging information enabled (using the @option{-Z7} or @option{-Zi} options in
 Visual C++) and that you tell the linker that you wish to preserve the debugging
@@ -15919,18 +15941,24 @@ An article on debugging memory problems in X applications.
 
 @cindex Edinburgh
 @cindex Scotland
+@cindex University of Edinburgh
+@cindex CCIR
+I live just outside Edinburgh (the capital city of Scotland) and work at the
+University of Edinburgh in the Centre for Communication Interface Research
+(CCIR).  I am currently also working towards gaining a PhD in Usability
+Engineering.
+
 @cindex Edinburgh Portable Compilers
 @cindex EPC
 @cindex Analog Devices
 @cindex ADI
-I live in Edinburgh (the capital city of Scotland) and work for an American
-company called Analog Devices which designs and manufactures digital and
-analogue electronic equipment, as well as Digital Signal Processors (DSPs).
-The company I used to work for was called Edinburgh Portable Compilers, a small
-Edinburgh-based company which designed, wrote and sold compilers for various
-programming languages and operating systems (mainly UNIX variants).  A few years
-ago it became a wholly-owned subsidiary of Analog Devices and our focus was
-shifted to write C and C++ compilers for the various ADI DSPs.
+I used to work for an American company called Analog Devices which designs and
+manufactures digital and analogue electronic equipment, as well as Digital
+Signal Processors (DSPs).  Before that I worked for Edinburgh Portable
+Compilers, a small Edinburgh-based company which designed, wrote and sold
+compilers for various programming languages and operating systems (mainly UNIX
+variants).  In 2000 it became a wholly-owned subsidiary of Analog Devices and
+the focus was shifted to write C and C++ compilers for the various ADI DSPs.
 
 I started working at EPC immediately after obtaining my honours degree in
 Computer Science at Edinburgh University.  My interests lie in operating systems

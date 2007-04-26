@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+ * Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -53,8 +53,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD
+#if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_INTERIX || \
+    SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
 #ifndef MAP_ANONYMOUS
 #define MAP_ANONYMOUS MAP_ANON
 #endif /* MAP_ANONYMOUS */
@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.59 2002-01-08 20:13:59 graeme Exp $"
+#ident "$Id: memory.c,v 1.60 2007-04-26 11:27:53 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.59 2002-01-08 20:13:59 graeme Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.60 2007-04-26 11:27:53 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -264,9 +264,10 @@ progname(void)
     extern char **__Argv;
 #elif SYSTEM == SYSTEM_UNIXWARE
     extern char **___Argv;
-#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
-      SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
-    static char c[256];
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_INTERIX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD
+    static char a[256], c[256];
     ssize_t l;
     int f;
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
@@ -292,9 +293,9 @@ progname(void)
 #endif /* TARGET */
 
 #if TARGET == TARGET_UNIX
-    /* AIX, HP/UX, IRIX, SINIX, Tru64 and UnixWare have global variables
-     * containing argc and argv which we can use to determine the filename
-     * that the program was invoked with.
+    /* AIX, HP/UX, Interix, IRIX, SINIX, Tru64 and UnixWare have global
+     * variables containing argc and argv which we can use to determine the
+     * filename that the program was invoked with.
      */
 #if SYSTEM == SYSTEM_AIX
     if (p_xargv[0] != NULL)
@@ -308,14 +309,15 @@ progname(void)
 #elif SYSTEM == SYSTEM_UNIXWARE
     if (___Argv[0] != NULL)
         return ___Argv[0];
-#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
-      SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
-    /* The BSD variants and Linux have a file in the /proc filesystem which
-     * contains the argument vector that a process was invoked with.
+#elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_INTERIX || \
+      SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_NETBSD || \
+      SYSTEM == SYSTEM_OPENBSD
+    /* The BSD variants, Interix and Linux have a file in the /proc filesystem
+     * which contains the argument vector that a process was invoked with.
      */
     l = 0;
-    sprintf(b, MP_PROCFS_CMDNAME, __mp_processid());
-    if ((f = open(b, O_RDONLY)) != -1)
+    sprintf(a, MP_PROCFS_CMDNAME, __mp_processid());
+    if ((f = open(a, O_RDONLY)) != -1)
     {
         if ((l = read(f, c, sizeof(c) - 1)) == -1)
             l = 0;
@@ -363,6 +365,9 @@ progname(void)
     SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
         if (p = (unsigned long *) p[4])
             return (char *) *p;
+#elif SYSTEM == SYSTEM_INTERIX
+        if (p = (unsigned long *) p[-6])
+            return (char *) (p + 1);
 #elif SYSTEM == SYSTEM_LYNXOS
         if (p = (unsigned long *) p[3])
             return (char *) *p;

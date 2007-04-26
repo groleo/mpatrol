@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+# Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.49 2003-11-26 15:43:43 graeme Exp $
+# $Id: Makefile,v 1.50 2007-04-26 11:27:18 groy Exp $
 
 
 # Definitions
@@ -116,9 +116,9 @@ endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).dvi: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).eps \
-	images/test.eps images/gcc.eps images/cpp.eps images/cc1.eps \
-	images/collect2.eps images/trace.eps
+$(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT).eps images/test.eps \
+	images/gcc.eps images/cpp.eps images/cc1.eps images/collect2.eps \
+	images/trace.eps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --verbose $<
@@ -138,9 +138,9 @@ endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).texi texinfo.tex images/$(DOCUMENT).pdf \
-	images/test.pdf images/gcc.pdf images/cpp.pdf images/cc1.pdf \
-	images/collect2.pdf images/trace.pdf
+$(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT).pdf images/test.pdf \
+	images/gcc.pdf images/cpp.pdf images/cc1.pdf images/collect2.pdf \
+	images/trace.pdf
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<

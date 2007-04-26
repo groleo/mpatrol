@@ -5,7 +5,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+ * Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@
 
 
 /*
- * $Id: version.h,v 1.22 2002-01-08 22:30:00 graeme Exp $
+ * $Id: version.h,v 1.23 2007-04-26 11:28:01 groy Exp $
  */
 
 

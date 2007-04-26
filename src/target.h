@@ -5,7 +5,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2002 Graeme S. Roy <graeme.roy@analog.com>
+ * Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.38 2002-01-08 20:13:59 graeme Exp $
+ * $Id: target.h,v 1.39 2007-04-26 11:28:00 groy Exp $
  */
 
 
@@ -56,7 +56,8 @@
 #ifndef TARGET
 #if defined(unix) || defined(_unix) || defined(__unix) || defined(__unix__) || \
     defined(AIX) || defined(_AIX) || defined(__AIX) || defined(__AIX__) || \
-    defined(__Lynx) || defined(__Lynx__)
+    defined(__Lynx) || defined(__Lynx__) || defined(__INTERIX) || \
+    defined(__INTERIX__)
 #define TARGET TARGET_UNIX
 #elif defined(AMIGA) || defined(_AMIGA) || defined(__AMIGA) || \
       defined(__AMIGA__)
@@ -102,16 +103,17 @@
 #define SYSTEM_DYNIX    5  /* DYNIX/ptx */
 #define SYSTEM_FREEBSD  6  /* FreeBSD */
 #define SYSTEM_HPUX     7  /* HP/UX */
-#define SYSTEM_IRIX     8  /* IRIX */
-#define SYSTEM_LINUX    9  /* Linux */
-#define SYSTEM_LYNXOS   10 /* LynxOS */
-#define SYSTEM_NETBSD   11 /* NetBSD */
-#define SYSTEM_OPENBSD  12 /* OpenBSD */
-#define SYSTEM_SINIX    13 /* SINIX */
-#define SYSTEM_SOLARIS  14 /* Solaris */
-#define SYSTEM_SUNOS    15 /* SunOS */
-#define SYSTEM_TRU64    16 /* Compaq Tru64 / Digital UNIX / OSF/1 */
-#define SYSTEM_UNIXWARE 17 /* UnixWare */
+#define SYSTEM_INTERIX  8  /* Interix / OpenNT / SFU / SUA */
+#define SYSTEM_IRIX     9  /* IRIX */
+#define SYSTEM_LINUX    10 /* Linux */
+#define SYSTEM_LYNXOS   11 /* LynxOS */
+#define SYSTEM_NETBSD   12 /* NetBSD */
+#define SYSTEM_OPENBSD  13 /* OpenBSD */
+#define SYSTEM_SINIX    14 /* SINIX */
+#define SYSTEM_SOLARIS  15 /* Solaris */
+#define SYSTEM_SUNOS    16 /* SunOS */
+#define SYSTEM_TRU64    17 /* Compaq Tru64 / Digital UNIX / OSF/1 */
+#define SYSTEM_UNIXWARE 18 /* UnixWare */
 
 
 #ifndef SYSTEM
@@ -130,6 +132,8 @@
 #define SYSTEM SYSTEM_FREEBSD
 #elif defined(hpux) || defined(_hpux) || defined(__hpux) || defined(__hpux__)
 #define SYSTEM SYSTEM_HPUX
+#elif defined(__INTERIX) || defined(__INTERIX__)
+#define SYSTEM SYSTEM_INTERIX
 #elif defined(sgi) || defined(_sgi) || defined(__sgi) || defined(__sgi__)
 #define SYSTEM SYSTEM_IRIX
 #elif defined(linux) || defined(_linux) || defined(__linux) || \
@@ -183,6 +187,8 @@
 #define SYSTEM_STR "FreeBSD"
 #elif SYSTEM == SYSTEM_HPUX
 #define SYSTEM_STR "HP/UX"
+#elif SYSTEM == SYSTEM_INTERIX
+#define SYSTEM_STR "INTERIX"
 #elif SYSTEM == SYSTEM_IRIX
 #define SYSTEM_STR "IRIX"
 #elif SYSTEM == SYSTEM_LINUX
@@ -370,20 +376,23 @@
  * library.
  */
 
-#define FORMAT_NONE  0 /* no symbol support */
-#define FORMAT_AOUT  1 /* a.out */
-#define FORMAT_COFF  2 /* COFF */
-#define FORMAT_XCOFF 3 /* XCOFF */
-#define FORMAT_ELF32 4 /* ELF32 */
-#define FORMAT_ELF64 5 /* ELF64 */
-#define FORMAT_BFD   6 /* GNU BFD */
-#define FORMAT_PE    7 /* Portable Executable */
+#define FORMAT_NONE   0 /* no symbol support */
+#define FORMAT_AOUT   1 /* a.out */
+#define FORMAT_COFF   2 /* COFF */
+#define FORMAT_XCOFF  3 /* XCOFF */
+#define FORMAT_PECOFF 4 /* PE-COFF */
+#define FORMAT_ELF32  5 /* ELF32 */
+#define FORMAT_ELF64  6 /* ELF64 */
+#define FORMAT_BFD    7 /* GNU BFD */
+#define FORMAT_IMGHLP 8 /* Microsoft IMAGEHLP */
 
 
 #ifndef FORMAT
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_AIX
 #define FORMAT FORMAT_XCOFF
+#elif SYSTEM == SYSTEM_INTERIX
+#define FORMAT FORMAT_PECOFF
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
       SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_IRIX || \
       SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
@@ -415,7 +424,7 @@
 #ifdef __GNUC__
 #define FORMAT FORMAT_BFD
 #else /* __GNUC__ */
-#define FORMAT FORMAT_PE
+#define FORMAT FORMAT_IMGHLP
 #endif /* __GNUC__ */
 #else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
@@ -436,14 +445,16 @@
 #define FORMAT_STR "COFF"
 #elif FORMAT == FORMAT_XCOFF
 #define FORMAT_STR "XCOFF"
+#elif FORMAT == FORMAT_PECOFF
+#define FORMAT_STR "PE-COFF"
 #elif FORMAT == FORMAT_ELF32
 #define FORMAT_STR "ELF32"
 #elif FORMAT == FORMAT_ELF64
 #define FORMAT_STR "ELF64"
 #elif FORMAT == FORMAT_BFD
 #define FORMAT_STR "BFD"
-#elif FORMAT == FORMAT_PE
-#define FORMAT_STR "PE"
+#elif FORMAT == FORMAT_IMGHLP
+#define FORMAT_STR "IMAGEHLP"
 #else /* FORMAT */
 #define FORMAT_STR "Unknown"
 #endif /* FORMAT */
@@ -458,10 +469,11 @@
 #define DYNLINK_AIX     1 /* AIX dynamic linker */
 #define DYNLINK_BSD     2 /* BSD dynamic linker */
 #define DYNLINK_HPUX    3 /* HP/UX dynamic linker */
-#define DYNLINK_IRIX    4 /* IRIX dynamic linker */
-#define DYNLINK_OSF     5 /* OSF dynamic linker */
-#define DYNLINK_SVR4    6 /* SVR4 dynamic linker */
-#define DYNLINK_WINDOWS 7 /* Windows dynamic linker */
+#define DYNLINK_INTERIX 4 /* Interix dynamic linker */
+#define DYNLINK_IRIX    5 /* IRIX dynamic linker */
+#define DYNLINK_OSF     6 /* OSF dynamic linker */
+#define DYNLINK_SVR4    7 /* SVR4 dynamic linker */
+#define DYNLINK_WINDOWS 8 /* Windows dynamic linker */
 
 
 #ifndef DYNLINK
@@ -484,6 +496,8 @@
 #endif /* __ELF__ */
 #elif SYSTEM == SYSTEM_HPUX
 #define DYNLINK DYNLINK_HPUX
+#elif SYSTEM == SYSTEM_INTERIX
+#define DYNLINK DYNLINK_INTERIX
 #elif SYSTEM == SYSTEM_IRIX
 #define DYNLINK DYNLINK_IRIX
 #elif SYSTEM == SYSTEM_TRU64
@@ -508,6 +522,8 @@
 #define DYNLINK_STR "BSD"
 #elif DYNLINK == DYNLINK_HPUX
 #define DYNLINK_STR "HP/UX"
+#elif DYNLINK == DYNLINK_INTERIX
+#define DYNLINK_STR "INTERIX"
 #elif DYNLINK == DYNLINK_IRIX
 #define DYNLINK_STR "IRIX"
 #elif DYNLINK == DYNLINK_OSF
@@ -536,7 +552,7 @@
 #define _POSIX_C_SOURCE 199506L
 #endif /* _POSIX_C_SOURCE */
 #endif /* SYSTEM */
-#if SYSTEM == SYSTEM_AIX
+#if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_INTERIX
 #ifndef _ALL_SOURCE
 #define _ALL_SOURCE 1
 #endif /* _ALL_SOURCE */
