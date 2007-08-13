@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.40 2007-08-13 13:28:38 groy Exp $
+ * $Id: target.h,v 1.41 2007-08-13 15:02:15 groy Exp $
  */
 
 
@@ -427,11 +427,7 @@
 #define FORMAT FORMAT_NONE
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
-#ifdef __GNUC__
-#define FORMAT FORMAT_BFD
-#else /* __GNUC__ */
 #define FORMAT FORMAT_IMGHLP
-#endif /* __GNUC__ */
 #else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define FORMAT FORMAT_BFD
