@@ -36,7 +36,7 @@
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
 #if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
-    (TARGET == TARGET_WINDOWS && !defined(__GNUC__))
+    (TARGET == TARGET_WINDOWS && !defined(__CYGWIN__))
 #include "sbrk.h"
 #endif /* TARGET && __GNUC__ */
 #include "option.h"
@@ -52,9 +52,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.158 2007-04-26 11:27:51 groy Exp $"
+#ident "$Id: inter.c,v 1.159 2007-08-13 13:56:57 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.158 2007-04-26 11:27:51 groy Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.159 2007-08-13 13:56:57 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
