@@ -35,8 +35,7 @@
 #if MP_THREADS_SUPPORT
 #include "mutex.h"
 #endif /* MP_THREADS_SUPPORT */
-#if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || \
-    (TARGET == TARGET_WINDOWS && !defined(__CYGWIN__))
+#if (TARGET == TARGET_AMIGA && defined(__GNUC__)) || TARGET == TARGET_WINDOWS
 #include "sbrk.h"
 #endif /* TARGET && __GNUC__ */
 #include "option.h"
@@ -52,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.159 2007-08-13 13:56:57 groy Exp $"
+#ident "$Id: inter.c,v 1.160 2007-08-13 14:59:14 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.159 2007-08-13 13:56:57 groy Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.160 2007-08-13 14:59:14 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -97,7 +96,7 @@ extern char **__environ;
 static int init_flag;
 extern void *__exc_crd_list_head;
 #endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS && !defined(__GNUC__)
+#elif TARGET == TARGET_WINDOWS
 /* These are global variables used by the Microsoft C run-time library to
  * indicate initialisation of the environment variables, the exit function
  * table and the streams buffers respectively.  The run-time library calls
@@ -110,7 +109,7 @@ extern void *__exc_crd_list_head;
 extern int __env_initialized;
 extern void *__onexitbegin;
 extern void **__piob;
-#endif /* TARGET && __GNUC__ */
+#endif /* TARGET */
 
 
 /* Determine if the C run-time library is initialised.
@@ -125,11 +124,7 @@ extern void **__piob;
 #define crt_initialised() (1)
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
-#ifndef __GNUC__
 #define crt_initialised() (__env_initialized && __onexitbegin && __piob)
-#else /* __GNUC__ */
-#define crt_initialised() (1)
-#endif /* __GNUC__ */
 #endif /* TARGET */
 
 
