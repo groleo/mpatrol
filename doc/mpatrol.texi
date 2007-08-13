@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.268 2007-08-13 11:50:22 groy Exp $
+@c $Id: mpatrol.texi,v 1.269 2007-08-13 12:10:05 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -253,7 +253,9 @@ Boris Makushkin requested, helped with, and provided initial testing for the
 FreeBSD port, and Ivan Finch, Gerrit Bruchhaeuser and Andreas Schallenberg did
 the same for the Tru64 and SuSE ports.  Both Aleksandar Donev and Van Snyder
 provided suggestions and code for using mpatrol with FORTRAN.  Michael Anthony
-wrote the profdiff tool and Jerome Marant did the Debian GNU/Linux port.
+wrote the profdiff tool and Jerome Marant did the Debian GNU/Linux port.  Robert
+Schmitt wrote a tutorial on how to use mpatrol on Windows platforms, located at
+@uref{http://www.codeguru.com/cpp/w-p/win32/tutorials/print.php/c12231}.
 
 If your native language is a language other than English, you can make use of
 the many web-based translation tools that are now available for free on the
