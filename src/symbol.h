@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: symbol.h,v 1.19 2007-04-26 11:28:00 groy Exp $
+ * $Id: symbol.h,v 1.20 2007-08-13 12:04:05 groy Exp $
  */
 
 
@@ -105,7 +105,7 @@ MP_EXPORT void __mp_newsymbols(symhead *, heaphead *, void *);
 MP_EXPORT void __mp_closesymbols(symhead *);
 MP_EXPORT void __mp_deletesymbols(symhead *);
 MP_EXPORT int __mp_addsymbols(symhead *, char *, char *, size_t);
-MP_EXPORT int __mp_addextsymbols(symhead *, meminfo *);
+MP_EXPORT int __mp_addextsymbols(symhead *, memoryinfo *);
 MP_EXPORT void __mp_fixsymbols(symhead *);
 MP_EXPORT int __mp_protectsymbols(symhead *, memaccess);
 MP_EXPORT symnode *__mp_findsymbol(symhead *, void *);

@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: diag.h,v 1.50 2007-04-26 11:27:50 groy Exp $
+ * $Id: diag.h,v 1.51 2007-08-13 12:04:04 groy Exp $
  */
 
 
@@ -112,9 +112,9 @@ MP_EXPORT char *__mp_lognames[LT_MAX + 1];
 MP_EXPORT unsigned long __mp_diagflags;
 
 
-MP_EXPORT char *__mp_logfile(meminfo *, char *);
-MP_EXPORT char *__mp_proffile(meminfo *, char *);
-MP_EXPORT char *__mp_tracefile(meminfo *, char *);
+MP_EXPORT char *__mp_logfile(memoryinfo *, char *);
+MP_EXPORT char *__mp_proffile(memoryinfo *, char *);
+MP_EXPORT char *__mp_tracefile(memoryinfo *, char *);
 MP_EXPORT char *__mp_getenv(char *);
 MP_EXPORT int __mp_openlogfile(char *);
 MP_EXPORT int __mp_closelogfile(void);

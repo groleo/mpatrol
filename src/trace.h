@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: trace.h,v 1.14 2007-04-26 11:28:00 groy Exp $
+ * $Id: trace.h,v 1.15 2007-08-13 12:04:05 groy Exp $
  */
 
 
@@ -58,7 +58,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newtrace(tracehead *, meminfo *);
+MP_EXPORT void __mp_newtrace(tracehead *, memoryinfo *);
 MP_EXPORT int __mp_changetrace(tracehead *, char *, int);
 MP_EXPORT int __mp_endtrace(tracehead *);
 MP_EXPORT void __mp_traceheap(void *, size_t, int);

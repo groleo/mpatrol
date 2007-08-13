@@ -49,9 +49,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.109 2007-04-26 11:27:49 groy Exp $"
+#ident "$Id: diag.c,v 1.110 2007-08-13 12:04:04 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.109 2007-04-26 11:27:49 groy Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.110 2007-08-13 12:04:04 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -252,7 +252,7 @@ MP_GLOBAL unsigned long __mp_diagflags;
 
 static
 void
-processfile(meminfo *m, char *s, char *b, size_t l)
+processfile(memoryinfo *m, char *s, char *b, size_t l)
 {
     char *p, *t;
     size_t i;
@@ -351,7 +351,7 @@ processfile(meminfo *m, char *s, char *b, size_t l)
 
 MP_GLOBAL
 char *
-__mp_logfile(meminfo *m, char *s)
+__mp_logfile(memoryinfo *m, char *s)
 {
     static char b[256];
     char p[256];
@@ -404,7 +404,7 @@ __mp_logfile(meminfo *m, char *s)
 
 MP_GLOBAL
 char *
-__mp_proffile(meminfo *m, char *s)
+__mp_proffile(memoryinfo *m, char *s)
 {
     static char b[256];
     char p[256];
@@ -457,7 +457,7 @@ __mp_proffile(meminfo *m, char *s)
 
 MP_GLOBAL
 char *
-__mp_tracefile(meminfo *m, char *s)
+__mp_tracefile(memoryinfo *m, char *s)
 {
     static char b[256];
     char p[256];

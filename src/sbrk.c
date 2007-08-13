@@ -37,9 +37,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: sbrk.c,v 1.14 2007-04-26 11:27:57 groy Exp $"
+#ident "$Id: sbrk.c,v 1.15 2007-08-13 12:04:05 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.14 2007-04-26 11:27:57 groy Exp $";
+static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.15 2007-08-13 12:04:05 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -48,10 +48,10 @@ static MP_CONST MP_VOLATILE char *sbrk_id = "$Id: sbrk.c,v 1.14 2007-04-26 11:27
 
 typedef struct brkinfo
 {
-    meminfo memory; /* memory details */
-    void *block;    /* pointer to block of memory */
-    size_t size;    /* size of block of memory */
-    size_t len;     /* current break length */
+    memoryinfo memory; /* memory details */
+    void *block;       /* pointer to block of memory */
+    size_t size;       /* size of block of memory */
+    size_t len;        /* current break length */
 }
 brkinfo;
 

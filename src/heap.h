@@ -34,7 +34,7 @@
 
 
 /*
- * $Id: heap.h,v 1.10 2007-04-26 11:27:50 groy Exp $
+ * $Id: heap.h,v 1.11 2007-08-13 12:04:04 groy Exp $
  */
 
 
@@ -63,15 +63,15 @@ heapnode;
 
 typedef struct heaphead
 {
-    meminfo memory;   /* memory details */
-    slottable table;  /* table of heap nodes */
-    treeroot itree;   /* internal allocation tree */
-    treeroot dtree;   /* heap node allocation tree */
-    size_t isize;     /* internal allocation total */
-    size_t dsize;     /* heap node allocation total */
-    memaccess prot;   /* protection status */
-    size_t protrecur; /* protection recursion count */
-    char tracing;     /* heap reservation tracing status */
+    memoryinfo memory; /* memory details */
+    slottable table;   /* table of heap nodes */
+    treeroot itree;    /* internal allocation tree */
+    treeroot dtree;    /* heap node allocation tree */
+    size_t isize;      /* internal allocation total */
+    size_t dsize;      /* heap node allocation total */
+    memaccess prot;    /* protection status */
+    size_t protrecur;  /* protection recursion count */
+    char tracing;      /* heap reservation tracing status */
 }
 heaphead;
 

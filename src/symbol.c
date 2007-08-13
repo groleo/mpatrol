@@ -133,9 +133,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.64 2007-04-26 11:27:59 groy Exp $"
+#ident "$Id: symbol.c,v 1.65 2007-08-13 12:04:05 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.64 2007-04-26 11:27:59 groy Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.65 2007-08-13 12:04:05 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1953,7 +1953,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 
 MP_GLOBAL
 int
-__mp_addextsymbols(symhead *y, meminfo *e)
+__mp_addextsymbols(symhead *y, memoryinfo *e)
 {
 #if DYNLINK == DYNLINK_AIX
     static char b[4096];

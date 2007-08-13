@@ -33,7 +33,7 @@
 
 
 /*
- * $Id: memory.h,v 1.15 2007-04-26 11:27:53 groy Exp $
+ * $Id: memory.h,v 1.16 2007-08-13 12:04:04 groy Exp $
  */
 
 
@@ -56,11 +56,11 @@ typedef enum memaccess
 memaccess;
 
 
-/* A meminfo structure contains details about the underlying memory
+/* A memoryinfo structure contains details about the underlying memory
  * architecture.
  */
 
-typedef struct meminfo
+typedef struct memoryinfo
 {
     size_t align;        /* most restrictive alignment */
     size_t page;         /* system page size */
@@ -70,7 +70,7 @@ typedef struct meminfo
     int wfile;           /* watch point control file handle */
     unsigned char flags; /* control flags */
 }
-meminfo;
+memoryinfo;
 
 
 #ifdef __cplusplus
@@ -79,14 +79,14 @@ extern "C"
 #endif /* __cplusplus */
 
 
-MP_EXPORT void __mp_newmemory(meminfo *);
-MP_EXPORT void __mp_endmemory(meminfo *);
+MP_EXPORT void __mp_newmemory(memoryinfo *);
+MP_EXPORT void __mp_endmemory(memoryinfo *);
 MP_EXPORT unsigned long __mp_processid(void);
-MP_EXPORT void *__mp_memalloc(meminfo *, size_t *, size_t, int);
-MP_EXPORT void __mp_memfree(meminfo *, void *, size_t);
-MP_EXPORT memaccess __mp_memquery(meminfo *, void *);
-MP_EXPORT int __mp_memprotect(meminfo *, void *, size_t, memaccess);
-MP_EXPORT int __mp_memwatch(meminfo *, void *, size_t, memaccess);
+MP_EXPORT void *__mp_memalloc(memoryinfo *, size_t *, size_t, int);
+MP_EXPORT void __mp_memfree(memoryinfo *, void *, size_t);
+MP_EXPORT memaccess __mp_memquery(memoryinfo *, void *);
+MP_EXPORT int __mp_memprotect(memoryinfo *, void *, size_t, memaccess);
+MP_EXPORT int __mp_memwatch(memoryinfo *, void *, size_t, memaccess);
 MP_EXPORT void *__mp_memcheck(void *, char, size_t);
 MP_EXPORT void *__mp_memcompare(void *, void *, size_t);
 MP_EXPORT void *__mp_memfind(void *, size_t, void *, size_t);

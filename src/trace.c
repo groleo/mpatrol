@@ -36,9 +36,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.20 2007-04-26 11:28:00 groy Exp $"
+#ident "$Id: trace.c,v 1.21 2007-08-13 12:04:05 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.20 2007-04-26 11:28:00 groy Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.21 2007-08-13 12:04:05 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -116,7 +116,7 @@ static int traceready;
 
 MP_GLOBAL
 void
-__mp_newtrace(tracehead *t, meminfo *m)
+__mp_newtrace(tracehead *t, memoryinfo *m)
 {
     size_t i;
 

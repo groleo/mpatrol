@@ -81,9 +81,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.60 2007-04-26 11:27:53 groy Exp $"
+#ident "$Id: memory.c,v 1.61 2007-08-13 12:04:04 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.60 2007-04-26 11:27:53 groy Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.61 2007-08-13 12:04:04 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -421,13 +421,13 @@ progname(void)
 }
 
 
-/* Initialise the fields of a meminfo structure to describe the details
+/* Initialise the fields of a memoryinfo structure to describe the details
  * of the underlying memory architecture.
  */
 
 MP_GLOBAL
 void
-__mp_newmemory(meminfo *i)
+__mp_newmemory(memoryinfo *i)
 {
 #if MP_WATCH_SUPPORT
     char b[64];
@@ -464,12 +464,12 @@ __mp_newmemory(meminfo *i)
 }
 
 
-/* Free up any resources used by the meminfo structure.
+/* Free up any resources used by the memoryinfo structure.
  */
 
 MP_GLOBAL
 void
-__mp_endmemory(meminfo *i)
+__mp_endmemory(memoryinfo *i)
 {
 #if MP_MMAP_SUPPORT
     if (i->mfile != -1)
@@ -548,7 +548,7 @@ getmemory(long l)
 
 MP_GLOBAL
 void *
-__mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
+__mp_memalloc(memoryinfo *i, size_t *l, size_t a, int u)
 {
     void *p;
 #if MP_ARRAY_SUPPORT || TARGET == TARGET_UNIX
@@ -680,7 +680,7 @@ __mp_memalloc(meminfo *i, size_t *l, size_t a, int u)
 
 MP_GLOBAL
 void
-__mp_memfree(meminfo *i, void *p, size_t l)
+__mp_memfree(memoryinfo *i, void *p, size_t l)
 {
 #if !MP_ARRAY_SUPPORT
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS || \
@@ -742,7 +742,7 @@ memoryhandler(int s)
 
 MP_GLOBAL
 memaccess
-__mp_memquery(meminfo *i, void *p)
+__mp_memquery(memoryinfo *i, void *p)
 {
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
@@ -816,7 +816,7 @@ __mp_memquery(meminfo *i, void *p)
 
 MP_GLOBAL
 int
-__mp_memprotect(meminfo *i, void *p, size_t l, memaccess a)
+__mp_memprotect(memoryinfo *i, void *p, size_t l, memaccess a)
 {
 #if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
     void *t;
@@ -858,7 +858,7 @@ __mp_memprotect(meminfo *i, void *p, size_t l, memaccess a)
 
 MP_GLOBAL
 int
-__mp_memwatch(meminfo *i, void *p, size_t l, memaccess a)
+__mp_memwatch(memoryinfo *i, void *p, size_t l, memaccess a)
 {
 #if MP_WATCH_SUPPORT
     watchcmd w;
