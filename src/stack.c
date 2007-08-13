@@ -65,9 +65,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.31 2007-04-26 11:27:58 groy Exp $"
+#ident "$Id: stack.c,v 1.32 2007-08-13 15:01:30 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.31 2007-04-26 11:27:58 groy Exp $";
+static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.32 2007-08-13 15:01:30 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -543,9 +543,9 @@ __mp_getframe(stackinfo *p)
         if (p->first == NULL)
         {
             setjmp(j);
-            p->next.AddrPC.Offset = ((_JUMP_BUFFER *) &j)->Eip;
-            p->next.AddrFrame.Offset = ((_JUMP_BUFFER *) &j)->Ebp;
-            p->next.AddrStack.Offset = ((_JUMP_BUFFER *) &j)->Esp;
+            p->next.AddrPC.Offset = (unsigned long) j[5];
+            p->next.AddrFrame.Offset = (unsigned long) j[0];
+            p->next.AddrStack.Offset = (unsigned long) j[4];
         }
         else
         {

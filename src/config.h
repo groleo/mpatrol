@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.88 2007-04-26 11:27:49 groy Exp $
+ * $Id: config.h,v 1.89 2007-08-13 15:01:30 groy Exp $
  */
 
 
@@ -577,8 +577,7 @@
 #ifndef MP_LIBRARYSTACK_SUPPORT
 #if !MP_BUILTINSTACK_SUPPORT
 #if (TARGET == TARGET_UNIX && (SYSTEM == SYSTEM_HPUX || \
-      SYSTEM == SYSTEM_TRU64)) || (TARGET == TARGET_WINDOWS && \
-     !defined(__GNUC__))
+      SYSTEM == SYSTEM_TRU64)) || TARGET == TARGET_WINDOWS
 #define MP_LIBRARYSTACK_SUPPORT 1
 #else /* TARGET && SYSTEM */
 #define MP_LIBRARYSTACK_SUPPORT 0
