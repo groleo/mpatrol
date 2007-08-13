@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.267 2007-04-26 11:27:19 groy Exp $
+@c $Id: mpatrol.texi,v 1.268 2007-08-13 11:50:22 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -240,38 +240,28 @@ it.
 
 @cindex acknowledgements
 @cindex contributors
-Finally, I'd like to thank Stephan Springl (@email{springl@@bfw-online.de}) for
-his help on reading debugging information from object files via the GNU BFD
-library, and Adam Zell (@email{zell@@best.com}) for helping with patching the
-dynamic linker support functions for loading shared libraries.  Both Alexander
-Barton (@email{abarton@@innotrac.com}) and Dave Gibson
-(@email{david.gibson@@analog.com}) helped to make mpatrol thread-safe.  Roger
-Keane (@email{rgr@@bcs-inc.com}) provided the perl code in the @command{mpsym}
-command and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve
-McIntyre (@email{smcintyre@@allstor-sw.co.uk}) helped by diagnosing the
-@code{fork()} problem and provided example code on how to fix it.  Peter
-Zijlstra (@email{peter@@xlnt-software.com}) contributed code to enhance stack
-traces for errors.
+Finally, I'd like to thank Stephan Springl for his help on reading debugging
+information from object files via the GNU BFD library, and Adam Zell for
+helping with patching the dynamic linker support functions for loading shared
+libraries.  Both Alexander Barton and Dave Gibson helped to make mpatrol
+thread-safe.  Roger Keane provided the perl code in the @command{mpsym} command
+and also the idea for the @code{MP_USE_ATEXIT} feature macro.  Steve McIntyre
+helped by diagnosing the @code{fork()} problem and provided example code on how
+to fix it.  Peter Zijlstra contributed code to enhance stack traces for errors.
 
-Boris Makushkin (@email{oberon@@antibiotic.ru}) requested, helped with, and
-provided initial testing for the FreeBSD port, and Ivan Finch
-(@email{i.finch@@rl.ac.uk}), Gerrit Bruchhaeuser
-(@email{gbruchhaeuser@@orga.com}) and Andreas Schallenberg
-(@email{andreas.schallenberg@@informatik.uni-oldenburg.de}) did the same for the
-Tru64 and SuSE ports.  Both Aleksandar Donev (@email{donev@@pa.msu.edu}) and Van
-Snyder (@email{vsnyder@@math.jpl.nasa.gov}) provided suggestions and code for
-using mpatrol with FORTRAN.  Michael Anthony (@email{m@@xyzfind.com}) wrote the
-profdiff tool and Jerome Marant (@email{jerome@@debian.org}) did the Debian
-GNU/Linux port.
+Boris Makushkin requested, helped with, and provided initial testing for the
+FreeBSD port, and Ivan Finch, Gerrit Bruchhaeuser and Andreas Schallenberg did
+the same for the Tru64 and SuSE ports.  Both Aleksandar Donev and Van Snyder
+provided suggestions and code for using mpatrol with FORTRAN.  Michael Anthony
+wrote the profdiff tool and Jerome Marant did the Debian GNU/Linux port.
 
 If your native language is a language other than English, you can make use of
 the many web-based translation tools that are now available for free on the
 internet.  These can be used to translate pages of the on-line mpatrol manual
 from English to your chosen language, and although they may not be perfect, they
 should be able to translate most of the important text and convey the general
-ideas across.  Note that Gerrit Bruchhaeuser (@email{gbruchhaeuser@@orga.com})
-has written a tutorial on mpatrol in German which is available from
-@uref{http://www.c-handbuch.org/mpatrol.html}.
+ideas across.  Note that Gerrit Bruchhaeuser has written a tutorial on mpatrol
+in German which is available from @uref{http://www.c-handbuch.org/mpatrol.html}.
 
 In addition, after spending well over 2000 hours designing and programming
 mpatrol, my sanity would not have been preserved in the state it is in today
@@ -12750,10 +12740,14 @@ Add wide-character equivalents of @code{memset()}, etc.  These are defined as
 Perhaps reimplement the standard I/O library for internal use by mpatrol, thus
 preventing recursive calls to @code{malloc()} each time a write to the log file
 occurs on some systems.  Example code to do this was submitted by Alexander
-Barton (@email{abarton@@innotrac.com}) and this may well be incorporated into
-the library at some point in the future@footnote{This code can be applied as an
-mpatrol library patch which can be downloaded from
+Barton and this may well be incorporated into the library at some point in the
+future@footnote{This code can be applied as an mpatrol library patch which can
+be downloaded from
 @uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch1.tar.gz}.}.
+
+@item
+Add the ability to use the reporting and tracing infrastructure of mpatrol
+with the existing C library's memory allocation implementation.
 
 @item
 The @option{LOG*} options could be extended to take a list of specific functions
@@ -14071,16 +14065,16 @@ A list of over ninety five different items of software which help in debugging
 dynamic memory allocation problems is given below@footnote{This list can be
 considered to be a slightly more up to date version of @cite{Debugging Tools
 for Dynamic Storage Allocation and Memory Management}
-(@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn
-(@email{zorn@@microsoft.com}).}.  They all provide some of the features that
-mpatrol contains and you may wish to use one of them to solve your problem if
-you have trouble using mpatrol.  I have only ever used CSRI malloc, Dbmalloc,
-Dmalloc, Electric Fence and Mprof, so I can't vouch for any of the others,
-although if you have any recommendations feel free to let me know so I can add
-them to this list.  In particular, there seems to be a shortage of such programs
-for Netware platforms.  Note that there is a comparison of a few of the
-following programs at @uref{http://www.consistent.org/terran/memorycheck.shtml}
-which might help illustrate the differences between the various tools.
+(@uref{http://www.cs.colorado.edu/~zorn/MallocDebug.html}) by Ben Zorn.}.  They
+all provide some of the features that mpatrol contains and you may wish to use
+one of them to solve your problem if you have trouble using mpatrol.  I have
+only ever used CSRI malloc, Dbmalloc, Dmalloc, Electric Fence and Mprof, so I
+can't vouch for any of the others, although if you have any recommendations
+feel free to let me know so I can add them to this list.  In particular, there
+seems to be a shortage of such programs for Netware platforms.  Note that there
+is a comparison of a few of the following programs at
+@uref{http://www.consistent.org/terran/memorycheck.shtml} which might help
+illustrate the differences between the various tools.
 
 @cindex AProbe
 @cindex OC Systems
