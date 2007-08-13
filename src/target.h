@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.39 2007-04-26 11:28:00 groy Exp $
+ * $Id: target.h,v 1.40 2007-08-13 13:28:38 groy Exp $
  */
 
 
@@ -223,15 +223,16 @@
 
 #define ARCH_ANY     0  /* no specific architecture */
 #define ARCH_ALPHA   1  /* DEC Alpha */
-#define ARCH_IA64    2  /* Intel Itanium */
-#define ARCH_IX86    3  /* Intel 80x86 */
-#define ARCH_M68K    4  /* Motorola 680x0 */
-#define ARCH_M88K    5  /* Motorola 88xx0 */
-#define ARCH_MIPS    6  /* MIPS */
-#define ARCH_PARISC  7  /* HP PA/RISC */
-#define ARCH_POWER   8  /* IBM RS/6000 */
-#define ARCH_POWERPC 9  /* PowerPC */
-#define ARCH_SPARC   10 /* SPARC */
+#define ARCH_ARM     2  /* Acorn/Advanced RISC Machine */
+#define ARCH_IA64    3  /* Intel Itanium */
+#define ARCH_IX86    4  /* Intel 80x86 */
+#define ARCH_M68K    5  /* Motorola 680x0 */
+#define ARCH_M88K    6  /* Motorola 88xx0 */
+#define ARCH_MIPS    7  /* MIPS */
+#define ARCH_PARISC  8  /* HP PA/RISC */
+#define ARCH_POWER   9  /* IBM RS/6000 */
+#define ARCH_POWERPC 10 /* PowerPC */
+#define ARCH_SPARC   11 /* SPARC */
 
 
 #ifndef ARCH
@@ -239,6 +240,9 @@
     defined(__ALPHA__) || defined(alpha) || defined(_alpha) || \
     defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 #define ARCH ARCH_ALPHA
+#elif defined(arm) || defined(_arm) || defined(__arm) || defined(__arm__) || \
+      defined(ARM) || defined(_ARM) || defined(__ARM) || defined(__ARM__)
+#define ARCH ARCH_ARM
 #elif defined(ia64) || defined(_ia64) || defined(__ia64) || \
       defined(__a64__) || defined(IA64) || defined(_IA64) || \
       defined(__IA64) || defined(__IA64__) || defined(_M_IA64)
@@ -286,6 +290,8 @@
 
 #if ARCH == ARCH_ALPHA
 #define ARCH_STR "DEC Alpha"
+#elif ARCH == ARCH_ARM
+#define ARCH_STR "ARM"
 #elif ARCH == ARCH_IA64
 #define ARCH_STR "Intel Itanium"
 #elif ARCH == ARCH_IX86
