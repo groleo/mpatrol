@@ -133,9 +133,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.65 2007-08-13 12:04:05 groy Exp $"
+#ident "$Id: symbol.c,v 1.66 2007-08-13 12:47:28 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.65 2007-08-13 12:04:05 groy Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.66 2007-08-13 12:47:28 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1493,7 +1493,8 @@ addsymbols(symhead *y, bfd *h, char *a, char *f, size_t b)
             /* We don't need to bother looking at undefined, absolute or common
              * symbols, and we only need to store non-data symbols.
              */
-            if (!bfd_is_und_section(p[i]->section) &&
+            if ((p[i]->section != NULL) &&
+                !bfd_is_und_section(p[i]->section) &&
                 !bfd_is_abs_section(p[i]->section) &&
                 !bfd_is_com_section(p[i]->section) &&
                 (p[i]->section->flags & SEC_CODE))
