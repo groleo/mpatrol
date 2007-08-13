@@ -43,9 +43,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: cplus.c,v 1.13 2007-04-26 11:27:49 groy Exp $"
+#ident "$Id: cplus.c,v 1.14 2007-08-13 13:04:35 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.13 2007-04-26 11:27:49 groy Exp $";
+static MP_CONST MP_VOLATILE char *cplus_id = "$Id: cplus.c,v 1.14 2007-08-13 13:04:35 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -66,7 +66,7 @@ new_handler
 set_new_handler(new_handler h) throw()
 #elif defined(__GNUC__)
 void
-(*set_new_handler__FPFv_v(void (*h)(void)))(void)
+(*_ZSt15set_new_handlerPFvvE(void (*h)(void)))(void)
 #else /* __cplusplus && __GNUC__ */
 void
 (*set_new_handler__3stdFPFv_v(void (*h)(void)))(void)
@@ -97,7 +97,7 @@ void *
 operator new(size_t l) throw(std::bad_alloc)
 #elif defined(__GNUC__)
 void *
-__builtin_new(size_t l)
+_Znwj(size_t l)
 #else /* __cplusplus && __GNUC__ */
 void *
 __nw__FUi(size_t l)
@@ -144,7 +144,7 @@ void *
 operator new(size_t l, MP_CONST std::nothrow_t&) throw()
 #elif defined(__GNUC__)
 void *
-__nw__FuiRC9nothrow_t(size_t l)
+_ZnwjRKSt9nothrow_t(size_t l)
 #else /* __cplusplus && __GNUC__ */
 void *
 __nw__FUiRCQ2_3std9nothrow_t(size_t l)
@@ -164,7 +164,7 @@ void *
 operator new[](size_t l) throw(std::bad_alloc)
 #elif defined(__GNUC__)
 void *
-__builtin_vec_new(size_t l)
+_Znaj(size_t l)
 #else /* __cplusplus && __GNUC__ */
 void *
 __nwa__FUi(size_t l)
@@ -211,7 +211,7 @@ void *
 operator new[](size_t l, MP_CONST std::nothrow_t&) throw()
 #elif defined(__GNUC__)
 void *
-__vn__FuiRC9nothrow_t(size_t l)
+_ZnajRKSt9nothrow_t(size_t l)
 #else /* __cplusplus && __GNUC__ */
 void *
 __nwa__FUiRCQ2_3std9nothrow_t(size_t l)
@@ -230,7 +230,7 @@ void
 operator delete(void *p) throw()
 #elif defined(__GNUC__)
 void
-__builtin_delete(void *p)
+_ZdlPv(void *p)
 #else /* __cplusplus && __GNUC__ */
 void
 __dl__FPv(void *p)
@@ -249,7 +249,7 @@ void
 operator delete(void *p, MP_CONST std::nothrow_t&) throw()
 #elif defined(__GNUC__)
 void
-__dl__FPvRC9nothrow_t(void *p)
+_ZdlPvRKSt9nothrow_t(void *p)
 #else /* __cplusplus && __GNUC__ */
 void
 __dl__FPvRCQ2_3std9nothrow_t(void *p)
@@ -268,7 +268,7 @@ void
 operator delete[](void *p) throw()
 #elif defined(__GNUC__)
 void
-__builtin_vec_delete(void *p)
+_ZdaPv(void *p)
 #else /* __cplusplus && __GNUC__ */
 void
 __dla__FPv(void *p)
@@ -287,7 +287,7 @@ void
 operator delete[](void *p, MP_CONST std::nothrow_t&) throw()
 #elif defined(__GNUC__)
 void
-__vd__FPvRC9nothrow_t(void *p)
+_ZdaPvRKSt9nothrow_t(void *p)
 #else /* __cplusplus && __GNUC__ */
 void
 __dla__FPvRCQ2_3std9nothrow_t(void *p)
