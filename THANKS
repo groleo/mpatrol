@@ -6,9 +6,11 @@ Michael Anthony
 Iulian Badarcea
 Alexander Barton
 Ryan Bobko
+Volker Boerchers
 Gerrit Bruchhaeuser
 Adam Burry
 Greg Chicares
+Christian Cloutier
 Jim Colton
 Brandon Corey
 William Croft
@@ -18,12 +20,22 @@ Ivan Finch
 Jim Gallagher
 Dave Gibson
 Hae Hirdler
+Stefan Hoffmeister
+Georg Huettenegger
+Richard Jones
+Aryeh Katz
 Roger Keane
+CheeChun Kok
+Stewart Levin
 Norman Lin
 Boris Makushkin
 Jerome Marant
 Patrick Marie
 Steve McIntyre
+Dimitrios Michailidis
+Paul Pluzhnikov
+Tim Powers
+Carlos Roldan
 Gopalakrishnan Sankaran
 Diego Santa Cruz
 Andreas Schallenberg
@@ -31,24 +43,11 @@ Robert Schmitt
 Van Snyder
 Stephan Springl
 Gregory Stark
+Pierre-Alain Tercier
+Saurabh Verma
 Ivan Vihovsky
-Adam Zell
-Peter Zijlstra
-
-The following people helped answer any queries from the author or gave
-useful feedback on the mpatrol library.
-
-Volker Boerchers
-Stefan Hoffmeister
-Georg Huettenegger
-Richard Jones
-Aryeh Katz
-CheeChun Kok
-Dimitrios Michailidis
-Paul Pluzhnikov
-Tim Powers
-Carlos Roldan
 Victor R. Volkman
 Per Winkvist
-Saurabh Verma
+Adam Zell
+Peter Zijlstra
 Ben Zorn
