@@ -21,7 +21,7 @@ dnl MA 02111-1307, USA.
 dnl Automake macro to build with the mpatrol library
 
 
-dnl $Id: mpatrol.m4,v 1.4 2007-04-26 11:27:21 groy Exp $
+dnl $Id: mpatrol.m4,v 1.5 2007-08-13 13:14:32 groy Exp $
 
 
 # serial 1
@@ -160,13 +160,8 @@ AC_DEFUN(AM_WITH_MPATROL, [
    # link a simple program with it.
 
    AC_CACHE_CHECK(for working mpatrol, am_cv_with_mpatrol, [
-     AC_TRY_LINK([#include <mpatrol.h>], [
-int main(void)
-{
-    malloc(4);
-    return EXIT_SUCCESS;
-}
-],
+     AC_TRY_LINK([#include <mpatrol.h>],
+      [void *p = malloc(4);],
       [am_cv_with_mpatrol=yes],
       [am_cv_with_mpatrol=no]
      )
