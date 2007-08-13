@@ -178,19 +178,19 @@ __mp_frameinfo
 	.PROC
 	.CALLINFO
 	.ENTRY
-	stw	sp,4(arg0)
-	mfsp	sr4,r20
-	stw	r20,8(arg0)
-	stw	rp,12(arg0)
-	stw	dp,16(arg0)
-	stw	r3,36(arg0)
-	stw	r4,44(arg0)
-	stw	r0,0(arg0)
-	stw	r0,20(arg0)
-	stw	r19,40(arg0)
-	bv	r0(rp)
+	stw	%r30,4(%r26)
+	mfsp	%sr4,%r20
+	stw	%r20,8(%r26)
+	stw	%r2,12(%r26)
+	stw	%r27,16(%r26)
+	stw	%r3,36(%r26)
+	stw	%r4,44(%r26)
+	stw	%r0,0(%r26)
+	stw	%r0,20(%r26)
+	stw	%r19,40(%r26)
+	bv	%r0(%r2)
 	.EXIT
-	stw	r0,24(arg0)
+	stw	%r0,24(%r26)
 	.PROCEND
 	.EXPORT	__mp_frameinfo,CODE,PRIV_LEV=3
 	.END
