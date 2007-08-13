@@ -42,7 +42,35 @@
  */
 
 
-#if ARCH == ARCH_IX86
+#if ARCH == ARCH_ARM
+/* Define the __mp_initsection variable.
+ */
+
+	.section ".data",#alloc,#write
+	.align	4
+__mp_initsection:
+	.word	1
+	.globl	__mp_initsection
+	.type	__mp_initsection,#object
+	.size	__mp_initsection,4
+
+
+/* Place calls to initialise the mpatrol mutexes and data structures into
+ * the .init section and a call to terminate the mpatrol library in the
+ * .fini section.
+ */
+
+	.section ".init",#alloc,#execinstr
+#if MP_THREADS_SUPPORT
+	bl	__mp_initmutexes
+#endif /* MP_THREADS_SUPPORT */
+	bl	__mp_init
+
+#if !MP_USE_ATEXIT
+	.section ".fini",#alloc,#execinstr
+	bl	__mp_fini
+#endif /* MP_USE_ATEXIT */
+#elif ARCH == ARCH_IX86
 /* Define the __mp_initsection variable.
  */
 
