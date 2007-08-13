@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.270 2007-08-13 12:28:46 groy Exp $
+@c $Id: mpatrol.texi,v 1.271 2007-08-13 12:36:03 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -15651,6 +15651,24 @@ A tool that performs memory access checks and memory leak detection of C, C++
 and Fortran programs at run-time.  Applications are modified using ATOM to
 determine if any memory locations are accessed when not properly allocated or
 initialised.
+@end table
+
+@cindex Valgrind
+@item
+Valgrind
+@table @asis
+@item Author
+Julian Seward (@email{jseward@@acm.org})
+@item License
+GNU General Public License
+@item Platforms
+Linux
+@item Location
+@uref{http://valgrind.org/}
+@item Overview
+A suite of tools for debugging and profiling on Linux.  Implements a virtual
+machine for various different processor architectures in order to perform
+instrumentation on the application being debugged.
 @end table
 
 @cindex Vmalloc
