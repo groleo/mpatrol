@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.269 2007-08-13 12:10:05 groy Exp $
+@c $Id: mpatrol.texi,v 1.270 2007-08-13 12:28:46 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -1252,6 +1252,11 @@ the @option{USEDEBUG} option or the @command{mpsym} command.  In addition, more
 symbolic information will be available if the executable files have not had
 their symbol tables stripped from them, although mpatrol can also fall back to
 using the dynamic symbol table from dynamically linked executable files.
+
+@cindex JNI
+The mpatrol library can also be used with JNI applications.  To do this, simply
+link the archive form of the thread-safe mpatrol library with your JNI
+application.  That way you won't end up profiling the entire JVM.
 
 @cindex AM_WITH_MPATROL
 Note that an automake macro is now provided to allow you to integrate mpatrol
@@ -12926,6 +12931,11 @@ from misaligned memory allocations.
 There seems to be a problem on some UNIX systems in that the @code{mprotect()}
 call will not work unless it is used on memory that has been allocated with
 @code{mmap()}.  This needs to be investigated further.
+
+@item
+Install a signal handler that can be sent a non-terminating signal that would
+instruct the mpatrol library to log a list of memory leaks and possibly write
+a profile output file.  This would be useful for monitoring daemon processes.
 
 @item
 There is currently a problem in that the call stack displayed from within the
