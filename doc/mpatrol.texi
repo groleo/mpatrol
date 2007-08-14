@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.271 2007-08-13 12:36:03 groy Exp $
+@c $Id: mpatrol.texi,v 1.272 2007-08-14 10:52:47 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -3747,14 +3747,15 @@ support then it must be told to preload the ELF access library (normally
 @file{libelf.so})@footnote{A freely available version of the ELF access library,
 libelf, can be downloaded from @uref{ftp://sunsite.unc.edu/pub/Linux/libs/}.}.
 If it was built with @code{FORMAT=FORMAT_BFD} support then it must be told to
-preload the GNU BFD access libraries (normally @file{libbfd.so} and
-@file{libiberty.so})@footnote{The GNU BFD access library can be downloaded from
-@uref{ftp://ftp.gnu.org/}.}.  However, if these libraries only exist on your
-system in archive form then you must build @file{libmpatrol.so} with these extra
-libraries incorporated into it so that there are no dependencies on them at
-run-time.  However, there may well be problems if the resulting shared library
-contains position-dependent code from the archive libraries you incorporated.
-The only way to find out is for you to try it and see.
+preload the GNU BFD access libraries (normally @file{libbfd.so},
+@file{libiberty.so} and @file{libintl.so})@footnote{The GNU BFD access library
+can be downloaded from @uref{ftp://ftp.gnu.org/}.}.  However, if these libraries
+only exist on your system in archive form then you must build
+@file{libmpatrol.so} with these extra libraries incorporated into it so that
+there are no dependencies on them at run-time.  However, there may well be
+problems if the resulting shared library contains position-dependent code from
+the archive libraries you incorporated.  The only way to find out is for you to
+try it and see.
 
 If you have access to the GNU linker on your system then there may be a way to
 convert archive libraries into shared libraries if position-independent code is
@@ -6020,7 +6021,7 @@ access library:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
-   -liberty
+   -liberty -lintl
 @end smallexample
 
 @item
@@ -6029,7 +6030,7 @@ file format access library:
 
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
-   -liberty -lcl
+   -liberty -lintl -lcl
 @end smallexample
 @end itemize
 
@@ -11582,7 +11583,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @item
@@ -11598,7 +11599,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @item
@@ -11611,7 +11612,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @item
@@ -11624,7 +11625,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @cindex Linux, Motorola 680x0
@@ -11641,7 +11642,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @item
@@ -11673,7 +11674,7 @@ The @option{CHECKFORK} option does not work properly in multithreaded programs
 due to each thread having different process identifiers.
 @item
 The @option{--dynamic} option to the @command{mpatrol} command does not work
-unless @file{libiberty.so} is available.
+unless @file{libiberty.so} and @file{libintl.so} are available.
 @end itemize
 
 @cindex LynxOS, Intel 80x86
@@ -13528,7 +13529,7 @@ defined in an object file access library.  If mpatrol was built with
 @code{FORMAT=FORMAT_ELF64} then you'll need to add @option{-lelf} (or
 equivalent) to the compiler command line straight after @option{-lmpatrol}.  If
 mpatrol was built with @code{FORMAT=FORMAT_BFD} then you'll need to add
-@option{-lbfd -liberty} (or equivalent) instead.  If you are using the
+@option{-lbfd -liberty -lintl} (or equivalent) instead.  If you are using the
 thread-safe version of mpatrol then you may also need to link with the system
 threads library.
 
@@ -13719,16 +13720,16 @@ option so that this can be achieved.
 
 @item
 Why do I get an error from the dynamic linker about not being able to locate
-@file{libiberty.so} when I use the @option{--dynamic} option with the
-@command{mpatrol} command?
+@file{libiberty.so} and @file{libintl.so} when I use the @option{--dynamic}
+option with the @command{mpatrol} command?
 
-The GNU libiberty library is required when the mpatrol library is build with
-support for the GNU BFD library but is unfortunately only available in archive
-form on many systems.  See the section on the @command{mpatrol} command
-(@pxref{The mpatrol command}) for information on how to get around this problem,
-either by embedding the libiberty library into the mpatrol library when you are
-building it, or by converting the archive form of the libiberty library into its
-corresponding shared library version.
+The GNU libiberty and libintl libraries are required when the mpatrol library is
+built with support for the GNU BFD library but are unfortunately only available
+in archive form on many systems.  See the section on the @command{mpatrol}
+command (@pxref{The mpatrol command}) for information on how to get around this
+problem, either by embedding these libraries into the mpatrol library when you
+are building it, or by converting the archive forms of these libraries into
+their corresponding shared library versions.
 
 @item
 Why does the mpatrol library not read the symbols in my executable file on

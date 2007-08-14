@@ -21,7 +21,7 @@ dnl MA 02111-1307, USA.
 dnl Automake macro to build with the mpatrol library
 
 
-dnl $Id: mpatrol.m4,v 1.5 2007-08-13 13:14:32 groy Exp $
+dnl $Id: mpatrol.m4,v 1.6 2007-08-14 10:52:50 groy Exp $
 
 
 # serial 1
@@ -92,8 +92,8 @@ AC_DEFUN(AM_WITH_MPATROL, [
    AC_CHECK_LIB(elf, elf_begin,
                 am_with_mpatrol_libs="$am_with_mpatrol_libs -lelf")
    AC_CHECK_LIB(bfd, bfd_init,
-                am_with_mpatrol_libs="$am_with_mpatrol_libs -lbfd -liberty", ,
-                -liberty)
+                am_with_mpatrol_libs="$am_with_mpatrol_libs -lbfd -liberty -lintl", ,
+                -liberty -lintl)
    AC_CHECK_LIB(imagehlp, SymInitialize,
                 am_with_mpatrol_libs="$am_with_mpatrol_libs -limagehlp")
    AC_CHECK_LIB(cl, U_get_previous_frame,
@@ -114,7 +114,7 @@ AC_DEFUN(AM_WITH_MPATROL, [
                 am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -lelf", ,
                 $am_with_mpatrol_libs)
    AC_CHECK_LIB(mpatrol, __mp_libbfd,
-                am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -lbfd -liberty", ,
+                am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -lbfd -liberty -lintl", ,
                 $am_with_mpatrol_libs)
    AC_CHECK_LIB(mpatrol, __mp_libimagehlp,
                 am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -limagehlp", ,

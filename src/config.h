@@ -31,7 +31,7 @@
 
 
 /*
- * $Id: config.h,v 1.89 2007-08-13 15:01:30 groy Exp $
+ * $Id: config.h,v 1.90 2007-08-14 10:52:53 groy Exp $
  */
 
 
@@ -685,7 +685,7 @@
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64
 #define MP_SYMBOL_LIBS , MP_LIBNAME(elf)
 #elif FORMAT == FORMAT_BFD
-#define MP_SYMBOL_LIBS , MP_LIBNAME(bfd), MP_LIBNAME(iberty)
+#define MP_SYMBOL_LIBS , MP_LIBNAME(bfd), MP_LIBNAME(iberty), MP_LIBNAME(intl)
 #elif FORMAT == FORMAT_IMGHLP
 #define MP_SYMBOL_LIBS , MP_LIBNAME(imagehlp)
 #else /* FORMAT */

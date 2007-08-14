@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.161 2007-08-14 08:14:28 groy Exp $"
+#ident "$Id: inter.c,v 1.162 2007-08-14 10:52:53 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.161 2007-08-14 08:14:28 groy Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.162 2007-08-14 10:52:53 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -2961,7 +2961,6 @@ MP_API void __mp_libld(void) {}
 MP_API void __mp_libelf(void) {}
 #elif FORMAT == FORMAT_BFD
 MP_API void __mp_libbfd(void) {}
-MP_API void __mp_libiberty(void) {}
 #endif /* FORMAT */
 
 
