@@ -133,9 +133,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.66 2007-08-13 12:47:28 groy Exp $"
+#ident "$Id: symbol.c,v 1.67 2007-08-14 10:00:26 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.66 2007-08-13 12:47:28 groy Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.67 2007-08-14 10:00:26 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1550,7 +1550,10 @@ addsyms(char *f, unsigned long b, void *p)
          */
         m.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
         if (SymGetModuleInfo(GetCurrentProcess(), b, &m))
-            f = m.LoadedImageName;
+            if (m.LoadedImageName[0] != '\0')
+                f = m.LoadedImageName;
+            else if (m.ImageName[0] != '\0')
+                f = m.ImageName;
         if ((t = __mp_addstring(&y->strings, f)) == NULL)
             r = 0;
         else
