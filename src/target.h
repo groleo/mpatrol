@@ -32,7 +32,7 @@
 
 
 /*
- * $Id: target.h,v 1.41 2007-08-13 15:02:15 groy Exp $
+ * $Id: target.h,v 1.42 2007-08-14 10:10:16 groy Exp $
  */
 
 
@@ -82,7 +82,7 @@
 #elif TARGET == TARGET_AMIGA
 #define TARGET_STR "Commodore AmigaOS"
 #elif TARGET == TARGET_WINDOWS
-#define TARGET_STR "Microsoft Windows 95/98/ME/NT/2000"
+#define TARGET_STR "Microsoft Windows NT/2000/XP/Vista"
 #elif TARGET == TARGET_NETWARE
 #define TARGET_STR "Novell Netware"
 #else /* TARGET */
@@ -427,7 +427,11 @@
 #define FORMAT FORMAT_NONE
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
+#ifdef __MINGW32__
+#define FORMAT FORMAT_BFD
+#else /* __MINGW32__ */
 #define FORMAT FORMAT_IMGHLP
+#endif /* __MINGW32__ */
 #else /* TARGET */
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define FORMAT FORMAT_BFD
