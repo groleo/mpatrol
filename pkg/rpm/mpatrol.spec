@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.74 2007-04-26 11:27:42 groy Exp $
+# $Id: mpatrol.spec,v 1.75 2007-08-14 12:36:56 groy Exp $
 
 
 %define libversion 1.4
@@ -62,8 +62,14 @@ to recompile or relink in order to change the library's behaviour.
 %build
 cd build/unix
 make libmpatrol.a libmpatrol.so.%{libversion}
+ln -s libmpatrol.so.%{libversion} libmpatrol.so.1
+ln -s libmpatrol.so.1 libmpatrol.so
 make libmpatrolmt.a libmpatrolmt.so.%{libversion}
+ln -s libmpatrolmt.so.%{libversion} libmpatrolmt.so.1
+ln -s libmpatrolmt.so.1 libmpatrolmt.so
 make libmpalloc.a libmpalloc.so.%{libversion}
+ln -s libmpalloc.so.%{libversion} libmpalloc.so.1
+ln -s libmpalloc.so.1 libmpalloc.so
 make libmptools.a
 make mpatrol mprof mptrace mleak
 
@@ -95,10 +101,16 @@ install -m644 doc/mpatrol.info* $RPM_BUILD_ROOT/%{_infodir}
 mkdir -p $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmpatrol.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpatrol.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpatrol.so.1 $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpatrol.so $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmpatrolmt.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpatrolmt.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpatrolmt.so.1 $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpatrolmt.so $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmpalloc.a $RPM_BUILD_ROOT/%{_libdir}
 install -m755 build/unix/libmpalloc.so.%{libversion} $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpalloc.so.1 $RPM_BUILD_ROOT/%{_libdir}
+mv build/unix/libmpalloc.so $RPM_BUILD_ROOT/%{_libdir}
 install -m644 build/unix/libmptools.a $RPM_BUILD_ROOT/%{_libdir}
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man1
 install -m644 man/man1/*.1 $RPM_BUILD_ROOT/%{_mandir}/man1
