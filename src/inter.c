@@ -51,9 +51,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: inter.c,v 1.160 2007-08-13 14:59:14 groy Exp $"
+#ident "$Id: inter.c,v 1.161 2007-08-14 08:14:28 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.160 2007-08-13 14:59:14 groy Exp $";
+static MP_CONST MP_VOLATILE char *inter_id = "$Id: inter.c,v 1.161 2007-08-14 08:14:28 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -96,7 +96,7 @@ extern char **__environ;
 static int init_flag;
 extern void *__exc_crd_list_head;
 #endif /* SYSTEM */
-#elif TARGET == TARGET_WINDOWS
+#elif TARGET == TARGET_WINDOWS && !defined(__MINGW32__)
 /* These are global variables used by the Microsoft C run-time library to
  * indicate initialisation of the environment variables, the exit function
  * table and the streams buffers respectively.  The run-time library calls
@@ -109,7 +109,7 @@ extern void *__exc_crd_list_head;
 extern int __env_initialized;
 extern void *__onexitbegin;
 extern void **__piob;
-#endif /* TARGET */
+#endif /* TARGET && __MINGW32__ */
 
 
 /* Determine if the C run-time library is initialised.
@@ -124,7 +124,11 @@ extern void **__piob;
 #define crt_initialised() (1)
 #endif /* SYSTEM */
 #elif TARGET == TARGET_WINDOWS
+#ifndef __MINGW32__
 #define crt_initialised() (__env_initialized && __onexitbegin && __piob)
+#else /* __MINGW32__ */
+#define crt_initialised() (1)
+#endif /* __MINGW32__ */
 #endif /* TARGET */
 
 
