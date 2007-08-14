@@ -21,7 +21,7 @@
 # GNU Makefile to compile on Windows with GNU C++
 
 
-# $Id: Makefile.mingw,v 1.1 2007-08-14 08:56:16 groy Exp $
+# $Id: Makefile.mingw,v 1.2 2007-08-14 10:35:07 groy Exp $
 
 
 # Definitions
@@ -96,7 +96,7 @@ $(ARCHIVE_MPATROL): $(ARCHIVE_MPTOBJS)
 	$(AR) cru $@ $(ARCHIVE_MPTOBJS)
 
 $(SHARED_MPATROL): $(SHARED_MPTOBJS)
-	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPTOBJS) -limagehlp
+	$(LD) $(LDFLAGS) -Wl,--out-implib,$(MPATROL).a -o $@ $(SHARED_MPTOBJS) -lbfd -liberty -lintl -limagehlp
 
 $(OBJECT_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
@@ -105,7 +105,7 @@ $(ARCHTS_MPATROL): $(ARCHTS_MPTOBJS)
 	$(AR) cru $@ $(ARCHTS_MPTOBJS)
 
 $(SHARTS_MPATROL): $(SHARTS_MPTOBJS)
-	$(LD) $(LDFLAGS) -o $@ $(SHARTS_MPTOBJS) -limagehlp
+	$(LD) $(LDFLAGS) -Wl,--out-implib,$(MPATROL)mt.a -o $@ $(SHARTS_MPTOBJS) -lbfd -liberty -lintl -limagehlp
 
 $(OBJTS_MPATROL): $(SOURCE)/library.c
 	$(CC) $(CFLAGS) $(OFLAGS) $(TFLAGS) -c -o $@ $<
@@ -114,7 +114,7 @@ $(ARCHIVE_MPALLOC): $(ARCHIVE_MPAOBJS)
 	$(AR) cru $@ $(ARCHIVE_MPAOBJS)
 
 $(SHARED_MPALLOC): $(SHARED_MPAOBJS)
-	$(LD) $(LDFLAGS) -o $@ $(SHARED_MPAOBJS)
+	$(LD) $(LDFLAGS) -Wl,--out-implib,$(MPALLOC).a -o $@ $(SHARED_MPAOBJS)
 
 $(OBJECT_MPALLOC): $(SOURCE)/library2.c
 	$(CC) $(CFLAGS) $(OFLAGS) -c -o $@ $<
@@ -148,8 +148,10 @@ clean:
 clobber: clean
 	-@ rm -f $(ARCHIVE_MPATROL) $(ARCHTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(SHARED_MPATROL) $(SHARTS_MPATROL) 2>&1 >/dev/null
+	-@ rm -f $(MPATROL).a $(MPATROL)mt.a 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPATROL) $(OBJTS_MPATROL) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPALLOC) $(SHARED_MPALLOC) 2>&1 >/dev/null
+	-@ rm -f $(MPALLOC).a 2>&1 >/dev/null
 	-@ rm -f $(OBJECT_MPALLOC) 2>&1 >/dev/null
 	-@ rm -f $(ARCHIVE_MPTOOLS) 2>&1 >/dev/null
 	-@ rm -f mpatrol.exe mprof.exe mptrace.exe mleak.exe 2>&1 >/dev/null
