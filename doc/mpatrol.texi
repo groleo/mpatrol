@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.272 2007-08-14 10:52:47 groy Exp $
+@c $Id: mpatrol.texi,v 1.273 2007-08-14 12:24:12 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -13102,9 +13102,10 @@ Perhaps add an @command{Installer} installation script with icons.
 @item
 Need to add support for processors other than the Intel 80x86.  However, about
 99% of Windows platforms run on this processor family --- does anyone really use
-Windows with other processors?  Also finish Cygwin support, although this is
-effectively mpatrol built with @option{-DTARGET=TARGET_UNIX} support on Windows
-platforms.
+Windows with other processors?  Also finish MinGW support for building with the
+GNU C compiler but using the Microsoft C library, and also Cygwin support,
+although this is effectively mpatrol built with @option{-DTARGET=TARGET_UNIX}
+on Windows platforms.
 
 @item
 Perhaps add support for compiling the mpatrol library with @command{gcc} on
