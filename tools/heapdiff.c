@@ -1,7 +1,7 @@
 /*
  * mpatrol
  * A library for controlling and tracing dynamic memory allocations.
- * Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
+ * Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,9 +33,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heapdiff.c,v 1.12 2007-04-26 11:28:13 groy Exp $"
+#ident "$Id: heapdiff.c,v 1.13 2008-07-16 13:07:28 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.12 2007-04-26 11:28:13 groy Exp $";
+static MP_CONST MP_VOLATILE char *heapdiff_id = "$Id: heapdiff.c,v 1.13 2008-07-16 13:07:28 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
