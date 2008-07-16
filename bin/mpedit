@@ -3,7 +3,7 @@
 
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
+# Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.11 2007-04-26 11:27:05 groy Exp $
+# $Id: mpedit,v 1.12 2008-07-16 14:27:12 groy Exp $
 
 
 # Program version.
@@ -179,13 +179,13 @@ fi
 if [ $version = 1 ]
 then
     echo "$progname $VERSION"
-    echo "Copyright (C) 1997-2007 Graeme S. Roy"
+    echo "Copyright (C) 1997-2008 Graeme S. Roy"
     echo
     echo "This is free software, and you are welcome to redistribute it under certain"
     echo "conditions; see the GNU Library General Public License for details."
     echo
     echo "For the latest mpatrol release and documentation,"
-    echo "visit http://www.cbmamiga.demon.co.uk/mpatrol."
+    echo "visit http://sourceforge.net/projects/mpatrol."
     echo
 fi
 

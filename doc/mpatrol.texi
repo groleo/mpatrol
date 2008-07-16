@@ -2,7 +2,7 @@
 
 @c mpatrol
 @c A library for controlling and tracing dynamic memory allocations.
-@c Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
+@c Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
 @c
 @c This library is free software; you can redistribute it and/or
 @c modify it under the terms of the GNU Library General Public
@@ -19,7 +19,7 @@
 @c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 @c MA 02111-1307, USA.
 
-@c $Id: mpatrol.texi,v 1.273 2007-08-14 12:24:12 groy Exp $
+@c $Id: mpatrol.texi,v 1.274 2008-07-16 14:16:57 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -53,7 +53,7 @@
 This file documents mpatrol, a library for controlling and tracing dynamic
 memory allocations.
 
-Copyright @copyright{} 1997-2007 Graeme S. Roy @email{mpatrol@@cbmamiga.demon.co.uk}
+Copyright @copyright{} 1997-2008 Graeme S. Roy @email{graemeroy@@users.sourceforge.net}
 
 This is edition @value{EDITION} of the mpatrol manual for version
 @value{VERSION}, @value{UPDATED}.
@@ -93,7 +93,7 @@ library are the trademarks of their respective owners.
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1997-2007 Graeme S. Roy <@email{mpatrol@@cbmamiga.demon.co.uk}>
+Copyright @copyright{} 1997-2008 Graeme S. Roy <@email{graemeroy@@users.sourceforge.net}>
 
 Permission is granted to make and distribute verbatim copies of this manual
 provided the copyright notice and this permission notice are preserved on all
@@ -224,9 +224,9 @@ about mpatrol.
 @cindex FreshMeat
 @cindex SourceForge
 The latest version of the mpatrol library and this manual can always be found at
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/}, and any correspondence relating
+@uref{http://sourceforge.net/projects/mpatrol/}, and any correspondence relating
 to mpatrol (bug reports, enhancement requests, compliments, etc.@:) should be
-sent to @email{mpatrol@@cbmamiga.demon.co.uk}.  I'd be very interested in
+sent to @email{graemeroy@@users.sourceforge.net}.  I'd be very interested in
 hearing any success stories with using mpatrol to debug programs, since I get
 very little feedback apart from the occasional bug report.  The mpatrol library
 is also registered at FreshMeat (@uref{http://freshmeat.net/projects/mpatrol/})
@@ -3883,7 +3883,7 @@ command line tools.
 
 @cindex condenseleaklog
 Note that mpatrol patch 5 (which can be downloaded from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch5.tar.gz})
+@uref{http://heanet.dl.sourceforge.net/sourceforge/mpatrol/mpatrol_patch5.tar.gz})
 contains the source code to a FORTRAN 90 program called
 @command{condenseleaklog} which offers similar facilities to the @command{mleak}
 command, as well as the ability to trim and filter stack traces.
@@ -4782,7 +4782,7 @@ unfreed memory can be produced to detect where memory leaks come from (via the
 Although @command{mprof} does not currently offer this facility, a small tool
 called @command{profdiff} which reports differences between two mpatrol
 profiling output files can be downloaded from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch3.tar.gz}.
+@uref{http://heanet.dl.sourceforge.net/sourceforge/mpatrol/mpatrol_patch3.tar.gz}.
 
 @cindex VAX
 Much of the functionality of this implementation of memory allocation profiling
@@ -6132,14 +6132,14 @@ and the program should be executed, generating the following output in
 
 @smallexample
 @@(#) mpatrol 1.4.8 (02/01/08)
-Copyright (C) 1997-2007 Graeme S. Roy
+Copyright (C) 1997-2008 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
 certain conditions; see the GNU Library General Public License for
 details.
 
 For the latest mpatrol release and documentation,
-visit http://www.cbmamiga.demon.co.uk/mpatrol.
+visit http://sourceforge.net/projects/mpatrol.
 
 operating system:       UNIX
 system variant:         Linux
@@ -12456,16 +12456,17 @@ well.
 This section contains information about known bugs and limitations in the
 mpatrol library as well as listing potential future enhancements.
 
-Bugs should be reported to @email{mpatrol@@cbmamiga.demon.co.uk} along with the
-details of the operating system, processor architecture and object file format
-that the mpatrol library is being used with --- and don't forget to include the
-version of the mpatrol library you are using!  Keep in mind that I only have
-access to a Pentium III Notebook PC running Red Hat Linux 7.1 and Windows ME, so
-I will be most likely unable to reproduce most of the system-specific bugs.  A
-bug report that comes with an associated fix will be most welcome.
+Bugs should be reported to @email{graemeroy@@users.sourceforge.net} along with
+the details of the operating system, processor architecture and object file
+format that the mpatrol library is being used with --- and don't forget to
+include the version of the mpatrol library you are using!  Keep in mind that I
+only have access to a Pentium III Notebook PC running Red Hat Linux 7.1 and
+Windows ME, so I will be most likely unable to reproduce most of the
+system-specific bugs.  A bug report that comes with an associated fix will be
+most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
-to @email{mpatrol@@cbmamiga.demon.co.uk} or the mpatrol discussion group at
+to @email{graemeroy@@users.sourceforge.net} or the mpatrol discussion group at
 @uref{http://groups.yahoo.com/group/mpatrol/}.  If you are planning to implement
 an enhancement, let me know first in case I am (or someone else is) working
 towards the same goal --- that way, work won't be wasted.  If you wish to send
@@ -12751,7 +12752,7 @@ occurs on some systems.  Example code to do this was submitted by Alexander
 Barton and this may well be incorporated into the library at some point in the
 future@footnote{This code can be applied as an mpatrol library patch which can
 be downloaded from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch1.tar.gz}.}.
+@uref{http://heanet.dl.sourceforge.net/sourceforge/mpatrol/mpatrol_patch1.tar.gz}.}.
 
 @item
 Add the ability to use the reporting and tracing infrastructure of mpatrol
@@ -12878,7 +12879,7 @@ library, but that currently allocates temporary space on the heap using
 @code{xmalloc()} which means that it will run unbearably slowly under
 mpatrol@footnote{If you really really want this functionality then code to do
 this is available as an mpatrol library patch which can be downloaded from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch4.tar.gz}.}.
+@uref{http://heanet.dl.sourceforge.net/sourceforge/mpatrol/mpatrol_patch4.tar.gz}.}.
 
 @item
 Add a script to wrap around various popular C and C++ compiler drivers so that
@@ -12986,7 +12987,7 @@ The library cannot currently read any symbols from shared objects that have been
 read via @code{dlopen()}, @code{shl_load()} or similar functions@footnote{There
 is an mpatrol library patch that supports reading symbols from shared libraries
 opened by @code{dlopen()} which can be downloaded from
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/patches/mpatrol_patch2.tar.gz}.}.
+@uref{http://heanet.dl.sourceforge.net/sourceforge/mpatrol/mpatrol_patch2.tar.gz}.}.
 In addition, symbols cannot currently be read from any COFF or XCOFF shared
 libraries on LynxOS and some work needs to be done to build the mpatrol library
 as a shared library on LynxOS.
@@ -13239,7 +13240,7 @@ distribution should already contain the latest mpatrol manual in a variety of
 formats and should also contain a file telling you where to get programs that
 can be used to view or print these files.  Alternatively, you can browse the
 latest mpatrol manual on-line at
-@uref{http://www.cbmamiga.demon.co.uk/mpatrol/}.
+@uref{http://sourceforge.net/projects/mpatrol/}.
 
 @item
 I'd like to convert the mpatrol manual to a different documentation format but
