@@ -25,7 +25,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.19 2008-07-16 13:54:20 groy Exp $
+# $Id: setup,v 1.20 2008-07-16 15:06:01 groy Exp $
 
 
 uselinks=0
@@ -64,8 +64,8 @@ copyfile()
 # Copy the required top-level files.
 
 echo "Copying top-level files" >&2
-files="../../README ../../AUTHORS ../../THANKS ../../COPYING ../../COPYING.LIB
-       ../../NEWS ../../ChangeLog"
+files="../../README ../../AUTHORS ../../THANKS ../../COPYING
+       ../../COPYING.LESSER ../../NEWS ../../ChangeLog"
 for file in $files
 do
     copyfile "$file" `basename "$file"`
