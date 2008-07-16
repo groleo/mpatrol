@@ -19,9 +19,9 @@ Description:    A link library that attempts to diagnose run-time errors that
                 library's behaviour.
 Keywords:       mpatrol malloc realloc free new delete library allocate
                 allocation trace tracing debug debugging dynamic memory
-Author:         mpatrol@cbmamiga.demon.co.uk (Graeme S. Roy)
-Maintained-by:  mpatrol@cbmamiga.demon.co.uk (Graeme S. Roy)
-Primary-site:   www.cbmamiga.demon.co.uk mpatrol/files
+Author:         graemeroy@users.sourceforge.net (Graeme S. Roy)
+Maintained-by:  graemeroy@users.sourceforge.net (Graeme S. Roy)
+Primary-site:   heanet.dl.sourceforge.net sourceforge/mpatrol
                 4.2M mpatrol_1.4.8.tar.gz
 Alternate-site: metalab.unc.edu pub/Linux/devel/lang/c
                 4.2M mpatrol-1.4.8.tar.gz
