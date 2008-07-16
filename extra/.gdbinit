@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
+# Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # GDB command file for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.8 2007-04-26 11:27:21 groy Exp $
+# $Id: .gdbinit,v 1.9 2008-07-16 14:04:25 groy Exp $
 
 
 # Set mpatrol library options in the current process environment.

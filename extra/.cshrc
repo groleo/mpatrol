@@ -1,6 +1,6 @@
 # mpatrol
 # A library for controlling and tracing dynamic memory allocations.
-# Copyright (C) 1997-2007 Graeme S. Roy <mpatrol@cbmamiga.demon.co.uk>
+# Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 # csh/tcsh shell script for use with mpatrol
 
 
-# $Id: .cshrc,v 1.3 2007-04-26 11:27:21 groy Exp $
+# $Id: .cshrc,v 1.4 2008-07-16 14:04:25 groy Exp $
 
 
 # Set mpatrol library options in the current shell environment.
