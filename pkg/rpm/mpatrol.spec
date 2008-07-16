@@ -21,7 +21,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.76 2008-07-16 13:54:28 groy Exp $
+# $Id: mpatrol.spec,v 1.77 2008-07-16 15:10:26 groy Exp $
 
 
 %define libversion 1.4
@@ -123,7 +123,7 @@ install -m644 extra/mpatrol.m4 $RPM_BUILD_ROOT/usr/share/aclocal
 %files
 %defattr(-,root,root)
 %doc README README.DOC README.MAN AUTHORS THANKS
-%doc COPYING COPYING.LIB NEWS ChangeLog
+%doc COPYING COPYING.LESSER NEWS ChangeLog
 %doc doc/mpatrol.txt doc/mpatrol.guide doc/mpatrol.html
 %doc doc/mpatrol.dvi doc/mpatrol.ps doc/mpatrol.pdf
 %doc doc/refcard.dvi doc/refcard.ps doc/refcard.pdf

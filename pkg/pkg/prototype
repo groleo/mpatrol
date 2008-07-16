@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.54 2008-07-16 13:54:27 groy Exp $
+# $Id: prototype,v 1.55 2008-07-16 15:10:25 groy Exp $
 
 
 d none bin 0775 bin bin
@@ -40,7 +40,7 @@ f none doc/mpatrol/README.MAN 0664 bin bin
 f none doc/mpatrol/AUTHORS 0664 bin bin
 f none doc/mpatrol/THANKS 0664 bin bin
 f none doc/mpatrol/COPYING 0664 bin bin
-f none doc/mpatrol/COPYING.LIB 0664 bin bin
+f none doc/mpatrol/COPYING.LESSER 0664 bin bin
 f none doc/mpatrol/NEWS 0664 bin bin
 f none doc/mpatrol/ChangeLog 0664 bin bin
 f none doc/mpatrol/mpatrol.txt 0664 bin bin

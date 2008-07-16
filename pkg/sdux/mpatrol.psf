@@ -21,7 +21,7 @@
 # SD/UX package specification file
 
 
-# $Id: mpatrol.psf,v 1.40 2008-07-16 13:54:30 groy Exp $
+# $Id: mpatrol.psf,v 1.41 2008-07-16 15:10:27 groy Exp $
 
 
 product
@@ -52,7 +52,7 @@ product
 	file			AUTHORS
 	file			THANKS
 	file			COPYING
-	file			COPYING.LIB
+	file			COPYING.LESSER
 	file			NEWS
 	file			ChangeLog
 	file			mpatrol.txt

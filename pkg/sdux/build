@@ -24,7 +24,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.38 2008-07-16 13:54:30 groy Exp $
+# $Id: build,v 1.39 2008-07-16 15:10:27 groy Exp $
 
 
 version=1.4.8
@@ -66,7 +66,7 @@ cp ../../man/README mpatrol/doc/mpatrol/README.MAN
 cp ../../AUTHORS mpatrol/doc/mpatrol
 cp ../../THANKS mpatrol/doc/mpatrol
 cp ../../COPYING mpatrol/doc/mpatrol
-cp ../../COPYING.LIB mpatrol/doc/mpatrol
+cp ../../COPYING.LESSER mpatrol/doc/mpatrol
 cp ../../NEWS mpatrol/doc/mpatrol
 cp ../../ChangeLog mpatrol/doc/mpatrol
 cp ../../doc/mpatrol.txt mpatrol/doc/mpatrol

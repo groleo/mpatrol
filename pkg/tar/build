@@ -24,7 +24,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.70 2008-07-16 13:54:31 groy Exp $
+# $Id: build,v 1.71 2008-07-16 15:10:31 groy Exp $
 
 
 version=1.4.8
@@ -58,7 +58,7 @@ cp ../../README mpatrol
 cp ../../AUTHORS mpatrol
 cp ../../THANKS mpatrol
 cp ../../COPYING mpatrol
-cp ../../COPYING.LIB mpatrol
+cp ../../COPYING.LESSER mpatrol
 cp ../../NEWS mpatrol
 cp ../../ChangeLog mpatrol
 mkdir -p mpatrol/bin
