@@ -17,7 +17,7 @@
 @c You should have received a copy of the GNU Lesser General Public License
 @c along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-@c $Id: mpatrol.texi,v 1.276 2008-07-17 12:23:51 groy Exp $
+@c $Id: mpatrol.texi,v 1.277 2008-07-17 12:34:23 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -158,7 +158,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * Related software::            Similar programs.
 * References::                  Additional information.
 * About the author::            Information about me.
-* Copying::                     GNU Library General Public License.
+* Copying::                     GNU GPL and GNU Lesser GPL.
 * Function index::              Library functions.
 * Index::                       Main index.
 @end menu
@@ -6133,7 +6133,7 @@ and the program should be executed, generating the following output in
 Copyright (C) 1997-2008 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
-certain conditions; see the GNU Library General Public License for
+certain conditions; see the GNU Lesser General Public License for
 details.
 
 For the latest mpatrol release and documentation,
