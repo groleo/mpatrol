@@ -1,3 +1,47 @@
+Changes for 1.5.0 (17th July, 2008)
+
+  * Ported the library and tools to Interix (Windows Services for UNIX).
+
+  * Added preliminary support for building with MinGW32 on Windows.
+
+  * Added preliminary support for the ARM architecture.
+
+  * Changed CHECKMEMORY to also warn about zero-length memory operations -
+    they should no longer be reported if this option is not used.
+
+  * Added the ZEROPN diagnostic to report zero-length memory operations.
+
+  * Now correctly handle memmem() if the pattern memory is zero-length.
+
+  * Fixed an issue that shows itself with newer BFD libraries and not reading
+    the dynamic symbol table if a normal symbol table doesn't exist.
+
+  * Fixed an intermittent bug with the BFD library and symbol reading on Linux.
+
+  * Fixed a problem if LoadedImageName is empty on Windows.
+
+  * Fixed a problem with reading the MPATROL_OPTIONS environment variable in
+    multithreaded processes on Windows.
+
+  * Changed the internal meminfo structure to memoryinfo to prevent a name
+    clash on newer releases of Solaris.
+
+  * Updated the G++ name mangling of externally visible C++ functions.
+
+  * Enhanced the definition of MP_ALIGN() in mpatrol.h.
+
+  * Fixed the faulty call to AC_TRY_LINK in mpatrol.m4.
+
+  * Now includes depcomp when building with libtool.
+
+  * Added examples for the mpatrol tools library to the manual.
+
+  * A DocBook version of the mpatrol manual can now be built.
+
+  * Updated from the GNU Library General Public License v2 to the GNU Lesser
+    General Public License v3.
+
+
 Changes for 1.4.8 (8th January, 2002)
 
   * Added better logging for diagnostic messages.
