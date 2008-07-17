@@ -4,22 +4,20 @@
 @c A library for controlling and tracing dynamic memory allocations.
 @c Copyright (C) 1997-2008 Graeme S. Roy <graemeroy@users.sourceforge.net>
 @c
-@c This library is free software; you can redistribute it and/or
-@c modify it under the terms of the GNU Library General Public
-@c License as published by the Free Software Foundation; either
-@c version 2 of the License, or (at your option) any later version.
+@c This program is free software: you can redistribute it and/or modify it
+@c under the terms of the GNU Lesser General Public License as published by
+@c the Free Software Foundation, either version 3 of the License, or (at
+@c your option) any later version.
 @c
-@c This library is distributed in the hope that it will be useful,
-@c but WITHOUT ANY WARRANTY; without even the implied warranty of
-@c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-@c Library General Public License for more details.
+@c This program is distributed in the hope that it will be useful, but
+@c WITHOUT ANY WARRANTY; without even the implied warranty of
+@c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+@c General Public License for more details.
 @c
-@c You should have received a copy of the GNU Library General Public
-@c License along with this library; if not, write to the Free
-@c Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-@c MA 02111-1307, USA.
+@c You should have received a copy of the GNU Lesser General Public License
+@c along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-@c $Id: mpatrol.texi,v 1.275 2008-07-17 10:04:09 groy Exp $
+@c $Id: mpatrol.texi,v 1.276 2008-07-17 12:23:51 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
