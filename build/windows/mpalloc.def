@@ -23,7 +23,7 @@
 
 LIBRARY MPALLOC
 
-VERSION 1.4
+VERSION 1.5
 
 DESCRIPTION "dynamic memory allocation replacement library"
 

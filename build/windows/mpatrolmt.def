@@ -23,7 +23,7 @@
 
 LIBRARY MPATROLMT
 
-VERSION 1.4
+VERSION 1.5
 
 DESCRIPTION "controls and traces dynamic memory allocations"
 

@@ -21,7 +21,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.82 2008-07-16 14:23:34 groy Exp $
+# $Id: Makefile,v 1.83 2008-07-17 10:11:40 groy Exp $
 
 
 # Definitions
@@ -52,7 +52,7 @@ MPATROL	 = mpatrol
 MPALLOC	 = mpalloc
 MPTOOLS	 = mptools
 VERSION	 = 1
-REVISION = 4
+REVISION = 5
 
 MPTOBJS	 = list.o tree.o slots.o utils.o memory.o heap.o alloc.o info.o \
 	   stack.o addr.o strtab.o symbol.o signals.o diag.o option.o \

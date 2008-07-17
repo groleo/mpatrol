@@ -21,15 +21,15 @@ dnl MA 02111-1307, USA.
 dnl Process this file with autoconf to produce a configure script
 
 
-dnl $Id: configure.in,v 1.14 2008-07-16 14:20:12 groy Exp $
+dnl $Id: configure.in,v 1.15 2008-07-17 10:07:52 groy Exp $
 
 
 dnl Initialisation.
 
-AC_REVISION($Revision: 1.14 $)
+AC_REVISION($Revision: 1.15 $)
 AC_INIT(src/mpatrol.h)
 AM_CONFIG_HEADER(configure.h)
-AM_INIT_AUTOMAKE(mpatrol, 1.4.8)
+AM_INIT_AUTOMAKE(mpatrol, 1.5.0)
 
 
 dnl Checks for programs.
