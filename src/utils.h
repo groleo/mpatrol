@@ -9,7 +9,8 @@
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at         * your option) any later version.
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,7 +28,7 @@
 
 
 /*
- * $Id: utils.h,v 1.12 2008-07-17 11:00:07 groy Exp $
+ * $Id: utils.h,v 1.13 2008-07-17 11:36:50 groy Exp $
  */
 
 

@@ -5,7 +5,8 @@
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at         * your option) any later version.
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprof.c,v 1.38 2008-07-17 11:16:09 groy Exp $"
+#ident "$Id: mprof.c,v 1.39 2008-07-17 11:32:51 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.38 2008-07-17 11:16:09 groy Exp $";
+static MP_CONST MP_VOLATILE char *mprof_id = "$Id: mprof.c,v 1.39 2008-07-17 11:32:51 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
