@@ -46,9 +46,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.112 2008-07-17 10:51:50 groy Exp $"
+#ident "$Id: diag.c,v 1.113 2008-07-17 11:16:09 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.112 2008-07-17 10:51:50 groy Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.113 2008-07-17 11:16:09 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -1817,7 +1817,7 @@ __mp_printversion(void)
         __mp_diag("%s %s\n\n", __mp_copyright, __mp_author);
     __mp_diag("This is free software, and you are welcome to redistribute it "
               "under certain\n");
-    __mp_diag("conditions; see the GNU Library General Public License for "
+    __mp_diag("conditions; see the GNU Lesser General Public License for "
               "details.\n");
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("<P>");

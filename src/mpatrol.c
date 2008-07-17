@@ -41,9 +41,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpatrol.c,v 1.49 2008-07-17 10:51:52 groy Exp $"
+#ident "$Id: mpatrol.c,v 1.50 2008-07-17 11:16:09 groy Exp $"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.49 2008-07-17 10:51:52 groy Exp $";
+static MP_CONST MP_VOLATILE char *mpatrol_id = "$Id: mpatrol.c,v 1.50 2008-07-17 11:16:09 groy Exp $";
 #endif /* MP_IDENT_SUPPORT */
 
 
@@ -855,7 +855,7 @@ main(int argc, char **argv)
                 __mp_copyright, __mp_author);
         fputs("This is free software, and you are welcome to redistribute it "
               "under certain\n", stdout);
-        fputs("conditions; see the GNU Library General Public License for "
+        fputs("conditions; see the GNU Lesser General Public License for "
               "details.\n\n", stdout);
         fputs("For the latest mpatrol release and documentation,\n", stdout);
         fprintf(stdout, "visit %s.\n\n", __mp_homepage);
