@@ -17,7 +17,7 @@
 @c You should have received a copy of the GNU Lesser General Public License
 @c along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-@c $Id: mpatrol.texi,v 1.278 2008-07-17 12:56:55 groy Exp $
+@c $Id: mpatrol.texi,v 1.279 2008-07-17 13:19:25 groy Exp $
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -893,15 +893,14 @@ tools can also be formatted for a printed manual.
 @cindex library, building
 
 @cindex Amiga 4000/040
-@cindex Dell Inspiron 7500
 The mpatrol library was initially developed on an Amiga 4000/040 running AmigaOS
 3.1.  I then installed Red Hat Linux 5.1 on my Amiga and added support for
-Linux/m68k.  I've now just recently purchased a Dell Inspiron 7500 Notebook PC
-and put my Amiga in retirement, so development will now continue on Red Hat
-Linux 7.0 and above on the Intel platform.  I've tried my best to make it as
-easy as possible to build and install mpatrol on any system, but it isn't
-likely to run smoothly for everybody.  However, there shouldn't be any major
-problems if you perform the following steps.
+Linux/m68k.  Just after mpatrol was first released I purchased a Windows 98
+laptop and put my Amiga in retirement, so development continued on Windows and
+Linux on the Intel x68 platform.  I've tried my best to make it as easy as
+possible to build and install mpatrol on any system, but it isn't likely to run
+smoothly for everybody.  However, there shouldn't be any major problems if you
+perform the following steps.
 
 @cindex CHECKSUMS
 @cindex md5sum
@@ -12457,11 +12456,10 @@ mpatrol library as well as listing potential future enhancements.
 Bugs should be reported to @email{graemeroy@@users.sourceforge.net} along with
 the details of the operating system, processor architecture and object file
 format that the mpatrol library is being used with --- and don't forget to
-include the version of the mpatrol library you are using!  Keep in mind that I
-only have access to a Pentium III Notebook PC running Red Hat Linux 7.1 and
-Windows ME, so I will be most likely unable to reproduce most of the
-system-specific bugs.  A bug report that comes with an associated fix will be
-most welcome.
+include the version of the mpatrol library you are using!  Nowadays I only
+use Windows XP and Interix or Cygwin on Intel x86 computers, so I will be most
+likely unable to reproduce most of the system-specific bugs on other platforms.
+A bug report that comes with an associated fix will be most welcome.
 
 Enhancement requests and source code containing enhancements should also be sent
 to @email{graemeroy@@users.sourceforge.net} or the mpatrol discussion group at
