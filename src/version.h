@@ -30,7 +30,7 @@
 
 
 /*
- * $Id: version.h,v 1.24 2008-07-16 13:17:37 groy Exp $
+ * $Id: version.h,v 1.25 2008-07-17 09:47:40 groy Exp $
  */
 
 
@@ -42,13 +42,13 @@
  * and ff represents the bug fix count.
  */
 
-#define MP_VERNUM 10408
+#define MP_VERNUM 10500
 
 
 /* The version string for the mpatrol library.
  */
 
-#define MP_VERSION "mpatrol 1.4.8"
+#define MP_VERSION "mpatrol 1.5.0"
 
 
 #ifdef __cplusplus
