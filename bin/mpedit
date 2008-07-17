@@ -22,7 +22,7 @@
 # optionally jump to a specific line number
 
 
-# $Id: mpedit,v 1.13 2008-07-17 11:21:04 groy Exp $
+# $Id: mpedit,v 1.14 2008-07-17 11:22:06 groy Exp $
 
 
 # Program version.
@@ -179,7 +179,7 @@ then
     echo "Copyright (C) 1997-2008 Graeme S. Roy"
     echo
     echo "This is free software, and you are welcome to redistribute it under certain"
-    echo "conditions; see the GNU Library General Public License for details."
+    echo "conditions; see the GNU Lesser General Public License for details."
     echo
     echo "For the latest mpatrol release and documentation,"
     echo "visit http://sourceforge.net/projects/mpatrol."
