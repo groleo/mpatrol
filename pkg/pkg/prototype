@@ -21,7 +21,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.55 2008-07-16 15:10:25 groy Exp $
+# $Id: prototype,v 1.56 2008-07-17 09:41:27 groy Exp $
 
 
 d none bin 0775 bin bin
@@ -167,16 +167,16 @@ f none include/mpatrol/mgauge.h 0664 bin bin
 f none include/mpatrol/mtrace.h 0664 bin bin
 d none lib 0775 bin bin
 f none lib/libmpatrol.a 0664 bin bin
-f none lib/libmpatrol.so.1.4 0775 bin bin
-s none lib/libmpatrol.so=libmpatrol.so.1.4
+f none lib/libmpatrol.so.1.5 0775 bin bin
+s none lib/libmpatrol.so=libmpatrol.so.1.5
 f none lib/libmpatrolmt.a 0664 bin bin
-f none lib/libmpatrolmt.so.1.4 0775 bin bin
-s none lib/libmpatrolmt.so=libmpatrolmt.so.1.4
+f none lib/libmpatrolmt.so.1.5 0775 bin bin
+s none lib/libmpatrolmt.so=libmpatrolmt.so.1.5
 f none lib/llib-lmpatrol.ln 0664 bin bin
 f none lib/llib-lmpatrolmt.ln 0664 bin bin
 f none lib/libmpalloc.a 0664 bin bin
-f none lib/libmpalloc.so.1.4 0775 bin bin
-s none lib/libmpalloc.so=libmpalloc.so.1.4
+f none lib/libmpalloc.so.1.5 0775 bin bin
+s none lib/libmpalloc.so=libmpalloc.so.1.5
 f none lib/llib-lmpalloc.ln 0664 bin bin
 f none lib/libmptools.a 0664 bin bin
 f none lib/llib-lmptools.ln 0664 bin bin

@@ -21,10 +21,10 @@
 @comment Interix package file list
 
 
-@comment $Id: pkglist,v 1.3 2008-07-16 15:10:23 groy Exp $
+@comment $Id: pkglist,v 1.4 2008-07-17 09:41:21 groy Exp $
 
 
-@name mpatrol-1.4.8-bin
+@name mpatrol-1.5.0-bin
 @mode 0775
 bin/mpatrol
 bin/mprof
@@ -159,11 +159,11 @@ lib/libmpatrolmt.a
 lib/libmpalloc.a
 lib/libmptools.a
 @mode 0775
-lib/libmpatrol.so.1.4
+lib/libmpatrol.so.1.5
 lib/libmpatrol.so
-lib/libmpatrolmt.so.1.4
+lib/libmpatrolmt.so.1.5
 lib/libmpatrolmt.so
-lib/libmpalloc.so.1.4
+lib/libmpalloc.so.1.5
 lib/libmpalloc.so
 @mode 0664
 man/man1/mpatrol.1
