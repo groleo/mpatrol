@@ -94,6 +94,8 @@ AC_DEFUN(AM_WITH_MPATROL, [
                 -liberty -lintl)
    AC_CHECK_LIB(imagehlp, SymInitialize,
                 am_with_mpatrol_libs="$am_with_mpatrol_libs -limagehlp")
+   AC_CHECK_LIB(unwind, unw_init_local,
+                am_with_mpatrol_libs="$am_with_mpatrol_libs -lunwind")
    AC_CHECK_LIB(cl, U_get_previous_frame,
                 am_with_mpatrol_libs="$am_with_mpatrol_libs -lcl")
    AC_CHECK_LIB(exc, unwind,
@@ -116,6 +118,9 @@ AC_DEFUN(AM_WITH_MPATROL, [
                 $am_with_mpatrol_libs)
    AC_CHECK_LIB(mpatrol, __mp_libimagehlp,
                 am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -limagehlp", ,
+                $am_with_mpatrol_libs)
+   AC_CHECK_LIB(mpatrol, __mp_libunwind,
+                am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -lunwind", ,
                 $am_with_mpatrol_libs)
    AC_CHECK_LIB(mpatrol, __mp_libcl,
                 am_with_mpatrol_libs2="$am_with_mpatrol_libs2 -lcl", ,

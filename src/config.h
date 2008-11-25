@@ -564,25 +564,38 @@
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
+/* Indicates if the routines in libunwind should be used to traverse call
+ * stacks.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
+ */
+
+#ifndef MP_LIBUNWIND_SUPPORT
+#if TARGET == TARGET_UNIX && (ARCH == ARCH_ARM || ARCH == ARCH_IA64)
+#define MP_LIBUNWIND_SUPPORT 1
+#else /* TARGET && ARCH */
+#define MP_LIBUNWIND_SUPPORT 0
+#endif /* TARGET && ARCH */
+#endif /* MP_LIBUNWIND_SUPPORT */
+
+
 /* Indicates if the operating system provides support routines for traversing
  * call stacks in an external library.  This is currently only available for
  * HP/UX, IRIX, Tru64 and Windows, but the IRIX unwind() library routine calls
  * malloc() and free() so the non-library method of call stack traversal is
- * used instead as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT takes
- * precedence.
+ * used instead as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT and
+ * MP_LIBUNWIND_SUPPORT take precedence.
  */
 
 #ifndef MP_LIBRARYSTACK_SUPPORT
-#if !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT
 #if (TARGET == TARGET_UNIX && (SYSTEM == SYSTEM_HPUX || \
       SYSTEM == SYSTEM_TRU64)) || TARGET == TARGET_WINDOWS
 #define MP_LIBRARYSTACK_SUPPORT 1
 #else /* TARGET && SYSTEM */
 #define MP_LIBRARYSTACK_SUPPORT 0
 #endif /* TARGET && SYSTEM */
-#else /* MP_BUILTINSTACK_SUPPORT */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
 #define MP_LIBRARYSTACK_SUPPORT 0
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 
 
@@ -596,15 +609,17 @@
 #ifndef MP_FULLSTACK
 #if MP_BUILTINSTACK_SUPPORT
 #define MP_FULLSTACK 0
-#elif MP_LIBRARYSTACK_SUPPORT || (TARGET == TARGET_UNIX && \
-       (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_M88K || \
-        ARCH == ARCH_MIPS || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
-        ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
-        TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
+#elif MP_LIBUNWIND_SUPPORT || MP_LIBRARYSTACK_SUPPORT
 #define MP_FULLSTACK 1
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ... */
+#elif (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
+        ARCH == ARCH_M88K || ARCH == ARCH_MIPS || ARCH == ARCH_POWER || \
+        ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)) || \
+      ((TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE) && \
+       ARCH == ARCH_IX86)
+#define MP_FULLSTACK 1
+#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
 #define MP_FULLSTACK 0
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
 #endif /* MP_FULLSTACK */
 
 
@@ -705,21 +720,27 @@
 #endif /* MP_THREADS_LIBS */
 
 #ifndef MP_SYSTEM_LIBS
+#if MP_LIBUNWIND_SUPPORT
+#if SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
+#define MP_SYSTEM_LIBS , MP_LIBNAME(unwind), "DEFAULT"
+#else /* SYSTEM */
+#define MP_SYSTEM_LIBS , MP_LIBNAME(unwind)
+#endif /* SYSTEM */
+#elif MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_HPUX
-#if MP_LIBRARYSTACK_SUPPORT
 #define MP_SYSTEM_LIBS , MP_LIBNAME(cl)
-#else /* MP_LIBRARYSTACK_SUPPORT */
-#define MP_SYSTEM_LIBS
-#endif /* MP_LIBRARYSTACK_SUPPORT */
 #elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
-#if MP_LIBRARYSTACK_SUPPORT
 #define MP_SYSTEM_LIBS , MP_LIBNAME(exc), "DEFAULT"
-#else /* MP_LIBRARYSTACK_SUPPORT */
-#define MP_SYSTEM_LIBS , "DEFAULT"
-#endif /* MP_LIBRARYSTACK_SUPPORT */
 #else /* SYSTEM */
 #define MP_SYSTEM_LIBS
 #endif /* SYSTEM */
+#else /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#if SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
+#define MP_SYSTEM_LIBS "DEFAULT"
+#else /* SYSTEM */
+#define MP_SYSTEM_LIBS
+#endif /* SYSTEM */
+#endif /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_SYSTEM_LIBS */
 #endif /* MP_PRELOAD_SUPPORT */
 

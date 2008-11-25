@@ -33,9 +33,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.14
+@set EDITION 2.15
 @set VERSION 1.5.0
-@set UPDATED 17th July, 2008
+@set UPDATED 25th November, 2008
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
@@ -1716,6 +1716,8 @@ of the functions in the process.
 
 @cindex MP_BUILTINSTACK_SUPPORT
 @cindex MP_LIBRARYSTACK_SUPPORT
+@cindex MP_LIBUNWIND_SUPPORT
+@cindex libunwind
 There are several different ways to perform stack unwinding.  The first requires
 compiler support and uses builtin functions to determine the next stack frame
 and the return address.  The GNU C compiler, @command{gcc}, supports this but
@@ -1724,9 +1726,12 @@ compile-time rather than run-time.  The second method requires operating system
 support, with a library of routines provided to perform call stack traversal.
 Unfortunately, such routines can be quite time consuming and may require a lot
 of resources, but on the other hand they are likely to be very reliable at
-obtaining the necessary information.  The mpatrol library can be built to
-support either of these methods, with the @code{MP_BUILTINSTACK_SUPPORT} and
-the @code{MP_LIBRARYSTACK_SUPPORT} preprocessor macros.
+obtaining the necessary information.  There is also support for using the
+libunwind library instead of such operating system libraries, which will be
+valuable as libunwind gradually supports more processor architectures.  The
+mpatrol library can be built to support either of these methods, with the
+@code{MP_BUILTINSTACK_SUPPORT}, @code{MP_LIBRARYSTACK_SUPPORT} or the
+@code{MP_LIBUNWIND_SUPPORT} preprocessor macros.
 
 @cindex RISC
 A third way to perform stack unwinding involves reading (or effectively
@@ -6019,6 +6024,15 @@ access library:
 @smallexample
 cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
    -liberty -lintl
+@end smallexample
+
+@item
+If the mpatrol library was built with support for the GNU BFD object file format
+access library and the libunwind stack traversal library:
+
+@smallexample
+cc -I/usr/local/include <file> -L/usr/local/lib -lmpatrol -lbfd
+   -liberty -lintl -lunwind
 @end smallexample
 
 @item
@@ -11851,8 +11865,8 @@ The system exception-handling library (libexc) is used for call stack traversal.
 Unfortunately, this library makes several calls to @code{malloc()} when
 initialising itself and this can sometimes result in a recursive loop when used
 in combination with the mpatrol library.  If this occurs, either
-@code{MP_BUILTINSTACK_SUPPORT=1} must be defined or the mpatrol library must
-be built without the @file{malloc.o} module.
+@code{MP_BUILTINSTACK_SUPPORT=1} or @code{MP_LIBUNWIND_SUPPORT=1} must be
+defined or the mpatrol library must be built without the @file{malloc.o} module.
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
@@ -12166,6 +12180,9 @@ facilities and so you may wish to make use of them by defining
 to call them in @file{src/stack.c}.  Examples of systems that can make use of
 this capability are IRIX and Tru64, although they have a drawback in that they
 recursively call @code{malloc()} and so work slower than they normally would.
+Alternatively, if libunwind has support for the processor architecture then you
+can try defining @code{MP_LIBUNWIND_SUPPORT} in @file{src/config.h} to see if
+that works.
 
 If any functions from an external system library were used to help implement
 stack traversal for the new processor architecture then you may also have to
@@ -12524,13 +12541,13 @@ work for unoptimised code.  A much better solution would be write the
 implementations at a lower level in assembly, but this is much less portable.
 Perhaps there is a library which can be used to perform this across many
 operating systems and processor architectures, or maybe someone would like to
-write one@footnote{There is currently a library called StackTrace written by
-Bjorn Reese which invokes a debugger to generate a stack traceback on certain
-UNIX platforms.  This method would be too slow for mpatrol to use though.}?  I
-can think of many applications that would benefit from such a library besides
-this one@footnote{Looking back at these statements about six months after they
-were written, it would appear that I have just written such a library judging by
-the number of architectures for which stack traversal is now supported.}.
+write one@footnote{There is now a library called libunwind that mpatrol can be
+built with to add support for stack traversal on various architectures and more
+will likely follow in the future.  There is also a library called StackTrace
+written by Bjorn Reese which invokes a debugger to generate a stack traceback
+on certain UNIX platforms, although this method would be too slow for mpatrol
+to use.}?  I can think of many applications that would benefit from such a
+library besides this one.
 
 @item
 An alternative implementation for call stack traversal uses the functions

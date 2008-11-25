@@ -2939,20 +2939,22 @@ __mp_remcontents(char *s, void *p)
  * data symbols so that AC_CHECK_LIB() works reliably.
  */
 
-#if TARGET == TARGET_WINDOWS || SYSTEM == SYSTEM_CYGWIN
-#if FORMAT == FORMAT_IMGHLP || DYNLINK == DYNLINK_WINDOWS || \
-    MP_LIBRARYSTACK_SUPPORT
+#if (TARGET == TARGET_WINDOWS || SYSTEM == SYSTEM_CYGWIN) && \
+    (FORMAT == FORMAT_IMGHLP || DYNLINK == DYNLINK_WINDOWS || \
+     MP_LIBRARYSTACK_SUPPORT)
 MP_API void __mp_libimagehlp(void) {}
-#endif /* FORMAT && DYNLINK && MP_LIBRARYSTACK_SUPPORT */
-#elif SYSTEM == SYSTEM_HPUX
-#if MP_LIBRARYSTACK_SUPPORT
+#endif /* TARGET && SYSTEM && FORMAT && DYNLINK && MP_LIBRARYSTACK_SUPPORT */
+
+#if MP_LIBUNWIND_SUPPORT
+MP_API void __mp_libunwind(void) {}
+#elif MP_LIBRARYSTACK_SUPPORT
+#if SYSTEM == SYSTEM_HPUX
 MP_API void __mp_libcl(void) {}
-#endif /* MP_LIBRARYSTACK_SUPPORT */
 #elif SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_TRU64
-#if MP_LIBRARYSTACK_SUPPORT
 MP_API void __mp_libexc(void) {}
-#endif /* MP_LIBRARYSTACK_SUPPORT */
-#endif /* TARGET && SYSTEM */
+#endif /* SYSTEM */
+#endif /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+
 #if (FORMAT == FORMAT_COFF || FORMAT == FORMAT_XCOFF) && SYSTEM != SYSTEM_LYNXOS
 MP_API void __mp_libld(void) {}
 #elif FORMAT == FORMAT_ELF32 || FORMAT == FORMAT_ELF64

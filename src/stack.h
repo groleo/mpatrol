@@ -37,10 +37,13 @@
 #include <stddef.h>
 #include <signal.h>
 #if !MP_BUILTINSTACK_SUPPORT
-#if MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_WINDOWS
+#if MP_LIBUNWIND_SUPPORT
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+#elif MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_WINDOWS
 #include <windows.h>
 #include <imagehlp.h>
-#endif /* MP_LIBRARYSTACK_SUPPORT && TARGET */
+#endif /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT && TARGET */
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
@@ -93,6 +96,9 @@ typedef struct stackinfo
     void *frames[MP_MAXSTACK]; /* array of frame pointers */
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
     size_t index;              /* current stack index */
+#elif MP_LIBUNWIND_SUPPORT
+    unw_context_t context;     /* current machine state */
+    unw_cursor_t cursor;       /* unwind cursor */
 #elif MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_HPUX
@@ -109,7 +115,7 @@ typedef struct stackinfo
 #else /* TARGET && ARCH */
     void *next;                /* next frame handle */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
     void *first;               /* first frame information */
 }
 stackinfo;
