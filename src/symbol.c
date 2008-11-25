@@ -119,6 +119,9 @@
  * definitions for reading the internal structures of the dynamic linker.
  */
 #include <elf.h>
+#if SYSTEM == SYSTEM_LINUX
+#include <link.h>
+#endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_WINDOWS
 /* We use the imagehlp library on Windows platforms to obtain information about
  * the symbols loaded from third-party and system DLLs.  We can also use it to
@@ -366,6 +369,7 @@ objectinfo;
  * all ELF header files.
  */
 
+#if SYSTEM != SYSTEM_LINUX
 typedef struct dynamiclink
 {
     size_t base;              /* virtual address of shared object */
@@ -378,6 +382,7 @@ typedef struct dynamiclink
     struct dynamiclink *next; /* pointer to next shared object */
 }
 dynamiclink;
+#endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_WINDOWS
 /* This structure is used to pass information to the callback function
  * called by SymEnumerateSymbols().
@@ -491,8 +496,10 @@ extern struct obj_list *__rld_obj_head;
  * a text symbol.
  */
 
+#if SYSTEM != SYSTEM_LINUX
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
+#endif /* SYSTEM */
 #endif /* DYNLINK */
 
 
@@ -1616,7 +1623,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
     int f;
 #elif FORMAT == FORMAT_BFD
     objectfile *p, *q;
-    bfd *a, *g, *h;
+    bfd *a, *d, *g, *h;
 #endif /* FORMAT */
     char *t;
 #elif FORMAT == FORMAT_IMGHLP
@@ -1818,7 +1825,6 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
      * BFD library comes with support for debugging information.  So take
      * your pick!
      */
-    t = NULL;
     bfd_init();
     if ((h = bfd_openr(s, NULL)) == NULL)
     {
@@ -1828,17 +1834,32 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
     }
     else
     {
-        /* Normally we wouldn't ever need to read symbols from an archive
-         * library, but this is just provided for completeness, and for AIX
-         * where shared libraries can be embedded within archive libraries.
-         */
-        if (bfd_check_format(h, bfd_archive))
+        a = d = NULL;
+        if (bfd_check_format(h, bfd_object))
         {
+            /* Look for a .gnu_debuglink section and open the separate debug
+             * file if it exists.
+             */
+            if (t = bfd_follow_gnu_debuglink(h, "/usr/lib/debug"))
+            {
+                if (g = bfd_openr(t, NULL))
+                {
+                    d = h;
+                    h = g;
+                }
+                free(t);
+            }
+        }
+        else if (bfd_check_format(h, bfd_archive))
+        {
+            /* Normally we wouldn't ever need to read symbols from an archive
+             * library, but this is just provided for completeness, and for AIX
+             * where shared libraries can be embedded within archive libraries.
+             */
             a = h;
             h = bfd_openr_next_archived_file(a, NULL);
         }
-        else
-            a = NULL;
+        t = NULL;
         while (h != NULL)
         {
             p = NULL;
@@ -1898,6 +1919,14 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
             g = h;
             if ((a != NULL) && (r == 1))
                 h = bfd_openr_next_archived_file(a, g);
+            else if (d != NULL)
+            {
+                /* If an external debugging file was found, now read the
+                 * original file.
+                 */
+                h = d;
+                d = NULL;
+            }
             else
                 h = NULL;
             if (!y->lineinfo || (r == 0))
@@ -1950,6 +1979,22 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 }
 
 
+#if DYNLINK == DYNLINK_SVR4 && SYSTEM == SYSTEM_LINUX
+/* The callback function called to allocate a set of symbol nodes for each
+ * shared object located by dl_iterate_phdr().
+ */
+
+static
+int
+addlibrary(struct dl_phdr_info *i, size_t l, void *y)
+{
+    if ((i->dlpi_name == NULL) || (*i->dlpi_name == '\0'))
+        return 0;
+    return !__mp_addsymbols((symhead *) y, i->dlpi_name, NULL, i->dlpi_addr);
+}
+#endif /* DYNLINK && SYSTEM */
+
+
 /* Add any external or additional symbols to the symbol table.
  */
 
@@ -1990,12 +2035,14 @@ __mp_addextsymbols(symhead *y, memoryinfo *e)
     size_t c, l, n;
     size_t b;
 #elif DYNLINK == DYNLINK_SVR4
+#if SYSTEM != SYSTEM_LINUX
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
 #else /* ENVIRON */
     Elf32_Dyn *d;
 #endif /* ENVIRON */
     dynamiclink *l;
+#endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_WINDOWS
     modinfo m;
 #endif /* DYNLINK */
@@ -2200,6 +2247,10 @@ __mp_addextsymbols(symhead *y, memoryinfo *e)
                 }
         }
 #elif DYNLINK == DYNLINK_SVR4
+#if SYSTEM == SYSTEM_LINUX
+    if (dl_iterate_phdr(addlibrary, y) != 0)
+        return 0;
+#else /* SYSTEM */
 #if ENVIRON == ENVIRON_64
     if ((&_DYNAMIC != NULL) && (d = (Elf64_Dyn *) _DYNAMIC))
 #else /* ENVIRON */
@@ -2235,6 +2286,7 @@ __mp_addextsymbols(symhead *y, memoryinfo *e)
             l = l->next;
         }
     }
+#endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_WINDOWS
     /* We always want to initialise the imagehlp library here since we will
      * be using it to obtain the symbols from any loaded DLLs here and
