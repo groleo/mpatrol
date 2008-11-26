@@ -32,7 +32,9 @@
 #include "machine.h"
 #include <string.h>
 #if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT
-#if MP_LIBRARYSTACK_SUPPORT
+#if MP_GLIBCBACKTRACE_SUPPORT
+#include <execinfo.h>
+#elif MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX
 #if SYSTEM == SYSTEM_IRIX
 #include <exception.h>
@@ -43,7 +45,7 @@
 #elif TARGET == TARGET_WINDOWS
 #include <setjmp.h>
 #endif /* TARGET */
-#else /* MP_LIBRARYSTACK_SUPPORT */
+#else /* MP_GLIBCBACKTRACE_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #if TARGET == TARGET_UNIX
 #include <setjmp.h>
 #if MP_SIGINFO_SUPPORT
@@ -58,7 +60,7 @@
 #endif /* ARCH */
 #endif /* SYSTEM */
 #endif /* TARGET */
-#endif /* MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_GLIBCBACKTRACE_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
 
 
@@ -110,7 +112,8 @@ static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.35 2008-07-17 11:
 #if MP_MAXSTACK > 8
 #error not enough frameaddress() and returnaddress() macros
 #endif /* MP_MAXSTACK */
-#elif !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
+#elif !MP_GLIBCBACKTRACE_SUPPORT && !MP_LIBUNWIND_SUPPORT && \
+      !MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
 /* These macros are used by the unwind() function for setting flags when
  * certain instructions are seen.
@@ -121,7 +124,7 @@ static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.35 2008-07-17 11:
 #define SP_LOWER  4 /* lower part of stack pointer offset has been set */
 #define SP_UPPER  8 /* upper part of stack pointer offset has been set */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
 #ifdef __cplusplus
@@ -130,7 +133,8 @@ extern "C"
 #endif /* __cplusplus */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    TARGET == TARGET_UNIX
 #if MP_LIBUNWIND_SUPPORT
 /* libunwind itself does some memory allocations, which will then cause infinite
  * recursion.  This variable acts as a per-thread lock to prevent that from
@@ -166,7 +170,26 @@ static void (*bushandler)(int);
 static void (*segvhandler)(int);
 #endif /* MP_SIGINFO_SUPPORT */
 #endif /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
-#endif /* MP_BUILTINSTACK_SUPPORT && TARGET */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && TARGET */
+
+
+/* Determine the stack direction on this system.
+ */
+
+MP_GLOBAL
+int
+__mp_stackdirection(void *p)
+{
+    unsigned long n;
+
+    n = (unsigned long) &p;
+    if (p == NULL)
+        return __mp_stackdirection(&n);
+    else if (&n < (unsigned long *) p)
+        return -1;
+    else
+        return 1;
+}
 
 
 /* Initialise the fields of a stackinfo structure.
@@ -177,9 +200,12 @@ void
 __mp_newframe(stackinfo *s, void *f)
 {
     s->frame = s->addr = NULL;
-#if MP_BUILTINSTACK_SUPPORT
+#if MP_BUILTINSTACK_SUPPORT || MP_GLIBCBACKTRACE_SUPPORT
     for (s->index = 0; s->index < MP_MAXSTACK; s->index++)
         s->frames[s->index] = s->addrs[s->index] = NULL;
+#if MP_GLIBCBACKTRACE_SUPPORT
+    s->count = 0;
+#endif /* MP_GLIBCBACKTRACE_SUPPORT */
     s->index = 0;
 #elif MP_LIBUNWIND_SUPPORT
     __mp_memset(&s->context, 0, sizeof(unw_context_t));
@@ -194,19 +220,19 @@ __mp_newframe(stackinfo *s, void *f)
 #elif TARGET == TARGET_WINDOWS
     __mp_memset(&s->next, 0, sizeof(STACKFRAME));
 #endif /* TARGET */
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
     s->next.sp = s->next.ra = 0;
 #else /* TARGET && ARCH */
     s->next = NULL;
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
     s->first = f;
 }
 
 
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT && \
-    !MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_UNIX
 /* Handles any signals that result from illegal memory accesses whilst
  * traversing the call stack.
  */
@@ -217,11 +243,11 @@ stackhandler(int s)
 {
     longjmp(environment, 1);
 }
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT && \
-    !MP_LIBRARYSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -257,11 +283,11 @@ getaddr(unsigned long *p)
     return a;
 }
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT && \
-    !MP_LIBRARYSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
 /* Determine the stack pointer and return address of the previous stack frame
  * by performing code reading.
@@ -352,11 +378,11 @@ unwind(frameinfo *f)
     return 0;
 }
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT && \
-    !MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_UNIX
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && TARGET == TARGET_UNIX
 #if ARCH == ARCH_SPARC
 /* Return a handle for the frame pointer at the current point in execution.
  */
@@ -384,7 +410,7 @@ getframe(void)
 #endif /* ENVIRON */
 }
 #endif /* ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
 /* Return a handle for the stack frame at the current point in execution
@@ -397,6 +423,8 @@ __mp_getframe(stackinfo *p)
 {
 #if MP_BUILTINSTACK_SUPPORT
     void *f;
+#elif MP_GLIBCBACKTRACE_SUPPORT
+    int d, i;
 #elif MP_LIBUNWIND_SUPPORT
     unw_word_t f;
 #elif MP_LIBRARYSTACK_SUPPORT
@@ -409,7 +437,7 @@ __mp_getframe(stackinfo *p)
 #elif TARGET == TARGET_WINDOWS
     jmp_buf j;
 #endif /* TARGET */
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #if MP_SIGINFO_SUPPORT
     struct sigaction i;
 #endif /* MP_SIGINFO_SUPPORT */
@@ -419,7 +447,7 @@ __mp_getframe(stackinfo *p)
       TARGET == TARGET_NETWARE) && ARCH == ARCH_IX86)
     unsigned long *f;
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
     int r;
 
     r = 0;
@@ -437,6 +465,33 @@ __mp_getframe(stackinfo *p)
     }
     if ((p->index++ < MP_MAXSTACK) && (p->frame = p->frames[p->index - 1]))
     {
+        p->addr = p->addrs[p->index - 1];
+        r = 1;
+    }
+    else
+    {
+        p->frame = NULL;
+        p->addr = NULL;
+        p->index = MP_MAXSTACK;
+    }
+#elif MP_GLIBCBACKTRACE_SUPPORT
+    if (p->index == 0)
+    {
+        /* Obtain up to MP_MAXSTACK return addresses for the calling stack
+         * frames.
+         */
+        p->count = backtrace(p->addrs, MP_MAXSTACK);
+        /* Spoof the frame pointers by taking the address of a local variable
+         * in this function and adding a fixed offset to that address for each
+         * subsequent stack frame.
+         */
+        d = __mp_stackdirection(NULL);
+        for (i = 0; i < p->count; i++)
+            p->frames[i] = (char *) &d - (i * d * 64);
+    }
+    if (p->index++ < p->count)
+    {
+        p->frame = p->frames[p->index - 1];
         p->addr = p->addrs[p->index - 1];
         r = 1;
     }
@@ -612,7 +667,7 @@ __mp_getframe(stackinfo *p)
         __mp_memset(&p->next, 0, sizeof(STACKFRAME));
     }
 #endif /* TARGET */
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #if (TARGET == TARGET_UNIX && (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || \
       ARCH == ARCH_M88K || ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || \
       ARCH == ARCH_SPARC)) || ((TARGET == TARGET_WINDOWS || \
@@ -729,7 +784,7 @@ __mp_getframe(stackinfo *p)
     signal(SIGSEGV, segvhandler);
 #endif /* MP_SIGINFO_SUPPORT */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
     return r;
 }
 

@@ -225,25 +225,6 @@ pagesize(void)
 }
 
 
-/* Determine the stack direction on this system.
- */
-
-static
-int
-stackdirection(void *p)
-{
-    unsigned long n;
-
-    n = (unsigned long) &p;
-    if (p == NULL)
-        return stackdirection(&n);
-    else if (&n < (unsigned long *) p)
-        return -1;
-    else
-        return 1;
-}
-
-
 /* Return the executable file name that the program was invoked with.
  * Note that this function will not be reentrant if the return value is
  * a pointer to a local static string buffer.
@@ -438,7 +419,7 @@ __mp_newmemory(memoryinfo *i)
 #endif /* MP_ARRAY_SUPPORT */
     i->align = minalign();
     i->page = pagesize();
-    i->stackdir = stackdirection(NULL);
+    i->stackdir = __mp_stackdirection(NULL);
     i->prog = progname();
 #if MP_MMAP_SUPPORT
     /* On UNIX systems that support the mmap() function call, we default to

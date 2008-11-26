@@ -131,6 +131,7 @@ extern "C"
 #endif /* __cplusplus */
 
 
+MP_EXPORT int __mp_stackdirection(void *);
 MP_EXPORT void __mp_newframe(stackinfo *, void *);
 MP_EXPORT int __mp_getframe(stackinfo *);
 
