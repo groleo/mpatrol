@@ -128,7 +128,6 @@ __mp_getaddrs(addrhead *h, stackinfo *p)
     addrnode *m, *n;
     stackinfo s;
 
-    s = *p;
     if ((p->frame == NULL) || (p->addr == NULL))
         m = NULL;
     else if (m = getaddrnode(h))
@@ -144,6 +143,7 @@ __mp_getaddrs(addrhead *h, stackinfo *p)
         /* Traverse the call stack, allocating a new address node
          * for each entry.
          */
+        s = *p;
         while (__mp_getframe(p) && (p->addr != NULL))
         {
             if ((n->data.next = getaddrnode(h)) == NULL)
@@ -157,8 +157,8 @@ __mp_getaddrs(addrhead *h, stackinfo *p)
             n->data.name = NULL;
             n->data.addr = p->addr;
         }
+        *p = s;
     }
-    *p = s;
     return m;
 }
 
