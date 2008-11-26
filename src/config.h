@@ -548,32 +548,60 @@
 #endif /* MP_BUILTINSTACK_SUPPORT */
 
 
-/* The maximum number of call stack traversals per function if builtin
- * frame address and return address support is being used.  This number must
- * be supported by the required number of macro functions in stack.c.
+/* Indicates if the backtrace() routine in glibc should be used to traverse
+ * call stacks.  Note that this method only allows a finite number of call
+ * stack traversals per function and that MP_BUILTINSTACK_SUPPORT takes
+ * precedence.
  */
 
-#if MP_BUILTINSTACK_SUPPORT
+#ifndef MP_GLIBCBACKTRACE_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT
+#if TARGET == TARGET_UNIX && SYSTEM == SYSTEM_LINUX && ARCH == ARCH_IX86 && \
+    ENVIRON == ENVIRON_64
+#define MP_GLIBCBACKTRACE_SUPPORT 1
+#else /* TARGET && SYSTEM && ARCH && ENVIRON */
+#define MP_GLIBCBACKTRACE_SUPPORT 0
+#endif /* TARGET && SYSTEM && ARCH && ENVIRON */
+#else /* MP_BUILTINSTACK_SUPPORT */
+#define MP_GLIBCBACKTRACE_SUPPORT 0
+#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_GLIBCBACKTRACE_SUPPORT */
+
+
+/* The maximum number of call stack traversals per function if builtin
+ * frame address and return address (or backtrace() in glibc) support is being
+ * used.  For the builtin functions, this number must be supported by the
+ * required number of macro functions in stack.c.
+ */
+
 #ifndef MP_MAXSTACK
+#if MP_BUILTINSTACK_SUPPORT
 #if TARGET == TARGET_AMIGA && defined(__GNUC__)
 #define MP_MAXSTACK 3
 #else /* TARGET && __GNUC__ */
 #define MP_MAXSTACK 8
 #endif /* TARGET && __GNUC__ */
+#elif MP_GLIBCBACKTRACE_SUPPORT
+#define MP_MAXSTACK 64
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT */
 #endif /* MP_MAXSTACK */
-#endif /* MP_BUILTINSTACK_SUPPORT */
 
 
 /* Indicates if the routines in libunwind should be used to traverse call
- * stacks.  Note that MP_BUILTINSTACK_SUPPORT takes precedence.
+ * stacks.  Note that MP_BUILTINSTACK_SUPPORT and MP_GLIBCBACKTRACE_SUPPORT
+ * take precedence.
  */
 
 #ifndef MP_LIBUNWIND_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT
 #if TARGET == TARGET_UNIX && (ARCH == ARCH_ARM || ARCH == ARCH_IA64)
 #define MP_LIBUNWIND_SUPPORT 1
 #else /* TARGET && ARCH */
 #define MP_LIBUNWIND_SUPPORT 0
 #endif /* TARGET && ARCH */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT */
+#define MP_LIBUNWIND_SUPPORT 0
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT */
 #endif /* MP_LIBUNWIND_SUPPORT */
 
 
@@ -581,21 +609,22 @@
  * call stacks in an external library.  This is currently only available for
  * HP/UX, IRIX, Tru64 and Windows, but the IRIX unwind() library routine calls
  * malloc() and free() so the non-library method of call stack traversal is
- * used instead as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT and
- * MP_LIBUNWIND_SUPPORT take precedence.
+ * used instead as it is much faster.  Note that MP_BUILTINSTACK_SUPPORT,
+ * MP_GLIBCBACKTRACE_SUPPORT and MP_LIBUNWIND_SUPPORT take precedence.
  */
 
 #ifndef MP_LIBRARYSTACK_SUPPORT
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBUNWIND_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT
 #if (TARGET == TARGET_UNIX && (SYSTEM == SYSTEM_HPUX || \
       SYSTEM == SYSTEM_TRU64)) || TARGET == TARGET_WINDOWS
 #define MP_LIBRARYSTACK_SUPPORT 1
 #else /* TARGET && SYSTEM */
 #define MP_LIBRARYSTACK_SUPPORT 0
 #endif /* TARGET && SYSTEM */
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #define MP_LIBRARYSTACK_SUPPORT 0
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
 
 
@@ -607,7 +636,7 @@
  */
 
 #ifndef MP_FULLSTACK
-#if MP_BUILTINSTACK_SUPPORT
+#if MP_BUILTINSTACK_SUPPORT || MP_GLIBCBACKTRACE_SUPPORT
 #define MP_FULLSTACK 0
 #elif MP_LIBUNWIND_SUPPORT || MP_LIBRARYSTACK_SUPPORT
 #define MP_FULLSTACK 1
@@ -617,9 +646,9 @@
       ((TARGET == TARGET_WINDOWS || TARGET == TARGET_NETWARE) && \
        ARCH == ARCH_IX86)
 #define MP_FULLSTACK 1
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #define MP_FULLSTACK 0
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #endif /* MP_FULLSTACK */
 
 
