@@ -303,7 +303,7 @@ checkalloca(loginfo *i, int f)
     alloctype t;
     int c;
 
-    if (memhead.fini || (memhead.astack.size == 0))
+    if (memhead.fini || (memhead.recur != 1) || (memhead.astack.size == 0))
         return;
 #if MP_FULLSTACK
     /* Create the address nodes for the current call.  This is not necessarily
@@ -335,7 +335,8 @@ checkalloca(loginfo *i, int f)
         else
         {
             b = (addrnode *) n->data.frame;
-            if ((b->data.next != NULL) && (a->data.next != NULL) &&
+            if ((b != NULL) && (b->data.next != NULL) &&
+                (a != NULL) && (a->data.next != NULL) &&
                 (((r = __mp_compareaddrs(b->data.next, a->data.next)) ==
                   SC_DIFFERENT) || (r == SC_SHALLOWER)))
                 c = 1;
