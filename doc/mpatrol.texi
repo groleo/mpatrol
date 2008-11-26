@@ -35,7 +35,7 @@
 @c Remember to change these after each revision!
 @set EDITION 2.15
 @set VERSION 1.5.0
-@set UPDATED 25th November, 2008
+@set UPDATED 26th November, 2008
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
@@ -1715,6 +1715,7 @@ since the address of the instruction must lie between the start and end of one
 of the functions in the process.
 
 @cindex MP_BUILTINSTACK_SUPPORT
+@cindex MP_GLIBCBACKTRACE_SUPPORT
 @cindex MP_LIBRARYSTACK_SUPPORT
 @cindex MP_LIBUNWIND_SUPPORT
 @cindex libunwind
@@ -1722,19 +1723,22 @@ There are several different ways to perform stack unwinding.  The first requires
 compiler support and uses builtin functions to determine the next stack frame
 and the return address.  The GNU C compiler, @command{gcc}, supports this but
 unfortunately the number of stack frames to traverse must be known at
-compile-time rather than run-time.  The second method requires operating system
-support, with a library of routines provided to perform call stack traversal.
-Unfortunately, such routines can be quite time consuming and may require a lot
-of resources, but on the other hand they are likely to be very reliable at
-obtaining the necessary information.  There is also support for using the
-libunwind library instead of such operating system libraries, which will be
-valuable as libunwind gradually supports more processor architectures.  The
-mpatrol library can be built to support either of these methods, with the
-@code{MP_BUILTINSTACK_SUPPORT}, @code{MP_LIBRARYSTACK_SUPPORT} or the
+compile-time rather than run-time.  The second method uses the glibc
+@code{backtrace()} function to perform the stack traversal but has a finite
+limit on the number of stack frames that can be traversed and does not return
+any frame pointers.  The third method requires operating system support, with a
+library of routines provided to perform call stack traversal.  Unfortunately,
+such routines can be quite time consuming and may require a lot of resources,
+but on the other hand they are likely to be very reliable at obtaining the
+necessary information.  There is also support for using the libunwind library
+instead of such operating system libraries, which will be valuable as libunwind
+gradually supports more processor architectures.  The mpatrol library can be
+built to support any of these methods, with the @code{MP_BUILTINSTACK_SUPPORT},
+@code{MP_GLIBCBACKTRACE_SUPPORT}, @code{MP_LIBRARYSTACK_SUPPORT} and the
 @code{MP_LIBUNWIND_SUPPORT} preprocessor macros.
 
 @cindex RISC
-A third way to perform stack unwinding involves reading (or effectively
+A fourth way to perform stack unwinding involves reading (or effectively
 disassembling) the instructions that are being executed in order to determine
 the size of the stack frame being used and the address of the instruction at
 which execution will resume when the function returns.  This can also be quite
@@ -11864,9 +11868,8 @@ The @option{OFLOWWATCH} option has no effect.
 The system exception-handling library (libexc) is used for call stack traversal.
 Unfortunately, this library makes several calls to @code{malloc()} when
 initialising itself and this can sometimes result in a recursive loop when used
-in combination with the mpatrol library.  If this occurs, either
-@code{MP_BUILTINSTACK_SUPPORT=1} or @code{MP_LIBUNWIND_SUPPORT=1} must be
-defined or the mpatrol library must be built without the @file{malloc.o} module.
+in combination with the mpatrol library.  If this occurs, the mpatrol library
+must be built without the @file{malloc.o} module.
 @item
 The mpatrol library can be compiled and run in a 64-bit environment.
 @end itemize
@@ -12172,7 +12175,9 @@ can be set by changing the @code{MP_MAXSTACK} macro in the same file.  The
 @code{MP_FULLSTACK} macro in @file{src/config.h} should be set for stack
 traversal implementations that have no limit to the maximum size of the call
 stack that can be traversed.  Obviously that is not the case for
-@code{MP_BUILTINSTACK_SUPPORT}.
+@code{MP_BUILTINSTACK_SUPPORT}.  A similar method can be used to traverse the
+stack using the @code{backtrace()} function from glibc with the
+@code{MP_GLIBCBACKTRACE_SUPPORT} preprocessor macro.
 
 Some operating systems have library functions that provide stack traversal
 facilities and so you may wish to make use of them by defining
@@ -12558,8 +12563,7 @@ a maximum number of stack frames that can be traversed at any one time.  The
 implementation depends on both of these builtin functions returning @samp{NULL}
 when the top of stack is reached.  If this is not the case then this method
 cannot be used or should only be used with a small number of fixed stack frames.
-However, perhaps there might even be a use for an option to limit the number of
-stack frames in stack tracebacks for systems that have no such limitation.
+However, using @code{backtrace()} from glibc is also supported as well.
 
 @item
 Is it worth adding functions to manually push and pop entries on the call stack
