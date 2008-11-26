@@ -49,7 +49,8 @@ extern int __mp_initsection;
 #endif /* MP_INIT_SUPPORT */
 
 
-#if !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT
 #if MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_HPUX
 void __mp_frameinfo(void *);
@@ -59,12 +60,12 @@ void __mp_frameinfo(void *);
 unsigned int __mp_stackpointer(void);
 unsigned int __mp_returnaddress(void);
 #elif ARCH == ARCH_SPARC
-#if SYSTEM == SYSTEM_SUNOS
+#if SYSTEM == SYSTEM_LINUX || SYSTEM == SYSTEM_SUNOS
 unsigned int __mp_stackpointer(void);
 #endif /* SYSTEM */
 #endif /* ARCH */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
 #ifdef __cplusplus

@@ -270,11 +270,11 @@ signalhandler(EXCEPTION_POINTERS *e)
      * need to invoke the __mp_newframe() function with the proper frame
      * pointer and explicitly display the first frame as well.
      */
-#if !MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT
+#if MP_LIBRARYSTACK_SUPPORT
     __mp_newframe(&i, (void *) e->ContextRecord);
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#else /* MP_LIBRARYSTACK_SUPPORT */
     __mp_newframe(&i, (void *) e->ContextRecord->Ebp);
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#endif /* MP_LIBRARYSTACK_SUPPORT */
     if (__mp_getframe(&i))
     {
         a = (void *) e->ContextRecord->Eip;

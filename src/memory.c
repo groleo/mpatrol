@@ -275,12 +275,13 @@ progname(void)
     char **e;
     char *t;
 #endif /* SYSTEM */
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
      ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     unsigned long *p;
     stackinfo s;
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #ifdef MP_PROCFS_EXENAME
     static char b[64];
 #endif /* MP_PROCFS_EXENAME */
@@ -345,7 +346,8 @@ progname(void)
     if (t != NULL)
         return t;
 #endif /* SYSTEM */
-#if !MP_BUILTINSTACK_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT && !MP_LIBRARYSTACK_SUPPORT && \
     (ARCH == ARCH_IX86 || ARCH == ARCH_M68K || ARCH == ARCH_MIPS || \
      ARCH == ARCH_POWER || ARCH == ARCH_POWERPC || ARCH == ARCH_SPARC)
     /* Because there is no function to return the executable filename
@@ -396,7 +398,7 @@ progname(void)
             return (char *) *p;
 #endif /* ARCH */
     }
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT && ARCH */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #ifdef MP_PROCFS_EXENAME
     /* If the /proc filesystem is supported then we can usually access the
      * actual executable file that contains the current program through a
