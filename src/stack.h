@@ -36,7 +36,7 @@
 #include "config.h"
 #include <stddef.h>
 #include <signal.h>
-#if !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT
 #if MP_LIBUNWIND_SUPPORT
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
@@ -44,10 +44,11 @@
 #include <windows.h>
 #include <imagehlp.h>
 #endif /* MP_LIBUNWIND_SUPPORT && MP_LIBRARYSTACK_SUPPORT && TARGET */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT */
 
 
-#if !MP_BUILTINSTACK_SUPPORT
+#if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
+    !MP_LIBUNWIND_SUPPORT
 #if MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_HPUX
 /* HP/UX provides functions to traverse the PA/RISC stack frames.  This
@@ -81,7 +82,7 @@ typedef struct frameinfo
 frameinfo;
 #endif /* TARGET && ARCH */
 #endif /* MP_LIBRARYSTACK_SUPPORT */
-#endif /* MP_BUILTINSTACK_SUPPORT */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 
 
 /* A stackinfo structure provides information about the currently selected
@@ -92,9 +93,12 @@ typedef struct stackinfo
 {
     void *frame;               /* current frame handle */
     void *addr;                /* current return address */
-#if MP_BUILTINSTACK_SUPPORT
+#if MP_BUILTINSTACK_SUPPORT || MP_GLIBCBACKTRACE_SUPPORT
     void *frames[MP_MAXSTACK]; /* array of frame pointers */
     void *addrs[MP_MAXSTACK];  /* array of return addresses */
+#if MP_GLIBCBACKTRACE_SUPPORT
+    size_t count;              /* number of stack frames */
+#endif /* MP_GLIBCBACKTRACE_SUPPORT */
     size_t index;              /* current stack index */
 #elif MP_LIBUNWIND_SUPPORT
     unw_context_t context;     /* current machine state */
@@ -109,13 +113,13 @@ typedef struct stackinfo
 #elif TARGET == TARGET_WINDOWS
     STACKFRAME next;           /* next frame handle */
 #endif /* TARGET */
-#else /* MP_BUILTINSTACK_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
+#else /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
 #if TARGET == TARGET_UNIX && ARCH == ARCH_MIPS
     struct frameinfo next;     /* next frame handle */
 #else /* TARGET && ARCH */
     void *next;                /* next frame handle */
 #endif /* TARGET && ARCH */
-#endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT && ... */
+#endif /* MP_BUILTINSTACK_SUPPORT && MP_GLIBCBACKTRACE_SUPPORT && ... */
     void *first;               /* first frame information */
 }
 stackinfo;
