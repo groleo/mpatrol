@@ -238,13 +238,22 @@
     defined(__ALPHA__) || defined(alpha) || defined(_alpha) || \
     defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 #define ARCH ARCH_ALPHA
+#define ENVIRON ENVIRON_64
 #elif defined(arm) || defined(_arm) || defined(__arm) || defined(__arm__) || \
       defined(ARM) || defined(_ARM) || defined(__ARM) || defined(__ARM__)
 #define ARCH ARCH_ARM
+#define ENVIRON ENVIRON_32
 #elif defined(ia64) || defined(_ia64) || defined(__ia64) || \
       defined(__a64__) || defined(IA64) || defined(_IA64) || \
       defined(__IA64) || defined(__IA64__) || defined(_M_IA64)
 #define ARCH ARCH_IA64
+#define ENVIRON ENVIRON_64
+#elif defined(amd64) || defined(_amd64) || defined(__amd64) || \
+      defined(__amd64__) || defined(AMD64) || defined(_AMD64) || \
+      defined(__AMD64) || defined(__AMD64__) || defined(x86_64) || \
+      defined(_x86_64) || defined(__x86_64) || defined(__x86_64__)
+#define ARCH ARCH_IX86
+#define ENVIRON ENVIRON_64
 #elif defined(i386) || defined(_i386) || defined(__i386) || \
       defined(__i386__) || defined(I386) || defined(_I386) || \
       defined(__I386) || defined(__I386__) || defined(ix86) || \
@@ -252,15 +261,18 @@
       defined(x86) || defined(_x86) || defined(__x86) || defined(__x86__) || \
       defined(_M_IX86)
 #define ARCH ARCH_IX86
+#define ENVIRON ENVIRON_32
 #elif defined(m68k) || defined(_m68k) || defined(__m68k) || \
       defined(__m68k__) || defined(mc68000) || defined(_mc68000) || \
       defined(__mc68000) || defined(__mc68000__) || defined(M68000) || \
       defined(_M68000) || defined(__M68000) || defined(__M68000__)
 #define ARCH ARCH_M68K
+#define ENVIRON ENVIRON_32
 #elif defined(m88k) || defined(_m88k) || defined(__m88k) || \
       defined(__m88k__) || defined(m88000) || defined(_m88000) || \
       defined(__m88000) || defined(__m88000__)
 #define ARCH ARCH_M88K
+#define ENVIRON ENVIRON_32
 #elif defined(mips) || defined(_mips) || defined(__mips) || \
       defined(__mips__) || defined(_M_MRX000)
 #define ARCH ARCH_MIPS
@@ -269,14 +281,20 @@
 #elif defined(POWER) || defined(_POWER) || defined(__POWER) || \
       defined(__POWER__)
 #define ARCH ARCH_POWER
+#define ENVIRON ENVIRON_32
 #elif defined(ppc) || defined(_ppc) || defined(__ppc) || defined(__ppc__) || \
       defined(powerpc) || defined(_powerpc) || defined(__powerpc) || \
       defined(__powerpc__) || defined(POWERPC) || defined(_POWERPC) || \
       defined(__POWERPC) || defined(__POWERPC__) || defined(_M_PPC)
 #define ARCH ARCH_POWERPC
+#elif defined(sparcv9) || defined(_sparcv9) || defined(__sparcv9) || \
+      defined(__sparcv9__)
+#define ARCH ARCH_SPARC
+#define ENVIRON ENVIRON_64
 #elif defined(sparc) || defined(_sparc) || defined(__sparc) || \
       defined(__sparc__)
 #define ARCH ARCH_SPARC
+#define ENVIRON ENVIRON_32
 #else /* ARCH */
 #define ARCH ARCH_ANY
 #endif /* ARCH */
@@ -332,22 +350,17 @@
 #define ENVIRON ENVIRON_ANY
 #endif /* SIZEOF_VOID_P */
 #else /* HAVE_CONFIG_H && SIZEOF_VOID_P */
-#if ARCH == ARCH_ALPHA || ARCH == ARCH_IA64
+#if defined(_ILP32)
+#define ENVIRON ENVIRON_32
+#elif defined(_LP64)
 #define ENVIRON ENVIRON_64
-#else /* ARCH */
+#else /* _ILP32 && _LP64 */
 #if SYSTEM == SYSTEM_IRIX
 #if defined(ABI64) || defined(_ABI64)
 #define ENVIRON ENVIRON_64
 #else /* ABI64 */
 #define ENVIRON ENVIRON_32
 #endif /* ABI64 */
-#elif SYSTEM == SYSTEM_SOLARIS
-#if defined(sparcv9) || defined(_sparcv9) || defined(__sparcv9) || \
-    defined(__sparcv9__)
-#define ENVIRON ENVIRON_64
-#else /* sparcv9 */
-#define ENVIRON ENVIRON_32
-#endif /* sparcv9 */
 #elif SYSTEM == SYSTEM_TRU64
 #if defined(arch64) || defined(_arch64) || defined(__arch64) || \
     defined(__arch64__)
@@ -358,7 +371,7 @@
 #else /* SYSTEM */
 #define ENVIRON ENVIRON_32
 #endif /* SYSTEM */
-#endif /* ARCH */
+#endif /* _ILP32 && _LP64 */
 #endif /* HAVE_CONFIG_H && SIZEOF_VOID_P */
 #endif /* ENVIRON */
 
