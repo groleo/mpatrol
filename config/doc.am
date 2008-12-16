@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: doc.am,v 1.5 2008-07-17 12:17:34 groy Exp $
+## $Id$
 
 
 SUBDIRS = images

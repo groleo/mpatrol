@@ -19,7 +19,7 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl Process this file with autoconf to produce a configure script
 
 
-dnl $Id: configure.in,v 1.16 2008-07-17 12:19:13 groy Exp $
+dnl $Id$
 
 
 dnl Initialisation.

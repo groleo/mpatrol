@@ -19,7 +19,7 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl Automake macro to build with the mpatrol library
 
 
-dnl $Id: mpatrol.m4,v 1.8 2008-07-17 13:23:28 groy Exp $
+dnl $Id$
 
 
 # serial 1

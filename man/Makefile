@@ -19,7 +19,7 @@
 # GNU Makefile to build the UNIX manual pages
 
 
-# $Id: Makefile,v 1.25 2008-07-17 13:30:17 groy Exp $
+# $Id$
 
 
 # Definitions

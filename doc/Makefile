@@ -19,7 +19,7 @@
 # GNU Makefile to build all formats of documentation
 
 
-# $Id: Makefile,v 1.52 2008-07-17 12:27:33 groy Exp $
+# $Id$
 
 
 # Definitions

@@ -19,7 +19,7 @@
 # Magic data file for use with the file command
 
 
-# $Id: magic,v 1.8 2008-07-17 13:23:27 groy Exp $
+# $Id$
 
 
 0	string	@(#)\ mpatrol	mpatrol log file (UNIX)

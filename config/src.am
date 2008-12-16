@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: src.am,v 1.10 2008-07-17 12:17:35 groy Exp $
+## $Id$
 
 
 INCLUDES = $(X_CFLAGS)
