@@ -34,8 +34,8 @@
 
 @c Remember to change these after each revision!
 @set EDITION 2.15
-@set VERSION 1.5.0
-@set UPDATED 26th November, 2008
+@set VERSION 1.5.1
+@set UPDATED 16th December, 2008
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
@@ -6146,7 +6146,7 @@ and the program should be executed, generating the following output in
 @file{mpatrol.log}.
 
 @smallexample
-@@(#) mpatrol 1.5.0 (08/07/17)
+@@(#) mpatrol 1.5.1 (08/12/16)
 Copyright (C) 1997-2008 Graeme S. Roy
 
 This is free software, and you are welcome to redistribute it under
@@ -6163,7 +6163,7 @@ processor word size:    32-bit
 object file format:     BFD
 dynamic linker type:    SVR4
 
-Log file generated on Thu Jul 17 13:01:17 2008
+Log file generated on Tue Dec 16 10:10:12 2008
 
 read 310 symbols from /usr/lib/libmpatrol.so.1.5
 read 647 symbols from /usr/lib/libbfd-2.9.5.0.22.so
