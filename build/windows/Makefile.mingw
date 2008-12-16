@@ -19,7 +19,7 @@
 # GNU Makefile to compile on Windows with GNU C++
 
 
-# $Id: Makefile.mingw,v 1.4 2008-07-17 12:10:40 groy Exp $
+# $Id$
 
 
 # Definitions

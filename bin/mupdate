@@ -23,7 +23,7 @@
 # release archive - this file should be used for administrative purposes only
 
 
-# $Id: mupdate,v 1.23 2008-07-17 11:47:00 groy Exp $
+# $Id$
 
 
 # Read the old release version and release date from the VERSION file.

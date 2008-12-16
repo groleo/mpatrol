@@ -19,7 +19,7 @@
 # Microsoft Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: NMakefile,v 1.61 2008-07-17 12:10:40 groy Exp $
+# $Id$
 
 
 # Definitions

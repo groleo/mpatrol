@@ -19,7 +19,7 @@
 # SAS/C Makefile to compile on AmigaOS with SAS/C
 
 
-# $Id: SMakefile,v 1.65 2008-07-17 12:07:44 groy Exp $
+# $Id$
 
 
 # Definitions

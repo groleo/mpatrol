@@ -19,7 +19,7 @@
 # GNU Makefile to compile on AmigaOS with GNU C++
 
 
-# $Id: Makefile,v 1.66 2008-07-17 12:07:44 groy Exp $
+# $Id$
 
 
 # Definitions

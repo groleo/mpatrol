@@ -19,7 +19,7 @@
 # GNU Makefile to compile on Windows with Microsoft Visual C++
 
 
-# $Id: Makefile,v 1.73 2008-07-17 12:10:40 groy Exp $
+# $Id$
 
 
 # Definitions

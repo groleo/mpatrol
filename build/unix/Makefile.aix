@@ -19,7 +19,7 @@
 # GNU Makefile to compile on AIX with CC
 
 
-# $Id: Makefile.aix,v 1.36 2008-07-17 12:07:46 groy Exp $
+# $Id$
 
 
 # Definitions

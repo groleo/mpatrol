@@ -19,7 +19,7 @@
 # GNU Makefile to compile on UNIX with GNU C++
 
 
-# $Id: Makefile,v 1.84 2008-07-17 12:07:46 groy Exp $
+# $Id$
 
 
 # Definitions
