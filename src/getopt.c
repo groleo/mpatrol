@@ -35,9 +35,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: getopt.c,v 1.21 2008-07-17 11:32:48 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *getopt_id = "$Id: getopt.c,v 1.21 2008-07-17 11:32:48 groy Exp $";
+static MP_CONST MP_VOLATILE char *getopt_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

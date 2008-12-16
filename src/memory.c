@@ -79,9 +79,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: memory.c,v 1.64 2008-07-17 11:32:50 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *memory_id = "$Id: memory.c,v 1.64 2008-07-17 11:32:50 groy Exp $";
+static MP_CONST MP_VOLATILE char *memory_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

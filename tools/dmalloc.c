@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: dmalloc.c,v 1.20 2008-07-17 11:38:47 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id: dmalloc.c,v 1.20 2008-07-17 11:38:47 groy Exp $";
+static MP_CONST MP_VOLATILE char *dmalloc_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

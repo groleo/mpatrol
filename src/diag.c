@@ -47,9 +47,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: diag.c,v 1.114 2008-07-17 11:32:48 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *diag_id = "$Id: diag.c,v 1.114 2008-07-17 11:32:48 groy Exp $";
+static MP_CONST MP_VOLATILE char *diag_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

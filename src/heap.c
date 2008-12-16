@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: heap.c,v 1.18 2008-07-17 11:32:48 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *heap_id = "$Id: heap.c,v 1.18 2008-07-17 11:32:48 groy Exp $";
+static MP_CONST MP_VOLATILE char *heap_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

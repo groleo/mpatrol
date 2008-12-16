@@ -65,9 +65,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: stack.c,v 1.35 2008-07-17 11:32:53 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *stack_id = "$Id: stack.c,v 1.35 2008-07-17 11:32:53 groy Exp $";
+static MP_CONST MP_VOLATILE char *stack_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

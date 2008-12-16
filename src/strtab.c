@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: strtab.c,v 1.21 2008-07-17 11:32:53 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *strtab_id = "$Id: strtab.c,v 1.21 2008-07-17 11:32:53 groy Exp $";
+static MP_CONST MP_VOLATILE char *strtab_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

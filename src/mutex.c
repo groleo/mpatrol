@@ -47,9 +47,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mutex.c,v 1.22 2008-07-17 11:32:52 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mutex_id = "$Id: mutex.c,v 1.22 2008-07-17 11:32:52 groy Exp $";
+static MP_CONST MP_VOLATILE char *mutex_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

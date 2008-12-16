@@ -29,9 +29,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: graph.c,v 1.10 2008-07-17 11:32:48 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *graph_id = "$Id: graph.c,v 1.10 2008-07-17 11:32:48 groy Exp $";
+static MP_CONST MP_VOLATILE char *graph_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 
