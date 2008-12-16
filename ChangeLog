@@ -1,3 +1,50 @@
+2008-11-27  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/target.h: Added detection of 64-bit x86 processors.
+
+2008-11-26  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* doc/mpatrol.texi: Mentioned using backtrace() from glibc.
+
+2008-11-26  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/memory.c, src/machine.c, src/machine.h, src/stack.c, src/stack.h,
+	  src/signals.c:
+	Added support for backtrace() and libunwind.
+
+2008-11-26  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/config.h:
+	Added the MP_GLIBCBACKTRACE_SUPPORT feature and made it the default
+	for 64-bit x86 Linux systems.
+
+2008-11-26  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/inter.c: Various fixes for checkalloca().  Courtesy of Daniel
+	Jacobowitz.
+
+2008-11-26  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/addr.c:
+	Moved the backup copy of the call stack context to a more appropriate
+	position within __mp_getaddrs().  Courtesy of Daniel Jacobowitz.
+
+2008-11-25  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* THANKS, doc/mpatrol.texi, extra/mpatrol.m4, man/man3/libmpatrol.3,
+	  src/config.h, src/stack.c, src/stack.h, src/inter.c:
+	Added support for using libunwind for call stack traversal. Turn on
+	with the macro MP_LIBUNWIND_SUPPORT when building mpatrol.  This has
+	been made the default for ARM and IA64 processors.  Courtesy of Daniel
+	Jacobowitz.
+
+2008-11-25  Graeme Roy  <graemeroy@users.sourceforge.net>
+
+	* src/symbol.c:
+	Added support for reading external debugging files created by gcc and
+	now use dl_iterate_phdr() on Linux to read the dynamic linker data
+	structures rather than _DYNAMIC.  Courtesy of Daniel Jacobowitz.
+
 2008-07-17  Graeme Roy  <graemeroy@users.sourceforge.net>
 
 	* doc/mpatrol.texi:
