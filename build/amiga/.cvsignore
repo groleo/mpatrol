@@ -1,9 +1,0 @@
-.cvsignore
-*.o
-*.a
-*.lib
-*.lnk
-mpatrol
-mprof
-mptrace
-mleak
