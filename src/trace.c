@@ -34,9 +34,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: trace.c,v 1.24 2008-07-17 11:32:53 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *trace_id = "$Id: trace.c,v 1.24 2008-07-17 11:32:53 groy Exp $";
+static MP_CONST MP_VOLATILE char *trace_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

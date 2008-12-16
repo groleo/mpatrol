@@ -29,9 +29,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: malloc.c,v 1.36 2008-07-17 11:32:50 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *malloc_id = "$Id: malloc.c,v 1.36 2008-07-17 11:32:50 groy Exp $";
+static MP_CONST MP_VOLATILE char *malloc_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

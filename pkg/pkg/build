@@ -22,7 +22,7 @@
 # UNIX shell script to build a PKG package file
 
 
-# $Id: build,v 1.80 2008-07-17 13:57:23 groy Exp $
+# $Id$
 
 
 version=1.5.1

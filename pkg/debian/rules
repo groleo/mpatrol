@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# $Id: rules,v 1.5 2008-07-17 13:46:22 groy Exp $
+# $Id$
 
 # Uncomment this to turn on verbose mode.
 # export DH_VERBOSE=1

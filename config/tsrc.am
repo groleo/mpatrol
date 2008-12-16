@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: tsrc.am,v 1.8 2008-07-17 12:17:35 groy Exp $
+## $Id$
 
 
 INCLUDES = -DMP_THREADS_SUPPORT

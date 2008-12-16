@@ -19,7 +19,7 @@
 # ksh/bash shell script for use with mpatrol
 
 
-# $Id: .profile,v 1.5 2008-07-17 13:23:27 groy Exp $
+# $Id$
 
 
 # Set mpatrol library options in the current shell environment.

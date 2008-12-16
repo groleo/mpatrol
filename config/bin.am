@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: bin.am,v 1.6 2008-07-17 12:17:34 groy Exp $
+## $Id$
 
 
 bin_SCRIPTS = mpsym mpedit hexwords

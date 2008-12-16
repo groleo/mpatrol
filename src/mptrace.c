@@ -42,9 +42,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mptrace.c,v 1.33 2008-07-17 11:32:52 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mptrace_id = "$Id: mptrace.c,v 1.33 2008-07-17 11:32:52 groy Exp $";
+static MP_CONST MP_VOLATILE char *mptrace_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

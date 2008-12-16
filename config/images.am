@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: images.am,v 1.5 2008-07-17 12:17:35 groy Exp $
+## $Id$
 
 
 EXTRA_DIST = mpatrol.eps test.eps gcc.eps cpp.eps cc1.eps collect2.eps \

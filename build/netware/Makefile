@@ -19,7 +19,7 @@
 # GNU Makefile to compile on Windows with EPC C++ Netware Cross-Compiler
 
 
-# $Id: Makefile,v 1.63 2008-07-17 12:07:45 groy Exp $
+# $Id$
 
 
 # Definitions

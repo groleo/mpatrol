@@ -31,9 +31,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mpcalloc.c,v 1.10 2008-07-17 11:32:50 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mpcalloc_id = "$Id: mpcalloc.c,v 1.10 2008-07-17 11:32:50 groy Exp $";
+static MP_CONST MP_VOLATILE char *mpcalloc_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

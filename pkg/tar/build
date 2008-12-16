@@ -22,7 +22,7 @@
 # UNIX shell script to build a tar distribution file
 
 
-# $Id: build,v 1.73 2008-07-17 14:02:17 groy Exp $
+# $Id$
 
 
 version=1.5.1

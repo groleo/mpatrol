@@ -17,7 +17,7 @@
 @c You should have received a copy of the GNU Lesser General Public License
 @c along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-@c $Id: mpatrol.texi,v 1.279 2008-07-17 13:19:25 groy Exp $
+@c $Id$
 
 @c %**start of header
 @setfilename mpatrol.info
@@ -13972,20 +13972,15 @@ platforms which require the assembler routines in @file{machine.c} cannot build
 the mpatrol library as one large object file from @file{library.c}.  Note that
 the Windows and Netware @file{Makefile}s use @file{libmpatrol.obj}.
 
-@cindex CVS
-@cindex .cvsignore
+@cindex Subversion
 @item
-What are the @file{CVS} subdirectories that come with the mpatrol distribution?
+What are the @file{.svn} subdirectories that come with the mpatrol distribution?
 
-CVS stands for Concurrent Versions System and is a project version control
-system.  All of the source files that comprise an mpatrol release are stored in
-a central CVS repository so that previous releases can be easily retrieved, but
-the CVS system needs to have a way of determining the versions of currently
-checked-out files, hence the @file{CVS} subdirectories.  The @file{.cvsignore}
-files within these directories simply inform CVS about which files to ignore
-when looking for changes.  You shouldn't need to worry about them, so just
-ignore them, and in later releases they should have been removed before a
-distribution was made.
+SVN is short for Subversion and is a project version control system.  All of
+the source files that comprise an mpatrol release are stored in a central
+Subversion repository so that previous releases can be easily retrieved, but
+the Subversion system needs to have a way of determining the versions of
+currently checked-out files, hence the @file{.svn} subdirectories.
 
 @item
 Why does the @command{mpsym} command not work for me?

@@ -19,7 +19,7 @@
 # GDB command file for use with mpatrol
 
 
-# $Id: .gdbinit,v 1.10 2008-07-17 13:23:27 groy Exp $
+# $Id$
 
 
 # Set mpatrol library options in the current process environment.

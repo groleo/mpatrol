@@ -23,7 +23,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: cleanup,v 1.17 2008-07-17 13:43:01 groy Exp $
+# $Id$
 
 
 rm -f README AUTHORS THANKS COPYING COPYING.LESSER NEWS ChangeLog

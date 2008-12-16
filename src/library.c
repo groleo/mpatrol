@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: library.c,v 1.14 2008-07-17 11:32:49 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *library_id = "$Id: library.c,v 1.14 2008-07-17 11:32:49 groy Exp $";
+static MP_CONST MP_VOLATILE char *library_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

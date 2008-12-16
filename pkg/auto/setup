@@ -23,7 +23,7 @@
 # GNU autoconf, automake and libtool.
 
 
-# $Id: setup,v 1.21 2008-07-17 13:43:01 groy Exp $
+# $Id$
 
 
 uselinks=0

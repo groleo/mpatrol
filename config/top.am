@@ -19,7 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 
-## $Id: top.am,v 1.7 2008-07-17 12:17:35 groy Exp $
+## $Id$
 
 
 SUBDIRS = bin doc extra man src tsrc tools

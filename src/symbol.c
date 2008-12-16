@@ -134,9 +134,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: symbol.c,v 1.70 2008-07-17 11:32:53 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *symbol_id = "$Id: symbol.c,v 1.70 2008-07-17 11:32:53 groy Exp $";
+static MP_CONST MP_VOLATILE char *symbol_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

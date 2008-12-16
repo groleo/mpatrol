@@ -30,9 +30,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: mprealloc.c,v 1.10 2008-07-17 11:32:51 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *mprealloc_id = "$Id: mprealloc.c,v 1.10 2008-07-17 11:32:51 groy Exp $";
+static MP_CONST MP_VOLATILE char *mprealloc_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 

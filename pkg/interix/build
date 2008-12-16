@@ -22,7 +22,7 @@
 # UNIX shell script to build an Interix package file
 
 
-# $Id: build,v 1.5 2008-07-17 13:50:52 groy Exp $
+# $Id$
 
 
 version=1.5.1

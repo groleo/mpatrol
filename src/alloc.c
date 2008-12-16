@@ -32,9 +32,9 @@
 
 
 #if MP_IDENT_SUPPORT
-#ident "$Id: alloc.c,v 1.22 2008-07-17 11:32:47 groy Exp $"
+#ident "$Id$"
 #else /* MP_IDENT_SUPPORT */
-static MP_CONST MP_VOLATILE char *alloc_id = "$Id: alloc.c,v 1.22 2008-07-17 11:32:47 groy Exp $";
+static MP_CONST MP_VOLATILE char *alloc_id = "$Id$";
 #endif /* MP_IDENT_SUPPORT */
 
 
