@@ -22,7 +22,7 @@
 # UNIX shell script to build a SD/UX package file
 
 
-# $Id: build,v 1.41 2008-07-17 14:01:23 groy Exp $
+# $Id$
 
 
 version=1.5.1

@@ -19,7 +19,7 @@
 # RPM package specification file
 
 
-# $Id: mpatrol.spec,v 1.79 2008-07-17 13:58:37 groy Exp $
+# $Id$
 
 
 %define libversion 1.5

@@ -22,7 +22,7 @@
 # UNIX shell script to build source and binary tar distribution files
 
 
-# $Id: build,v 1.6 2008-07-17 13:43:01 groy Exp $
+# $Id$
 
 
 arch=i386

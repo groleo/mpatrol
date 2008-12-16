@@ -19,7 +19,7 @@
 # PKG package file list
 
 
-# $Id: prototype,v 1.57 2008-07-17 13:57:23 groy Exp $
+# $Id$
 
 
 d none bin 0775 bin bin

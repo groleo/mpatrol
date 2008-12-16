@@ -22,7 +22,7 @@ rem along with this program.  If not, see <http://www.gnu.org/licenses/>.
 rem DOS batch file to build a zip distribution file
 
 
-rem $Id: build.bat,v 1.54 2008-07-17 14:03:35 groy Exp $
+rem $Id$
 
 
 set version=1.5.1

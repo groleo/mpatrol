@@ -22,7 +22,7 @@
 # UNIX shell script to build a Debian package file
 
 
-# $Id: build,v 1.7 2008-07-17 13:46:21 groy Exp $
+# $Id$
 
 
 arch=i386

@@ -19,7 +19,7 @@
 # PKG package specification file
 
 
-# $Id: pkginfo,v 1.36 2008-07-17 13:57:23 groy Exp $
+# $Id$
 
 
 PKG=GSRmptrl

@@ -22,7 +22,7 @@
 # UNIX shell script to build an RPM package file
 
 
-# $Id: build,v 1.38 2008-07-17 13:58:37 groy Exp $
+# $Id$
 
 
 arch=i386
