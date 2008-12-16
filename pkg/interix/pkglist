@@ -23,7 +23,7 @@
 @comment $Id: pkglist,v 1.5 2008-07-17 13:50:52 groy Exp $
 
 
-@name mpatrol-1.5.0-bin
+@name mpatrol-1.5.1-bin
 @mode 0775
 bin/mpatrol
 bin/mprof

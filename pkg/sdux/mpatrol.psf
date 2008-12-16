@@ -25,7 +25,7 @@
 product
     tag				mpatrol
     title			"mpatrol library"
-    revision			1.5.0
+    revision			1.5.1
     category			language
     category_title		"Languages"
     description			"The mpatrol library for controlling and tracing dynamic memory allocations."

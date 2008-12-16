@@ -25,7 +25,7 @@ rem DOS batch file to build a zip distribution file
 rem $Id: build.bat,v 1.54 2008-07-17 14:03:35 groy Exp $
 
 
-set version=1.5.0
+set version=1.5.1
 
 
 rem Build the mpatrol library.
