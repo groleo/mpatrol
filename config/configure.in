@@ -27,7 +27,7 @@ dnl Initialisation.
 AC_REVISION($Revision: 1.16 $)
 AC_INIT(src/mpatrol.h)
 AM_CONFIG_HEADER(configure.h)
-AM_INIT_AUTOMAKE(mpatrol, 1.5.0)
+AM_INIT_AUTOMAKE(mpatrol, 1.5.1)
 
 
 dnl Checks for programs.
