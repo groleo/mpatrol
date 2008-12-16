@@ -45,19 +45,19 @@ extern "C"
 
 /* SCCS identification string and American date format.
  */
-MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (08/07/17)";
+MP_GLOBAL char *__mp_version = "@(#) " MP_VERSION " (08/12/16)";
 
 #elif TARGET == TARGET_AMIGA
 
 /* Amiga identification string and European date format.
  */
-MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (17.07.08)";
+MP_GLOBAL char *__mp_version = "$VER: " MP_VERSION " (16.12.08)";
 
 #else /* TARGET */
 
 /* No identification string and English date format.
  */
-MP_GLOBAL char *__mp_version = MP_VERSION " (17 July 2008)";
+MP_GLOBAL char *__mp_version = MP_VERSION " (16 December 2008)";
 
 #endif /* TARGET */
 

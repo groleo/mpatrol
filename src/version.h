@@ -40,13 +40,13 @@
  * and ff represents the bug fix count.
  */
 
-#define MP_VERNUM 10500
+#define MP_VERNUM 10501
 
 
 /* The version string for the mpatrol library.
  */
 
-#define MP_VERSION "mpatrol 1.5.0"
+#define MP_VERSION "mpatrol 1.5.1"
 
 
 #ifdef __cplusplus
