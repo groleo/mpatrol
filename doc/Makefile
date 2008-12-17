@@ -102,7 +102,7 @@ else
 	@ makeinfo --html --number-sections --output pages $<
 endif
 	@ echo "<html><head>mpatrol</head><body>" >$@
-	@ echo "<a href="pages/index.html">documentation</a>" >>$@
+	@ echo "<a href="pages/index.html#Top">documentation</a>" >>$@
 	@ echo "</body></html>" >>$@
 else
 ifeq ($(VERBOSE),true)
