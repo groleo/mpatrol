@@ -33,9 +33,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.15
+@set EDITION 2.16
 @set VERSION 1.5.1
-@set UPDATED 16th December, 2008
+@set UPDATED 17th December, 2008
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
@@ -160,7 +160,7 @@ This is edition @value{EDITION} of the mpatrol manual for version
 * About the author::            Information about me.
 * Copying::                     GNU GPL and GNU Lesser GPL.
 * Function index::              Library functions.
-* Index::                       Main index.
+* Main index::                  Main index.
 @end menu
 
 @node Foreword, Overview, Top, Top
@@ -16871,13 +16871,13 @@ permanent authorization for you to choose that version for the
 Library.
 @end smallexample
 
-@node Function index, Index, Copying, Top
+@node Function index, Main index, Copying, Top
 @unnumbered Function index
 
 @printindex fn
 
-@node Index, , Function index, Top
-@unnumbered Index
+@node Main index, , Function index, Top
+@unnumbered Main index
 
 @printindex cp
 
