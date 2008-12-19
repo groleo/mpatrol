@@ -160,9 +160,9 @@ endif
 $(REFCARD).ps: $(REFCARD).dvi
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ dvips -tlandscape -Ppdf -o $@ $<
+	@ dvips -ta4 -tlandscape -Ppdf -o $@ $<
 else
-	@ dvips -tlandscape -Ppdf -q -o $@ $<
+	@ dvips -ta4 -tlandscape -Ppdf -q -o $@ $<
 endif
 
 # Build the PDF reference card from the postscript file using pstill
