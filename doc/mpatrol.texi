@@ -91,7 +91,7 @@ library are the trademarks of their respective owners.
 @image{images/mpatrol}
 @end ifnottex
 @iftex
-@image{images/mpatrol_hi}
+@center @image{images/mpatrol_hi}
 @end iftex
 @author Graeme S. Roy
 @page
@@ -126,7 +126,7 @@ library are the trademarks of their respective owners.
 @image{images/mpatrol}
 @end ifnottex
 @iftex
-@image{images/mpatrol_hi}
+@center @image{images/mpatrol_hi}
 @end iftex
 @end ifset
 
@@ -4647,7 +4647,7 @@ options.
 @image{images/test}
 @end ifnottex
 @iftex
-@image{images/test_hi}
+@center @image{images/test_hi}
 @end iftex
 @end ifset
 
@@ -4745,7 +4745,7 @@ bash$ dot -Tps -Gsize="4,3" -Gratio=fill -o collect2.ps collect2.dot
 @image{images/gcc}
 @end ifnottex
 @iftex
-@image{images/gcc_hi}
+@center @image{images/gcc_hi}
 @end iftex
 
 The figure above shows the allocation call graph for the @command{gcc} compiler
@@ -4765,7 +4765,7 @@ both of these types of routines throughout the following graphs.
 @image{images/cpp}
 @end ifnottex
 @iftex
-@image{images/cpp_hi}
+@center @image{images/cpp_hi}
 @end iftex
 
 As would be expected, in the above allocation call graph for the @command{cpp}
@@ -4795,14 +4795,14 @@ initiated with @code{rest_of_compilation()}.
 @image{images/cc1}
 @end ifnottex
 @iftex
-@image{images/cc1_hi}
+@center @image{images/cc1_hi}
 @end iftex
 
 @ifnottex
 @image{images/collect2}
 @end ifnottex
 @iftex
-@image{images/collect2_hi}
+@center @image{images/collect2_hi}
 @end iftex
 
 The allocation call graph for the prelinker, @command{collect2}, is a lot
@@ -5240,7 +5240,7 @@ generated using the @option{--space 2} option.
 @image{images/trace}
 @end ifnottex
 @iftex
-@image{images/trace_hi}
+@center @image{images/trace_hi}
 @end iftex
 
 Areas coloured blue indicate heap memory that has not yet been used by the
