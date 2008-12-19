@@ -28,11 +28,10 @@ SHELL = /bin/sh
 
 DOCUMENT = mpatrol
 REFCARD  = refcard
-SOURCE	 = source
+SOURCE   = source
 
-SPLIT      = false
-THUMBNAILS = true
-VERBOSE    = false
+SPLIT   = false
+VERBOSE = false
 
 
 # Rules
@@ -145,17 +144,6 @@ ifeq ($(VERBOSE),true)
 else
 	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
 endif
-ifeq ($(THUMBNAILS),true)
-ifeq ($(VERBOSE),true)
-	@ thumbpdf --verbose $@
-	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
-	-@ rm -f $(DOCUMENT).tpt >/dev/null 2>&1
-else
-	@ thumbpdf --quiet $@
-	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
-	-@ rm -f $(DOCUMENT).tpt >/dev/null 2>&1
-endif
-endif
 
 # Build the DVI reference card from the LaTeX file using texi2dvi
 
@@ -226,17 +214,6 @@ ifeq ($(VERBOSE),true)
 	@ texi2dvi --language=latex --pdf --batch --clean --verbose $<
 else
 	@ texi2dvi --language=latex --pdf --batch --clean --quiet $<
-endif
-ifeq ($(THUMBNAILS),true)
-ifeq ($(VERBOSE),true)
-	@ thumbpdf --verbose $@
-	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --verbose $<
-	-@ rm -f $(SOURCE).tpt >/dev/null 2>&1
-else
-	@ thumbpdf --quiet $@
-	@ TEXPSHEADERS=`pwd`: texi2dvi --language=latex --pdf --batch --clean --quiet $<
-	-@ rm -f $(SOURCE).tpt >/dev/null 2>&1
-endif
 endif
 	-@ rm -rf bin src tools >/dev/null 2>&1
 
