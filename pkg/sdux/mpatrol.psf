@@ -65,26 +65,26 @@ product
 	directory		mpatrol/doc/mpatrol/images=/usr/local/doc/mpatrol/images
 	file			mpatrol.txt
 	file			mpatrol.jpg
-	file			mpatrol.eps
-	file			mpatrol.pdf
+	file			mpatrol_hi.eps
+	file			mpatrol_hi.pdf
 	file			test.jpg
-	file			test.eps
-	file			test.pdf
+	file			test_hi.eps
+	file			test_hi.pdf
 	file			gcc.jpg
-	file			gcc.eps
-	file			gcc.pdf
+	file			gcc_hi.eps
+	file			gcc_hi.pdf
 	file			cpp.jpg
-	file			cpp.eps
-	file			cpp.pdf
+	file			cpp_hi.eps
+	file			cpp_hi.pdf
 	file			cc1.jpg
-	file			cc1.eps
-	file			cc1.pdf
+	file			cc1_hi.eps
+	file			cc1_hi.pdf
 	file			collect2.jpg
-	file			collect2.eps
-	file			collect2.pdf
+	file			collect2_hi.eps
+	file			collect2_hi.pdf
 	file			trace.jpg
-	file			trace.eps
-	file			trace.pdf
+	file			trace_hi.eps
+	file			trace_hi.pdf
 	directory		mpatrol/doc/mpatrol/html=/usr/local/doc/mpatrol/html
 	file			mpatrol.html
 	file			mprof.html

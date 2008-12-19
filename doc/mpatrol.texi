@@ -33,9 +33,9 @@
 @end direntry
 
 @c Remember to change these after each revision!
-@set EDITION 2.16
+@set EDITION 2.17
 @set VERSION 1.5.1
-@set UPDATED 17th December, 2008
+@set UPDATED 19th December, 2008
 
 @c Flags to determine when images should be included
 @clear TITLEIMAGES
@@ -87,7 +87,12 @@ library are the trademarks of their respective owners.
 @subtitle Edition @value{EDITION} for mpatrol version @value{VERSION}
 @subtitle @value{UPDATED}
 @sp 5
+@ifnottex
 @image{images/mpatrol}
+@end ifnottex
+@iftex
+@image{images/mpatrol_hi}
+@end iftex
 @author Graeme S. Roy
 @page
 @vskip 0pt plus 1filll
@@ -117,7 +122,12 @@ library are the trademarks of their respective owners.
 @top mpatrol
 
 @ifset TITLEIMAGES
+@ifnottex
 @image{images/mpatrol}
+@end ifnottex
+@iftex
+@image{images/mpatrol_hi}
+@end iftex
 @end ifset
 
 This document describes mpatrol, a library for controlling and tracing dynamic
@@ -4633,7 +4643,12 @@ The following graph illustrates the use of these options with the above example.
 It was generated using the @option{--addresses} and @option{--graph-file}
 options.
 
+@ifnottex
 @image{images/test}
+@end ifnottex
+@iftex
+@image{images/test_hi}
+@end iftex
 @end ifset
 
 As a final demonstration of mpatrol's profiling features we will attempt to
@@ -4726,7 +4741,12 @@ bash$ dot -Tps -Gsize="4,3" -Gratio=fill -o collect2.ps collect2.dot
 @end smallexample
 
 @ifset EXAMPLEIMAGES
+@ifnottex
 @image{images/gcc}
+@end ifnottex
+@iftex
+@image{images/gcc_hi}
+@end iftex
 
 The figure above shows the allocation call graph for the @command{gcc} compiler
 driver.  From the graph you can see that the vast majority of memory allocations
@@ -4741,7 +4761,12 @@ the @emph{obstack} module, which provides a functionality similar to
 @emph{arenas} for variable-sized data structures.  You'll see extensive use of
 both of these types of routines throughout the following graphs.
 
+@ifnottex
 @image{images/cpp}
+@end ifnottex
+@iftex
+@image{images/cpp_hi}
+@end iftex
 
 As would be expected, in the above allocation call graph for the @command{cpp}
 C preprocessor, the majority of memory allocations are used for macro
@@ -4766,9 +4791,19 @@ can also see the parser module at the top left of the graph, initiated with
 @code{yyparse()}, and the code generator module in the rest of the graph,
 initiated with @code{rest_of_compilation()}.
 
+@ifnottex
 @image{images/cc1}
+@end ifnottex
+@iftex
+@image{images/cc1_hi}
+@end iftex
 
+@ifnottex
 @image{images/collect2}
+@end ifnottex
+@iftex
+@image{images/collect2_hi}
+@end iftex
 
 The allocation call graph for the prelinker, @command{collect2}, is a lot
 simpler than the previous graphs.  There are no cycles in the graph and most of
@@ -5201,7 +5236,12 @@ The following screenshot shows the @command{mptrace} display window when it is
 run with the @option{--gui} option and @file{cc1.trace} as input.  It was
 generated using the @option{--space 2} option.
 
+@ifnottex
 @image{images/trace}
+@end ifnottex
+@iftex
+@image{images/trace_hi}
+@end iftex
 
 Areas coloured blue indicate heap memory that has not yet been used by the
 mpatrol library (i.e.@: it has not currently been allocated from the system, or

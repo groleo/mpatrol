@@ -72,7 +72,8 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-EXTRA_DIST = mpatrol.eps test.eps gcc.eps cpp.eps cc1.eps collect2.eps 	     trace.eps mpatrol.txt
+EXTRA_DIST = mpatrol_hi.eps test_hi.eps gcc_hi.eps cpp_hi.eps cc1_hi.eps \
+	collect2_hi.eps trace_hi.eps mpatrol.txt
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../configure.h

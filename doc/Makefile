@@ -113,14 +113,14 @@ endif
 
 # Build the DVI file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT).eps images/test.eps \
-	images/gcc.eps images/cpp.eps images/cc1.eps images/collect2.eps \
-	images/trace.eps
+$(DOCUMENT).dvi: $(DOCUMENT).texi images/$(DOCUMENT)_hi.eps \
+	images/test_hi.eps images/gcc_hi.eps images/cpp_hi.eps \
+	images/cc1_hi.eps images/collect2_hi.eps images/trace_hi.eps
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --verbose $<
+	@ texi2dvi --batch --clean --verbose $<
 else
-	@ TEXPSHEADERS=`pwd`: texi2dvi --batch --clean --quiet $<
+	@ texi2dvi --batch --clean --quiet $<
 endif
 
 # Build the postscript file from the DVI file using dvips
@@ -135,14 +135,14 @@ endif
 
 # Build the PDF file from the Texinfo file using texi2dvi
 
-$(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT).pdf images/test.pdf \
-	images/gcc.pdf images/cpp.pdf images/cc1.pdf images/collect2.pdf \
-	images/trace.pdf
+$(DOCUMENT).pdf: $(DOCUMENT).texi images/$(DOCUMENT)_hi.pdf \
+	images/test_hi.pdf images/gcc_hi.pdf images/cpp_hi.pdf \
+	images/cc1_hi.pdf images/collect2_hi.pdf images/trace_hi.pdf
 	@ echo creating $@ from $<...
 ifeq ($(VERBOSE),true)
-	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --verbose $<
+	@ texi2dvi --pdf --batch --clean --verbose $<
 else
-	@ TEXPSHEADERS=`pwd`: texi2dvi --pdf --batch --clean --quiet $<
+	@ texi2dvi --pdf --batch --clean --quiet $<
 endif
 
 # Build the DVI reference card from the LaTeX file using texi2dvi
