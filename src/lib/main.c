@@ -24,6 +24,9 @@
  */
 
 
+#if defined(_WIN32) && defined(DLL_EXPORT)
+
+
 #include "inter.h"
 #include <windows.h>
 #include <winbase.h>
@@ -67,3 +70,6 @@ DllMain(HANDLE h, DWORD r, LPVOID d)
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+
+#endif /* _WIN32 && DLL_EXPORT */
