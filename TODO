@@ -1,0 +1,4 @@
+ * lots of warnings
+ * support of x86_64 ?
+ * instead of having 4 apps, just one (mpatrol) and passing options
+   like valgrind: mpatrol --tool=leak, etc...
