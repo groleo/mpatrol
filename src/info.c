@@ -396,6 +396,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
         if ((((v->type != AT_ALLOCA) && (v->type != AT_STRDUPA) &&
               (v->type != AT_STRNDUPA)) || (g = getallocanode(h))) &&
             (m = getinfonode(h)))
+        {
             if (n = __mp_getalloc(&h->alloc, l, a, m))
             {
 #if MP_THREADS_SUPPORT
@@ -450,8 +451,10 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
             }
             else
                 __mp_freeslot(&h->table, m);
+        }
         if (((v->type == AT_ALLOCA) || (v->type == AT_STRDUPA) ||
              (v->type == AT_STRNDUPA)) && (g != NULL))
+        {
             if (p != NULL)
             {
                 __mp_addhead(&h->astack, &g->node);
@@ -476,6 +479,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
             }
             else
                 __mp_freeslot(&h->atable, g);
+        }
         if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
             __mp_protectinfo(h, MA_READONLY);
         if (h->cpeak < h->alloc.atree.size)
@@ -729,10 +733,12 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
             if ((h->recur == 1) && !(h->flags & FLG_NOPROTECT))
                 __mp_protectinfo(h, MA_READONLY);
             if ((p != NULL) && (l > d))
+            {
                 if (v->type == AT_RECALLOC)
                     __mp_memset((char *) p + d, 0, l - d);
                 else
                     __mp_memset((char *) p + d, h->alloc.abyte, l - d);
+            }
             if (h->cpeak < h->alloc.atree.size)
                 h->cpeak = h->alloc.atree.size;
             if (h->peak < h->alloc.asize)
@@ -1268,6 +1274,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
         }
     }
     else if (n = __mp_findnode(&h->alloc, p, s))
+    {
         if ((m = (infonode *) n->info) == NULL)
         {
             __mp_log(h, v);
@@ -1310,6 +1317,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
             __mp_diag("\n");
             e = ((h->flags & FLG_ALLOWOFLOW) != 0);
         }
+    }
     return e;
 }
 
@@ -1361,10 +1369,12 @@ __mp_checkstring(infohead *h, char *p, size_t *s, loginfo *v, int g)
             {
                 for (c = p; (c < u) && (c < (char *) b) && (*c != '\0'); c++);
                 if (u > (char *) b)
+                {
                     if (c == b)
                         e = 1;
                     else if (!(h->flags & FLG_ALLOWOFLOW))
                         e = 2;
+                }
             }
             else
             {
@@ -1400,10 +1410,12 @@ __mp_checkstring(infohead *h, char *p, size_t *s, loginfo *v, int g)
         {
             for (c = p; (c < u) && (c < (char *) b) && (*c != '\0'); c++);
             if (u > (char *) b)
+            {
                 if (c == b)
                     e = 1;
                 else if (!(h->flags & FLG_ALLOWOFLOW))
                     e = 2;
+            }
         }
         else
         {

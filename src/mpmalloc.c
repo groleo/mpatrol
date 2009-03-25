@@ -56,10 +56,12 @@ __mp_xmalloc(size_t l, MP_CONST char *s, MP_CONST char *t, unsigned long u,
     void *p;
 
     if (l == 0)
+    {
         if (h != 0)
             l = h;
         else
             l = 1;
+    }
     if ((p = malloc(l)) == NULL)
     {
         if (__mp_failure != NULL)
