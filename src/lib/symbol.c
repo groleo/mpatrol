@@ -1908,6 +1908,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
                 else
                     r = addsymbols(y, h, NULL, t, b);
                 if (y->lineinfo && (r == 0))
+                {
                     if (y->hhead == p)
                         y->hhead = y->htail = NULL;
                     else
@@ -1915,6 +1916,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
                         y->htail = q;
                         q->next = NULL;
                     }
+                }
             }
             g = h;
             if ((a != NULL) && (r == 1))
@@ -1962,6 +1964,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("</TT>");
     if (v != NULL)
+    {
         if (__mp_diagflags & FLG_HTML)
         {
             __mp_diag(" [");
@@ -1972,6 +1975,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
         }
         else
             __mp_diag(" [%s]", v);
+    }
     __mp_diag("\n");
     if (__mp_diagflags & FLG_HTML)
         __mp_diagtag("<BR>\n");
@@ -2341,10 +2345,12 @@ __mp_fixsymbols(symhead *y)
          */
         p = (symnode *) __mp_successor(&n->data.node);
         if ((n->data.size == 0) && (n->data.addr >= l))
+        {
             if ((p == NULL) || (n->data.file != p->data.file))
                 n->data.size = 256;
             else
                 n->data.size = (char *) p->data.addr - (char *) n->data.addr;
+        }
         if ((m = (char *) n->data.addr + n->data.size) > l)
             l = m;
 #if TARGET == TARGET_AMIGA

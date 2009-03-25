@@ -526,6 +526,7 @@ __mp_parseoptions(infohead *h)
                     h->flags |= FLG_ALLOWOFLOW;
                 }
                 else if (matchoption(o, "AUTOSAVE"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -535,6 +536,7 @@ __mp_parseoptions(infohead *h)
                         h->prof.autosave = n;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'C':
                 if (matchoption(o, "CHECK"))
@@ -601,6 +603,7 @@ __mp_parseoptions(infohead *h)
                 break;
               case 'D':
                 if (matchoption(o, "DEFALIGN"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if ((a[readnumber(a, (long *) &n, 1)] != '\0') ||
@@ -613,6 +616,7 @@ __mp_parseoptions(infohead *h)
                         h->alloc.heap.memory.align = __mp_poweroftwo(n);
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'E':
                 if (matchoption(o, "EDIT"))
@@ -661,6 +665,7 @@ __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "FREESTOP"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -670,6 +675,7 @@ __mp_parseoptions(infohead *h)
                         h->fstop = n;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'H':
                 if (matchoption(o, "HELP"))
@@ -784,6 +790,7 @@ __mp_parseoptions(infohead *h)
                 break;
               case 'M':
                 if (matchoption(o, "MEDIUMBOUND"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -796,6 +803,7 @@ __mp_parseoptions(infohead *h)
                             h->prof.mbound = n;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'N':
                 if (matchoption(o, "NOFREE"))
@@ -911,6 +919,7 @@ __mp_parseoptions(infohead *h)
                         i = OE_RECOGNISED;
                     }
                 else if (matchoption(o, "PROGFILE"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else
@@ -918,9 +927,11 @@ __mp_parseoptions(infohead *h)
                         h->alloc.heap.memory.prog = a;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'R':
                 if (matchoption(o, "REALLOCSTOP"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -930,6 +941,7 @@ __mp_parseoptions(infohead *h)
                         h->rstop = n;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'S':
                 if (matchoption(o, "SAFESIGNALS"))
@@ -990,6 +1002,7 @@ __mp_parseoptions(infohead *h)
                     h->flags |= FLG_SHOWUNFREED;
                 }
                 else if (matchoption(o, "SMALLBOUND"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else if (a[readnumber(a, (long *) &n, 1)] != '\0')
@@ -1002,6 +1015,7 @@ __mp_parseoptions(infohead *h)
                             h->prof.sbound = n;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'T':
                 if (matchoption(o, "TRACE"))
@@ -1014,6 +1028,7 @@ __mp_parseoptions(infohead *h)
                     h->alloc.heap.tracing = 1;
                 }
                 else if (matchoption(o, "TRACEFILE"))
+                {
                     if (*a == '\0')
                         i = OE_NOARGUMENT;
                     else
@@ -1021,6 +1036,7 @@ __mp_parseoptions(infohead *h)
                         t = a;
                         i = OE_RECOGNISED;
                     }
+                }
                 break;
               case 'U':
                 if (matchoption(o, "UNFREEDABORT"))

@@ -1129,10 +1129,12 @@ __mp_realloc(void *p, size_t l, size_t a, alloctype f, char *s, char *t,
         else
             __mp_memcopy(q, p, l);
         if (q == NULL)
+        {
             if (f == AT_REALLOCF)
                 free(p);
             else if (f == AT_XREALLOC)
                 abort();
+        }
         return q;
     }
 #endif /* TARGET */
@@ -1370,6 +1372,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     int j;
 
     if (!memhead.init || memhead.fini)
+    {
         if (f == AT_MEMCCPY)
         {
             if (r = __mp_memfind(p, l, &c, 1))
@@ -1385,6 +1388,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
             __mp_memcopy(q, p, l);
             return q;
         }
+    }
     savesignals();
     if (__mp_processid() != memhead.pid)
         __mp_reinit();
@@ -1455,10 +1459,12 @@ __mp_locatemem(void *p, size_t l, void *q, size_t m, alloctype f, char *s,
         m = 1;
     }
     if (!memhead.init || memhead.fini)
+    {
         if ((f == AT_MEMMEM) && (m == 0))
             return p;
         else
             return __mp_memfind(p, l, q, m);
+    }
     savesignals();
     if (__mp_processid() != memhead.pid)
         __mp_reinit();
@@ -1519,6 +1525,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
     int j, r;
 
     if (!memhead.init || memhead.fini)
+    {
         if (m = __mp_memcompare(p, q, l))
         {
             l = (char *) m - (char *) p;
@@ -1527,6 +1534,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
         }
         else
             return 0;
+    }
     savesignals();
     if (__mp_processid() != memhead.pid)
         __mp_reinit();

@@ -607,6 +607,7 @@ __mp_memalloc(memoryinfo *i, size_t *l, size_t a, int u)
                     (unsigned long) p;
             }
             if (n > 0)
+            {
                 /* We need to allocate a little more memory in order to make the
                  * allocation page-aligned.
                  */
@@ -620,6 +621,7 @@ __mp_memalloc(memoryinfo *i, size_t *l, size_t a, int u)
                 }
                 else if (p >= t)
                     p = (char *) t + n;
+            }
         }
     }
 #elif TARGET == TARGET_AMIGA

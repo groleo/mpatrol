@@ -241,11 +241,13 @@ splitnode(allochead *h, allocnode *n, size_t l, size_t a, void *i)
          * the overflow byte, or place a watch point area there.
          */
         if ((m = n->size - l) > 0)
+        {
             if (h->flags & FLG_OFLOWWATCH)
                 __mp_memwatch(&h->heap.memory, (char *) n->block + l, m,
                               MA_NOACCESS);
             else
                 __mp_memset((char *) n->block + l, h->obyte, m);
+        }
         n->size = l;
     }
     else if (h->flags & FLG_OFLOWWATCH)

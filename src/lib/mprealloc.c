@@ -56,10 +56,12 @@ __mp_xrealloc(void *r, size_t l, MP_CONST char *s, MP_CONST char *t,
     void *p;
 
     if (l == 0)
+    {
         if (h != 0)
             l = h;
         else
             l = 1;
+    }
     if (r == NULL)
         p = malloc(l);
     else
