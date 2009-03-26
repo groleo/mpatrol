@@ -1127,6 +1127,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
          n = (allocnode *) n->lnode.next)
     {
         if ((m = (infonode *) n->info) == NULL)
+        {
             /* Check that all free blocks are filled with the free byte, but
              * only if all allocations are not pages since they will be read
              * and write protected in that case.
@@ -1147,6 +1148,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
             }
             else
                 continue;
+        }
         if ((m->data.flags & FLG_FREED) && !(h->alloc.flags & FLG_PAGEALLOC) &&
             !(h->alloc.flags & FLG_PRESERVE))
             /* Check that all freed blocks are filled with the free byte, but
