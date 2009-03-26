@@ -456,6 +456,7 @@ refill(size_t s)
      */
     l = MP_BUFFER_SIZE - bufferlen;
     if ((n = fread(buffer + bufferlen, sizeof(char), l, tracefile)) != l)
+    {
         if (feof(tracefile))
             e = 1;
         else
@@ -463,6 +464,7 @@ refill(size_t s)
             fprintf(stderr, "%s: Error reading file\n", progname);
             exit(EXIT_FAILURE);
         }
+    }
     bufferlen += n;
     /* If the buffer has not been completely filled then we zero the remaining
      * bytes.  This is done simply to prevent running off the end of the buffer

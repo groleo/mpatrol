@@ -349,6 +349,7 @@ printallocs(void)
          * SHOWUNFREED option.
          */
         if (s = getnextline())
+        {
             if ((strncmp(s, "ALLOC: ", 7) == 0) &&
                 (t = strchr(s + 7, '(')) && (t > s) && (*(t = t - 1) == ' '))
             {
@@ -377,6 +378,7 @@ printallocs(void)
                 if ((alloctree.size > 1) && (maxstack != 0))
                     putchar('\n');
             }
+        }
         __mp_treeremove(&alloctree, &n->node);
         free(n);
     }
