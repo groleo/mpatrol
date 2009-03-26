@@ -7,6 +7,6 @@ Name: mpatrol
 Description: Mpatrol debugging library (Multi threaded)
 Requires:
 Version: @VERSION@
-Libs: @prefix@/lib/libmpatrolmt.a @MPATROL_LIBS@
+Libs: @libdir@/libmpatrolmt.a @MPATROL_LIBS@
 Libs.private:
 Cflags: -I${includedir}

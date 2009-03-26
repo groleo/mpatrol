@@ -7,6 +7,6 @@ Name: mpalloc
 Description: Mpatrol debugging library
 Requires:
 Version: @VERSION@
-Libs: @prefix@/lib/liblmpalloc.a @MPATROL_LIBS@
+Libs: @libdir@/liblmpalloc.a @MPATROL_LIBS@
 Libs.private:
 Cflags: -I${includedir}
