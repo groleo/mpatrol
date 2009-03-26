@@ -302,7 +302,7 @@ static option options_table[] =
      "\tsite.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
-    NULL
+    {NULL, 0, NULL, NULL}
 };
 
 

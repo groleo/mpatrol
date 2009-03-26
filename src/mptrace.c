@@ -332,7 +332,7 @@ static option options_table[] =
      "\tSpecifies that the tracing table should be displayed.\n"},
     {"version", OF_VERSION, NULL,
      "\tDisplays the version number of this program.\n"},
-    NULL
+    {NULL, 0, NULL, NULL}
 };
 
 
