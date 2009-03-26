@@ -414,6 +414,7 @@ setoptions(int r, int s)
     sprintf(options, "%s=", MP_OPTIONS);
     optlen = strlen(options);
     if (r != 0)
+    {
         if (((t = getenv(MP_OPTIONS)) != NULL) && (*t != '\0'))
         {
             strcpy(options + optlen, t);
@@ -421,6 +422,7 @@ setoptions(int r, int s)
         }
         else
             r = 0;
+    }
     addoption("LOGFILE", logfile, (r == 0));
     if (allocbyte)
         addoption("ALLOCBYTE", allocbyte, 0);
