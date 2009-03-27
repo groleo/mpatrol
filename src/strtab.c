@@ -113,7 +113,7 @@ hash(char *s)
     for (h = 0; *s != '\0'; s++)
     {
         h = (h << 4) + *s;
-        if (g = h & (0xFUL << ((sizeof(unsigned long) << 3) - 4)))
+        if ((g = h & (0xFUL << ((sizeof(unsigned long) << 3) - 4))) != 0UL)
         {
             h ^= g >> ((sizeof(unsigned long) << 3) - 8);
             h ^= g;

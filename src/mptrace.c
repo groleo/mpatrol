@@ -350,7 +350,7 @@ newalloc(unsigned long i, unsigned long e, void *a, size_t l)
 {
     allocation *n;
 
-    if (n = (allocation *) __mp_search(alloctree.root, i))
+    if ((n = (allocation *) __mp_search(alloctree.root, i)) != NULL)
     {
         if (n->time == 0)
             fprintf(stderr, "%s: Allocation index `%lu' has been allocated "
@@ -470,7 +470,7 @@ refill(size_t s)
      * bytes.  This is done simply to prevent running off the end of the buffer
      * if we are reading an LEB128 number from an unterminated file.
      */
-    if (l = MP_BUFFER_SIZE - bufferlen)
+    if ((l = MP_BUFFER_SIZE - bufferlen) != 0UL)
         memset(buffer + bufferlen, 0, l);
     return bufferlen;
 }
@@ -921,7 +921,7 @@ readevent(void)
             a = (void *) getuleb128();
             l = getuleb128();
             getsource(&t, &g, &h, &u);
-            if (f = (allocation *) __mp_search(alloctree.root, n))
+            if ((f = (allocation *) __mp_search(alloctree.root, n)) != NULL)
             {
                 if (f->time != 0)
                     fprintf(stderr, "%s: Allocation index `%lu' has already "
@@ -978,7 +978,7 @@ readevent(void)
             currentevent++;
             n = getuleb128();
             getsource(&t, &g, &h, &u);
-            if (f = (allocation *) __mp_search(alloctree.root, n))
+            if ((f = (allocation *) __mp_search(alloctree.root, n)) != NULL)
             {
                 if (f->time != 0)
                     fprintf(stderr, "%s: Allocation index `%lu' has already "

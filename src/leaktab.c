@@ -112,7 +112,7 @@ __mp_clearleaktab(leaktab *t)
     size_t i;
 
     for (i = 0; i < MP_LEAKTAB_SIZE; i++)
-        while (n = (tablenode *) __mp_remhead(&t->slots[i]))
+        while ((n = (tablenode *) __mp_remhead(&t->slots[i])) != NULL)
             __mp_freeslot(&t->table, n);
     __mp_newtree(&t->tree);
     t->size = 0;
@@ -168,7 +168,7 @@ hashloc(char *f, unsigned long l)
         for (h = 0; *f != '\0'; f++)
         {
             h = (h << 4) + *f;
-            if (g = h & (0xFUL << ((sizeof(unsigned long) << 3) - 4)))
+            if ((g = h & (0xFUL << ((sizeof(unsigned long) << 3) - 4))) != 0UL)
             {
                 h ^= g >> ((sizeof(unsigned long) << 3) - 8);
                 h ^= g;

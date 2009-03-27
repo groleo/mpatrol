@@ -216,7 +216,7 @@ signalhandler(EXCEPTION_POINTERS *e)
 #endif /* MP_SIGINFO_SUPPORT */
         __mp_error(ET_ILLMEM, AT_MAX, NULL, 0, "illegal memory access at "
                    "address " MP_POINTER, a);
-        if (t = __mp_findnode(&h->alloc, a, 1))
+        if ((t = __mp_findnode(&h->alloc, a, 1)) != NULL)
             if (t->info != NULL)
                 __mp_printalloc(&h->syms, t);
             else

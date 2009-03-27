@@ -202,8 +202,8 @@ getcallsite(profhead *p, addrnode *a)
     profnode *n, *t;
     addrnode *d;
 
-    if (n = (profnode *) __mp_search(p->tree.root,
-        (unsigned long) a->data.addr))
+    if ((n = (profnode *) __mp_search(p->tree.root,
+        (unsigned long) a->data.addr)) != NULL)
     {
         while ((t = (profnode *) __mp_predecessor(&n->data.node)) &&
                (t->data.addr == a->data.addr))

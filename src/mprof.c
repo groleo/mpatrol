@@ -829,7 +829,7 @@ deletegraph(void)
      * the removal of the nodes in the previous loop, so we just need to
      * free the memory that each edge uses.
      */
-    for (e = (edge *) edgelist.head; m = (edge *) e->node.next; e = m)
+    for (e = (edge *) edgelist.head; (m = (edge *) e->node.next) != NULL; e = m)
     {
         __mp_remove(&edgelist, &e->node);
         free(e);

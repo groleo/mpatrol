@@ -81,12 +81,12 @@ __mp_removenode(graphhead *g, graphnode *n)
     graphedge *e;
     listnode *l, *p;
 
-    for (l = n->parents.head; p = l->next; l = p)
+    for (l = n->parents.head; (p = l->next) != NULL; l = p)
     {
         e = (graphedge *) ((char *) l - offsetof(graphedge, pnode));
         __mp_removeedge(g, e);
     }
-    for (l = n->children.head; p = l->next; l = p)
+    for (l = n->children.head; (p = l->next) != NULL; l = p)
     {
         e = (graphedge *) ((char *) l - offsetof(graphedge, cnode));
         __mp_removeedge(g, e);

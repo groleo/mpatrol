@@ -130,7 +130,7 @@ __mp_getaddrs(addrhead *h, stackinfo *p)
 
     if ((p->frame == NULL) || (p->addr == NULL))
         m = NULL;
-    else if (m = getaddrnode(h))
+    else if ((m = getaddrnode(h)) != NULL)
     {
         m->data.next = NULL;
         /* We don't fill in the symbol name field at the moment as that might

@@ -813,7 +813,7 @@ __mp_parseoptions(infohead *h)
                         i = OE_BADNUMBER;
                     else
                     {
-                        if (h->alloc.fmax = n)
+                        if ((h->alloc.fmax = n) != 0UL)
                             h->alloc.flags |= FLG_NOFREE;
                         else
                             h->alloc.flags &= ~FLG_NOFREE;
@@ -1385,7 +1385,7 @@ __mp_set(infohead *h, unsigned long o, unsigned long v)
       case OPT_NOFREE:
         while (h->alloc.flist.size > v)
             __mp_recyclefreed(&h->alloc);
-        if (h->alloc.fmax = v)
+        if ((h->alloc.fmax = v) != 0UL)
             h->alloc.flags |= FLG_NOFREE;
         else
             h->alloc.flags &= ~FLG_NOFREE;

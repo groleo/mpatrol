@@ -318,7 +318,7 @@ checkalloca(loginfo *i, int f)
         __mp_protectaddrs(&memhead.addr, MA_READONLY);
 #endif /* MP_FULLSTACK */
     for (n = (allocanode *) memhead.astack.head;
-         p = (allocanode *) n->node.next; n = p)
+         (p = (allocanode *) n->node.next) != NULL; n = p)
     {
         c = 0;
         if (f == 1)
@@ -1055,7 +1055,7 @@ __mp_strdup(char *p, size_t l, alloctype f, char *s, char *t, unsigned long u,
      */
     if (__mp_checkstring(&memhead, o, &n, &v, j))
     {
-        if (p = (char *) __mp_getmemory(&memhead, n + 1, 1, &v))
+        if ((p = (char *) __mp_getmemory(&memhead, n + 1, 1, &v)) != NULL)
         {
             __mp_memcopy(p, o, n);
             p[n] = '\0';
@@ -1375,7 +1375,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     {
         if (f == AT_MEMCCPY)
         {
-            if (r = __mp_memfind(p, l, &c, 1))
+            if ((r = __mp_memfind(p, l, &c, 1)) != NULL)
                 l = (size_t) ((char *) r - (char *) p) + 1;
             __mp_memcopy(q, p, l);
             if (r != NULL)
@@ -1526,7 +1526,7 @@ __mp_comparemem(void *p, void *q, size_t l, alloctype f, char *s, char *t,
 
     if (!memhead.init || memhead.fini)
     {
-        if (m = __mp_memcompare(p, q, l))
+        if ((m = __mp_memcompare(p, q, l)) != NULL)
         {
             l = (char *) m - (char *) p;
             return (int) ((unsigned char *) p)[l] -
@@ -1857,7 +1857,7 @@ __mp_symbol(void *p)
         __mp_init();
     if (__mp_processid() != memhead.pid)
         __mp_reinit();
-    if (n = __mp_findsymbol(&memhead.syms, p))
+    if ((n = __mp_findsymbol(&memhead.syms, p)) != NULL)
         t = n->data.name;
     else if (__mp_findsource(&memhead.syms, p, &s, &t, &u) && (s != NULL))
     {
@@ -1969,7 +1969,7 @@ __mp_printinfo(void *p)
     /* Traverse the function call stack, displaying as much information as
      * possible.
      */
-    if (a = m->data.stack)
+    if ((a = m->data.stack) != NULL)
     {
         fputs("    function call stack:\n", stderr);
         do
@@ -1977,7 +1977,7 @@ __mp_printinfo(void *p)
             fprintf(stderr, "\t" MP_POINTER " ", a->data.addr);
             if (a->data.name)
                 fputs(a->data.name, stderr);
-            else if (s = __mp_findsymbol(&memhead.syms, a->data.addr))
+            else if ((s = __mp_findsymbol(&memhead.syms, a->data.addr)) != NULL)
                 fputs(s->data.name, stderr);
             else
                 fputs("???", stderr);
@@ -2033,7 +2033,7 @@ __mp_iterate(int (*f)(void *, void *), void *d, unsigned long s)
         __mp_reinit();
     i = 0;
     for (n = (allocnode *) memhead.alloc.list.head;
-         p = (allocnode *) n->lnode.next; n = p)
+         (p = (allocnode *) n->lnode.next) != NULL; n = p)
         if ((m = (infonode *) n->info) && !(m->data.flags & FLG_INTERNAL) &&
             (m->data.event > s))
         {
@@ -2070,7 +2070,7 @@ __mp_iterateall(int (*f)(void *, void *), void *d)
         __mp_reinit();
     i = 0;
     for (n = (allocnode *) memhead.alloc.list.head;
-         p = (allocnode *) n->lnode.next; n = p)
+         (p = (allocnode *) n->lnode.next) != NULL; n = p)
     {
         if (f == NULL)
             r = __mp_printinfo(n->block);
@@ -2491,7 +2491,7 @@ __mp_printf(char *s, ...)
     if (r >= 0)
     {
         l = strlen(MP_PRINTPREFIX);
-        for (t = b; p = strchr(t, '\n'); t = p + 1)
+        for (t = b; (p = strchr(t, '\n')) != NULL; t = p + 1)
         {
             *p = '\0';
             if (*t != '\0')
@@ -2533,7 +2533,7 @@ __mp_vprintf(char *s, va_list v)
     if (r >= 0)
     {
         l = strlen(MP_PRINTPREFIX);
-        for (t = b; p = strchr(t, '\n'); t = p + 1)
+        for (t = b; (p = strchr(t, '\n')) != NULL; t = p + 1)
         {
             *p = '\0';
             if (*t != '\0')
@@ -2574,7 +2574,7 @@ __mp_printfwithloc(char *s, char *t, unsigned long u, char *m, ...)
     va_start(v, m);
     vsprintf(b, m, v);
     va_end(v);
-    for (r = b; p = strchr(r, '\n'); r = p + 1)
+    for (r = b; (p = strchr(r, '\n')) != NULL; r = p + 1)
     {
         *p = '\0';
         if (*r != '\0')
@@ -2636,7 +2636,7 @@ __mp_vprintfwithloc(char *s, char *t, unsigned long u, char *m, va_list v)
     if (__mp_processid() != memhead.pid)
         __mp_reinit();
     vsprintf(b, m, v);
-    for (r = b; p = strchr(r, '\n'); r = p + 1)
+    for (r = b; (p = strchr(r, '\n')) != NULL; r = p + 1)
     {
         *p = '\0';
         if (*r != '\0')
@@ -2715,7 +2715,7 @@ __mp_logstack(size_t k)
     if (__mp_processid() != memhead.pid)
         __mp_reinit();
     __mp_newframe(&i, NULL);
-    if (r = __mp_getframe(&i))
+    if ((r = __mp_getframe(&i)) != 0)
     {
         r = __mp_getframe(&i);
         while ((k > 0) && (r != 0))
