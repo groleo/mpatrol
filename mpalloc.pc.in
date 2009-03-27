@@ -9,4 +9,4 @@ Requires:
 Version: @VERSION@
 Libs: @libdir@/liblmpalloc.a @MPATROL_LIBS@
 Libs.private:
-Cflags: -I${includedir}
+Cflags: -I${includedir}/mpatrol-1

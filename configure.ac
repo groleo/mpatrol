@@ -65,6 +65,18 @@ case "$host_os" in
       ;;
 esac
 
+AC_PATH_X
+AC_PATH_XTRA
+
+have_x="yes"
+if test "x${no_x}" = "xyes" ; then
+   have_x="no"
+fi
+
+if test "x${have_x}" = "xyes" ; then
+   AC_CHECK_LIB([Xt], [XtVaAppInitialize], [have_x="yes"], [have_x="no"])
+fi
+
 
 ### Checks for header files
 
@@ -75,6 +87,17 @@ case "$host_os" in
       AC_CHECK_HEADERS([bfd.h])
       ;;
 esac
+
+save_CPPFLAGS=${CPPFLAGS}
+CPPFLAGS="${CPPFLAGS} ${X_CFLAGS}"
+if test "x${have_x}" = "xyes" ; then
+   AC_CHECK_HEADERS([Xm/DrawingA.h Xm/ScrolledW.h], [have_x="yes"], [have_x="no"])
+fi
+CPPFLAGS="${save_CPPFLAGS}"
+
+if test "x${have_x}" = "xyes" ; then
+   AC_DEFINE([MP_GUI_SUPPORT], [1], [Define to 1 if you built mptrace with X toolkit])
+fi
 
 
 ### Checks for types
@@ -91,7 +114,7 @@ AC_CHECK_SIZEOF([void *])
 
 ### Checks for compiler characteristics
 
-MPATROL_CFLAGS="-O3 -fno-inline-functions -xc++"
+MPATROL_CFLAGS="-O3 -fno-inline-functions"
 case "$host_os" in
    mingw* | cegcc*)
       MPATROL_CFLAGS="${MPATROL_CFLAGS} -mno-cygwin"
@@ -139,5 +162,10 @@ echo
 echo "Configuration Options Summary:"
 echo
 echo "  OS...................: ${host_os}"
+echo "  GUI..................: ${have_x}"
 echo "  Tests................: ${enable_tests}"
+echo
+echo "Installation:"
+echo
+echo "  prefix...............: ${prefix}"
 echo

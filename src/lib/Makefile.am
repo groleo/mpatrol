@@ -1,7 +1,8 @@
 
 MAINTAINERCLEANFILES = Makefile.in
 
-include_HEADERS = mpatrol.h mpalloc.h mpdebug.h
+installed_mainheaderdir = $(includedir)/mpatrol-1
+dist_installed_mainheader_DATA = mpatrol.h mpalloc.h mpdebug.h
 
 lib_LTLIBRARIES = libmpatrol.la libmpatrolmt.la libmpalloc.la
 

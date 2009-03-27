@@ -801,20 +801,6 @@
 #endif /* MP_INUSE_SUPPORT */
 
 
-/* Indicates if the mptrace tool should be built with support for a graphical
- * user interface.  This is currently only available on UNIX systems running
- * X that have the Motif or LessTif libraries.
- */
-
-#ifndef MP_GUI_SUPPORT
-#if defined(HAVE_CONFIG_H) && !defined(X_DISPLAY_MISSING)
-#define MP_GUI_SUPPORT 1
-#else /* HAVE_CONFIG_H && X_DISPLAY_MISSING */
-#define MP_GUI_SUPPORT 0
-#endif /* HAVE_CONFIG_H && X_DISPLAY_MISSING */
-#endif /* MP_GUI_SUPPORT */
-
-
 /* Indicates if the C functions defined in malloc.c are to have duplicate
  * functions defined with an alternative name.
  */
