@@ -1840,9 +1840,9 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
             /* Look for a .gnu_debuglink section and open the separate debug
              * file if it exists.
              */
-            if (t = bfd_follow_gnu_debuglink(h, "/usr/lib/debug"))
+            if ((t = bfd_follow_gnu_debuglink(h, "/usr/lib/debug")) != NULL)
             {
-                if (g = bfd_openr(t, NULL))
+                if ((g = bfd_openr(t, NULL)) != NULL)
                 {
                     d = h;
                     h = g;
@@ -2430,7 +2430,7 @@ __mp_findsymbol(symhead *y, void *p)
      * implementation should suffice.
      */
     r = NULL;
-    if (n = (symnode *) __mp_searchlower(y->dtree.root, (unsigned long) p))
+    if ((n = (symnode *) __mp_searchlower(y->dtree.root, (unsigned long) p)) != NULL)
     {
         while ((m = (symnode *) __mp_predecessor(&n->data.node)) &&
                (m->data.addr == n->data.addr))

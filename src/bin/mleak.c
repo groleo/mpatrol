@@ -167,7 +167,7 @@ freealloc(unsigned long i)
 {
     allocation *n;
 
-    if (n = (allocation *) __mp_search(alloctree.root, i))
+    if ((n = (allocation *) __mp_search(alloctree.root, i)) != NULL)
     {
         __mp_treeremove(&alloctree, &n->node);
         alloctotal -= n->size;
@@ -222,7 +222,7 @@ readfile(void)
     char *s, *t;
     unsigned long a, l, n, o;
 
-    while (s = getnextline())
+    while ((s = getnextline()) != NULL)
         if (strncmp(s, "ALLOC: ", 7) == 0)
         {
             /* Parse relevant details from the memory allocation and
@@ -262,7 +262,7 @@ readfile(void)
                 /* Get the allocation address.
                  */
                 *t = '\0';
-                if (a = strtoul(s + 1, NULL, 0))
+                if ((a = strtoul(s + 1, NULL, 0)) != 0UL)
                 {
                     while ((s = getnextline()) && (*s != '\0'));
                     /* Don't record the deallocation if a warning or error
@@ -285,7 +285,7 @@ readfile(void)
              * allocations in the log file.  In this case we just parse them
              * anyway, adding any new entries to the allocation tree.
              */
-            while (s = getnextline())
+            while ((s = getnextline()) != NULL)
             {
                 /* Parse relevant details from the unfreed allocation and
                  * add the allocation to the allocation tree.
@@ -348,14 +348,14 @@ printallocs(void)
          * we can format it in the same way as that displayed for the
          * SHOWUNFREED option.
          */
-        if (s = getnextline())
+        if ((s = getnextline()) != NULL)
         {
             if ((strncmp(s, "ALLOC: ", 7) == 0) &&
                 (t = strchr(s + 7, '(')) && (t > s) && (*(t = t - 1) == ' '))
             {
                 *t = '\0';
                 r = s + 7;
-                if (s = strchr(t + 2, '['))
+                if ((s = strchr(t + 2, '[')) != NULL)
                 {
                     i = 0;
                     printf("    " MP_POINTER " (%lu byte%s) {%s:%lu:0} %s\n",

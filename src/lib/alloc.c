@@ -791,7 +791,7 @@ __mp_findalloc(allochead *h, void *p)
     allocnode *n;
     treenode *t;
 
-    if (t = __mp_searchlower(h->atree.root, (unsigned long) p))
+    if ((t = __mp_searchlower(h->atree.root, (unsigned long) p)) != NULL)
     {
         n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
         if ((char *) n->block + n->size > (char *) p)
@@ -811,7 +811,7 @@ __mp_findfreed(allochead *h, void *p)
     allocnode *n;
     treenode *t;
 
-    if (t = __mp_searchlower(h->gtree.root, (unsigned long) p))
+    if ((t = __mp_searchlower(h->gtree.root, (unsigned long) p)) != NULL)
     {
         n = (allocnode *) ((char *) t - offsetof(allocnode, tnode));
         if ((char *) n->block + n->size > (char *) p)

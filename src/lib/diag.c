@@ -304,13 +304,13 @@ processfile(memoryinfo *m, char *s, char *b, size_t l)
               case 'p':
                 /* Replace %p with the program name.
                  */
-                if (p = m->prog)
+                if ((p = m->prog) != NULL)
 #if TARGET == TARGET_UNIX
-                    while (t = strchr(p, '/'))
+                    while ((t = strchr(p, '/')) != NULL)
 #elif TARGET == TARGET_AMIGA
-                    while (t = strpbrk(p, ":/"))
+                    while ((t = strpbrk(p, ":/")) != NULL)
 #else /* TARGET */
-                    while (t = strpbrk(p, ":/\\"))
+                    while ((t = strpbrk(p, ":/\\")) != NULL)
 #endif /* TARGET */
                         p = t + 1;
                 if ((p == NULL) || (*p == '\0'))
@@ -648,7 +648,7 @@ __mp_diag(char *s, ...)
     if (__mp_diagflags & FLG_HTML)
         for (s = t = b; t != NULL; s = t + 1)
         {
-            if (t = strpbrk(s, "<>&\""))
+            if ((t = strpbrk(s, "<>&\"")) != NULL)
             {
                 c = *t;
                 *t = '\0';
@@ -881,7 +881,7 @@ __mp_readalloc(char *s, unsigned long n, void *a, size_t l)
     int r;
 
     r = 0;
-    if (f = fopen(allocfile(s, n), "rb"))
+    if ((f = fopen(allocfile(s, n), "rb")) != NULL)
     {
         if (fread(a, sizeof(char), l, f) == l)
             r = 1;
@@ -904,7 +904,7 @@ __mp_writealloc(char *s, unsigned long n, void *a, size_t l)
 
     r = 0;
     t = allocfile(s, n);
-    if (f = fopen(t, "wb"))
+    if ((f = fopen(t, "wb")) != NULL)
     {
         if (fwrite(a, sizeof(char), l, f) == l)
             r = 1;
@@ -929,7 +929,7 @@ __mp_cmpalloc(char *s, unsigned long n, void *a, size_t l)
     int c;
 
     r = -1;
-    if (f = fopen(allocfile(s, n), "rb"))
+    if ((f = fopen(allocfile(s, n), "rb")) != NULL)
     {
         r = 0;
         p = (char *) a;
@@ -1112,7 +1112,7 @@ __mp_printsymbol(symhead *y, void *a)
     unsigned long u;
 
     __mp_findsource(y, (char *) a - 1, &s, &t, &u);
-    if (n = __mp_findsymbol(y, a))
+    if ((n = __mp_findsymbol(y, a)) != NULL)
     {
         if (__mp_diagflags & FLG_HTML)
             __mp_diagtag("<TT>");
@@ -1587,7 +1587,7 @@ __mp_printfree(infohead *h)
         c = 0;
         do
         {
-            if (s = __mp_predecessor(s))
+            if ((s = __mp_predecessor(s)) != NULL)
                 p = (allocnode *) ((char *) s - offsetof(allocnode, tnode));
             else
                 p = NULL;

@@ -597,7 +597,7 @@ execpath(char *s)
     }
     for (x = y = p; y != NULL; x = y + 1)
     {
-        if (y = strchr(x, ':'))
+        if ((y = strchr(x, ':')) != NULL)
             *y = '\0';
         if (*x == '\0')
             x = ".";

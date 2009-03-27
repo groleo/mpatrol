@@ -282,7 +282,7 @@ leaktabentry(infohead *h, infonode *m, size_t l, int f)
     }
     else if (m->data.func != NULL)
         t = m->data.func;
-    else if (a = m->data.stack)
+    else if ((a = m->data.stack) != NULL)
     {
         if ((a->data.name == NULL) &&
             (s = __mp_findsymbol(&h->syms, a->data.addr)))
@@ -397,7 +397,7 @@ __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
               (v->type != AT_STRNDUPA)) || (g = getallocanode(h))) &&
             (m = getinfonode(h)))
         {
-            if (n = __mp_getalloc(&h->alloc, l, a, m))
+            if ((n = __mp_getalloc(&h->alloc, l, a, m)) != NULL)
             {
 #if MP_THREADS_SUPPORT
                 t = __mp_threadid();
@@ -521,7 +521,7 @@ __mp_resizememory(infohead *h, void *p, size_t l, size_t a, loginfo *v)
         }
         p = __mp_getmemory(h, l, a, v);
     }
-    else if (n = __mp_findfreed(&h->alloc, p))
+    else if ((n = __mp_findfreed(&h->alloc, p)) != NULL)
     {
         /* This block of memory has already been freed but has not been
          * returned to the free tree.
@@ -783,7 +783,7 @@ __mp_freememory(infohead *h, void *p, loginfo *v)
         }
         return;
     }
-    if (n = __mp_findfreed(&h->alloc, p))
+    if ((n = __mp_findfreed(&h->alloc, p)) != NULL)
     {
         /* This block of memory has already been freed but has not been
          * returned to the free tree.
@@ -989,7 +989,7 @@ __mp_copymemory(infohead *h, void *p, void *q, size_t l, unsigned char c,
     {
         if (v->type == AT_MEMCCPY)
         {
-            if (r = __mp_memfind(p, l, &c, 1))
+            if ((r = __mp_memfind(p, l, &c, 1)) != NULL)
                 l = (size_t) ((char *) r - (char *) p) + 1;
             __mp_memcopy(q, p, l);
             if (r != NULL)
@@ -1064,7 +1064,7 @@ __mp_comparememory(infohead *h, void *p, void *q, size_t l, loginfo *v)
     if (__mp_checkrange(h, p, l, v) && __mp_checkrange(h, q, l, v))
     {
         h->dtotal += l;
-        if (r = __mp_memcompare(p, q, l))
+        if ((r = __mp_memcompare(p, q, l)) != NULL)
         {
             l = (char *) r - (char *) p;
             c = (int) ((unsigned char *) p)[l] - (int) ((unsigned char *) q)[l];
@@ -1155,7 +1155,7 @@ __mp_checkinfo(infohead *h, loginfo *v)
              * only if all allocations are not pages and the original contents
              * were not preserved.
              */
-            if (p = __mp_memcheck(n->block, h->alloc.fbyte, n->size))
+            if ((p = __mp_memcheck(n->block, h->alloc.fbyte, n->size)) != NULL)
             {
                 __mp_log(h, v);
                 __mp_printsummary(h);
@@ -1275,7 +1275,7 @@ __mp_checkrange(infohead *h, void *p, size_t s, loginfo *v)
             __mp_warn(ET_ZEROPN, v->type, v->file, v->line, NULL);
         }
     }
-    else if (n = __mp_findnode(&h->alloc, p, s))
+    else if ((n = __mp_findnode(&h->alloc, p, s)) != NULL)
     {
         if ((m = (infonode *) n->info) == NULL)
         {

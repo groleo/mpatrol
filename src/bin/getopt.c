@@ -69,11 +69,11 @@ __mp_basename(char *s)
     char *t;
 
 #if TARGET == TARGET_UNIX
-    while (t = strchr(s, '/'))
+    while ((t = strchr(s, '/')) != NULL)
 #elif TARGET == TARGET_AMIGA
-    while (t = strpbrk(s, ":/"))
+    while ((t = strpbrk(s, ":/")) != NULL)
 #else /* TARGET */
-    while (t = strpbrk(s, ":/\\"))
+    while ((t = strpbrk(s, ":/\\")) != NULL)
 #endif /* TARGET */
         s = t + 1;
     return s;
@@ -137,7 +137,7 @@ findopt(char *s, option *l, char **a)
     char *t;
     size_t n;
 
-    if (t = strchr(s, '='))
+    if ((t = strchr(s, '=')) != NULL)
         n = t - s;
     else
         n = strlen(s);
@@ -341,7 +341,7 @@ __mp_match(char *s, char *t)
         if (c == '[')
         {
             i = 0;
-            if (n = (*t == '!'))
+            if ((n = (*t == '!')) != 0)
                 t++;
             if ((*t == ']') || ((d = *s++) == '\0'))
                 return 0;

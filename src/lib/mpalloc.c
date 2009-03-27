@@ -338,7 +338,7 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         p = malloc(l);
         break;
       case AT_CALLOC:
-        if (p = malloc(l))
+        if ((p = malloc(l)) != NULL)
             memset(p, 0, l);
         break;
       case AT_MEMALIGN:
@@ -533,7 +533,7 @@ __mp_copymem(void *p, void *q, size_t l, unsigned char c, alloctype f, char *s,
     switch (f)
     {
       case AT_MEMCCPY:
-        if (r = memchr(p, (int) c, l))
+        if ((r = memchr(p, (int) c, l)) != NULL)
             l = (size_t) ((char *) r - (char *) p) + 1;
         memcpy(q, p, l);
         if (r != NULL)
