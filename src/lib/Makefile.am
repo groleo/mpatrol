@@ -55,7 +55,7 @@ endif
 
 libmpatrol_la-machine.lo: machine.c config.h target.h
 	$(COMPILE) -E -P $< > libmpatrol_la-machine.S
-	$(LTCXXCOMPILE) -c libmpatrol_la-machine.S
+	$(LTCOMPILE) -c libmpatrol_la-machine.S
 	rm -f libmpatrol_la-machine.S
 
 
