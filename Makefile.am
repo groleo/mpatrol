@@ -5,8 +5,17 @@ MAINTAINERCLEANFILES = \
 Makefile.in \
 aclocal.m4 \
 config.guess \
-config.h.in \
-config.sub
+configure \
+configure.h.in \
+configure.h.in~ \
+config.sub \
+depcomp \
+install \
+install-sh \
+ltmain.sh \
+missing \
+$(PACKAGE_TARNAME)-$(VERSION).tar.bz2 \
+$(PACKAGE_TARNAME)-$(VERSION).tar.gz
 
 SUBDIRS = src
 
