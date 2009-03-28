@@ -7,7 +7,6 @@ AM_INIT_AUTOMAKE(1.6 dist-bzip2)
 
 AC_LIBTOOL_WIN32_DLL
 define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 
 ### Libtool versioning
@@ -24,7 +23,7 @@ AC_PROG_LIBTOOL
 # 6. If any interfaces have been removed since the last public release, then
 #    set age to 0.
 
-version_info="6:0:5"
+version_info="6:1:5"
 AC_SUBST(version_info)
 
 
@@ -47,7 +46,6 @@ MPATROL_LDFLAGS=""
 
 
 ### Checks for programs
-AM_PROG_AS
 AC_PROG_CXX
 AC_LANG(C)
 AC_PROG_CPP
@@ -58,9 +56,15 @@ AC_PROG_CC
 
 case "$host_os" in
    mingw* | cegcc*)
+      MPALLOC_PC_LIBS="\${libdir}/libmpalloc.a"
+      MPATROL_PC_LIBS="\${libdir}/libmpatrol.a"
+      MPATROL_MT_PC_LIBS="\${libdir}/libmpatrolmt.a"
       MPATROL_LIBS="${MPATROL_LIBS} -lbfd -limagehlp -liberty"
       ;;
    *)
+      MPALLOC_PC_LIBS="-L\${libdir} -lmpalloc"
+      MPATROL_PC_LIBS="-L\${libdir} -lmpatrol"
+      MPATROL_MT_PC_LIBS="-L\${libdir} -lmpatrolmt"
       MPATROL_LIBS="${MPATROL_LIBS} -lbfd"
       ;;
 esac
@@ -114,7 +118,7 @@ AC_CHECK_SIZEOF([void *])
 
 ### Checks for compiler characteristics
 
-MPATROL_CFLAGS="-O3 -fno-inline-functions"
+MPATROL_CFLAGS="-O3 -fno-inline-functions -Wmissing-prototypes -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-declarations -Wdeclaration-after-statement"
 case "$host_os" in
    mingw* | cegcc*)
       MPATROL_CFLAGS="${MPATROL_CFLAGS} -mno-cygwin"
@@ -131,13 +135,24 @@ case "$host_os" in
       ;;
 esac
 
-# Unit tests, coverage and benchmarking
+
+### Checks for library functions
+
+AC_FUNC_MMAP
+AC_FUNC_SETVBUF_REVERSED
+AC_CHECK_FUNCS(memalign mincore)
+
+
+### Unit tests, coverage and benchmarking
 
 MP_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
 
 
 AC_SUBST(MPATROL_CFLAGS)
 AC_SUBST(MPATROL_LIBS)
+AC_SUBST(MPALLOC_PC_LIBS)
+AC_SUBST(MPATROL_PC_LIBS)
+AC_SUBST(MPATROL_MT_PC_LIBS)
 AC_SUBST(MPATROL_LDFLAGS)
 
 AC_CONFIG_FILES([

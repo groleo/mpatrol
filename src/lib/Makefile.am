@@ -47,10 +47,17 @@ libmpatrol_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrol_la_LIBADD = $(MPATROL_LIBS)
 libmpatrol_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
 
+if HAVE_WINDOWS
+
+libmpatrol_la_LIBTOOLFLAGS = --tag=disable-shared
+
+endif
+
 libmpatrol_la-machine.lo: machine.c config.h target.h
 	$(COMPILE) -E -P $< > libmpatrol_la-machine.S
 	$(LTCXXCOMPILE) -c libmpatrol_la-machine.S
 	rm -f libmpatrol_la-machine.S
+
 
 libmpatrolmt_la_SOURCES  = $(MPATROL_SOURCES) mutex.c
 
@@ -58,6 +65,12 @@ libmpatrolmt_la_CPPFLAGS = -DMP_THREADS_SUPPORT
 libmpatrolmt_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrolmt_la_LIBADD = $(MPATROL_LIBS)
 libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+
+if HAVE_WINDOWS
+
+libmpatrolmt_la_LIBTOOLFLAGS = --tag=disable-shared
+
+endif
 
 libmpatrolmt_la-machine.lo: machine.c config.h target.h
 	$(COMPILE) -E -P $< > libmpatrolmt_la-machine.S
@@ -83,6 +96,12 @@ libmpalloc_la_CPPFLAGS =
 libmpalloc_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpalloc_la_LIBADD = $(MPATROL_LIBS)
 libmpalloc_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+
+if HAVE_WINDOWS
+
+libmpalloc_la_LIBTOOLFLAGS = --tag=disable-shared
+
+endif
 
 EXTRA_DIST = \
 config.h \
