@@ -36,7 +36,7 @@ MPATROL_SOURCES += sbrk.c main.c
 
 else # Unix
 
-MPATROL_SOURCES += machine.S
+MPATROL_SOURCES += machine.c
 
 endif
 
@@ -47,12 +47,22 @@ libmpatrol_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrol_la_LIBADD = $(MPATROL_LIBS)
 libmpatrol_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
 
+libmpatrol_la-machine.lo: machine.c config.h target.h
+	$(COMPILE) -E -P $< > libmpatrol_la-machine.S
+	$(LTCXXCOMPILE) -c libmpatrol_la-machine.S
+	rm -f libmpatrol_la-machine.S
+
 libmpatrolmt_la_SOURCES  = $(MPATROL_SOURCES) mutex.c
 
 libmpatrolmt_la_CPPFLAGS = -DMP_THREADS_SUPPORT
 libmpatrolmt_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrolmt_la_LIBADD = $(MPATROL_LIBS)
 libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+
+libmpatrolmt_la-machine.lo: machine.c config.h target.h
+	$(COMPILE) -E -P $< > libmpatrolmt_la-machine.S
+	$(LTCOMPILE) -c libmpatrolmt_la-machine.S
+	rm -f libmpatrolmt_la-machine.S
 
 libmpalloc_la_SOURCES  = \
 mpalloc.c \
