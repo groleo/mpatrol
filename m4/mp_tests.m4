@@ -33,8 +33,8 @@ fi
 AM_CONDITIONAL(MP_ENABLE_TESTS, test "x${_mp_enable_tests}" = "xyes")
 
 if test "x${_mp_enable_tests}" = "xyes" ; then
-   ifelse([$1], , :, [$1])
+   m4_default([$1], [:])
 else
-   ifelse([$2], , :, [$2])
+   m4_default([$2], [:])
 fi
 ])
