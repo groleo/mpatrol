@@ -28,7 +28,7 @@
 
 
 /*
- * $Id$
+ * $Id: version.h 2312 2009-03-23 10:58:58Z graemeroy $
  */
 
 
@@ -40,13 +40,13 @@
  * and ff represents the bug fix count.
  */
 
-#define MP_VERNUM 10501
+#define MP_VERNUM @mp_version@
 
 
 /* The version string for the mpatrol library.
  */
 
-#define MP_VERSION "mpatrol 1.5.1"
+#define MP_VERSION "@PACKAGE_STRING@"
 
 
 #ifdef __cplusplus

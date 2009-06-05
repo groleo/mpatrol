@@ -23,6 +23,12 @@ AC_PROG_LIBTOOL
 # 6. If any interfaces have been removed since the last public release, then
 #    set age to 0.
 
+VMAJ=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $1);}'`
+VMIN=`echo $PACKAGE_VERSION | awk -F. '{printf("%02d", $2+0);}'`
+VMIC=`echo $PACKAGE_VERSION | awk -F. '{printf("%02d", $3+0);}'`
+mp_version="${VMAJ}${VMIN}${VMIC}"
+AC_SUBST(mp_version)
+
 version_info="6:1:5"
 AC_SUBST(version_info)
 
@@ -38,6 +44,7 @@ esac
 
 AM_CONDITIONAL([HAVE_WINDOWS], [test "x${have_windows}" = "xyes"])
 
+MPATROL_CPPFLAGS=""
 MPATROL_CFLAGS=""
 MPATROL_LIBS=""
 MPATROL_LDFLAGS=""
@@ -54,6 +61,9 @@ AC_PROG_CC
 
 ### Checks for libraries
 
+# On Windows (MinGW) it seems that there is a conflict with
+# mpatrol and msvcrt DLLs. So we statically link mpatrol to
+# the program which uses it on that platform.
 case "$host_os" in
    mingw* | cegcc*)
       MPALLOC_PC_LIBS="\${libdir}/libmpalloc.a"
@@ -62,6 +72,9 @@ case "$host_os" in
       MPATROL_LIBS="${MPATROL_LIBS} -lbfd -limagehlp -liberty"
       ;;
    *)
+      AC_CHECK_LIB([bfd], [bfd_openr],
+         [dumy="yes"],
+         [AC_MSG_ERROR([the symbol bfd_openr can not be found in libbfd.a or libbfd.a is missing])])
       MPALLOC_PC_LIBS="-L\${libdir} -lmpalloc"
       MPATROL_PC_LIBS="-L\${libdir} -lmpatrol"
       MPATROL_MT_PC_LIBS="-L\${libdir} -lmpatrolmt"
@@ -88,7 +101,9 @@ case "$host_os" in
    mingw* | cegcc*)
       ;;
    *)
-      AC_CHECK_HEADERS([bfd.h])
+      AC_CHECK_HEADERS([bfd.h],
+         [dummy="yes"],
+         [AC_MSG_ERROR([the header file bfd.h is missing])])
       ;;
 esac
 
@@ -126,6 +141,14 @@ case "$host_os" in
       ;;
 esac
 
+# On x86_64, compilation prolem. Need to be fixed in mpatrol.
+# Ugly hack: we avoid initialisation support on that platform
+case "$host" in
+   *x86_64*)
+      MPATROL_CPPFLAGS="-DMP_INIT_SUPPORT=0"
+      ;;
+esac
+
 
 ### Checks for linker characteristics
 
@@ -148,6 +171,7 @@ AC_CHECK_FUNCS(memalign mincore)
 MP_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
 
 
+AC_SUBST(MPATROL_CPPFLAGS)
 AC_SUBST(MPATROL_CFLAGS)
 AC_SUBST(MPATROL_LIBS)
 AC_SUBST(MPALLOC_PC_LIBS)
@@ -163,6 +187,8 @@ mpalloc.pc
 src/Makefile
 src/bin/Makefile
 src/lib/Makefile
+src/lib/mpatrol.h
+src/lib/version.h
 src/tests/Makefile
 ])
 

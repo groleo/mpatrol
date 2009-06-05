@@ -4,7 +4,11 @@ MAINTAINERCLEANFILES = Makefile.in
 installed_mainheaderdir = $(includedir)/mpatrol-1
 dist_installed_mainheader_DATA = mpatrol.h mpalloc.h mpdebug.h
 
-lib_LTLIBRARIES = libmpatrol.la libmpatrolmt.la libmpalloc.la
+lib_LTLIBRARIES = \
+libmpatrol.la \
+libmpatrolmt.la \
+libmpalloc.la \
+libmptools.la
 
 MPATROL_SOURCES = \
 list.c \
@@ -42,7 +46,7 @@ endif
 
 libmpatrol_la_SOURCES  = $(MPATROL_SOURCES)
 
-libmpatrol_la_CPPFLAGS =
+libmpatrol_la_CPPFLAGS = @MPATROL_CPPFLAGS@
 libmpatrol_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrol_la_LIBADD = $(MPATROL_LIBS)
 libmpatrol_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
@@ -54,14 +58,14 @@ libmpatrol_la_LIBTOOLFLAGS = --tag=disable-shared
 endif
 
 libmpatrol_la-machine.lo: machine.c config.h target.h
-	$(COMPILE) -E -P $< > libmpatrol_la-machine.S
+	$(COMPILE) @MPATROL_CPPFLAGS@ -E -P $< > libmpatrol_la-machine.S
 	$(LTCOMPILE) -c libmpatrol_la-machine.S
 	rm -f libmpatrol_la-machine.S
 
 
 libmpatrolmt_la_SOURCES  = $(MPATROL_SOURCES) mutex.c
 
-libmpatrolmt_la_CPPFLAGS = -DMP_THREADS_SUPPORT
+libmpatrolmt_la_CPPFLAGS = @MPATROL_CPPFLAGS@ -DMP_THREADS_SUPPORT
 libmpatrolmt_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrolmt_la_LIBADD = $(MPATROL_LIBS)
 libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
@@ -73,7 +77,7 @@ libmpatrolmt_la_LIBTOOLFLAGS = --tag=disable-shared
 endif
 
 libmpatrolmt_la-machine.lo: machine.c config.h target.h
-	$(COMPILE) -E -P $< > libmpatrolmt_la-machine.S
+	$(COMPILE) @MPATROL_CPPFLAGS@ -E -P $< > libmpatrolmt_la-machine.S
 	$(LTCOMPILE) -c libmpatrolmt_la-machine.S
 	rm -f libmpatrolmt_la-machine.S
 
@@ -103,6 +107,13 @@ libmpalloc_la_LIBTOOLFLAGS = --tag=disable-shared
 
 endif
 
+libmptools_la_SOURCES = dbmalloc.c dmalloc.c heapdiff.c mgauge.c mtrace.c
+
+libmptools_la_CPPFLAGS =
+libmptools_la_CFLAGS = $(MPATROL_CFLAGS)
+libmptools_la_LIBADD =
+libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+
 EXTRA_DIST = \
 config.h \
 target.h \
@@ -127,5 +138,11 @@ profile.h \
 trace.h \
 inter.h \
 machine.h \
-version.h \
-sbrk.h
+version.h.in \
+mpatrol.h.in \
+sbrk.h\
+dbmalloc.h \
+dmalloc.h \
+heapdiff.h \
+mgauge.h \
+mtrace.h
