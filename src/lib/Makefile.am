@@ -114,6 +114,12 @@ libmptools_la_CFLAGS = $(MPATROL_CFLAGS)
 libmptools_la_LIBADD =
 libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
 
+if HAVE_WINDOWS
+
+libmptools_la_LIBTOOLFLAGS = --tag=disable-shared
+
+endif
+
 EXTRA_DIST = \
 config.h \
 target.h \
