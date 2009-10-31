@@ -708,7 +708,7 @@ __mp_getframe(stackinfo *p)
                 f = (unsigned long *) p->first;
         else
             f = (unsigned long *) p->next;
-        if (p->frame = f)
+        if ((p->frame = f))
         {
             p->addr = getaddr(f);
             /* We cache the next frame pointer in the call stack since on some

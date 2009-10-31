@@ -96,6 +96,7 @@ location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
         return;
     fputs("@ ", trace_file);
     if (__mp_syminfo(a, &i))
+    {
         if ((i.file != NULL) && (i.line != 0))
         {
             fprintf(trace_file, "%s:%lu ", i.file, i.line);
@@ -113,6 +114,7 @@ location(MP_CONST char *s, MP_CONST char *t, unsigned long u, MP_CONST void *a)
                 fprintf(trace_file, "-%#lx", o);
             fputc(')', trace_file);
         }
+    }
     fprintf(trace_file, "[%p] ", a);
 }
 
