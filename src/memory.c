@@ -344,30 +344,30 @@ progname(void)
 #if ARCH == ARCH_IX86
 #if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_NETBSD || SYSTEM == SYSTEM_OPENBSD
-        if (p = (unsigned long *) p[4])
+        if ((p = (unsigned long *) p[4]))
             return (char *) *p;
 #elif SYSTEM == SYSTEM_INTERIX
-        if (p = (unsigned long *) p[-6])
+        if ((p = (unsigned long *) p[-6]))
             return (char *) (p + 1);
 #elif SYSTEM == SYSTEM_LYNXOS
-        if (p = (unsigned long *) p[3])
+        if ((p = (unsigned long *) p[3]))
             return (char *) *p;
 #else /* SYSTEM */
-        if (p = (unsigned long *) p[3])
+        if ((p = (unsigned long *) p[3]))
             return (char *) p;
 #endif /* SYSTEM */
 #elif ARCH == ARCH_M68K
-        if (p = (unsigned long *) p[3])
+        if ((p = (unsigned long *) p[3]))
             return (char *) *p;
 #elif ARCH == ARCH_MIPS
-        if (p = (unsigned long *) p[7])
+        if ((p = (unsigned long *) p[7]))
             return (char *) p;
 #elif ARCH == ARCH_POWER || ARCH == ARCH_POWERPC
 #if SYSTEM == SYSTEM_AIX
-        if (p = (unsigned long *) p[7])
+        if ((p = (unsigned long *) p[7]))
             return (char *) p;
 #else /* SYSTEM */
-        if (p = (unsigned long *) p[23])
+        if ((p = (unsigned long *) p[23]))
             return (char *) *p;
 #endif /* SYSTEM */
 #elif ARCH == ARCH_SPARC

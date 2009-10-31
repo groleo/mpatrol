@@ -207,13 +207,13 @@ readoptions(void)
     b[sizeof(b) - 1] = '\0';
     for (s = t = b; t != NULL; s = t + 1)
     {
-        if (t = strchr(s, ','))
+        if ((t = strchr(s, ',')))
             *t = '\0';
         if (*s == '\0')
             continue;
         if ((strncmp(s, "addr", 4) == 0) && (s[4] == '='))
         {
-            if (p = strchr(s + 5, ':'))
+            if ((p = strchr(s + 5, ':')))
                 *p = '\0';
             dmalloc_address = (void *) strtoul(s + 5, NULL, 16);
             if (p != NULL)
@@ -407,7 +407,7 @@ bytestring(char *b, size_t s, char *p, size_t l)
                 b[n++] = '0';
             }
         }
-        else if (t = strchr(ESCAPE_CHARS, p[i]))
+        else if ((t = strchr(ESCAPE_CHARS, p[i])))
         {
             b[n++] = '\\';
             b[n++] = ESCAPE_REPLACE[t - ESCAPE_CHARS];
@@ -616,10 +616,12 @@ __mpt_dmallocexamine(MP_CONST void *p, size_t *l, char **t, unsigned long *u,
         if (u != NULL)
             *u = i.line;
         if (a != NULL)
+        {
             if (i.stack != NULL)
                 *a = i.stack->addr;
             else
                 *a = NULL;
+        }
         return 1;
     }
     return 0;
@@ -677,7 +679,7 @@ __mpt_dmallocvmessage(MP_CONST char *s, va_list v)
 #endif /* LOG_ITERATION_COUNT */
     m[l] = '\0';
     vsprintf(b, s, v);
-    for (c = b; p = strchr(c, '\n'); c = p + 1)
+    for (c = b; (p = strchr(c, '\n')); c = p + 1)
     {
         *p = '\0';
         if (*c != '\0')
