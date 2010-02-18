@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "valgrind", "valgrind.vcproj", "{5CF66759-1EBE-419F-A251-67F03A4DE946}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "valgrind_dll", "valgrind_dll.vcproj", "{A0752025-09F7-473F-B531-287850F975F1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5CF66759-1EBE-419F-A251-67F03A4DE946} = {5CF66759-1EBE-419F-A251-67F03A4DE946}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "valgrind_test", "valgrind_test.vcproj", "{35D7B4A8-DBBE-4580-B21F-B26F333CC719}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CF66759-1EBE-419F-A251-67F03A4DE946}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5CF66759-1EBE-419F-A251-67F03A4DE946}.Debug|Win32.Build.0 = Debug|Win32
+		{5CF66759-1EBE-419F-A251-67F03A4DE946}.Release|Win32.ActiveCfg = Release|Win32
+		{5CF66759-1EBE-419F-A251-67F03A4DE946}.Release|Win32.Build.0 = Release|Win32
+		{A0752025-09F7-473F-B531-287850F975F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A0752025-09F7-473F-B531-287850F975F1}.Debug|Win32.Build.0 = Debug|Win32
+		{A0752025-09F7-473F-B531-287850F975F1}.Release|Win32.ActiveCfg = Release|Win32
+		{A0752025-09F7-473F-B531-287850F975F1}.Release|Win32.Build.0 = Release|Win32
+		{35D7B4A8-DBBE-4580-B21F-B26F333CC719}.Debug|Win32.ActiveCfg = Debug|Win32
+		{35D7B4A8-DBBE-4580-B21F-B26F333CC719}.Debug|Win32.Build.0 = Debug|Win32
+		{35D7B4A8-DBBE-4580-B21F-B26F333CC719}.Release|Win32.ActiveCfg = Release|Win32
+		{35D7B4A8-DBBE-4580-B21F-B26F333CC719}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
