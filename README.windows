@@ -1,0 +1,5 @@
+
+ISSUE:
+
+The is an issue with mpatrol DLL. Currently, only linking statically
+mpatrol library against a program is working on Windows.
