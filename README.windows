@@ -3,3 +3,32 @@ ISSUE:
 
 The is an issue with mpatrol DLL. Currently, only linking statically
 mpatrol library against a program is working on Windows.
+
+To link against mpatrol, you just have to pass --static to pkg-config.
+
+For example, with MSYS/MinGW, save the following code in mpatrol_test.c:
+
+---- beginning of code ----
+
+#include "mpatrol.h"
+
+int main(void)
+{
+  char *p;
+
+  if ((p = (char *) malloc(16)))
+    free(p + 1);
+  return EXIT_SUCCESS;
+}
+
+---- end of code ----
+
+then compile with:
+
+gcc -g -Wall -o mpatrol_test mpatrol_test.c `pkg-config --static --cflags --libs mpatrol`
+
+then execute your program in MSYS like that:
+
+MPATROL_OPTIONS=LOGALL ./mpatrol_test.exe
+
+The file mpatrol.log will be generated with the report of all the errors.

@@ -49,7 +49,7 @@ libmpatrol_la_SOURCES  = $(MPATROL_SOURCES)
 libmpatrol_la_CPPFLAGS = @MPATROL_CPPFLAGS@
 libmpatrol_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrol_la_LIBADD = $(MPATROL_LIBS)
-libmpatrol_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+libmpatrol_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
 
@@ -68,7 +68,7 @@ libmpatrolmt_la_SOURCES  = $(MPATROL_SOURCES) mutex.c
 libmpatrolmt_la_CPPFLAGS = @MPATROL_CPPFLAGS@ -DMP_THREADS_SUPPORT
 libmpatrolmt_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpatrolmt_la_LIBADD = $(MPATROL_LIBS)
-libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
 
@@ -99,7 +99,7 @@ endif
 libmpalloc_la_CPPFLAGS =
 libmpalloc_la_CFLAGS = $(MPATROL_CFLAGS)
 libmpalloc_la_LIBADD = $(MPATROL_LIBS)
-libmpalloc_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+libmpalloc_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
 
@@ -112,7 +112,7 @@ libmptools_la_SOURCES = dbmalloc.c dmalloc.c heapdiff.c mgauge.c mtrace.c
 libmptools_la_CPPFLAGS =
 libmptools_la_CFLAGS = $(MPATROL_CFLAGS)
 libmptools_la_LIBADD =
-libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @version_info@
+libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
 

@@ -1,5 +1,20 @@
-AC_INIT([mpatrol], [1.5.1], [])
-AM_CONFIG_HEADER([configure.h])
+
+# According to http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info :
+#
+# 1) when bugs are fixed or internal code is changed: increase MICRO
+# 2) if API is added, increase MINOR and set MICRO to 0
+# 3) if API or ABI is broken (this case should (must) never happen as it's very bad for a library), or a new designed library, increase MAJOR and set MINOR and MICRO to 0
+
+m4_define([v_maj], [1])
+m4_define([v_min], [5])
+m4_define([v_mic], [1])
+
+m4_define([lt_cur], m4_eval(v_maj + v_min))
+m4_define([lt_rev], v_mic)
+m4_define([lt_age], v_min)
+
+AC_INIT([mpatrol], [v_maj.v_min.v_mic], [])
+AC_CONFIG_HEADERS([configure.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 
@@ -10,35 +25,24 @@ AC_LIBTOOL_WIN32_DLL
 define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
 AC_PROG_LIBTOOL
 
-### Libtool versioning
-# 1. Start with version information of ‘0:0:0’ for each libtool library.
-# 2. Update the version information only immediately before a public release
-#    of your software. More frequent updates are unnecessary, and only
-#    guarantee that the current interface number gets larger faster.
-# 3. If the library source code has changed at all since the last update,
-#    then increment revision (‘c:r:a’ becomes ‘c:r+1:a’).
-# 4. If any interfaces have been added, removed, or changed since the last
-#    update, increment current, and set revision to 0.
-# 5. If any interfaces have been added since the last public release, then
-#    increment age.
-# 6. If any interfaces have been removed since the last public release, then
-#    set age to 0.
-
-VMAJ=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $1);}'`
-VMIN=`echo $PACKAGE_VERSION | awk -F. '{printf("%02d", $2+0);}'`
-VMIC=`echo $PACKAGE_VERSION | awk -F. '{printf("%02d", $3+0);}'`
+VMAJ=v_maj
+VMIN=v_min
+VMIC=v_mic
 mp_version="${VMAJ}${VMIN}${VMIC}"
 AC_SUBST(mp_version)
 
-version_info="6:1:5"
-AC_SUBST(version_info)
+lt_version=lt_cur:lt_rev:lt_age
+AC_SUBST(lt_version)
 
 
 ### Needed informations
 
 have_windows="no"
 case "$host_os" in
-   mingw* | cegcc*)
+   mingw32ce* | cegcc*)
+      AC_MSG_ERROR([Windows CE not supported])
+      ;;
+   mingw*)
       have_windows="yes"
       ;;
 esac
@@ -66,20 +70,60 @@ AC_PROG_CC
 # mpatrol and msvcrt DLLs. So we statically link mpatrol to
 # the program which uses it on that platform.
 case "$host_os" in
-   mingw* | cegcc*)
-      MPALLOC_PC_LIBS="\${libdir}/libmpalloc.a"
-      MPATROL_PC_LIBS="\${libdir}/libmpatrol.a"
-      MPATROL_MT_PC_LIBS="\${libdir}/libmpatrolmt.a"
-      MPATROL_LIBS="${MPATROL_LIBS} -lbfd -limagehlp -liberty"
+   mingw*)
+# Because of autoconf cache feature, I prefer using the
+# linker directly.
+      LIBS_save="$LIBS"
+      LIBS="$LIBS -lbfd -limagehlp -liberty"
+      AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM(
+             [[
+#include <bfd.h>
+             ]],
+             [[
+bfd *b;
+b = bfd_openr("", "");
+             ]])],
+         [
+          have_bfd="yes"
+          bfd_libs="-lbfd"
+         ],
+         [have_bfd="no"])
+      LIBS="$LIBS_save"
+      AC_MSG_CHECKING([whether bfd_openr is in -lbfd])
+      AC_MSG_RESULT([${have_bfd}])
+
+      if test "x$have_bfd" = "xno" ; then
+         LIBS_save="$LIBS"
+         LIBS="$LIBS -lbfd -lintl -limagehlp -liberty"
+         AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM(
+                [[
+#include <bfd.h>
+                ]],
+                [[
+bfd *b;
+b = bfd_openr("", "");
+                ]])],
+            [
+             have_bfd="yes"
+             bfd_libs="-lbfd -lintl"
+            ],
+            [have_bfd="no"])
+         LIBS="$LIBS_save"
+         AC_MSG_CHECKING([whether bfd_openr is in -lbfd -lintl])
+         AC_MSG_RESULT([${have_bfd}])
+      fi
+      if test "x$have_bfd" = "xno" ; then
+         AC_MSG_ERROR([the symbol bfd_openr can not be found in libbfd.a, or libbfd.a or libintl are missing])
+      fi
+      MPATROL_LIBS="${bfd_libs} -limagehlp -liberty"
       ;;
    *)
       AC_CHECK_LIB([bfd], [bfd_openr],
          [dumy="yes"],
          [AC_MSG_ERROR([the symbol bfd_openr can not be found in libbfd.a or libbfd.a is missing])])
-      MPALLOC_PC_LIBS="-L\${libdir} -lmpalloc"
-      MPATROL_PC_LIBS="-L\${libdir} -lmpatrol"
-      MPATROL_MT_PC_LIBS="-L\${libdir} -lmpatrolmt"
-      MPATROL_LIBS="${MPATROL_LIBS} -lbfd"
+      MPATROL_LIBS="-lbfd"
       ;;
 esac
 
@@ -99,7 +143,7 @@ fi
 ### Checks for header files
 
 case "$host_os" in
-   mingw* | cegcc*)
+   mingw*)
       ;;
    *)
       AC_CHECK_HEADERS([bfd.h],
@@ -136,7 +180,7 @@ AC_CHECK_SIZEOF([void *])
 
 MPATROL_CFLAGS="-O3 -fno-inline-functions -Wmissing-prototypes -Wall -Wshadow -Wpointer-arith -Wstrict-prototypes -Wmissing-declarations -Wdeclaration-after-statement"
 case "$host_os" in
-   mingw* | cegcc*)
+   mingw*)
       MPATROL_CFLAGS="${MPATROL_CFLAGS} -mno-cygwin"
       AC_DEFINE([X_DISPLAY_MISSING], [1], [Define to 1 if you want to build the GUI.])
       ;;
@@ -154,7 +198,7 @@ esac
 ### Checks for linker characteristics
 
 case "$host_os" in
-   mingw* | cegcc*)
+   mingw*)
       MPATROL_LDFLAGS="${MPATROL_LDFLAGS} -Wl,--enable-auto-import -Wl,--allow-multiple-definition"
       ;;
 esac
@@ -175,9 +219,6 @@ MP_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
 AC_SUBST(MPATROL_CPPFLAGS)
 AC_SUBST(MPATROL_CFLAGS)
 AC_SUBST(MPATROL_LIBS)
-AC_SUBST(MPALLOC_PC_LIBS)
-AC_SUBST(MPATROL_PC_LIBS)
-AC_SUBST(MPATROL_MT_PC_LIBS)
 AC_SUBST(MPATROL_LDFLAGS)
 
 AC_CONFIG_FILES([
