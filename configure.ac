@@ -53,6 +53,9 @@ MPATROL_CPPFLAGS=""
 MPATROL_CFLAGS=""
 MPATROL_LIBS=""
 MPATROL_LDFLAGS=""
+MPATROL_MT_CFLAGS=""
+MPATROL_MT_LIBS=""
+MPATROL_MT_LDFLAGS=""
 
 ### Additional options to configure
 
@@ -126,6 +129,55 @@ b = bfd_openr("", "");
       MPATROL_LIBS="-lbfd"
       ;;
 esac
+
+MPATROL_MT_CFLAGS="${MPATROL_CFLAGS}"
+MPATROL_MT_LIBS="${MPATROL_LIBS}"
+MPATROL_MT_LDFLAGS="${MPATROL_LDFLAGS}"
+
+_mp_want_posix_threads="no"
+case "$host_os" in
+   mingw*)
+      ;;
+   solaris*)
+      MPATROL_MT_CFLAGS="${MPATROL_MT_CFLAGS} -mt"
+      MPATROL_MT_LDFLAGS="${MPATROL_MT_LDFLAGS} -mt"
+      _mp_want_posix_threads="yes"
+      ;;
+   *)
+      MPATROL_MT_CFLAGS="${MPATROL_MT_CFLAGS} -pthread"
+      MPATROL_MT_LIBS="${MPATROL_MT_LIBS} -lpthread"
+      MPATROL_MT_LDFLAGS="${MPATROL_MT_LDFLAGS} -pthread"
+      _mp_want_posix_threads="yes"
+      ;;
+esac
+
+if test "x${_mp_want_posix_threads}" = "xyes" ; then
+
+   CFLAGS_save=${CFLAGS}
+   CFLAGS="${CFLAGS} ${MPATROL_MT_CFLAGS}"
+   LIBS_save=${LIBS}
+   LIBS="${LIBS} ${MPATROL_MT_LIBS}"
+   LDFLAGS_save=${LDFLAGS}
+   LDFLAGS="${LDFLAGS} ${MPATROL_MT_LDFLAGS}"
+   AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM([[
+#include <pthread.h>
+                       ]],
+                       [[
+pthread_t id;
+id = pthread_self();
+int on = pthread_once(NULL, NULL)
+                       ]])],
+      [_mp_have_posix_threads="yes"],
+      [_mp_have_posix_threads="no"])
+   CFLAGS=${CFLAGS_save}
+   LIBS=${LIBS_save}
+   LDFLAGS=${LDFLAGS_save}
+
+   AC_MSG_CHECKING([whether system supports POSIX threads])
+   AC_MSG_RESULT([${_mp_have_posix_threads}])
+
+fi
 
 AC_PATH_X
 AC_PATH_XTRA
@@ -220,6 +272,9 @@ AC_SUBST(MPATROL_CPPFLAGS)
 AC_SUBST(MPATROL_CFLAGS)
 AC_SUBST(MPATROL_LIBS)
 AC_SUBST(MPATROL_LDFLAGS)
+AC_SUBST(MPATROL_MT_CFLAGS)
+AC_SUBST(MPATROL_MT_LIBS)
+AC_SUBST(MPATROL_MT_LDFLAGS)
 
 AC_CONFIG_FILES([
 Makefile

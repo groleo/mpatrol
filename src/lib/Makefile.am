@@ -66,9 +66,9 @@ libmpatrol_la-machine.lo: machine.c config.h target.h
 libmpatrolmt_la_SOURCES  = $(MPATROL_SOURCES) mutex.c
 
 libmpatrolmt_la_CPPFLAGS = @MPATROL_CPPFLAGS@ -DMP_THREADS_SUPPORT
-libmpatrolmt_la_CFLAGS = $(MPATROL_CFLAGS)
-libmpatrolmt_la_LIBADD = $(MPATROL_LIBS)
-libmpatrolmt_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
+libmpatrolmt_la_CFLAGS = $(MPATROL_MT_CFLAGS)
+libmpatrolmt_la_LIBADD = $(MPATROL_MT_LIBS)
+libmpatrolmt_la_LDFLAGS = $(MPATROL_MT_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
 
@@ -111,7 +111,7 @@ libmptools_la_SOURCES = dbmalloc.c dmalloc.c heapdiff.c mgauge.c mtrace.c
 
 libmptools_la_CPPFLAGS =
 libmptools_la_CFLAGS = $(MPATROL_CFLAGS)
-libmptools_la_LIBADD =
+libmptools_la_LIBADD = $(top_builddir)/src/lib/libmpatrol.la
 libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
