@@ -12,8 +12,6 @@ TODO:
  * Split the code so that the overloaded functions are in a separate
    file, and generally, clean the code.
 
- * Add C runtime functions (malloc and al) to that framework. Problem:
-   we have to know which dll is used : msvcrt.dll ? msvcr**.dll ? (** is
-   the version of the used C runtime DLL). So the DLL that are run by
-   the program to test must be enumerated, and we check their name
-   with all the possible names of a C runtime DLL.
+ * Add all the memory functions to overload (win32 and C Run Time)
+
+ * Add checks for other CRT DLL than msvcrt.dll, msvcr90.dll and msvcr90d.dll
