@@ -1,10 +1,10 @@
-TARGET = i586-mingw32msvc-
+TARGET = #i586-mingw32msvc-
 
 all:
-	$(TARGET)gcc -g -Wall -ansi -pedantic -o valgrind.exe valgrind.c
-	$(TARGET)gcc -g -Wall -DPSAPI_VERSION=1 -c -o valgrind_dll.o valgrind_dll.c
+	$(TARGET)gcc -g -Wall -W -Wextra -Wshadow -ansi -pedantic -o valgrind.exe valgrind.c
+	$(TARGET)gcc -g -Wall -W -Wextra -Wshadow -DPSAPI_VERSION=1 -c -o valgrind_dll.o valgrind_dll.c
 	$(TARGET)gcc -shared -Wl,-soname,valgrind_dll.dll -Wl,--out-implib,libvalgrind_dll.dll.a -o valgrind_dll.dll valgrind_dll.o -lpsapi -limagehlp
-	$(TARGET)gcc -g -Wall -ansi -pedantic -o valgrind_test.exe valgrind_test.c
+	$(TARGET)gcc -g -Wall -W -Wextra -Wshadow -ansi -pedantic -o valgrind_test.exe valgrind_test.c
 
 clean:
 	rm -f *.o *.a *.exe *.dll

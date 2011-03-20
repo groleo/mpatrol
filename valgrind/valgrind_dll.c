@@ -7,18 +7,55 @@
 #include <psapi.h>
 #include <imagehlp.h>
 
+#ifdef __GNUC__
+# define __UNUSED__ __attribute__ ((unused))
+#else
+# define __UNUSED__
+#endif
+
+LPVOID WINAPI VG_HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes);
+BOOL WINAPI VG_HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
+
 typedef struct
 {
   char *func_name_old;
-  PROC func_proc_old;
-  PROC func_proc_new;
+  PROC  func_proc_old;
+  PROC  func_proc_new;
+} Vg_Hook_Overload;
+
+/*
+ * WARNING
+ *
+ * Mofidy the value of VG_HOOK_OVERLOAD_COUNT when adding
+ * other overloaded functions in overloads_instance
+ */
+#define VG_HOOK_OVERLOAD_COUNT 2
+
+Vg_Hook_Overload overloads_instance[VG_HOOK_OVERLOAD_COUNT] =
+  {
+    {
+      "HeapAlloc",
+      NULL,
+      (PROC)VG_HeapAlloc
+    },
+    {
+      "HeapFree",
+      NULL,
+      (PROC)VG_HeapFree
+    }
+  };
+
+typedef struct
+{
+  char            *filename;
+  HMODULE          mod;
+  Vg_Hook_Overload overloads[VG_HOOK_OVERLOAD_COUNT];
 } Vg_Hook;
 
 typedef LPVOID (WINAPI *vgd_heap_alloc_t) (HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes);
 typedef BOOL   (WINAPI *vgd_heap_free_t)  (HANDLE hHeap, DWORD dwFlags, LPVOID lpMem);
 
-
-Vg_Hook vg_hooks_kernel32[2];
+Vg_Hook vgh_instance;
 
 LPVOID WINAPI VG_HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes)
 {
@@ -27,7 +64,7 @@ LPVOID WINAPI VG_HeapAlloc(HANDLE hHeap, DWORD dwFlags, SIZE_T dwBytes)
 
   printf("HeapAlloc !!!\n");
 
-  ha = (vgd_heap_alloc_t)vg_hooks_kernel32[0].func_proc_old;
+  ha = (vgd_heap_alloc_t)vgh_instance.overloads[0].func_proc_old;
   data = ha(hHeap, dwFlags, dwBytes);
 
   return data;
@@ -40,12 +77,76 @@ BOOL WINAPI VG_HeapFree(HANDLE hHeap, DWORD dwFlags, LPVOID lpMem)
 
   printf("HeapFree !!!\n");
 
-  hf = (vgd_heap_free_t)vg_hooks_kernel32[1].func_proc_old;
+  hf = (vgd_heap_free_t)vgh_instance.overloads[1].func_proc_old;
   res = hf(hHeap, dwFlags, lpMem);
 
   return res;  
 }
 
+int
+vgh_init()
+{
+  char user_profile[4096];
+  char app_file[256];
+  char *lock_file;
+  HANDLE hf;
+  DWORD res;
+
+  res = GetEnvironmentVariable("USERPROFILE", user_profile, sizeof(user_profile));
+  if ((res == 0) || (res == 4096))
+    return 0;
+
+  lock_file = malloc((res + sizeof("\\.valgrind")) * sizeof(char));
+  if (!lock_file)
+    return 0;
+
+  memcpy(lock_file, user_profile, res);
+  memcpy(lock_file + res, "\\.valgrind", sizeof("\\.valgrind"));
+
+  hf = CreateFile(lock_file, GENERIC_READ, 0, NULL, OPEN_EXISTING,
+                  FILE_ATTRIBUTE_NORMAL,
+                  NULL);
+  if (hf == INVALID_HANDLE_VALUE)
+    {
+      if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        printf("Can not find lock file %s\n", lock_file);
+      else
+        printf("Critical error when opening %s\n", lock_file);
+      return 0;
+    }
+
+  if (!ReadFile(hf, app_file, sizeof(app_file), &res, NULL))
+    {
+      printf("Can not read the content of %s\n", lock_file);
+      CloseHandle(hf);
+      return 0;
+    }
+
+  if (res >= 255)
+    {
+      printf("The content of %s is not a valid file name\n", lock_file);
+      CloseHandle(hf);
+      return 0;
+    }
+
+  app_file[res] = '\0';
+  CloseHandle(hf);
+
+  vgh_instance.filename = _strdup(app_file);
+  if (!vgh_instance.filename)
+    return 0;
+
+  memcpy(vgh_instance.overloads, overloads_instance, sizeof(vgh_instance.overloads));
+
+  return 1;
+}
+
+void
+vgh_shutdown(void)
+{
+  if (vgh_instance.filename)
+    free(vgh_instance.filename);
+}
 
 void
 _vgd_modules_hook_set(HMODULE module, const char *lib_name, PROC old_function_proc, PROC new_function_proc)
@@ -96,85 +197,105 @@ _vgd_modules_hook_set(HMODULE module, const char *lib_name, PROC old_function_pr
 }
 
 void
-_vgd_modules_hook(HMODULE main_module, const char *lib_name)
+_vgh_modules_hook(const char *lib_name)
 {
   HMODULE mods[1024];
   HMODULE lib_module;
+  HMODULE hook_module = NULL;
+  DWORD res;
   DWORD mods_nbr;
   unsigned int i;
-  unsigned int j;
 
   lib_module = LoadLibrary(lib_name);
 
-  for (j = 0; vg_hooks_kernel32[j].func_name_old; j++)
-    vg_hooks_kernel32[j].func_proc_old = GetProcAddress(lib_module, vg_hooks_kernel32[j].func_name_old);
+  for (i = 0; i < VG_HOOK_OVERLOAD_COUNT; i++)
+    vgh_instance.overloads[i].func_proc_old = GetProcAddress(lib_module, vgh_instance.overloads[i].func_name_old);
 
   if (!EnumProcessModules(GetCurrentProcess(), mods, sizeof(mods), &mods_nbr))
     return;
 
   for (i = 0; i < (mods_nbr / sizeof(HMODULE)); i++)
     {
-      if (mods[i] == main_module)
+      char name[256] = "";
+
+      res = GetModuleFileNameEx(GetCurrentProcess(), mods[i], name, sizeof(name));
+      if (!res)
         continue;
 
-      for (j = 0; vg_hooks_kernel32[j].func_name_old; j++)
-        _vgd_modules_hook_set(mods[i], lib_name,
-                              vg_hooks_kernel32[j].func_proc_old,
-                              vg_hooks_kernel32[j].func_proc_new);
+      if (lstrcmp(name, vgh_instance.filename) != 0)
+        continue;
+
+      hook_module = mods[i];
+    }
+
+  if (hook_module)
+    {
+      for (i = 0; i < VG_HOOK_OVERLOAD_COUNT; i++)
+        _vgd_modules_hook_set(hook_module, lib_name,
+                              vgh_instance.overloads[i].func_proc_old,
+                              vgh_instance.overloads[i].func_proc_new);
     }
 
   FreeLibrary(lib_module);
 }
 
 void
-_vgd_modules_unhook(HMODULE main_module, const char *lib_name)
+_vgh_modules_unhook(const char *lib_name)
 {
   HMODULE mods[1024];
+  HMODULE hook_module = NULL;
   DWORD mods_nbr;
+  DWORD res;
   unsigned int i;
-  unsigned int j;
 
   if (!EnumProcessModules(GetCurrentProcess(), mods, sizeof(mods), &mods_nbr))
     return;
 
   for (i = 0; i < (mods_nbr / sizeof(HMODULE)); i++)
     {
-      if (mods[i] == main_module) continue;
+      char name[256] = "";
 
-      for (j = 0; vg_hooks_kernel32[j].func_name_old; j++)
-        _vgd_modules_hook_set(mods[i], lib_name,
-                              vg_hooks_kernel32[j].func_proc_new,
-                              vg_hooks_kernel32[j].func_proc_old);
+      res = GetModuleFileNameEx(GetCurrentProcess(), mods[i], name, sizeof(name));
+      if (!res)
+        continue;
+
+      if (lstrcmp(name, vgh_instance.filename) != 0)
+        continue;
+
+      hook_module = mods[i];
+    }
+
+  if (hook_module)
+    {
+      for (i = 0; i < VG_HOOK_OVERLOAD_COUNT; i++)
+        _vgd_modules_hook_set(hook_module, lib_name,
+                              vgh_instance.overloads[i].func_proc_new,
+                              vgh_instance.overloads[i].func_proc_old);
     }
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ulReason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule __UNUSED__, DWORD ulReason, LPVOID lpReserved __UNUSED__)
 {
   switch (ulReason)
     {
     case DLL_PROCESS_ATTACH:
-      printf ("process attach\n");
-      vg_hooks_kernel32[0].func_name_old = "HeapAlloc";
-      vg_hooks_kernel32[0].func_proc_old = NULL;
-      vg_hooks_kernel32[0].func_proc_new = (PROC)VG_HeapAlloc;
-
-      vg_hooks_kernel32[1].func_name_old = "HeapFree";
-      vg_hooks_kernel32[1].func_proc_old = NULL;
-      vg_hooks_kernel32[1].func_proc_new = (PROC)VG_HeapFree;
-
-      vg_hooks_kernel32[2].func_name_old = NULL;
-      vg_hooks_kernel32[2].func_proc_old = NULL;
-      vg_hooks_kernel32[2].func_proc_new = NULL;
+      printf (" # process attach\n");
+      if (!vgh_init())
+        return FALSE;
 
       break;
     case DLL_THREAD_ATTACH:
-      printf ("thread attach\n");
-      _vgd_modules_hook(hModule, "kernel32.dll");
+      printf (" # thread attach begin\n");
+      _vgh_modules_hook("kernel32.dll");
+      printf (" # thread attach end\n");
       break;
     case DLL_THREAD_DETACH:
-      _vgd_modules_unhook(hModule, "kernel32.dll");
+      printf (" # thread detach\n");
       break;
     case DLL_PROCESS_DETACH:
+      printf (" # process detach\n");
+      _vgh_modules_unhook("kernel32.dll");
+      vgh_shutdown();
       break;
     }
 

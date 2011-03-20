@@ -1,0 +1,19 @@
+TODO:
+
+ * The overloading of the functions is done only in the program to
+   check. To pass the file name of the program to check to the DLL
+   that is doing the API hooking, the memory tool checker is writing
+   in the file %USERPROFILE%/.valgrind the full name of the program to
+   check. The DLL retrieve it and compare it to the ame of the
+   processes that are running. When it is found, API hooking is
+   done. If there is a better way to pass data from a binary to a DLL
+   that is loaded by LoadLibrary, then it must be implemented.
+
+ * Split the code so that the overloaded functions are in a separate
+   file, and generally, clean the code.
+
+ * Add C runtime functions (malloc and al) to that framework. Problem:
+   we have to know which dll is used : msvcrt.dll ? msvcr**.dll ? (** is
+   the version of the used C runtime DLL). So the DLL that are run by
+   the program to test must be enumerated, and we check their name
+   with all the possible names of a C runtime DLL.

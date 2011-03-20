@@ -17,6 +17,7 @@ struct _Vg
   _load_library        ll;
   _free_library        fl;
 
+  char                *lock_file;
   char                *dll_fullname;
   int                  dll_length;
 
@@ -140,10 +141,113 @@ vg_del(Vg *vg)
   if (vg->child.process1)
     CloseHandle(vg->child.process1);
   free(vg->dll_fullname);
+  if (vg->lock_file)
+    {
+      DeleteFile(vg->lock_file);
+      free(vg->lock_file);
+    }
   free(vg);
 }
 
-int vg_dll_inject(Vg *vg, const char *prog)
+int
+vg_lock(Vg *vg, const char *filename)
+{
+  char user_profile[4096];
+  char *fullfilename;
+  char *tmp;
+  HANDLE hf;
+  DWORD res;
+  size_t length;
+  DWORD written;
+
+  if (!filename || !*filename)
+    return 0;
+
+  length = GetFullPathName(filename, 1, (char *)&res, NULL);
+  if (length == 0)
+    return 0;
+  fullfilename = malloc((length + 1) * sizeof(char));
+  if (!fullfilename)
+    return 0;
+  length = GetFullPathName(filename, length + 1, fullfilename, NULL);
+  if (length == 0)
+    goto free_filename;
+
+  tmp = fullfilename;
+  while (!tmp)
+    {
+      if (*tmp == '/') *tmp = '\\';
+      tmp++;
+    }
+
+  res = GetEnvironmentVariable("USERPROFILE", user_profile, sizeof(user_profile));
+  if ((res == 0) || (res == 4096))
+    goto free_filename;
+
+  vg->lock_file = malloc((res + sizeof("\\.valgrind")) * sizeof(char));
+  if (!vg->lock_file)
+    goto free_filename;
+
+  memcpy(vg->lock_file, user_profile, res);
+  memcpy(vg->lock_file + res, "\\.valgrind", sizeof("\\.valgrind"));
+
+  printf("lock file : %s\n", vg->lock_file);
+
+  /* /\* Check if the lock file exists *\/ */
+  /* hf = CreateFile(fullpath, GENERIC_READ, 0, NULL, OPEN_EXISTING, */
+  /*                 FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN | FILE_FLAG_NO_BUFFERING, */
+  /*                 NULL); */
+
+  hf = CreateFile(vg->lock_file, GENERIC_WRITE, 0, NULL, CREATE_NEW,
+                  FILE_ATTRIBUTE_NORMAL,
+                  NULL);
+  if ((hf == INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_FILE_NOT_FOUND))
+    {
+      if (GetLastError() == ERROR_FILE_EXISTS)
+        {
+          printf("%s already exists. valgrind is already running or has been interrupted.\n", vg->lock_file);
+          printf("Exiting...\n");
+          goto free_filename;
+        }
+      if ((hf == INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_FILE_NOT_FOUND))
+        {
+          printf("A non awaited error has raised (%ld).\n", GetLastError());
+          printf("Exiting...\n");
+          goto free_filename;
+        }
+    }
+
+  if (!LockFile(hf, 0, 0, length, 0))
+    {
+      printf("can not lock file\n");
+      printf("Exiting...\n");
+      goto close_file;
+    }
+  printf("filename : %s (%d)\n", fullfilename, length);
+  if (!WriteFile(hf, fullfilename, length, &written, NULL))
+    {
+      printf("can not write to file (%ld)\n", GetLastError());
+      printf("Exiting...\n");
+      goto unlock_file;
+    }
+  UnlockFile(hf, 0, 0, length, 0);
+  CloseHandle(hf);
+  free(fullfilename);
+
+  return 1;
+
+ unlock_file:
+  UnlockFile(hf, 0, 0, length, 0);
+ close_file:
+  CloseHandle(hf);
+ free_filename:
+  free(fullfilename);
+
+  return 0;
+}
+
+int
+vg_dll_inject(Vg *vg, const char *prog)
 {
   STARTUPINFO         si;
   PROCESS_INFORMATION pi;
@@ -245,7 +349,7 @@ int vg_dll_inject(Vg *vg, const char *prog)
 }
 
 void
-vg_dll_extract(Vg *vg)
+vg_dll_eject(Vg *vg)
 {
   HANDLE thread;
 
@@ -260,17 +364,23 @@ int main(int argc, char *argv[])
 {
   Vg *vg;
 
-/*   if (argc < 2) */
-/*     { */
-/*       printf ("Usage: %s file\n\n", argv[0]); */
-/*       return -1; */
-/*     } */
+  if (argc < 2)
+    {
+      printf ("Usage: %s file\n\n", argv[0]);
+      return -1;
+    }
 
   vg = vg_new();
   if (!vg)
     return -1;
 
-  if (!vg_dll_inject(vg, "valgrind_test.exe"/*argv[1]*/))
+  if (!vg_lock(vg, argv[1]))
+    {
+      printf(" * impossible to create lock file\n * exiting...\n");
+      goto del_vg;
+    }
+
+  if (!vg_dll_inject(vg, argv[1]))
     {
       printf(" * injection failed\n * exiting...\n");
       goto del_vg;
@@ -279,7 +389,7 @@ int main(int argc, char *argv[])
   Sleep(2000);
   printf(" * fin process\n");
 
-  vg_dll_extract(vg);
+  vg_dll_eject(vg);
 
   vg_del(vg);
   printf(" * ressources freed\n");

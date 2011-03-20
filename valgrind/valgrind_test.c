@@ -20,5 +20,7 @@ int main()
     }
   HeapFree (hDefaultProcessHeap, 0, data);
 
+  printf ("process finished...\n");
+
   return 0;
 }
