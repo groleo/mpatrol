@@ -10,6 +10,12 @@
 typedef HMODULE (*_load_library) (const char *);
 typedef BOOL    (*_free_library) (HMODULE);
 
+struct Vg_Map
+{
+  HANDLE handle;
+  void *base;
+};
+
 typedef struct _Vg Vg;
 
 struct _Vg
@@ -26,6 +32,9 @@ struct _Vg
     HANDLE thread;
     HANDLE process2;
   } child;
+
+  struct Vg_Map map_size;
+  struct Vg_Map map_file;
 
   DWORD exit_code; /* actually the base address of the mapped DLL */
 };
@@ -150,100 +159,58 @@ vg_del(Vg *vg)
 }
 
 int
-vg_lock(Vg *vg, const char *filename)
+vg_map_filename(Vg *vg, const char *filename)
 {
-  char user_profile[4096];
-  char *fullfilename;
-  char *tmp;
-  HANDLE hf;
-  DWORD res;
-  size_t length;
-  DWORD written;
+  int length;
 
   if (!filename || !*filename)
     return 0;
 
-  length = GetFullPathName(filename, 1, (char *)&res, NULL);
-  if (length == 0)
+  length = lstrlen(filename) + 1;
+
+  vg->map_size.handle = CreateFileMapping(INVALID_HANDLE_VALUE,
+                                          NULL, PAGE_READWRITE, 0, sizeof(int),
+                                          "shared_size");
+  if (!vg->map_size.handle)
     return 0;
-  fullfilename = malloc((length + 1) * sizeof(char));
-  if (!fullfilename)
-    return 0;
-  length = GetFullPathName(filename, length + 1, fullfilename, NULL);
-  if (length == 0)
-    goto free_filename;
 
-  tmp = fullfilename;
-  while (!tmp)
-    {
-      if (*tmp == '/') *tmp = '\\';
-      tmp++;
-    }
+  vg->map_size.base = MapViewOfFile(vg->map_size.handle, FILE_MAP_WRITE,
+                                    0, 0, sizeof(int));
+  if (!vg->map_size.base)
+    goto close_size_mapping;
 
-  res = GetEnvironmentVariable("USERPROFILE", user_profile, sizeof(user_profile));
-  if ((res == 0) || (res == 4096))
-    goto free_filename;
+  CopyMemory(vg->map_size.base, &length, sizeof(int));
 
-  vg->lock_file = malloc((res + sizeof("\\.valgrind")) * sizeof(char));
-  if (!vg->lock_file)
-    goto free_filename;
-
-  memcpy(vg->lock_file, user_profile, res);
-  memcpy(vg->lock_file + res, "\\.valgrind", sizeof("\\.valgrind"));
-
-  printf("lock file : %s\n", vg->lock_file);
-
-  /* /\* Check if the lock file exists *\/ */
-  /* hf = CreateFile(fullpath, GENERIC_READ, 0, NULL, OPEN_EXISTING, */
-  /*                 FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN | FILE_FLAG_NO_BUFFERING, */
-  /*                 NULL); */
-
-  hf = CreateFile(vg->lock_file, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-                  FILE_ATTRIBUTE_NORMAL,
-                  NULL);
-  if ((hf == INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_FILE_NOT_FOUND))
-    {
-      if (GetLastError() == ERROR_FILE_EXISTS)
-        {
-          printf("%s already exists. valgrind is already running or has been interrupted.\n", vg->lock_file);
-          printf("Exiting...\n");
-          goto free_filename;
-        }
-      if ((hf == INVALID_HANDLE_VALUE) && (GetLastError() != ERROR_FILE_NOT_FOUND))
-        {
-          printf("A non awaited error has raised (%ld).\n", GetLastError());
-          printf("Exiting...\n");
-          goto free_filename;
-        }
-    }
-
-  if (!LockFile(hf, 0, 0, length, 0))
-    {
-      printf("can not lock file\n");
-      printf("Exiting...\n");
-      goto close_file;
-    }
-  printf("filename : %s (%d)\n", fullfilename, length);
-  if (!WriteFile(hf, fullfilename, length, &written, NULL))
-    {
-      printf("can not write to file (%ld)\n", GetLastError());
-      printf("Exiting...\n");
-      goto unlock_file;
-    }
-  UnlockFile(hf, 0, 0, length, 0);
-  CloseHandle(hf);
-  free(fullfilename);
+  vg->map_file.handle = CreateFileMapping(INVALID_HANDLE_VALUE,
+                                          NULL, PAGE_READWRITE, 0, length,
+                                          "shared_filename");
+  if (!vg->map_file.handle)
+    goto unmap_size_base;
+  vg->map_file.base = MapViewOfFile(vg->map_file.handle, FILE_MAP_WRITE,
+                                    0, 0, length);
+  if (!vg->map_file.base)
+    goto close_file_mapping;
+  CopyMemory(vg->map_file.base, filename, length);
 
   return 1;
 
- unlock_file:
-  UnlockFile(hf, 0, 0, length, 0);
- close_file:
-  CloseHandle(hf);
- free_filename:
-  free(fullfilename);
+ close_file_mapping:
+  CloseHandle(vg->map_file.handle);
+ unmap_size_base:
+  UnmapViewOfFile(vg->map_size.base);
+ close_size_mapping:
+  CloseHandle(vg->map_size.handle);
 
   return 0;
+}
+
+void
+vg_unmap_filename(Vg *vg)
+{
+  UnmapViewOfFile(vg->map_file.base);
+  CloseHandle(vg->map_file.handle);
+  UnmapViewOfFile(vg->map_size.base);
+  CloseHandle(vg->map_size.handle);
 }
 
 int
@@ -374,16 +341,16 @@ int main(int argc, char *argv[])
   if (!vg)
     return -1;
 
-  if (!vg_lock(vg, argv[1]))
+  if (!vg_map_filename(vg, argv[1]))
     {
-      printf(" * impossible to create lock file\n * exiting...\n");
+      printf(" * impossible to map filename\n * exiting...\n");
       goto del_vg;
     }
 
   if (!vg_dll_inject(vg, argv[1]))
     {
       printf(" * injection failed\n * exiting...\n");
-      goto del_vg;
+      goto unmap_vg;
     }
 
   Sleep(2000);
@@ -391,11 +358,14 @@ int main(int argc, char *argv[])
 
   vg_dll_eject(vg);
 
+  vg_unmap_filename(vg);
   vg_del(vg);
   printf(" * ressources freed\n");
 
   return 0;
 
+ unmap_vg:
+  vg_unmap_filename(vg);
  del_vg:
   vg_del(vg);
 

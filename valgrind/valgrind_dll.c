@@ -159,7 +159,6 @@ _vgh_crt_name_get()
     {
       if(IsBadReadPtr((BYTE *)dos_headers + import_desc->Name,1) == 0)
         {
-          IMAGE_THUNK_DATA *thunk_data;
           char *module_name;
 
           module_name = (char *)((BYTE *)dos_headers + import_desc->Name);
@@ -182,26 +181,6 @@ _vgh_crt_name_get()
               res = _strdup(module_name);
               break;
             }
-
-          /* thunk_data = (IMAGE_THUNK_DATA *)((BYTE*)dos_headers + import_desc->FirstThunk); */
-
-          /* while (thunk_data->u1.Function) */
-          /*   { */
-          /*     IMAGE_IMPORT_BY_NAME *import_by_name; */
-          /*     import_by_name = (IMAGE_IMPORT_BY_NAME *)((BYTE *)dos_headers + thunk_data->u1.AddressOfData); */
-          /*     if (IsBadReadPtr(import_by_name, sizeof(IMAGE_IMPORT_BY_NAME)) == 0) */
-          /*       { */
-          /*         printf("function: %s\r\n", import_by_name->Name); */
-          /*         thunk_data++; */
-          /*       } */
-          /*     else */
-          /*       { */
-          /*         import_by_name = (IMAGE_IMPORT_BY_NAME *)(thunk_data); */
-          /*         printf("ordinal : %d\r\n", import_by_name->Hint); */
-          /*         import_by_name++; */
-          /*         thunk_data = (IMAGE_THUNK_DATA*)import_by_name; */
-          /*       } */
-          /*   } */
           import_desc = (IMAGE_IMPORT_DESCRIPTOR *)((BYTE *)import_desc + sizeof(IMAGE_IMPORT_DESCRIPTOR));
         }
       else
@@ -224,55 +203,72 @@ _vgh_crt_name_get()
 int
 vgh_init()
 {
-  char user_profile[4096];
-  char app_file[256];
-  char *lock_file;
-  HANDLE hf;
+  HANDLE handle;
+  void *base;
+  char *tmp;
   DWORD res;
+  int length;
 
-  res = GetEnvironmentVariable("USERPROFILE", user_profile, sizeof(user_profile));
-  if ((res == 0) || (res == 4096))
+  handle = OpenFileMapping(PAGE_READWRITE, FALSE, "shared_size");
+  if (!handle)
     return 0;
 
-  lock_file = malloc((res + sizeof("\\.valgrind")) * sizeof(char));
-  if (!lock_file)
+  base = MapViewOfFile(handle, FILE_MAP_READ, 0, 0, sizeof(int));
+  if (!base)
+    {
+      CloseHandle(handle);
+      return 0;
+    }
+
+  CopyMemory(&length, base, sizeof(int));
+  UnmapViewOfFile(base);
+  CloseHandle(handle);
+
+  handle = OpenFileMapping(PAGE_READWRITE, FALSE, "shared_filename");
+  if (!handle)
     return 0;
 
-  memcpy(lock_file, user_profile, res);
-  memcpy(lock_file + res, "\\.valgrind", sizeof("\\.valgrind"));
-
-  hf = CreateFile(lock_file, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL,
-                  NULL);
-  if (hf == INVALID_HANDLE_VALUE)
+  base = MapViewOfFile(handle, FILE_MAP_READ, 0, 0, length);
+  if (!base)
     {
-      if (GetLastError() == ERROR_FILE_NOT_FOUND)
-        printf("Can not find lock file %s\n", lock_file);
-      else
-        printf("Critical error when opening %s\n", lock_file);
+      CloseHandle(handle);
       return 0;
     }
 
-  if (!ReadFile(hf, app_file, sizeof(app_file), &res, NULL))
+  tmp = malloc(length * sizeof(char));
+  if (!tmp)
     {
-      printf("Can not read the content of %s\n", lock_file);
-      CloseHandle(hf);
+      UnmapViewOfFile(base);
+      CloseHandle(handle);
       return 0;
     }
 
-  if (res >= 255)
+  CopyMemory(tmp, base, length);
+  UnmapViewOfFile(base);
+  CloseHandle(handle);
+
+  length = GetFullPathName(tmp, 1, (char *)&res, NULL);
+  if (length == 0)
     {
-      printf("The content of %s is not a valid file name\n", lock_file);
-      CloseHandle(hf);
+      free(tmp);
       return 0;
     }
 
-  app_file[res] = '\0';
-  CloseHandle(hf);
-
-  vgh_instance.filename = _strdup(app_file);
+  vgh_instance.filename = malloc((length + 1) * sizeof(char));
   if (!vgh_instance.filename)
-    return 0;
+    {
+      free(tmp);
+      return 0;
+    }
+  length = GetFullPathName(tmp, length + 1, vgh_instance.filename, NULL);
+  if (length == 0)
+    {
+      free(vgh_instance.filename);
+      free(tmp);
+      return 0;
+    }
+
+  printf(" ** filename : %s\n", vgh_instance.filename);
 
   memcpy(vgh_instance.overloads, overloads_instance, sizeof(vgh_instance.overloads));
 
