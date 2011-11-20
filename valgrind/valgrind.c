@@ -49,7 +49,7 @@ _vg_symbol_get (const char *module, const char *symbol)
   mod = LoadLibrary(module);
   if (!mod)
     {
-      printf("failed\n", module);
+      printf("failed to load module %s\n", module);
       return NULL;
     }
   printf ("done\n");
@@ -58,7 +58,7 @@ _vg_symbol_get (const char *module, const char *symbol)
   proc = GetProcAddress(mod, symbol);
   if (!proc)
     {
-      printf("failed\n", symbol);
+      printf("failed to retrieve symbol %s\n", symbol);
       goto free_library;
     }
 
