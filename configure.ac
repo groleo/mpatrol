@@ -123,10 +123,51 @@ b = bfd_openr("", "");
       MPATROL_LIBS="${bfd_libs} -limagehlp -liberty"
       ;;
    *)
-      AC_CHECK_LIB([bfd], [bfd_openr],
-         [dumy="yes"],
-         [AC_MSG_ERROR([the symbol bfd_openr can not be found in libbfd.a or libbfd.a is missing])])
-      MPATROL_LIBS="-lbfd"
+      LIBS_save="$LIBS"
+      LIBS="$LIBS -lbfd"
+      AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM(
+             [[
+#include <bfd.h>
+             ]],
+             [[
+bfd *b;
+b = bfd_openr("", "");
+             ]])],
+         [
+          have_bfd="yes"
+          MPATROL_LIBS="-lbfd"
+         ],
+         [have_bfd="no"])
+      LIBS="$LIBS_save"
+      AC_MSG_CHECKING([whether bfd_openr is in -lbfd])
+      AC_MSG_RESULT([${have_bfd}])
+
+      if test "x$have_bfd" = "xno" ; then
+         LIBS_save="$LIBS"
+         LIBS="$LIBS -lbfd -ldl"
+         AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM(
+                [[
+#include <bfd.h>
+                ]],
+                [[
+bfd *b;
+b = bfd_openr("", "");
+                ]])],
+            [
+             have_bfd="yes"
+             MPATROL_LIBS="-lbfd -ldl"
+            ],
+            [have_bfd="no"])
+         LIBS="$LIBS_save"
+         AC_MSG_CHECKING([whether bfd_openr is in -lbfd -ldl])
+         AC_MSG_RESULT([${have_bfd}])
+      fi
+
+      if test "x$have_bfd" = "xno" ; then
+         AC_MSG_ERROR([the symbol bfd_openr can not be found in libbfd.a, or libbfd.a or libdl are missing])
+      fi
       ;;
 esac
 
