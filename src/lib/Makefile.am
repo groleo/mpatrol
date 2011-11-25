@@ -111,7 +111,7 @@ libmptools_la_SOURCES = dbmalloc.c dmalloc.c heapdiff.c mgauge.c mtrace.c
 
 libmptools_la_CPPFLAGS =
 libmptools_la_CFLAGS = $(MPATROL_CFLAGS)
-libmptools_la_LIBADD = $(top_builddir)/src/lib/libmpatrol.la
+libmptools_la_LIBADD = libmpatrol.la
 libmptools_la_LDFLAGS = $(MPATROL_LDFLAGS) -no-undefined -version-info @lt_version@
 
 if HAVE_WINDOWS
