@@ -449,7 +449,7 @@ __mp_heapinfo;
 
 /* The structure filled by mallinfo().
  */
-
+#ifndef __ANDROID__
 struct mallinfo
 {
     unsigned long arena;    /* total space in arena */
@@ -463,6 +463,7 @@ struct mallinfo
     unsigned long fordblks; /* space in free ordinary blocks */
     unsigned long keepcost; /* cost of enabling keep option */
 };
+#endif
 
 
 #ifndef NDEBUG

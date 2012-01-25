@@ -35,11 +35,11 @@ TOOLS  = ../../tools
 VPATH  = $(SOURCE):$(TOOLS)
 
 GUISUP	= false
-
+CFLAGS += -DHAVE_CONFIG_H -Wno-format -Wno-write-strings -fpermissive
 ifeq ($(GUISUP),true)
-CFLAGS	= -I$(SOURCE) -I$(TOOLS) -I/usr/X11R6/include -I/usr/X11R5/include -I/usr/X11/include -I/usr/X/include -DMP_GUI_SUPPORT=1
+CFLAGS	+= -I$(SOURCE) -I$(TOOLS) -I/usr/X11R6/include -I/usr/X11R5/include -I/usr/X11/include -I/usr/X/include -DMP_GUI_SUPPORT=1
 else
-CFLAGS	= -I$(SOURCE) -I$(TOOLS)
+CFLAGS	+= -I$(SOURCE) -I$(TOOLS)
 endif
 OFLAGS	= -O3 -fno-inline-functions
 SFLAGS	= -fPIC
