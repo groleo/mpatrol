@@ -120,7 +120,9 @@
  */
 #include <elf.h>
 #if SYSTEM == SYSTEM_LINUX
+#ifndef __ANDROID__
 #include <link.h>
+#endif
 #endif /* SYSTEM */
 #elif DYNLINK == DYNLINK_WINDOWS
 /* We use the imagehlp library on Windows platforms to obtain information about
