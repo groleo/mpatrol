@@ -1,8 +1,10 @@
 LOCAL_PATH:=$(call my-dir)
+
 TOP:=../../
 S:=$(TOP)/src
 T:=$(TOP)/tools
 TF:=$(TOP)/tests/fail
+
 SRC_FILES:=\
 	  $(S)/list.c $(S)/tree.c $(S)/slots.c $(S)/utils.c $(S)/memory.c $(S)/heap.c $(S)/alloc.c $(S)/info.c \
 	  $(S)/stack.c $(S)/addr.c $(S)/strtab.c $(S)/symbol.c $(S)/signals.c $(S)/diag.c $(S)/option.c \
