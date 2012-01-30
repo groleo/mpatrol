@@ -42,6 +42,9 @@
 typedef enum mutextype
 {
     MT_MAIN, /* main mpatrol library mutex */
+#if MP_LIBUNWIND_SUPPORT
+    MT_RECURSIVE, /* mutex for recursive calls */
+#endif
     MT_MAX   /* total number of mutex types */
 }
 mutextype;

@@ -1711,7 +1711,7 @@ __mp_printmap(infohead *h)
     allocnode *n;
     infonode *m;
     void *a, *b;
-    size_t l, s;
+    size_t l, s=0;
 
     a = NULL;
     __mp_diag("memory map:\n");
