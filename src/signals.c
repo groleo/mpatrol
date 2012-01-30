@@ -35,12 +35,15 @@
 #include <signal.h>
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
+#if SYSTEM == SYSTEM_ANDROID
+#include <unistd.h>
+#else
 #include <siginfo.h>
+#endif
 #endif /* MP_SIGINFO_SUPPORT */
 #elif TARGET == TARGET_WINDOWS
 #include <windows.h>
 #endif /* TARGET */
-
 
 #if MP_IDENT_SUPPORT
 #ident "$Id$"
@@ -74,9 +77,11 @@ signalhandler(int s, siginfo_t *n, void *p)
 #if SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_FREEBSD || \
     SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS || \
+    SYSTEM == SYSTEM_ANDROID
 #if SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS || \
+    SYSTEM == SYSTEM_ANDROID
 static
 void
 signalhandler(int s, int c, struct sigcontext *n, void *f)
@@ -147,7 +152,8 @@ signalhandler(EXCEPTION_POINTERS *e)
 #if MP_SIGINFO_SUPPORT || SYSTEM == SYSTEM_AIX || SYSTEM == SYSTEM_FREEBSD || \
     SYSTEM == SYSTEM_IRIX || SYSTEM == SYSTEM_LINUX || \
     SYSTEM == SYSTEM_LYNXOS || SYSTEM == SYSTEM_NETBSD || \
-    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+    SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS || \
+    SYSTEM == SYSTEM_ANDROID
 #if MP_SIGINFO_SUPPORT
     if ((n != NULL) && (n->si_code > 0))
     {
@@ -174,7 +180,8 @@ signalhandler(EXCEPTION_POINTERS *e)
 #if SYSTEM == SYSTEM_AIX
         a = (void *) n->sc_jmpbuf.jmp_context.o_vaddr;
 #elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS || \
+      SYSTEM == SYSTEM_ANDROID
         a = f;
 #elif SYSTEM == SYSTEM_IRIX
         a = (void *) ((long) n->sc_badvaddr);
@@ -313,7 +320,8 @@ __mp_initsignals(sighead *s)
 #if TARGET == TARGET_UNIX
 #if MP_SIGINFO_SUPPORT
     i.sa_flags = SA_SIGINFO;
-    (void *) i.sa_handler = (void *) signalhandler;
+    //(void *) i.sa_handler = (void *) signalhandler;
+    i.sa_handler = signalhandler;
     sigfillset(&i.sa_mask);
     sigaction(SIGBUS, &i, NULL);
     sigaction(SIGSEGV, &i, NULL);
@@ -371,7 +379,8 @@ MP_GLOBAL
 void
 __mp_abort(void)
 {
-#if TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS
+
+#if SYSTEM != SYSTEM_ANDROID && (TARGET == TARGET_UNIX || TARGET == TARGET_WINDOWS)
     /* Send the current process an ABORT signal for use in a debugger.
      * Used on systems where this is supported.
      */

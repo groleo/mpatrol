@@ -498,7 +498,7 @@ extern struct obj_list *__rld_obj_head;
  * a text symbol.
  */
 
-#if SYSTEM != SYSTEM_LINUX
+#if SYSTEM != SYSTEM_LINUX || defined(__ANDROID__)
 #pragma weak _DYNAMIC
 void _DYNAMIC(void);
 #endif /* SYSTEM */
@@ -1985,7 +1985,7 @@ __mp_addsymbols(symhead *y, char *s, char *v, size_t b)
 }
 
 
-#if DYNLINK == DYNLINK_SVR4 && SYSTEM == SYSTEM_LINUX
+#if DYNLINK == DYNLINK_SVR4 && SYSTEM == SYSTEM_LINUX && !defined(__ANDROID__)
 /* The callback function called to allocate a set of symbol nodes for each
  * shared object located by dl_iterate_phdr().
  */
@@ -2041,7 +2041,7 @@ __mp_addextsymbols(symhead *y, memoryinfo *e)
     size_t c, l, n;
     size_t b;
 #elif DYNLINK == DYNLINK_SVR4
-#if SYSTEM != SYSTEM_LINUX
+#if SYSTEM != SYSTEM_LINUX || defined(__ANDROID__)
 #if ENVIRON == ENVIRON_64
     Elf64_Dyn *d;
 #else /* ENVIRON */
@@ -2253,7 +2253,7 @@ __mp_addextsymbols(symhead *y, memoryinfo *e)
                 }
         }
 #elif DYNLINK == DYNLINK_SVR4
-#if SYSTEM == SYSTEM_LINUX
+#if SYSTEM == SYSTEM_LINUX && !defined(__ANDROID__)
     if (dl_iterate_phdr(addlibrary, y) != 0)
         return 0;
 #else /* SYSTEM */

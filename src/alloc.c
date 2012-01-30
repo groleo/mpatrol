@@ -566,8 +566,8 @@ MP_GLOBAL
 void
 __mp_freealloc(allochead *h, allocnode *n, void *i)
 {
-    void *p;
-    size_t l, s;
+    void *p=NULL;
+    size_t l, s=0;
 
     /* If we are keeping the details (and possibly the contents) of a specified
      * number of recently freed memory allocations then we may have to recycle

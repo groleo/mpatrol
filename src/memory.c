@@ -46,7 +46,11 @@
 #include <setjmp.h>
 #include <signal.h>
 #if MP_SIGINFO_SUPPORT
+#if SYSTEM == SYSTEM_ANDROID
+#include <unistd.h>
+#else
 #include <siginfo.h>
+#endif
 #endif /* MP_SIGINFO_SUPPORT */
 #include <fcntl.h>
 #include <unistd.h>
@@ -754,7 +758,8 @@ __mp_memquery(memoryinfo *i, void *p)
      */
 #if MP_SIGINFO_SUPPORT
     s.sa_flags = 0;
-    (void *) s.sa_handler = (void *) memoryhandler;
+    //(void *) s.sa_handler = (void *) memoryhandler;
+    s.sa_handler = memoryhandler;
     sigfillset(&s.sa_mask);
     sigaction(SIGBUS, &s, &membushandler);
     sigaction(SIGSEGV, &s, &memsegvhandler);

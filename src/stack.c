@@ -63,6 +63,9 @@
 #endif /* MP_GLIBCBACKTRACE_SUPPORT && MP_LIBRARYSTACK_SUPPORT */
 #endif /* MP_BUILTINSTACK_SUPPORT && MP_LIBUNWIND_SUPPORT */
 
+#if MP_THREADS_SUPPORT
+#include <mutex.h>
+#endif
 
 #if MP_IDENT_SUPPORT
 #ident "$Id$"
@@ -135,13 +138,13 @@ extern "C"
 
 #if !MP_BUILTINSTACK_SUPPORT && !MP_GLIBCBACKTRACE_SUPPORT && \
     TARGET == TARGET_UNIX
-#if MP_LIBUNWIND_SUPPORT
+#if MP_LIBUNWIND_SUPPORT && MP_THREADS_SUPPORT
 /* libunwind itself does some memory allocations, which will then cause infinite
  * recursion.  This variable acts as a per-thread lock to prevent that from
  * happening.
  */
 
-static __thread int recursive;
+static int recursive;
 #elif MP_LIBRARYSTACK_SUPPORT
 #if SYSTEM == SYSTEM_HPUX
 /* The following function is defined in the HP/UX traceback library (libcl).
@@ -506,9 +509,11 @@ __mp_getframe(stackinfo *p)
      * stack frames in a machine-independent way.  Instead of a frame pointer
      * we just use the stack pointer returned by unw_get_reg().
      */
+    __mp_lockmutex(MT_RECURSIVE);
     if (!recursive)
     {
         recursive = 1;
+        __mp_unlockmutex(MT_RECURSIVE);
         if (p->frame == NULL)
         {
             unw_getcontext(&p->context);
@@ -527,8 +532,10 @@ __mp_getframe(stackinfo *p)
             p->frame = NULL;
             p->addr = NULL;
         }
+        __mp_lockmutex(MT_RECURSIVE);
         recursive = 0;
     }
+    __mp_unlockmutex(MT_RECURSIVE);
 #elif MP_LIBRARYSTACK_SUPPORT
     /* HP/UX, IRIX, Tru64 and Windows platforms provide a library for
      * traversing function call stack frames since the stack frame format

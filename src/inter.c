@@ -555,7 +555,6 @@ __mp_reinit(void)
     allocnode *n;
     treenode *t;
     unsigned long i;
-
     savesignals();
     if (!memhead.init)
         __mp_init();
@@ -859,8 +858,10 @@ __mp_alloc(size_t l, size_t a, alloctype f, char *s, char *t, unsigned long u,
         if (l == 0)
             l = 1;
         if ((p = sbrk(l)) == (void *) -1)
-            if ((f == AT_ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC))
+            if ((f == AT_ALLOCA) || (f == AT_XMALLOC) || (f == AT_XCALLOC)) {
+                __mp_diag("FAIL:\n");
                 abort();
+            }
             else
                 p = NULL;
         else if ((f == AT_CALLOC) || (f == AT_XCALLOC))

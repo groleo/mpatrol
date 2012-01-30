@@ -112,6 +112,7 @@
 #define SYSTEM_SUNOS    16 /* SunOS */
 #define SYSTEM_TRU64    17 /* Compaq Tru64 / Digital UNIX / OSF/1 */
 #define SYSTEM_UNIXWARE 18 /* UnixWare */
+#define SYSTEM_ANDROID  19 /* Android */
 
 
 #ifndef SYSTEM
@@ -207,6 +208,8 @@
 #define SYSTEM_STR "Tru64"
 #elif SYSTEM == SYSTEM_UNIXWARE
 #define SYSTEM_STR "UnixWare"
+#elif SYSTEM == SYSTEM_ANDROID
+#define SYSTEM_STR "Android"
 #else /* SYSTEM */
 #define SYSTEM_STR "Unknown"
 #endif /* SYSTEM */
@@ -413,7 +416,7 @@
 #elif SYSTEM == SYSTEM_DGUX || SYSTEM == SYSTEM_DRSNX || \
       SYSTEM == SYSTEM_DYNIX || SYSTEM == SYSTEM_IRIX || \
       SYSTEM == SYSTEM_SINIX || SYSTEM == SYSTEM_SOLARIS || \
-      SYSTEM == SYSTEM_UNIXWARE
+      SYSTEM == SYSTEM_UNIXWARE || SYSTEM == SYSTEM_ANDROID
 #if ENVIRON == ENVIRON_64
 #define FORMAT FORMAT_ELF64
 #else /* ENVIRON */
@@ -505,7 +508,8 @@
       SYSTEM == SYSTEM_UNIXWARE
 #define DYNLINK DYNLINK_SVR4
 #elif SYSTEM == SYSTEM_FREEBSD || SYSTEM == SYSTEM_NETBSD || \
-      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS
+      SYSTEM == SYSTEM_OPENBSD || SYSTEM == SYSTEM_SUNOS  || \
+      SYSTEM == SYSTEM_ANDROID
 #ifdef __ELF__
 #define DYNLINK DYNLINK_SVR4
 #else /* __ELF__ */

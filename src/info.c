@@ -307,7 +307,7 @@ void *
 __mp_getmemory(infohead *h, size_t l, size_t a, loginfo *v)
 {
     allocnode *n;
-    allocanode *g;
+    allocanode *g=NULL;
     infonode *m;
     void *p;
     unsigned long c, t;

@@ -47,5 +47,6 @@
 /* Version number of package */
 #define VERSION "1.4.8"
 
-#define FORMAT FORMAT_ELF32
-#define SYSTEM SYSTEM_NETBSD
+#define SYSTEM SYSTEM_ANDROID
+#define MP_LIBUNWIND_SUPPORT 1
+#define MP_THREADS_SUPPORT 1
